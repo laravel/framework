@@ -53,9 +53,11 @@ trait ManagesFrequencies
     private function inTimeInterval($startTime, $endTime)
     {
         return function () use ($startTime, $endTime) {
-            $now = Carbon::now()->getTimestamp();
-
-            return $now >= strtotime($startTime) && $now <= strtotime($endTime);
+            return Carbon::now($this->timezone)->between(
+                Carbon::parse($startTime, $this->timezone),
+                Carbon::parse($endTime, $this->timezone),
+                true
+            );
         };
     }
 
@@ -271,6 +273,22 @@ trait ManagesFrequencies
         $this->dailyAt($time);
 
         return $this->spliceIntoPosition(3, $day);
+    }
+
+    /**
+     * Schedule the event to run twice monthly.
+     *
+     * @param  int  $first
+     * @param  int  $second
+     * @return $this
+     */
+    public function twiceMonthly($first = 1, $second = 16)
+    {
+        $days = $first.','.$second;
+
+        return $this->spliceIntoPosition(1, 0)
+            ->spliceIntoPosition(2, 0)
+            ->spliceIntoPosition(3, $days);
     }
 
     /**
