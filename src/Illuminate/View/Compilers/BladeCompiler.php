@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Compilers;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
