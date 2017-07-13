@@ -3,8 +3,9 @@
 namespace Illuminate\Cache;
 
 use Closure;
-use DateTime;
 use ArrayAccess;
+use DateInterval;
+use DateTimeInterface;
 use BadMethodCallException;
 use Illuminate\Support\Carbon;
 use Illuminate\Cache\Events\CacheHit;
@@ -159,7 +160,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @return void
      */
     public function put($key, $value, $minutes = null)
@@ -179,7 +180,7 @@ class Repository implements CacheContract, ArrayAccess
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
-     * @param  float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @return void
      */
     public function putMany(array $values, $minutes)
@@ -198,7 +199,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @return bool
      */
     public function add($key, $value, $minutes)
@@ -270,7 +271,7 @@ class Repository implements CacheContract, ArrayAccess
      * Get an item from the cache, or store the default value.
      *
      * @param  string  $key
-     * @param  \DateTime|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
      * @param  \Closure  $callback
      * @return mixed
      */
@@ -477,13 +478,17 @@ class Repository implements CacheContract, ArrayAccess
     /**
      * Calculate the number of minutes with the given duration.
      *
-     * @param  \DateTime|float|int  $duration
+     * @param  \DateTimeInterface|\DateInterval|float|int  $duration
      * @return float|int|null
      */
     protected function getMinutes($duration)
     {
-        if ($duration instanceof DateTime) {
-            $duration = Carbon::now()->diffInSeconds(Carbon::instance($duration), false) / 60;
+        if ($duration instanceof DateInterval) {
+            $duration = Carbon::now()->add($duration);
+        }
+
+        if ($duration instanceof DateTimeInterface) {
+            $duration = Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($duration->getTimestamp()), false) / 60;
         }
 
         return (int) ($duration * 60) > 0 ? $duration : null;

@@ -2,7 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
+use DateTime;
+use DateInterval;
 use Mockery as m;
+use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
@@ -134,6 +137,32 @@ class CacheRepositoryTest extends TestCase
         $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
         $repository = new \Illuminate\Cache\Repository($store);
         $this->assertTrue($repository->add('k', 'v', 60));
+    }
+
+    public function dataProviderTestGetMinutes()
+    {
+        return [
+            [Carbon::now()->addMinutes(5)],
+            [(new DateTime('2017-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [(new DateTimeImmutable('2017-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [new DateInterval('PT5M')],
+            [5],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderTestGetMinutes
+     * @param mixed $duration
+     */
+    public function testGetMinutes($duration)
+    {
+        Carbon::setTestNow(Carbon::parse('2017-07-25 12:13:14 UTC'));
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 5);
+        $repo->put($key, $value, $duration);
+
+        Carbon::setTestNow();
     }
 
     public function testRegisterMacroWithNonStaticCall()
