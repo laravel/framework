@@ -17,6 +17,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \Eloquent
  */
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
