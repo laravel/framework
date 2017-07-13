@@ -4,7 +4,7 @@ namespace DummyNamespace;
 
 use Illuminate\Contracts\View\BladeExtension;
 
-class DummyClassExtension implements BladeExtension
+class DummyClass implements BladeExtension
 {
     /**
      * Get custom directives this extension provides

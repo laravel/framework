@@ -51,6 +51,22 @@ class BladeExtensionMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the desired class name from the input.
+     *
+     * @return string
+     */
+    protected function getNameInput()
+    {
+        $name = trim($this->argument('name'));
+
+        if (Str::endsWith($name, 'Extension')) {
+            return $name;
+        }
+
+        return sprintf("%sExtension", $name);
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
