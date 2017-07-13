@@ -209,7 +209,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerBladeExtensionMakeCommand()
     {
         $this->app->singleton('command.blade.make', function ($app) {
-            return new BladeExtensionMakeCommand;
+            return new BladeExtensionMakeCommand($app['files']);
         });
     }
 
