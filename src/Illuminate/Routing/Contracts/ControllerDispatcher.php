@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Contracts\Routing;
+namespace Illuminate\Routing\Contracts;
 
 use Illuminate\Routing\Route;
 

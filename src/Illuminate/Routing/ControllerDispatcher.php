@@ -3,7 +3,7 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
-use Illuminate\Contracts\Routing\ControllerDispatcher as ControllerDispatcherContract;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
 class ControllerDispatcher implements ControllerDispatcherContract
 {
