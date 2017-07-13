@@ -250,14 +250,8 @@ class Builder
      */
     public function selectSub($query, $as)
     {
-        // If the given query is a Closure, we will execute it while passing in a new
-        // query instance to the Closure. This will give the developer a chance to
-        // format and work with the query before we cast it to a raw SQL string.
-        if ($query instanceof Closure) {
-            $callback = $query;
-
-            $callback($query = $this->newQuery());
-        }
+        // parse the query.
+        $query = $this->getQueryFromClosure($query);
 
         // Here, we will parse this query into an SQL string and an array of bindings
         // so we can add it to the query builder using the selectRaw method so the
@@ -267,6 +261,23 @@ class Builder
         return $this->selectRaw(
             '('.$query.') as '.$this->grammar->wrap($as), $bindings
         );
+    }
+
+    /**
+     * @param $query
+     * @return Builder
+     */
+    protected function getQueryFromClosure($query)
+    {
+        // If the given query is a Closure, we will execute it while passing in a new
+        // query instance to the Closure. This will give the developer a chance to
+        // format and work with the query before we cast it to a raw SQL string.
+        if ($query instanceof Closure) {
+            $callback = $query;
+
+            $callback($query = $this->newQuery());
+        }
+        return $query;
     }
 
     /**
@@ -341,6 +352,11 @@ class Builder
      */
     public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
     {
+        // If the table is a closure or an instance of Builder it will be
+        // parsed as a subquery with the table name the subquery queries
+        // from as the 'as' value for the subquery.
+        $table = $this->parseJoinWithSubQuery($table);
+
         $join = new JoinClause($this, $type, $table);
 
         // If the first "column" of the join is really a Closure instance the developer
@@ -366,6 +382,70 @@ class Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Add a join clause to the query using a sub query.
+     *
+     * @param        $query
+     * @param        $as
+     * @param        $first
+     * @param        $operator
+     * @param        $second
+     * @param string $type
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function joinSub($query, $as, $first, $operator, $second, $type = 'inner')
+    {
+        $table = $this->parseJoinWithSubQuery($query, $as);
+
+        return $this->join($table, $first, $operator, $second, $type);
+    }
+
+    /**
+     * @param $table
+     *
+     * @param null $as
+     * @return Expression
+     */
+    protected function parseJoinWithSubQuery($table, $as = null)
+    {
+        if ($table instanceof self || $table instanceof Closure) {
+
+            // If the given query is a Closure, we will execute it while passing in a new
+            // query instance to the Closure. This will give the developer a chance to
+            // format and work with the query before we cast it to a raw SQL string.
+            $query = $this->getQueryFromClosure($table);
+
+            // if the given as name is null, we will extract the table name from the
+            // query, giving the developer the possibility to just use the existing
+            // join methods, with a closure or builder object as first parameter.
+            $as = is_null($as) ? $query->from : $as;
+
+            // build the resulting subquery and merge the bindings of the given query into
+            // the base query.
+            $table = $this->mergeJoinWithSubQuery($query, $as);
+        }
+
+        return $table;
+    }
+
+    /**
+     * @param $query
+     * @param $as
+     *
+     * @return \Illuminate\Database\Query\Expression
+     */
+    protected function mergeJoinWithSubQuery(Builder $query, $as)
+    {
+        $table = new Expression(
+            '(' . $query->toSql() . ') as ' . $this->grammar->wrap($as)
+        );
+
+        $this->mergeBindings($query);
+
+        return $table;
     }
 
     /**
@@ -412,6 +492,22 @@ class Builder
     }
 
     /**
+     * Add a left join clause to the query using a sub query.
+     *
+     * @param $query
+     * @param $as
+     * @param $first
+     * @param $operator
+     * @param $second
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function leftJoinSub($query, $as, $first, $operator, $second)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'left');
+    }
+
+    /**
      * Add a right join to the query.
      *
      * @param  string  $table
@@ -437,6 +533,22 @@ class Builder
     public function rightJoinWhere($table, $first, $operator, $second)
     {
         return $this->joinWhere($table, $first, $operator, $second, 'right');
+    }
+
+    /**
+     * Add a right join clause to the query using a sub query.
+     *
+     * @param $query
+     * @param $as
+     * @param $first
+     * @param $operator
+     * @param $second
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function rightJoinSub($query, $as, $first, $operator, $second)
+    {
+        return $this->joinSub($query, $as, $first, $operator, $second, 'right');
     }
 
     /**
@@ -555,7 +667,7 @@ class Builder
             'type', 'column', 'operator', 'value', 'boolean'
         );
 
-        if (! $value instanceof Expression) {
+        if (!$value instanceof Expression) {
             $this->addBinding($value, 'where');
         }
 
