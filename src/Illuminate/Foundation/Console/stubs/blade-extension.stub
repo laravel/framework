@@ -7,7 +7,7 @@ use Illuminate\Contracts\View\BladeExtension;
 class DummyClass implements BladeExtension
 {
     /**
-     * Get custom directives this extension provides
+     * Define custom blade directives
      *
      * @example
      * return ['foo' => [$this, 'doFoo']]
@@ -20,7 +20,7 @@ class DummyClass implements BladeExtension
     }
 
     /**
-     * Get custom conditional directives this extension provides
+     * Define custom conditional blade directives
      *
      * @example
      * return ['bar' => [$this, 'isBar']]
