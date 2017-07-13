@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Compilers;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -355,10 +354,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return void
      */
-    public function if($name, Closure $callback)
+    public function if($name, callable $callback)
     {
         $this->conditions[$name] = $callback;
 
