@@ -736,6 +736,13 @@ class SupportHelpersTest extends TestCase
     {
         throw_if(true, RuntimeException::class, 'Test Message');
     }
+
+    public function testOpt()
+    {
+        $this->assertEquals('a', opt(true, 'a', 'b'));
+        $this->assertEquals('b', opt(false, 'a', 'b'));
+        $this->assertNull(opt(false, 'a'));
+    }
 }
 
 trait SupportTestTraitOne
