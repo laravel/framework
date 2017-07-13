@@ -240,7 +240,7 @@ class PostgresGrammar extends Grammar
         $using_tables = [];
 
         if (isset($query->joins)) {
-            collect($query->joins)->each(function ($join) use ($query, &$using_tables, &$joins_wheres){
+            collect($query->joins)->each(function ($join) use ($query, &$using_tables, &$joins_wheres) {
                 array_push($using_tables, $this->wrapTable($join->table));
                 $joins_wheres = array_merge($joins_wheres, $join->wheres);
             });
@@ -255,7 +255,7 @@ class PostgresGrammar extends Grammar
 
         return trim("delete from {$table}{$using}{$where}");
     }
-    
+
     /**
      * Compile a truncate table statement into SQL.
      *
