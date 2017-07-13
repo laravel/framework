@@ -13,7 +13,9 @@ class MorphMany extends MorphOneOrMany
      */
     public function getResults()
     {
-        return $this->query->get();
+        return tap($this->query->get(), function ($result) {
+            $this->setInverseRelation($result);
+        });
     }
 
     /**
