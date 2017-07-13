@@ -297,11 +297,11 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function apiResource($name, $controller, array $options = [])
     {
-        $this->resource($name, $controller, array_merge([
+        return $this->resource($name, $controller, array_merge([
             'only' => ['index', 'show', 'store', 'update', 'destroy'],
         ], $options));
     }
