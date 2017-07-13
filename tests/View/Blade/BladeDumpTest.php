@@ -6,18 +6,18 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeDdTest extends TestCase
+class BladeDumpTest extends TestCase
 {
     public function tearDown()
     {
         m::close();
     }
 
-    public function testDdStatementsAreCompiled()
+    public function testDumpStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php dd(\'foo\'); ?>', $compiler->compileString('@dd(\'foo\')'));
-        $this->assertEquals('<?php dd($foo); ?>', $compiler->compileString('@dd($foo)'));
+        $this->assertEquals('<?php dd(\'foo\'); ?>', $compiler->compileString('@dump(\'foo\')'));
+        $this->assertEquals('<?php dd($foo); ?>', $compiler->compileString('@dump($foo)'));
     }
 
     protected function getFiles()

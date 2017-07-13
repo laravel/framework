@@ -2,15 +2,15 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
-trait CompilesDd
+trait CompilesDump
 {
     /**
-     * Compile the dd statements into valid PHP.
+     * Compile the dump statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
      */
-    protected function compileDd($expression)
+    protected function compileDump($expression)
     {
         return "<?php dd{$expression}; ?>";
     }
