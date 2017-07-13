@@ -317,6 +317,15 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('Baz', class_basename('Baz'));
     }
 
+    public function testClassNames()
+    {
+        $this->assertEquals('foo bar', class_names(['foo' => true, 'bar' => true]));
+        $this->assertEquals('foo bar', class_names('foo', 'bar'));
+        $this->assertEquals('foo bar', class_names('foo', ['bar' => true]));
+        $this->assertEquals('foo bar', class_names(['foo' => true], ['bar' => true]));
+        $this->assertEquals('foo bar', class_names('foo', ['bar' => true], ['baz' => false]));
+    }
+
     public function testValue()
     {
         $this->assertEquals('foo', value('foo'));

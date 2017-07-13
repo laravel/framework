@@ -358,6 +358,27 @@ if (! function_exists('class_basename')) {
     }
 }
 
+if (! function_exists('class_names')) {
+    /**
+     * A simple utility for conditionally joining class names together.
+     *
+     * @param  string|array $classNames
+     * @return string
+     */
+    function class_names()
+    {
+        $classes = array_reduce(func_get_args(), function ($accumulator, $current) {
+            return array_merge($accumulator, is_array($current) ? $current : [$current => true]);
+        }, []);
+
+        $classNames = array_map(function ($expression, $class) {
+            return $expression ? $class : null;
+        }, array_values($classes), array_keys($classes));
+
+        return implode(' ', array_filter($classNames));
+    }
+}
+
 if (! function_exists('class_uses_recursive')) {
     /**
      * Returns all traits used by a class, its subclasses and trait of their traits.
