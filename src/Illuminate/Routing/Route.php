@@ -754,7 +754,8 @@ class Route
      *
      * @return ControllerDispatcherContract
      */
-    public function controllerDispatcher() {
+    public function controllerDispatcher()
+    {
         if ($this->container->bound(ControllerDispatcherContract::class)) {
             return $this->container->make(ControllerDispatcherContract::class);
         }
