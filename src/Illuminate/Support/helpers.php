@@ -1071,3 +1071,18 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('opt')) {
+    /**
+     * Functional equivalent of ternary operator. Useful shorthand in Blade templates.
+     *
+     * @param  mixed  $condition
+     * @param  mixed  $object
+     * @param  mixed  $object
+     * @return mixed
+     */
+    function opt($condition, $a, $b = null)
+    {
+        return $condition ? $a : $b;
+    }
+}
