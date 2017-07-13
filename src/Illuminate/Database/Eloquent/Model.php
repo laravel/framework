@@ -16,7 +16,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 /**
- * @abstract
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
