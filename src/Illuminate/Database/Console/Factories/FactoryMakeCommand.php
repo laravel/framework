@@ -3,7 +3,7 @@
 namespace Illuminate\Database\Console\Factories;
 
 use Illuminate\Console\GeneratorCommand;
-use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class FactoryMakeCommand extends GeneratorCommand
 {
@@ -46,11 +46,9 @@ class FactoryMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $model = $this->qualifyClass($this->argument('name'));
-
-        if ($this->argument('model')) {
-            $model = $this->qualifyClass($this->argument('model'));
-        }
+        $model = $this->option('model')
+                        ? $this->qualifyClass($this->option('model'))
+                        : 'Model';
 
         return str_replace(
             'DummyModel', $model, parent::buildClass($name)
@@ -67,16 +65,20 @@ class FactoryMakeCommand extends GeneratorCommand
     {
         $name = str_replace(
             ['\\', '/'], '', $this->argument('name')
-        ).'Factory';
+        );
 
         return $this->laravel->databasePath()."/factories/{$name}.php";
     }
 
-    protected function getArguments()
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
     {
         return [
-            parent::getArguments()[0],
-            ['model', InputArgument::OPTIONAL, 'The name of the model to create'],
+            ['model', null, InputOption::VALUE_OPTIONAL, 'The name of the model'],
         ];
     }
 }
