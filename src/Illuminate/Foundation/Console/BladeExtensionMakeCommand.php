@@ -27,7 +27,7 @@ class BladeExtensionMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $type = 'BladeExtension';
+    protected $type = 'Blade Extension';
 
     /**
      * Get the stub file for the generator.
