@@ -17,7 +17,13 @@ class HasOne extends HasOneOrMany
      */
     public function getResults()
     {
-        return $this->query->first() ?: $this->getDefaultFor($this->parent);
+        if (! $result = $this->query->first()) {
+            return $this->getDefaultFor($this->parent);
+        }
+
+        $this->setInverseRelation($result);
+
+        return $result;
     }
 
     /**
@@ -57,8 +63,10 @@ class HasOne extends HasOneOrMany
      */
     public function newRelatedInstanceFor(Model $parent)
     {
-        return $this->related->newInstance()->setAttribute(
-            $this->getForeignKeyName(), $parent->{$this->localKey}
-        );
+        return tap($this->related->newInstance(), function ($model) use ($parent) {
+            $model->setAttribute($this->getForeignKeyName(), $parent->getAttribute($this->localKey));
+
+            $this->setInverseRelation($model, $parent);
+        });
     }
 }

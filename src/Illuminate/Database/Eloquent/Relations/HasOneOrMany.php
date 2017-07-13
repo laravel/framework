@@ -47,6 +47,45 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Assign the inverse side name of the relationship to be populated.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function inversedBy($name)
+    {
+        $this->inverseSide = $name;
+
+        return $this;
+    }
+
+    /**
+     * Set the inverse side of the relationship on the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection  $models
+     * @param  \Illuminate\Database\Eloquent\Mode|null  $parent
+     * @return void
+     */
+    protected function setInverseRelation($models, $parent = null)
+    {
+        if (! $this->inverseSide) {
+            return;
+        }
+
+        if (! $parent) {
+            $parent = $this->parent;
+        }
+
+        if ($models instanceof Collection) {
+            $models->each(function ($model) use ($parent) {
+                $model->setRelation($this->inverseSide, $parent);
+            });
+        } else {
+            $models->setRelation($this->inverseSide, $parent);
+        }
+    }
+
+    /**
      * Create and return an un-saved instance of the related model.
      *
      * @param  array  $attributes
@@ -55,7 +94,10 @@ abstract class HasOneOrMany extends Relation
     public function make(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
+
             $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+
+            $this->setInverseRelation($instance);
         });
     }
 
@@ -130,9 +172,11 @@ abstract class HasOneOrMany extends Relation
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
             if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
-                $model->setRelation(
-                    $relation, $this->getRelationValue($dictionary, $key, $type)
-                );
+                $related = $this->getRelationValue($dictionary, $key, $type);
+
+                $this->setInverseRelation($related, $model);
+
+                $model->setRelation($relation, $related);
             }
         }
 
@@ -191,6 +235,8 @@ abstract class HasOneOrMany extends Relation
             $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
         }
 
+        $this->setInverseRelation($instance);
+
         return $instance;
     }
 
@@ -209,6 +255,8 @@ abstract class HasOneOrMany extends Relation
             $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
         }
 
+        $this->setInverseRelation($instance);
+
         return $instance;
     }
 
@@ -223,6 +271,8 @@ abstract class HasOneOrMany extends Relation
     {
         if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->create($attributes + $values);
+        } else {
+            $this->setInverseRelation($instance);
         }
 
         return $instance;
@@ -254,6 +304,8 @@ abstract class HasOneOrMany extends Relation
     {
         $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
 
+        $this->setInverseRelation($model);
+
         return $model->save() ? $model : false;
     }
 
@@ -282,6 +334,8 @@ abstract class HasOneOrMany extends Relation
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
             $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+
+            $this->setInverseRelation($instance);
 
             $instance->save();
         });
