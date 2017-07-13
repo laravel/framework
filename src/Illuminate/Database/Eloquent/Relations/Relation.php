@@ -337,7 +337,7 @@ abstract class Relation
             return $this->macroCall($method, $parameters);
         }
 
-        $result = call_user_func_array([$this->query, $method], $parameters);
+        $result = $this->query->{$method}(...$parameters);
 
         if ($result === $this->query) {
             return $this;
