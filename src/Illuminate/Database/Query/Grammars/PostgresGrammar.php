@@ -227,6 +227,36 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a delete statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileDelete(Builder $query)
+    {
+        $table = $this->wrapTable($query->from);
+
+        $joins_wheres = [];
+        $using_tables = [];
+
+        if (isset($query->joins)) {
+            collect($query->joins)->each(function ($join) use ($query, &$using_tables, &$joins_wheres) {
+                array_push($using_tables, $this->wrapTable($join->table));
+                $joins_wheres = array_merge($joins_wheres, $join->wheres);
+            });
+
+            if (count($joins_wheres)) {
+                $query->wheres = is_array($query->wheres) ? array_merge($joins_wheres, $query->wheres) : $joins_wheres;
+            }
+        }
+
+        $where = count($query->wheres) ? $this->compileWheres($query) : '';
+        $using = count($using_tables) ? ' USING '.implode(', ', $using_tables).' ' : '';
+
+        return trim("delete from {$table}{$using}{$where}");
+    }
+
+    /**
      * Compile a truncate table statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
