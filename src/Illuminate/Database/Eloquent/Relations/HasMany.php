@@ -13,7 +13,9 @@ class HasMany extends HasOneOrMany
      */
     public function getResults()
     {
-        return $this->query->get();
+        return tap($this->query->get(), function ($results) {
+            $this->setInverseRelation($results);
+        });
     }
 
     /**

@@ -52,6 +52,13 @@ abstract class Relation
     protected static $morphMap = [];
 
     /**
+     * The inverse side of the relationship.
+     *
+     * @var string
+     */
+    protected $inverseSide;
+
+    /**
      * Create a new relation instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -138,6 +145,17 @@ abstract class Relation
     public function getEager()
     {
         return $this->get();
+    }
+
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function get($columns = ['*'])
+    {
+        return $this->query->get($columns);
     }
 
     /**
@@ -342,6 +360,8 @@ abstract class Relation
         if ($result === $this->query) {
             return $this;
         }
+
+        $this->setInverseRelation($result);
 
         return $result;
     }

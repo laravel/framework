@@ -199,6 +199,8 @@ abstract class MorphOneOrMany extends HasOneOrMany
         $model->{$this->getForeignKeyName()} = $this->getParentKey();
 
         $model->{$this->getMorphType()} = $this->morphClass;
+
+        $this->setInverseRelation($model);
     }
 
     /**
