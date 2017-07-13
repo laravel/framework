@@ -240,14 +240,14 @@ class PostgresGrammar extends Grammar
         $using_tables = [];
 
         if (isset($query->joins)) {
-            collect($query->joins)->each(function($join) use ($query, &$using_tables, &$joins_wheres){
+            collect($query->joins)->each(function ($join) use ($query, &$using_tables, &$joins_wheres){
                 array_push($using_tables, $this->wrapTable($join->table));
                 $joins_wheres = array_merge($joins_wheres, $join->wheres);
             });
 
             if (count($joins_wheres)) {
                 $query->wheres = is_array($query->wheres) ? array_merge($joins_wheres, $query->wheres) : $joins_wheres;
-             }
+            }
         }
 
         $where = count($query->wheres) ? $this->compileWheres($query) : '';
