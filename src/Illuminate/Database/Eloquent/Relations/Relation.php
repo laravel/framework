@@ -10,7 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
-/** @mixin \Eloquent */ 
+/**
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 abstract class Relation
 {
     use Macroable {
