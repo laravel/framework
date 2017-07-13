@@ -1,0 +1,34 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Contracts\View\BladeExtension;
+
+class DummyClass implements BladeExtension
+{
+    /**
+     * Get custom directives this extension provides
+     *
+     * @example
+     * return ['foo' => [$this, 'doFoo']]
+     *
+     * @return array
+     */
+    public function getDirectives()
+    {
+        return [];
+    }
+
+    /**
+     * Get custom conditional directives this extension provides
+     *
+     * @example
+     * return ['bar' => [$this, 'isBar']]
+     *
+     * @return array
+     */
+    public function getConditionals()
+    {
+        return [];
+    }
+}
