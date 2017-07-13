@@ -178,16 +178,14 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     public function create(array $attributes = [])
     {
-        $instance = $this->related->newInstance($attributes);
+        return tap($this->related->newInstance($attributes), function ($instance) {
+            // When saving a polymorphic relationship, we need to set not only the foreign
+            // key, but also the foreign key type, which is typically the class name of
+            // the parent model. This makes the polymorphic item unique in the table.
+            $this->setForeignAttributesForCreate($instance);
 
-        // When saving a polymorphic relationship, we need to set not only the foreign
-        // key, but also the foreign key type, which is typically the class name of
-        // the parent model. This makes the polymorphic item unique in the table.
-        $this->setForeignAttributesForCreate($instance);
-
-        $instance->save();
-
-        return $instance;
+            $instance->save();
+        });
     }
 
     /**
