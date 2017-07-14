@@ -62,6 +62,18 @@ class DummyClass extends Controller
     }
 
     /**
+     * Replace the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function replace(Request $request, DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -69,18 +81,6 @@ class DummyClass extends Controller
      * @return \Illuminate\Http\Response
      */
     public function update(Request $request, DummyModelClass $DummyModelVariable)
-    {
-        //
-    }
-
-    /**
-     * Patch the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \DummyFullModelClass  $DummyModelVariable
-     * @return \Illuminate\Http\Response
-     */
-    public function patch(Request $request, DummyModelClass $DummyModelVariable)
     {
         //
     }

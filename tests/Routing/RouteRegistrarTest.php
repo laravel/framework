@@ -207,8 +207,8 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertCount(3, $this->router->getRoutes());
 
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.replace'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
-        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.patch'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
@@ -225,19 +225,19 @@ class RouteRegistrarTest extends TestCase
     public function testCanRouteUpdateMethodOnRegisteredResource()
     {
         $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarUpdateControllerStub::class)
-                     ->only(['update']);
+                     ->only(['replace']);
 
         $this->assertCount(1, $this->router->getRoutes());
-        $this->seeResponse('updated', Request::create('users/123', 'PUT'));
+        $this->seeResponse('replaced', Request::create('users/123', 'PUT'));
     }
 
     public function testCanRoutePatchMethodOnRegisteredResource()
     {
         $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarPatchControllerStub::class)
-                     ->only(['patch']);
+                     ->only(['update']);
 
         $this->assertCount(1, $this->router->getRoutes());
-        $this->seeResponse('patched', Request::create('users/123', 'PATCH'));
+        $this->seeResponse('updated', Request::create('users/123', 'PATCH'));
     }
 
     public function testCanRoutePutAndPatchMethodOnRegisteredResource()
@@ -245,7 +245,7 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarUpdateControllerStub::class)
                      ->only(['patch', 'update']);
 
-        $this->seeResponse('patched', Request::create('users/123', 'PATCH'));
+        $this->seeResponse('updated', Request::create('users/123', 'PATCH'));
     }
 
     public function testCanNameRoutesOnRegisteredResource()
@@ -360,22 +360,22 @@ class RouteRegistrarControllerStub
 
 class RouteRegistrarUpdateControllerStub
 {
+    public function replace()
+    {
+        return 'replaced';
+    }
+
     public function update()
     {
         return 'updated';
-    }
-
-    public function patch()
-    {
-        return 'patched';
     }
 }
 
 class RouteRegistrarPatchControllerStub
 {
-    public function patch()
+    public function update()
     {
-        return 'patched';
+        return 'updated';
     }
 }
 
