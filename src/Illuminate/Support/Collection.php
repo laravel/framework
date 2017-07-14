@@ -60,6 +60,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * If the given value is not a collection, wrap it in one.
+     *
+     * @param  mixed  $value
+     * @return static
+     */
+    public static function wrap($value)
+    {
+        return $value instanceof self
+            ? new static($value)
+            : new static(Arr::wrap($value));
+    }
+
+    /**
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $amount
