@@ -1014,6 +1014,49 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $collection->all());
     }
 
+    public function testWrapWithScalar()
+    {
+        $collection = Collection::wrap('foo');
+        $this->assertEquals(['foo'], $collection->all());
+    }
+
+    public function testWrapWithArray()
+    {
+        $collection = Collection::wrap(['foo']);
+        $this->assertEquals(['foo'], $collection->all());
+    }
+
+    public function testWrapWithArrayable()
+    {
+        $collection = Collection::wrap($o = new TestArrayableObject);
+        $this->assertEquals([$o], $collection->all());
+    }
+
+    public function testWrapWithJsonable()
+    {
+        $collection = Collection::wrap($o = new TestJsonableObject);
+        $this->assertEquals([$o], $collection->all());
+    }
+
+    public function testWrapWithJsonSerialize()
+    {
+        $collection = Collection::wrap($o = new TestJsonSerializeObject);
+        $this->assertEquals([$o], $collection->all());
+    }
+
+    public function testWrapWithCollectionClass()
+    {
+        $collection = Collection::wrap(Collection::make(['foo']));
+        $this->assertEquals(['foo'], $collection->all());
+    }
+
+    public function testWrapWithCollectionSubclass()
+    {
+        $collection = TestCollectionSubclass::wrap(Collection::make(['foo']));
+        $this->assertEquals(['foo'], $collection->all());
+        $this->assertInstanceOf(TestCollectionSubclass::class, $collection);
+    }
+
     public function testTimesMethod()
     {
         $two = Collection::times(2, function ($number) {
@@ -2286,4 +2329,9 @@ class TestCollectionMapIntoObject
     {
         $this->value = $value;
     }
+}
+
+class TestCollectionSubclass extends Collection
+{
+    //
 }
