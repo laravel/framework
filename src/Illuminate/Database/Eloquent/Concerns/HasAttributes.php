@@ -843,13 +843,20 @@ trait HasAttributes
     }
 
     /**
-     * Get all of the current attributes on the model.
+     * Get all/some of the current attributes on the model.
      *
+     * @param array $keys
      * @return array
      */
-    public function getAttributes()
+    public function getAttributes($keys = ['*'])
     {
-        return $this->attributes;
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        if (count($keys) > 0 && $keys[0] === '*') {
+            return $this->attributes;
+        }
+
+        return array_only($this->attributes, $keys);
     }
 
     /**
