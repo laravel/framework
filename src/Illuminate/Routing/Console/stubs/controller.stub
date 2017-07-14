@@ -61,6 +61,18 @@ class DummyClass extends Controller
     }
 
     /**
+     * Replace the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function replace(Request $request, $id)
+    {
+        //
+    }
+
+    /**
      * Update the specified resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request

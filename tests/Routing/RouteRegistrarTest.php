@@ -205,8 +205,9 @@ class RouteRegistrarTest extends TestCase
         $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
                      ->except(['index', 'create', 'store', 'show', 'edit']);
 
-        $this->assertCount(2, $this->router->getRoutes());
+        $this->assertCount(3, $this->router->getRoutes());
 
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.replace'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
@@ -215,10 +216,38 @@ class RouteRegistrarTest extends TestCase
     {
         $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class);
 
-        $this->assertCount(5, $this->router->getRoutes());
+        $this->assertCount(6, $this->router->getRoutes());
 
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.create'));
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.replace'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+    }
+
+    public function testCanRouteUpdateMethodOnRegisteredResource()
+    {
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarUpdateControllerStub::class)
+                     ->only(['replace']);
+
+        $this->assertCount(1, $this->router->getRoutes());
+        $this->seeResponse('replaced', Request::create('users/123', 'PUT'));
+    }
+
+    public function testCanRoutePatchMethodOnRegisteredResource()
+    {
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarPatchControllerStub::class)
+                     ->only(['update']);
+
+        $this->assertCount(1, $this->router->getRoutes());
+        $this->seeResponse('updated', Request::create('users/123', 'PATCH'));
+    }
+
+    public function testCanRoutePutAndPatchMethodOnRegisteredResource()
+    {
+        $this->router->resource('users', \Illuminate\Tests\Routing\RouteRegistrarUpdateControllerStub::class)
+                     ->only(['patch', 'update']);
+
+        $this->seeResponse('updated', Request::create('users/123', 'PATCH'));
     }
 
     public function testCanNameRoutesOnRegisteredResource()
@@ -331,6 +360,28 @@ class RouteRegistrarControllerStub
     }
 }
 
+class RouteRegistrarUpdateControllerStub
+{
+    public function replace()
+    {
+        return 'replaced';
+    }
+
+    public function update()
+    {
+        return 'updated';
+    }
+}
+
+class RouteRegistrarPatchControllerStub
+{
+    public function update()
+    {
+        return 'updated';
+    }
+}
+
 class RouteRegistrarMiddlewareStub
 {
+    //
 }

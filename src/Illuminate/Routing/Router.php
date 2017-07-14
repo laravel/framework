@@ -302,7 +302,7 @@ class Router implements RegistrarContract, BindingRegistrar
     public function apiResource($name, $controller, array $options = [])
     {
         return $this->resource($name, $controller, array_merge([
-            'only' => ['index', 'show', 'store', 'update', 'destroy'],
+            'only' => ['index', 'show', 'store', 'replace', 'update', 'destroy'],
         ], $options));
     }
 
