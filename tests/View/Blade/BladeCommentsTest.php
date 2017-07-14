@@ -31,4 +31,12 @@ this is a comment
 
         $this->assertEmpty($this->compiler->compileString($string));
     }
+
+    public function testRawBlocksDontGetMixedUpWhenSomeAreRemovedByBladeComments()
+    {
+        $string = '{{-- @verbatim Block #1 @endverbatim --}} @php "Block #2" @endphp';
+        $expected = ' <?php "Block #2" ?>';
+
+        $this->assertSame($expected, $this->compiler->compileString($string));
+    }
 }
