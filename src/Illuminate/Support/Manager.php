@@ -79,16 +79,39 @@ abstract class Manager
         // We'll check to see if a creator method exists for the given driver. If not we
         // will check for a custom driver creator, which allows developers to create
         // drivers using their own customized driver creator Closure to create it.
-        if (isset($this->customCreators[$driver])) {
+        if ($this->hasCustomDriver($driver)) {
             return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create'.Str::studly($driver).'Driver';
-
-            if (method_exists($this, $method)) {
-                return $this->$method();
-            }
         }
+
+        $method = $this->getCreateDriverMethod($driver);
+
+        if (is_callable([$this, $method])) {
+            return $this->$method();
+        }
+
         throw new InvalidArgumentException("Driver [$driver] not supported.");
+    }
+
+    /**
+     * Determine whether driver is registered by developer.
+     *
+     * @param  string  $driver
+     * @return bool
+     */
+    protected function hasCustomDriver($driver)
+    {
+        return isset($this->customCreators[$driver]);
+    }
+
+    /**
+     * Get createDriver method base on given driver.
+     *
+     * @param  string  $driver
+     * @return string
+     */
+    protected function getCreateDriverMethod($driver)
+    {
+        return 'create' . Str::studly($driver) . 'Driver';
     }
 
     /**
