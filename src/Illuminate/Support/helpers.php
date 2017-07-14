@@ -354,11 +354,11 @@ if (! function_exists('ceilf')) {
     function ceilf($value, $precision = 0)
     {
         $offset = 0.5;
-        
+
         if ($precision !== 0) {
             $offset /= pow(10, $precision);
         }
-        
+
         return round($value + $offset, $precision, PHP_ROUND_HALF_DOWN);
     }
 }
