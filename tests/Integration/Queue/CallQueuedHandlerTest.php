@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Queue;
+
+use Mockery;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Queue\Events\JobFailed;
@@ -9,11 +12,18 @@ use Illuminate\Queue\Events\JobFailed;
  */
 class CallQueuedHandlerTest extends TestCase
 {
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Mockery::close();
+    }
+
     public function test_job_can_be_dispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
 
-        $instance = new Illuminate\Queue\CallQueuedHandler(new Illuminate\Bus\Dispatcher(app()));
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
 
         $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('hasFailed')->andReturn(false);
@@ -33,7 +43,7 @@ class CallQueuedHandlerTest extends TestCase
     {
         Event::fake();
 
-        $instance = new Illuminate\Queue\CallQueuedHandler(new Illuminate\Bus\Dispatcher(app()));
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
 
         $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('getConnectionName')->andReturn('connection');
@@ -54,7 +64,7 @@ class CallQueuedHandlerTest extends TestCase
     {
         Event::fake();
 
-        $instance = new Illuminate\Queue\CallQueuedHandler(new Illuminate\Bus\Dispatcher(app()));
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
 
         $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
         $job->shouldReceive('getConnectionName')->andReturn('connection');
@@ -74,7 +84,7 @@ class CallQueuedHandlerTest extends TestCase
 
 class CallQueuedHandlerTestJob
 {
-    use Illuminate\Queue\InteractsWithQueue;
+    use \Illuminate\Queue\InteractsWithQueue;
 
     public static $handled = false;
 
@@ -95,6 +105,6 @@ class CallQueuedHandlerExceptionThrower
 
     public function __wakeup()
     {
-        throw new Illuminate\Database\Eloquent\ModelNotFoundException('Foo');
+        throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Foo');
     }
 }

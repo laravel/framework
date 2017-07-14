@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Notifications;
+
+use Mockery;
 use Illuminate\Mail\Markdown;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Mail\Mailer;
@@ -17,6 +20,13 @@ use Illuminate\Notifications\Messages\MailMessage;
 class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Mockery::close();
+    }
 
     protected function getEnvironmentSetUp($app)
     {

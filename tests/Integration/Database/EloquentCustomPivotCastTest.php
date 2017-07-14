@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Database;
+
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
@@ -95,7 +97,7 @@ class CustomPivotCastTestProject extends Model
     }
 }
 
-class CustomPivotCastTestCollaborator extends Illuminate\Database\Eloquent\Relations\Pivot
+class CustomPivotCastTestCollaborator extends \Illuminate\Database\Eloquent\Relations\Pivot
 {
     protected $casts = [
         'permissions' => 'json',

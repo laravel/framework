@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Notifications;
+
 use Orchestra\Testbench\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\AnonymousNotifiable;

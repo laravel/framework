@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Database;
+
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
