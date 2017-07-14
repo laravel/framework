@@ -849,7 +849,7 @@ trait HasAttributes
      * @param array $keys
      * @return array
      */
-    public function getAttributes($keys)
+    public function getAttributes($keys = ['*'])
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
