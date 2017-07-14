@@ -90,7 +90,7 @@ trait InteractsWithInput
 
         return true;
     }
-    
+
     /**
      * ?
      *
