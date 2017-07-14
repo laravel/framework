@@ -21,6 +21,13 @@ class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
 
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Mockery::close();
+    }
+
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('app.debug', 'true');

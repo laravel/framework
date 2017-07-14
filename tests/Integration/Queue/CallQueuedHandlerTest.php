@@ -12,6 +12,13 @@ use Illuminate\Queue\Events\JobFailed;
  */
 class CallQueuedHandlerTest extends TestCase
 {
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Mockery::close();
+    }
+
     public function test_job_can_be_dispatched()
     {
         CallQueuedHandlerTestJob::$handled = false;
