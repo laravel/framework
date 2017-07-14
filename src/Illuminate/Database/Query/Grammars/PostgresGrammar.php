@@ -266,7 +266,7 @@ class PostgresGrammar extends Grammar
      */
     protected function compileDeleteWithJoins($query, $table)
     {
-        $using = ' USING '.collect($query->joins)->map(function ($join) use ($query, &$using_tables) {
+        $using = ' USING '.collect($query->joins)->map(function ($join) use ($query) {
             return $this->wrapTable($join->table);
         })->implode(', ');
 
