@@ -141,6 +141,17 @@ abstract class Relation
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function get($columns = ['*'])
+    {
+        return $this->query->get($columns);
+    }
+
+    /**
      * Touch all of the related models for the relationship.
      *
      * @return void
