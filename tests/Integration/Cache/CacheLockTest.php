@@ -1,6 +1,9 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Cache;
+
 use Illuminate\Support\Carbon;
+use Memcached;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Tests\Redis\InteractsWithRedis;

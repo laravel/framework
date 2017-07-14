@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Queue;
+
 use Illuminate\Bus\Queueable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Queue;

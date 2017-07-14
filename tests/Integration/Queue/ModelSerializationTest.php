@@ -1,7 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Queue;
+
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Schema;
 
 /**
  * @group integration
@@ -51,7 +54,7 @@ class ModelSerializationTest extends TestCase
             'email' => 'mohamed@laravel.com',
         ]);
 
-        $user2 = ModelSerializationTestUser::create([
+        ModelSerializationTestUser::create([
             'email' => 'taylor@laravel.com',
         ]);
 

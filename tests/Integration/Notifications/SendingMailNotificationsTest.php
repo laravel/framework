@@ -1,5 +1,8 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Notifications;
+
+use Mockery;
 use Illuminate\Mail\Markdown;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Mail\Mailer;
