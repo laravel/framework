@@ -60,7 +60,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * If the given value is not a collection, wrap it in one.
+     * Wrap the given value in a collection if applicable.
      *
      * @param  mixed  $value
      * @return static
@@ -70,6 +70,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return $value instanceof self
             ? new static($value)
             : new static(Arr::wrap($value));
+    }
+
+    /**
+     * Get the underlying items from the given collection if applicable.
+     *
+     * @param  array|static  $value
+     * @return array
+     */
+    public static function unwrap($value)
+    {
+        return $value instanceof self ? $value->all() : $value;
     }
 
     /**
