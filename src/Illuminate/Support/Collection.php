@@ -60,7 +60,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * If the given value is not a collection, wrap it in one.
+     * Wrap the given value in a collection if applicable.
      *
      * @param  mixed  $value
      * @return static
@@ -73,7 +73,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * If the given value is a collection return its items.
+     * Get the underlying items from the given collection if applicable.
      *
      * @param  array|static  $value
      * @return array
