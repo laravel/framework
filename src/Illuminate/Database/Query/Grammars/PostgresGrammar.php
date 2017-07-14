@@ -238,22 +238,7 @@ class PostgresGrammar extends Grammar
 
         return isset($query->joins)
             ? $this->compileDeleteWithJoins($query, $table)
-            : $this->compileDeleteWithoutJoins($query, $table);
-    }
-
-    /**
-     * Compile a delete query that does not use joins.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $table
-     * @param  array  $where
-     * @return string
-     */
-    protected function compileDeleteWithoutJoins($query, $table)
-    {
-        $where = is_array($query->wheres) ? ' '.$this->compileWheres($query) : '';
-
-        return trim("delete from {$table}{$where}");
+            : parent::compileDelete($query);
     }
 
     /**
