@@ -220,6 +220,8 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.create'));
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.replace'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
     }
 
     public function testCanRouteUpdateMethodOnRegisteredResource()
