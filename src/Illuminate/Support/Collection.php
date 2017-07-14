@@ -73,6 +73,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * If the given value is a collection return its items.
+     *
+     * @param  array|static  $value
+     * @return array
+     */
+    public static function unwrap($value)
+    {
+        return $value instanceof self ? $value->all() : $value;
+    }
+
+    /**
      * Create a new collection by invoking the callback a given amount of times.
      *
      * @param  int  $amount

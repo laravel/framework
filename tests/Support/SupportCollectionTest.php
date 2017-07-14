@@ -1057,6 +1057,22 @@ class SupportCollectionTest extends TestCase
         $this->assertInstanceOf(TestCollectionSubclass::class, $collection);
     }
 
+    public function testUnwrapCollection()
+    {
+        $collection = new Collection(['foo']);
+        $this->assertEquals(['foo'], Collection::unwrap($collection));
+    }
+
+    public function testUnwrapCollectionWithArray()
+    {
+        $this->assertEquals(['foo'], Collection::unwrap(['foo']));
+    }
+
+    public function testUnwrapCollectionWithScalar()
+    {
+        $this->assertEquals('foo', Collection::unwrap('foo'));
+    }
+
     public function testTimesMethod()
     {
         $two = Collection::times(2, function ($number) {
