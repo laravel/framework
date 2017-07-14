@@ -5,16 +5,11 @@ namespace Illuminate\Tests\Cache;
 use DateTime;
 use DateInterval;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Cache\ArrayStore;
 
 class CacheTaggedCacheTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCacheCanBeSavedWithMultipleTags()
     {
         $store = new ArrayStore;

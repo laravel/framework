@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class SupportStrTest extends TestCase
 {

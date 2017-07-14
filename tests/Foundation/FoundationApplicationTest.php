@@ -3,16 +3,11 @@
 namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Foundation\Application;
 
 class FoundationApplicationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Mail;
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;

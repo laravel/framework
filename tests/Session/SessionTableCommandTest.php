@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Session;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Session\Console\SessionTableCommand;
 
 class SessionTableCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCreateMakesMigration()
     {
         $command = new SessionTableCommandTestStub(

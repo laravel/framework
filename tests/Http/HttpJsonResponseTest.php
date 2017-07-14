@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Http;
 
 use JsonSerializable;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 

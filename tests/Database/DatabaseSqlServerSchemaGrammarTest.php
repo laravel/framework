@@ -3,16 +3,11 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Schema\Blueprint;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint('users');

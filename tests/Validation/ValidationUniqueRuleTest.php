@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class ValidationUniqueRuleTest extends TestCase
 {

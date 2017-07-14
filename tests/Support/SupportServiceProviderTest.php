@@ -3,13 +3,15 @@
 namespace Illuminate\Tests\Support;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
+
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
 
@@ -18,11 +20,6 @@ class SupportServiceProviderTest extends TestCase
         $one->boot();
         $two = new ServiceProviderForTestingTwo($app);
         $two->boot();
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testPublishableServiceProviders()

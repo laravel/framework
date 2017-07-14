@@ -3,18 +3,13 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Channels\BroadcastChannel;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;

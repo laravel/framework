@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 
 class NotificationSlackChannelTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     /**
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  array  $payload

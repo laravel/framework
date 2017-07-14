@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Container;
 
 use stdClass;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 
 class ContainerTest extends TestCase

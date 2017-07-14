@@ -47,8 +47,6 @@ class CacheLockTest extends TestCase
 
     public function test_memcached_locks_can_block_for_seconds()
     {
-        Carbon::setTestNow();
-
         Cache::store('memcached')->lock('foo')->release();
         $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {
             return 'taylor';
@@ -61,8 +59,6 @@ class CacheLockTest extends TestCase
     public function test_redis_locks_can_block_for_seconds()
     {
         $this->ifRedisAvailable(function () {
-            Carbon::setTestNow();
-
             Cache::store('redis')->lock('foo')->release();
             $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
                 return 'taylor';
@@ -87,8 +83,6 @@ class CacheLockTest extends TestCase
      */
     public function test_locks_throw_timeout_if_block_expires()
     {
-        Carbon::setTestNow();
-
         Cache::store('memcached')->lock('foo')->release();
         Cache::store('memcached')->lock('foo', 5)->get();
         $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->block(1, function () {

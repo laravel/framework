@@ -7,7 +7,7 @@ use ArrayAccess;
 use Mockery as m;
 use ReflectionClass;
 use JsonSerializable;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;

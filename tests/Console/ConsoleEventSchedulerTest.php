@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Console\Scheduling\Schedule;
 
 class ConsoleEventSchedulerTest extends TestCase
@@ -19,11 +19,6 @@ class ConsoleEventSchedulerTest extends TestCase
         $container->instance(
             'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Console\Scheduling\Mutex'))
         );
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testExecCreatesNewCommand()

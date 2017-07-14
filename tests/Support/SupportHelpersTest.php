@@ -8,15 +8,10 @@ use Mockery as m;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class SupportHelpersTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testArrayDot()
     {
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);

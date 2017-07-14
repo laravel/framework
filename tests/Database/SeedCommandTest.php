@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery;
 use Illuminate\Database\Seeder;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\ConnectionResolverInterface;
@@ -34,10 +34,5 @@ class SeedCommandTest extends TestCase
         $command->handle();
 
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
-    }
-
-    protected function tearDown()
-    {
-        Mockery::close();
     }
 }

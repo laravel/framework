@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEventTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicEventBroadcastParameterFormatting()
     {
         $broadcaster = m::mock(Broadcaster::class);

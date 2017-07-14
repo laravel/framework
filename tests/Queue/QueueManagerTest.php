@@ -3,16 +3,11 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDefaultConnectionCanBeResolved()
     {
         $app = [

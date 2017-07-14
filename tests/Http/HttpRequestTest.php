@@ -5,16 +5,11 @@ namespace Illuminate\Tests\Http;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testInstanceMethod()
     {
         $request = Request::create('', 'GET');

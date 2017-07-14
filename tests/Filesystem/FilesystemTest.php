@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Filesystem\Filesystem;
 
 class FilesystemTest extends TestCase
@@ -11,12 +11,14 @@ class FilesystemTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->tempDir = __DIR__.'/tmp';
         mkdir($this->tempDir);
     }
 
     public function tearDown()
     {
+        parent::tearDown();
         $files = new Filesystem;
         $files->deleteDirectory($this->tempDir);
     }

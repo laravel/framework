@@ -4,15 +4,10 @@ namespace Illuminate\Tests\Cache;
 
 use Memcached;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testServersAreAddedCorrectly()
     {
         $memcached = $this->memcachedMockWithAddServer();

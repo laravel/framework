@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -12,11 +12,6 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     public function testNotificationCanBeDispatchedToDriver()
     {
         $container = new Container;

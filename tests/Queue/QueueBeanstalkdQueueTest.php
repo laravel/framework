@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);

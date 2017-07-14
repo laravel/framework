@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Notifications\Action;
 
 class NotificationActionTest extends TestCase

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Hashing;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class BcryptHasherTest extends TestCase
 {

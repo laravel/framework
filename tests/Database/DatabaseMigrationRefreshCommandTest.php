@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Console\Migrations\ResetCommand;
@@ -14,11 +14,6 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 
 class DatabaseMigrationRefreshCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRefreshCommandCallsCommandsWithProperArguments()
     {
         $command = new RefreshCommand($migrator = m::mock(Migrator::class));

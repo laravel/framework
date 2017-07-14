@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\View;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class ViewFinderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicViewFinding()
     {
         $finder = $this->getFinder();

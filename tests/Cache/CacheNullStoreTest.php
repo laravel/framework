@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\NullStore;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class CacheNullStoreTest extends TestCase
 {

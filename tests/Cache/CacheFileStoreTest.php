@@ -4,25 +4,11 @@ namespace Illuminate\Tests\Cache;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Cache\FileStore;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class CacheFileStoreTest extends TestCase
 {
-    public function setup()
-    {
-        parent::setup();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
-    public function tearDown()
-    {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
-    }
-
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();

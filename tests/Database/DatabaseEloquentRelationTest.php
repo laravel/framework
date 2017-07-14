@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -11,11 +11,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSetRelationFail()
     {
         $parent = new EloquentRelationResetModelStub;

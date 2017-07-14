@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Routing\Redirector;
 
 class RoutingRedirectorTest extends TestCase
@@ -16,6 +16,8 @@ class RoutingRedirectorTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->headers = m::mock('Symfony\Component\HttpFoundation\HeaderBag');
 
         $this->request = m::mock('Illuminate\Http\Request');
@@ -33,11 +35,6 @@ class RoutingRedirectorTest extends TestCase
 
         $this->redirect = new Redirector($this->url);
         $this->redirect->setSession($this->session);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testBasicRedirectTo()

@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\Translation;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class TranslationTranslatorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();

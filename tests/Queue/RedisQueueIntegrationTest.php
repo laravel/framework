@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
@@ -21,17 +21,14 @@ class RedisQueueIntegrationTest extends TestCase
 
     public function setUp()
     {
-        Carbon::setTestNow(Carbon::now());
         parent::setUp();
         $this->setUpRedis();
     }
 
     public function tearDown()
     {
-        Carbon::setTestNow(null);
         parent::tearDown();
         $this->tearDownRedis();
-        m::close();
     }
 
     /**

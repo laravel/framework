@@ -4,18 +4,13 @@ namespace Illuminate\Tests\Database;
 
 use stdClass;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFindMethod()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);

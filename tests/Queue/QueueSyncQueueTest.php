@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Queue;
 
 use Exception;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 
 class QueueSyncQueueTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushShouldFireJobInstantly()
     {
         unset($_SERVER['__sync.test']);
@@ -59,7 +54,7 @@ class SyncQueueTestEntity implements \Illuminate\Contracts\Queue\QueueableEntity
 
     public function getQueueableConnection()
     {
-        return null;
+        return;
     }
 }
 

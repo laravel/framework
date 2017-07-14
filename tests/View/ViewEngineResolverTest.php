@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\View;
 
 use stdClass;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class ViewEngineResolverTest extends TestCase
 {

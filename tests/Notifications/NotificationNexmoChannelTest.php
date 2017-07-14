@@ -3,17 +3,12 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\NexmoMessage;
 
 class NotificationNexmoChannelTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     public function testSmsIsSentViaNexmo()
     {
         $notification = new NotificationNexmoChannelTestNotification;

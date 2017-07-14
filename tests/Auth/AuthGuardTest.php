@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
@@ -11,11 +11,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthGuardTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicReturnsNullOnValidAttempt()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();

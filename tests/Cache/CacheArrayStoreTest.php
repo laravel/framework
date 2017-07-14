@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Cache\ArrayStore;
 
 class CacheArrayStoreTest extends TestCase

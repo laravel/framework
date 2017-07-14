@@ -6,7 +6,7 @@ use DateTime;
 use Mockery as m;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -16,11 +16,6 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSometimesWorksOnNestedArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();

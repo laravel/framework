@@ -5,19 +5,15 @@ namespace Illuminate\Tests\Support;
 use stdClass;
 use ArrayAccess;
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class SupportFacadeTest extends TestCase
 {
     public function setUp()
     {
+        parent::setUp();
         \Illuminate\Support\Facades\Facade::clearResolvedInstances();
         FacadeStub::setFacadeApplication(null);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testFacadeCallsUnderlyingApplication()

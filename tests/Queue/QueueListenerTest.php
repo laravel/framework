@@ -3,15 +3,10 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class QueueListenerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRunProcessCallsProcess()
     {
         $process = m::mock('Symfony\Component\Process\Process')->makePartial();

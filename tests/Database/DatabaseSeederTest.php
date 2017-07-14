@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use Illuminate\Database\Seeder;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class TestSeeder extends Seeder
 {
@@ -24,11 +24,6 @@ class TestDepsSeeder extends Seeder
 
 class DatabaseSeederTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCallResolveTheClassAndCallsRun()
     {
         $seeder = new TestSeeder;

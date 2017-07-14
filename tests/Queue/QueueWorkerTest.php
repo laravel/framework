@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery;
 use RuntimeException;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
 use Illuminate\Queue\Events\JobFailed;
@@ -22,6 +22,8 @@ class QueueWorkerTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
+
         $this->events = Mockery::spy(Dispatcher::class);
         $this->exceptionHandler = Mockery::spy(ExceptionHandler::class);
 
@@ -33,6 +35,7 @@ class QueueWorkerTest extends TestCase
 
     public function tearDown()
     {
+        parent::tearDown();
         Container::setInstance();
     }
 

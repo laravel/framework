@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Translation;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Translation\MessageSelector;
 
 class TranslationMessageSelectorTest extends TestCase

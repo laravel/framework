@@ -3,16 +3,11 @@
 namespace Illuminate\Tests\View;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\View\Engines\CompilerEngine;
 
 class ViewCompilerEngineTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testViewsMayBeRecompiledAndRendered()
     {
         $engine = $this->getEngine();

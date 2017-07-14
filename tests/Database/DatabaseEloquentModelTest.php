@@ -10,26 +10,16 @@ use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentModelTest extends TestCase
 {
-    public function setup()
-    {
-        parent::setup();
-
-        Carbon::setTestNow(Carbon::now());
-    }
-
     public function tearDown()
     {
         parent::tearDown();
-
-        m::close();
-        Carbon::setTestNow(null);
 
         \Illuminate\Database\Eloquent\Model::unsetEventDispatcher();
         \Illuminate\Support\Carbon::resetToStringFormat();

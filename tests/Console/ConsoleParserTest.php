@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Illuminate\Console\Parser;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class ConsoleParserTest extends TestCase
 {

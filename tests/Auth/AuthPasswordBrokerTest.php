@@ -4,16 +4,11 @@ namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
 use Illuminate\Support\Arr;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {
         $mocks = $this->getMocks();

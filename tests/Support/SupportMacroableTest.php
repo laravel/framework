@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\Traits\Macroable;
 
 class SupportMacroableTest extends TestCase
@@ -11,6 +11,7 @@ class SupportMacroableTest extends TestCase
 
     public function setUp()
     {
+        parent::setUp();
         $this->macroable = $this->createObjectForTrait();
     }
 

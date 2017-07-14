@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\BindingRegistrar;
@@ -11,11 +11,6 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class BroadcasterTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
         $broadcaster = new FakeBroadcaster;

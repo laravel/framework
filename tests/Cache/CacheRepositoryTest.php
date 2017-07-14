@@ -7,15 +7,10 @@ use DateInterval;
 use Mockery as m;
 use DateTimeImmutable;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testGetReturnsValueFromCache()
     {
         $repo = $this->getRepository();
@@ -74,11 +69,6 @@ class CacheRepositoryTest extends TestCase
         });
         $this->assertEquals('bar', $result);
 
-        /*
-         * Use Carbon object...
-         */
-        Carbon::setTestNow(Carbon::now());
-
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 602 / 60);
@@ -91,8 +81,6 @@ class CacheRepositoryTest extends TestCase
             return 'qux';
         });
         $this->assertEquals('qux', $result);
-
-        Carbon::setTestNow();
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()

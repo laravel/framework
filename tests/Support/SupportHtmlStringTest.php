@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Support\HtmlString;
 
 class SupportHtmlStringTest extends TestCase

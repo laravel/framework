@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Foundation\Application;
@@ -47,11 +47,6 @@ class FoundationAuthenticationTest extends TestCase
             ->andReturn($auth);
 
         return $guard;
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testAssertAuthenticated()

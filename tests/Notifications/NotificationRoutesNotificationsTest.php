@@ -4,17 +4,12 @@ namespace Illuminate\Tests\Notifications;
 
 use Mockery;
 use stdClass;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Notifications\Dispatcher;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    public function tearDown()
-    {
-        Mockery::close();
-    }
-
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;

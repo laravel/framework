@@ -53,6 +53,7 @@ trait InteractsWithRedis
 
     public function tearDownRedis()
     {
+        parent::tearDown();
         $this->redis['predis']->connection()->flushdb();
 
         foreach ($this->redisDriverProvider() as $driver) {

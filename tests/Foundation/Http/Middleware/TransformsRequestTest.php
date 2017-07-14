@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
 use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Tests\AbstractTestCase as TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 
 class TransformsRequestTest extends TestCase
