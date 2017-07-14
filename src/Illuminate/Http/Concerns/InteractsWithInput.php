@@ -92,6 +92,18 @@ trait InteractsWithInput
     }
 
     /**
+     * ?
+     *
+     * @param string  $key
+     * @param mixed $default
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        return Arr::get($this->all(), $key, $default);
+    }
+
+    /**
      * Determine if the request contains any of the given inputs.
      *
      * @param  dynamic  $key
