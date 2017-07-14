@@ -343,6 +343,26 @@ if (! function_exists('camel_case')) {
     }
 }
 
+if (! function_exists('ceilf')) {
+    /**
+     * Round decimal up to given precision.
+     *
+     * @param  float  $value
+     * @param  int    $precision
+     * @return float
+     */
+    function ceilf($value, $precision = 0)
+    {
+        $offset = 0.5;
+        
+        if ($precision !== 0) {
+            $offset /= pow(10, $precision);
+        }
+        
+        return round($value + $offset, $precision, PHP_ROUND_HALF_DOWN);
+    }
+}
+
 if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
