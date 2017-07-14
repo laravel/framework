@@ -227,6 +227,55 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a delete statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileDelete(Builder $query)
+    {
+        $table = $this->wrapTable($query->from);
+
+        return isset($query->joins)
+            ? $this->compileDeleteWithJoins($query, $table)
+            : $this->compileDeleteWithoutJoins($query, $table);
+    }
+
+    /**
+     * Compile a delete query that does not use joins.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  array  $where
+     * @return string
+     */
+    protected function compileDeleteWithoutJoins($query, $table)
+    {
+        $where = is_array($query->wheres) ? ' '.$this->compileWheres($query) : '';
+
+        return trim("delete from {$table}{$where}");
+    }
+
+    /**
+     * Compile a delete query that uses joins.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  string  $table
+     * @param  array  $where
+     * @return string
+     */
+    protected function compileDeleteWithJoins($query, $table)
+    {
+        $using = ' USING '.collect($query->joins)->map(function ($join) use ($query, &$using_tables) {
+            return $this->wrapTable($join->table);
+        })->implode(', ');
+
+        $where = count($query->wheres) > 0 ? ' '.$this->compileUpdateWheres($query) : '';
+
+        return trim("delete from {$table}{$using}{$where}");
+    }
+
+    /**
      * Compile a truncate table statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
