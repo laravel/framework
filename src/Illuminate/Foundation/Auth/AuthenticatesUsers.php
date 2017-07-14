@@ -127,7 +127,7 @@ trait AuthenticatesUsers
         $errors = [$this->username() => trans('auth.failed')];
 
         if ($request->expectsJson()) {
-            return response()->json($errors, 422);
+            return response()->json(['message' => 'Authentication failed.'], 422);
         }
 
         return redirect()->back()
