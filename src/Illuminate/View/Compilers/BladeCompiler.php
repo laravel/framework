@@ -100,7 +100,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var string
      */
-    protected $rawPlaceholder = '@__raw-block__@';
+    protected $rawPlaceholder = '@__raw_block_#__@';
 
     /**
      * Array to temporary store the raw blocks found in the template.
@@ -158,13 +158,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function compileString($value)
     {
         if (strpos($value, '@verbatim') !== false) {
-            $value = $this->storeVerbatimBlocks($value);
+            $value = $this->storeRawBlocks($value, 'verbatim');
         }
 
         $this->footer = [];
 
         if (strpos($value, '@php') !== false) {
-            $value = $this->storePhpBlocks($value);
+            $value = $this->storeRawBlocks($value, 'php');
         }
 
         $result = '';
@@ -191,32 +191,20 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Store the verbatim blocks and replace them with a temporary placeholder.
+     * Store the verbatim and PHP blocks and replace them with a temporary placeholder.
      *
      * @param  string  $value
+     * @param  string  $tag
      * @return string
      */
-    protected function storeVerbatimBlocks($value)
+    protected function storeRawBlocks($value, $tag)
     {
-        return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            $this->rawBlocks[] = $matches[1];
+        return preg_replace_callback("/(?<!@)@{$tag}(.*?)@end{$tag}/s", function ($matches) use ($tag) {
+            $this->rawBlocks[] = $tag == 'php' ? "<?php{$matches[1]}?>" : $matches[1];
 
-            return $this->rawPlaceholder;
-        }, $value);
-    }
+            end($this->rawBlocks);
 
-    /**
-     * Store the PHP blocks and replace them with a temporary placeholder.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function storePhpBlocks($value)
-    {
-        return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
-            $this->rawBlocks[] = "<?php{$matches[1]}?>";
-
-            return $this->rawPlaceholder;
+            return str_replace('#', key($this->rawBlocks), $this->rawPlaceholder);
         }, $value);
     }
 
@@ -228,8 +216,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.preg_quote($this->rawPlaceholder).'/', function () {
-            return array_shift($this->rawBlocks);
+        $placeholderRegex = str_replace('#', '(\d+)', preg_quote($this->rawPlaceholder));
+
+        $result = preg_replace_callback("/{$placeholderRegex}/", function ($matches) {
+            return $this->rawBlocks[$matches[1]];
         }, $result);
 
         $this->rawBlocks = [];
