@@ -53,7 +53,7 @@ class PendingResourceRegistration
      * Set the methods the controller should apply to.
      *
      * @param  array|string|dynamic  $methods
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function only($methods)
     {
@@ -66,7 +66,7 @@ class PendingResourceRegistration
      * Set the methods the controller should exclude.
      *
      * @param  array|string|dynamic  $methods
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function except($methods)
     {
@@ -79,7 +79,7 @@ class PendingResourceRegistration
      * Set the route names for controller actions.
      *
      * @param  array  $names
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function names(array $names)
     {
@@ -93,7 +93,7 @@ class PendingResourceRegistration
      *
      * @param  string  $method
      * @param  string  $name
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function name($method, $name)
     {
@@ -106,7 +106,7 @@ class PendingResourceRegistration
      * Override the route parameter names.
      *
      * @param  array  $parameters
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function parameters(array $parameters)
     {
@@ -120,7 +120,7 @@ class PendingResourceRegistration
      *
      * @param  string  $previous
      * @param  string  $new
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function parameter($previous, $new)
     {
@@ -133,7 +133,7 @@ class PendingResourceRegistration
      * Set a middleware to the resource.
      *
      * @param  mixed  $middleware
-     * @return \Illuminate\Routing\PendingResourceRegistration
+     * @return $this
      */
     public function middleware($middleware)
     {

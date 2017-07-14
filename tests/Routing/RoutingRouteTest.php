@@ -1018,7 +1018,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->resource('foo', 'FooController');
         $routes = $router->getRoutes();
-        $this->assertCount(7, $routes);
+        $this->assertCount(8, $routes);
 
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['only' => ['update']]);
@@ -1036,7 +1036,7 @@ class RoutingRouteTest extends TestCase
         $router->resource('foo', 'FooController', ['except' => ['show', 'destroy']]);
         $routes = $router->getRoutes();
 
-        $this->assertCount(5, $routes);
+        $this->assertCount(6, $routes);
 
         $router = $this->getRouter();
         $router->resource('foo-bars', 'FooController', ['only' => ['show']]);
@@ -1083,7 +1083,7 @@ class RoutingRouteTest extends TestCase
         $routes = $routes->getRoutes();
 
         $this->assertEquals('foos/{foo}', $routes[3]->uri());
-        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->uri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[11]->uri());
 
         ResourceRegistrar::setParameters(['foos' => 'oof', 'bazs' => 'b']);
 
@@ -1104,7 +1104,7 @@ class RoutingRouteTest extends TestCase
         $routes = $routes->getRoutes();
 
         $this->assertEquals('foos/{foo}', $routes[3]->uri());
-        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[10]->uri());
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[11]->uri());
 
         $router = $this->getRouter();
         $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);

@@ -74,6 +74,18 @@ class DummyClass extends Controller
     }
 
     /**
+     * Patch the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function patch(Request $request, DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+
+    /**
      * Remove the specified resource from storage.
      *
      * @param  \DummyFullModelClass  $DummyModelVariable

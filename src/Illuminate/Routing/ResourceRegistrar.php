@@ -18,7 +18,7 @@ class ResourceRegistrar
      *
      * @var array
      */
-    protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
+    protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'patch', 'destroy'];
 
     /**
      * The parameters set for this resource instance.
@@ -260,7 +260,25 @@ class ResourceRegistrar
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
 
-        return $this->router->match(['PUT', 'PATCH'], $uri, $action);
+        return $this->router->put($uri, $action);
+    }
+
+    /**
+     * Add the patch method for a resourceful route.
+     *
+     * @param  string  $name
+     * @param  string  $base
+     * @param  string  $controller
+     * @param  array   $options
+     * @return \Illuminate\Routing\Route
+     */
+    protected function addResourcePatch($name, $base, $controller, $options)
+    {
+        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+
+        $action = $this->getResourceAction($name, $controller, 'patch', $options);
+
+        return $this->router->patch($uri, $action);
     }
 
     /**
