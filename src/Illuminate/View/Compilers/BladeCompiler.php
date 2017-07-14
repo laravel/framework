@@ -163,17 +163,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
         $this->footer = [];
 
-        if (strpos($value, '@php') !== false) {
-            $value = $this->storePhpBlocks($value);
+        $result = $this->convertPhpTagsToBladeSyntax($value);
+
+        if (strpos($result, '@php') !== false) {
+            $result = $this->storePhpBlocks($result);
         }
 
-        $result = '';
-
-        // Here we will loop through all of the tokens returned by the Zend lexer and
-        // parse each one into the corresponding valid PHP. We will then have this
-        // template as the correctly rendered PHP that can be rendered natively.
-        foreach (token_get_all($value) as $token) {
-            $result .= is_array($token) ? $this->parseToken($token) : $token;
+        foreach ($this->compilers as $type) {
+            $result = $this->{"compile{$type}"}($result);
         }
 
         if (! empty($this->rawBlocks)) {
@@ -221,6 +218,34 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Found raw PHP tags in the given string and convert them to the Blade equivalents.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public function convertPhpTagsToBladeSyntax($value)
+    {
+        $result = '';
+
+        foreach (token_get_all($value) as $token) {
+            if (! is_array($token)) {
+                $result .= $token;
+                continue;
+            }
+
+            if ($token[0] === T_OPEN_TAG) {
+                $result .= str_replace('<?php', '@php', $token[1]);
+            } elseif ($token[0] === T_CLOSE_TAG) {
+                $result .= str_replace('?>', '@endphp', $token[1]);
+            } else {
+                $result .= $token[1];
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Replace the raw placeholders with the original code stored in the raw blocks.
      *
      * @param  string  $result
@@ -247,25 +272,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         return ltrim($result, PHP_EOL)
                 .PHP_EOL.implode(PHP_EOL, array_reverse($this->footer));
-    }
-
-    /**
-     * Parse the tokens from the template.
-     *
-     * @param  array  $token
-     * @return string
-     */
-    protected function parseToken($token)
-    {
-        list($id, $content) = $token;
-
-        if ($id == T_INLINE_HTML) {
-            foreach ($this->compilers as $type) {
-                $content = $this->{"compile{$type}"}($content);
-            }
-        }
-
-        return $content;
     }
 
     /**

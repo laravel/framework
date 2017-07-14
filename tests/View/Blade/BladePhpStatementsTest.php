@@ -29,6 +29,27 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
+    public function testRawPhpStatementsAreConvertedToBladeSyntax()
+    {
+        $string = '<?php echo "Hello world"; ?>';
+        $expected = '@php echo "Hello world"; @endphp';
+        $this->assertEquals($expected, $this->compiler->convertPhpTagsToBladeSyntax($string));
+
+        $string = "<?php
+            echo 'Hello world';
+        ?>
+        
+        Content here";
+
+        $expected = "@php
+            echo 'Hello world';
+        @endphp
+        
+        Content here";
+
+        $this->assertEquals($expected, $this->compiler->convertPhpTagsToBladeSyntax($string));
+    }
+
     public function testVerbatimAndPhpStatementsDontGetMixedUp()
     {
         $string = "@verbatim {{ Hello, I'm not blade! }}"

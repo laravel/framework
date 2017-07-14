@@ -24,4 +24,11 @@ this is a comment
 
         $this->assertEmpty($this->compiler->compileString($string));
     }
+
+    public function testPhpCodeInsideCommentsIsNotCompiled()
+    {
+        $string = '{{-- <?php echo "No one will see this"; ?> --}}';
+
+        $this->assertEmpty($this->compiler->compileString($string));
+    }
 }
