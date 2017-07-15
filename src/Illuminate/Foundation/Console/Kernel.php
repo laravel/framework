@@ -91,7 +91,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Auto register commands
+     * Auto register commands.
      *
      * @return void
      */
