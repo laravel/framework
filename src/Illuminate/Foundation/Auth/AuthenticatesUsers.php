@@ -59,7 +59,7 @@ trait AuthenticatesUsers
     protected function validateLogin(Request $request)
     {
         $this->validate($request, [
-            $this->username() => 'required|string',
+            $this->identity() => 'required|string',
             'password' => 'required|string',
         ]);
     }
@@ -85,7 +85,7 @@ trait AuthenticatesUsers
      */
     protected function credentials(Request $request)
     {
-        return $request->only($this->username(), 'password');
+        return $request->only($this->identity(), 'password');
     }
 
     /**
@@ -129,16 +129,16 @@ trait AuthenticatesUsers
         }
 
         return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors([$this->username() => trans('auth.failed')]);
+            ->withInput($request->only($this->identity(), 'remember'))
+            ->withErrors([$this->identity() => trans('auth.failed')]);
     }
 
     /**
-     * Get the login username to be used by the controller.
+     * Get the login identity to be used by the controller.
      *
      * @return string
      */
-    public function username()
+    public function identity()
     {
         return 'email';
     }
