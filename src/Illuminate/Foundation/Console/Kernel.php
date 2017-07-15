@@ -97,7 +97,11 @@ class Kernel implements KernelContract
      */
     protected function autoRegisterCommands()
     {
-        $files = (new Finder)->in(app_path('Console/Commands/'))->files();
+        if (! is_dir($commands = app_path('Console/Commands/'))) {
+            return;
+        }
+
+        $files = (new Finder)->in($commands)->files();
 
         $namespace = $this->app->getNamespace();
 
