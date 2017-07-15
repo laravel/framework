@@ -155,6 +155,105 @@ class NotificationSlackChannelTest extends TestCase
             ]
         );
     }
+
+    public function testCorrectPayloadWithActionButtonsIsSentToSlack()
+    {
+        $this->validatePayload(
+            new NotificationSlackChannelWithActionButtonsTestNotification,
+            [
+                'json' => [
+                    'text' => 'Content',
+                    'attachments' => [
+                        [
+                            'title' => 'Laravel',
+                            'text' => 'Attachment Content',
+                            'title_link' => 'https://laravel.com',
+                            'callback_id' => 'laravel_123',
+                            'actions' => [
+                                [
+                                    'name' => 'laravel',
+                                    'style' => 'danger',
+                                    'text' => 'Cancel',
+                                    'type' => 'button',
+                                    'value' => 'laravel-cancel',
+                                    'confirm' => [
+                                        'title' => 'Are You Sure?',
+                                        'text' => 'Are you sure you want to cancel?',
+                                        'ok_text' => 'Yes, Cancel',
+                                        'dismiss_text' => 'Dismiss',
+                                    ],
+                                    'options' => null,
+                                    'min_query_length' => 1,
+                                    'data_source' => 'static',
+                                ],
+                                [
+                                    'name' => 'laravel',
+                                    'text' => 'Okay',
+                                    'type' => 'button',
+                                    'value' => 'laravel-okay',
+                                    'style' => 'default',
+                                    'options' => null,
+                                    'min_query_length' => 1,
+                                    'data_source' => 'static',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
+
+    public function testCorrectPayloadWithActionMenusIsSentToSlack()
+    {
+        $this->validatePayload(
+            new NotificationSlackChannelWithActionMenusTestNotification,
+            [
+                'json' => [
+                    'text' => 'Content',
+                    'attachments' => [
+                        [
+                            'title' => 'Laravel',
+                            'text' => 'Attachment Content',
+                            'title_link' => 'https://laravel.com',
+                            'callback_id' => 'laravel_123',
+                            'actions' => [
+                                [
+                                    'name' => 'laravel',
+                                    'style' => 'danger',
+                                    'text' => 'Cancel',
+                                    'type' => 'select',
+                                    'value' => 'laravel-cancel',
+                                    'options' => [
+                                        [
+                                            'text' => 'First Option',
+                                            'value' => 'first_option',
+                                        ],
+                                        [
+                                            'text' => 'Second Option',
+                                            'value' => 'second_option',
+                                        ],
+                                    ],
+                                    'min_query_length' => 5,
+                                    'data_source' => 'external',
+                                ],
+                                [
+                                    'name' => 'laravel',
+                                    'text' => 'Okay',
+                                    'type' => 'button',
+                                    'value' => 'laravel-okay',
+                                    'style' => 'default',
+                                    'options' => null,
+                                    'min_query_length' => 1,
+                                    'data_source' => 'static',
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ]
+        );
+    }
 }
 
 class NotificationSlackChannelTestNotifiable
@@ -249,6 +348,76 @@ class NotificationSlackChannelWithAttachmentFieldBuilderTestNotification extends
                             ->title('Special powers')
                             ->content('Zonda')
                             ->long();
+                    });
+            });
+    }
+}
+
+class NotificationSlackChannelWithActionButtonsTestNotification extends Notification
+{
+    public function toSlack($notifiable)
+    {
+        return (new SlackMessage)
+            ->content('Content')
+            ->attachment(function ($attachment) {
+                $attachment->title('Laravel', 'https://laravel.com')
+                    ->content('Attachment Content')
+                    ->callbackId('laravel_123')
+                    ->action(function ($action) {
+                        $action->name('laravel')
+                               ->text('Cancel')
+                               ->style('danger')
+                               ->type('button')
+                               ->value('laravel-cancel')
+                               ->confirmation(function ($confirm) {
+                                   $confirm->title('Are You Sure?')
+                                           ->content('Are you sure you want to cancel?')
+                                           ->okText('Yes, Cancel')
+                                           ->dismissText('Dismiss');
+                               });
+                    })
+                    ->action(function ($action) {
+                        $action->name('laravel')
+                               ->text('Okay')
+                               ->type('button')
+                               ->value('laravel-okay');
+                    });
+            });
+    }
+}
+
+class NotificationSlackChannelWithActionMenusTestNotification extends Notification
+{
+    public function toSlack($notifiable)
+    {
+        return (new SlackMessage)
+            ->content('Content')
+            ->attachment(function ($attachment) {
+                $attachment->title('Laravel', 'https://laravel.com')
+                    ->content('Attachment Content')
+                    ->callbackId('laravel_123')
+                    ->action(function ($action) {
+                        $action->name('laravel')
+                               ->text('Cancel')
+                               ->style('danger')
+                               ->type('select')
+                               ->value('laravel-cancel')
+                               ->minQueryLength(5)
+                               ->dataSource('external')
+                               ->option(function ($option) {
+                                   $option->text('First Option')
+                                          ->value('first_option');
+                               })
+                               ->option(function ($option) {
+                                   $option->text('Second Option')
+                                          ->value('second_option');
+                               });
+                    })
+                    ->action(function ($action) {
+                        $action->name('laravel')
+                               ->text('Okay')
+                               ->type('button')
+                               ->value('laravel-okay');
                     });
             });
     }

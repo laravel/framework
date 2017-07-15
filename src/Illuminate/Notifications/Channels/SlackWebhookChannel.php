@@ -7,6 +7,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
 use Illuminate\Notifications\Messages\SlackAttachmentField;
+use Illuminate\Notifications\Messages\SlackAttachmentAction;
 
 class SlackWebhookChannel
 {
@@ -80,9 +81,11 @@ class SlackWebhookChannel
     {
         return collect($message->attachments)->map(function ($attachment) use ($message) {
             return array_filter([
+                'callback_id' => $attachment->callbackId,
                 'color' => $attachment->color ?: $message->color(),
                 'fallback' => $attachment->fallback,
                 'fields' => $this->fields($attachment),
+                'actions' => $this->actions($attachment),
                 'footer' => $attachment->footer,
                 'footer_icon' => $attachment->footerIcon,
                 'image_url' => $attachment->imageUrl,
@@ -109,6 +112,23 @@ class SlackWebhookChannel
             }
 
             return ['title' => $key, 'value' => $value, 'short' => true];
+        })->values()->all();
+    }
+
+    /**
+     * Format the attachment's actions.
+     *
+     * @param  \Illuminate\Notifications\Messages\SlackAttachment  $attachment
+     * @return array
+     */
+    protected function actions(SlackAttachment $attachment)
+    {
+        return collect($attachment->actions)->map(function ($value) {
+            if ($value instanceof SlackAttachmentAction) {
+                return $value->toArray();
+            }
+
+            return $value;
         })->values()->all();
     }
 }

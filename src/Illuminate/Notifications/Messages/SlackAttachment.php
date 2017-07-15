@@ -49,6 +49,13 @@ class SlackAttachment
     public $fields;
 
     /**
+     * The attachment's actions.
+     *
+     * @var array
+     */
+    public $actions;
+
+    /**
      * The fields containing markdown.
      *
      * @var array
@@ -82,6 +89,13 @@ class SlackAttachment
      * @var int
      */
     public $timestamp;
+
+    /**
+     * The attachment's callback ID.
+     *
+     * @var string
+     */
+    public $callbackId;
 
     /**
      * Set the title of the attachment.
@@ -175,6 +189,43 @@ class SlackAttachment
     }
 
     /**
+     * Add an action to the attachment.
+     *
+     * @param  \Closure|string  $title
+     * @param  array  $content
+     * @return $this
+     */
+    public function action($title, $content = [])
+    {
+        if (is_callable($title)) {
+            $callback = $title;
+
+            $callback($attachmentAction = new SlackAttachmentAction);
+
+            $this->actions[] = $attachmentAction;
+
+            return $this;
+        }
+
+        $this->actions[$title] = $content;
+
+        return $this;
+    }
+
+    /**
+     * Set the actions of the attachment.
+     *
+     * @param  array  $actions
+     * @return $this
+     */
+    public function actions(array $actions)
+    {
+        $this->actions = $actions;
+
+        return $this;
+    }
+
+    /**
      * Set the fields containing markdown.
      *
      * @param  array  $fields
@@ -235,6 +286,19 @@ class SlackAttachment
     public function timestamp(Carbon $timestamp)
     {
         $this->timestamp = $timestamp->getTimestamp();
+
+        return $this;
+    }
+
+    /**
+     * Set the callback ID.
+     *
+     * @param  $callbackId
+     * @return $this
+     */
+    public function callbackId($callbackId)
+    {
+        $this->callbackId = $callbackId;
 
         return $this;
     }
