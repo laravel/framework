@@ -101,12 +101,10 @@ class Kernel implements KernelContract
             return;
         }
 
-        $files = (new Finder)->in($commands)->files();
-
         $namespace = $this->app->getNamespace();
 
-        foreach ($files as $file) {
-            $this->commands[] = $namespace.'Console\\Commands\\'.$file->getBaseName('.php');
+        foreach ((new Finder)->in($commands)->files() as $command) {
+            $this->commands[] = $namespace.'Console\\Commands\\'.$command->getBaseName('.php');
         }
     }
 
