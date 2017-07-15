@@ -59,7 +59,7 @@ class GateTest extends TestCase
         ];
 
         $gate->resource('test', AccessGateTestCustomResource::class, $abilities);
-        
+
         $dummy = new AccessGateTestDummy;
 
         $this->assertTrue($gate->check('test.view'));
@@ -423,7 +423,7 @@ class AccessGateTestCustomResource
     {
         return true;
     }
-    
+
     public function foo($user)
     {
         return true;
