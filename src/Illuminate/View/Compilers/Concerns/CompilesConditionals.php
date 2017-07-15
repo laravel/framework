@@ -98,7 +98,7 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
-    
+
     /**
      * Compile the if-auth statements into valid PHP.
      *
