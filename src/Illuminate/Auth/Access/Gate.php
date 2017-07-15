@@ -118,12 +118,13 @@ class Gate implements GateContract
      */
     public function resource($name, $class, array $abilities = null)
     {
-        $abilities = $abilities ?: [
+        $abilities = $abilities ? $abilities : [];
+        $abilities = array_merge($abilities, [
             'view'   => 'view',
             'create' => 'create',
             'update' => 'update',
             'delete' => 'delete',
-        ];
+        ]);
 
         foreach ($abilities as $ability => $method) {
             $this->define($name.'.'.$ability, $class.'@'.$method);

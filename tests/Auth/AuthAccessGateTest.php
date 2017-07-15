@@ -60,6 +60,12 @@ class GateTest extends TestCase
 
         $gate->resource('test', AccessGateTestCustomResource::class, $abilities);
 
+        $dummy = new AccessGateTestDummy;
+
+        $this->assertTrue($gate->check('test.view'));
+        $this->assertTrue($gate->check('test.create'));
+        $this->assertTrue($gate->check('test.update', $dummy));
+        $this->assertTrue($gate->check('test.delete', $dummy));
         $this->assertTrue($gate->check('test.ability1'));
         $this->assertTrue($gate->check('test.ability2'));
     }
@@ -398,6 +404,26 @@ class AccessGateTestResource
 
 class AccessGateTestCustomResource
 {
+    public function view($user)
+    {
+        return true;
+    }
+
+    public function create($user)
+    {
+        return true;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+
+    public function delete($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+
     public function foo($user)
     {
         return true;
