@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
@@ -82,9 +83,27 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->events = $events;
 
+        $this->autoRegisterCommands();
+
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
         });
+    }
+
+    /**
+     * Auto register commands
+     *
+     * @return void
+     */
+    protected function autoRegisterCommands()
+    {
+        $files = (new Finder)->in(app_path('Console/Commands/'))->files();
+
+        $namespace = $this->app->getNamespace();
+
+        foreach ($files as $file) {
+            $this->commands[] = $namespace.'Console\\Commands\\'.$file->getBaseName('.php');
+        }
     }
 
     /**
