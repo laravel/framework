@@ -4,8 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Exception;
-use Illuminate\Console\Command;
 use Throwable;
+use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
