@@ -14,6 +14,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
 class Route
 {
@@ -199,7 +200,7 @@ class Route
      */
     protected function runController()
     {
-        return (new ControllerDispatcher($this->container))->dispatch(
+        return $this->controllerDispatcher()->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
     }
@@ -407,7 +408,7 @@ class Route
      */
     protected function compileParameterNames()
     {
-        preg_match_all('/\{(.*?)\}/', $this->domain().$this->uri, $matches);
+        preg_match_all('/\{(.*?)\}/', $this->getDomain().$this->uri, $matches);
 
         return array_map(function ($m) {
             return trim($m, '?');
@@ -523,11 +524,28 @@ class Route
     }
 
     /**
+     * Get or set the domain for the route.
+     *
+     * @param  string|null  $domain
+     * @return $this|string|null
+     */
+    public function domain($domain = null)
+    {
+        if (is_null($domain)) {
+            return $this->getDomain();
+        }
+
+        $this->action['domain'] = $domain;
+
+        return $this;
+    }
+
+    /**
      * Get the domain defined for the route.
      *
      * @return string|null
      */
-    public function domain()
+    public function getDomain()
     {
         return isset($this->action['domain'])
                 ? str_replace(['http://', 'https://'], '', $this->action['domain']) : null;
@@ -540,7 +558,7 @@ class Route
      */
     public function getPrefix()
     {
-        return isset($this->action['prefix']) ? $this->action['prefix'] : null;
+        return $this->action['prefix'] ?? null;
     }
 
     /**
@@ -588,7 +606,7 @@ class Route
      */
     public function getName()
     {
-        return isset($this->action['as']) ? $this->action['as'] : null;
+        return $this->action['as'] ?? null;
     }
 
     /**
@@ -605,14 +623,24 @@ class Route
     }
 
     /**
-     * Determine whether the route's name matches the given name.
+     * Determine whether the route's name matches the given patterns.
      *
-     * @param  string  $name
+     * @param  dynamic  $patterns
      * @return bool
      */
-    public function named($name)
+    public function named(...$patterns)
     {
-        return $this->getName() === $name;
+        if (is_null($routeName = $this->getName())) {
+            return false;
+        }
+
+        foreach ($patterns as $pattern) {
+            if (Str::is($pattern, $routeName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -655,7 +683,7 @@ class Route
      */
     public function getActionName()
     {
-        return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
+        return $this->action['controller'] ?? 'Closure';
     }
 
     /**
@@ -665,7 +693,7 @@ class Route
      */
     public function getActionMethod()
     {
-        return array_last(explode('@', $this->getActionName()));
+        return Arr::last(explode('@', $this->getActionName()));
     }
 
     /**
@@ -718,7 +746,7 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
+            return (array) ($this->action['middleware'] ?? []);
         }
 
         if (is_string($middleware)) {
@@ -726,7 +754,7 @@ class Route
         }
 
         $this->action['middleware'] = array_merge(
-            (array) Arr::get($this->action, 'middleware', []), $middleware
+            (array) ($this->action['middleware'] ?? []), $middleware
         );
 
         return $this;
@@ -743,9 +771,23 @@ class Route
             return [];
         }
 
-        return ControllerDispatcher::getMiddleware(
+        return $this->controllerDispatcher()->getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Get the dispatcher for the route's controller.
+     *
+     * @return ControllerDispatcherContract
+     */
+    public function controllerDispatcher()
+    {
+        if ($this->container->bound(ControllerDispatcherContract::class)) {
+            return $this->container->make(ControllerDispatcherContract::class);
+        }
+
+        return new ControllerDispatcher($this->container);
     }
 
     /**

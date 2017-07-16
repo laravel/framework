@@ -4,12 +4,15 @@ namespace Illuminate\Tests\Validation;
 
 use DateTime;
 use Mockery as m;
-use Carbon\Carbon;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Contracts\Validation\Rule;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -63,6 +66,7 @@ class ValidationValidatorTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Validation\ValidationException
+     * @expectedExceptionMessage The given data failed to pass validation.
      */
     public function testValidateThrowsOnFail()
     {
@@ -239,7 +243,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], ['name' => 'required']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addReplacer('required', 'Foo@bar');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
         $foo->shouldReceive('bar')->once()->andReturn('replaced!');
         $v->passes();
         $v->messages()->setFormat(':message');
@@ -430,7 +434,7 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.attributes.lastname' => 'Lastname'], 'en');
         $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
         $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
-            $other = array_get($validator->getData(), $parameters[0]);
+            $other = Arr::get($validator->getData(), $parameters[0]);
 
             return $value[0] == $other[0];
         });
@@ -447,7 +451,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
         $v->addCustomAttributes($customAttributes);
         $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
-            $other = array_get($validator->getData(), $parameters[0]);
+            $other = Arr::get($validator->getData(), $parameters[0]);
 
             return $value[0] == $other[0];
         });
@@ -2267,7 +2271,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['x' => new DateTime()], ['x' => 'date']);
+        $v = new Validator($trans, ['x' => new DateTime], ['x' => 'date']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
@@ -2549,7 +2553,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addExtension('foo', 'Foo@bar');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
         $foo->shouldReceive('bar')->once()->andReturn(false);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -2563,7 +2567,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addExtension('foo', 'Foo');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
         $foo->shouldReceive('validate')->once()->andReturn(false);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -2590,13 +2594,14 @@ class ValidationValidatorTest extends TestCase
             ['*.name' => 'dependent_rule:*.age']
         );
         $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
-            return array_get($v->getData(), $name) == 'Jamie';
+            return Arr::get($v->getData(), $name) == 'Jamie';
         });
         $this->assertTrue($v->passes());
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Validation rule required_if requires at least 2 parameters.
      */
     public function testExceptionThrownOnIncorrectParameterCount()
     {
@@ -3413,6 +3418,140 @@ class ValidationValidatorTest extends TestCase
         $file = new File(__FILE__, false);
         $v = new Validator($trans, ['file' => $file], ['file' => 'Required|mimes:xls']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testCustomValidationObject()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name' => new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return ':attribute must be taylor';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => [new class implements Rule {
+                public function passes($attribute, $value)
+                {
+                    return $value === 'taylor';
+                }
+
+                public function message()
+                {
+                    return ':attribute must be taylor';
+                }
+            }]]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->all()[0]);
+
+        // Test passing case with Closure...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name.*' => function ($attribute, $value, $fail) {
+                if ($value !== 'taylor') {
+                    $fail(':attribute was '.$value.' instead of taylor');
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+
+        // Test failing case with Closure...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => function ($attribute, $value, $fail) {
+                if ($value !== 'taylor') {
+                    $fail(':attribute was '.$value.' instead of taylor');
+                }
+            }]
+        );
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name was adam instead of taylor', $v->errors()->all()[0]);
+
+        // Test complex failing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
+            [
+                'states.*' => new class implements Rule {
+                    public function passes($attribute, $value)
+                    {
+                        return in_array($value, ['AK', 'HI']);
+                    }
+
+                    public function message()
+                    {
+                        return ':attribute must be AR or TX';
+                    }
+                },
+                'name' => function ($attribute, $value, $fail) {
+                    if ($value !== 'taylor') {
+                        $fail(':attribute must be taylor');
+                    }
+                },
+                'number' => [
+                    'required',
+                    'integer',
+                    function ($attribute, $value, $fail) {
+                        if ($value % 4 !== 0) {
+                            $fail(':attribute must be divisible by 4');
+                        }
+                    },
+                ],
+            ]
+        );
+
+        $this->assertFalse($v->passes());
+        $this->assertEquals('states.0 must be AR or TX', $v->errors()->get('states.0')[0]);
+        $this->assertEquals('states.1 must be AR or TX', $v->errors()->get('states.1')[0]);
+        $this->assertEquals('number must be divisible by 4', $v->errors()->get('number')[0]);
+    }
+
+    public function testImplicitCustomValidationObjects()
+    {
+        // Test passing case...
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => ''],
+            ['name' => $rule = new class implements ImplicitRule {
+                public $called = false;
+
+                public function passes($attribute, $value)
+                {
+                    $this->called = true;
+
+                    return true;
+                }
+
+                public function message()
+                {
+                    return 'message';
+                }
+            }]
+        );
+
+        $this->assertTrue($v->passes());
+        $this->assertTrue($rule->called);
     }
 
     protected function getTranslator()

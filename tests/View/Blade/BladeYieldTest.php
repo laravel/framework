@@ -1,28 +1,13 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeYieldTest extends TestCase
+class BladeYieldTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testYieldsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo $__env->yieldContent(\'foo\'); ?>', $compiler->compileString('@yield(\'foo\')'));
-        $this->assertEquals('<?php echo $__env->yieldContent(\'foo\', \'bar\'); ?>', $compiler->compileString('@yield(\'foo\', \'bar\')'));
-        $this->assertEquals('<?php echo $__env->yieldContent(name(foo)); ?>', $compiler->compileString('@yield(name(foo))'));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $this->assertEquals('<?php echo $__env->yieldContent(\'foo\'); ?>', $this->compiler->compileString('@yield(\'foo\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent(\'foo\', \'bar\'); ?>', $this->compiler->compileString('@yield(\'foo\', \'bar\')'));
+        $this->assertEquals('<?php echo $__env->yieldContent(name(foo)); ?>', $this->compiler->compileString('@yield(name(foo))'));
     }
 }

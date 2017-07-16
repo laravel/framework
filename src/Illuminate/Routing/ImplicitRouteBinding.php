@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 
 class ImplicitRouteBinding
@@ -49,9 +50,7 @@ class ImplicitRouteBinding
             return $name;
         }
 
-        $snakedName = snake_case($name);
-
-        if (array_key_exists($snakedName, $parameters)) {
+        if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
             return $snakedName;
         }
     }

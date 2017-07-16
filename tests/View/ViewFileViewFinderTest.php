@@ -73,7 +73,7 @@ class ViewFinderTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testExceptionThrownWhenViewNotFound()
     {
@@ -86,7 +86,8 @@ class ViewFinderTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage No hint path defined for [name].
      */
     public function testExceptionThrownOnInvalidViewName()
     {
@@ -95,7 +96,8 @@ class ViewFinderTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage No hint path defined for [name].
      */
     public function testExceptionThrownWhenNoHintPathIsRegistered()
     {

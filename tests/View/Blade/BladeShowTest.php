@@ -1,26 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeShowTest extends TestCase
+class BladeShowTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testShowsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $this->assertEquals('<?php echo $__env->yieldSection(); ?>', $compiler->compileString('@show'));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $this->assertEquals('<?php echo $__env->yieldSection(); ?>', $this->compiler->compileString('@show'));
     }
 }

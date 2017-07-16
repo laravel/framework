@@ -47,7 +47,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->integer('age')->change();
         });
 
-        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar());
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar);
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',

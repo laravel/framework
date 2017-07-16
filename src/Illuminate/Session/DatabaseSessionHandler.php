@@ -2,9 +2,9 @@
 
 namespace Illuminate\Session;
 
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use SessionHandlerInterface;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\QueryException;
 use Illuminate\Database\ConnectionInterface;
@@ -137,7 +137,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      *
      * @param  string  $sessionId
      * @param  string  $payload
-     * @return void
+     * @return bool|null
      */
     protected function performInsert($sessionId, $payload)
     {

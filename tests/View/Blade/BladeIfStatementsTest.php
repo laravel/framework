@@ -1,32 +1,56 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeIfStatementsTest extends TestCase
+class BladeIfStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testIfStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@if (name(foo(bar)))
 breeze
 @endif';
         $expected = '<?php if(name(foo(bar))): ?>
 breeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    protected function getFiles()
+    public function testSwitchstatementsAreCompiled()
     {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $string = '@switch(true)
+@case(1)
+foo
+
+@case(2)
+bar
+@endswitch
+
+foo
+
+@switch(true)
+@case(1)
+foo
+
+@case(2)
+bar
+@endswitch';
+        $expected = '<?php switch(true):
+case (1): ?>
+foo
+
+<?php case (2): ?>
+bar
+<?php endswitch; ?>
+
+foo
+
+<?php switch(true):
+case (1): ?>
+foo
+
+<?php case (2): ?>
+bar
+<?php endswitch; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

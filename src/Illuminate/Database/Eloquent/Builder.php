@@ -627,6 +627,8 @@ class Builder
             }
 
             $lastId = $results->last()->{$alias};
+
+            unset($results);
         } while ($countResults == $count);
 
         return true;
@@ -931,7 +933,7 @@ class Builder
         $originalWhereCount = is_null($query->wheres)
                     ? 0 : count($query->wheres);
 
-        $result = $scope(...array_values($parameters)) ?: $this;
+        $result = $scope(...array_values($parameters)) ?? $this;
 
         if (count($query->wheres) > $originalWhereCount) {
             $this->addNewWheresWithinGroup($query, $originalWhereCount);

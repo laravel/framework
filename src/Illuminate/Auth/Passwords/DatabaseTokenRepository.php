@@ -2,8 +2,8 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Carbon\Carbon;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
