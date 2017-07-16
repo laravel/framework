@@ -236,6 +236,49 @@ class NotificationMailChannelTest extends TestCase
         $channel->send($notifiable, $notification);
     }
 
+    public function testMessageWithCCandBCC()
+    {
+        $notification = new NotificationMailChannelTestNotificationWithCCandBCC;
+        $notifiable = new NotificationMailChannelTestNotifiable;
+
+        $message = $notification->toMail($notifiable);
+        $data = $message->toArray();
+
+        $channel = new \Illuminate\Notifications\Channels\MailChannel(
+            $mailer = Mockery::mock(\Illuminate\Contracts\Mail\Mailer::class)
+        );
+
+        $markdown = Mockery::mock(StdClass::class);
+        $markdown->shouldReceive('render')->andReturn($html = new HtmlString(''));
+        $markdown->shouldReceive('renderText')->andReturn($text = new HtmlString(''));
+
+        $channel->setMarkdownResolver(function () use ($markdown) {
+            return $markdown;
+        });
+
+        $views = ['html' => $html, 'text' => $text];
+
+        $mailer->shouldReceive('send')->with($views, $data, Mockery::on(function ($closure) {
+            $mock = Mockery::mock('Illuminate\Mailer\Message');
+
+            $mock->shouldReceive('subject')->once();
+
+            $mock->shouldReceive('to')->once();
+
+            $mock->shouldReceive('from')->with('test@mail.com', null);
+
+            $mock->shouldReceive('cc')->with('cc@mail.com', null);
+
+            $mock->shouldReceive('bcc')->with('bcc@mail.com', null);
+
+            $closure($mock);
+
+            return true;
+        }));
+
+        $channel->send($notifiable, $notification);
+    }
+
     public function testMessageWithReplyToAddress()
     {
         $notification = new NotificationMailChannelTestNotificationWithReplyToAddress;
@@ -417,6 +460,16 @@ class NotificationMailChannelTestNotificationWithFromAddressNoName extends Notif
     {
         return (new MailMessage)
             ->from('test@mail.com');
+    }
+}
+
+class NotificationMailChannelTestNotificationWithCCandBCC extends Notification
+{
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->cc('cc@mail.com')
+            ->bcc('bcc@mail.com');
     }
 }
 
