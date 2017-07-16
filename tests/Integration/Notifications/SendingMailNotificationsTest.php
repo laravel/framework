@@ -81,6 +81,10 @@ class SendingMailNotificationsTest extends TestCase
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
 
+                $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
+
+                $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
+
                 $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
 
                 $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
@@ -159,6 +163,8 @@ class TestMailNotification extends Notification
     {
         return (new MailMessage)
             ->priority(1)
+            ->cc('cc@deepblue.com', 'cc')
+            ->bcc('bcc@deepblue.com', 'bcc')
             ->from('jack@deepblue.com', 'Jacques Mayol')
             ->replyTo('jack@deepblue.com', 'Jacques Mayol')
             ->line('The introduction to the notification.');
