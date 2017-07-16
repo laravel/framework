@@ -58,5 +58,4 @@ class Foundation extends Preset
 
         copy(__DIR__.'/foundation-stubs/bootstrap.js', resource_path('assets/js/bootstrap.js'));
     }
-
 }
