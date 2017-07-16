@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Exception;
+use Illuminate\Console\Command;
 use Throwable;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
@@ -83,29 +84,9 @@ class Kernel implements KernelContract
         $this->app = $app;
         $this->events = $events;
 
-        $this->autoRegisterCommands();
-
         $this->app->booted(function () {
             $this->defineConsoleSchedule();
         });
-    }
-
-    /**
-     * Auto register commands.
-     *
-     * @return void
-     */
-    protected function autoRegisterCommands()
-    {
-        if (! is_dir($commands = app_path('Console/Commands/'))) {
-            return;
-        }
-
-        $namespace = $this->app->getNamespace();
-
-        foreach ((new Finder)->in($commands)->files() as $command) {
-            $this->commands[] = $namespace.'Console\\Commands\\'.$command->getBaseName('.php');
-        }
     }
 
     /**
@@ -302,11 +283,37 @@ class Kernel implements KernelContract
     protected function getArtisan()
     {
         if (is_null($this->artisan)) {
-            return $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
+            $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
                                 ->resolveCommands($this->commands);
         }
 
+        $this->autoRegisterCommands();
+
         return $this->artisan;
+    }
+
+    /**
+     * Auto register commands.
+     *
+     * @return void
+     */
+    protected function autoRegisterCommands()
+    {
+        if (! is_dir($commands = app_path('Console/Commands'))) {
+            return;
+        }
+
+        $namespace = $this->app->getNamespace();
+
+        foreach ((new Finder)->in($commands)->files() as $command) {
+            $command = $namespace.str_replace(['/', '.php'], ['\\', ''],
+                    str_after($command->getPathname(), app_path().'/')
+                );
+
+            if (is_subclass_of($command, Command::class)) {
+                $this->artisan->resolve($command);
+            }
+        }
     }
 
     /**
