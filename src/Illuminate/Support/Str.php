@@ -156,6 +156,9 @@ class Str
         }
 
         foreach ($patterns as $pattern) {
+            // If the given value is an exact match we can of course return true right
+            // from the beginning. Otherwise, we will translate asterisks and do an
+            // actual pattern match against the two strings to see if they match.
             if ($pattern == $value) {
                 return true;
             }
