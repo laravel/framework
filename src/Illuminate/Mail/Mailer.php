@@ -386,7 +386,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new e-mail message for sending after (n) seconds.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array|MailableContract  $view
      * @param  string|null  $queue
      * @return mixed
@@ -404,7 +404,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Queue a new e-mail message for sending after (n) seconds on the given queue.
      *
      * @param  string  $queue
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array  $view
      * @return mixed
      */
