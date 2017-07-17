@@ -452,7 +452,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->items->all());
+        return $this->items->getIterator();
     }
 
     /**
