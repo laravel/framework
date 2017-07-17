@@ -61,6 +61,10 @@ trait ValidatesRequests
      */
     public function validatePreconditions(Request $request, $eTag = null, $lastModified = null)
     {
+        if (in_array($request->getMethod(), ['DELETE', 'PATCH', 'PUT']) === false) {
+            return $this;
+        }
+
         if ($request->passesPreconditions($eTag, $lastModified) === false) {
             throw new PreconditionFailedHttpException;
         }
