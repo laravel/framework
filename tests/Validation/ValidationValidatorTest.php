@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Validation;
 
 use DateTime;
 use Mockery as m;
+use DateTimeImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -2272,6 +2273,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['x' => new DateTime], ['x' => 'date']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => new DateTimeImmutable], ['x' => 'date']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
