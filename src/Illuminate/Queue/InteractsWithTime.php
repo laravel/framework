@@ -17,7 +17,7 @@ trait InteractsWithTime
      */
     protected function secondsUntil($delay)
     {
-        $delay = $this->handlesInterval($delay);
+        $delay = $this->parseDateInterval($delay);
 
         return $delay instanceof DateTimeInterface
                             ? max(0, $delay->getTimestamp() - $this->currentTime())
@@ -32,7 +32,7 @@ trait InteractsWithTime
      */
     protected function availableAt($delay = 0)
     {
-        $delay = $this->handlesInterval($delay);
+        $delay = $this->parseDateInterval($delay);
 
         return $delay instanceof DateTimeInterface
                             ? $delay->getTimestamp()
@@ -40,12 +40,12 @@ trait InteractsWithTime
     }
 
     /**
-     * Converts an interval to a DateTime instance.
+     * If the given value is an interval, convert it to a DateTime instance.
      *
      * @param \DateTimeInterface|\DateInterval|int
      * @return \DateTime
      */
-    protected function handlesInterval($delay)
+    protected function parseDateInterval($delay)
     {
         if ($delay instanceof DateInterval) {
             $delay = (new DateTime)->add($delay);
