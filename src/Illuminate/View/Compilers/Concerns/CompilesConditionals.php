@@ -119,7 +119,7 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
-    
+
     /**
      * Compile the if-errors statements into valid PHP.
      *
@@ -130,7 +130,7 @@ trait CompilesConditionals
     {
         return "<?php if(is_null(session('errors')) ? false:{$key} !== null ? session('errors')->has({$key}):true): ?>";
     }
-    
+
     /**
      * Compile the end-errors statements into valid PHP.
      *
