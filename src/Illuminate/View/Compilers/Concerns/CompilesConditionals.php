@@ -11,17 +11,6 @@ trait CompilesConditionals
      */
     protected $firstCaseInSwitch = true;
 
-    /**
-     * Compile the has-section statements into valid PHP.
-     *
-     * @param  string  $expression
-     * @return string
-     */
-    protected function compileHasSection($expression)
-    {
-        return "<?php if (! empty(trim(\$__env->yieldContent{$expression}))): ?>";
-    }
-
     /*
      * Compile the if-auth statements into valid PHP.
      *
@@ -41,6 +30,17 @@ trait CompilesConditionals
     protected function compileEndAuth()
     {
         return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the has-section statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHasSection($expression)
+    {
+        return "<?php if (! empty(trim(\$__env->yieldContent{$expression}))): ?>";
     }
 
     /**
