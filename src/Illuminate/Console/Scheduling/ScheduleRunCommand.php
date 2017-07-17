@@ -49,7 +49,7 @@ class ScheduleRunCommand extends Command
     {
         $eventsRan = false;
 
-        foreach ($this->schedule->dueEvents($this->laravel)->toArray() as $event) {
+        foreach ($this->schedule->dueEvents($this->laravel) as $event) {
             if (! $event->filtersPass($this->laravel)) {
                 continue;
             }
