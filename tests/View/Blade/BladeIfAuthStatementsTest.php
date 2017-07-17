@@ -16,7 +16,7 @@ class BladeIfAuthStatementsTest extends TestCase
     public function testIfStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $string = '@auth ("api")
+        $string = '@auth("api")
 breeze
 @endisset';
         $expected = '<?php if(auth()->guard("api")->check()): ?>
