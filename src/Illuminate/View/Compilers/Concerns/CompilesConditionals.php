@@ -119,4 +119,25 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+    
+    /**
+     * Compile the if-errors statements into valid PHP.
+     *
+     * @param  string|null  $key
+     * @return string
+     */
+    protected function compileErrors($key = null)
+    {
+        return "<?php if(is_null(session('errors')) ? false:{$key} !== null ? session('errors')->has({$key}):true): ?>"
+    }
+    
+    /**
+     * Compile the end-errors statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndErrors()
+    {
+        return '<?php endif; ?>';
+    }
 }
