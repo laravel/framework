@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Validation;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
 trait ValidatesRequests
 {
@@ -47,6 +48,42 @@ trait ValidatesRequests
              ->validate();
 
         return $request->only(array_keys($rules));
+    }
+
+    /**
+     * Validate the request preconditions.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param  string|null  $eTag
+     * @param  string|null  $lastModified
+     * @return $this
+     */
+    public function validatePreconditions(Request $request, $eTag = null, $lastModified = null)
+    {
+        if ($request->passesPreconditions($eTag, $lastModified) === false) {
+            throw new PreconditionFailedHttpException;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Validate the request preconditions using an entity.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param mixed $entity
+     * @return $this
+     */
+    public function validateEntityPreconditions(Request $request, $entity = null)
+    {
+        if ($entity === null) {
+            return $this;
+        }
+
+        $etag = method_exists($entity, 'getEtag') ? $entity->getEtag() : null;
+        $lastModified = method_exists($entity, 'getLastModified') ? $entity->getEtag() : null;
+
+        return $this->validatePreconditions($request, $etag, $lastModified);
     }
 
     /**

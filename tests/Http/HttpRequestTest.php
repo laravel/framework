@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Http;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -788,6 +789,52 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($request->undefined, null);
         $this->assertEquals(isset($request->undefined), false);
         $this->assertEquals(empty($request->undefined), true);
+    }
+
+    public function testRequestPassesPreconditions()
+    {
+        $request = Request::create('/', 'GET');
+        $this->assertTrue($request->passesPreconditions(null, null));
+
+        // etags
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-None-Match' => '12345']);
+        $this->assertTrue($request->passesPreconditions(null));
+
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-None-Match' => '*']);
+        $this->assertTrue($request->passesPreconditions('12345'));
+
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-None-Match' => '12345']);
+        $this->assertFalse($request->passesPreconditions('qwerty'));
+
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-None-Match' => '12345']);
+        $this->assertTrue($request->passesPreconditions('12345'));
+
+        // Last Modified
+        Carbon::setTestNow($now = Carbon::now('UTC'));
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-Modified-Since' => $now]);
+        $this->assertTrue($request->passesPreconditions(null, null));
+
+        Carbon::setTestNow($now = Carbon::now('UTC'));
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-Modified-Since' => $now]);
+        $this->assertTrue($request->passesPreconditions(null, $now));
+
+        Carbon::setTestNow($now = Carbon::now('UTC'));
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-Modified-Since' => $now]);
+        $this->assertTrue($request->passesPreconditions(null, $now->subMinute()));
+
+        Carbon::setTestNow($now = Carbon::now('UTC'));
+        $request = Request::create('/', 'GET');
+        $request->headers->add(['If-Modified-Since' => $now]);
+        $this->assertFalse($request->passesPreconditions(null, $now->addMinute()));
+
+        Carbon::setTestNow();
     }
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
