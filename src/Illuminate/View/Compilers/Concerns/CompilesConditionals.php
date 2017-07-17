@@ -128,7 +128,7 @@ trait CompilesConditionals
      */
     protected function compileErrors($key = null)
     {
-        return "<?php if(is_null(session('errors')) ? false:{$key} !== null ? session('errors')->has({$key}):true): ?>"
+        return "<?php if(is_null(session('errors')) ? false:{$key} !== null ? session('errors')->has({$key}):true): ?>";
     }
     
     /**
