@@ -29,10 +29,8 @@ trait HandlesConditions
      */
     public function getLastModified()
     {
-        if (! $this->exists) {
-            return;
+        if ($this->exists) {
+            return $this->{$this->getUpdatedAtColumn()};
         }
-
-        return $this->{$this->getUpdatedAtColumn()};
     }
 }
