@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Throwable;
 use Illuminate\Support\Str;
+use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -211,9 +212,11 @@ class Kernel implements KernelContract
                 Str::after($command->getPathname(), app_path().'/')
             );
 
-            Artisan::starting(function ($artisan) use ($command) {
-                $artisan->resolve($command);
-            });
+            if (is_subclass_of($command, Command::class)) {
+                Artisan::starting(function ($artisan) use ($command) {
+                    $artisan->resolve($command);
+                });
+            }
         }
     }
 
