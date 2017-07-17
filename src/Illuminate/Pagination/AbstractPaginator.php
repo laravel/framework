@@ -3,7 +3,6 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use ArrayIterator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
@@ -452,7 +451,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->items->all());
+        return $this->items->getIterator();
     }
 
     /**
