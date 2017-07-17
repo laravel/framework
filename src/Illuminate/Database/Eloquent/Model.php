@@ -10,6 +10,7 @@ use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Http\ConditionEntity;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -18,9 +19,10 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model implements ArrayAccess, Arrayable, ConditionEntity, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
+        Concerns\HandlesConditions,
         Concerns\HasEvents,
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,

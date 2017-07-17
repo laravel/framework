@@ -822,11 +822,11 @@ class HttpRequestTest extends TestCase
         Carbon::setTestNow($now = Carbon::now('UTC'));
         $request = Request::create('/', 'GET');
         $request->headers->add(['If-Modified-Since' => $now]);
-        $this->assertTrue($request->passesPreconditions(null, $now));
+        $this->assertTrue($request->passesPreconditions(null, $now->toDateTimeString()));
 
         Carbon::setTestNow($now = Carbon::now('UTC'));
         $request = Request::create('/', 'GET');
-        $request->headers->add(['If-Modified-Since' => $now]);
+        $request->headers->add(['If-Modified-Since' => $now->toW3cString()]);
         $this->assertTrue($request->passesPreconditions(null, $now->subMinute()));
 
         Carbon::setTestNow($now = Carbon::now('UTC'));

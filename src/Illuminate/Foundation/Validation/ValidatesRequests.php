@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Contracts\Http\ConditionEntity;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException;
 
@@ -78,6 +79,10 @@ trait ValidatesRequests
     {
         if ($entity === null) {
             return $this;
+        }
+
+        if ($entity instanceof ConditionEntity) {
+            return $this->validatePreconditions($request, $entity->getEtag(), $entity->getLastModified());
         }
 
         $etag = method_exists($entity, 'getEtag') ? $entity->getEtag() : null;
