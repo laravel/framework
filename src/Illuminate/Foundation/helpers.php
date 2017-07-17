@@ -442,11 +442,9 @@ if (! function_exists('errors')) {
     function errors($key = null)
     {
         $errors = session('errors');
-        if (is_null($errors))
-        {
+        if (is_null($errors)) {
             return false;
-        } else if ($key !== null)
-        {
+        } elseif ($key !== null) {
             return $errors->has($key);
         }
 
