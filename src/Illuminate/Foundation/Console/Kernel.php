@@ -5,6 +5,8 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
+use Symfony\Component\Finder\Finder;
+use Illuminate\Console\ShouldAutoRegister;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
@@ -281,11 +283,37 @@ class Kernel implements KernelContract
     protected function getArtisan()
     {
         if (is_null($this->artisan)) {
-            return $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
+            $this->artisan = (new Artisan($this->app, $this->events, $this->app->version()))
                                 ->resolveCommands($this->commands);
         }
 
+        $this->autoRegisterCommands();
+
         return $this->artisan;
+    }
+
+    /**
+     * Auto register commands.
+     *
+     * @return void
+     */
+    protected function autoRegisterCommands()
+    {
+        if (! is_dir($commands = app_path('Console/Commands'))) {
+            return;
+        }
+
+        $namespace = $this->app->getNamespace();
+
+        foreach ((new Finder)->in($commands)->files() as $command) {
+            $command = $namespace.str_replace(['/', '.php'], ['\\', ''],
+                    str_after($command->getPathname(), app_path().'/')
+                );
+
+            if (class_implements($command, ShouldAutoRegister::class)) {
+                $this->artisan->resolve($command);
+            }
+        }
     }
 
     /**
