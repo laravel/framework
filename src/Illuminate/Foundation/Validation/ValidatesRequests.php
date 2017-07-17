@@ -58,6 +58,7 @@ trait ValidatesRequests
      * @param  string|null  $eTag
      * @param  string|null  $lastModified
      * @return $this
+     * @throws \Symfony\Component\HttpKernel\Exception\PreconditionFailedHttpException
      */
     public function validatePreconditions(Request $request, $eTag = null, $lastModified = null)
     {
