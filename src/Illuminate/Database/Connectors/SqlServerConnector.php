@@ -126,6 +126,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['TrustServerCertificate'] = $config['trust_server_certificate'];
         }
 
+        if (isset($config['multiple_active_resultsets']) && $config['multiple_active_resultsets'] === false) {
+            $arguments['MultipleActiveResultSets'] = 'false';
+        }
+
         return $this->buildConnectString('sqlsrv', $arguments);
     }
 
