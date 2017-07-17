@@ -5,6 +5,8 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
+use Illuminate\Support\Str;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
@@ -186,6 +188,33 @@ class Kernel implements KernelContract
         });
 
         return $command;
+    }
+
+    /**
+     * Register all of the commands in the given directory.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function load($path)
+    {
+        if (! is_dir($path)) {
+            return;
+        }
+
+        $namespace = $this->app->getNamespace();
+
+        foreach ((new Finder)->in($path)->files() as $command) {
+            $command = $namespace.str_replace(
+                ['/', '.php'],
+                ['\\', ''],
+                Str::after($command->getPathname(), app_path().'/')
+            );
+
+            Artisan::starting(function ($artisan) use ($command) {
+                $artisan->resolve($command);
+            });
+        }
     }
 
     /**
