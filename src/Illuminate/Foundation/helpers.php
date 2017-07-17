@@ -432,6 +432,28 @@ if (! function_exists('encrypt')) {
     }
 }
 
+if (! function_exists('errors')) {
+    /**
+     * Returns true if session has errors, and optionally key-specific errors.
+     *
+     * @param  string|null  $key
+     * @return bool
+     */
+    function errors($key = null)
+    {
+        $errors = session('errors');
+        if (is_null($errors))
+        {
+            return false;
+        } else if ($key !== null)
+        {
+            return $errors->has($key);
+        }
+
+        return true;
+    }
+}
+
 if (! function_exists('event')) {
     /**
      * Dispatch an event and call the listeners.
