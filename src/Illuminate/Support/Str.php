@@ -149,18 +149,30 @@ class Str
      */
     public static function is($pattern, $value)
     {
-        if ($pattern == $value) {
-            return true;
+        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+
+        if (empty($patterns)) {
+            return false;
         }
 
-        $pattern = preg_quote($pattern, '#');
+        foreach ($patterns as $pattern) {
+            if ($pattern == $value) {
+                return true;
+            }
 
-        // Asterisks are translated into zero-or-more regular expression wildcards
-        // to make it convenient to check if the strings starts with the given
-        // pattern such as "library/*", making any string check convenient.
-        $pattern = str_replace('\*', '.*', $pattern);
+            $pattern = preg_quote($pattern, '#');
 
-        return (bool) preg_match('#^'.$pattern.'\z#u', $value);
+            // Asterisks are translated into zero-or-more regular expression wildcards
+            // to make it convenient to check if the strings starts with the given
+            // pattern such as "library/*", making any string check convenient.
+            $pattern = str_replace('\*', '.*', $pattern);
+
+            if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

@@ -220,6 +220,18 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Str::is('foo.ar', 'foobar'));
         $this->assertFalse(Str::is('foo?bar', 'foobar'));
         $this->assertFalse(Str::is('foo?bar', 'fobar'));
+
+        $this->assertTrue(Str::is([
+            '*.dev',
+            '*oc*',
+        ], 'localhost.dev'));
+
+        $this->assertFalse(Str::is([
+            '/',
+            'a*',
+        ], 'localhost.dev'));
+
+        $this->assertFalse(Str::is([], 'localhost.dev'));
     }
 
     public function testStrRandom()
