@@ -130,7 +130,7 @@ class Schedule
      */
     public function dueEvents($app)
     {
-        return collect($this->events)->filter->isDue($app);
+        return collect($this->events)->filter->isDue($app)->toArray();
     }
 
     /**
