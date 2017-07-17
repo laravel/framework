@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use DateTime;
 use DateInterval;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
@@ -12,7 +11,7 @@ trait InteractsWithTime
     /**
      * Get the number of seconds until the given DateTime.
      *
-     * @param  \DateTimeInterface|\DateInterval  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @return int
      */
     protected function secondsUntil($delay)
@@ -43,12 +42,12 @@ trait InteractsWithTime
      * If the given value is an interval, convert it to a DateTime instance.
      *
      * @param \DateTimeInterface|\DateInterval|int
-     * @return \DateTime
+     * @return \DateTimeInterface|int
      */
     protected function parseDateInterval($delay)
     {
         if ($delay instanceof DateInterval) {
-            $delay = (new DateTime)->add($delay);
+            $delay = Carbon::now()->add($delay);
         }
 
         return $delay;
