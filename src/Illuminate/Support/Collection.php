@@ -281,7 +281,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Dump the collection.
      *
-     * @return void
+     * @return static
      */
     public function dump()
     {
