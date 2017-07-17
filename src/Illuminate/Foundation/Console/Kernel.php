@@ -5,8 +5,8 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
-use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
+use Illuminate\Console\ShouldAutoRegister;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
@@ -310,7 +310,7 @@ class Kernel implements KernelContract
                     str_after($command->getPathname(), app_path().'/')
                 );
 
-            if (is_subclass_of($command, Command::class)) {
+            if (class_implements($command, ShouldAutoRegister::class)) {
                 $this->artisan->resolve($command);
             }
         }
