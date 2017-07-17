@@ -102,7 +102,7 @@ class Encrypter implements EncrypterContract
 
         $json = json_encode(compact('iv', 'value', 'mac'));
 
-        if (! is_string($json)) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptException('Could not encrypt the data.');
         }
 
