@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
-use Illuminate\Http\Testing\MimeType;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\Testing\MimeType;
 
 class HttpMimeTypeTest extends TestCase
 {
