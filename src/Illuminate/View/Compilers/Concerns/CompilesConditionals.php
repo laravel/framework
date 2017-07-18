@@ -33,6 +33,27 @@ trait CompilesConditionals
     }
 
     /**
+     * Compile the if-guest statements into valid PHP.
+     *
+     * @param  string|null  $guard
+     * @return string
+     */
+    protected function compileGuest($guard = null)
+    {
+        return "<?php if(auth()->guard{$guard}->guest()): ?>";
+    }
+
+    /**
+     * Compile the end-guest statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndGuest()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the has-section statements into valid PHP.
      *
      * @param  string  $expression
