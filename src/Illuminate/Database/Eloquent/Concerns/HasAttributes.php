@@ -1128,7 +1128,7 @@ trait HasAttributes
         // Here we will spin through every attribute and see if this is in the array of
         // dirty attributes. If it is, we will return true and if we make it through
         // all of the attributes for the entire array we will return false at end.
-        foreach (array_wrap($attributes) as $attribute) {
+        foreach (Arr::wrap($attributes) as $attribute) {
             if (array_key_exists($attribute, $changes)) {
                 return true;
             }
