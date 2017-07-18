@@ -75,7 +75,7 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith(0.27, '0.27'));
         $this->assertFalse(Str::endsWith(0.27, '8'));
     }
-    
+
     public function testStrBefore()
     {
         $this->assertEquals('han', Str::before('hannah', 'nah'));
