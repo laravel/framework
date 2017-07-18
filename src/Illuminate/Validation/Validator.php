@@ -2,7 +2,6 @@
 
 namespace Illuminate\Validation;
 
-use Closure;
 use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
