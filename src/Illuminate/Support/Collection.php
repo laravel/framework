@@ -38,25 +38,47 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     ];
 
     /**
-     * Create a new collection.
+     * Create a new collection. If $nested, will create a collection for all traversable nested levels.
      *
      * @param  mixed  $items
+     * @param  bool  $nested
      * @return void
      */
-    public function __construct($items = [])
+    public function __construct($items = [], $nested = false)
     {
         $this->items = $this->getArrayableItems($items);
+
+        if ($nested) {
+            $this->items = $this->parseNested()->all();
+        }
+    }
+
+    /**
+     * Convert all nested levels of traversable items to collections.
+     *
+     * @return static
+     */
+    public function parseNested()
+    {
+        return $this->map(function ($value) {
+            if (is_array($value) || $value instanceof Traversable) {
+                return $value instanceof self ? $value->parseNested() : (new static($value))->parseNested();
+            }
+
+            return $value;
+        });
     }
 
     /**
      * Create a new collection instance if the value isn't one already.
      *
      * @param  mixed  $items
+     * @param  bool  $nested
      * @return static
      */
-    public static function make($items = [])
+    public static function make($items = [], $nested = false)
     {
-        return new static($items);
+        return new static($items, $nested);
     }
 
     /**
