@@ -126,9 +126,9 @@ trait CompilesConditionals
      * @param  string|null  $key
      * @return string
      */
-    protected function compileErrors($key = null)
+    protected function compileErrors($expression = null)
     {
-        return "<?php if(errors({$key})): ?>";
+        return "<?php if(errors{$expression}): ?>";
     }
 
     /**
