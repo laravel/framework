@@ -121,7 +121,7 @@ trait CompilesConditionals
     }
     
     /**
-     * Compile the if-auth statements into valid PHP.
+     * Compile the if-guest statements into valid PHP.
      *
      * @param  string|null  $guard
      * @return string
@@ -132,7 +132,7 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile the end-auth statements into valid PHP.
+     * Compile the end-guest statements into valid PHP.
      *
      * @return string
      */
