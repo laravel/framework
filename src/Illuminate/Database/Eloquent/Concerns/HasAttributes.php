@@ -29,7 +29,7 @@ trait HasAttributes
     protected $original = [];
 
     /**
-     * The changed model attribute's.
+     * The changed model attributes.
      *
      * @var array
      */
@@ -984,6 +984,32 @@ trait HasAttributes
     public function isClean($attributes = null)
     {
         return ! $this->isDirty(...func_get_args());
+    }
+
+    /**
+     * Determine if the model or given attribute(s) have been modified.
+     *
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    public function isChanged($attributes = null)
+    {
+        $changes = $this->getChanges();
+
+        if (is_null($attributes)) {
+            return count($changes) > 0;
+        }
+
+        $attributes = is_array($attributes)
+            ? $attributes : func_get_args();
+
+        foreach ($attributes as $attribute) {
+            if (array_key_exists($attribute, $changes)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

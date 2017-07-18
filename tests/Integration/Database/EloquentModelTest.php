@@ -63,16 +63,22 @@ class EloquentModelTest extends TestCase
 
         $this->assertEmpty($user->getDirty());
         $this->assertEmpty($user->getChanges());
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->isChanged());
 
         $user->name = $name = str_random();
 
         $this->assertEquals(['name' => $name], $user->getDirty());
         $this->assertEmpty($user->getChanges());
+        $this->assertTrue($user->isDirty());
+        $this->assertFalse($user->isChanged());
 
         $user->save();
 
         $this->assertEmpty($user->getDirty());
         $this->assertEquals(['name' => $name], $user->getChanges());
+        $this->assertTrue($user->isChanged());
+        $this->assertTrue($user->isChanged('name'));
     }
 }
 
