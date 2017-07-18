@@ -28,6 +28,13 @@ class ModelIdentifier
     public $connection;
 
     /**
+     * The changes applied to the model.
+     *
+     * @var array
+     */
+    public $changes = [];
+
+    /**
      * Create a new model identifier.
      *
      * @param  string  $class
@@ -40,5 +47,28 @@ class ModelIdentifier
         $this->id = $id;
         $this->class = $class;
         $this->connection = $connection;
+    }
+
+    /**
+     * Set the changes applied to the mode;.
+     *
+     * @param  array  $changes
+     * @return $this
+     */
+    public function setChanges($changes)
+    {
+        $this->changes = $changes;
+
+        return $this;
+    }
+
+    /**
+     * The changes applied to the model.
+     *
+     * @return array
+     */
+    public function getChanges()
+    {
+        return $this->changes;
     }
 }

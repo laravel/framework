@@ -26,11 +26,11 @@ trait SerializesAndRestoresModelIdentifiers
         }
 
         if ($value instanceof QueueableEntity) {
-            return new ModelIdentifier(
+            return (new ModelIdentifier(
                 get_class($value),
                 $value->getQueueableId(),
                 $value->getQueueableConnection()
-            );
+            ))->setChanges($value->getChanges());
         }
 
         return $value;
@@ -51,7 +51,7 @@ trait SerializesAndRestoresModelIdentifiers
         return is_array($value->id)
                 ? $this->restoreCollection($value)
                 : $this->getQueryForModelRestoration((new $value->class)->setConnection($value->connection))
-                    ->useWritePdo()->findOrFail($value->id);
+                    ->useWritePdo()->findOrFail($value->id)->setChanges($value->changes);
     }
 
     /**

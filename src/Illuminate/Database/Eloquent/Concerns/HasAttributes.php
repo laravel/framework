@@ -878,6 +878,19 @@ trait HasAttributes
     }
 
     /**
+     * Set the array of model changes.
+     *
+     * @param  array  $changes
+     * @return $this
+     */
+    public function setChanges(array $changes)
+    {
+        $this->changes = $changes;
+
+        return $this;
+    }
+
+    /**
      * Get the model's original attribute values.
      *
      * @param  string|null  $key
