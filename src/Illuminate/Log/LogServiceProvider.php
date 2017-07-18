@@ -48,7 +48,7 @@ class LogServiceProvider extends ServiceProvider
     {
         if ($this->app->bound('config') &&
             $channel = $this->app->make('config')->get('app.log_channel')) {
-                return $channel;
+            return $channel;
         }
 
         return $this->app->bound('env') ? $this->app->environment() : 'production';
