@@ -2250,7 +2250,7 @@ class SupportCollectionTest extends TestCase
                     'bar' => ['foo', 'bar'],
                 ]),
 
-            ]
+            ],
         ];
 
         $basicCollection = new Collection($nestedArray);
@@ -2264,7 +2264,7 @@ class SupportCollectionTest extends TestCase
                 '2ndLevelArrayableObj' => new TestArrayableObject(),
                 '2ndLevelSubCollection' => new TestCollectionSubclass([
                     'foo' => new TestArrayableObject(),
-                    'bar' => new TestCollectionSubclass(['foo', 'bar'])
+                    'bar' => new TestCollectionSubclass(['foo', 'bar']),
                 ]),
             ]),
         ]);
