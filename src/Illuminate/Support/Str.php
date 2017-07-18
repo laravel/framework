@@ -65,7 +65,7 @@ class Str
 
         return preg_replace('/[^\x20-\x7E]/u', '', $value);
     }
-    
+
     /**
      * Get the portion of a string before a given value.
      *
