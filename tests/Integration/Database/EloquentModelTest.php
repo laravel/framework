@@ -28,15 +28,21 @@ class EloquentModelTest extends TestCase
     {
         parent::setUp();
 
-        Schema::create('users', function ($table) {
+        Schema::create('test_model1', function ($table) {
             $table->increments('id');
             $table->timestamp('nullable_date')->nullable();
+        });
+
+        Schema::create('test_model2', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('title');
         });
     }
 
     public function test_user_can_update_nullable_date()
     {
-        $user = EloquentModelTestModel::create([
+        $user = TestModel1::create([
             'nullable_date' => null,
         ]);
 
@@ -48,12 +54,45 @@ class EloquentModelTest extends TestCase
         $user->save();
         $this->assertEquals($now->toDateString(), $user->nullable_date->toDateString());
     }
+
+    public function test_attribute_changes()
+    {
+        $user = TestModel2::create([
+            'name' => str_random(), 'title' => str_random(),
+        ]);
+
+        $this->assertEmpty($user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertFalse($user->isDirty());
+        $this->assertFalse($user->isChanged());
+
+        $user->name = $name = str_random();
+
+        $this->assertEquals(['name' => $name], $user->getDirty());
+        $this->assertEmpty($user->getChanges());
+        $this->assertTrue($user->isDirty());
+        $this->assertFalse($user->isChanged());
+
+        $user->save();
+
+        $this->assertEmpty($user->getDirty());
+        $this->assertEquals(['name' => $name], $user->getChanges());
+        $this->assertTrue($user->isChanged());
+        $this->assertTrue($user->isChanged('name'));
+    }
 }
 
-class EloquentModelTestModel extends Model
+class TestModel1 extends Model
 {
-    public $table = 'users';
+    public $table = 'test_model1';
     public $timestamps = false;
     protected $guarded = ['id'];
     protected $dates = ['nullable_date'];
+}
+
+class TestModel2 extends Model
+{
+    public $table = 'test_model2';
+    public $timestamps = false;
+    protected $guarded = ['id'];
 }
