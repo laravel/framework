@@ -119,7 +119,7 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
- 
+
     /**
      * Compile the if-guest statements into valid PHP.
      *
