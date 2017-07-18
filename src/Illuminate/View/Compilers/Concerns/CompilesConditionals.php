@@ -144,12 +144,12 @@ trait CompilesConditionals
     /**
      * Compile the if-errors statements into valid PHP.
      *
-     * @param  string|null  $key
+     * @param  string|null  $expression
      * @return string
      */
     protected function compileErrors($expression = null)
     {
-        return "<?php if(errors{$expression}): ?>";
+        return "<?php if(has_errors{$expression}): ?>";
     }
 
     /**
