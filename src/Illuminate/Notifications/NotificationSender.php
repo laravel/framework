@@ -6,7 +6,6 @@ use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Database\Eloquent\Collection as ModelCollection;
 
 class NotificationSender
 {
@@ -167,13 +166,13 @@ class NotificationSender
      * Format the notifiables into a Collection / array if necessary.
      *
      * @param  mixed  $notifiables
-     * @return ModelCollection|array
+     * @return \Illuminate\Support\Collection|array
      */
     protected function formatNotifiables($notifiables)
     {
         if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
             return $notifiables instanceof Model
-                            ? new ModelCollection([$notifiables]) : [$notifiables];
+                            ? $notifiables->newCollection([$notifiables]) : [$notifiables];
         }
 
         return $notifiables;
