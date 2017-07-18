@@ -478,13 +478,13 @@ if (! function_exists('has_errors')) {
      * @param  string|null  $bag
      * @return bool
      */
-    function has_errors($key = null, $bag = null)
+    function has_errors($key = null, $bag = 'default')
     {
         $errors = session('errors');
-        if (is_null($errors) || ! $errors->getBag($bag ?: 'default')->any()) {
+        if (is_null($errors) || ! $errors->getBag($bag)->any()) {
             return false;
         } elseif ($key !== null) {
-            return is_null($bag) ? $errors->has($key) : $errors->$bag->has($key);
+            return $errors->getBag($bag)->has($key);
         }
 
         return true;
