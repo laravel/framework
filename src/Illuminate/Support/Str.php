@@ -67,6 +67,18 @@ class Str
     }
 
     /**
+     * Get the portion of a string before a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function before($subject, $search)
+    {
+        return $search === '' ? $subject : explode($search, $subject)[0];
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
