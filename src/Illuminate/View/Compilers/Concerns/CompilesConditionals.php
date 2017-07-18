@@ -119,4 +119,25 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+    
+    /**
+     * Compile the if-auth statements into valid PHP.
+     *
+     * @param  string|null  $guard
+     * @return string
+     */
+    protected function compileGuest($guard = null)
+    {
+        return "<?php if(auth()->guard{$guard}->guest()): ?>";
+    }
+
+    /**
+     * Compile the end-auth statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndGuest()
+    {
+        return '<?php endif; ?>';
+    }
 }
