@@ -437,15 +437,16 @@ if (! function_exists('has_errors')) {
      * Returns true if session has errors, and optionally key-specific errors.
      *
      * @param  string|null  $key
+     * @param  string|null  $bag
      * @return bool
      */
-    function has_errors($key = null)
+    function has_errors($key = null, $bag = null)
     {
         $errors = session('errors');
         if (is_null($errors)) {
             return false;
         } elseif ($key !== null) {
-            return $errors->has($key);
+            return is_null($bag) ? $errors->has($key):$errors->$bag->has($key);
         }
 
         return true;
