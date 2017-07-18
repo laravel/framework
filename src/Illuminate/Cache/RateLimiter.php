@@ -2,9 +2,8 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Support\Carbon;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Cache\Repository as Cache;
 
 class RateLimiter
 {

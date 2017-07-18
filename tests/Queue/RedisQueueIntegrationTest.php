@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Support\InteractsWithTime;
 use Mockery as m;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Tests\Redis\InteractsWithRedis;
 
 class RedisQueueIntegrationTest extends TestCase

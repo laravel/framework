@@ -6,8 +6,8 @@ use Closure;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\ConnectionInterface;
 
 class DatabaseStore implements Store
 {

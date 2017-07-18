@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\InteractsWithTime;
 

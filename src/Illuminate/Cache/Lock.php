@@ -2,8 +2,8 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\LockTimeoutException;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Cache\LockTimeoutException;
 
 abstract class Lock
 {

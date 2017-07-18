@@ -2,9 +2,8 @@
 
 namespace Illuminate\Session;
 
-use Illuminate\Support\InteractsWithTime;
 use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
@@ -85,7 +84,7 @@ class CookieSessionHandler implements SessionHandlerInterface
     {
         $this->cookie->queue($sessionId, json_encode([
             'data' => $data,
-            'expires' => $this->availableAt($this->minutes*60),
+            'expires' => $this->availableAt($this->minutes * 60),
         ]), $this->minutes);
 
         return true;
