@@ -2235,6 +2235,43 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testNestedCollection()
+    {
+        $nestedArray = [
+            '1stLevel' => [
+                '2ndLevel' => [
+                    '3rdLevel' => 'value',
+                    '3rdLevelObj' => (object) ['foo' => 'bar'],
+                ],
+                '2ndLevelArrayableObj' => new TestArrayableObject(),
+                '2ndLevelSubCollection' => new TestCollectionSubclass([
+                    'foo' => new TestArrayableObject(),
+                    'bar' => ['foo', 'bar'],
+                ]),
+
+            ],
+        ];
+
+        $basicCollection = new Collection($nestedArray);
+
+        $nestedCollection = new Collection([
+            '1stLevel' => new Collection([
+                '2ndLevel'    => new Collection([
+                    '3rdLevel'    => 'value',
+                    '3rdLevelObj' => (object) ['foo' => 'bar'],
+                ]),
+                '2ndLevelArrayableObj' => new TestArrayableObject(),
+                '2ndLevelSubCollection' => new TestCollectionSubclass([
+                    'foo' => new TestArrayableObject(),
+                    'bar' => new TestCollectionSubclass(['foo', 'bar']),
+                ]),
+            ]),
+        ]);
+
+        $this->assertEquals($basicCollection, new Collection($nestedArray, false));
+        $this->assertEquals($nestedCollection, new Collection($nestedArray, true));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
