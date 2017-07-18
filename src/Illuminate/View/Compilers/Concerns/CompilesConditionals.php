@@ -142,27 +142,6 @@ trait CompilesConditionals
     }
 
     /**
-     * Compile the if-auth statements into valid PHP.
-     *
-     * @param  string|null  $guard
-     * @return string
-     */
-    protected function compileAuth($guard = null)
-    {
-        return "<?php if(auth()->guard{$guard}->check()): ?>";
-    }
-
-    /**
-     * Compile the end-auth statements into valid PHP.
-     *
-     * @return string
-     */
-    protected function compileEndAuth()
-    {
-        return '<?php endif; ?>';
-    }
-
-    /**
      * Compile the if-errors statements into valid PHP.
      *
      * @param  string|null  $key
