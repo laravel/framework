@@ -29,6 +29,13 @@ trait HasAttributes
     protected $original = [];
 
     /**
+     * The changed model attribute's.
+     *
+     * @var array
+     */
+    protected $changes = [];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -925,6 +932,18 @@ trait HasAttributes
     }
 
     /**
+     * Sync the changed attributes.
+     *
+     * @return $this
+     */
+    public function syncChanges()
+    {
+        $this->changes = $this->getDirty();
+
+        return $this;
+    }
+
+    /**
      * Determine if the model or given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
@@ -983,6 +1002,16 @@ trait HasAttributes
         }
 
         return $dirty;
+    }
+
+    /**
+     * Get the attributes that was changed.
+     *
+     * @return array
+     */
+    public function getChanges()
+    {
+        return $this->changes;
     }
 
     /**
