@@ -32,7 +32,7 @@ class ModelIdentifier
      *
      * @var array
      */
-    public $changes;
+    public $changes = [];
 
     /**
      * Create a new model identifier.

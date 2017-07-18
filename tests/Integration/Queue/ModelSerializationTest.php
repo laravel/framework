@@ -48,6 +48,28 @@ class ModelSerializationTest extends TestCase
     /**
      * @test
      */
+    public function it_keeps_model_changes()
+    {
+        $user = ModelSerializationTestUser::create([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $user->update([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $serialized = serialize(new ModelSerializationTestClass($user));
+
+        $unSerialized = unserialize($serialized);
+
+        $this->assertEquals('testbench', $unSerialized->user->getConnectionName());
+        $this->assertEquals('taylor@laravel.com', $unSerialized->user->email);
+        $this->assertEquals(['email' => 'taylor@laravel.com'], $unSerialized->user->getChanges());
+    }
+
+    /**
+     * @test
+     */
     public function it_serialize_user_on_default_connection()
     {
         $user = ModelSerializationTestUser::create([
