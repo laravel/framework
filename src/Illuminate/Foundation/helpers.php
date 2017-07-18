@@ -432,14 +432,14 @@ if (! function_exists('encrypt')) {
     }
 }
 
-if (! function_exists('errors')) {
+if (! function_exists('has_errors')) {
     /**
      * Returns true if session has errors, and optionally key-specific errors.
      *
      * @param  string|null  $key
      * @return bool
      */
-    function errors($key = null)
+    function has_errors($key = null)
     {
         $errors = session('errors');
         if (is_null($errors)) {
