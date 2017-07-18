@@ -381,7 +381,7 @@ class Command extends SymfonyCommand
      * @param  string  $style
      * @return void
      */
-    public function table(array $headers, $rows, $style = 'default')
+    public function table($headers, $rows, $style = 'default')
     {
         $table = new Table($this->output);
 
@@ -389,7 +389,7 @@ class Command extends SymfonyCommand
             $rows = $rows->toArray();
         }
 
-        $table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
+        $table->setHeaders((array) $headers)->setRows($rows)->setStyle($style)->render();
     }
 
     /**
