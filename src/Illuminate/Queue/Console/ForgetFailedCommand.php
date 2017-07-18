@@ -3,16 +3,15 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputArgument;
 
 class ForgetFailedCommand extends Command
 {
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'queue:forget';
+    protected $signature = 'queue:forget {id : The ID of the failed job.}';
 
     /**
      * The console command description.
@@ -33,17 +32,5 @@ class ForgetFailedCommand extends Command
         } else {
             $this->error('No failed job matches the given ID.');
         }
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['id', InputArgument::REQUIRED, 'The ID of the failed job'],
-        ];
     }
 }
