@@ -443,7 +443,7 @@ if (! function_exists('has_errors')) {
     function has_errors($key = null, $bag = null)
     {
         $errors = session('errors');
-        if (if (is_null($errors) || ! $errors->any())) {
+        if (is_null($errors) || ! $errors->any()) {
             return false;
         } elseif ($key !== null) {
             return is_null($bag) ? $errors->has($key) : $errors->$bag->has($key);
