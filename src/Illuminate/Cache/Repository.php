@@ -12,6 +12,7 @@ use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Contracts\Events\Dispatcher;

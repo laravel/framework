@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Queue
 {

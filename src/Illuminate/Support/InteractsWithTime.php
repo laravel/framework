@@ -1,10 +1,9 @@
 <?php
 
-namespace Illuminate\Queue;
+namespace Illuminate\Support;
 
 use DateInterval;
 use DateTimeInterface;
-use Illuminate\Support\Carbon;
 
 trait InteractsWithTime
 {
