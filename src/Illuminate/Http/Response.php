@@ -7,9 +7,10 @@ use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Http\ConditionEntity;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
-class Response extends BaseResponse
+class Response extends BaseResponse implements ConditionEntity
 {
     use ResponseTrait;
 
