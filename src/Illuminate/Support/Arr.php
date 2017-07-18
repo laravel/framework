@@ -140,15 +140,20 @@ class Arr
      *
      * @param  \ArrayAccess|array  $array
      * @param  string|int  $key
+     * @param  bool  $dotted
      * @return bool
      */
-    public static function exists($array, $key)
+    public static function exists($array, $key, $dotted = false)
     {
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
+        } elseif (array_key_exists($key, $array)) {
+            return true;
+        } elseif ($dotted) {
+            return array_key_exists($key, static::dot($array));
         }
 
-        return array_key_exists($key, $array);
+        return false;
     }
 
     /**

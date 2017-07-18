@@ -124,6 +124,20 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::exists(new Collection(['a' => null]), 'b'));
     }
 
+    public function testExistsWithDots()
+    {
+        $array = [];
+        Arr::set($array, 'foo.bar', 'baz');
+        Arr::set($array, 'foo.null', null);
+
+        $this->assertTrue(Arr::exists($array, 'foo.bar', true));
+        $this->assertTrue(Arr::exists($array, 'foo.null', true));
+        $this->assertFalse(Arr::exists($array, 'foo.xxx', true));
+
+        $array['xxx.yyy'] = 'zzz';
+        $this->assertTrue(Arr::exists($array, 'xxx.yyy'));
+    }
+
     public function testFirst()
     {
         $array = [100, 200, 300];
