@@ -6,7 +6,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeIfAuthStatementsTest extends TestCase
+class BladeIfGuestStatementsTest extends TestCase
 {
     public function tearDown()
     {
@@ -16,10 +16,10 @@ class BladeIfAuthStatementsTest extends TestCase
     public function testIfStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $string = '@auth("api")
+        $string = '@guest("api")
 breeze
-@endauth';
-        $expected = '<?php if(auth()->guard("api")->check()): ?>
+@endguest';
+        $expected = '<?php if(auth()->guard("api")->guest()): ?>
 breeze
 <?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
