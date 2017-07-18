@@ -432,27 +432,6 @@ if (! function_exists('encrypt')) {
     }
 }
 
-if (! function_exists('has_errors')) {
-    /**
-     * Returns true if session has errors, and optionally key-specific errors.
-     *
-     * @param  string|null  $key
-     * @param  string|null  $bag
-     * @return bool
-     */
-    function has_errors($key = null, $bag = null)
-    {
-        $errors = session('errors');
-        if (is_null($errors) || ! $errors->any()) {
-            return false;
-        } elseif ($key !== null) {
-            return is_null($bag) ? $errors->has($key) : $errors->$bag->has($key);
-        }
-
-        return true;
-    }
-}
-
 if (! function_exists('event')) {
     /**
      * Dispatch an event and call the listeners.
@@ -488,6 +467,27 @@ if (! function_exists('factory')) {
         } else {
             return $factory->of($arguments[0]);
         }
+    }
+}
+
+if (! function_exists('has_errors')) {
+    /**
+     * Returns true if session has errors, and optionally key-specific errors.
+     *
+     * @param  string|null  $key
+     * @param  string|null  $bag
+     * @return bool
+     */
+    function has_errors($key = null, $bag = null)
+    {
+        $errors = session('errors');
+        if (is_null($errors) || ! $errors->any()) {
+            return false;
+        } elseif ($key !== null) {
+            return is_null($bag) ? $errors->has($key) : $errors->$bag->has($key);
+        }
+
+        return true;
     }
 }
 
