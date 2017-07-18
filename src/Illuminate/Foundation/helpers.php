@@ -446,7 +446,7 @@ if (! function_exists('has_errors')) {
         if (is_null($errors)) {
             return false;
         } elseif ($key !== null) {
-            return is_null($bag) ? $errors->has($key):$errors->$bag->has($key);
+            return is_null($bag) ? $errors->has($key) : $errors->$bag->has($key);
         }
 
         return true;
