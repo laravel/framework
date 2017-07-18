@@ -2,11 +2,13 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\InteractsWithTime;
 
 class DownCommand extends Command
 {
+    use InteractsWithTime;
+
     /**
      * The console command signature.
      *
@@ -45,7 +47,7 @@ class DownCommand extends Command
     protected function getDownFilePayload()
     {
         return [
-            'time' => Carbon::now()->getTimestamp(),
+            'time' => $this->currentTime(),
             'message' => $this->option('message'),
             'retry' => $this->getRetryTime(),
         ];

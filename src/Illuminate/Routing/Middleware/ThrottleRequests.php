@@ -5,13 +5,15 @@ namespace Illuminate\Routing\Middleware;
 use Closure;
 use RuntimeException;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Cache\RateLimiter;
+use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ThrottleRequests
 {
+    use InteractsWithTime;
+
     /**
      * The rate limiter instance.
      *
@@ -151,7 +153,7 @@ class ThrottleRequests
 
         if (! is_null($retryAfter)) {
             $headers['Retry-After'] = $retryAfter;
-            $headers['X-RateLimit-Reset'] = Carbon::now()->getTimestamp() + $retryAfter;
+            $headers['X-RateLimit-Reset'] = $this->availableAt($retryAfter);
         }
 
         return $headers;

@@ -3,13 +3,13 @@
 namespace Illuminate\Cache;
 
 use Exception;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\InteractsWithTime;
 
 class FileStore implements Store
 {
-    use RetrievesMultipleKeys;
+    use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
      * The Illuminate Filesystem instance.
@@ -178,7 +178,7 @@ class FileStore implements Store
         // If the current time is greater than expiration timestamps we will delete
         // the file and return null. This helps clean up the old files and keeps
         // this directory much cleaner for us as old files aren't hanging out.
-        if (Carbon::now()->getTimestamp() >= $expire) {
+        if ($this->currentTime() >= $expire) {
             $this->forget($key);
 
             return $this->emptyPayload();
@@ -189,7 +189,7 @@ class FileStore implements Store
         // Next, we'll extract the number of minutes that are remaining for a cache
         // so that we can properly retain the time for things like the increment
         // operation that may be performed on this cache on a later operation.
-        $time = ($expire - Carbon::now()->getTimestamp()) / 60;
+        $time = ($expire - $this->currentTime()) / 60;
 
         return compact('data', 'time');
     }
@@ -225,7 +225,7 @@ class FileStore implements Store
      */
     protected function expiration($minutes)
     {
-        $time = Carbon::now()->getTimestamp() + (int) ($minutes * 60);
+        $time = $this->availableAt((int) ($minutes * 60));
 
         return $minutes === 0 || $time > 9999999999 ? 9999999999 : (int) $time;
     }

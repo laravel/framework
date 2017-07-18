@@ -2,10 +2,13 @@
 
 namespace Illuminate\Cache;
 
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\LockTimeoutException;
 
 abstract class Lock
 {
+    use InteractsWithTime;
+
     /**
      * The name of the lock.
      *
@@ -69,12 +72,12 @@ abstract class Lock
      */
     public function block($seconds, $callback = null)
     {
-        $starting = time();
+        $starting = $this->currentTime();
 
         while (! $this->acquire()) {
             usleep(250 * 1000);
 
-            if (time() - $seconds >= $starting) {
+            if ($this->currentTime() - $seconds >= $starting) {
                 throw new LockTimeoutException;
             }
         }

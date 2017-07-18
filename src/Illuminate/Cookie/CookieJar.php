@@ -3,12 +3,14 @@
 namespace Illuminate\Cookie;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Cookie\QueueingFactory as JarContract;
 
 class CookieJar implements JarContract
 {
+    use InteractsWithTime;
+
     /**
      * The default path (if specified).
      *
@@ -62,7 +64,7 @@ class CookieJar implements JarContract
     {
         list($path, $domain, $secure, $sameSite) = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
-        $time = ($minutes == 0) ? 0 : Carbon::now()->getTimestamp() + ($minutes * 60);
+        $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * 60);
 
         return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
