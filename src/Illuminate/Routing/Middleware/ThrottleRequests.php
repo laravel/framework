@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Contracts\Auth\HasRequestThrottleLimit;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ThrottleRequests
@@ -71,8 +72,12 @@ class ThrottleRequests
      */
     protected function resolveMaxAttempts($request, $maxAttempts)
     {
-        if (Str::contains($maxAttempts, '|')) {
-            $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
+        $user = $request->user();
+
+        if ($user && $user instanceof HasRequestThrottleLimit) {
+            $maxAttempts = $user->getRequestLimit();
+        } elseif (Str::contains($maxAttempts, '|')) {
+            $maxAttempts = explode('|', $maxAttempts, 2)[$user ? 1 : 0];
         }
 
         return (int) $maxAttempts;
