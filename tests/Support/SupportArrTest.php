@@ -133,6 +133,9 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::exists($array, 'foo.bar', true));
         $this->assertTrue(Arr::exists($array, 'foo.null', true));
         $this->assertFalse(Arr::exists($array, 'foo.xxx', true));
+
+        $array['xxx.yyy'] = 'zzz';
+        $this->assertTrue(Arr::exists($array, 'xxx.yyy'));
     }
 
     public function testFirst()

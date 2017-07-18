@@ -145,13 +145,15 @@ class Arr
      */
     public static function exists($array, $key, $dotted = false)
     {
-        if ($dotted === true) {
-            $array = static::dot($array);
-        } elseif ($array instanceof ArrayAccess) {
+        if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
+        } elseif (array_key_exists($key, $array)) {
+            return true;
+        } elseif ($dotted) {
+            return array_key_exists($key, static::dot($array));
         }
 
-        return array_key_exists($key, $array);
+        return false;
     }
 
     /**
