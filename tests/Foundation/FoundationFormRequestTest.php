@@ -56,23 +56,6 @@ class FoundationFormRequestTest extends TestCase
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validate();
     }
 
-    public function test_redirect_response_is_properly_created_with_given_errors()
-    {
-        $request = $this->createRequest();
-
-        $this->mocks['redirect']->shouldReceive('withInput')->andReturnSelf();
-
-        $this->mocks['redirect']
-             ->shouldReceive('withErrors')
-             ->with(['name' => ['error']], 'default')
-             ->andReturnSelf();
-
-        $e = $this->catchException(ValidationException::class, function () use ($request) {
-            $request->validate();
-        });
-
-        $this->assertInstanceOf(RedirectResponse::class, $e->getResponse());
-    }
 
     public function test_prepare_for_validation_runs_before_validation()
     {
