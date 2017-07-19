@@ -41,7 +41,7 @@ class Handler implements ExceptionHandlerContract
     protected $container;
 
     /**
-     * A list of the exception types that should not be reported.
+     * A list of the exception types that are not reported.
      *
      * @var array
      */
@@ -60,6 +60,16 @@ class Handler implements ExceptionHandlerContract
         \Illuminate\Database\Eloquent\ModelNotFoundException::class,
         \Illuminate\Session\TokenMismatchException::class,
         \Illuminate\Validation\ValidationException::class,
+    ];
+
+    /**
+     * A list of the inputs that are never flashed for validation exceptions.
+     *
+     * @var array
+     */
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
     ];
 
     /**
@@ -222,13 +232,14 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        return redirect()->back()->withInput($request->except([
-            'password',
-            'password_confirmation',
-        ]))->withErrors(
-            $exception->validator->errors()->messages(),
-            $exception->errorBag
-        );
+        $url = $exception->redirectTo ?? url()->previous();
+
+        return redirect($url)
+                ->withInput($request->except($this->dontFlash))
+                ->withErrors(
+                    $exception->errors(),
+                    $exception->errorBag
+                );
     }
 
     /**
@@ -236,13 +247,13 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Validation\ValidationException  $exception
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     protected function invalidJson($request, ValidationException $exception)
     {
         return response()->json([
             'message' => $exception->getMessage(),
-            'errors' => $exception->validator->errors()->messages(),
+            'errors' => $exception->errors(),
         ], 422);
     }
 

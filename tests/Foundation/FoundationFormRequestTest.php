@@ -10,7 +10,6 @@ use Illuminate\Container\Container;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
@@ -54,24 +53,6 @@ class FoundationFormRequestTest extends TestCase
     public function test_validate_method_throws_when_authorization_fails()
     {
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validate();
-    }
-
-    public function test_redirect_response_is_properly_created_with_given_errors()
-    {
-        $request = $this->createRequest();
-
-        $this->mocks['redirect']->shouldReceive('withInput')->andReturnSelf();
-
-        $this->mocks['redirect']
-             ->shouldReceive('withErrors')
-             ->with(['name' => ['error']], 'default')
-             ->andReturnSelf();
-
-        $e = $this->catchException(ValidationException::class, function () use ($request) {
-            $request->validate();
-        });
-
-        $this->assertInstanceOf(RedirectResponse::class, $e->getResponse());
     }
 
     public function test_prepare_for_validation_runs_before_validation()
