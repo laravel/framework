@@ -126,17 +126,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     }
 
     /**
-     * Format the errors from the given Validator instance.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return array
-     */
-    protected function formatErrors(Validator $validator)
-    {
-        return $validator->getMessageBag()->toArray();
-    }
-
-    /**
      * Get the URL to redirect to on a validation error.
      *
      * @return string
