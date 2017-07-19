@@ -778,7 +778,7 @@ class Connection implements ConnectionInterface
      * Fire an event for this connection.
      *
      * @param  string  $event
-     * @return void
+     * @return array|null
      */
     protected function fireConnectionEvent($event)
     {
