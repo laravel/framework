@@ -308,14 +308,14 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @return string
      */
-    public function url($path)
+    public function url($path, $expires = null)
     {
         $adapter = $this->driver->getAdapter();
 
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsUrl($adapter, $path);
+            return $this->getAwsUrl($adapter, $path, $expires);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
         } else {
@@ -330,11 +330,22 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @return string
      */
-    protected function getAwsUrl($adapter, $path)
-    {
-        return $adapter->getClient()->getObjectUrl(
-            $adapter->getBucket(), $adapter->getPathPrefix().$path
-        );
+    protected function getAwsUrl($adapter, $path, $expires)
+    {       
+        if ($expires === null) {
+            return $adapter->getClient()->getObjectUrl(
+                $adapter->getBucket(), $adapter->getPathPrefix().$path
+            );
+        }
+
+        $command = $adapter->getClient()->getCommand('GetObject', [
+            'Bucket' => $adapter->getBucket(),
+            'Key'    => $adapter->getPathPrefix().$path
+        ]);
+
+        $request = $adapter->getClient()->createPresignedRequest($command, $expires);
+
+        return (string) $request->getUri();
     }
 
     /**
