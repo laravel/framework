@@ -209,8 +209,8 @@ class Handler implements ExceptionHandlerContract
         }
 
         return $request->expectsJson()
-                    ? $this->invalid($request, $exception)
-                    : $this->invalidJson($request, $exception);
+                    ? $this->invalidJson($request, $e)
+                    : $this->invalid($request, $e);
     }
 
     /**
@@ -222,8 +222,12 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        return redirect()->back()->withInput()->withErrors(
-            $exception->validator->errors()->messages(), $exception->errorBag
+        return redirect()->back()->withInput($request->except([
+            'password',
+            'password_confirmation',
+        ]))->withErrors(
+            $exception->validator->errors()->messages(),
+            $exception->errorBag
         );
     }
 
