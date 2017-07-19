@@ -463,25 +463,44 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Save the model and all of its relationships.
+     * Save the model and all the non inverse relationships.
      *
      * @return bool
      */
     public function push()
     {
+        $nonInverseRelations = $this->getRelationPushers()->reject->isInverse();
+
+        return $this->save() && $nonInverseRelations->every->push();
+    }
+
+    /**
+     * Save the model and all of its relationships.
+     *
+     * @return bool
+     */
+    public function pushAll()
+    {
         // To sync all of the relationships to the database, it's important to split the inverse
         // and the non-inverse ones, so we can: save the parents first, associate them to the
         // main model (assign foreign keys), save the main model and then save the children.
-        list($inverse, $nonInverse) = collect($this->relations)
+        list($inverseRelations, $nonInverseRelations) = $this->getRelationPushers()->partition->isInverse();
+
+        return $inverseRelations->every->push() && $this->save() && $nonInverseRelations->every->push();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getRelationPushers()
+    {
+        return collect($this->relations)
             ->filter()
             ->map(function ($models, $name) {
                 return new RelationPusher(
                     $name, $models, method_exists($this, $name) ? $this->$name() : null
                 );
-            })
-            ->partition->isInverse();
-
-        return $inverse->every->push() && $this->save() && $nonInverse->every->push();
+            });
     }
 
     /**

@@ -37,7 +37,7 @@ class RelationPusher
     public function __construct($name, $models, $relation)
     {
         $this->name = $name;
-        $this->models = $models instanceof Collection ? $models : collect([$models]);
+        $this->models = Collection::wrap($models);
         $this->relation = $relation;
     }
 
