@@ -136,7 +136,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function response(array $errors)
     {
         if ($this->expectsJson()) {
-            return new JsonResponse($errors, 422);
+            return new JsonResponse([
+                'message' => 'The given data failed to pass validation.', 'errors' => $errors,
+            ], 422);
         }
 
         return $this->redirector->to($this->getRedirectUrl())
