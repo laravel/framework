@@ -150,7 +150,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @param  array  $errors
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function jsonResponse(array $errors)
+    public function jsonResponse(array $errors)
     {
         return new JsonResponse([
             'message' => 'The given data was invalid.',
