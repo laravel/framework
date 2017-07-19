@@ -67,7 +67,6 @@ class ValidationValidatorTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Validation\ValidationException
-     * @expectedExceptionMessage The given data failed to pass validation.
      */
     public function testValidateThrowsOnFail()
     {

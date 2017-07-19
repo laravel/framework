@@ -37,7 +37,6 @@ class FoundationFormRequestTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Validation\ValidationException
-     * @expectedExceptionMessage The given data failed to pass validation.
      */
     public function test_validate_throws_when_validation_fails()
     {

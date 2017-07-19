@@ -204,7 +204,13 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        return $e->response ? $e->response : $this->invalid($request, $e);
+        if ($e->response) {
+            return $e->response;
+        }
+
+        return $request->expectsJson()
+                    ? $this->invalid($request, $exception)
+                    : $this->invalidJson($request, $exception);
     }
 
     /**
@@ -216,15 +222,24 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        $message = $exception->getMessage();
+        return redirect()->back()->withInput()->withErrors(
+            $exception->validator->errors()->messages(), $exception->errorBag
+        );
+    }
 
-        $errors = $exception->validator->errors()->messages();
-
-        return $request->expectsJson()
-                    ? response()->json(['message' => $message, 'errors' => $errors], 422)
-                    : redirect()->back()->withInput()->withErrors(
-                            $errors, $exception->errorBag
-                      );
+    /**
+     * Convert a validation exception into a JSON response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Validation\ValidationException  $exception
+     * @return \Illuminate\Http\Response
+     */
+    protected function invalidJson($request, ValidationException $exception)
+    {
+        return response()->json([
+            'message' => $exception->getMessage(),
+            'errors' => $exception->validator->errors()->messages()
+        ], 422);
     }
 
     /**
