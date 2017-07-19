@@ -237,7 +237,7 @@ class Handler implements ExceptionHandlerContract
         return redirect($url)
                 ->withInput($request->except($this->dontFlash))
                 ->withErrors(
-                    $exception->validator->errors()->messages(),
+                    $exception->errors(),
                     $exception->errorBag
                 );
     }
