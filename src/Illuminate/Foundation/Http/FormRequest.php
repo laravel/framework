@@ -122,37 +122,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function failedValidation(Validator $validator)
     {
-        throw new ValidationException($validator, $this->response(
-            $this->formatErrors($validator)
-        ));
-    }
-
-    /**
-     * Get the proper failed validation response for the request.
-     *
-     * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function response(array $errors)
-    {
-        if ($this->expectsJson()) {
-            return new JsonResponse($errors, 422);
-        }
-
-        return $this->redirector->to($this->getRedirectUrl())
-                                        ->withInput($this->except($this->dontFlash))
-                                        ->withErrors($errors, $this->errorBag);
-    }
-
-    /**
-     * Format the errors from the given Validator instance.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return array
-     */
-    protected function formatErrors(Validator $validator)
-    {
-        return $validator->getMessageBag()->toArray();
+        throw new ValidationException($validator, null, 'default', $this->getRedirectUrl());
     }
 
     /**
