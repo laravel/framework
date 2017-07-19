@@ -136,14 +136,26 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function response(array $errors)
     {
         if ($this->expectsJson()) {
-            return new JsonResponse([
-                'message' => 'The given data was invalid.', 'errors' => $errors,
-            ], 422);
+            return $this->jsonResponse($errors);
         }
 
         return $this->redirector->to($this->getRedirectUrl())
                         ->withInput($this->except($this->dontFlash))
                         ->withErrors($errors, $this->errorBag);
+    }
+
+    /**
+     * Get the proper failed validation JSON response for the request.
+     *
+     * @param  array  $errors
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function jsonResponse(array $errors)
+    {
+        return new JsonResponse([
+            'message' => 'The given data was invalid.',
+            'errors' => $errors,
+        ], 422);
     }
 
     /**
