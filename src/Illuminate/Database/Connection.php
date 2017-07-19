@@ -27,14 +27,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var PDO|\Closure
+     * @var \PDO|\Closure
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var PDO|\Closure
+     * @var \PDO|\Closure
      */
     protected $readPdo;
 
