@@ -25,6 +25,18 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testPlainIfStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@auth
+breeze
+@endauth';
+        $expected = '<?php if(auth()->guard()->check()): ?>
+breeze
+<?php endif; ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');
