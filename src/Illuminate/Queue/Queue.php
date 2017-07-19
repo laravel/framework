@@ -87,7 +87,7 @@ abstract class Queue
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw new InvalidPayloadException(
-                'Unable to JSON encode payload.  Error code: '.json_last_error()
+                'Unable to JSON encode payload. Error code: '.json_last_error()
             );
         }
 
