@@ -10,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
@@ -54,6 +55,7 @@ class FoundationFormRequestTest extends TestCase
     {
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validate();
     }
+
 
     public function test_prepare_for_validation_runs_before_validation()
     {
