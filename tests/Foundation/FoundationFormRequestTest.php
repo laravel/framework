@@ -71,8 +71,6 @@ class FoundationFormRequestTest extends TestCase
         $e = $this->catchException(ValidationException::class, function () use ($request) {
             $request->validate();
         });
-
-        $this->assertInstanceOf(RedirectResponse::class, $e->getResponse());
     }
 
     public function test_prepare_for_validation_runs_before_validation()

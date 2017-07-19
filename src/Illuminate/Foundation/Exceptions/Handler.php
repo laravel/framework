@@ -220,9 +220,11 @@ class Handler implements ExceptionHandlerContract
 
         $errors = $exception->validator->errors()->messages();
 
+        $redirectUrl = $exception->redirectUrl ?: redirect()->getUrlGenerator()->previous();
+
         return $request->expectsJson()
                     ? response()->json(['message' => $message, 'errors' => $errors], 422)
-                    : redirect()->back()->withInput()->withErrors(
+                    : redirect()->to($redirectUrl)->withInput()->withErrors(
                             $errors, $exception->errorBag
                       );
     }

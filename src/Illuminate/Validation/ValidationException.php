@@ -28,20 +28,29 @@ class ValidationException extends Exception
     public $errorBag;
 
     /**
+     * The URI to redirect to.
+     *
+     * @var string
+     */
+    public $redirectUrl;
+
+    /**
      * Create a new exception instance.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  string  $errorBag
+     * @param  string  $redirectUrl
      * @return void
      */
-    public function __construct($validator, $response = null, $errorBag = 'default')
+    public function __construct($validator, $response = null, $errorBag = 'default', $redirectUrl = null)
     {
         parent::__construct('The given data failed to pass validation.');
 
         $this->response = $response;
         $this->errorBag = $errorBag;
         $this->validator = $validator;
+        $this->redirectUrl = $redirectUrl;
     }
 
     /**
