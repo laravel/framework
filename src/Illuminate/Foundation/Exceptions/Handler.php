@@ -242,7 +242,7 @@ class Handler implements ExceptionHandlerContract
     {
         return response()->json([
             'message' => $exception->getMessage(),
-            'errors' => $exception->validator->errors()->messages()
+            'errors' => $exception->validator->errors()->messages(),
         ], 422);
     }
 
