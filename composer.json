@@ -72,6 +72,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
+        "queue-interop/queue-interop": "^0.5",
         "doctrine/dbal": "~2.5",
         "mockery/mockery": "~0.9.4",
         "pda/pheanstalk": "~3.0",
@@ -104,6 +105,7 @@
     },
     "suggest": {
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
+        "queue-interop/queue-interop": "Required to use the queue interop driver compatible transports",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.5).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~6.0).",
