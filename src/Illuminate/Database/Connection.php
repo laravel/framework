@@ -27,14 +27,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var PDO
+     * @var \PDO|\Closure
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var PDO
+     * @var \PDO|\Closure
      */
     protected $readPdo;
 
@@ -907,7 +907,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO|\Closure|null  $pdo
      * @return $this
      */
     public function setPdo($pdo)
@@ -922,7 +922,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection used for reading.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO||\Closure|null  $pdo
      * @return $this
      */
     public function setReadPdo($pdo)
