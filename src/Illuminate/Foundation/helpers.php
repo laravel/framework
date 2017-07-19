@@ -181,7 +181,7 @@ if (! function_exists('base_path')) {
     }
 }
 
-if (! function_exists('bcrypt')) {
+if (! function_exists('str_hash')) {
     /**
      * Hash the given value.
      *
@@ -189,7 +189,7 @@ if (! function_exists('bcrypt')) {
      * @param  array   $options
      * @return string
      */
-    function bcrypt($value, $options = [])
+    function str_hash($value, $options = [])
     {
         return app('hash')->make($value, $options);
     }
