@@ -1372,8 +1372,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->stringAttribute = 2.5;
         $model->boolAttribute = 1;
         $model->booleanAttribute = 0;
-        $model->boolAttributeAsString = "true";
-        $model->booleanAttributeAsString = "false";
+        $model->boolAttributeAsString = 'true';
+        $model->booleanAttributeAsString = 'false';
         $model->objectAttribute = ['foo' => 'bar'];
         $obj = new StdClass;
         $obj->foo = 'bar';
