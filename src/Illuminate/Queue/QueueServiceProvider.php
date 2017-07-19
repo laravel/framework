@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Illuminate\Queue\Connectors\InteropConnector;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Connectors\SqsConnector;
 use Illuminate\Queue\Connectors\NullConnector;
@@ -77,7 +78,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     public function registerConnectors($manager)
     {
-        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs'] as $connector) {
+        foreach (['Null', 'Sync', 'Database', 'Redis', 'Beanstalkd', 'Sqs', 'Interop'] as $connector) {
             $this->{"register{$connector}Connector"}($manager);
         }
     }
@@ -157,6 +158,19 @@ class QueueServiceProvider extends ServiceProvider
     {
         $manager->addConnector('sqs', function () {
             return new SqsConnector;
+        });
+    }
+
+    /**
+     * Register the interop queue connector.
+     *
+     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @return void
+     */
+    protected function registerInteropConnector($manager)
+    {
+        $manager->addConnector('interop', function () {
+            return new InteropConnector();
         });
     }
 
