@@ -285,7 +285,7 @@ class Arr
             return $array[$key];
         }
 
-        if (strstr($key, '.') === null) {
+        if (strpos($key, '.') === false) {
             return $array[$key] ?? value($default);
         }
 
