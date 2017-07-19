@@ -78,6 +78,17 @@ class MigrateMakeCommand extends BaseCommand
             $create = true;
         }
 
+        // Next, we will attempt to guess the table name if this the migration has
+        // "create" in the name. This will allow us to provide a convenient way
+        // of creating migrations that create new tables for the application.
+        if (! $table) {
+            if (preg_match('/^create_(\w+)_table$/', $name, $matches)) {
+                $table = $matches[1];
+
+                $create = true;
+            }
+        }
+
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.

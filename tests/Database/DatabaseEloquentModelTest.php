@@ -13,10 +13,13 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentModelTest extends TestCase
 {
+    use InteractsWithTime;
+
     public function setup()
     {
         parent::setup();
@@ -361,7 +364,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
-            'updated_at' => Carbon::now()->getTimestamp(),
+            'updated_at' => $this->currentTime(),
         ]);
 
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
@@ -408,7 +411,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
 
         $model = new EloquentDateModelStub;
-        $model->created_at = Carbon::now()->getTimestamp();
+        $model->created_at = $this->currentTime();
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
 
         $model = new EloquentDateModelStub;

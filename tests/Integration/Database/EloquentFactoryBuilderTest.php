@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Database;
+
 use Faker\Generator;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;

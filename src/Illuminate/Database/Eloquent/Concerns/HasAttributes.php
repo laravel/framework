@@ -29,6 +29,13 @@ trait HasAttributes
     protected $original = [];
 
     /**
+     * The changed model attributes.
+     *
+     * @var array
+     */
+    protected $changes = [];
+
+    /**
      * The attributes that should be cast to native types.
      *
      * @var array
@@ -925,6 +932,18 @@ trait HasAttributes
     }
 
     /**
+     * Sync the changed attributes.
+     *
+     * @return $this
+     */
+    public function syncChanges()
+    {
+        $this->changes = $this->getDirty();
+
+        return $this;
+    }
+
+    /**
      * Determine if the model or given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
@@ -932,28 +951,9 @@ trait HasAttributes
      */
     public function isDirty($attributes = null)
     {
-        $dirty = $this->getDirty();
-
-        // If no specific attributes were provided, we will just see if the dirty array
-        // already contains any attributes. If it does we will just return that this
-        // count is greater than zero. Else, we need to check specific attributes.
-        if (is_null($attributes)) {
-            return count($dirty) > 0;
-        }
-
-        $attributes = is_array($attributes)
-                            ? $attributes : func_get_args();
-
-        // Here we will spin through every attribute and see if this is in the array of
-        // dirty attributes. If it is, we will return true and if we make it through
-        // all of the attributes for the entire array we will return false at end.
-        foreach ($attributes as $attribute) {
-            if (array_key_exists($attribute, $dirty)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasChanges(
+            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+        );
     }
 
     /**
@@ -965,6 +965,47 @@ trait HasAttributes
     public function isClean($attributes = null)
     {
         return ! $this->isDirty(...func_get_args());
+    }
+
+    /**
+     * Determine if the model or given attribute(s) have been modified.
+     *
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    public function wasChanged($attributes = null)
+    {
+        return $this->hasChanges(
+            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+        );
+    }
+
+    /**
+     * Determine if the given attributes were changed.
+     *
+     * @param  array  $changes
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    protected function hasChanges($changes, $attributes = null)
+    {
+        // If no specific attributes were provided, we will just see if the dirty array
+        // already contains any attributes. If it does we will just return that this
+        // count is greater than zero. Else, we need to check specific attributes.
+        if (empty($attributes)) {
+            return count($changes) > 0;
+        }
+
+        // Here we will spin through every attribute and see if this is in the array of
+        // dirty attributes. If it is, we will return true and if we make it through
+        // all of the attributes for the entire array we will return false at end.
+        foreach (Arr::wrap($attributes) as $attribute) {
+            if (array_key_exists($attribute, $changes)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -983,6 +1024,16 @@ trait HasAttributes
         }
 
         return $dirty;
+    }
+
+    /**
+     * Get the attributes that was changed.
+     *
+     * @return array
+     */
+    public function getChanges()
+    {
+        return $this->changes;
     }
 
     /**

@@ -4,12 +4,14 @@ namespace Illuminate\Cache;
 
 use Memcached;
 use ReflectionMethod;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\LockProvider;
 
 class MemcachedStore extends TaggableStore implements LockProvider, Store
 {
+    use InteractsWithTime;
+
     /**
      * The Memcached instance.
      *
@@ -212,7 +214,7 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      */
     protected function toTimestamp($minutes)
     {
-        return $minutes > 0 ? Carbon::now()->addSeconds($minutes * 60)->getTimestamp() : 0;
+        return $minutes > 0 ? $this->availableAt($minutes * 60) : 0;
     }
 
     /**

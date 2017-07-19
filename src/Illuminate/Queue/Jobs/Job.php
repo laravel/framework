@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\InteractsWithTime;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
 {

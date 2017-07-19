@@ -329,7 +329,7 @@ trait ValidatesAttributes
      */
     protected function validateDate($attribute, $value)
     {
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeInterface) {
             return true;
         }
 

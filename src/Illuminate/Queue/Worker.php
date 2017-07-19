@@ -139,9 +139,9 @@ class Worker
                 $this->kill(1);
             });
 
-            $timeout = $this->timeoutForJob($job, $options);
-
-            pcntl_alarm($timeout > 0 ? $timeout + $options->sleep : 0);
+            pcntl_alarm(
+                max($this->timeoutForJob($job, $options), 0)
+            );
         }
     }
 

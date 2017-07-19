@@ -762,6 +762,20 @@ if (! function_exists('str_after')) {
     }
 }
 
+if (! function_exists('str_before')) {
+    /**
+     * Get the portion of a string before a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    function str_before($subject, $search)
+    {
+        return Str::before($subject, $search);
+    }
+}
+
 if (! function_exists('str_contains')) {
     /**
      * Determine if a given string contains a given substring.

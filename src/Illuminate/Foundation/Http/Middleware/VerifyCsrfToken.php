@@ -3,14 +3,16 @@
 namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\InteractsWithTime;
 use Symfony\Component\HttpFoundation\Cookie;
 use Illuminate\Contracts\Encryption\Encrypter;
 use Illuminate\Session\TokenMismatchException;
 
 class VerifyCsrfToken
 {
+    use InteractsWithTime;
+
     /**
      * The application instance.
      *
@@ -155,7 +157,7 @@ class VerifyCsrfToken
 
         $response->headers->setCookie(
             new Cookie(
-                'XSRF-TOKEN', $request->session()->token(), Carbon::now()->getTimestamp() + 60 * $config['lifetime'],
+                'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
                 $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
             )
         );

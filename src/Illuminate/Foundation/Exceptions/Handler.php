@@ -204,37 +204,27 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
-        if ($e->response) {
-            return $e->response;
-        }
-
-        if (method_exists($this, 'invalid')) {
-            return $this->invalid($request, $e);
-        }
-
-        if ($request->expectsJson()) {
-            return response()->json(
-                $this->formatValidationResponse($e), 422
-            );
-        }
-
-        return redirect()->back()->withInput($request->input())->withErrors(
-            $e->validator->errors()->getMessages(), $e->errorBag
-        );
+        return $e->response ? $e->response : $this->invalid($request, $e);
     }
 
     /**
-     * Format the validation JSON response payload.
+     * Convert a validation exception into a response.
      *
-     * @param  \Illuminate\Validation\ValidationException  $e
-     * @return array
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Validation\ValidationException  $exception
+     * @return \Illuminate\Http\Response
      */
-    protected function formatValidationResponse(ValidationException $e)
+    protected function invalid($request, ValidationException $exception)
     {
-        return [
-            'message' => $e->getMessage(),
-            'errors' => $e->validator->errors()->getMessages(),
-        ];
+        $message = $exception->getMessage();
+
+        $errors = $exception->validator->errors()->messages();
+
+        return $request->expectsJson()
+                    ? response()->json(['message' => $message, 'errors' => $errors], 422)
+                    : redirect()->back()->withInput()->withErrors(
+                            $errors, $exception->errorBag
+                      );
     }
 
     /**

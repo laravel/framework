@@ -6,11 +6,12 @@ use Closure;
 use Exception;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Store;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Database\ConnectionInterface;
 
 class DatabaseStore implements Store
 {
-    use RetrievesMultipleKeys;
+    use InteractsWithTime, RetrievesMultipleKeys;
 
     /**
      * The database connection instance.
@@ -72,7 +73,7 @@ class DatabaseStore implements Store
         // If this cache expiration date is past the current time, we will remove this
         // item from the cache. Then we will return a null value since the cache is
         // expired. We will use "Carbon" to make this comparison with the column.
-        if (Carbon::now()->getTimestamp() >= $cache->expiration) {
+        if ($this->currentTime() >= $cache->expiration) {
             $this->forget($key);
 
             return;
@@ -186,7 +187,7 @@ class DatabaseStore implements Store
      */
     protected function getTime()
     {
-        return Carbon::now()->getTimestamp();
+        return $this->currentTime();
     }
 
     /**

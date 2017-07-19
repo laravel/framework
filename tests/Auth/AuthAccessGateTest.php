@@ -319,6 +319,60 @@ class GateTest extends TestCase
             return (object) ['id' => 1, 'isAdmin' => $isAdmin];
         });
     }
+
+    public function test_any_ability_check_passes_if_all_pass()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllPermissions::class);
+
+        $this->assertTrue($gate->any(['edit', 'update'], new AccessGateTestDummy));
+    }
+
+    public function test_any_ability_check_passes_if_at_least_one_passes()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithMixedPermissions::class);
+
+        $this->assertTrue($gate->any(['edit', 'update'], new AccessGateTestDummy));
+    }
+
+    public function test_any_ability_check_fails_if_none_pass()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
+
+        $this->assertFalse($gate->any(['edit', 'update'], new AccessGateTestDummy));
+    }
+
+    public function test_every_ability_check_passes_if_all_pass()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllPermissions::class);
+
+        $this->assertTrue($gate->check(['edit', 'update'], new AccessGateTestDummy));
+    }
+
+    public function test_every_ability_check_fails_if_at_least_one_fails()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithMixedPermissions::class);
+
+        $this->assertFalse($gate->check(['edit', 'update'], new AccessGateTestDummy));
+    }
+
+    public function test_every_ability_check_fails_if_none_pass()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
+
+        $this->assertFalse($gate->check(['edit', 'update'], new AccessGateTestDummy));
+    }
 }
 
 class AccessGateTestClass
@@ -418,6 +472,45 @@ class AccessGateTestCustomResource
     }
 
     public function bar($user)
+    {
+        return true;
+    }
+}
+
+class AccessGateTestPolicyWithMixedPermissions
+{
+    public function edit($user, AccessGateTestDummy $dummy)
+    {
+        return false;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+}
+
+class AccessGateTestPolicyWithNoPermissions
+{
+    public function edit($user, AccessGateTestDummy $dummy)
+    {
+        return false;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return false;
+    }
+}
+
+class AccessGateTestPolicyWithAllPermissions
+{
+    public function edit($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
     {
         return true;
     }

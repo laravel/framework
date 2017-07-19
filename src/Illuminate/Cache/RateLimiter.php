@@ -2,11 +2,13 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 class RateLimiter
 {
+    use InteractsWithTime;
+
     /**
      * The cache store implementation.
      *
@@ -60,7 +62,7 @@ class RateLimiter
     protected function lockout($key, $decayMinutes)
     {
         $this->cache->add(
-            $key.':lockout', Carbon::now()->getTimestamp() + ($decayMinutes * 60), $decayMinutes
+            $key.':lockout', $this->availableAt($decayMinutes * 60), $decayMinutes
         );
     }
 
@@ -135,6 +137,6 @@ class RateLimiter
      */
     public function availableIn($key)
     {
-        return $this->cache->get($key.':lockout') - Carbon::now()->getTimestamp();
+        return $this->cache->get($key.':lockout') - $this->currentTime();
     }
 }

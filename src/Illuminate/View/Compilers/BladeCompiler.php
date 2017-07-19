@@ -2,7 +2,6 @@
 
 namespace Illuminate\View\Compilers;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
@@ -97,18 +96,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $footer = [];
 
     /**
-     * Placeholder to temporary mark the position of verbatim blocks.
+     * Placeholder to temporary mark the position of raw blocks.
      *
      * @var string
      */
-    protected $verbatimPlaceholder = '@__verbatim__@';
+    protected $rawPlaceholder = '@__raw-block__@';
 
     /**
-     * Array to temporary store the verbatim blocks found in the template.
+     * Array to temporary store the raw blocks found in the template.
      *
      * @var array
      */
-    protected $verbatimBlocks = [];
+    protected $rawBlocks = [];
 
     /**
      * Compile the view at the given path.
@@ -158,13 +157,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function compileString($value)
     {
-        $result = '';
-
         if (strpos($value, '@verbatim') !== false) {
             $value = $this->storeVerbatimBlocks($value);
         }
 
         $this->footer = [];
+
+        if (strpos($value, '@php') !== false) {
+            $value = $this->storePhpBlocks($value);
+        }
+
+        $result = '';
 
         // Here we will loop through all of the tokens returned by the Zend lexer and
         // parse each one into the corresponding valid PHP. We will then have this
@@ -173,8 +176,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $result .= is_array($token) ? $this->parseToken($token) : $token;
         }
 
-        if (! empty($this->verbatimBlocks)) {
-            $result = $this->restoreVerbatimBlocks($result);
+        if (! empty($this->rawBlocks)) {
+            $result = $this->restoreRawContent($result);
         }
 
         // If there are any footer lines that need to get added to a template we will
@@ -196,9 +199,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storeVerbatimBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            $this->verbatimBlocks[] = $matches[1];
+            $this->rawBlocks[] = $matches[1];
 
-            return $this->verbatimPlaceholder;
+            return $this->rawPlaceholder;
+        }, $value);
+    }
+
+    /**
+     * Store the PHP blocks and replace them with a temporary placeholder.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function storePhpBlocks($value)
+    {
+        return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
+            $this->rawBlocks[] = "<?php{$matches[1]}?>";
+
+            return $this->rawPlaceholder;
         }, $value);
     }
 
@@ -208,13 +226,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @param  string  $result
      * @return string
      */
-    protected function restoreVerbatimBlocks($result)
+    protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.preg_quote($this->verbatimPlaceholder).'/', function () {
-            return array_shift($this->verbatimBlocks);
+        $result = preg_replace_callback('/'.preg_quote($this->rawPlaceholder).'/', function () {
+            return array_shift($this->rawBlocks);
         }, $result);
 
-        $this->verbatimBlocks = [];
+        $this->rawBlocks = [];
 
         return $result;
     }
@@ -355,10 +373,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * Register an "if" statement directive.
      *
      * @param  string  $name
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return void
      */
-    public function if($name, Closure $callback)
+    public function if($name, callable $callback)
     {
         $this->conditions[$name] = $callback;
 

@@ -17,18 +17,17 @@ trait CreatesUserProviders
      * Create the user provider implementation for the driver.
      *
      * @param  string|null  $provider
-     * @return \Illuminate\Contracts\Auth\UserProvider
+     * @return \Illuminate\Contracts\Auth\UserProvider|null
      *
      * @throws \InvalidArgumentException
      */
     public function createUserProvider($provider = null)
     {
-        $provider = $provider ?: $this->getDefaultUserProvider();
+        if (is_null($config = $this->getProviderConfiguration($provider))) {
+            return;
+        }
 
-        $config = $this->app['config']['auth.providers.'.$provider];
-        $driver = $config['driver'] ?? null;
-
-        if (isset($this->customProviderCreators[$driver])) {
+        if (isset($this->customProviderCreators[$driver = ($config['driver'] ?? null)])) {
             return call_user_func(
                 $this->customProviderCreators[$driver], $this->app, $config
             );
@@ -40,7 +39,22 @@ trait CreatesUserProviders
             case 'eloquent':
                 return $this->createEloquentProvider($config);
             default:
-                throw new InvalidArgumentException("Authentication user provider [{$driver}] is not defined.");
+                throw new InvalidArgumentException(
+                    "Authentication user provider [{$driver}] is not defined."
+                );
+        }
+    }
+
+    /**
+     * Get the user provider configuration.
+     *
+     * @param  string|null  $provider
+     * @return array|null
+     */
+    protected function getProviderConfiguration($provider)
+    {
+        if ($provider = $provider ?: $this->getDefaultUserProvider()) {
+            return $this->app['config']['auth.providers.'.$provider];
         }
     }
 

@@ -3,8 +3,9 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Container\Container;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
-class ControllerDispatcher
+class ControllerDispatcher implements ControllerDispatcherContract
 {
     use RouteDependencyResolverTrait;
 
@@ -54,7 +55,7 @@ class ControllerDispatcher
      * @param  string  $method
      * @return array
      */
-    public static function getMiddleware($controller, $method)
+    public function getMiddleware($controller, $method)
     {
         if (! method_exists($controller, 'getMiddleware')) {
             return [];

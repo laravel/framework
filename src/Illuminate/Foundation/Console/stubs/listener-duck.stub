@@ -12,7 +12,7 @@ class DummyClass
      *
      * @var array
      */
-    public static $hears = [
+    public static $listensFor = [
         //
     ];
 
