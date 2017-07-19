@@ -306,6 +306,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Get the URL for the file at the given path.
      *
      * @param  string  $path
+     * @param  string  $expires
      * @return string
      */
     public function url($path, $expires = null)
@@ -328,10 +329,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
      * @param  string  $path
+     * @param  string  $expires
      * @return string
      */
     protected function getAwsUrl($adapter, $path, $expires)
-    {       
+    {
         if ($expires === null) {
             return $adapter->getClient()->getObjectUrl(
                 $adapter->getBucket(), $adapter->getPathPrefix().$path
@@ -340,7 +342,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         $command = $adapter->getClient()->getCommand('GetObject', [
             'Bucket' => $adapter->getBucket(),
-            'Key'    => $adapter->getPathPrefix().$path
+            'Key'    => $adapter->getPathPrefix().$path,
         ]);
 
         $request = $adapter->getClient()->createPresignedRequest($command, $expires);
