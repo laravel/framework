@@ -8,15 +8,22 @@
 - Added `$expiresAt` parameter to `CallbackEvent::withoutOverlapping()` ([#19861](https://github.com/laravel/framework/pull/19861))
 - Support keeping old files when testing uploads ([#19859](https://github.com/laravel/framework/pull/19859))
 - Added `--force` option to `make:mail`, `make:model` and `make:notification` ([#19932](https://github.com/laravel/framework/pull/19932))
+- Added support for PostgreSQL deletes with `USES` clauses ([#20062](https://github.com/laravel/framework/pull/20062), [f94fc02](https://github.com/laravel/framework/commit/f94fc026c64471ca5a5b42919c9b5795021d783c))
+- Added support for CC and BBC on mail notifications ([#20093](https://github.com/laravel/framework/pull/20093))
+- Added Blade `@auth` and `@guest` directive ([#20087](https://github.com/laravel/framework/pull/20087), ([#20114](https://github.com/laravel/framework/pull/20114)))
+- Added option to configure MARS on SqlServer connections ([#20113](https://github.com/laravel/framework/pull/20113), [c2c917c](https://github.com/laravel/framework/commit/c2c917c5f773d3df7f59242768f921af95309bcc))
 
 ### Changed
 - Support object items in `Arr::pluck()` ([#19838](https://github.com/laravel/framework/pull/19838), [#19845](https://github.com/laravel/framework/pull/19845))
 - `MessageBag` interface now extends `Arrayable` ([#19849](https://github.com/laravel/framework/pull/19849))
 - Made `Blueprint` macroable ([#19862](https://github.com/laravel/framework/pull/19862))
-- Improved performace for `Arr::crossJoin()` ([#19864](https://github.com/laravel/framework/pull/19864))
+- Improved performance for `Arr::crossJoin()` ([#19864](https://github.com/laravel/framework/pull/19864))
 - Use the correct `User` model namespace for new policies ([#19965](https://github.com/laravel/framework/pull/19965), [a7094c2](https://github.com/laravel/framework/commit/a7094c2e68a6eb9768462ce9b8d26fec00e9ba65))
 - Consider scheduled event timezone in `inTimeInterval()` ([#19959](https://github.com/laravel/framework/pull/19959))
 - Render exception if handler can't report it ([#19977](https://github.com/laravel/framework/pull/19977))
+- Made `MakesHttpRequests::withServerVariables()` public ([#20086](https://github.com/laravel/framework/pull/20086))
+- Invalidate session instead of regenerating it when logging out ([#20107](https://github.com/laravel/framework/pull/20107))
+- Improved `InvalidPayloadException` error message ([#20143](https://github.com/laravel/framework/pull/20143))
 
 ### Fixed
 - Don't re-escape a `View` instance passed as the default value to `@yield` or `@section` directives ([#19884](https://github.com/laravel/framework/pull/19884))
