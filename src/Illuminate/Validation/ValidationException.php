@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Exception;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 class ValidationException extends Exception
 {
@@ -56,6 +57,23 @@ class ValidationException extends Exception
         $this->response = $response;
         $this->errorBag = $errorBag;
         $this->validator = $validator;
+    }
+
+    /**
+     * Create a new validation exception from a plain array of messages.
+     *
+     * @param  array  $messages
+     * @return static
+     */
+    public static function fromMessages(array $messages)
+    {
+        return new static(tap(ValidatorFacade::make([], []), function ($validator) use ($messages) {
+            foreach ($messages as $key => $value) {
+                foreach ($value as $message) {
+                    $validator->errors()->add($key, $message);
+                }
+            }
+        }));
     }
 
     /**

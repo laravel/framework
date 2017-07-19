@@ -126,9 +126,9 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        throw new ValidationException(tap(Validator::make([], []), function ($validator) {
-            $validator->errors()->add($this->username(), trans('auth.failed'));
-        }));
+        throw ValidationException::fromMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 
     /**
