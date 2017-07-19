@@ -149,7 +149,7 @@ trait CompilesConditionals
      */
     protected function compileAuth($guard = null)
     {
-        $guard = is_null($guard) ? "()" : $guard;
+        $guard = is_null($guard) ? '()' : $guard;
         return "<?php if(auth()->guard{$guard}->guest()): ?>";
     }
 
