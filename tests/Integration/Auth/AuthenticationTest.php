@@ -41,7 +41,7 @@ class AuthenticationTest extends TestCase
         AuthenticationTestUser::create([
             'username' => 'username',
             'email' => 'email',
-            'password' => bcrypt('password'),
+            'password' => str_hash('password'),
             'is_active' => true,
         ]);
 
@@ -85,7 +85,7 @@ class AuthenticationTest extends TestCase
         AuthenticationTestUser::create([
             'username' => 'username2',
             'email' => 'email2',
-            'password' => bcrypt('password'),
+            'password' => str_hash('password'),
             'is_active' => false,
         ]);
 
