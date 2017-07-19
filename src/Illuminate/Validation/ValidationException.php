@@ -21,6 +21,13 @@ class ValidationException extends Exception
     public $response;
 
     /**
+     * The status code to use for the response.
+     *
+     * @var int
+     */
+    public $status = 422;
+
+    /**
      * The name of the error bag.
      *
      * @var string
@@ -59,6 +66,19 @@ class ValidationException extends Exception
     public function errors()
     {
         return $this->validator->errors()->messages();
+    }
+
+    /**
+     * Set the HTTP status code to be used for the response.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function status($status)
+    {
+        $this->status = $status;
+
+        return $this;
     }
 
     /**
