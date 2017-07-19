@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Validation\ValidationException;
 
 trait AuthenticatesUsers
 {
@@ -124,17 +125,9 @@ trait AuthenticatesUsers
      */
     protected function sendFailedLoginResponse(Request $request)
     {
-        if ($request->expectsJson()) {
-            return response()->json([
-                'message' => 'Authentication failed.', 'errors' => [
-                    $this->username() => [trans('auth.failed')],
-                ],
-            ], 422);
-        }
-
-        return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors([$this->username() => trans('auth.failed')]);
+        throw ValidationException::fromMessages([
+            $this->username() => [trans('auth.failed')],
+        ]);
     }
 
     /**

@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Validation\ValidationException;
 
 trait ThrottlesLogins
 {
@@ -46,17 +47,9 @@ trait ThrottlesLogins
             $this->throttleKey($request)
         );
 
-        $message = Lang::get('auth.throttle', ['seconds' => $seconds]);
-
-        $errors = [$this->username() => $message];
-
-        if ($request->expectsJson()) {
-            return response()->json($errors, 423);
-        }
-
-        return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors($errors);
+        throw ValidationException::fromMessages([
+            $this->username => [Lang::get('auth.throttle', ['seconds' => $seconds])],
+        ])->status(423);
     }
 
     /**

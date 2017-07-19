@@ -1,7 +1,7 @@
 language: php
 
 php:
-  - 7.0
+  - 7.0.21
   - 7.1
 
 env:
@@ -11,9 +11,9 @@ env:
 matrix:
   fast_finish: true
   include:
-    - php: 7.0
+    - php: 7.0.21
       env: setup=lowest
-    - php: 7.0
+    - php: 7.0.21
       env: setup=stable
     - php: 7.1
       env: setup=lowest

@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Exception;
+use Illuminate\Support\Facades\Validator as ValidatorFacade;
 
 class ValidationException extends Exception
 {
@@ -19,6 +20,13 @@ class ValidationException extends Exception
      * @var \Symfony\Component\HttpFoundation\Response|null
      */
     public $response;
+
+    /**
+     * The status code to use for the response.
+     *
+     * @var int
+     */
+    public $status = 422;
 
     /**
      * The name of the error bag.
@@ -52,6 +60,23 @@ class ValidationException extends Exception
     }
 
     /**
+     * Create a new validation exception from a plain array of messages.
+     *
+     * @param  array  $messages
+     * @return static
+     */
+    public static function fromMessages(array $messages)
+    {
+        return new static(tap(ValidatorFacade::make([], []), function ($validator) use ($messages) {
+            foreach ($messages as $key => $value) {
+                foreach ($value as $message) {
+                    $validator->errors()->add($key, $message);
+                }
+            }
+        }));
+    }
+
+    /**
      * Get all of the validation error messages.
      *
      * @return array
@@ -59,6 +84,19 @@ class ValidationException extends Exception
     public function errors()
     {
         return $this->validator->errors()->messages();
+    }
+
+    /**
+     * Set the HTTP status code to be used for the response.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function status($status)
+    {
+        $this->status = $status;
+
+        return $this;
     }
 
     /**
