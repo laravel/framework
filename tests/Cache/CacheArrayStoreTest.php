@@ -45,6 +45,13 @@ class CacheArrayStoreTest extends TestCase
         $this->assertEquals(2, $store->get('foo'));
     }
 
+    public function testNonExistingKeysCanBeIncremented()
+    {
+        $store = new ArrayStore;
+        $store->increment('foo');
+        $this->assertEquals(1, $store->get('foo'));
+    }
+
     public function testValuesCanBeDecremented()
     {
         $store = new ArrayStore;
