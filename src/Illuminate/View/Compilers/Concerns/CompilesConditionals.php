@@ -23,6 +23,7 @@ trait CompilesConditionals
      */
     protected function compileAuth($guard = null)
     {
+        $guard = is_null($guard) ? '()' : $guard;
         return "<?php if(auth()->guard{$guard}->check()): ?>";
     }
 
@@ -137,28 +138,6 @@ trait CompilesConditionals
      * @return string
      */
     protected function compileEndIsset()
-    {
-        return '<?php endif; ?>';
-    }
-
-    /**
-     * Compile the if-auth statements into valid PHP.
-     *
-     * @param  string|null  $guard
-     * @return string
-     */
-    protected function compileAuth($guard = null)
-    {
-        $guard = is_null($guard) ? '()' : $guard;
-        return "<?php if(auth()->guard{$guard}->guest()): ?>";
-    }
-
-    /**
-     * Compile the end-auth statements into valid PHP.
-     *
-     * @return string
-     */
-    protected function compileEndAuth()
     {
         return '<?php endif; ?>';
     }
