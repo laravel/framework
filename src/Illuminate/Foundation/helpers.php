@@ -470,6 +470,27 @@ if (! function_exists('factory')) {
     }
 }
 
+if (! function_exists('has_errors')) {
+    /**
+     * Returns true if session has errors, and optionally key-specific errors.
+     *
+     * @param  string|null  $key
+     * @param  string|null  $bag
+     * @return bool
+     */
+    function has_errors($key = null, $bag = 'default')
+    {
+        $errors = session('errors');
+        if (is_null($errors) || ! $errors->getBag($bag)->any()) {
+            return false;
+        } elseif ($key !== null) {
+            return $errors->getBag($bag)->has($key);
+        }
+
+        return true;
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.

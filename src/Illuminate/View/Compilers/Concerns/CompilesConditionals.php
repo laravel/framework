@@ -144,4 +144,25 @@ trait CompilesConditionals
     {
         return '<?php endif; ?>';
     }
+
+    /**
+     * Compile the if-errors statements into valid PHP.
+     *
+     * @param  string|null  $expression
+     * @return string
+     */
+    protected function compileErrors($expression = null)
+    {
+        return "<?php if(has_errors{$expression}): ?>";
+    }
+
+    /**
+     * Compile the end-errors statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndErrors()
+    {
+        return '<?php endif; ?>';
+    }
 }
