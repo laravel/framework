@@ -167,6 +167,21 @@ class MailFake implements Mailer
     }
 
     /**
+     * Queue a new e-mail message for sending after (n) seconds.
+     *
+     * @param  int  $delay
+     * @param  string|array  $view
+     * @param  array  $data
+     * @param  \Closure|string  $callback
+     * @param  string|null  $queue
+     * @return mixed
+     */
+    public function later($delay, $view, array $data = [], $callback = null, $queue = null)
+    {
+        $this->send($view);
+    }
+
+    /**
      * Get the array of failed recipients.
      *
      * @return array
