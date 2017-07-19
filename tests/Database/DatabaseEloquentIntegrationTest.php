@@ -1135,6 +1135,49 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 
+    public function testAttributesMayBeCastToObjects()
+    {
+        $model = new EloquentTestObjectCast();
+
+        $model->token = new EloquentTestBase64Object('Taylor');
+        $this->assertInstanceOf(EloquentTestBase64Object::class, $model->token);
+        $this->assertEquals('Taylor', $model->token->secret);
+        $this->assertEquals('VGF5bG9y', $model->toArray()['token']);
+        $this->assertTrue($model->hasCast('token', 'base64'));
+
+        $model->price = (new EloquentTestMoneyObject(10))->setCurrency('BTC');
+        $this->assertInstanceOf(EloquentTestMoneyObject::class, $model->price);
+        $this->assertEquals(10, $model->toArray()['price']);
+        $this->assertEquals('BTC', $model->toArray()['currency']);
+        $this->assertTrue($model->hasCast('price', 'money'));
+
+        $model->price->amount = 20;
+        $this->assertEquals(20, $model->toArray()['price']);
+
+        $model->price = (new EloquentTestMoneyObject(30));
+        $this->assertEquals(30, $model->toArray()['price']);
+        $this->assertNull($model->toArray()['currency']);
+
+        $model->price = null;
+        $this->assertNull($model->price);
+        $this->assertNull($model->toArray()['price']);
+        $this->assertNull($model->toArray()['currency']);
+
+        $model->price = (new EloquentTestMoneyObject(10))->setCurrency('BTC');
+        $model->forceFill(['price' => null]);
+        $this->assertNull($model->price);
+        $this->assertNull($model->toArray()['price']);
+        $this->assertNull($model->toArray()['currency']);
+
+        $model->price = (new EloquentTestMoneyObject(10))->setCurrency('BTC');
+        $model->price->setCurrency('XBT');
+        $model = unserialize(serialize($model));
+        $this->assertEquals('XBT', $model->currency);
+
+        $model->meta = new EloquentTestStringifyableObject(['friends' => ['Adam']]);
+        $this->assertEquals('{"friends":["Adam"]}', $model->toArray()['meta']);
+    }
+
     /**
      * Helpers...
      */
@@ -1363,5 +1406,99 @@ class EloquentTestFriendPivot extends Pivot
     public function level()
     {
         return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
+    }
+}
+
+class EloquentTestBase64Object
+{
+    public $secret;
+
+    public function __construct($secret)
+    {
+        $this->secret = empty($secret) ? null : $secret;
+    }
+
+    public static function fromHash($secret)
+    {
+        return new static(empty($secret) ? null : base64_decode($secret));
+    }
+
+    public function hash()
+    {
+        return empty($this->secret) ? null : base64_encode($this->secret);
+    }
+}
+
+class EloquentTestStringifyableObject
+{
+    public $json;
+
+    public function __construct($json)
+    {
+        $this->json = $json;
+    }
+
+    public static function fromString($string)
+    {
+        return new static(json_encode($string));
+    }
+
+    public function __toString()
+    {
+        return json_encode($this->json);
+    }
+}
+
+class EloquentTestMoneyObject
+{
+    public $amount;
+    public $currency;
+
+    public function __construct($amount)
+    {
+        $this->amount = $amount;
+    }
+
+    public function setCurrency($currency)
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+}
+
+class EloquentTestObjectCast extends Eloquent
+{
+    protected $casts = [
+        'meta' => 'stringifyable',
+        'token' => 'base64',
+        'price' => 'money:price,currency',
+    ];
+
+    public function castToStringifyable($value)
+    {
+        return EloquentTestStringifyableObject::fromString($value);
+    }
+
+    public function castToBase64($value)
+    {
+        return EloquentTestBase64Object::fromHash($value);
+    }
+
+    public function castFromBase64($secret)
+    {
+        return $secret->hash();
+    }
+
+    public function castToMoney($amount, $currency)
+    {
+        return (new EloquentTestMoneyObject($amount))->setCurrency($currency);
+    }
+
+    public function castFromMoney($money)
+    {
+        if ($money) {
+            return [$money->amount, $money->currency];
+        }
     }
 }
