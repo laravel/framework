@@ -28,6 +28,13 @@ class ValidationException extends Exception
     public $errorBag;
 
     /**
+     * The path the client should be redirected to.
+     *
+     * @var string
+     */
+    public $redirectTo;
+
+    /**
      * Create a new exception instance.
      *
      * @param  \Illuminate\Contracts\Validation\Validator  $validator
@@ -42,6 +49,42 @@ class ValidationException extends Exception
         $this->response = $response;
         $this->errorBag = $errorBag;
         $this->validator = $validator;
+    }
+
+    /**
+     * Get all of the validation error messages.
+     *
+     * @return array
+     */
+    public function errors()
+    {
+        return $this->validator->errors()->messages();
+    }
+
+    /**
+     * Set the error bag on the exception.
+     *
+     * @param  string  $errorBag
+     * @return $this
+     */
+    public function errorBag($errorBag)
+    {
+        $this->errorBag = $errorBag;
+
+        return $this;
+    }
+
+    /**
+     * Set the URL to redirect to on a validation error.
+     *
+     * @param  string  $url
+     * @return string
+     */
+    public function redirectTo($url)
+    {
+        $this->redirectTo = $url;
+
+        return $this;
     }
 
     /**

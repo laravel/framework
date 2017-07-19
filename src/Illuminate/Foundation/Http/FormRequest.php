@@ -60,13 +60,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
     protected $errorBag = 'default';
 
     /**
-     * The input keys that should not be flashed on redirect.
-     *
-     * @var array
-     */
-    protected $dontFlash = ['password', 'password_confirmation'];
-
-    /**
      * Get the validator instance for the request.
      *
      * @return \Illuminate\Contracts\Validation\Validator
@@ -122,51 +115,9 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function failedValidation(Validator $validator)
     {
-        throw new ValidationException($validator, $this->response(
-            $this->formatErrors($validator)
-        ));
-    }
-
-    /**
-     * Get the proper failed validation response for the request.
-     *
-     * @param  array  $errors
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    public function response(array $errors)
-    {
-        if ($this->expectsJson()) {
-            return $this->jsonResponse($errors);
-        }
-
-        return $this->redirector->to($this->getRedirectUrl())
-                        ->withInput($this->except($this->dontFlash))
-                        ->withErrors($errors, $this->errorBag);
-    }
-
-    /**
-     * Get the proper failed validation JSON response for the request.
-     *
-     * @param  array  $errors
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function jsonResponse(array $errors)
-    {
-        return new JsonResponse([
-            'message' => 'The given data was invalid.',
-            'errors' => $errors,
-        ], 422);
-    }
-
-    /**
-     * Format the errors from the given Validator instance.
-     *
-     * @param  \Illuminate\Contracts\Validation\Validator  $validator
-     * @return array
-     */
-    protected function formatErrors(Validator $validator)
-    {
-        return $validator->getMessageBag()->toArray();
+        throw (new ValidationException($validator))
+                    ->errorBag($this->errorBag)
+                    ->redirectTo($this->getRedirectUrl());
     }
 
     /**

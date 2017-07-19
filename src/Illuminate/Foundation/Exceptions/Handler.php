@@ -63,6 +63,16 @@ class Handler implements ExceptionHandlerContract
     ];
 
     /**
+     * A list of the inputs that are never flashed for validation exceptions.
+     *
+     * @var array
+     */
+    protected $dontFlash = [
+        'password',
+        'password_confirmation',
+    ];
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -222,13 +232,14 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        return redirect()->back()->withInput($request->except([
-            'password',
-            'password_confirmation',
-        ]))->withErrors(
-            $exception->validator->errors()->messages(),
-            $exception->errorBag
-        );
+        $url = $exception->redirectTo ?? url()->previous();
+
+        return redirect($url)
+                ->withInput($request->except($this->dontFlash))
+                ->withErrors(
+                    $exception->validator->errors()->messages(),
+                    $exception->errorBag
+                );
     }
 
     /**
@@ -242,7 +253,7 @@ class Handler implements ExceptionHandlerContract
     {
         return response()->json([
             'message' => $exception->getMessage(),
-            'errors' => $exception->validator->errors()->messages(),
+            'errors' => $exception->errors()
         ], 422);
     }
 
