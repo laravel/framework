@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.29 (2017-07-19)
 
 ### Added
 - Added `ManagesFrequencies::twiceMonthly()` method ([#19874](https://github.com/laravel/framework/pull/19874))
