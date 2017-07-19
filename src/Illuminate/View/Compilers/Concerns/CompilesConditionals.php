@@ -45,6 +45,7 @@ trait CompilesConditionals
      */
     protected function compileGuest($guard = null)
     {
+        $guard = is_null($guard) ? '()' : $guard;
         return "<?php if(auth()->guard{$guard}->guest()): ?>";
     }
 
