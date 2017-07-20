@@ -82,7 +82,9 @@ class EloquentBelongsToManyTest extends TestCase
             ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
         ]);
 
-        Carbon::setTestNow('2017-10-10 10:10:10');
+        Carbon::setTestNow(
+            Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
+        );
 
         $post->tags()->touch();
 
