@@ -68,7 +68,7 @@ class FoundationHelpersTest extends TestCase
         touch(public_path('mix-manifest.json'));
 
         file_put_contents(public_path('mix-manifest.json'), json_encode([
-            '/unversioned.css' => '/versioned.css'
+            '/unversioned.css' => '/versioned.css',
         ]));
 
         $result = mix($file);
