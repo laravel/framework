@@ -1,13 +1,12 @@
 <?php
 
-namespace Illuminate\Auth;
+  namespace Illuminate\Auth;
 
 use Closure;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 
-class AuthManager implements FactoryContract
-{
+class AuthManager implements FactoryContract {
     use CreatesUserProviders;
 
     /**
@@ -34,12 +33,11 @@ class AuthManager implements FactoryContract
     /**
      * The user resolver shared by various services.
      *
-     * Determines the default user for Gate, Request, and the Authenticatable contract.
+* Determines the default user for Gate, Request, and the Authenticatable contract.
      *
      * @var \Closure
      */
     protected $userResolver;
-
     /**
      * Create a new Auth manager instance.
      *
