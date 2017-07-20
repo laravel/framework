@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 
@@ -63,7 +63,6 @@ class EloquentBelongsToManyTest extends TestCase
             ['post_id' => $post->id, 'tag_id' => 300, 'flag' => 'exclude'],
             ['post_id' => $post->id, 'tag_id' => 400, 'flag' => ''],
         ]);
-
 
         $this->assertEquals([200, 400], $post->tags()->allRelatedIds()->toArray());
     }
