@@ -306,7 +306,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Get the URL for the file at the given path.
      *
      * @param  string  $path
-     * @param  string  $expires
+     * @param  int|string|\DateTime $expires The time at which the URL should
+     *                                      expire. This can be a Unix
+     *                                      timestamp, a PHP DateTime object,
+     *                                      or a string that can be evaluated
+     *                                      by strtotime().
      * @return string
      */
     public function url($path, $expires = null)
@@ -329,7 +333,11 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
      * @param  string  $path
-     * @param  string  $expires
+     * @param  int|string|\DateTime $expires The time at which the URL should
+     *                                      expire. This can be a Unix
+     *                                      timestamp, a PHP DateTime object,
+     *                                      or a string that can be evaluated
+     *                                      by strtotime().
      * @return string
      */
     protected function getAwsUrl($adapter, $path, $expires)
