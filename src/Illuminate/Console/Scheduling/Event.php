@@ -532,7 +532,7 @@ class Event
     /**
      * Register a callback to further filter the schedule.
      *
-     * @param  \Closure|boolean  $callback
+     * @param  \Closure|bool  $callback
      * @return $this
      */
     public function when($callback)
@@ -547,7 +547,7 @@ class Event
     /**
      * Register a callback to further filter the schedule.
      *
-     * @param  \Closure|boolean  $callback
+     * @param  \Closure|bool  $callback
      * @return $this
      */
     public function skip($callback)
