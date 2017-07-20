@@ -1198,6 +1198,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Replace all occurrences of the search item with the replacement item.
+     *
+     * @param  mixed  $search
+     * @param  mixed  $replace
+     * @return static
+     */
+    public function replace($search, $replace)
+    {
+        return $this->map(function ($item) use ($search, $replace) {
+            return $item == $search ? $replace : $item;
+        });
+    }
+
+    /**
      * Reverse items order.
      *
      * @return static
