@@ -115,6 +115,25 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getMultiple($keys, $default = null)
+    {
+        if (is_null($default))
+            return $this->many($keys);
+
+        $default = collect($default);
+
+        foreach ($keys as $key) {
+            if (! $default->has($key)) {
+                $default->put($key, null);
+            }
+        }
+
+        return $this->many($default->toArray());
+    }
+
+    /**
      * Handle a result for the "many" method.
      *
      * @param  array  $keys
@@ -177,6 +196,14 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function set($key, $value, $ttl = null)
+    {
+        $this->put($key, $value, $ttl);
+    }
+
+    /**
      * Store multiple items in the cache for a given number of minutes.
      *
      * @param  array  $values
@@ -192,6 +219,14 @@ class Repository implements CacheContract, ArrayAccess
                 $this->event(new KeyWritten($key, $value, $minutes));
             }
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setMultiple($values, $ttl = null)
+    {
+        $this->putMany($values, $ttl);
     }
 
     /**
@@ -337,6 +372,34 @@ class Repository implements CacheContract, ArrayAccess
         return tap($this->store->forget($this->itemKey($key)), function () use ($key) {
             $this->event(new KeyForgotten($key));
         });
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function delete($key)
+    {
+        return $this->forget($key);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteMultiple($keys)
+    {
+        foreach ($keys as $key) {
+            $this->forget($key);
+        }
+
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function clear()
+    {
+        return $this->store->flush();
     }
 
     /**
