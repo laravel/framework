@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Testing\Constraints;
 
-use PHPUnit_Framework_Constraint;
 use Illuminate\Database\Connection;
+use PHPUnit_Framework_Constraint;
 
 class HasInDatabase extends PHPUnit_Framework_Constraint
 {
@@ -31,8 +31,9 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Create a new constraint instance.
      *
-     * @param  \Illuminate\Database\Connection  $database
-     * @param  array  $data
+     * @param \Illuminate\Database\Connection $database
+     * @param array                           $data
+     *
      * @return void
      */
     public function __construct(Connection $database, array $data)
@@ -45,7 +46,8 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Check if the data is found in the given table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return bool
      */
     public function matches($table)
@@ -56,7 +58,8 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Get the description of the failure.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return string
      */
     public function failureDescription($table)
@@ -70,7 +73,8 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Get additional info about the records found in the database table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return string
      */
     protected function getAdditionalInfo($table)
@@ -93,7 +97,8 @@ class HasInDatabase extends PHPUnit_Framework_Constraint
     /**
      * Get a string representation of the object.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      */
     public function toString($options = 0)

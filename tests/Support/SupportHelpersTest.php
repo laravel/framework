@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayAccess;
-use Mockery as m;
 use Illuminate\Support\Str;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportHelpersTest extends TestCase
 {
@@ -87,13 +87,13 @@ class SupportHelpersTest extends TestCase
         $array = [
             [
                 'account' => 'a',
-                'users' => [
+                'users'   => [
                     ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
                 ],
             ],
             [
                 'account' => 'b',
-                'users' => [
+                'users'   => [
                     ['first' => 'abigail', 'last' => 'otwell'],
                     ['first' => 'dayle', 'last' => 'rees'],
                 ],
@@ -327,8 +327,8 @@ class SupportHelpersTest extends TestCase
 
     public function testObjectGet()
     {
-        $class = new StdClass;
-        $class->name = new StdClass;
+        $class = new StdClass();
+        $class->name = new StdClass();
         $class->name->first = 'Taylor';
 
         $this->assertEquals('Taylor', object_get($class, 'name.first'));
@@ -656,7 +656,7 @@ class SupportHelpersTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
-        $object = new stdClass;
+        $object = new stdClass();
         $object->value = 'a';
         $this->assertEquals(['a'], array_wrap($string));
         $this->assertEquals($array, array_wrap($array));
@@ -690,7 +690,7 @@ class SupportHelpersTest extends TestCase
             'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
         ],
-        class_uses_recursive(new SupportTestClassTwo));
+        class_uses_recursive(new SupportTestClassTwo()));
     }
 
     public function testArrayAdd()

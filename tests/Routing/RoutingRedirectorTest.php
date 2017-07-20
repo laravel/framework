@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Routing\Redirector;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Redirector;
 
 class RoutingRedirectorTest extends TestCase
 {

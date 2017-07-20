@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Pagination\LengthAwarePaginator;
+use PHPUnit\Framework\TestCase;
 
 class LengthAwarePaginatorTest extends TestCase
 {

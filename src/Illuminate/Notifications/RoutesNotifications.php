@@ -2,15 +2,16 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Notifications\Dispatcher;
+use Illuminate\Support\Str;
 
 trait RoutesNotifications
 {
     /**
      * Send the given notification.
      *
-     * @param  mixed  $instance
+     * @param mixed $instance
+     *
      * @return void
      */
     public function notify($instance)
@@ -21,7 +22,8 @@ trait RoutesNotifications
     /**
      * Get the notification routing information for the given driver.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      */
     public function routeNotificationFor($driver)

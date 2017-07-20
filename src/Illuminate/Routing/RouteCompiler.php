@@ -16,7 +16,8 @@ class RouteCompiler
     /**
      * Create a new Route compiler instance.
      *
-     * @param  \Illuminate\Routing\Route  $route
+     * @param \Illuminate\Routing\Route $route
+     *
      * @return void
      */
     public function __construct($route)

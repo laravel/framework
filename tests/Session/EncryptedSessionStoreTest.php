@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Session;
 
 use Mockery as m;
-use ReflectionClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class EncryptedSessionStoreTest extends TestCase
 {
@@ -24,8 +24,8 @@ class EncryptedSessionStoreTest extends TestCase
         $session->now('qux', 'norf');
         $serialized = serialize([
             '_token' => $session->token(),
-            'foo' => 'bar',
-            'baz' => 'boom',
+            'foo'    => 'bar',
+            'baz'    => 'boom',
             '_flash' => [
                 'new' => [],
                 'old' => ['baz'],

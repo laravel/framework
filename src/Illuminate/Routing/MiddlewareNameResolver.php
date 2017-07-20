@@ -9,9 +9,10 @@ class MiddlewareNameResolver
     /**
      * Resolve the middleware name to a class name(s) preserving passed parameters.
      *
-     * @param  string  $name
-     * @param  array  $map
-     * @param  array  $middlewareGroups
+     * @param string $name
+     * @param array  $map
+     * @param array  $middlewareGroups
+     *
      * @return string|array
      */
     public static function resolve($name, $map, $middlewareGroups)
@@ -39,16 +40,17 @@ class MiddlewareNameResolver
             list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
             return (isset($map[$name]) ? $map[$name] : $name).
-                   (! is_null($parameters) ? ':'.$parameters : '');
+                   (!is_null($parameters) ? ':'.$parameters : '');
         }
     }
 
     /**
      * Parse the middleware group and format it for usage.
      *
-     * @param  string  $name
-     * @param  array  $map
-     * @param  array  $middlewareGroups
+     * @param string $name
+     * @param array  $map
+     * @param array  $middlewareGroups
+     *
      * @return array
      */
     protected static function parseMiddlewareGroup($name, $map, $middlewareGroups)

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Pipeline;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Pipeline\Hub as PipelineHubContract;
+use Illuminate\Support\ServiceProvider;
 
 class PipelineServiceProvider extends ServiceProvider
 {

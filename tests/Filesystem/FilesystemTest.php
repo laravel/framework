@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\TestCase;
 
 class FilesystemTest extends TestCase
 {
@@ -356,7 +356,7 @@ class FilesystemTest extends TestCase
      */
     public function testSharedGet()
     {
-        if (! function_exists('pcntl_fork')) {
+        if (!function_exists('pcntl_fork')) {
             $this->markTestSkipped('Skipping since the pcntl extension is not available');
         }
 
@@ -366,7 +366,7 @@ class FilesystemTest extends TestCase
         for ($i = 1; $i <= 20; ++$i) {
             $pid = pcntl_fork();
 
-            if (! $pid) {
+            if (!$pid) {
                 $files = new Filesystem();
                 $files->put($this->tempDir.'/file.txt', $content, true);
                 $read = $files->get($this->tempDir.'/file.txt', true);

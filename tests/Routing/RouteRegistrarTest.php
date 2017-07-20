@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Mockery as m;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class RouteRegistrarTest extends TestCase
 {
@@ -220,7 +220,8 @@ class RouteRegistrarTest extends TestCase
     /**
      * Assert that the last route has the given middleware.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return void
      */
     protected function seeMiddleware($middleware)
@@ -231,8 +232,9 @@ class RouteRegistrarTest extends TestCase
     /**
      * Assert that the last route has the given content.
      *
-     * @param  string  $content
-     * @param  \Illuminate\Http\Request  $request
+     * @param string                   $content
+     * @param \Illuminate\Http\Request $request
+     *
      * @return void
      */
     protected function seeResponse($content, Request $request)

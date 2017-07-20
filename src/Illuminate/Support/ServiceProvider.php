@@ -37,7 +37,8 @@ abstract class ServiceProvider
     /**
      * Create a new service provider instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     *
      * @return void
      */
     public function __construct($app)
@@ -48,8 +49,9 @@ abstract class ServiceProvider
     /**
      * Merge the given configuration with the existing configuration.
      *
-     * @param  string  $path
-     * @param  string  $key
+     * @param string $path
+     * @param string $key
+     *
      * @return void
      */
     protected function mergeConfigFrom($path, $key)
@@ -62,12 +64,13 @@ abstract class ServiceProvider
     /**
      * Load the given routes file if routes are not already cached.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     protected function loadRoutesFrom($path)
     {
-        if (! $this->app->routesAreCached()) {
+        if (!$this->app->routesAreCached()) {
             require $path;
         }
     }
@@ -75,8 +78,9 @@ abstract class ServiceProvider
     /**
      * Register a view file namespace.
      *
-     * @param  string  $path
-     * @param  string  $namespace
+     * @param string $path
+     * @param string $namespace
+     *
      * @return void
      */
     protected function loadViewsFrom($path, $namespace)
@@ -91,8 +95,9 @@ abstract class ServiceProvider
     /**
      * Register a translation file namespace.
      *
-     * @param  string  $path
-     * @param  string  $namespace
+     * @param string $path
+     * @param string $namespace
+     *
      * @return void
      */
     protected function loadTranslationsFrom($path, $namespace)
@@ -103,7 +108,8 @@ abstract class ServiceProvider
     /**
      * Register a database migration path.
      *
-     * @param  array|string  $paths
+     * @param array|string $paths
+     *
      * @return void
      */
     protected function loadMigrationsFrom($paths)
@@ -118,8 +124,9 @@ abstract class ServiceProvider
     /**
      * Register paths to be published by the publish command.
      *
-     * @param  array  $paths
-     * @param  string  $group
+     * @param array  $paths
+     * @param string $group
+     *
      * @return void
      */
     protected function publishes(array $paths, $group = null)
@@ -136,12 +143,13 @@ abstract class ServiceProvider
     /**
      * Ensure the publish array for the service provider is initialized.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return void
      */
     protected function ensurePublishArrayInitialized($class)
     {
-        if (! array_key_exists($class, static::$publishes)) {
+        if (!array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
         }
     }
@@ -149,13 +157,14 @@ abstract class ServiceProvider
     /**
      * Add a publish group / tag to the service provider.
      *
-     * @param  string  $group
-     * @param  array  $paths
+     * @param string $group
+     * @param array  $paths
+     *
      * @return void
      */
     protected function addPublishGroup($group, $paths)
     {
-        if (! array_key_exists($group, static::$publishGroups)) {
+        if (!array_key_exists($group, static::$publishGroups)) {
             static::$publishGroups[$group] = [];
         }
 
@@ -167,13 +176,14 @@ abstract class ServiceProvider
     /**
      * Get the paths to publish.
      *
-     * @param  string  $provider
-     * @param  string  $group
+     * @param string $provider
+     * @param string $group
+     *
      * @return array
      */
     public static function pathsToPublish($provider = null, $group = null)
     {
-        if (! is_null($paths = static::pathsForProviderOrGroup($provider, $group))) {
+        if (!is_null($paths = static::pathsForProviderOrGroup($provider, $group))) {
             return $paths;
         }
 
@@ -185,8 +195,9 @@ abstract class ServiceProvider
     /**
      * Get the paths for the provider or group (or both).
      *
-     * @param  string|null  $provider
-     * @param  string|null  $group
+     * @param string|null $provider
+     * @param string|null $group
+     *
      * @return array
      */
     protected static function pathsForProviderOrGroup($provider, $group)
@@ -205,13 +216,14 @@ abstract class ServiceProvider
     /**
      * Get the paths for the provider and group.
      *
-     * @param  string  $provider
-     * @param  string  $group
+     * @param string $provider
+     * @param string $group
+     *
      * @return array
      */
     protected static function pathsForProviderAndGroup($provider, $group)
     {
-        if (! empty(static::$publishes[$provider]) && ! empty(static::$publishGroups[$group])) {
+        if (!empty(static::$publishes[$provider]) && !empty(static::$publishGroups[$group])) {
             return array_intersect_key(static::$publishes[$provider], static::$publishGroups[$group]);
         }
 
@@ -221,7 +233,8 @@ abstract class ServiceProvider
     /**
      * Register the package's custom Artisan commands.
      *
-     * @param  array|mixed  $commands
+     * @param array|mixed $commands
+     *
      * @return void
      */
     public function commands($commands)

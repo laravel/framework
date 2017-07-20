@@ -2,10 +2,10 @@
 
 namespace Illuminate\Mail;
 
-use Swift_Mailer;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use Swift_Mailer;
 
 class MailServiceProvider extends ServiceProvider
 {
@@ -65,9 +65,10 @@ class MailServiceProvider extends ServiceProvider
     /**
      * Set a global address on the mailer by type.
      *
-     * @param  \Illuminate\Mail\Mailer  $mailer
-     * @param  array  $config
-     * @param  string  $type
+     * @param \Illuminate\Mail\Mailer $mailer
+     * @param array                   $config
+     * @param string                  $type
+     *
      * @return void
      */
     protected function setGlobalAddress($mailer, array $config, $type)

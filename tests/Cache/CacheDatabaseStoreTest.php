@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Cache;
 
 use Exception;
+use Illuminate\Cache\DatabaseStore;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\DatabaseStore;
 
 class CacheDatabaseStoreTest extends TestCase
 {
@@ -69,7 +69,7 @@ class CacheDatabaseStoreTest extends TestCase
         $store->getEncrypter()->shouldReceive('encrypt')->once()->with('bar')->andReturn('bar');
         $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
         $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => 'bar', 'expiration' => 61])->andReturnUsing(function () {
-            throw new Exception;
+            throw new Exception();
         });
         $table->shouldReceive('where')->once()->with('key', 'prefixfoo')->andReturn($table);
         $table->shouldReceive('update')->once()->with(['value' => 'bar', 'expiration' => 61]);

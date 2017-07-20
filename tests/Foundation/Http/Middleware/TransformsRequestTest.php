@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
-use Illuminate\Http\Request;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Illuminate\Http\Request;
 
 class TransformsRequestTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +12,7 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
         $middleware = new ManipulateInput();
         $request = new Request(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => 4,
             ],
             ['age' => 28]
@@ -30,7 +30,7 @@ class TransformsRequestTest extends \PHPUnit_Framework_TestCase
         $middleware = new ManipulateInput();
         $request = new Request(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => 4,
             ],
             [],

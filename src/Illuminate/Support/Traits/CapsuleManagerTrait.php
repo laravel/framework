@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Traits;
 
-use Illuminate\Support\Fluent;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Support\Fluent;
 
 trait CapsuleManagerTrait
 {
@@ -24,15 +24,16 @@ trait CapsuleManagerTrait
     /**
      * Setup the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param \Illuminate\Contracts\Container\Container $container
+     *
      * @return void
      */
     protected function setupContainer(Container $container)
     {
         $this->container = $container;
 
-        if (! $this->container->bound('config')) {
-            $this->container->instance('config', new Fluent);
+        if (!$this->container->bound('config')) {
+            $this->container->instance('config', new Fluent());
         }
     }
 
@@ -59,7 +60,8 @@ trait CapsuleManagerTrait
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param \Illuminate\Contracts\Container\Container $container
+     *
      * @return void
      */
     public function setContainer(Container $container)

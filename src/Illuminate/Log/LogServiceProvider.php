@@ -2,8 +2,8 @@
 
 namespace Illuminate\Log;
 
-use Monolog\Logger as Monolog;
 use Illuminate\Support\ServiceProvider;
+use Monolog\Logger as Monolog;
 
 class LogServiceProvider extends ServiceProvider
 {
@@ -52,7 +52,8 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Log\Writer  $log
+     * @param \Illuminate\Log\Writer $log
+     *
      * @return void
      */
     protected function configureHandler(Writer $log)
@@ -63,7 +64,8 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Log\Writer  $log
+     * @param \Illuminate\Log\Writer $log
+     *
      * @return void
      */
     protected function configureSingleHandler(Writer $log)
@@ -77,7 +79,8 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Log\Writer  $log
+     * @param \Illuminate\Log\Writer $log
+     *
      * @return void
      */
     protected function configureDailyHandler(Writer $log)
@@ -91,7 +94,8 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Log\Writer  $log
+     * @param \Illuminate\Log\Writer $log
+     *
      * @return void
      */
     protected function configureSyslogHandler(Writer $log)
@@ -102,7 +106,8 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Configure the Monolog handlers for the application.
      *
-     * @param  \Illuminate\Log\Writer  $log
+     * @param \Illuminate\Log\Writer $log
+     *
      * @return void
      */
     protected function configureErrorlogHandler(Writer $log)

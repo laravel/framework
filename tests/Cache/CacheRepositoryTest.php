@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
 use Carbon\Carbon;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase

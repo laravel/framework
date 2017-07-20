@@ -107,7 +107,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the view at the given path.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function compile($path = null)
@@ -116,7 +117,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $this->setPath($path);
         }
 
-        if (! is_null($this->cachePath)) {
+        if (!is_null($this->cachePath)) {
             $contents = $this->compileString($this->files->get($this->getPath()));
 
             $this->files->put($this->getCompiledPath($this->getPath()), $contents);
@@ -136,7 +137,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Set the path currently being compiled.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function setPath($path)
@@ -147,7 +149,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile the given Blade template contents.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileString($value)
@@ -167,7 +170,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
             $result .= is_array($token) ? $this->parseToken($token) : $token;
         }
 
-        if (! empty($this->verbatimBlocks)) {
+        if (!empty($this->verbatimBlocks)) {
             $result = $this->restoreVerbatimBlocks($result);
         }
 
@@ -184,7 +187,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Store the verbatim blocks and replace them with a temporary placeholder.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function storeVerbatimBlocks($value)
@@ -199,7 +203,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Replace the raw placeholders with the original code stored in the raw blocks.
      *
-     * @param  string  $result
+     * @param string $result
+     *
      * @return string
      */
     protected function restoreVerbatimBlocks($result)
@@ -216,7 +221,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Add the stored footers onto the given content.
      *
-     * @param  string  $result
+     * @param string $result
+     *
      * @return string
      */
     protected function addFooters($result)
@@ -228,7 +234,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Parse the tokens from the template.
      *
-     * @param  array  $token
+     * @param array $token
+     *
      * @return string
      */
     protected function parseToken($token)
@@ -247,7 +254,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Execute the user defined extensions.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileExtensions($value)
@@ -262,7 +270,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile Blade statements that start with "@".
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileStatements($value)
@@ -277,7 +286,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Compile a single Blade @ statement.
      *
-     * @param  array  $match
+     * @param array $match
+     *
      * @return string
      */
     protected function compileStatement($match)
@@ -296,8 +306,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Call the given directive with the given value.
      *
-     * @param  string  $name
-     * @param  string|null  $value
+     * @param string      $name
+     * @param string|null $value
+     *
      * @return string
      */
     protected function callCustomDirective($name, $value)
@@ -312,7 +323,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Strip the parentheses from the given expression.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     public function stripParentheses($expression)
@@ -327,7 +339,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a custom Blade compiler.
      *
-     * @param  callable  $compiler
+     * @param callable $compiler
+     *
      * @return void
      */
     public function extend(callable $compiler)
@@ -348,8 +361,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Register a handler for custom directives.
      *
-     * @param  string  $name
-     * @param  callable  $handler
+     * @param string   $name
+     * @param callable $handler
+     *
      * @return void
      */
     public function directive($name, callable $handler)
@@ -370,7 +384,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     /**
      * Set the echo format to be used by the compiler.
      *
-     * @param  string  $format
+     * @param string $format
+     *
      * @return void
      */
     public function setEchoFormat($format)

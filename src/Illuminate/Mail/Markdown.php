@@ -2,10 +2,10 @@
 
 namespace Illuminate\Mail;
 
-use Parsedown;
+use Illuminate\Contracts\View\Factory as ViewFactory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
-use Illuminate\Contracts\View\Factory as ViewFactory;
+use Parsedown;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
 
 class Markdown
@@ -34,8 +34,9 @@ class Markdown
     /**
      * Create a new Markdown renderer instance.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $view
-     * @param  array  $options
+     * @param \Illuminate\Contracts\View\Factory $view
+     * @param array                              $options
+     *
      * @return void
      */
     public function __construct(ViewFactory $view, array $options = [])
@@ -48,9 +49,10 @@ class Markdown
     /**
      * Render the Markdown template into HTML.
      *
-     * @param  string  $view
-     * @param  array  $data
-     * @param  \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles|null  $inliner
+     * @param string                                                 $view
+     * @param array                                                  $data
+     * @param \TijsVerkoyen\CssToInlineStyles\CssToInlineStyles|null $inliner
+     *
      * @return \Illuminate\Support\HtmlString
      */
     public function render($view, array $data = [], $inliner = null)
@@ -61,7 +63,7 @@ class Markdown
             'mail', $this->htmlComponentPaths()
         )->make($view, $data)->render();
 
-        return new HtmlString(with($inliner ?: new CssToInlineStyles)->convert(
+        return new HtmlString(with($inliner ?: new CssToInlineStyles())->convert(
             $contents, $this->view->make('mail::themes.'.$this->theme)->render()
         ));
     }
@@ -69,8 +71,9 @@ class Markdown
     /**
      * Render the Markdown template into HTML.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return \Illuminate\Support\HtmlString
      */
     public function renderText($view, array $data = [])
@@ -89,12 +92,13 @@ class Markdown
     /**
      * Parse the given Markdown text into HTML.
      *
-     * @param  string  $text
+     * @param string $text
+     *
      * @return string
      */
     public static function parse($text)
     {
-        $parsedown = new Parsedown;
+        $parsedown = new Parsedown();
 
         return new HtmlString($parsedown->text($text));
     }
@@ -138,7 +142,8 @@ class Markdown
     /**
      * Register new mail component paths.
      *
-     * @param  array  $paths
+     * @param array $paths
+     *
      * @return void
      */
     public function loadComponentsFrom(array $paths = [])

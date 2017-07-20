@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Session;
 
 use Mockery as m;
-use ReflectionClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
 
 class SessionStoreTest extends TestCase
 {
@@ -100,8 +100,8 @@ class SessionStoreTest extends TestCase
             $this->getSessionId(),
             serialize([
                 '_token' => $session->token(),
-                'foo' => 'bar',
-                'baz' => 'boom',
+                'foo'    => 'bar',
+                'baz'    => 'boom',
                 '_flash' => [
                     'new' => [],
                     'old' => ['baz'],

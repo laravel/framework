@@ -3,23 +3,24 @@
 namespace Illuminate\Database;
 
 use Closure;
-use Exception;
-use Throwable;
 use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
-use Illuminate\Database\Query\Processors\SqlServerProcessor;
+use Exception;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
+use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
+use Throwable;
 
 class SqlServerConnection extends Connection
 {
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
-     * @param  int  $attempts
-     * @return mixed
+     * @param \Closure $callback
+     * @param int      $attempts
      *
      * @throws \Exception|\Throwable
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
@@ -63,7 +64,7 @@ class SqlServerConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        return $this->withTablePrefix(new QueryGrammar);
+        return $this->withTablePrefix(new QueryGrammar());
     }
 
     /**
@@ -73,7 +74,7 @@ class SqlServerConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        return $this->withTablePrefix(new SchemaGrammar);
+        return $this->withTablePrefix(new SchemaGrammar());
     }
 
     /**
@@ -83,7 +84,7 @@ class SqlServerConnection extends Connection
      */
     protected function getDefaultPostProcessor()
     {
-        return new SqlServerProcessor;
+        return new SqlServerProcessor();
     }
 
     /**
@@ -93,6 +94,6 @@ class SqlServerConnection extends Connection
      */
     protected function getDoctrineDriver()
     {
-        return new DoctrineDriver;
+        return new DoctrineDriver();
     }
 }

@@ -3,9 +3,9 @@
 namespace Illuminate\Session;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 use SessionHandlerInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
 
 class CookieSessionHandler implements SessionHandlerInterface
 {
@@ -33,8 +33,9 @@ class CookieSessionHandler implements SessionHandlerInterface
     /**
      * Create a new cookie driven handler instance.
      *
-     * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
-     * @param  int  $minutes
+     * @param \Illuminate\Contracts\Cookie\QueueingFactory $cookie
+     * @param int                                          $minutes
+     *
      * @return void
      */
     public function __construct(CookieJar $cookie, $minutes)
@@ -66,7 +67,7 @@ class CookieSessionHandler implements SessionHandlerInterface
     {
         $value = $this->request->cookies->get($sessionId) ?: '';
 
-        if (! is_null($decoded = json_decode($value, true)) && is_array($decoded)) {
+        if (!is_null($decoded = json_decode($value, true)) && is_array($decoded)) {
             if (isset($decoded['expires']) && Carbon::now()->getTimestamp() <= $decoded['expires']) {
                 return $decoded['data'];
             }
@@ -81,7 +82,7 @@ class CookieSessionHandler implements SessionHandlerInterface
     public function write($sessionId, $data)
     {
         $this->cookie->queue($sessionId, json_encode([
-            'data' => $data,
+            'data'    => $data,
             'expires' => Carbon::now()->addMinutes($this->minutes)->getTimestamp(),
         ]), $this->minutes);
 
@@ -109,7 +110,8 @@ class CookieSessionHandler implements SessionHandlerInterface
     /**
      * Set the request instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param \Symfony\Component\HttpFoundation\Request $request
+     *
      * @return void
      */
     public function setRequest(Request $request)

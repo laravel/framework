@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Auth;
 
 use Closure;
+use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Controller;
-use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuthorizesResourcesTest extends TestCase
 {
@@ -56,14 +56,15 @@ class AuthorizesResourcesTest extends TestCase
     /**
      * Assert that the given middleware has been registered on the given controller for the given method.
      *
-     * @param  \Illuminate\Routing\Controller  $controller
-     * @param  string  $method
-     * @param  string  $middleware
+     * @param \Illuminate\Routing\Controller $controller
+     * @param string                         $method
+     * @param string                         $middleware
+     *
      * @return void
      */
     protected function assertHasMiddleware($controller, $method, $middleware)
     {
-        $router = new Router(new \Illuminate\Events\Dispatcher);
+        $router = new Router(new \Illuminate\Events\Dispatcher());
 
         $router->aliasMiddleware('can', '\Illuminate\Tests\Auth\AuthorizesResourcesMiddleware');
         $router->get($method)->uses('\Illuminate\Tests\Auth\AuthorizesResourcesController@'.$method);

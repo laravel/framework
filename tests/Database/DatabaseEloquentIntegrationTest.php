@@ -3,14 +3,14 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentIntegrationTest extends TestCase
 {
@@ -21,7 +21,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      */
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -832,7 +832,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testEmptyMorphToRelationship()
     {
-        $photo = new EloquentTestPhoto;
+        $photo = new EloquentTestPhoto();
 
         $this->assertNull($photo->imageable);
     }
@@ -913,7 +913,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $this->connection()->transaction(function () use ($user) {
                     $user->email = 'otwell@laravel.com';
                     $user->save();
-                    throw new Exception;
+                    throw new Exception();
                 });
             } catch (Exception $e) {
                 // ignore the exception
@@ -960,7 +960,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testToArrayIncludesDefaultFormattedTimestamps()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
 
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
@@ -975,7 +975,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testToArrayIncludesCustomFormattedTimestamps()
     {
-        $model = new EloquentTestUser;
+        $model = new EloquentTestUser();
         $model->setDateFormat('d-m-y');
 
         $model->setRawAttributes([

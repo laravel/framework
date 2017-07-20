@@ -31,10 +31,10 @@ trait InteractsWithRedis
             $this->redis[$driver[0]] = new RedisManager($driver[0], [
                 'cluster' => false,
                 'default' => [
-                    'host' => $host,
-                    'port' => $port,
+                    'host'     => $host,
+                    'port'     => $port,
                     'database' => 5,
-                    'timeout' => 0.5,
+                    'timeout'  => 0.5,
                 ],
             ]);
         }

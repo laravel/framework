@@ -28,9 +28,10 @@ class MessageLogged
     /**
      * Create a new event instance.
      *
-     * @param  string  $level
-     * @param  string  $message
-     * @param  array  $context
+     * @param string $level
+     * @param string $message
+     * @param array  $context
+     *
      * @return void
      */
     public function __construct($level, $message, array $context = [])

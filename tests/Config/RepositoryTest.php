@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Config;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
+use PHPUnit\Framework\TestCase;
 
 class RepositoryTest extends TestCase
 {
@@ -20,9 +20,9 @@ class RepositoryTest extends TestCase
     public function setUp()
     {
         $this->repository = new Repository($this->config = [
-            'foo' => 'bar',
-            'bar' => 'baz',
-            'null' => null,
+            'foo'       => 'bar',
+            'bar'       => 'baz',
+            'null'      => null,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Schema\Blueprint;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Schema\Blueprint;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
@@ -515,6 +515,6 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new \Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+        return new \Illuminate\Database\Schema\Grammars\SQLiteGrammar();
     }
 }
