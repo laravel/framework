@@ -119,8 +119,9 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function getMultiple($keys, $default = null)
     {
-        if (is_null($default))
+        if (is_null($default)) {
             return $this->many($keys);
+        }
 
         $default = collect($default);
 
