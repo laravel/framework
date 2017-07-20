@@ -765,7 +765,8 @@ trait HasAttributes
     {
         $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
-        return $this->usesTimestamps() ? array_merge($this->dates, $defaults) : $this->dates;
+        return $this->usesTimestamps()
+                    ? array_unique(array_merge($this->dates, $defaults)) : $this->dates;
     }
 
     /**
