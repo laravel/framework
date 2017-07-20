@@ -164,12 +164,14 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $precision = strtoupper($precision);
         if ($precision == 'MAJOR') {
-            return (int) static::VERSION;
+            $version = (int) static::VERSION;
         } elseif ($precision == 'MINOR') {
-            return (float) static::VERSION;
+            $version = (float) static::VERSION;
+        } else {
+            $version = static::VERSION;
         }
 
-        return static::VERSION;
+        return (string) $version;
     }
 
     /**
