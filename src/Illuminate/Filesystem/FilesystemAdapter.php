@@ -306,9 +306,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Get the URL for the file at the given path.
      *
      * @param  string  $path
+     * @param  string  $expires
      * @return string
      */
-    public function url($path)
+    public function url($path, $expires = null)
     {
         $adapter = $this->driver->getAdapter();
 
