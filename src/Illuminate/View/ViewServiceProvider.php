@@ -12,6 +12,16 @@ use Illuminate\View\Compilers\BladeCompiler;
 class ViewServiceProvider extends ServiceProvider
 {
     /**
+     * Bootstrap the application services.
+     *
+     * @return void
+     */
+    public function boot()
+    {
+        $this->defineCustomBladeExtensions();
+    }
+
+    /**
      * Register the service provider.
      *
      * @return void
@@ -132,5 +142,18 @@ class ViewServiceProvider extends ServiceProvider
         $resolver->register('blade', function () {
             return new CompilerEngine($this->app['blade.compiler']);
         });
+    }
+
+    public function defineCustomBladeExtensions()
+    {
+        foreach ($this->app->tagged('blade.extension') as $extension) {
+            foreach ($extension->getDirectives() as $name => $callable) {
+                $this->app['blade.compiler']->directive($name, $callable);
+            }
+
+            foreach ($extension->getConditionals() as $name => $callable) {
+                $this->app['blade.compiler']->if($name, $callable);
+            }
+        }
     }
 }

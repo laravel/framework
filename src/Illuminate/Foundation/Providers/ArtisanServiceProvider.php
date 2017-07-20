@@ -47,6 +47,7 @@ use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
+use Illuminate\Foundation\Console\BladeExtensionMakeCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
@@ -125,6 +126,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected $devCommands = [
         'AppName' => 'command.app.name',
+        'BladeExtensionMake' => 'command.blade.make',
         'AuthMake' => 'command.auth.make',
         'CacheTable' => 'command.cache.table',
         'ConsoleMake' => 'command.console.make',
@@ -201,6 +203,13 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.auth.make', function ($app) {
             return new MakeAuthCommand;
+        });
+    }
+
+    protected function registerBladeExtensionMakeCommand()
+    {
+        $this->app->singleton('command.blade.make', function ($app) {
+            return new BladeExtensionMakeCommand($app['files']);
         });
     }
 
