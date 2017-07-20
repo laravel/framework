@@ -2235,6 +2235,13 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testReplace()
+    {
+        $collection = new Collection(['jeffrey', 'tom', 'adam', 'tom']);
+
+        $this->assertSame(['jeffrey', 'taylor', 'adam', 'taylor'], $collection->replace('tom', 'taylor')->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
