@@ -306,16 +306,21 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Get the URL for the file at the given path.
      *
      * @param  string  $path
+     * @param  int|string|\DateTime $expires The time at which the URL should
+     *                                      expire. This can be a Unix
+     *                                      timestamp, a PHP DateTime object,
+     *                                      or a string that can be evaluated
+     *                                      by strtotime().
      * @return string
      */
-    public function url($path)
+    public function url($path, $expires = null)
     {
         $adapter = $this->driver->getAdapter();
 
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsUrl($adapter, $path);
+            return $this->getAwsUrl($adapter, $path, $expires);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
         } else {
@@ -328,13 +333,29 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
      * @param  string  $path
+     * @param  int|string|\DateTime $expires The time at which the URL should
+     *                                      expire. This can be a Unix
+     *                                      timestamp, a PHP DateTime object,
+     *                                      or a string that can be evaluated
+     *                                      by strtotime().
      * @return string
      */
-    protected function getAwsUrl($adapter, $path)
+    protected function getAwsUrl($adapter, $path, $expires)
     {
-        return $adapter->getClient()->getObjectUrl(
-            $adapter->getBucket(), $adapter->getPathPrefix().$path
-        );
+        if ($expires === null) {
+            return $adapter->getClient()->getObjectUrl(
+                $adapter->getBucket(), $adapter->getPathPrefix().$path
+            );
+        }
+
+        $command = $adapter->getClient()->getCommand('GetObject', [
+            'Bucket' => $adapter->getBucket(),
+            'Key'    => $adapter->getPathPrefix().$path,
+        ]);
+
+        $request = $adapter->getClient()->createPresignedRequest($command, $expires);
+
+        return (string) $request->getUri();
     }
 
     /**
