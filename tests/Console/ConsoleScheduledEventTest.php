@@ -55,6 +55,10 @@ class ConsoleScheduledEventTest extends TestCase
             return false;
         })->filtersPass($app));
 
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
+        $this->assertEquals('* * * * * *', $event->getExpression());
+        $this->assertFalse($event->when(false)->filtersPass($app));
+
         // chained rules should be commutative
         $eventA = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
         $eventB = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
