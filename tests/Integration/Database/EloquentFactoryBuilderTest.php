@@ -179,6 +179,16 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertEquals('alternative-connection', $user->getConnectionName());
         $this->assertTrue($user->is($dbUser));
     }
+
+    /** @test */
+    public function making_models_with_a_custom_connection()
+    {
+        $user = factory(FactoryBuildableUser::class)
+            ->connection('alternative-connection')
+            ->make();
+
+        $this->assertEquals('alternative-connection', $user->getConnectionName());
+    }
 }
 
 class FactoryBuildableUser extends Model

@@ -166,9 +166,7 @@ class FactoryBuilder
     protected function store($results)
     {
         $results->each(function ($model) {
-            if (isset($this->connection)) {
-                $model->setConnection($this->connection);
-            } else {
+            if (! isset($this->connection)) {
                 $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
             }
 
@@ -251,9 +249,15 @@ class FactoryBuilder
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
             }
 
-            return new $this->class(
+            $instance = new $this->class(
                 $this->getRawAttributes($attributes)
             );
+
+            if (isset($this->connection)) {
+                $instance->setConnection($this->connection);
+            }
+
+            return $instance;
         });
     }
 
