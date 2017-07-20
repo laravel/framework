@@ -708,11 +708,7 @@ class BelongsToMany extends Relation
      */
     public function allRelatedIds()
     {
-        $related = $this->getRelated();
-
-        return $this->getQuery()->select(
-            $related->getQualifiedKeyName()
-        )->pluck($related->getKeyName());
+        return $this->newPivotQuery()->pluck($this->relatedPivotKey);
     }
 
     /**
