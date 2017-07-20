@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
@@ -1371,8 +1372,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         try {
             return $this->newQuery()->$method(...$parameters);
-        } catch (\BadMethodCallException $e) {
-            throw new \BadMethodCallException(
+        } catch (BadMethodCallException $e) {
+            throw new BadMethodCallException(
                 sprintf('Call to undefined method %s::%s()', get_class($this), $method)
             );
         }
