@@ -560,7 +560,7 @@ if (! function_exists('mix')) {
             );
         }
 
-        return new HtmlString(asset($manifestDirectory.$manifest[$path]));
+        return new HtmlString($manifestDirectory.$manifest[$path]);
     }
 }
 
