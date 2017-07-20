@@ -453,6 +453,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
     }
 
+    public function testBadMethodCallException()
+    {
+        $conn = m::mock('Illuminate\Database\Connection');
+        $grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $conn->shouldReceive('getQueryGrammar')->once()->andReturn($grammar);
+        $conn->shouldReceive('getPostProcessor')->once()->andReturn($processor);
+        EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
+        $resolver->shouldReceive('connection')->andReturn($conn);
+        $model = new EloquentModelStub;
+
+        try {
+            $model->badMethod();
+        } catch (\BadMethodCallException $e) {
+            $this->assertEquals('Call to undefined method Illuminate\Tests\Database\EloquentModelStub::badMethod()', $e->getMessage());
+
+            return;
+        }
+
+        $this->fail('BadMethodCallException expected.');
+    }
+
     public function testInsertProcess()
     {
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentModelStub')->setMethods(['newQueryWithoutScopes', 'updateTimestamps', 'refresh'])->getMock();
