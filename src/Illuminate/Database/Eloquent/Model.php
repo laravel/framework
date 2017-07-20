@@ -1258,13 +1258,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Check if the model has atleast one record of a relation.
      *
      * @param  string  $relation
-     * @return boolean
+     * @return bool
      *
      * @throws \Exception
      */
     public function has($relation)
     {
-        if (!method_exists($this, $relation)) {
+        if (! method_exists($this, $relation)) {
             throw new Exception("No relation named " . $relation);
         }
 
