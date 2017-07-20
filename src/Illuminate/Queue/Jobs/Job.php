@@ -92,7 +92,8 @@ abstract class Job
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0)
@@ -143,7 +144,8 @@ abstract class Job
     /**
      * Process an exception that caused the job to fail.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return void
      */
     public function failed($e)
@@ -162,7 +164,8 @@ abstract class Job
     /**
      * Resolve the given class.
      *
-     * @param  string  $class
+     * @param string $class
+     *
      * @return mixed
      */
     protected function resolve($class)

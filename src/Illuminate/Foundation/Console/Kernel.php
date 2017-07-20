@@ -4,15 +4,15 @@ namespace Illuminate\Foundation\Console;
 
 use Closure;
 use Exception;
-use Throwable;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
-use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
+use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Foundation\Application;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Kernel implements KernelContract
 {
@@ -69,13 +69,14 @@ class Kernel implements KernelContract
     /**
      * Create a new console kernel instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Contracts\Events\Dispatcher      $events
+     *
      * @return void
      */
     public function __construct(Application $app, Dispatcher $events)
     {
-        if (! defined('ARTISAN_BINARY')) {
+        if (!defined('ARTISAN_BINARY')) {
             define('ARTISAN_BINARY', 'artisan');
         }
 
@@ -104,8 +105,9 @@ class Kernel implements KernelContract
     /**
      * Run the console application.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return int
      */
     public function handle($input, $output = null)
@@ -113,7 +115,7 @@ class Kernel implements KernelContract
         try {
             $this->bootstrap();
 
-            if (! $this->commandsLoaded) {
+            if (!$this->commandsLoaded) {
                 $this->commands();
 
                 $this->commandsLoaded = true;
@@ -140,8 +142,9 @@ class Kernel implements KernelContract
     /**
      * Terminate the application.
      *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  int  $status
+     * @param \Symfony\Component\Console\Input\InputInterface $input
+     * @param int                                             $status
+     *
      * @return void
      */
     public function terminate($input, $status)
@@ -152,7 +155,8 @@ class Kernel implements KernelContract
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     *
      * @return void
      */
     protected function schedule(Schedule $schedule)
@@ -173,8 +177,9 @@ class Kernel implements KernelContract
     /**
      * Register a Closure based command with the application.
      *
-     * @param  string  $signature
-     * @param  Closure  $callback
+     * @param string  $signature
+     * @param Closure $callback
+     *
      * @return \Illuminate\Foundation\Console\ClosureCommand
      */
     public function command($signature, Closure $callback)
@@ -191,7 +196,8 @@ class Kernel implements KernelContract
     /**
      * Register the given command with the console application.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param \Symfony\Component\Console\Command\Command $command
+     *
      * @return void
      */
     public function registerCommand($command)
@@ -202,16 +208,17 @@ class Kernel implements KernelContract
     /**
      * Run an Artisan console command by name.
      *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
+     * @param string                                            $command
+     * @param array                                             $parameters
+     * @param \Symfony\Component\Console\Output\OutputInterface $outputBuffer
+     *
      * @return int
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $this->bootstrap();
 
-        if (! $this->commandsLoaded) {
+        if (!$this->commandsLoaded) {
             $this->commands();
 
             $this->commandsLoaded = true;
@@ -223,8 +230,9 @@ class Kernel implements KernelContract
     /**
      * Queue the given console command.
      *
-     * @param  string  $command
-     * @param  array   $parameters
+     * @param string $command
+     * @param array  $parameters
+     *
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
     public function queue($command, array $parameters = [])
@@ -263,7 +271,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        if (! $this->app->hasBeenBootstrapped()) {
+        if (!$this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
@@ -291,7 +299,8 @@ class Kernel implements KernelContract
     /**
      * Set the Artisan application instance.
      *
-     * @param  \Illuminate\Console\Application  $artisan
+     * @param \Illuminate\Console\Application $artisan
+     *
      * @return void
      */
     public function setArtisan($artisan)
@@ -312,7 +321,8 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return void
      */
     protected function reportException(Exception $e)
@@ -323,8 +333,9 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @param  \Exception  $e
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     * @param \Exception                                        $e
+     *
      * @return void
      */
     protected function renderException($output, Exception $e)

@@ -1,8 +1,8 @@
 <?php
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Schema\Blueprint;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 {
@@ -15,16 +15,16 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
      */
     public function setUp()
     {
-        $this->db = $db = new DB;
+        $this->db = $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $db->setAsGlobal();
 
-        $container = new Illuminate\Container\Container;
+        $container = new Illuminate\Container\Container();
         $container->instance('db', $db->getDatabaseManager());
         Illuminate\Support\Facades\Facade::setFacadeApplication($container);
     }

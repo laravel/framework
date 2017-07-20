@@ -2,10 +2,10 @@
 
 namespace Illuminate\Bus;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Bus\Dispatcher as DispatcherContract;
-use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
 use Illuminate\Contracts\Bus\QueueingDispatcher as QueueingDispatcherContract;
+use Illuminate\Contracts\Queue\Factory as QueueFactoryContract;
+use Illuminate\Support\ServiceProvider;
 
 class BusServiceProvider extends ServiceProvider
 {

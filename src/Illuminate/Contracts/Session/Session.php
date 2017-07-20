@@ -21,7 +21,8 @@ interface Session
     /**
      * Set the session ID.
      *
-     * @param  string  $id
+     * @param string $id
+     *
      * @return void
      */
     public function setId($id);
@@ -50,7 +51,8 @@ interface Session
     /**
      * Checks if a key exists.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function exists($key);
@@ -58,7 +60,8 @@ interface Session
     /**
      * Checks if an a key is present and not null.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return bool
      */
     public function has($key);
@@ -66,8 +69,9 @@ interface Session
     /**
      * Get an item from the session.
      *
-     * @param  string  $key
-     * @param  mixed  $default
+     * @param string $key
+     * @param mixed  $default
+     *
      * @return mixed
      */
     public function get($key, $default = null);
@@ -75,8 +79,9 @@ interface Session
     /**
      * Put a key / value pair or array of key / value pairs in the session.
      *
-     * @param  string|array  $key
-     * @param  mixed       $value
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return void
      */
     public function put($key, $value = null);
@@ -91,7 +96,8 @@ interface Session
     /**
      * Remove an item from the session, returning its value.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function remove($key);
@@ -99,7 +105,8 @@ interface Session
     /**
      * Remove one or many items from the session.
      *
-     * @param  string|array  $keys
+     * @param string|array $keys
+     *
      * @return void
      */
     public function forget($keys);
@@ -114,7 +121,8 @@ interface Session
     /**
      * Generate a new session ID for the session.
      *
-     * @param  bool  $destroy
+     * @param bool $destroy
+     *
      * @return bool
      */
     public function migrate($destroy = false);
@@ -136,7 +144,8 @@ interface Session
     /**
      * Set the "previous" URL in the session.
      *
-     * @param  string  $url
+     * @param string $url
+     *
      * @return void
      */
     public function setPreviousUrl($url);
@@ -158,7 +167,8 @@ interface Session
     /**
      * Set the request on the handler instance.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return void
      */
     public function setRequestOnHandler($request);

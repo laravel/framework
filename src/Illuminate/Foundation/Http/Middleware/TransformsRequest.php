@@ -17,8 +17,9 @@ class TransformsRequest
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next, ...$attributes)
@@ -33,7 +34,8 @@ class TransformsRequest
     /**
      * Clean the request's data.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return void
      */
     protected function clean($request)
@@ -50,7 +52,8 @@ class TransformsRequest
     /**
      * Clean the data in the parameter bag.
      *
-     * @param  \Symfony\Component\HttpFoundation\ParameterBag  $bag
+     * @param \Symfony\Component\HttpFoundation\ParameterBag $bag
+     *
      * @return void
      */
     protected function cleanParameterBag(ParameterBag $bag)
@@ -61,7 +64,8 @@ class TransformsRequest
     /**
      * Clean the data in the given array.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return array
      */
     protected function cleanArray(array $data)
@@ -74,8 +78,9 @@ class TransformsRequest
     /**
      * Clean the given value.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function cleanValue($key, $value)
@@ -90,8 +95,9 @@ class TransformsRequest
     /**
      * Transform the given value.
      *
-     * @param  string  $key
-     * @param  mixed  $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return mixed
      */
     protected function transform($key, $value)

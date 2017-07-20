@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Redis\Connections;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Tests\Redis\InteractsWithRedis;
+use PHPUnit\Framework\TestCase;
 
 class PhpRedisConnectionTest extends TestCase
 {
@@ -14,7 +14,7 @@ class PhpRedisConnectionTest extends TestCase
         parent::setUp();
         $this->setUpRedis();
 
-        if (! isset($this->redis['phpredis'])) {
+        if (!isset($this->redis['phpredis'])) {
             $this->markTestSkipped('PhpRedis should be enabled to run the tests');
         }
     }

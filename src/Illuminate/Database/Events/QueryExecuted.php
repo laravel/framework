@@ -42,9 +42,9 @@ class QueryExecuted
     /**
      * Create a new event instance.
      *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  float  $time
+     * @param string $sql
+     * @param array  $bindings
+     * @param float  $time
      * @param
      */
     public function __construct($sql, $bindings, $time, $connection)

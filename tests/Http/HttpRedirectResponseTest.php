@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Http;
 
-use Mockery as m;
 use BadMethodCallException;
-use Illuminate\Http\Request;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class HttpRedirectResponseTest extends TestCase
 {
@@ -79,10 +79,10 @@ class HttpRedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag());
         $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
         $provider = m::mock('Illuminate\Contracts\Support\MessageProvider');
-        $provider->shouldReceive('getMessageBag')->once()->andReturn(new \Illuminate\Support\MessageBag);
+        $provider->shouldReceive('getMessageBag')->once()->andReturn(new \Illuminate\Support\MessageBag());
         $response->withErrors($provider);
     }
 
@@ -105,7 +105,7 @@ class HttpRedirectResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
         $response->setSession($session = m::mock('Illuminate\Session\Store'));
-        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag);
+        $session->shouldReceive('get')->with('errors', m::type('Illuminate\Support\ViewErrorBag'))->andReturn(new \Illuminate\Support\ViewErrorBag());
         $session->shouldReceive('flash')->once()->with('errors', m::type('Illuminate\Support\ViewErrorBag'));
         $provider = ['foo' => 'bar'];
         $response->withErrors($provider);

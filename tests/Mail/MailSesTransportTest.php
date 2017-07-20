@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Mail;
 
 use Aws\Ses\SesClient;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
-use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
+use Illuminate\Mail\TransportManager;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\TestCase;
 
 class MailSesTransportTest extends TestCase
 {
@@ -55,7 +55,7 @@ class MailSesTransportTest extends TestCase
         $client->expects($this->once())
             ->method('sendRawEmail')
             ->with($this->equalTo([
-                'Source' => 'myself@example.com',
+                'Source'     => 'myself@example.com',
                 'RawMessage' => ['Data' => (string) $message],
             ]))
             ->willReturn($sendRawEmailMock);
@@ -76,8 +76,10 @@ class sendRawEmailMock
 
     /**
      * Mock the get() call for the sendRawEmail response.
-     * @param  [type] $key [description]
-     * @return [type]      [description]
+     *
+     * @param [type] $key [description]
+     *
+     * @return [type] [description]
      */
     public function get($key)
     {

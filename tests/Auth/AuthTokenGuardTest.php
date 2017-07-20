@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery;
-use Illuminate\Http\Request;
 use Illuminate\Auth\TokenGuard;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Http\Request;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class AuthTokenGuardTest extends TestCase
 {
@@ -18,7 +18,7 @@ class AuthTokenGuardTest extends TestCase
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = Mockery::mock(UserProvider::class);
-        $user = new AuthTokenGuardTestUser;
+        $user = new AuthTokenGuardTestUser();
         $user->id = 1;
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
@@ -62,7 +62,7 @@ class AuthTokenGuardTest extends TestCase
     public function testValidateCanDetermineIfCredentialsAreValid()
     {
         $provider = Mockery::mock(UserProvider::class);
-        $user = new AuthTokenGuardTestUser;
+        $user = new AuthTokenGuardTestUser();
         $user->id = 1;
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
@@ -75,7 +75,7 @@ class AuthTokenGuardTest extends TestCase
     public function testValidateCanDetermineIfCredentialsAreInvalid()
     {
         $provider = Mockery::mock(UserProvider::class);
-        $user = new AuthTokenGuardTestUser;
+        $user = new AuthTokenGuardTestUser();
         $user->id = 1;
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn(null);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
@@ -88,7 +88,7 @@ class AuthTokenGuardTest extends TestCase
     public function testValidateIfApiTokenIsEmpty()
     {
         $provider = Mockery::mock(UserProvider::class);
-        $user = new AuthTokenGuardTestUser;
+        $user = new AuthTokenGuardTestUser();
         $user->id = 1;
         $request = Request::create('/', 'GET', ['api_token' => '']);
 

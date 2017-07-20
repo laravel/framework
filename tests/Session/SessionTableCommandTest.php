@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Session;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Session\Console\SessionTableCommand;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SessionTableCommandTest extends TestCase
 {
@@ -37,7 +37,7 @@ class SessionTableCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput());
     }
 }
 

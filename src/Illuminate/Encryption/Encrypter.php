@@ -2,10 +2,10 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
 use Illuminate\Contracts\Encryption\DecryptException;
-use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Contracts\Encryption\EncryptException;
+use RuntimeException;
 
 class Encrypter implements EncrypterContract
 {
@@ -26,11 +26,12 @@ class Encrypter implements EncrypterContract
     /**
      * Create a new encrypter instance.
      *
-     * @param  string  $key
-     * @param  string  $cipher
-     * @return void
+     * @param string $key
+     * @param string $cipher
      *
      * @throws \RuntimeException
+     *
+     * @return void
      */
     public function __construct($key, $cipher = 'AES-128-CBC')
     {
@@ -47,8 +48,9 @@ class Encrypter implements EncrypterContract
     /**
      * Determine if the given key and cipher combination is valid.
      *
-     * @param  string  $key
-     * @param  string  $cipher
+     * @param string $key
+     * @param string $cipher
+     *
      * @return bool
      */
     public static function supported($key, $cipher)
@@ -62,11 +64,12 @@ class Encrypter implements EncrypterContract
     /**
      * Encrypt the given value.
      *
-     * @param  mixed  $value
-     * @param  bool  $serialize
-     * @return string
+     * @param mixed $value
+     * @param bool  $serialize
      *
      * @throws \Illuminate\Contracts\Encryption\EncryptException
+     *
+     * @return string
      */
     public function encrypt($value, $serialize = true)
     {
@@ -91,7 +94,7 @@ class Encrypter implements EncrypterContract
 
         $json = json_encode(compact('iv', 'value', 'mac'));
 
-        if (! is_string($json)) {
+        if (!is_string($json)) {
             throw new EncryptException('Could not encrypt the data.');
         }
 
@@ -101,7 +104,8 @@ class Encrypter implements EncrypterContract
     /**
      * Encrypt a string without serialization.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function encryptString($value)
@@ -112,11 +116,12 @@ class Encrypter implements EncrypterContract
     /**
      * Decrypt the given value.
      *
-     * @param  mixed  $payload
-     * @param  bool  $unserialize
-     * @return string
+     * @param mixed $payload
+     * @param bool  $unserialize
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
+     *
+     * @return string
      */
     public function decrypt($payload, $unserialize = true)
     {
@@ -141,7 +146,8 @@ class Encrypter implements EncrypterContract
     /**
      * Decrypt the given string without unserialization.
      *
-     * @param  string  $payload
+     * @param string $payload
+     *
      * @return string
      */
     public function decryptString($payload)
@@ -152,8 +158,9 @@ class Encrypter implements EncrypterContract
     /**
      * Create a MAC for the given value.
      *
-     * @param  string  $iv
-     * @param  mixed  $value
+     * @param string $iv
+     * @param mixed  $value
+     *
      * @return string
      */
     protected function hash($iv, $value)
@@ -164,10 +171,11 @@ class Encrypter implements EncrypterContract
     /**
      * Get the JSON array from the given payload.
      *
-     * @param  string  $payload
-     * @return array
+     * @param string $payload
      *
      * @throws \Illuminate\Contracts\Encryption\DecryptException
+     *
+     * @return array
      */
     protected function getJsonPayload($payload)
     {
@@ -176,11 +184,11 @@ class Encrypter implements EncrypterContract
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able
         // to decrypt the given value. We'll also check the MAC for this encryption.
-        if (! $this->validPayload($payload)) {
+        if (!$this->validPayload($payload)) {
             throw new DecryptException('The payload is invalid.');
         }
 
-        if (! $this->validMac($payload)) {
+        if (!$this->validMac($payload)) {
             throw new DecryptException('The MAC is invalid.');
         }
 
@@ -190,7 +198,8 @@ class Encrypter implements EncrypterContract
     /**
      * Verify that the encryption payload is valid.
      *
-     * @param  mixed  $payload
+     * @param mixed $payload
+     *
      * @return bool
      */
     protected function validPayload($payload)
@@ -203,7 +212,8 @@ class Encrypter implements EncrypterContract
     /**
      * Determine if the MAC for the given payload is valid.
      *
-     * @param  array  $payload
+     * @param array $payload
+     *
      * @return bool
      */
     protected function validMac(array $payload)
@@ -218,8 +228,9 @@ class Encrypter implements EncrypterContract
     /**
      * Calculate the hash of the given payload.
      *
-     * @param  array  $payload
-     * @param  string  $bytes
+     * @param array  $payload
+     * @param string $bytes
+     *
      * @return string
      */
     protected function calculateMac($payload, $bytes)

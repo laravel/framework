@@ -2,12 +2,12 @@
 
 namespace Illuminate\View;
 
-use Illuminate\View\Engines\PhpEngine;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\View\Engines\FileEngine;
+use Illuminate\View\Compilers\BladeCompiler;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\View\Engines\FileEngine;
+use Illuminate\View\Engines\PhpEngine;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -73,7 +73,7 @@ class ViewServiceProvider extends ServiceProvider
     public function registerEngineResolver()
     {
         $this->app->singleton('view.engine.resolver', function () {
-            $resolver = new EngineResolver;
+            $resolver = new EngineResolver();
 
             // Next, we will register the various view engines with the resolver so that the
             // environment will resolve the engines needed for various views based on the
@@ -89,33 +89,36 @@ class ViewServiceProvider extends ServiceProvider
     /**
      * Register the file engine implementation.
      *
-     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @param \Illuminate\View\Engines\EngineResolver $resolver
+     *
      * @return void
      */
     public function registerFileEngine($resolver)
     {
         $resolver->register('file', function () {
-            return new FileEngine;
+            return new FileEngine();
         });
     }
 
     /**
      * Register the PHP engine implementation.
      *
-     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @param \Illuminate\View\Engines\EngineResolver $resolver
+     *
      * @return void
      */
     public function registerPhpEngine($resolver)
     {
         $resolver->register('php', function () {
-            return new PhpEngine;
+            return new PhpEngine();
         });
     }
 
     /**
      * Register the Blade engine implementation.
      *
-     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @param \Illuminate\View\Engines\EngineResolver $resolver
+     *
      * @return void
      */
     public function registerBladeEngine($resolver)

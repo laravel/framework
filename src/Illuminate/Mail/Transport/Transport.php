@@ -2,10 +2,10 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Transport;
-use Swift_Mime_Message;
-use Swift_Events_SendEvent;
 use Swift_Events_EventListener;
+use Swift_Events_SendEvent;
+use Swift_Mime_Message;
+use Swift_Transport;
 
 abstract class Transport implements Swift_Transport
 {
@@ -43,7 +43,8 @@ abstract class Transport implements Swift_Transport
     /**
      * Register a plug-in with the transport.
      *
-     * @param  \Swift_Events_EventListener  $plugin
+     * @param \Swift_Events_EventListener $plugin
+     *
      * @return void
      */
     public function registerPlugin(Swift_Events_EventListener $plugin)
@@ -54,7 +55,8 @@ abstract class Transport implements Swift_Transport
     /**
      * Iterate through registered plugins and execute plugins' methods.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param \Swift_Mime_Message $message
+     *
      * @return void
      */
     protected function beforeSendPerformed(Swift_Mime_Message $message)
@@ -71,7 +73,8 @@ abstract class Transport implements Swift_Transport
     /**
      * Iterate through registered plugins and execute plugins' methods.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param \Swift_Mime_Message $message
+     *
      * @return void
      */
     protected function sendPerformed(Swift_Mime_Message $message)
@@ -88,7 +91,8 @@ abstract class Transport implements Swift_Transport
     /**
      * Get the number of recipients.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param \Swift_Mime_Message $message
+     *
      * @return int
      */
     protected function numberOfRecipients(Swift_Mime_Message $message)

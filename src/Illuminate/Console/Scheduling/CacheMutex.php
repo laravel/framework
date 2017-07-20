@@ -16,7 +16,8 @@ class CacheMutex implements Mutex
     /**
      * Create a new overlapping strategy.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param \Illuminate\Contracts\Cache\Repository $cache
+     *
      * @return void
      */
     public function __construct(Cache $cache)
@@ -27,7 +28,8 @@ class CacheMutex implements Mutex
     /**
      * Attempt to obtain a mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return bool
      */
     public function create(Event $event)
@@ -40,7 +42,8 @@ class CacheMutex implements Mutex
     /**
      * Determine if a mutex exists for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return bool
      */
     public function exists(Event $event)
@@ -51,7 +54,8 @@ class CacheMutex implements Mutex
     /**
      * Clear the mutex for the given event.
      *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param \Illuminate\Console\Scheduling\Event $event
+     *
      * @return void
      */
     public function forget(Event $event)

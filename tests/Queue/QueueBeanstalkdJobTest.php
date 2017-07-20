@@ -29,7 +29,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('Illuminate\Tests\Queue\BeanstalkdJobTestFailedTest'));
         $handler->shouldReceive('failed')->once()->with(['data'], m::type('Exception'));
 
-        $job->failed(new \Exception);
+        $job->failed(new \Exception());
     }
 
     public function testDeleteRemovesTheJobFromBeanstalkd()

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Traits\Macroable;
+use PHPUnit\Framework\TestCase;
 
 class SupportMacroableTest extends TestCase
 {
@@ -45,7 +45,7 @@ class SupportMacroableTest extends TestCase
         TestMacroable::macro('tryStatic', function () {
             return static::getProtectedStatic();
         });
-        $instance = new TestMacroable;
+        $instance = new TestMacroable();
 
         $result = $instance->tryInstance();
         $this->assertEquals('instance', $result);

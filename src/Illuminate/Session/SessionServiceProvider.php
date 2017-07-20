@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Session\Middleware\StartSession;
+use Illuminate\Support\ServiceProvider;
 
 class SessionServiceProvider extends ServiceProvider
 {

@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
+use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Database\Eloquent\Model;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Contracts\Routing\BindingRegistrar;
-use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class BroadcasterTest extends TestCase
 {
@@ -43,7 +43,7 @@ class BroadcasterTest extends TestCase
         /*
          * Test Explicit Binding...
          */
-        $container = new Container;
+        $container = new Container();
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
         $binder->shouldReceive('getBindingCallback')->with('model')->andReturn(function () {
@@ -54,7 +54,7 @@ class BroadcasterTest extends TestCase
         };
         $parameters = $broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
         $this->assertEquals(['bound'], $parameters);
-        Container::setInstance(new Container);
+        Container::setInstance(new Container());
     }
 
     /**

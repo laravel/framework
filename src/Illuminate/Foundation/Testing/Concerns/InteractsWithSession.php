@@ -7,7 +7,8 @@ trait InteractsWithSession
     /**
      * Set the session to the given array.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return $this
      */
     public function withSession(array $data)
@@ -20,7 +21,8 @@ trait InteractsWithSession
     /**
      * Set the session to the given array.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return $this
      */
     public function session(array $data)
@@ -41,7 +43,7 @@ trait InteractsWithSession
      */
     protected function startSession()
     {
-        if (! $this->app['session']->isStarted()) {
+        if (!$this->app['session']->isStarted()) {
             $this->app['session']->start();
         }
 

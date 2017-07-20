@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Blade;
 
+use Illuminate\View\Compilers\BladeCompiler;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeIfEmptyStatementsTest extends TestCase
+class BladeIfIEmptyStatementsTest extends TestCase
 {
     public function tearDown()
     {

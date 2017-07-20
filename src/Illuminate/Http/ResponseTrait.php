@@ -54,9 +54,10 @@ trait ResponseTrait
     /**
      * Set a header on the Response.
      *
-     * @param  string  $key
-     * @param  array|string  $values
-     * @param  bool    $replace
+     * @param string       $key
+     * @param array|string $values
+     * @param bool         $replace
+     *
      * @return $this
      */
     public function header($key, $values, $replace = true)
@@ -69,7 +70,8 @@ trait ResponseTrait
     /**
      * Add an array of headers to the response.
      *
-     * @param  array  $headers
+     * @param array $headers
+     *
      * @return $this
      */
     public function withHeaders(array $headers)
@@ -84,7 +86,8 @@ trait ResponseTrait
     /**
      * Add a cookie to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie
+     * @param \Symfony\Component\HttpFoundation\Cookie|mixed $cookie
+     *
      * @return $this
      */
     public function cookie($cookie)
@@ -95,7 +98,8 @@ trait ResponseTrait
     /**
      * Add a cookie to the response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Cookie|mixed  $cookie
+     * @param \Symfony\Component\HttpFoundation\Cookie|mixed $cookie
+     *
      * @return $this
      */
     public function withCookie($cookie)
@@ -112,7 +116,8 @@ trait ResponseTrait
     /**
      * Set the exception to attach to the response.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return $this
      */
     public function withException(Exception $e)

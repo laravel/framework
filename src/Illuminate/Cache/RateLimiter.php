@@ -17,7 +17,8 @@ class RateLimiter
     /**
      * Create a new rate limiter instance.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param \Illuminate\Contracts\Cache\Repository $cache
+     *
      * @return void
      */
     public function __construct(Cache $cache)
@@ -28,9 +29,10 @@ class RateLimiter
     /**
      * Determine if the given key has been "accessed" too many times.
      *
-     * @param  string  $key
-     * @param  int  $maxAttempts
-     * @param  float|int  $decayMinutes
+     * @param string    $key
+     * @param int       $maxAttempts
+     * @param float|int $decayMinutes
+     *
      * @return bool
      */
     public function tooManyAttempts($key, $maxAttempts, $decayMinutes = 1)
@@ -53,8 +55,9 @@ class RateLimiter
     /**
      * Add the lockout key to the cache.
      *
-     * @param  string  $key
-     * @param  int  $decayMinutes
+     * @param string $key
+     * @param int    $decayMinutes
+     *
      * @return void
      */
     protected function lockout($key, $decayMinutes)
@@ -67,8 +70,9 @@ class RateLimiter
     /**
      * Increment the counter for a given key for a given decay time.
      *
-     * @param  string  $key
-     * @param  float|int  $decayMinutes
+     * @param string    $key
+     * @param float|int $decayMinutes
+     *
      * @return int
      */
     public function hit($key, $decayMinutes = 1)
@@ -81,7 +85,8 @@ class RateLimiter
     /**
      * Get the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function attempts($key)
@@ -92,7 +97,8 @@ class RateLimiter
     /**
      * Reset the number of attempts for the given key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function resetAttempts($key)
@@ -103,8 +109,9 @@ class RateLimiter
     /**
      * Get the number of retries left for the given key.
      *
-     * @param  string  $key
-     * @param  int  $maxAttempts
+     * @param string $key
+     * @param int    $maxAttempts
+     *
      * @return int
      */
     public function retriesLeft($key, $maxAttempts)
@@ -117,7 +124,8 @@ class RateLimiter
     /**
      * Clear the hits and lockout for the given key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function clear($key)
@@ -130,7 +138,8 @@ class RateLimiter
     /**
      * Get the number of seconds until the "key" is accessible again.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return int
      */
     public function availableIn($key)

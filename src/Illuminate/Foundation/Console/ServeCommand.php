@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Process\ProcessUtils;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\ProcessUtils;
 
 class ServeCommand extends Command
 {
@@ -26,9 +26,9 @@ class ServeCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
-     *
      * @throws \Exception
+     *
+     * @return void
      */
     public function fire()
     {
@@ -47,7 +47,7 @@ class ServeCommand extends Command
     protected function serverCommand()
     {
         return sprintf('%s -S %s:%s %s/server.php',
-            ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)),
+            ProcessUtils::escapeArgument((new PhpExecutableFinder())->find(false)),
             $this->host(),
             $this->port(),
             ProcessUtils::escapeArgument($this->laravel->basePath())

@@ -14,8 +14,9 @@ trait FormatsMessages
     /**
      * Get the validation message for an attribute and rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string
      */
     protected function getMessage($attribute, $rule)
@@ -27,7 +28,7 @@ trait FormatsMessages
         // First we will retrieve the custom message for the validation rule if one
         // exists. If a custom validation message is being used we'll return the
         // custom message, otherwise we'll keep searching for a valid message.
-        if (! is_null($inlineMessage)) {
+        if (!is_null($inlineMessage)) {
             return $inlineMessage;
         }
 
@@ -66,9 +67,10 @@ trait FormatsMessages
     /**
      * Get the inline message for a rule if it exists.
      *
-     * @param  string  $attribute
-     * @param  string  $lowerRule
-     * @param  array   $source
+     * @param string $attribute
+     * @param string $lowerRule
+     * @param array  $source
+     *
      * @return string|null
      */
     protected function getFromLocalArray($attribute, $lowerRule, $source = null)
@@ -92,7 +94,8 @@ trait FormatsMessages
     /**
      * Get the custom error message from translator.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return string
      */
     protected function getCustomMessageFromTranslator($key)
@@ -116,9 +119,10 @@ trait FormatsMessages
     /**
      * Check the given messages for a wildcard key.
      *
-     * @param  array  $messages
-     * @param  string  $search
-     * @param  string  $default
+     * @param array  $messages
+     * @param string $search
+     * @param string $default
+     *
      * @return string
      */
     protected function getWildcardCustomMessages($messages, $search, $default)
@@ -135,8 +139,9 @@ trait FormatsMessages
     /**
      * Get the proper error message for an attribute and size rule.
      *
-     * @param  string  $attribute
-     * @param  string  $rule
+     * @param string $attribute
+     * @param string $rule
+     *
      * @return string
      */
     protected function getSizeMessage($attribute, $rule)
@@ -156,7 +161,8 @@ trait FormatsMessages
     /**
      * Get the data type of the given attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     protected function getAttributeType($attribute)
@@ -178,10 +184,11 @@ trait FormatsMessages
     /**
      * Replace all error message place-holders with actual values.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
+     * @param string $message
+     * @param string $attribute
+     * @param string $rule
+     * @param array  $parameters
+     *
      * @return string
      */
     public function makeReplacements($message, $attribute, $rule, $parameters)
@@ -202,7 +209,8 @@ trait FormatsMessages
     /**
      * Get the displayable name of the attribute.
      *
-     * @param  string  $attribute
+     * @param string $attribute
+     *
      * @return string
      */
     public function getDisplayableAttribute($attribute)
@@ -241,7 +249,8 @@ trait FormatsMessages
     /**
      * Get the given attribute from the attribute translations.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function getAttributeFromTranslations($name)
@@ -252,8 +261,9 @@ trait FormatsMessages
     /**
      * Replace the :attribute placeholder in the given message.
      *
-     * @param  string  $message
-     * @param  string  $value
+     * @param string $message
+     * @param string $value
+     *
      * @return string
      */
     protected function replaceAttributePlaceholder($message, $value)
@@ -268,8 +278,9 @@ trait FormatsMessages
     /**
      * Get the displayable name of the value.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
+     * @param string $attribute
+     * @param mixed  $value
+     *
      * @return string
      */
     public function getDisplayableValue($attribute, $value)
@@ -290,7 +301,8 @@ trait FormatsMessages
     /**
      * Transform an array of attributes to their displayable form.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     protected function getAttributeList(array $values)
@@ -310,11 +322,12 @@ trait FormatsMessages
     /**
      * Call a custom validator message replacer.
      *
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @param  \Illuminate\Validation\Validator  $validator
+     * @param string                           $message
+     * @param string                           $attribute
+     * @param string                           $rule
+     * @param array                            $parameters
+     * @param \Illuminate\Validation\Validator $validator
+     *
      * @return string|null
      */
     protected function callReplacer($message, $attribute, $rule, $parameters, $validator)
@@ -331,12 +344,13 @@ trait FormatsMessages
     /**
      * Call a class based validator message replacer.
      *
-     * @param  string  $callback
-     * @param  string  $message
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @param  array   $parameters
-     * @param  \Illuminate\Validation\Validator  $validator
+     * @param string                           $callback
+     * @param string                           $message
+     * @param string                           $attribute
+     * @param string                           $rule
+     * @param array                            $parameters
+     * @param \Illuminate\Validation\Validator $validator
+     *
      * @return string
      */
     protected function callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator)

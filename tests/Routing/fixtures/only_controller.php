@@ -15,7 +15,8 @@ class FooController extends \BaseController
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param int $id
+     *
      * @return Response
      */
     public function show($id)

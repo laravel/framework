@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Database\Console\Migrations\RefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand;
 use Illuminate\Database\Console\Migrations\RollbackCommand;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Foundation\Application;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application as ConsoleApplication;
 
 class DatabaseMigrationRefreshCommandTest extends TestCase
@@ -65,14 +65,15 @@ class DatabaseMigrationRefreshCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput());
     }
 }
 
 class InputMatcher extends m\Matcher\MatcherAbstract
 {
     /**
-     * @param  \Symfony\Component\Console\Input\ArrayInput  $actual
+     * @param \Symfony\Component\Console\Input\ArrayInput $actual
+     *
      * @return bool
      */
     public function match(&$actual)
