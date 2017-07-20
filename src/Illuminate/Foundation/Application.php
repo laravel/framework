@@ -157,11 +157,21 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get the version number of the application.
      *
+     * @param  null|string $precision
      * @return string
      */
-    public function version()
+    public function version($precision = null)
     {
-        return static::VERSION;
+        $precision = strtoupper($precision);
+        if ($precision == 'MAJOR') {
+            $version = (int) static::VERSION;
+        } elseif ($precision == 'MINOR') {
+            $version = (float) static::VERSION;
+        } else {
+            $version = static::VERSION;
+        }
+
+        return (string) $version;
     }
 
     /**
