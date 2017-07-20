@@ -1265,7 +1265,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function has($relation)
     {
         if (! method_exists($this, $relation)) {
-            throw new Exception("No relation named ".$relation);
+            throw new Exception('No relation named '.$relation);
         }
 
         return $this->$relation()->count() > 0;
