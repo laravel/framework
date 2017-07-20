@@ -123,15 +123,13 @@ class Repository implements CacheContract, ArrayAccess
             return $this->many($keys);
         }
 
-        $default = collect($default);
-
         foreach ($keys as $key) {
-            if (! $default->has($key)) {
-                $default->put($key, null);
+            if (! isset($default[$key])) {
+                $default[$key] = null;
             }
         }
 
-        return $this->many($default->toArray());
+        return $this->many($default);
     }
 
     /**
