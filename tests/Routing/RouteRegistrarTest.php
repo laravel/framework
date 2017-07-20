@@ -260,6 +260,19 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
     }
 
+    public function testCanSetSingularOnRegisteredResource()
+    {
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->singular();
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        $this->assertEquals('users', $this->router->getRoutes()->getByName('users.show')->uri());
+        $this->assertEquals('users/edit', $this->router->getRoutes()->getByName('users.edit')->uri());
+        $this->assertEquals('users', $this->router->getRoutes()->getByName('users.update')->uri());
+        $this->assertEquals('users', $this->router->getRoutes()->getByName('users.destroy')->uri());
+    }
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {

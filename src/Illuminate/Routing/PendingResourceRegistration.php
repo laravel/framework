@@ -143,6 +143,19 @@ class PendingResourceRegistration
     }
 
     /**
+     * Set the resource to be a singular resource instance.
+     *
+     * @param  bool|string|array  $resources
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function singular($resources = true)
+    {
+        $this->options['singular'] = $resources;
+
+        return $this;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
