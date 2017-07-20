@@ -9,9 +9,10 @@ interface Application extends Container
     /**
      * Get the version number of the application.
      *
+     * @param null $precision
      * @return string
      */
-    public function version();
+    public function version($precision = null);
 
     /**
      * Get the base path of the Laravel installation.
