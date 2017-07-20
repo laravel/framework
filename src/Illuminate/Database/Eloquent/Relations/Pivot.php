@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -42,19 +43,17 @@ class Pivot extends Model
      * @param  array   $attributes
      * @param  string  $table
      * @param  bool    $exists
-     * @return void
+     * @return $this
      */
-    public function __construct(Model $parent, $attributes, $table, $exists = false)
+    public function fromAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        parent::__construct();
-
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
         $this->setConnection($parent->getConnectionName())
-             ->setTable($table)
-             ->forceFill($attributes)
-             ->syncOriginal();
+            ->setTable($table)
+            ->forceFill($attributes)
+            ->syncOriginal();
 
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
@@ -64,6 +63,8 @@ class Pivot extends Model
         $this->exists = $exists;
 
         $this->timestamps = $this->hasTimestampAttributes();
+
+        return $this;
     }
 
     /**
@@ -77,7 +78,7 @@ class Pivot extends Model
      */
     public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        $instance = new static($parent, $attributes, $table, $exists);
+        $instance = (new static())->fromAttributes($parent, $attributes, $table, $exists);
 
         $instance->setRawAttributes($attributes, true);
 
@@ -194,5 +195,14 @@ class Pivot extends Model
     public function getUpdatedAtColumn()
     {
         return $this->pivotParent->getUpdatedAtColumn();
+    }
+
+    public function getTable()
+    {
+        if (! isset($this->table)) {
+            return str_replace('\\', '', Str::snake(Str::singular(class_basename($this))));
+        }
+
+        return $this->table;
     }
 }
