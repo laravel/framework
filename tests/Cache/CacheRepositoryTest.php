@@ -194,7 +194,7 @@ class CacheRepositoryTest extends TestCase
         // Alias of Forget
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
-        $repo->remove('a-key');
+        $repo->delete('a-key');
     }
 
     public function testSettingCache()
@@ -217,7 +217,7 @@ class CacheRepositoryTest extends TestCase
         $default = ['key2' => 5];
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('many')->once()->with(['key1' => null, 'key2' => 5, 'key3' => null])->andReturn(['key1' => 1, 'key2' => 5, 'key3' => null]);
+        $repo->getStore()->shouldReceive('many')->once()->with(['key2', 'key1', 'key3'])->andReturn(['key1' => 1, 'key2' => null, 'key3' => null]);
         $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => null], $repo->getMultiple($keys, $default));
     }
 
