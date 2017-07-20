@@ -887,7 +887,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null)
     {
         return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
-                      : (new Pivot())->fromAttributes($parent, $attributes, $table, $exists);
+                      : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
     /**

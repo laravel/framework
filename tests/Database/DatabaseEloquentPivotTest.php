@@ -19,7 +19,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
-        $pivot = (new Pivot())->fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
+        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 
         $this->assertEquals(['foo' => 'bar', 'created_at' => '2015-09-12 00:00:00'], $pivot->getAttributes());
         $this->assertEquals('connection', $pivot->getConnectionName());
@@ -32,7 +32,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
-        $pivot = (new DatabaseEloquentPivotTestMutatorStub())->fromAttributes($parent, ['foo' => 'bar'], 'table', true);
+        $pivot = DatabaseEloquentPivotTestMutatorStub::fromAttributes($parent, ['foo' => 'bar'], 'table', true);
 
         $this->assertTrue($pivot->getMutatorCalled());
     }
@@ -51,7 +51,7 @@ class DatabaseEloquentPivotTest extends TestCase
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = (new Pivot())->fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
+        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
         $this->assertEquals([], $pivot->getDirty());
     }
@@ -60,7 +60,7 @@ class DatabaseEloquentPivotTest extends TestCase
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = (new Pivot())->fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
+        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
 
         $this->assertEquals(['shimy' => 'changed'], $pivot->getDirty());
@@ -71,10 +71,10 @@ class DatabaseEloquentPivotTest extends TestCase
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
         $parent->shouldReceive('getDates')->andReturn([]);
-        $pivot = (new DatabaseEloquentPivotTestDateStub())->fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
 
-        $pivot = (new DatabaseEloquentPivotTestDateStub())->fromAttributes($parent, ['foo' => 'bar'], 'table');
+        $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $this->assertFalse($pivot->timestamps);
     }
 
@@ -82,7 +82,7 @@ class DatabaseEloquentPivotTest extends TestCase
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
-        $pivot = (new Pivot())->fromAttributes($parent, ['foo' => 'bar'], 'table');
+        $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
 
         $this->assertEquals('foreign', $pivot->getForeignKey());

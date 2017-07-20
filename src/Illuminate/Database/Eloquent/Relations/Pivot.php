@@ -43,28 +43,30 @@ class Pivot extends Model
      * @param  array   $attributes
      * @param  string  $table
      * @param  bool    $exists
-     * @return $this
+     * @return static
      */
-    public function fromAttributes(Model $parent, $attributes, $table, $exists = false)
+    public static function fromAttributes(Model $parent, $attributes, $table, $exists = false)
     {
+        $instance = new static;
+
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
         // many to many relationship that are defined by this developer's classes.
-        $this->setConnection($parent->getConnectionName())
-            ->setTable($table)
-            ->forceFill($attributes)
-            ->syncOriginal();
+        $instance->setConnection($parent->getConnectionName())
+                ->setTable($table)
+                ->forceFill($attributes)
+                ->syncOriginal();
 
         // We store off the parent instance so we will access the timestamp column names
         // for the model, since the pivot model timestamps aren't easily configurable
         // from the developer's point of view. We can use the parents to get these.
-        $this->pivotParent = $parent;
+        $instance->pivotParent = $parent;
 
-        $this->exists = $exists;
+        $instance->exists = $exists;
 
-        $this->timestamps = $this->hasTimestampAttributes();
+        $instance->timestamps = $instance->hasTimestampAttributes();
 
-        return $this;
+        return $instance;
     }
 
     /**
@@ -78,7 +80,7 @@ class Pivot extends Model
      */
     public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        $instance = (new static())->fromAttributes($parent, $attributes, $table, $exists);
+        $instance = static::fromAttributes($parent, $attributes, $table, $exists);
 
         $instance->setRawAttributes($attributes, true);
 
@@ -119,6 +121,22 @@ class Pivot extends Model
             $this->foreignKey => $this->getAttribute($this->foreignKey),
             $this->relatedKey => $this->getAttribute($this->relatedKey),
         ]);
+    }
+
+    /**
+     * Get the table associated with the model.
+     *
+     * @return string
+     */
+    public function getTable()
+    {
+        if (! isset($this->table)) {
+            $this->setTable(str_replace(
+                '\\', '', Str::snake(Str::singular(class_basename($this)))
+            ));
+        }
+
+        return $this->table;
     }
 
     /**
@@ -195,14 +213,5 @@ class Pivot extends Model
     public function getUpdatedAtColumn()
     {
         return $this->pivotParent->getUpdatedAtColumn();
-    }
-
-    public function getTable()
-    {
-        if (! isset($this->table)) {
-            return str_replace('\\', '', Str::snake(Str::singular(class_basename($this))));
-        }
-
-        return $this->table;
     }
 }
