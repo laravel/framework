@@ -791,6 +791,20 @@ if (! function_exists('storage_path')) {
     }
 }
 
+if (! function_exists('str_hash')) {
+    /**
+     * Hash the given value.
+     *
+     * @param  string  $value
+     * @param  array   $options
+     * @return string
+     */
+    function str_hash($value, $options = [])
+    {
+        return app('hash')->make($value, $options);
+    }
+}
+
 if (! function_exists('trans')) {
     /**
      * Translate the given message.
