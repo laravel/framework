@@ -21,11 +21,25 @@ class ResourceRegistrar
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 
     /**
+     * The default actions for a singular resourceful controller.
+     *
+     * @var array
+     */
+    protected $singularResourceDefaults = ['create', 'store', 'show', 'edit', 'update', 'destroy'];
+
+    /**
      * The parameters set for this resource instance.
      *
      * @var array|string
      */
     protected $parameters;
+
+    /**
+     * The resources to treat as singular.
+     *
+     * @var array
+     */
+    protected $singularResources = [];
 
     /**
      * The global parameter mapping.
@@ -85,12 +99,24 @@ class ResourceRegistrar
             return;
         }
 
+        $resources = explode('.', $name);
+
+        // If the singular option is set, we need to determine which resources are meant
+        // to be singular resources. If set to true, then only the last resource will
+        // be singular, otherwise intersect all resources with the given resources.
+        if (! empty($options['singular'])) {
+            $this->singularResources = array_intersect(
+                $resources,
+                $options['singular'] === true ? [last($resources)] : array_wrap($options['singular'])
+            );
+        }
+
         // We need to extract the base resource from the resource name. Nested resources
         // are supported in the framework, but we need to know what name to use for a
         // place-holder on the route parameters, which should be the base resources.
-        $base = $this->getResourceWildcard(last(explode('.', $name)));
+        $base = $this->getResourceWildcard(last($resources));
 
-        $defaults = $this->resourceDefaults;
+        $defaults = $this->getResourceDefaults(last($resources));
 
         foreach ($this->getResourceMethods($defaults, $options) as $m) {
             $this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options);
@@ -135,6 +161,21 @@ class ResourceRegistrar
         $prefix = implode('/', array_slice($segments, 0, -1));
 
         return [end($segments), $prefix];
+    }
+
+    /**
+     * Get the default resource methods defaults for the given resource.
+     *
+     * @param  string  $resource
+     * @return array
+     */
+    protected function getResourceDefaults($resource)
+    {
+        if (in_array($resource, $this->singularResources)) {
+            return $this->singularResourceDefaults;
+        }
+
+        return $this->resourceDefaults;
     }
 
     /**
@@ -220,7 +261,7 @@ class ResourceRegistrar
      */
     protected function addResourceShow($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+        $uri = $this->getResourceUri($name).$this->getResourceUriParameter($base);
 
         $action = $this->getResourceAction($name, $controller, 'show', $options);
 
@@ -238,7 +279,7 @@ class ResourceRegistrar
      */
     protected function addResourceEdit($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}/'.static::$verbs['edit'];
+        $uri = $this->getResourceUri($name).$this->getResourceUriParameter($base).'/'.static::$verbs['edit'];
 
         $action = $this->getResourceAction($name, $controller, 'edit', $options);
 
@@ -256,7 +297,7 @@ class ResourceRegistrar
      */
     protected function addResourceUpdate($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+        $uri = $this->getResourceUri($name).$this->getResourceUriParameter($base);
 
         $action = $this->getResourceAction($name, $controller, 'update', $options);
 
@@ -274,7 +315,7 @@ class ResourceRegistrar
      */
     protected function addResourceDestroy($name, $base, $controller, $options)
     {
-        $uri = $this->getResourceUri($name).'/{'.$base.'}';
+        $uri = $this->getResourceUri($name).$this->getResourceUriParameter($base);
 
         $action = $this->getResourceAction($name, $controller, 'destroy', $options);
 
@@ -300,7 +341,7 @@ class ResourceRegistrar
 
         $uri = $this->getNestedResourceUri($segments);
 
-        return str_replace('/{'.$this->getResourceWildcard(end($segments)).'}', '', $uri);
+        return str_replace($this->getResourceUriParameter($this->getResourceWildcard(end($segments))), '', $uri);
     }
 
     /**
@@ -315,7 +356,7 @@ class ResourceRegistrar
         // resource segments, as well as the resource itself. Then we should get an
         // entire string for the resource URI that contains all nested resources.
         return implode('/', array_map(function ($s) {
-            return $s.'/{'.$this->getResourceWildcard($s).'}';
+            return $s.$this->getResourceUriParameter($this->getResourceWildcard($s));
         }, $segments));
     }
 
@@ -323,10 +364,14 @@ class ResourceRegistrar
      * Format a resource parameter for usage.
      *
      * @param  string  $value
-     * @return string
+     * @return string|null
      */
     public function getResourceWildcard($value)
     {
+        if (in_array($value, $this->singularResources)) {
+            return null;
+        }
+
         if (isset($this->parameters[$value])) {
             $value = $this->parameters[$value];
         } elseif (isset(static::$parameterMap[$value])) {
@@ -336,6 +381,21 @@ class ResourceRegistrar
         }
 
         return str_replace('-', '_', $value);
+    }
+
+    /**
+     * Get the parameter name as a resource URI parameter segment.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function getResourceUriParameter($value)
+    {
+        if (empty($value)) {
+            return '';
+        }
+
+        return '/{'.$value.'}';
     }
 
     /**
