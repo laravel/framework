@@ -4,7 +4,6 @@ namespace Illuminate\Cache;
 
 use Closure;
 use ArrayAccess;
-use DateInterval;
 use DateTimeInterface;
 use BadMethodCallException;
 use Illuminate\Support\Carbon;
@@ -14,11 +13,13 @@ use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Repository implements CacheContract, ArrayAccess
 {
+    use InteractsWithTime;
     use Macroable {
         __call as macroCall;
     }
@@ -483,9 +484,7 @@ class Repository implements CacheContract, ArrayAccess
      */
     protected function getMinutes($duration)
     {
-        if ($duration instanceof DateInterval) {
-            $duration = Carbon::now()->add($duration);
-        }
+        $duration = $this->parseDateInterval($duration);
 
         if ($duration instanceof DateTimeInterface) {
             $duration = Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($duration->getTimestamp()), false) / 60;
