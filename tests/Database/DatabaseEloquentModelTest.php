@@ -453,6 +453,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
     }
 
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Call to undefined method Illuminate\Tests\Database\EloquentModelStub::badMethod()
+     */
     public function testBadMethodCallException()
     {
         $conn = m::mock('Illuminate\Database\Connection');
@@ -462,17 +466,9 @@ class DatabaseEloquentModelTest extends TestCase
         $conn->shouldReceive('getPostProcessor')->once()->andReturn($processor);
         EloquentModelStub::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
         $resolver->shouldReceive('connection')->andReturn($conn);
+
         $model = new EloquentModelStub;
-
-        try {
-            $model->badMethod();
-        } catch (\BadMethodCallException $e) {
-            $this->assertEquals('Call to undefined method Illuminate\Tests\Database\EloquentModelStub::badMethod()', $e->getMessage());
-
-            return;
-        }
-
-        $this->fail('BadMethodCallException expected.');
+        $model->badMethod();
     }
 
     public function testInsertProcess()

@@ -868,7 +868,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage SQLSTATE[23000]:
      */
     public function testSaveOrFailWithDuplicatedEntry()
     {

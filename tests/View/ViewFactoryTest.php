@@ -435,7 +435,7 @@ class ViewFactoryTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \ErrorException
      * @expectedExceptionMessage section exception message
      */
     public function testExceptionsInSectionsAreThrown()
