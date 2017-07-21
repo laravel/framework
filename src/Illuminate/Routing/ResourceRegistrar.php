@@ -2,6 +2,7 @@
 
 namespace Illuminate\Routing;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class ResourceRegistrar
@@ -107,7 +108,7 @@ class ResourceRegistrar
         if (! empty($options['singular'])) {
             $this->singularResources = array_intersect(
                 $resources,
-                $options['singular'] === true ? [last($resources)] : array_wrap($options['singular'])
+                $options['singular'] === true ? [last($resources)] : Arr::wrap($options['singular'])
             );
         }
 
