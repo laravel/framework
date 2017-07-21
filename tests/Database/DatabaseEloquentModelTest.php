@@ -1445,6 +1445,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->stringAttribute = 2.5;
         $model->boolAttribute = 1;
         $model->booleanAttribute = 0;
+        $model->boolAttributeAsString = 'true';
+        $model->booleanAttributeAsString = 'false';
+        $model->defaultBooleanAttribute = 'foobar';
         $model->objectAttribute = ['foo' => 'bar'];
         $obj = new stdClass;
         $obj->foo = 'bar';
@@ -1464,6 +1467,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInternalType('array', $model->jsonAttribute);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
+        $this->assertFalse($model->defaultBooleanAttribute);
+        $this->assertInternalType('boolean', $model->boolAttributeAsString);
+        $this->assertInternalType('boolean', $model->booleanAttributeAsString);
         $this->assertEquals($obj, $model->objectAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
         $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
@@ -1485,6 +1491,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInternalType('array', $arr['jsonAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
+        $this->assertTrue($arr['boolAttributeAsString']);
+        $this->assertFalse($arr['booleanAttributeAsString']);
+        $this->assertFalse($arr['defaultBooleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
@@ -1989,6 +1998,9 @@ class EloquentModelCastingStub extends Model
         'stringAttribute' => 'string',
         'boolAttribute' => 'bool',
         'booleanAttribute' => 'boolean',
+        'boolAttributeAsString' => 'bool',
+        'booleanAttributeAsString' => 'boolean',
+        'defaultBooleanAttribute' => 'boolean',
         'objectAttribute' => 'object',
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
