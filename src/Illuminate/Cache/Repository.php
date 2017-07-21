@@ -12,8 +12,8 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\Events\KeyWritten;
 use Illuminate\Cache\Events\CacheMissed;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Cache\Events\KeyForgotten;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
