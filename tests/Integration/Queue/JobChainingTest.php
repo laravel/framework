@@ -31,6 +31,16 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestSecondJob::$ran);
     }
 
+    public function test_jobs_can_be_chained_on_success_using_pending_chain()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+        ])->dispatch();
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
     public function test_jobs_chained_on_explicit_delete()
     {
         JobChainingTestDeletingJob::dispatch()->chain([
