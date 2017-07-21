@@ -40,7 +40,7 @@ class ViewServiceProvider extends ServiceProvider
 
             $finder = $app['view.finder'];
 
-            $env = new Factory($resolver, $finder, $app['events']);
+            $env = $this->newFactory($resolver, $finder, $app['events']);
 
             // We will also set the container instance on this view environment since the
             // view composers may be classes registered in the container, which allows
@@ -132,5 +132,18 @@ class ViewServiceProvider extends ServiceProvider
         $resolver->register('blade', function () {
             return new CompilerEngine($this->app['blade.compiler']);
         });
+    }
+
+    /**
+     * Create a new Factory Instance.
+     *
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @param  \Illuminate\View\ViewFinderInterface  $finder
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return \Illuminate\View\Factory
+     */
+    protected function newFactory($resolver, $finder, $events)
+    {
+        return new Factory($resolver, $finder, $events);
     }
 }
