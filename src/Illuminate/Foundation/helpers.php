@@ -564,6 +564,18 @@ if (! function_exists('mix')) {
     }
 }
 
+if (! function_exists('now')) {
+    /**
+     * Get Carbon instance for current date/time.
+     *
+     * @return \Carbon\Carbon
+     */
+    function now()
+    {
+        return \Carbon\Carbon::now();
+    }
+}
+
 if (! function_exists('old')) {
     /**
      * Retrieve an old input item.
