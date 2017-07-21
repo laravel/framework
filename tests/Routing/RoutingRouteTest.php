@@ -1097,7 +1097,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['only' => ['index'], 'singular' => true]);
         $routes = $router->getRoutes();
-        $this->assertCount(0, $routes);
+        $this->assertEmpty($routes);
 
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['singular' => ['bar']]);
