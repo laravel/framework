@@ -221,6 +221,39 @@ class RouteRegistrarTest extends TestCase
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
     }
 
+    public function testUserCanRegisterSingularApiResource()
+    {
+        $this->router->apiResource('user', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, ['singular' => true]);
+
+        $this->assertCount(4, $this->router->getRoutes());
+
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.index'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.create'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.edit'));
+
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.show')->uri());
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.store')->uri());
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.update')->uri());
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.destroy')->uri());
+    }
+
+    public function testUserCanSetSingularOnRegisteredApiResource()
+    {
+        $this->router->apiResource('user', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class)
+                     ->singular();
+
+        $this->assertCount(4, $this->router->getRoutes());
+
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.index'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.create'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('user.edit'));
+
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.show')->uri());
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.store')->uri());
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.update')->uri());
+        $this->assertEquals('user', $this->router->getRoutes()->getByName('user.destroy')->uri());
+    }
+
     public function testCanNameRoutesOnRegisteredResource()
     {
         $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
