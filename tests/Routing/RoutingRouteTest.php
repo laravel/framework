@@ -1070,6 +1070,111 @@ class RoutingRouteTest extends TestCase
 
         $this->assertEquals('foo/ajouter', $routes->getByName('foo.create')->uri());
         $this->assertEquals('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
+
+        ResourceRegistrar::verbs([
+            'create' => 'create',
+            'edit' => 'edit',
+        ]);
+    }
+
+    public function testSingularResourceRouting()
+    {
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['singular' => true]);
+        $routes = $router->getRoutes();
+        $this->assertCount(6, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['singular' => 'foo']);
+        $routes = $router->getRoutes();
+        $this->assertCount(6, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['singular' => ['foo']]);
+        $routes = $router->getRoutes();
+        $this->assertCount(6, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['index'], 'singular' => true]);
+        $routes = $router->getRoutes();
+        $this->assertEmpty($routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['singular' => ['bar']]);
+        $routes = $router->getRoutes();
+        $this->assertCount(7, $routes);
+
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', ['only' => ['show', 'edit', 'update', 'destroy'], 'singular' => true]);
+        $routes = $router->getRoutes();
+
+        $this->assertEquals('foo', $routes->getByName('foo.show')->uri());
+        $this->assertEquals('foo/edit', $routes->getByName('foo.edit')->uri());
+        $this->assertEquals('foo', $routes->getByName('foo.update')->uri());
+        $this->assertEquals('foo', $routes->getByName('foo.destroy')->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo.bar', 'FooController', ['only' => ['show'], 'singular' => true]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/{foo}/bar', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo.bar', 'FooController', ['only' => ['show'], 'singular' => 'bar']);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/{foo}/bar', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo.bar', 'FooController', ['only' => ['show'], 'singular' => ['bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/{foo}/bar', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo.bar', 'FooController', ['only' => ['show'], 'singular' => ['foo']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/bar/{bar}', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo.bar', 'FooController', ['only' => ['show'], 'singular' => ['foo', 'bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/bar', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo/bar', 'FooController', ['only' => ['show'], 'singular' => true]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/bar', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo/bar.baz', 'FooController', ['only' => ['show'], 'singular' => true]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/bar/{bar}/baz', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo/bar.baz', 'FooController', ['only' => ['show'], 'singular' => ['bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/bar/baz/{baz}', $routes[0]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foo/bar.baz', 'FooController', ['only' => ['show'], 'singular' => ['bar', 'baz']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foo/bar/baz', $routes[0]->uri());
     }
 
     public function testResourceRoutingParameters()
