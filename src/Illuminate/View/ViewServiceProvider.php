@@ -137,10 +137,10 @@ class ViewServiceProvider extends ServiceProvider
     /**
      * Create a new Factory Instance.
      *
-     * @param  EngineResolver  $resolver
-     * @param  FileViewFinder  $finder
-     * @param  $events
-     * @return Factory
+     * @param  \Illuminate\View\Engines\EngineResolver  $resolver
+     * @param  \Illuminate\View\ViewFinderInterface  $finder
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return \Illuminate\View\Factory
      */
     protected function newFactory($resolver, $finder, $events)
     {
