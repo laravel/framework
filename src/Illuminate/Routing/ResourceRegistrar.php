@@ -370,7 +370,7 @@ class ResourceRegistrar
     public function getResourceWildcard($value)
     {
         if (in_array($value, $this->singularResources)) {
-            return null;
+            return;
         }
 
         if (isset($this->parameters[$value])) {
