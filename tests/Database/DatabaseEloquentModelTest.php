@@ -1447,6 +1447,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->booleanAttribute = 0;
         $model->boolAttributeAsString = 'true';
         $model->booleanAttributeAsString = 'false';
+        $model->defaultBooleanAttribute = 'foobar';
         $model->objectAttribute = ['foo' => 'bar'];
         $obj = new stdClass;
         $obj->foo = 'bar';
@@ -1466,6 +1467,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInternalType('array', $model->jsonAttribute);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
+        $this->assertFalse($model->defaultBooleanAttribute);
         $this->assertInternalType('boolean', $model->boolAttributeAsString);
         $this->assertInternalType('boolean', $model->booleanAttributeAsString);
         $this->assertEquals($obj, $model->objectAttribute);
@@ -1491,6 +1493,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertTrue($arr['boolAttributeAsString']);
         $this->assertFalse($arr['booleanAttributeAsString']);
+        $this->assertFalse($arr['defaultBooleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
         $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
@@ -1997,6 +2000,7 @@ class EloquentModelCastingStub extends Model
         'booleanAttribute' => 'boolean',
         'boolAttributeAsString' => 'bool',
         'booleanAttributeAsString' => 'boolean',
+        'defaultBooleanAttribute' => 'boolean',
         'objectAttribute' => 'object',
         'arrayAttribute' => 'array',
         'jsonAttribute' => 'json',
