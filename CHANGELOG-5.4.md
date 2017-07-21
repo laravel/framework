@@ -1,5 +1,12 @@
 # Release Notes for 5.4.x
 
+## v5.4.30 (2017-07-19)
+
+### Fixed
+- Handle a non-existing key in `ArrayStore` ([#20156](https://github.com/laravel/framework/pull/20156))
+- Fixed bug `@guest` and `@auth` directives ([#20166](https://github.com/laravel/framework/pull/20166), [b164e45](https://github.com/laravel/framework/commit/b164e4552517b6126eac4dc77e276131b835b784))
+
+
 ## v5.4.29 (2017-07-19)
 
 ### Added
