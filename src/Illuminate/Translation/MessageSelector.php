@@ -26,7 +26,7 @@ class MessageSelector
 
         $pluralIndex = $this->getPluralIndex($locale, $number);
 
-        if (count($segments) == 1 || !isset($segments[$pluralIndex])) {
+        if (count($segments) == 1 || ! isset($segments[$pluralIndex])) {
             return $segments[0];
         }
 
@@ -43,7 +43,7 @@ class MessageSelector
     private function extract($segments, $number)
     {
         foreach ($segments as $part) {
-            if (!is_null($line = $this->extractFromString($part, $number))) {
+            if (! is_null($line = $this->extractFromString($part, $number))) {
                 return $line;
             }
         }
@@ -123,13 +123,13 @@ class MessageSelector
                 return (($number % 10 == 1) && ($number % 100 != 11)) ? 0 : ((($number % 10 >= 2) && ($number % 10 <= 4) && (($number % 100 < 10) || ($number % 100 >= 20))) ? 1 : 2);
             case strpos('cs|sk', $countryCode) !== false:
                 return ($number == 1) ? 0 : ((($number >= 2) && ($number <= 4)) ? 1 : 2);
-            default :
+            default:
                 return $this->getUniquePluralIndex($countryCode, $number);
         }
     }
 
     /**
-     * Get the index to use for countries with unique pluralization pattern
+     * Get the index to use for countries with unique pluralization pattern.
      *
      * @param string $countryCode
      * @param int $number

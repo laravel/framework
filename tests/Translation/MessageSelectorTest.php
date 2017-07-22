@@ -36,90 +36,90 @@ class MessageSelectorTest extends TestCase
 
     public function getPluralIndexTestData()
     {
-        /**
+        /*
          * Some locales of each cases with number and expected result
          */
         return $testData = [
             'az_AZ' => [
                 'number' => 0,
-                'expected_result' => 0
+                'expected_result' => 0,
             ],
             'bn_BD' => [
                 'number' => 0,
-                'expected_result' => 1
+                'expected_result' => 1,
             ],
             'zu_ZA' => [
                 'number' => 1,
-                'expected_result' => 0
+                'expected_result' => 0,
             ],
             'fi' => [
                 'number' => 2,
-                'expected_result' => 1
+                'expected_result' => 1,
             ],
             'fil_PH' => [
                 'number' => 1,
-                'expected_result' => 0
+                'expected_result' => 0,
             ],
             'wa_BE' => [
                 'number' => 2,
-                'expected_result' => 1
+                'expected_result' => 1,
             ],
             'hr_HR' => [
                 'number' => 21,
-                'expected_result' => 0
+                'expected_result' => 0,
             ],
             'uk_UA' => [
                 'number' => 10,
-                'expected_result' => 2
+                'expected_result' => 2,
             ],
             'cs_CZ' => [
                 'number' => 5,
-                'expected_result' => 2
+                'expected_result' => 2,
             ],
             'ga_IE' => [
                 'number' => 2,
-                'expected_result' => 1
+                'expected_result' => 1,
             ],
             'lt_LT' => [
                 'number' => 81,
-                'expected_result' => 0
+                'expected_result' => 0,
             ],
             'sl_SI' => [
                 'number' => 5,
-                'expected_result' => 3
+                'expected_result' => 3,
             ],
             'mk_MK' => [
                 'number' => 91,
-                'expected_result' => 0
+                'expected_result' => 0,
             ],
             'mt_MT' => [
                 'number' => 20,
-                'expected_result' => 3
+                'expected_result' => 3,
             ],
             'lv_LV' => [
                 'number' => 51,
-                'expected_result' => 1
+                'expected_result' => 1,
             ],
             'pl_PL' => [
                 'number' => 25,
-                'expected_result' => 2
+                'expected_result' => 2,
             ],
             'cy_GB' => [
                 'number' => 8,
-                'expected_result' => 2
+                'expected_result' => 2,
             ],
             'ro_RO' => [
                 'number' => 19,
-                'expected_result' => 1
+                'expected_result' => 1,
             ],
             'ar_AE' => [
                 'number' => 4,
-                'expected_result' => 3
+                'expected_result' => 3,
             ],
             'not_EXIST' => [
                 'number' => 7,
-                'expected_result' => 0
-            ]
+                'expected_result' => 0,
+            ],
         ];
     }
 
