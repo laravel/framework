@@ -81,6 +81,42 @@ class ViewErrorBag implements Countable
     }
 
     /**
+     * Determine if messages exist for all of the given keys in any MessageBag.
+     *
+     * @param  array|string  $key
+     * @return bool
+     */
+    public function anyBagHas($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+        $messageKeys = [];
+
+        foreach ($this->bags as $bag) {
+            $messageKeys = array_merge($messageKeys, $bag->keys());
+        }
+
+        return count($keys) == count(array_intersect($keys, $messageKeys));
+    }
+
+    /**
+     * Determine if messages exist for any of the given keys in any MessageBag.
+     *
+     * @param  array|string  $key
+     * @return bool
+     */
+    public function anyBagHasAny($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+        $messageKeys = [];
+
+        foreach ($this->bags as $bag) {
+            $messageKeys = array_merge($messageKeys, $bag->keys());
+        }
+
+        return ! empty(array_intersect($keys, $messageKeys));
+    }
+
+    /**
      * Dynamically call methods on the default bag.
      *
      * @param  string  $method
