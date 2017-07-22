@@ -27,6 +27,13 @@ trait HasRelationships
     protected $relations = [];
 
     /**
+     * The loaded inverse relationships for the model.
+     *
+     * @var array
+     */
+    protected $inverseRelations = [];
+
+    /**
      * The relationships that should be touched on save.
      *
      * @var array
@@ -552,6 +559,20 @@ trait HasRelationships
     public function setRelation($relation, $value)
     {
         $this->relations[$relation] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set the inverse relationship in the model.
+     *
+     * @param  string  $relation
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setInverseRelation($relation, $value)
+    {
+        $this->inverseRelations[$relation] = $value;
 
         return $this;
     }

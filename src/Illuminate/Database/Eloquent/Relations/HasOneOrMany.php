@@ -73,9 +73,9 @@ abstract class HasOneOrMany extends Relation
         }
 
         if ($models instanceof Collection) {
-            $models->each->setRelation($this->inverseSide, $parent ?: $this->parent);
+            $models->each->setInverseRelation($this->inverseSide, $parent ?: $this->parent);
         } elseif ($models instanceof Model) {
-            $models->setRelation($this->inverseSide, $parent ?: $this->parent);
+            $models->setInverseRelation($this->inverseSide, $parent ?: $this->parent);
         }
     }
 

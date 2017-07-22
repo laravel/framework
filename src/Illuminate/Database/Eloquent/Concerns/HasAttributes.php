@@ -379,6 +379,10 @@ trait HasAttributes
             return $this->relations[$key];
         }
 
+        if (isset($this->inverseRelations[$key])) {
+            return $this->inverseRelations[$key];
+        }
+
         // If the "attribute" exists as a method on the model, we will just assume
         // it is a relationship and will load and return results from the query
         // and hydrate the relationship's value on the "relationships" array.
