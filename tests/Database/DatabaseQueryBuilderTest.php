@@ -42,6 +42,21 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertEquals('select * from "users"', $builder->toSql());
         $this->assertNull($builder->columns);
+
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "foo" from "users"', $sql);
+        });
+        $builder->from('users')->get('foo');
+
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "foo", "bar" from "users"', $sql);
+        });
+        $builder->from('users')->get('foo', 'bar');
+
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "foo", "bar" from "users"', $sql);
+        });
+        $builder->from('users')->get(['foo', 'bar']);
     }
 
     public function testBasicSelectUseWritePdo()

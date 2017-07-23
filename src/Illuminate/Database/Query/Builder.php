@@ -1689,7 +1689,7 @@ class Builder
         $original = $this->columns;
 
         if (is_null($original)) {
-            $this->columns = $columns;
+            $this->columns = is_array($columns) ? $columns : func_get_args();
         }
 
         $results = $this->processor->processSelect($this, $this->runSelect());
