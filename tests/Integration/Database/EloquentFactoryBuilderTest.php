@@ -23,6 +23,11 @@ class EloquentFactoryBuilderTest extends TestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+        $app['config']->set('database.connections.alternative-connection', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
 
         $factory = new Factory($app->make(Generator::class));
 
@@ -61,6 +66,12 @@ class EloquentFactoryBuilderTest extends TestCase
         parent::setUp();
 
         Schema::create('users', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('email');
+        });
+
+        Schema::connection('alternative-connection')->create('users', function ($table) {
             $table->increments('id');
             $table->string('name');
             $table->string('email');
@@ -152,6 +163,31 @@ class EloquentFactoryBuilderTest extends TestCase
             ->each(function ($user) {
                 $this->assertCount(2, $user->servers);
             });
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_on_custom_connection()
+    {
+        $user = factory(FactoryBuildableUser::class)
+            ->connection('alternative-connection')
+            ->create();
+
+        $dbUser = FactoryBuildableUser::on('alternative-connection')->find(1);
+
+        $this->assertEquals('alternative-connection', $user->getConnectionName());
+        $this->assertTrue($user->is($dbUser));
+    }
+
+    /** @test */
+    public function making_models_with_a_custom_connection()
+    {
+        $user = factory(FactoryBuildableUser::class)
+            ->connection('alternative-connection')
+            ->make();
+
+        $this->assertEquals('alternative-connection', $user->getConnectionName());
     }
 }
 
