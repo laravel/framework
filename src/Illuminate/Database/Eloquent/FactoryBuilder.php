@@ -33,6 +33,13 @@ class FactoryBuilder
     protected $name = 'default';
 
     /**
+     * The database connection on which the model instance should be persisted.
+     *
+     * @var string
+     */
+    protected $connection;
+
+    /**
      * The model states.
      *
      * @var array
@@ -45,13 +52,6 @@ class FactoryBuilder
      * @var array
      */
     protected $activeStates = [];
-
-    /**
-     * The database connection on which the model instance should be persisted.
-     *
-     * @var string
-     */
-    protected $connection;
 
     /**
      * The Faker instance for the builder.
