@@ -1667,7 +1667,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @return static
      * @see http://php.net/manual/en/function.array-replace-recursive.php
      */
-    public function replace($items, $recursive = false)
+    public function replace($items)
     {
         return new static(array_replace($this->items, $this->getArrayableItems($items)));
     }
