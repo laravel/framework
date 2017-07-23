@@ -2153,6 +2153,21 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testReplace()
+    {
+        $c = new Collection(['foo' => 'x', 'bar' => 'y']);
+        $this->assertEquals(['foo' => 'f', 'bar' => 'y', 'baz' => 'z'], $c->replace(new Collection(['foo' => 'f', 'baz' => 'z']))->all());
+    }
+
+    public function testReplaceCollectionRecursively()
+    {
+        $base = ['citrus' => ["orange"], 'berries' => ["blackberry", "raspberry"],];
+        $replacements = ['citrus' => ['pineapple'], 'berries' => ['blueberry']];
+        $expect = ['citrus' => ['pineapple'], 'berries' => ['blueberry', 'raspberry']];
+        $c = new Collection($base);
+        $this->assertEquals($expect, $c->replaceRecursively(new Collection($replacements))->all());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
