@@ -1659,4 +1659,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return new HigherOrderCollectionProxy($this, $key);
     }
+
+    /**
+     * Replaces elements from passed arrays into the collection
+     *
+     * @param  mixed $items
+     * @return static
+     * @see http://php.net/manual/en/function.array-replace-recursive.php
+     */
+    public function replace($items, $recursive = false)
+    {
+        return new static(array_replace($this->items, $this->getArrayableItems($items)));
+    }
+
+    /**
+     * Replaces elements from passed arrays into the collection recursively
+     *
+     * @param  mixed $items
+     * @return static
+     * @see http://php.net/manual/en/function.array-replace-recursive.php
+     */
+    public function replaceRecursively($items)
+    {
+        return new static(array_replace_recursive($this->items, $this->getArrayableItems($items)));
+    }
 }
