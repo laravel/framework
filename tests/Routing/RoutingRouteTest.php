@@ -854,6 +854,25 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testCurrentRouteUses()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', ['as' => 'foo.bar', 'uses' => 'Illuminate\Tests\Routing\RouteTestControllerStub@index']);
+
+        $this->assertNull($router->currentRouteAction());
+
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($router->uses('*RouteTestControllerStub*'));
+        $this->assertTrue($router->uses('*RouteTestControllerStub@index'));
+        $this->assertTrue($router->uses(['*RouteTestControllerStub*', '*FooController*']));
+        $this->assertTrue($router->uses(['*BarController*', '*FooController*', '*RouteTestControllerStub@index']));
+        $this->assertTrue($router->uses(['*BarController*', '*FooController*'], '*RouteTestControllerStub*'));
+        $this->assertFalse($router->uses(['*BarController*', '*FooController*']));
+
+        $this->assertEquals($router->currentRouteAction(), 'Illuminate\Tests\Routing\RouteTestControllerStub@index');
+        $this->assertTrue($router->currentRouteUses('Illuminate\Tests\Routing\RouteTestControllerStub@index'));
+    }
+
     public function testRouteGroupingFromFile()
     {
         $router = $this->getRouter();
