@@ -57,4 +57,25 @@ class FoundationHelpersTest extends TestCase
 
         unlink(public_path($file));
     }
+
+    public function testMixDoesNotIncludeHost()
+    {
+        $file = 'unversioned.css';
+
+        app()->singleton('path.public', function () {
+            return __DIR__;
+        });
+
+        touch(public_path('mix-manifest.json'));
+
+        file_put_contents(public_path('mix-manifest.json'), json_encode([
+            '/unversioned.css' => '/versioned.css',
+        ]));
+
+        $result = mix($file);
+
+        $this->assertEquals('/versioned.css', $result);
+
+        unlink(public_path('mix-manifest.json'));
+    }
 }

@@ -5,7 +5,7 @@ namespace Illuminate\Auth\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\DetectsApplicationNamespace;
 
-class MakeAuthCommand extends Command
+class AuthMakeCommand extends Command
 {
     use DetectsApplicationNamespace;
 
