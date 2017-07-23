@@ -1021,7 +1021,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function currentRouteAction()
     {
-        if($this->current()) {
+        if ($this->current()) {
             return $this->current()->getAction()['controller'] ?? null;
         }
     }
