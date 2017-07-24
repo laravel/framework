@@ -326,6 +326,15 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Taylor', $all['name']);
     }
 
+    public function testPostMethod()
+    {
+        $request = Request::create('/', 'POST', ['name' => 'Taylor']);
+        $this->assertEquals('Taylor', $request->post('name'));
+        $this->assertEquals('Bob', $request->post('foo', 'Bob'));
+        $all = $request->post(null);
+        $this->assertEquals('Taylor', $all['name']);
+    }
+
     public function testCookieMethod()
     {
         $request = Request::create('/', 'GET', [], ['name' => 'Taylor']);
