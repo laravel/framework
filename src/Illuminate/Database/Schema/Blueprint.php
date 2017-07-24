@@ -411,7 +411,7 @@ class Blueprint
     /**
      * Create a new auto-incrementing tiny integer (1-byte) column on the table.
      *
-     * @param  string  $column
+     * @param  string $column
      * @return \Illuminate\Support\Fluent
      */
     public function tinyIncrements($column)
@@ -581,8 +581,8 @@ class Blueprint
     /**
      * Create a new unsigned integer (4-byte) column on the table.
      *
-     * @param  string  $column
-     * @param  bool  $autoIncrement
+     * @param  string $column
+     * @param  bool $autoIncrement
      * @return \Illuminate\Support\Fluent
      */
     public function unsignedInteger($column, $autoIncrement = false)
@@ -675,6 +675,20 @@ class Blueprint
     public function decimal($column, $total = 8, $places = 2)
     {
         return $this->addColumn('decimal', $column, compact('total', 'places'));
+    }
+
+    /**
+     * Create a new unsigned decimal column on the table.
+     *
+     * @param string $column
+     * @param int    $total
+     * @param int    $places
+     * @param bool   $unsigned
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedDecimal($column, $total = 8, $places = 2, $unsigned = true)
+    {
+        return $this->addColumn('decimal', $column, compact('total', 'places', 'unsigned'));
     }
 
     /**

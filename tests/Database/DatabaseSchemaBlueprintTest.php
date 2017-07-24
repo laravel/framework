@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
+use \Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
@@ -74,5 +74,17 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
+    }
+
+    public function testUnsignedDecimalTable()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->unsignedDecimal('money', 10, 2, true)->useCurrent();
+        });
+
+        $connection = m::mock('Illuminate\Database\Connection');
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
 }
