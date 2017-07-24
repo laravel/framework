@@ -355,4 +355,26 @@ trait ReplacesAttributes
     {
         return $this->replaceBefore($message, $attribute, $rule, $parameters);
     }
+
+    /**
+     * Replace all place-holders for the dimensions rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceDimensions($message, $attribute, $rule, $parameters)
+    {
+        $parameters = $this->parseNamedParameters($parameters);
+
+        if (is_array($parameters)) {
+            foreach ($parameters as $key => $value) {
+                $message = str_replace(':'.$key, $value, $message);
+            }
+        }
+
+        return $message;
+    }
 }

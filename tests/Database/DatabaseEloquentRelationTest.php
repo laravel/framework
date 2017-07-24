@@ -64,6 +64,19 @@ class DatabaseEloquentRelationTest extends TestCase
 
         Relation::morphMap([], false);
     }
+
+    public function testMacroable()
+    {
+        Relation::macro('foo', function () {
+            return 'foo';
+        });
+
+        $model = new EloquentRelationResetModelStub();
+        $relation = new EloquentRelationStub($model->newQuery(), $model);
+
+        $result = $relation->foo();
+        $this->assertEquals('foo', $result);
+    }
 }
 
 class EloquentRelationResetModelStub extends Model

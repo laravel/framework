@@ -19,6 +19,7 @@
         "illuminate/bus": "5.4.*",
         "illuminate/container": "5.4.*",
         "illuminate/contracts": "5.4.*",
+        "illuminate/filesystem": "5.4.*",
         "illuminate/mail": "5.4.*",
         "illuminate/queue": "5.4.*",
         "illuminate/support": "5.4.*",
@@ -35,7 +36,7 @@
         }
     },
     "suggest": {
-        "guzzlehttp/guzzle": "Required to use the Slack transport (~6.0)",
+        "guzzlehttp/guzzle": "Required to use the Slack transport (~6.0).",
         "illuminate/database": "Required to use the database transport (5.4.*).",
         "nexmo/client": "Required to use the Nexmo transport (~1.0)."
     },

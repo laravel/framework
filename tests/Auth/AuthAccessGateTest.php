@@ -35,6 +35,35 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_resource_gates_can_be_defined()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->resource('test', AccessGateTestResource::class);
+
+        $dummy = new AccessGateTestDummy;
+
+        $this->assertTrue($gate->check('test.view'));
+        $this->assertTrue($gate->check('test.create'));
+        $this->assertTrue($gate->check('test.update', $dummy));
+        $this->assertTrue($gate->check('test.delete', $dummy));
+    }
+
+    public function test_custom_resource_gates_can_be_defined()
+    {
+        $gate = $this->getBasicGate();
+
+        $abilities = [
+            'ability1' => 'foo',
+            'ability2' => 'bar',
+        ];
+
+        $gate->resource('test', AccessGateTestCustomResource::class, $abilities);
+
+        $this->assertTrue($gate->check('test.ability1'));
+        $this->assertTrue($gate->check('test.ability2'));
+    }
+
     public function test_before_callbacks_can_override_result_if_necessary()
     {
         $gate = $this->getBasicGate();
@@ -341,5 +370,41 @@ class AccessGateTestPolicyWithBefore
     public function update($user, AccessGateTestDummy $dummy)
     {
         return false;
+    }
+}
+
+class AccessGateTestResource
+{
+    public function view($user)
+    {
+        return true;
+    }
+
+    public function create($user)
+    {
+        return true;
+    }
+
+    public function update($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+
+    public function delete($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+}
+
+class AccessGateTestCustomResource
+{
+    public function foo($user)
+    {
+        return true;
+    }
+
+    public function bar($user)
+    {
+        return true;
     }
 }

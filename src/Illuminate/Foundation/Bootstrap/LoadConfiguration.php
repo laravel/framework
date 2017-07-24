@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Bootstrap;
 
+use Exception;
 use SplFileInfo;
 use Illuminate\Config\Repository;
 use Symfony\Component\Finder\Finder;
@@ -56,10 +57,17 @@ class LoadConfiguration
      * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @param  \Illuminate\Contracts\Config\Repository  $repository
      * @return void
+     * @throws \Exception
      */
     protected function loadConfigurationFiles(Application $app, RepositoryContract $repository)
     {
-        foreach ($this->getConfigurationFiles($app) as $key => $path) {
+        $files = $this->getConfigurationFiles($app);
+
+        if (! isset($files['app'])) {
+            throw new Exception('Unable to load the "app" configuration file.');
+        }
+
+        foreach ($files as $key => $path) {
             $repository->set($key, require $path);
         }
     }

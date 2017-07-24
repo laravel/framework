@@ -26,6 +26,10 @@ class RedisServiceProvider extends ServiceProvider
 
             return new RedisManager(Arr::pull($config, 'client', 'predis'), $config);
         });
+
+        $this->app->bind('redis.connection', function ($app) {
+            return $app['redis']->connection();
+        });
     }
 
     /**
@@ -35,6 +39,6 @@ class RedisServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['redis'];
+        return ['redis', 'redis.connection'];
     }
 }

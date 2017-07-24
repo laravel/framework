@@ -5,6 +5,9 @@ namespace Illuminate\Mail;
 use Swift_Image;
 use Swift_Attachment;
 
+/**
+ * @mixin \Swift_Message
+ */
 class Message
 {
     /**
@@ -13,6 +16,13 @@ class Message
      * @var \Swift_Message
      */
     protected $swift;
+
+    /**
+     * CIDs of files embedded in the message.
+     *
+     * @var array
+     */
+    protected $embeddedFiles = [];
 
     /**
      * Create a new message instance.
@@ -240,7 +250,13 @@ class Message
      */
     public function embed($file)
     {
-        return $this->swift->embed(Swift_Image::fromPath($file));
+        if (isset($this->embeddedFiles[$file])) {
+            return $this->embeddedFiles[$file];
+        }
+
+        return $this->embeddedFiles[$file] = $this->swift->embed(
+            Swift_Image::fromPath($file)
+        );
     }
 
     /**

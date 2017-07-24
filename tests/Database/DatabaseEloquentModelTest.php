@@ -6,6 +6,7 @@ use DateTime;
 use stdClass;
 use Exception;
 use Mockery as m;
+use Carbon\Carbon;
 use LogicException;
 use ReflectionClass;
 use DateTimeImmutable;
@@ -17,9 +18,19 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentModelTest extends TestCase
 {
+    public function setup()
+    {
+        parent::setup();
+
+        Carbon::setTestNow(Carbon::now());
+    }
+
     public function tearDown()
     {
+        parent::tearDown();
+
         m::close();
+        Carbon::setTestNow(null);
 
         \Illuminate\Database\Eloquent\Model::unsetEventDispatcher();
         \Carbon\Carbon::resetToStringFormat();
@@ -100,6 +111,14 @@ class DatabaseEloquentModelTest extends TestCase
         $_SERVER['__eloquent.saved'] = false;
         $model = EloquentModelSaveStub::create(['name' => 'taylor']);
         $this->assertTrue($_SERVER['__eloquent.saved']);
+        $this->assertEquals('taylor', $model->name);
+    }
+
+    public function testMakeMethodDoesNotSaveNewModel()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = EloquentModelSaveStub::make(['name' => 'taylor']);
+        $this->assertFalse($_SERVER['__eloquent.saved']);
         $this->assertEquals('taylor', $model->name);
     }
 
@@ -292,7 +311,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
-            'updated_at' => time(),
+            'updated_at' => Carbon::now()->getTimestamp(),
         ]);
 
         $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
@@ -339,7 +358,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
 
         $model = new EloquentDateModelStub;
-        $model->created_at = time();
+        $model->created_at = Carbon::now()->getTimestamp();
         $this->assertInstanceOf('Carbon\Carbon', $model->created_at);
 
         $model = new EloquentDateModelStub;
@@ -1303,10 +1322,13 @@ class DatabaseEloquentModelTest extends TestCase
         $query->shouldReceive('where')->andReturn($query);
         $query->shouldReceive('increment');
 
-        $model->publicIncrement('foo');
-
-        $this->assertEquals(3, $model->foo);
+        $model->publicIncrement('foo', 1);
         $this->assertFalse($model->isDirty());
+
+        $model->publicIncrement('foo', 1, ['category' => 1]);
+        $this->assertEquals(4, $model->foo);
+        $this->assertEquals(1, $model->category);
+        $this->assertTrue($model->isDirty('category'));
     }
 
     public function testRelationshipTouchOwnersIsPropagated()
@@ -1464,6 +1486,21 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
         $this->assertNull($array['timestampAttribute']);
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\JsonEncodingException
+     */
+    public function testModelAttributeCastingFailsOnUnencodableData()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->objectAttribute = ['foo' => "b\xF8r"];
+        $obj = new StdClass;
+        $obj->foo = "b\xF8r";
+        $model->arrayAttribute = $obj;
+        $model->jsonAttribute = ['foo' => "b\xF8r"];
+
+        $model->getAttributes();
     }
 
     public function testUpdatingNonExistentModelFails()
@@ -1625,9 +1662,9 @@ class EloquentModelStub extends Model
         $this->attributes['password_hash'] = sha1($value);
     }
 
-    public function publicIncrement($column, $amount = 1)
+    public function publicIncrement($column, $amount = 1, $extra = [])
     {
-        return $this->increment($column, $amount);
+        return $this->increment($column, $amount, $extra);
     }
 
     public function belongsToStub()

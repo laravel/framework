@@ -99,6 +99,17 @@ class Filesystem
     }
 
     /**
+     * Get the MD5 hash of the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function hash($path)
+    {
+        return md5_file($path);
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
@@ -374,7 +385,7 @@ class Filesystem
      */
     public function files($directory)
     {
-        $glob = glob($directory.'/*');
+        $glob = glob($directory.DIRECTORY_SEPARATOR.'*');
 
         if ($glob === false) {
             return [];

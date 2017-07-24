@@ -145,7 +145,7 @@ trait GuardsAttributes
         }
 
         // If the attribute is explicitly listed in the "guarded" array then we can
-        // retunr false immediately. This means this attribute is definitely not
+        // return false immediately. This means this attribute is definitely not
         // fillable and there is no point in going any further in this method.
         if ($this->isGuarded($key)) {
             return false;

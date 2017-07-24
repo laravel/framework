@@ -56,6 +56,8 @@ class FormRequestServiceProvider extends ServiceProvider
             $current->cookies->all(), $files, $current->server->all(), $current->getContent()
         );
 
+        $form->setJson($current->json());
+
         if ($session = $current->getSession()) {
             $form->setLaravelSession($session);
         }

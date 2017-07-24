@@ -117,14 +117,16 @@ class MailServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->publishes([
-                __DIR__.'/resources/views' => resource_path('views/vendor/mail'),
+                __DIR__.'/resources/views' => $this->app->resourcePath('views/vendor/mail'),
             ], 'laravel-mail');
         }
 
-        $this->app->singleton(Markdown::class, function () {
-            return new Markdown($this->app->make('view'), [
-                'theme' => config('mail.markdown.theme', 'default'),
-                'paths' => config('mail.markdown.paths', []),
+        $this->app->singleton(Markdown::class, function ($app) {
+            $config = $app->make('config');
+
+            return new Markdown($app->make('view'), [
+                'theme' => $config->get('mail.markdown.theme', 'default'),
+                'paths' => $config->get('mail.markdown.paths', []),
             ]);
         });
     }

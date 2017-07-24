@@ -180,7 +180,7 @@ class Store implements Session
     }
 
     /**
-     * Checks if an a key is present and not null.
+     * Checks if a key is present and not null.
      *
      * @param  string|array  $key
      * @return bool

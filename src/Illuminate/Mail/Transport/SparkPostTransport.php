@@ -54,7 +54,7 @@ class SparkPostTransport extends Transport
 
         $message->setBcc([]);
 
-        $this->client->post('https://api.sparkpost.com/api/v1/transmissions', [
+        $response = $this->client->post('https://api.sparkpost.com/api/v1/transmissions', [
             'headers' => [
                 'Authorization' => $this->key,
             ],
@@ -65,6 +65,10 @@ class SparkPostTransport extends Transport
                 ],
             ], $this->options),
         ]);
+
+        $message->getHeaders()->addTextHeader(
+            'X-SparkPost-Transmission-ID', $this->getTransmissionId($response)
+        );
 
         $this->sendPerformed($message);
 
@@ -96,6 +100,19 @@ class SparkPostTransport extends Transport
         }
 
         return $recipients;
+    }
+
+    /**
+     * Get the transmission ID from the response.
+     *
+     * @param \GuzzleHttp\Psr7\Response $response
+     * @return string
+     */
+    protected function getTransmissionId($response)
+    {
+        return object_get(
+            json_decode($response->getBody()->getContents()), 'results.id'
+        );
     }
 
     /**

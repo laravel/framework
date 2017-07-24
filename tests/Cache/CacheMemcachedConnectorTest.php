@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Cache;
 
 use Memcached;
 use Mockery as m;
-use RuntimeException;
 use PHPUnit\Framework\TestCase;
 
 class CacheMemcachedConnectorTest extends TestCase
@@ -26,21 +25,6 @@ class CacheMemcachedConnectorTest extends TestCase
         $result = $this->connect($connector);
 
         $this->assertSame($result, $memcached);
-    }
-
-    /**
-     * @expectedException RuntimeException
-     */
-    public function testExceptionThrownOnBadConnection()
-    {
-        $memcached = $this->memcachedMockWithAddServer(['255.255.255']);
-
-        $connector = $this->connectorMock();
-        $connector->expects($this->once())
-            ->method('createMemcachedInstance')
-            ->will($this->returnValue($memcached));
-
-        $this->connect($connector);
     }
 
     public function testServersAreAddedCorrectlyWithPersistentConnection()
@@ -110,7 +94,6 @@ class CacheMemcachedConnectorTest extends TestCase
     {
         $memcached = m::mock('stdClass');
         $memcached->shouldReceive('addServer')->once()->with($this->getHost(), $this->getPort(), $this->getWeight());
-        $memcached->shouldReceive('getVersion')->once()->andReturn($returnedVersion);
         $memcached->shouldReceive('getServerList')->once()->andReturn([]);
 
         return $memcached;

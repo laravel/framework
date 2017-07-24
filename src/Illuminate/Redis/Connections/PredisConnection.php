@@ -4,6 +4,9 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 
+/**
+ * @mixin \Predis\Client
+ */
 class PredisConnection extends Connection
 {
     /**

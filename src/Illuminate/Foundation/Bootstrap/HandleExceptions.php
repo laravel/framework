@@ -77,7 +77,11 @@ class HandleExceptions
             $e = new FatalThrowableError($e);
         }
 
-        $this->getExceptionHandler()->report($e);
+        try {
+            $this->getExceptionHandler()->report($e);
+        } catch (Exception $e) {
+            //
+        }
 
         if ($this->app->runningInConsole()) {
             $this->renderForConsole($e);

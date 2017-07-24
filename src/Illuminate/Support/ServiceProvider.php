@@ -37,7 +37,7 @@ abstract class ServiceProvider
     /**
      * Create a new service provider instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Foundation\Application $app
      * @return void
      */
     public function __construct($app)
@@ -203,7 +203,7 @@ abstract class ServiceProvider
     }
 
     /**
-     * Get the paths for the provdider and group.
+     * Get the paths for the provider and group.
      *
      * @param  string  $provider
      * @param  string  $group

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Mockery as m;
+use Illuminate\Mail\Mailer;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 
@@ -132,14 +133,44 @@ class MailMailerTest extends TestCase
         $this->assertEquals(['taylorotwell@gmail.com'], $mailer->failures());
     }
 
-    protected function getMailer()
+    public function testEventsAreDispatched()
     {
-        return new \Illuminate\Mail\Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'));
+        unset($_SERVER['__mailer.test']);
+        $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('until')->once()->with(m::type('Illuminate\Mail\Events\MessageSending'));
+        $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Mail\Events\MessageSent'));
+        $mailer = $this->getMailer($events);
+        $view = m::mock('StdClass');
+        $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
+        $view->shouldReceive('render')->once()->andReturn('rendered.view');
+        $this->setSwiftMailer($mailer);
+        $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type('Swift_Message'), []);
+        $mailer->send('foo', ['data'], function ($m) {
+        });
+    }
+
+    public function testMacroable()
+    {
+        Mailer::macro('foo', function () {
+            return 'bar';
+        });
+
+        $mailer = $this->getMailer();
+
+        $this->assertEquals(
+            'bar', $mailer->foo()
+        );
+    }
+
+    protected function getMailer($events = null)
+    {
+        return new Mailer(m::mock('Illuminate\Contracts\View\Factory'), m::mock('Swift_Mailer'), $events);
     }
 
     public function setSwiftMailer($mailer)
     {
         $swift = m::mock('Swift_Mailer');
+        $swift->shouldReceive('createMessage')->andReturn(new \Swift_Message);
         $swift->shouldReceive('getTransport')->andReturn($transport = m::mock('Swift_Transport'));
         $transport->shouldReceive('stop');
         $mailer->setSwiftMailer($swift);
@@ -166,5 +197,10 @@ class FailingSwiftMailerStub
         $transport->shouldReceive('stop');
 
         return $transport;
+    }
+
+    public function createMessage()
+    {
+        return new \Swift_Message();
     }
 }

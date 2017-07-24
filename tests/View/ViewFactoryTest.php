@@ -202,6 +202,26 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->doneRendering());
     }
 
+    public function testYieldDefault()
+    {
+        $factory = $this->getFactory();
+        $this->assertEquals('hi', $factory->yieldContent('foo', 'hi'));
+    }
+
+    public function testYieldDefaultIsEscaped()
+    {
+        $factory = $this->getFactory();
+        $this->assertEquals('&lt;p&gt;hi&lt;/p&gt;', $factory->yieldContent('foo', '<p>hi</p>'));
+    }
+
+    public function testYieldDefaultViewIsNotEscapedTwice()
+    {
+        $factory = $this->getFactory();
+        $view = m::mock('Illuminate\View\View');
+        $view->shouldReceive('__toString')->once()->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
+        $this->assertEquals('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo', $view));
+    }
+
     public function testBasicSectionHandling()
     {
         $factory = $this->getFactory();
@@ -209,6 +229,29 @@ class ViewFactoryTest extends TestCase
         echo 'hi';
         $factory->stopSection();
         $this->assertEquals('hi', $factory->yieldContent('foo'));
+    }
+
+    public function testBasicSectionDefault()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo', 'hi');
+        $this->assertEquals('hi', $factory->yieldContent('foo'));
+    }
+
+    public function testBasicSectionDefaultIsEscaped()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo', '<p>hi</p>');
+        $this->assertEquals('&lt;p&gt;hi&lt;/p&gt;', $factory->yieldContent('foo'));
+    }
+
+    public function testBasicSectionDefaultViewIsNotEscapedTwice()
+    {
+        $factory = $this->getFactory();
+        $view = m::mock('Illuminate\View\View');
+        $view->shouldReceive('__toString')->once()->andReturn('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;');
+        $factory->startSection('foo', $view);
+        $this->assertEquals('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo'));
     }
 
     public function testSectionExtending()
@@ -347,6 +390,18 @@ class ViewFactoryTest extends TestCase
 
         $this->assertTrue($factory->hasSection('foo'));
         $this->assertFalse($factory->hasSection('bar'));
+    }
+
+    public function testGetSection()
+    {
+        $factory = $this->getFactory();
+        $factory->startSection('foo');
+        echo 'hi';
+        $factory->stopSection();
+
+        $this->assertEquals('hi', $factory->getSection('foo'));
+        $this->assertNull($factory->getSection('bar'));
+        $this->assertEquals('default', $factory->getSection('bar', 'default'));
     }
 
     public function testMakeWithSlashAndDot()

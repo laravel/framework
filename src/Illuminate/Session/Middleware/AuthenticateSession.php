@@ -47,7 +47,7 @@ class AuthenticateSession
             $this->storePasswordHashInSession($request);
         }
 
-        if ($request->session()->get('password_hash') !== $request->user()->password) {
+        if ($request->session()->get('password_hash') !== $request->user()->getAuthPassword()) {
             $this->logout($request);
         }
 
@@ -69,7 +69,7 @@ class AuthenticateSession
         }
 
         $request->session()->put([
-            'password_hash' => $request->user()->password,
+            'password_hash' => $request->user()->getAuthPassword(),
         ]);
     }
 

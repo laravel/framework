@@ -4,36 +4,63 @@ namespace Illuminate\Foundation\Testing;
 
 use Closure;
 use Illuminate\Support\Arr;
-use Illuminate\Http\Response;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\Cookie;
 
-class TestResponse extends Response
+/**
+ * @mixin \Illuminate\Http\Response
+ */
+class TestResponse
 {
+    use Macroable {
+        __call as macroCall;
+    }
+
     /**
-     * Convert the given response into a TestResponse.
+     * The response to delegate to.
+     *
+     * @var \Illuminate\Http\Response
+     */
+    public $baseResponse;
+
+    /**
+     * Create a new test response instance.
+     *
+     * @param  \Illuminate\Http\Response  $response
+     * @return void
+     */
+    public function __construct($response)
+    {
+        $this->baseResponse = $response;
+    }
+
+    /**
+     * Create a new TestResponse from another response.
      *
      * @param  \Illuminate\Http\Response  $response
      * @return static
      */
     public static function fromBaseResponse($response)
     {
-        $testResponse = new static(
-            $response->getContent(), $response->getStatusCode()
+        return new static($response);
+    }
+
+    /**
+     * Assert that the response has a successful status code.
+     *
+     * @return $this
+     */
+    public function assertSuccessful()
+    {
+        PHPUnit::assertTrue(
+            $this->isSuccessful(),
+            'Response status code ['.$this->getStatusCode().'] is not a successful status code.'
         );
 
-        $testResponse->headers = $response->headers;
-
-        if (isset($response->original)) {
-            $testResponse->original = $response->original;
-        }
-
-        if (isset($response->exception)) {
-            $testResponse->exception = $response->exception;
-        }
-
-        return $testResponse;
+        return $this;
     }
 
     /**
@@ -60,13 +87,15 @@ class TestResponse extends Response
      * @param  string  $uri
      * @return $this
      */
-    public function assertRedirect($uri)
+    public function assertRedirect($uri = null)
     {
         PHPUnit::assertTrue(
-            $this->isRedirect(), 'Response status code ['.$this->status().'] is not a redirect status code.'
+            $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+        if (! is_null($uri)) {
+            PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+        }
 
         return $this;
     }
@@ -88,7 +117,7 @@ class TestResponse extends Response
 
         if (! is_null($value)) {
             PHPUnit::assertEquals(
-                $this->headers->get($headerName), $value,
+                $value, $this->headers->get($headerName),
                 "Header [{$headerName}] was found, but value [{$actual}] does not match [{$value}]."
             );
         }
@@ -135,7 +164,7 @@ class TestResponse extends Response
             ? app('encrypter')->decrypt($cookieValue) : $cookieValue;
 
         PHPUnit::assertEquals(
-            $actual, $value,
+            $value, $actual,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
         );
 
@@ -146,7 +175,7 @@ class TestResponse extends Response
      * Get the given cookie from the response.
      *
      * @param  string  $cookieName
-     * @return Cookie|null
+     * @return \Symfony\Component\HttpFoundation\Cookie|null
      */
     protected function getCookie($cookieName)
     {
@@ -171,6 +200,19 @@ class TestResponse extends Response
     }
 
     /**
+     * Assert that the given string is contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSeeText($value)
+    {
+        PHPUnit::assertContains($value, strip_tags($this->getContent()));
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string is not contained within the response.
      *
      * @param  string  $value
@@ -184,6 +226,19 @@ class TestResponse extends Response
     }
 
     /**
+     * Assert that the given string is not contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertDontSeeText($value)
+    {
+        PHPUnit::assertNotContains($value, strip_tags($this->getContent()));
+
+        return $this;
+    }
+
+    /**
      * Assert that the response is a superset of the given JSON.
      *
      * @param  array  $data
@@ -191,9 +246,29 @@ class TestResponse extends Response
      */
     public function assertJson(array $data)
     {
-        PHPUnit::assertArraySubset($data, $this->decodeResponseJson());
+        PHPUnit::assertArraySubset(
+            $data, $this->decodeResponseJson(), false, $this->assertJsonMessage($data)
+        );
 
         return $this;
+    }
+
+    /**
+     * Get the assertion message for assertJson.
+     *
+     * @param  array  $data
+     * @return string
+     */
+    protected function assertJsonMessage(array $data)
+    {
+        $expected = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        $actual = json_encode($this->decodeResponseJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        return 'Unable to find JSON: '.PHP_EOL.PHP_EOL.
+            "[{$expected}]".PHP_EOL.PHP_EOL.
+            'within response JSON:'.PHP_EOL.PHP_EOL.
+            "[{$actual}].".PHP_EOL.PHP_EOL;
     }
 
     /**
@@ -209,6 +284,96 @@ class TestResponse extends Response
         ));
 
         PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains the given JSON fragment.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonFragment(array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = substr(json_encode([$key => $value]), 1, -1);
+
+            PHPUnit::assertTrue(
+                Str::contains($actual, $expected),
+                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
+                "[{$expected}]".PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response does not contain the given JSON fragment.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function assertJsonMissing(array $data)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = substr(json_encode([$key => $value]), 1, -1);
+
+            PHPUnit::assertFalse(
+                Str::contains($actual, $expected),
+                'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
+                "[{$expected}]".PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has a given JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function assertJsonStructure(array $structure = null, $responseData = null)
+    {
+        if (is_null($structure)) {
+            return $this->assertJson($this->json());
+        }
+
+        if (is_null($responseData)) {
+            $responseData = $this->decodeResponseJson();
+        }
+
+        foreach ($structure as $key => $value) {
+            if (is_array($value) && $key === '*') {
+                PHPUnit::assertInternalType('array', $responseData);
+
+                foreach ($responseData as $responseDataItem) {
+                    $this->assertJsonStructure($structure['*'], $responseDataItem);
+                }
+            } elseif (is_array($value)) {
+                PHPUnit::assertArrayHasKey($key, $responseData);
+
+                $this->assertJsonStructure($structure[$key], $responseData[$key]);
+            } else {
+                PHPUnit::assertArrayHasKey($value, $responseData);
+            }
+        }
 
         return $this;
     }
@@ -231,6 +396,31 @@ class TestResponse extends Response
         }
 
         return $decodedResponse;
+    }
+
+    /**
+     * Validate and return the decoded response JSON.
+     *
+     * @return array
+     */
+    public function json()
+    {
+        return $this->decodeResponseJson();
+    }
+
+    /**
+     * Assert that the response view equals the given value.
+     *
+     * @param  string $value
+     * @return $this
+     */
+    public function assertViewIs($value)
+    {
+        $this->ensureResponseHasView();
+
+        PHPUnit::assertEquals($value, $this->original->getName());
+
+        return $this;
     }
 
     /**
@@ -352,6 +542,32 @@ class TestResponse extends Response
     }
 
     /**
+     * Assert that the session has the given errors.
+     *
+     * @param  string|array  $keys
+     * @param  mixed  $format
+     * @return $this
+     */
+    public function assertSessionHasErrors($keys = [], $format = null)
+    {
+        $this->assertSessionHas('errors');
+
+        $keys = (array) $keys;
+
+        $errors = app('session.store')->get('errors');
+
+        foreach ($keys as $key => $value) {
+            if (is_int($key)) {
+                PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
+            } else {
+                PHPUnit::assertContains($value, $errors->get($key, $format));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the session does not have a given key.
      *
      * @param  string|array  $key
@@ -399,5 +615,43 @@ class TestResponse extends Response
         }
 
         dd($content);
+    }
+
+    /**
+     * Dynamically access base response parameters.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __get($key)
+    {
+        return $this->baseResponse->{$key};
+    }
+
+    /**
+     * Proxy isset() checks to the underlying base response.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function __isset($key)
+    {
+        return isset($this->baseResponse->{$key});
+    }
+
+    /**
+     * Handle dynamic calls into macros or pass missing methods to the base response.
+     *
+     * @param  string  $method
+     * @param  array  $args
+     * @return mixed
+     */
+    public function __call($method, $args)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $args);
+        }
+
+        return $this->baseResponse->{$method}(...$args);
     }
 }

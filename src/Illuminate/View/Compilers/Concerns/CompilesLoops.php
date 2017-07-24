@@ -35,12 +35,17 @@ trait CompilesLoops
     }
 
     /**
-     * Compile the for-else-empty statements into valid PHP.
+     * Compile the for-else-empty and empty statements into valid PHP.
      *
+     * @param  string  $expression
      * @return string
      */
-    protected function compileEmpty()
+    protected function compileEmpty($expression)
     {
+        if ($expression) {
+            return "<?php if(empty{$expression}): ?>";
+        }
+
         $empty = '$__empty_'.$this->forElseCounter--;
 
         return "<?php endforeach; \$__env->popLoop(); \$loop = \$__env->getLastLoop(); if ({$empty}): ?>";
@@ -52,6 +57,16 @@ trait CompilesLoops
      * @return string
      */
     protected function compileEndforelse()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
+     * Compile the end-empty statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndEmpty()
     {
         return '<?php endif; ?>';
     }
@@ -96,7 +111,13 @@ trait CompilesLoops
      */
     protected function compileBreak($expression)
     {
-        return $expression ? "<?php if{$expression} break; ?>" : '<?php break; ?>';
+        if ($expression) {
+            preg_match('/\(\s*(-?\d+)\s*\)$/', $expression, $matches);
+
+            return $matches ? '<?php break '.max(1, $matches[1]).'; ?>' : "<?php if{$expression} break; ?>";
+        }
+
+        return '<?php break; ?>';
     }
 
     /**
@@ -107,7 +128,13 @@ trait CompilesLoops
      */
     protected function compileContinue($expression)
     {
-        return $expression ? "<?php if{$expression} continue; ?>" : '<?php continue; ?>';
+        if ($expression) {
+            preg_match('/\(\s*(-?\d+)\s*\)$/', $expression, $matches);
+
+            return $matches ? '<?php continue '.max(1, $matches[1]).'; ?>' : "<?php if{$expression} continue; ?>";
+        }
+
+        return '<?php continue; ?>';
     }
 
     /**

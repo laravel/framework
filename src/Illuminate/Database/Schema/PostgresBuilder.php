@@ -16,6 +16,8 @@ class PostgresBuilder extends Builder
             $schema = head($schema);
         }
 
+        $schema = $schema ? $schema : 'public';
+
         $table = $this->connection->getTablePrefix().$table;
 
         return count($this->connection->select(

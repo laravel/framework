@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Testing\Fakes\EventFake;
 
 /**
@@ -16,7 +17,9 @@ class Event extends Facade
      */
     public static function fake()
     {
-        static::swap(new EventFake);
+        static::swap($fake = new EventFake);
+
+        Model::setEventDispatcher($fake);
     }
 
     /**

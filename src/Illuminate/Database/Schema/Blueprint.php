@@ -5,10 +5,13 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Blueprint
 {
+    use Macroable;
+
     /**
      * The table the blueprint describes.
      *
@@ -403,6 +406,17 @@ class Blueprint
     public function increments($column)
     {
         return $this->unsignedInteger($column, true);
+    }
+
+    /**
+     * Create a new auto-incrementing tiny integer (1-byte) column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function tinyIncrements($column)
+    {
+        return $this->unsignedTinyInteger($column, true);
     }
 
     /**
@@ -824,11 +838,12 @@ class Blueprint
     /**
      * Add a "deleted at" timestamp for the table.
      *
+     * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function softDeletes()
+    public function softDeletes($column = 'deleted_at')
     {
-        return $this->timestamp('deleted_at')->nullable();
+        return $this->timestamp($column)->nullable();
     }
 
     /**

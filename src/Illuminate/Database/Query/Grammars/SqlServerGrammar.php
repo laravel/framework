@@ -269,7 +269,10 @@ class SqlServerGrammar extends Grammar
     {
         $joins = ' '.$this->compileJoins($query, $query->joins);
 
-        return trim("delete {$table} from {$table}{$joins} {$where}");
+        $alias = strpos(strtolower($table), ' as ') !== false
+                ? explode(' as ', $table)[1] : $table;
+
+        return trim("delete {$alias} from {$table}{$joins} {$where}");
     }
 
     /**
@@ -365,7 +368,29 @@ class SqlServerGrammar extends Grammar
      */
     public function supportsSavepoints()
     {
-        return false;
+        return true;
+    }
+
+    /**
+     * Compile the SQL statement to define a savepoint.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepoint($name)
+    {
+        return 'SAVE TRANSACTION '.$name;
+    }
+
+    /**
+     * Compile the SQL statement to execute a savepoint rollback.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    public function compileSavepointRollBack($name)
+    {
+        return 'ROLLBACK TRANSACTION '.$name;
     }
 
     /**

@@ -4,6 +4,9 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 
+/**
+ * @mixin \Predis\Client
+ */
 class PhpRedisConnection extends Connection
 {
     /**
@@ -18,6 +21,32 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Returns the value of the given key.
+     *
+     * @param  string  $key
+     * @return string|null
+     */
+    public function get($key)
+    {
+        $result = $this->client->get($key);
+
+        return $result !== false ? $result : null;
+    }
+
+    /**
+     * Get the values of all the given keys.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function mget(array $keys)
+    {
+        return array_map(function ($value) {
+            return $value !== false ? $value : null;
+        }, $this->client->mget($keys));
+    }
+
+    /**
      * Set the string value in argument as value of the key.
      *
      * @param string  $key
@@ -29,16 +58,15 @@ class PhpRedisConnection extends Connection
      */
     public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
     {
-        return $this->command(
-            'set',
+        return $this->command('set', [
             $key,
             $value,
-            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null
-        );
+            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null,
+        ]);
     }
 
     /**
-     * Removes the first count occurences of the value element from the list.
+     * Removes the first count occurrences of the value element from the list.
      *
      * @param  string  $key
      * @param  int  $count
@@ -47,7 +75,7 @@ class PhpRedisConnection extends Connection
      */
     public function lrem($key, $count, $value)
     {
-        return $this->command('lrem', $key, $value, $count);
+        return $this->command('lrem', [$key, $value, $count]);
     }
 
     /**
@@ -59,26 +87,60 @@ class PhpRedisConnection extends Connection
      */
     public function spop($key, $count = null)
     {
-        return $this->command('spop', $key, $count);
+        return $this->command('spop', [$key]);
     }
 
     /**
      * Add one or more members to a sorted set or update its score if it already exists.
      *
      * @param  string  $key
-     * @param  array  $membersAndScoresDictionary
+     * @param  mixed  $dictionary
      * @return int
      */
-    public function zadd($key, array $membersAndScoresDictionary)
+    public function zadd($key, ...$dictionary)
     {
-        $arguments = [];
+        if (count($dictionary) === 1) {
+            $_dictionary = [];
 
-        foreach ($membersAndScoresDictionary as $member => $score) {
-            $arguments[] = $score;
-            $arguments[] = $member;
+            foreach ($dictionary[0] as $member => $score) {
+                $_dictionary[] = $score;
+                $_dictionary[] = $member;
+            }
+
+            $dictionary = $_dictionary;
         }
 
-        return $this->command('zadd', ...$arguments);
+        return $this->client->zadd($key, ...$dictionary);
+    }
+
+    /**
+     * Execute commands in a pipeline.
+     *
+     * @param  callable  $callback
+     * @return array|\Redis
+     */
+    public function pipeline(callable $callback = null)
+    {
+        $pipeline = $this->client()->pipeline();
+
+        return is_null($callback)
+            ? $pipeline
+            : tap($pipeline, $callback)->exec();
+    }
+
+    /**
+     * Execute commands in a transaction.
+     *
+     * @param  callable  $callback
+     * @return array|\Redis
+     */
+    public function transaction(callable $callback = null)
+    {
+        $transaction = $this->client()->multi();
+
+        return is_null($callback)
+            ? $transaction
+            : tap($transaction, $callback)->exec();
     }
 
     /**
@@ -91,7 +153,9 @@ class PhpRedisConnection extends Connection
      */
     public function evalsha($script, $numkeys, ...$arguments)
     {
-        return $this->command('evalsha', [$this->script('load', $script), $arguments, $parameters]);
+        return $this->command('evalsha', [
+            $this->script('load', $script), $arguments, $numkeys,
+        ]);
     }
 
     /**
@@ -151,6 +215,27 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Execute a raw command.
+     *
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function executeRaw(array $parameters)
+    {
+        return $this->command('rawCommand', $parameters);
+    }
+
+    /**
+     * Disconnects from the Redis instance.
+     *
+     * @return void
+     */
+    public function disconnect()
+    {
+        $this->client->close();
+    }
+
+    /**
      * Pass other method calls down to the underlying client.
      *
      * @param  string  $method
@@ -159,19 +244,16 @@ class PhpRedisConnection extends Connection
      */
     public function __call($method, $parameters)
     {
+        $method = strtolower($method);
+
         if ($method == 'eval') {
             return $this->proxyToEval($parameters);
         }
 
-        $arrayMethods = [
-            'hdel', 'hstrlen',
-            'lpush', 'rpush',
-            'scan', 'hscan', 'sscan', 'zscan',
-            'sadd', 'srem', 'sdiff', 'sinter', 'sunion', 'sdiffstore', 'sinterstore', 'sunionstore',
-        ];
-
-        if (is_array($parameters) && in_array($method, $arrayMethods)) {
-            $this->command($method, ...$parameters);
+        if ($method == 'zrangebyscore' || $method == 'zrevrangebyscore') {
+            $parameters = array_map(function ($parameter) {
+                return is_array($parameter) ? array_change_key_case($parameter) : $parameter;
+            }, $parameters);
         }
 
         return parent::__call($method, $parameters);

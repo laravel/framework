@@ -16,6 +16,7 @@
     "require": {
         "php": ">=5.6.4",
         "illuminate/contracts": "5.4.*",
+        "illuminate/filesystem": "5.4.*",
         "illuminate/support": "5.4.*",
         "nesbot/carbon": "~1.20",
         "symfony/finder": "~3.2",

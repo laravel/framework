@@ -27,14 +27,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var PDO
+     * @var \PDO|\Closure
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var PDO
+     * @var \PDO|\Closure
      */
     protected $readPdo;
 
@@ -490,7 +490,7 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            return (bool) $this->getPdo()->exec($query);
+            return $this->getPdo()->exec($query) === false ? false : true;
         });
     }
 
@@ -688,6 +688,7 @@ class Connection implements ConnectionInterface
      * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
+     * @throws \Exception
      */
     protected function handleQueryException($e, $query, $bindings, Closure $callback)
     {
@@ -777,7 +778,7 @@ class Connection implements ConnectionInterface
      * Fire an event for this connection.
      *
      * @param  string  $event
-     * @return void
+     * @return array|null
      */
     protected function fireConnectionEvent($event)
     {
@@ -906,7 +907,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO|\Closure|null  $pdo
      * @return $this
      */
     public function setPdo($pdo)
@@ -921,7 +922,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection used for reading.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO||\Closure|null  $pdo
      * @return $this
      */
     public function setReadPdo($pdo)
@@ -957,10 +958,10 @@ class Connection implements ConnectionInterface
     /**
      * Get an option from the configuration options.
      *
-     * @param  string  $option
+     * @param  string|null  $option
      * @return mixed
      */
-    public function getConfig($option)
+    public function getConfig($option = null)
     {
         return Arr::get($this->config, $option);
     }

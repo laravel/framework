@@ -9,7 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class HttpJsonResponseTest extends TestCase
 {
-    public function testSeAndRetrieveJsonableData()
+    public function testSetAndRetrieveJsonableData()
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
         $data = $response->getData();
@@ -17,7 +17,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
-    public function testSeAndRetrieveJsonSerializeData()
+    public function testSetAndRetrieveJsonSerializeData()
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
         $data = $response->getData();
@@ -25,7 +25,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
-    public function testSeAndRetrieveArrayableData()
+    public function testSetAndRetrieveArrayableData()
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $data = $response->getData();
@@ -72,6 +72,25 @@ class HttpJsonResponseTest extends TestCase
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
+    }
+
+    /**
+     * @expectedException        \InvalidArgumentException
+     * @expectedExceptionMessage Type is not supported
+     */
+    public function testJsonErrorResource()
+    {
+        $resource = tmpfile();
+        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource]);
+    }
+
+    public function testJsonErrorResourceWithPartialOutputOnError()
+    {
+        $resource = tmpfile();
+        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+        $data = $response->getData();
+        $this->assertInstanceOf('StdClass', $data);
+        $this->assertNull($data->resource);
     }
 }
 

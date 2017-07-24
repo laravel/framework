@@ -177,6 +177,37 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('validation.boolean', $v->messages()->get('b')[0]);
     }
 
+    public function testNullableMakesNoDifferenceIfImplicitRuleExists()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, [
+            'x' => null, 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, [
+            'x' => 'value', 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals('validation.integer', $v->messages()->get('x')[0]);
+
+        $v = new Validator($trans, [
+            'x' => 123, 'y' => null,
+        ], [
+            'x' => 'nullable|required_with:y|integer',
+            'y' => 'nullable|required_with:x|integer',
+        ]);
+        $this->assertTrue($v->fails());
+        $this->assertEquals('validation.required_with', $v->messages()->get('y')[0]);
+    }
+
     public function testProperLanguageLineIsSet()
     {
         $trans = $this->getIlluminateArrayTranslator();
@@ -213,6 +244,26 @@ class ValidationValidatorTest extends TestCase
         $v->passes();
         $v->messages()->setFormat(':message');
         $this->assertEquals('replaced!', $v->messages()->first('name'));
+    }
+
+    public function testNestedAttributesAreReplacedInDimensions()
+    {
+        // Knowing that demo image.png has width = 3 and height = 2
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, null, true);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.dimensions' => ':min_width :max_height :ratio'], 'en');
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_width=10,max_height=20,ratio=1']);
+        $v->messages()->setFormat(':message');
+        $this->assertTrue($v->fails());
+        $this->assertEquals('10 20 1', $v->messages()->first('x'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.dimensions' => ':width :height :ratio'], 'en');
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:min_width=10,max_height=20,ratio=1']);
+        $v->messages()->setFormat(':message');
+        $this->assertTrue($v->fails());
+        $this->assertEquals(':width :height 1', $v->messages()->first('x'));
     }
 
     public function testAttributeNamesAreReplaced()
@@ -369,6 +420,48 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('type must be included in Short, Long.', $v->messages()->first('type'));
+    }
+
+    public function testDisplayableAttributesAreReplacedInCustomReplacers()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $trans->addLines(['validation.attributes.firstname' => 'Firstname'], 'en');
+        $trans->addLines(['validation.attributes.lastname' => 'Lastname'], 'en');
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+            $other = array_get($validator->getData(), $parameters[0]);
+
+            return $value[0] == $other[0];
+        });
+        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+            return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
+        });
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Lastname needs to begin with the same letter as Firstname', $v->messages()->first('lastname'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        $v->addCustomAttributes($customAttributes);
+        $v->addExtension('alliteration', function ($attribute, $value, $parameters, $validator) {
+            $other = array_get($validator->getData(), $parameters[0]);
+
+            return $value[0] == $other[0];
+        });
+        $v->addReplacer('alliteration', function ($message, $attribute, $rule, $parameters, $validator) {
+            return str_replace(':other', $validator->getDisplayableAttribute($parameters[0]), $message);
+        });
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('Lastname needs to begin with the same letter as Firstname', $v->messages()->first('lastname'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
+        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
+        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
     }
 
     public function testCustomValidationLinesAreRespected()
@@ -528,6 +621,12 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $v = new Validator($trans, [], ['name' => 'present']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, [], ['name' => 'present|nullable']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['name' => null], ['name' => 'present|nullable']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['name' => ''], ['name' => 'present']);
         $this->assertTrue($v->passes());
@@ -894,6 +993,9 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '1e2', 'baz' => '100'], ['foo' => 'Same:baz']);
         $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => null, 'baz' => null], ['foo' => 'Same:baz']);
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateDifferent()
@@ -910,6 +1012,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '1e2', 'baz' => '100'], ['foo' => 'Different:baz']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'fuu' => 'baa', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'fuu' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAccepted()
@@ -1870,10 +1981,13 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    /**
+     * @group dimension
+     */
     public function testValidateImageDimensions()
     {
-        // Knowing that demo image.gif has width = 3 and height = 2
-        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.gif', '', null, null, null, true);
+        // Knowing that demo image.png has width = 3 and height = 2
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image.png', '', null, null, null, true);
         $trans = $this->getIlluminateArrayTranslator();
 
         $v = new Validator($trans, ['x' => 'file'], ['x' => 'dimensions']);
@@ -1920,6 +2034,29 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=1']);
         $this->assertTrue($v->fails());
+
+        // Knowing that demo image2.png has width = 4 and height = 2
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image2.png', '', null, null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // Ensure validation doesn't erroneously fail when ratio has no fractional part
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=2/1']);
+        $this->assertTrue($v->passes());
+
+        // This test fails without suppressing warnings on getimagesize() due to a read error.
+        $emptyUploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/empty.png', '', null, null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => $emptyUploadedFile], ['x' => 'dimensions:min_width=1']);
+        $this->assertTrue($v->fails());
+
+        // Knowing that demo image3.png has width = 7 and height = 10
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image3.png', '', null, null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // Ensure validation doesn't erroneously fail when ratio has no fractional part
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=2/3']);
+        $this->assertTrue($v->passes());
     }
 
     /**
@@ -1932,7 +2069,11 @@ class ValidationValidatorTest extends TestCase
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/x-php']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
     }
 
@@ -2439,6 +2580,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testCustomDependentValidators()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans,
+            [
+                ['name' => 'Jamie', 'age' => 27],
+            ],
+            ['*.name' => 'dependent_rule:*.age']
+        );
+        $v->addDependentExtension('dependent_rule', function ($name) use ($v) {
+            return array_get($v->getData(), $name) == 'Jamie';
+        });
+        $this->assertTrue($v->passes());
+    }
+
     /**
      * @expectedException InvalidArgumentException
      */
@@ -2637,6 +2793,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo' => 'size:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => [1, 2, 3, 4]], ['foo.*' => 'integer', 'foo.0' => 'required']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => [['bar' => [1, 2, 3]], ['bar' => [1, 2, 3]]]], ['foo.*.bar' => 'size:4']);

@@ -193,6 +193,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Check if the route name matches the given string.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function routeIs($name)
+    {
+        return $this->route() && $this->route()->named($name);
+    }
+
+    /**
      * Determine if the current request URL and query string matches a pattern.
      *
      * @return bool
@@ -426,9 +437,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         if (is_null($route) || is_null($param)) {
             return $route;
-        } else {
-            return $route->parameter($param);
         }
+
+        return $route->parameter($param);
     }
 
     /**
@@ -447,6 +458,19 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         return sha1(implode('|', array_merge(
             $route->methods(), [$route->domain(), $route->uri(), $this->ip()]
         )));
+    }
+
+    /**
+     * Set the JSON payload for the request.
+     *
+     * @param  array  $json
+     * @return $this
+     */
+    public function setJson($json)
+    {
+        $this->json = $json;
+
+        return $this;
     }
 
     /**

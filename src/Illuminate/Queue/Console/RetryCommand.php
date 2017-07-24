@@ -30,11 +30,17 @@ class RetryCommand extends Command
     public function fire()
     {
         foreach ($this->getJobIds() as $id) {
-            $this->retryJob($id);
+            $job = $this->laravel['queue.failer']->find($id);
 
-            $this->info("The failed job [{$id}] has been pushed back onto the queue!");
+            if (is_null($job)) {
+                $this->error("Unable to find failed job with ID [{$id}].");
+            } else {
+                $this->retryJob($job);
 
-            $this->laravel['queue.failer']->forget($id);
+                $this->info("The failed job [{$id}] has been pushed back onto the queue!");
+
+                $this->laravel['queue.failer']->forget($id);
+            }
         }
     }
 
@@ -55,21 +61,15 @@ class RetryCommand extends Command
     }
 
     /**
-     * Retry the queue job with the given ID.
+     * Retry the queue job.
      *
-     * @param  string  $id
+     * @param  \stdClass  $job
      * @return void
      */
-    protected function retryJob($id)
+    protected function retryJob($job)
     {
-        if (is_null($failed = $this->laravel['queue.failer']->find($id))) {
-            return $this->error("No failed job matches the given ID [{$id}].");
-        }
-
-        $failed = (object) $failed;
-
-        $this->laravel['queue']->connection($failed->connection)->pushRaw(
-            $this->resetAttempts($failed->payload), $failed->queue
+        $this->laravel['queue']->connection($job->connection)->pushRaw(
+            $this->resetAttempts($job->payload), $job->queue
         );
     }
 

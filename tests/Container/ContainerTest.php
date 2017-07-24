@@ -121,6 +121,16 @@ class ContainerTest extends TestCase
         $this->assertEquals('bar', $container->make('bat'));
     }
 
+    public function testAliasesWithArrayOfParameters()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($app, $config) {
+            return $config;
+        });
+        $container->alias('foo', 'baz');
+        $this->assertEquals([1, 2, 3], $container->makeWith('baz', [1, 2, 3]));
+    }
+
     public function testBindingsCanBeOverridden()
     {
         $container = new Container;
@@ -226,6 +236,76 @@ class ContainerTest extends TestCase
         $this->assertEquals('foobar', $container->make('foo'));
     }
 
+    public function testExtendInstanceRebindingCallback()
+    {
+        $_SERVER['_test_rebind'] = false;
+
+        $container = new Container;
+        $container->rebinding('foo', function () {
+            $_SERVER['_test_rebind'] = true;
+        });
+
+        $obj = new StdClass;
+        $container->instance('foo', $obj);
+
+        $container->extend('foo', function ($obj, $container) {
+            return $obj;
+        });
+
+        $this->assertTrue($_SERVER['_test_rebind']);
+    }
+
+    public function testExtendBindRebindingCallback()
+    {
+        $_SERVER['_test_rebind'] = false;
+
+        $container = new Container;
+        $container->rebinding('foo', function () {
+            $_SERVER['_test_rebind'] = true;
+        });
+        $container->bind('foo', function () {
+            $obj = new StdClass;
+
+            return $obj;
+        });
+
+        $this->assertFalse($_SERVER['_test_rebind']);
+
+        $container->make('foo');
+
+        $container->extend('foo', function ($obj, $container) {
+            return $obj;
+        });
+
+        $this->assertTrue($_SERVER['_test_rebind']);
+    }
+
+    public function testUnsetExtend()
+    {
+        $container = new Container;
+        $container->bind('foo', function () {
+            $obj = new StdClass;
+            $obj->foo = 'bar';
+
+            return $obj;
+        });
+
+        $container->extend('foo', function ($obj, $container) {
+            $obj->bar = 'baz';
+
+            return $obj;
+        });
+
+        unset($container['foo']);
+        $container->forgetExtenders('foo');
+
+        $container->bind('foo', function () {
+            return 'foo';
+        });
+
+        $this->assertEquals('foo', $container->make('foo'));
+    }
+
     public function testResolutionOfDefaultParameters()
     {
         $container = new Container;
@@ -325,6 +405,20 @@ class ContainerTest extends TestCase
         });
 
         $this->assertTrue($_SERVER['__test.rebind']);
+    }
+
+    public function testReboundListenersOnInstancesOnlyFiresIfWasAlreadyBound()
+    {
+        $_SERVER['__test.rebind'] = false;
+
+        $container = new Container;
+        $container->rebinding('foo', function () {
+            $_SERVER['__test.rebind'] = true;
+        });
+        $container->instance('foo', function () {
+        });
+
+        $this->assertFalse($_SERVER['__test.rebind']);
     }
 
     /**
@@ -772,6 +866,83 @@ class ContainerTest extends TestCase
 
         $this->assertEquals('taylor', $instance->name);
     }
+
+    public function testResolvingWithArrayOfParameters()
+    {
+        $container = new Container;
+        $instance = $container->makeWith(ContainerDefaultValueStub::class, ['default' => 'adam']);
+        $this->assertEquals('adam', $instance->default);
+
+        $instance = $container->make(ContainerDefaultValueStub::class);
+        $this->assertEquals('taylor', $instance->default);
+
+        $container->bind('foo', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals([1, 2, 3], $container->makeWith('foo', [1, 2, 3]));
+    }
+
+    public function testResolvingWithUsingAnInterface()
+    {
+        $container = new Container;
+        $container->bind(IContainerContractStub::class, ContainerInjectVariableStubWithInterfaceImplementation::class);
+        $instance = $container->makeWith(IContainerContractStub::class, ['something' => 'laurence']);
+        $this->assertEquals('laurence', $instance->something);
+    }
+
+    public function testNestedParameterOverride()
+    {
+        $container = new Container;
+        $container->bind('foo', function ($app, $config) {
+            return $app->makeWith('bar', ['name' => 'Taylor']);
+        });
+        $container->bind('bar', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals(['name' => 'Taylor'], $container->make('foo', ['something']));
+    }
+
+    public function testNestedParametersAreResetForFreshMake()
+    {
+        $container = new Container;
+
+        $container->bind('foo', function ($app, $config) {
+            return $app->make('bar');
+        });
+
+        $container->bind('bar', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals([], $container->makeWith('foo', ['something']));
+    }
+
+    public function testSingletonBindingsNotRespectedWithMakeParameters()
+    {
+        $container = new Container;
+
+        $container->singleton('foo', function ($app, $config) {
+            return $config;
+        });
+
+        $this->assertEquals(['name' => 'taylor'], $container->makeWith('foo', ['name' => 'taylor']));
+        $this->assertEquals(['name' => 'abigail'], $container->makeWith('foo', ['name' => 'abigail']));
+    }
+
+    public function testCanBuildWithoutParameterStackWithNoConstructors()
+    {
+        $container = new Container;
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->build(ContainerConcreteStub::class));
+    }
+
+    public function testCanBuildWithoutParameterStackWithConstructors()
+    {
+        $container = new Container;
+        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $this->assertInstanceOf(ContainerDependentStub::class, $container->build(ContainerDependentStub::class));
+    }
 }
 
 class ContainerConcreteStub
@@ -785,6 +956,7 @@ interface IContainerContractStub
 class ContainerImplementationStub implements IContainerContractStub
 {
 }
+
 class ContainerImplementationStubTwo implements IContainerContractStub
 {
 }
@@ -902,6 +1074,16 @@ class ContainerStaticMethodStub
 }
 
 class ContainerInjectVariableStub
+{
+    public $something;
+
+    public function __construct(ContainerConcreteStub $concrete, $something)
+    {
+        $this->something = $something;
+    }
+}
+
+class ContainerInjectVariableStubWithInterfaceImplementation implements IContainerContractStub
 {
     public $something;
 

@@ -6,6 +6,9 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 
+/**
+ * @mixin \Illuminate\Redis\Connections\Connection
+ */
 class RedisManager implements Factory
 {
     /**
@@ -44,7 +47,7 @@ class RedisManager implements Factory
     /**
      * Get a Redis connection by name.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
@@ -61,13 +64,15 @@ class RedisManager implements Factory
     /**
      * Resolve the given connection by name.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Redis\Connections\Connection
      *
      * @throws \InvalidArgumentException
      */
-    protected function resolve($name)
+    public function resolve($name = null)
     {
+        $name = $name ?: 'default';
+
         $options = Arr::get($this->config, 'options', []);
 
         if (isset($this->config[$name])) {

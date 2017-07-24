@@ -176,7 +176,7 @@ trait HasRelationships
     protected function morphInstanceTo($target, $name, $type, $id)
     {
         $instance = $this->newRelatedInstance(
-            Model::getActualClassNameForMorph($target)
+            static::getActualClassNameForMorph($target)
         );
 
         return new MorphTo(
@@ -192,7 +192,7 @@ trait HasRelationships
      */
     public static function getActualClassNameForMorph($class)
     {
-        return Arr::get(Relation::morphMap(), $class, $class);
+        return Arr::get(Relation::morphMap() ?: [], $class, $class);
     }
 
     /**

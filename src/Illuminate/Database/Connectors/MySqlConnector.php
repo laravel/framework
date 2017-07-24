@@ -65,7 +65,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
      */
     protected function getCollation(array $config)
     {
-        return ! is_null($config['collation']) ? " collate '{$config['collation']}'" : '';
+        return isset($config['collation']) ? " collate '{$config['collation']}'" : '';
     }
 
     /**

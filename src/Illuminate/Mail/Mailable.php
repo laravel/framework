@@ -192,7 +192,7 @@ class Mailable implements MailableContract
 
         return [
             'html' => $markdown->render($this->markdown, $data),
-            'text' => $markdown->renderText($this->markdown, $data),
+            'text' => $this->buildMarkdownText($markdown, $data),
         ];
     }
 
@@ -212,6 +212,20 @@ class Mailable implements MailableContract
         }
 
         return $data;
+    }
+
+    /**
+     * Build the text view for a Markdown message.
+     *
+     * @param  \Illuminate\Mail\Markdown  $markdown
+     * @param  array  $data
+     * @return string
+     */
+    protected function buildMarkdownText($markdown, $data)
+    {
+        return isset($this->textView)
+                ? $this->textView
+                : $markdown->renderText($this->markdown, $data);
     }
 
     /**
@@ -326,6 +340,18 @@ class Mailable implements MailableContract
     public function from($address, $name = null)
     {
         return $this->setAddress($address, $name, 'from');
+    }
+
+    /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasFrom($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'from');
     }
 
     /**
@@ -520,7 +546,7 @@ class Mailable implements MailableContract
     public function markdown($view, array $data = [])
     {
         $this->markdown = $view;
-        $this->viewData = $data;
+        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }
@@ -535,7 +561,7 @@ class Mailable implements MailableContract
     public function view($view, array $data = [])
     {
         $this->view = $view;
-        $this->viewData = $data;
+        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }
@@ -550,7 +576,7 @@ class Mailable implements MailableContract
     public function text($textView, array $data = [])
     {
         $this->textView = $textView;
-        $this->viewData = $data;
+        $this->viewData = array_merge($this->viewData, $data);
 
         return $this;
     }

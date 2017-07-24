@@ -31,8 +31,8 @@ class QueueManagerTest extends TestCase
         $manager->addConnector('sync', function () use ($connector) {
             return $connector;
         });
-        $queue->shouldReceive('setContainer')->once()->with($app);
 
+        $queue->shouldReceive('setContainer')->once()->with($app);
         $this->assertSame($queue, $manager->connection('sync'));
     }
 

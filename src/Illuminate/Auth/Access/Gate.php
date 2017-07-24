@@ -109,6 +109,30 @@ class Gate implements GateContract
     }
 
     /**
+     * Define abilities for a resource.
+     *
+     * @param  string  $name
+     * @param  string  $class
+     * @param  array   $abilities
+     * @return $this
+     */
+    public function resource($name, $class, array $abilities = null)
+    {
+        $abilities = $abilities ?: [
+            'view'   => 'view',
+            'create' => 'create',
+            'update' => 'update',
+            'delete' => 'delete',
+        ];
+
+        foreach ($abilities as $ability => $method) {
+            $this->define($name.'.'.$ability, $class.'@'.$method);
+        }
+
+        return $this;
+    }
+
+    /**
      * Create the ability callback for a callback string.
      *
      * @param  string  $callback
@@ -329,11 +353,11 @@ class Gate implements GateContract
 
         if (isset($this->abilities[$ability])) {
             return $this->abilities[$ability];
-        } else {
-            return function () {
-                return false;
-            };
         }
+
+        return function () {
+            return false;
+        };
     }
 
     /**
@@ -346,6 +370,10 @@ class Gate implements GateContract
     {
         if (is_object($class)) {
             $class = get_class($class);
+        }
+
+        if (! is_string($class)) {
+            return null;
         }
 
         if (isset($this->policies[$class])) {
@@ -464,5 +492,15 @@ class Gate implements GateContract
     protected function resolveUser()
     {
         return call_user_func($this->userResolver);
+    }
+
+    /**
+     * Get all of the defined abilities.
+     *
+     * @return array
+     */
+    public function abilities()
+    {
+        return $this->abilities;
     }
 }

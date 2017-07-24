@@ -7,6 +7,10 @@ use Illuminate\Container\Container;
 use Illuminate\Queue\QueueServiceProvider;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
 
+/**
+ * @mixin \Illuminate\Queue\QueueManager
+ * @mixin \Illuminate\Contracts\Queue\Queue
+ */
 class Manager
 {
     use CapsuleManagerTrait;

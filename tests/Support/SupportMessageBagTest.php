@@ -112,8 +112,12 @@ class SupportMessageBagTest extends TestCase
         $container->add('bar', 'foo');
         $container->add('boom', 'baz');
         $this->assertTrue($container->hasAny(['foo', 'bar']));
+        $this->assertTrue($container->hasAny('foo', 'bar'));
         $this->assertTrue($container->hasAny(['boom', 'baz']));
+        $this->assertTrue($container->hasAny('boom', 'baz'));
         $this->assertFalse($container->hasAny(['baz']));
+        $this->assertFalse($container->hasAny('baz'));
+        $this->assertFalse($container->hasAny('baz', 'biz'));
     }
 
     public function testHasIndicatesExistenceOfAllKeys()

@@ -210,7 +210,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $replace['count'] = $number;
 
         return $this->makeReplacements(
-            $this->getSelector()->choose($line, $number), $replace
+            $this->getSelector()->choose($line, $number, $locale), $replace
         );
     }
 
@@ -257,6 +257,10 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function makeReplacements($line, array $replace)
     {
+        if (empty($replace)) {
+            return $line;
+        }
+
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {

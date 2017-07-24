@@ -16,7 +16,7 @@ class FrequencyTest extends TestCase
     public function setUp()
     {
         $this->event = new Event(
-            m::mock('Illuminate\Contracts\Cache\Repository'),
+            m::mock('Illuminate\Console\Scheduling\Mutex'),
             'php foo'
         );
     }
@@ -51,6 +51,11 @@ class FrequencyTest extends TestCase
     public function testMonthlyOn()
     {
         $this->assertEquals('0 15 4 * * *', $this->event->monthlyOn(4, '15:00')->getExpression());
+    }
+
+    public function testTwiceMonthly()
+    {
+        $this->assertEquals('0 0 1,16 * * *', $this->event->twiceMonthly(1, 16)->getExpression());
     }
 
     public function testMonthlyOnWithMinutes()

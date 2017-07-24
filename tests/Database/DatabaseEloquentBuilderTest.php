@@ -104,6 +104,18 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
+    public function testFindWithManyUsingCollection()
+    {
+        $ids = collect([1, 2]);
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', $ids);
+        $builder->setModel($this->getMockModel());
+        $builder->shouldReceive('get')->with(['column'])->andReturn('baz');
+
+        $result = $builder->find($ids, ['column']);
+        $this->assertEquals('baz', $result);
+    }
+
     public function testFirstMethod()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get,take]', [$this->getMockQueryBuilder()]);
@@ -351,7 +363,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['bar', 'baz'], $builder->pluck('name')->all());
     }
 
-    public function testMacrosAreCalledOnBuilder()
+    public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
@@ -371,17 +383,25 @@ class DatabaseEloquentBuilderTest extends TestCase
         unset($_SERVER['__test.builder']);
     }
 
+    public function testGlobalMacrosAreCalledOnBuilder()
+    {
+        Builder::macro('foo', function ($bar) {
+            return $bar;
+        });
+
+        $this->assertEquals($this->getBuilder()->foo('bar'), 'bar');
+    }
+
     public function testGetModelsProperlyHydratesModels()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
         $records[] = ['name' => 'taylor', 'age' => 26];
         $records[] = ['name' => 'dayle', 'age' => 28];
         $builder->getQuery()->shouldReceive('get')->once()->with(['foo'])->andReturn(new BaseCollection($records));
-        $model = m::mock('Illuminate\Database\Eloquent\Model[getTable,getConnectionName,hydrate]');
+        $model = m::mock('Illuminate\Database\Eloquent\Model[getTable,hydrate]');
         $model->shouldReceive('getTable')->once()->andReturn('foo_table');
         $builder->setModel($model);
-        $model->shouldReceive('getConnectionName')->once()->andReturn('foo_connection');
-        $model->shouldReceive('hydrate')->once()->with($records, 'foo_connection')->andReturn(new Collection(['hydrated']));
+        $model->shouldReceive('hydrate')->once()->with($records)->andReturn(new Collection(['hydrated']));
         $models = $builder->getModels(['foo']);
 
         $this->assertEquals($models, ['hydrated']);
@@ -629,7 +649,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['qux', true], $builder->getBindings());
     }
 
-    public function testWithCountAndContraintsAndHaving()
+    public function testWithCountAndGlobalScope()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+            return $query->addSelect('id');
+        });
+
+        $builder = $model->select('id')->withCount(['foo']);
+
+        // Remove the global scope so it doesn't interfere with any other tests
+        EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+        });
+
+        $this->assertEquals('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
+    }
+
+    public function testWithCountAndConstraintsAndHaving()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -660,7 +696,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('select "eloquent_builder_test_model_parent_stubs".*, (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_bar_count", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
     }
 
-    public function testHasWithContraintsAndHavingInSubquery()
+    public function testHasWithConstraintsAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -673,7 +709,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
-    public function testHasWithContraintsWithOrWhereAndHavingInSubquery()
+    public function testHasWithConstraintsWithOrWhereAndHavingInSubquery()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -703,7 +739,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'quuuuuux', 'qux', 'quuux'], $builder->getBindings());
     }
 
-    public function testHasWithContraintsAndHavingInSubqueryWithCount()
+    public function testHasWithConstraintsAndHavingInSubqueryWithCount()
     {
         $model = new EloquentBuilderTestModelParentStub;
 
@@ -794,6 +830,45 @@ class DatabaseEloquentBuilderTest extends TestCase
         $sql = preg_replace($aliasRegex, $alias, $sql);
 
         $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
+    }
+
+    public function testWhereKeyMethodWithInt()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 1;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '=', $int);
+
+        $builder->whereKey($int);
+    }
+
+    public function testWhereKeyMethodWithArray()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $array = [1, 2, 3];
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $array);
+
+        $builder->whereKey($array);
+    }
+
+    public function testWhereKeyMethodWithCollection()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([1, 2, 3]);
+
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with($keyName, $collection);
+
+        $builder->whereKey($collection);
     }
 
     protected function mockConnectionForModel($model, $database)

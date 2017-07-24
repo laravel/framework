@@ -74,7 +74,7 @@ class RedirectResponse extends BaseRedirectResponse
     public function withInput(array $input = null)
     {
         $this->session->flashInput($this->removeFilesFromInput(
-            $input ?: $this->request->input()
+            ! is_null($input) ? $input : $this->request->input()
         ));
 
         return $this;
@@ -132,8 +132,14 @@ class RedirectResponse extends BaseRedirectResponse
     {
         $value = $this->parseErrors($provider);
 
+        $errors = $this->session->get('errors', new ViewErrorBag);
+
+        if (! $errors instanceof ViewErrorBag) {
+            $errors = new ViewErrorBag;
+        }
+
         $this->session->flash(
-            'errors', $this->session->get('errors', new ViewErrorBag)->put($key, $value)
+            'errors', $errors->put($key, $value)
         );
 
         return $this;

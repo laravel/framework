@@ -14,6 +14,9 @@ use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 
+/**
+ * @mixin \Illuminate\Contracts\Broadcasting\Broadcaster
+ */
 class BroadcastManager implements FactoryContract
 {
     /**
@@ -113,7 +116,9 @@ class BroadcastManager implements FactoryContract
 
         $queue = null;
 
-        if (isset($event->broadcastQueue)) {
+        if (method_exists($event, 'broadcastQueue')) {
+            $queue = $event->broadcastQueue();
+        } elseif (isset($event->broadcastQueue)) {
             $queue = $event->broadcastQueue;
         } elseif (isset($event->queue)) {
             $queue = $event->queue;

@@ -729,6 +729,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `foo` varchar(17) not null', $statements[0]);
     }
 
+    public function testAddingComment()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->string('foo')->comment("Escape ' when using words like it's");
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertEquals(1, count($statements));
+        $this->assertEquals("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');

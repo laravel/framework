@@ -17,7 +17,7 @@ trait CompilesTranslations
         } elseif ($expression[1] === '[') {
             return "<?php \$__env->startTranslation{$expression}; ?>";
         } else {
-            return "<?php echo app('translator')->get{$expression}; ?>";
+            return "<?php echo app('translator')->getFromJson{$expression}; ?>";
         }
     }
 

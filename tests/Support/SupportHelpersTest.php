@@ -252,6 +252,13 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Str::endsWith('jason', ['no']));
     }
 
+    public function testStrAfter()
+    {
+        $this->assertEquals('nah', str_after('hannah', 'han'));
+        $this->assertEquals('nah', str_after('hannah', 'n'));
+        $this->assertEquals('hannah', str_after('hannah', 'xxxx'));
+    }
+
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
@@ -645,6 +652,17 @@ class SupportHelpersTest extends TestCase
         ));
     }
 
+    public function testArrayWrap()
+    {
+        $string = 'a';
+        $array = ['a'];
+        $object = new stdClass;
+        $object->value = 'a';
+        $this->assertEquals(['a'], array_wrap($string));
+        $this->assertEquals($array, array_wrap($array));
+        $this->assertEquals([$object], array_wrap($object));
+    }
+
     public function testHead()
     {
         $array = ['a', 'b', 'c'];
@@ -694,6 +712,10 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(2, tap($object, function ($object) {
             $object->id = 2;
         })->id);
+
+        $mock = m::mock();
+        $mock->shouldReceive('foo')->once()->andReturn('bar');
+        $this->assertEquals($mock, tap($mock)->foo());
     }
 }
 

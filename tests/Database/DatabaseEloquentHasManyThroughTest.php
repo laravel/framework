@@ -214,26 +214,30 @@ class DatabaseEloquentHasManyThroughTest extends TestCase
 
     public function testFindMethod()
     {
+        $returnValue = new StdClass;
+
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[first]', $this->getRelationArguments());
         $relation->shouldReceive('where')->with('posts.id', '=', 'foo')->once()->andReturn($relation);
-        $relation->shouldReceive('first')->once()->andReturn(new StdClass);
+        $relation->shouldReceive('first')->once()->andReturn($returnValue);
 
         $related = $relation->getRelated();
         $related->shouldReceive('getQualifiedKeyName')->once()->andReturn('posts.id');
 
-        $relation->find('foo');
+        $this->assertEquals($returnValue, $relation->find('foo'));
     }
 
     public function testFindManyMethod()
     {
+        $returnValue = new \Illuminate\Database\Eloquent\Collection(['first', 'second']);
+
         $relation = m::mock('Illuminate\Database\Eloquent\Relations\HasManyThrough[get]', $this->getRelationArguments());
-        $relation->shouldReceive('get')->once()->andReturn(new \Illuminate\Database\Eloquent\Collection(['first', 'second']));
+        $relation->shouldReceive('get')->once()->andReturn($returnValue);
         $relation->shouldReceive('whereIn')->with('posts.id', ['foo', 'bar'])->once()->andReturn($relation);
 
         $related = $relation->getRelated();
         $related->shouldReceive('getQualifiedKeyName')->once()->andReturn('posts.id');
 
-        $relation->findMany(['foo', 'bar']);
+        $this->assertEquals($returnValue, $relation->findMany(['foo', 'bar']));
     }
 
     public function testIgnoreSoftDeletingParent()

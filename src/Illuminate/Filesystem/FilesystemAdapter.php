@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
+use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
@@ -17,6 +18,9 @@ use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 
+/**
+ * @mixin \League\Flysystem\FilesystemInterface
+ */
 class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 {
     /**
@@ -35,6 +39,32 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function __construct(FilesystemInterface $driver)
     {
         $this->driver = $driver;
+    }
+
+    /**
+     * Assert that the given file exists.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function assertExists($path)
+    {
+        PHPUnit::assertTrue(
+            $this->exists($path), "Unable to find a file at path [{$path}]."
+        );
+    }
+
+    /**
+     * Assert that the given file does not exist.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function assertMissing($path)
+    {
+        PHPUnit::assertFalse(
+            $this->exists($path), "Found unexpected file at path [{$path}]."
+        );
     }
 
     /**
@@ -96,7 +126,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Store the uploaded file on the disk.
      *
      * @param  string  $path
-     * @param  \Illuminate\Http\UploadedFile  $file
+     * @param  \Illuminate\Http\File|\Illuminate\Http\UploadedFile  $file
      * @param  array  $options
      * @return string|false
      */
@@ -324,7 +354,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
         if ($config->has('url')) {
-            return trim($config->get('url'), '/').'/'.ltrim($path, '/');
+            return rtrim($config->get('url'), '/').'/'.ltrim($path, '/');
         }
 
         $path = '/storage/'.$path;

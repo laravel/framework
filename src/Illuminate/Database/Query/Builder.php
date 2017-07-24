@@ -13,13 +13,13 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Processors\Processor;
 
 class Builder
 {
-    use Macroable {
+    use BuildsQueries, Macroable {
         __call as macroCall;
     }
 
@@ -176,7 +176,7 @@ class Builder
      * @var array
      */
     public $operators = [
-        '=', '<', '>', '<=', '>=', '<>', '!=',
+        '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
         'like', 'like binary', 'not like', 'between', 'ilike',
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
@@ -251,7 +251,7 @@ class Builder
     public function selectSub($query, $as)
     {
         // If the given query is a Closure, we will execute it while passing in a new
-        // query instance ot the Closure. This will give the developer a chance to
+        // query instance to the Closure. This will give the developer a chance to
         // format and work with the query before we cast it to a raw SQL string.
         if ($query instanceof Closure) {
             $callback = $query;
@@ -278,6 +278,8 @@ class Builder
     protected function parseSubSelect($query)
     {
         if ($query instanceof self) {
+            $query->columns = [$query->columns[0]];
+
             return [$query->toSql(), $query->getBindings()];
         } elseif (is_string($query)) {
             return [$query, []];
@@ -458,24 +460,14 @@ class Builder
     }
 
     /**
-     * Apply the callback's query changes if the given "value" is true.
+     * Pass the query to a given callback.
      *
-     * @param  bool  $value
      * @param  \Closure  $callback
-     * @param  \Closure  $default
      * @return \Illuminate\Database\Query\Builder
      */
-    public function when($value, $callback, $default = null)
+    public function tap($callback)
     {
-        $builder = $this;
-
-        if ($value) {
-            $builder = call_user_func($callback, $builder);
-        } elseif ($default) {
-            $builder = call_user_func($default, $builder);
-        }
-
-        return $builder;
+        return $this->when(true, $callback);
     }
 
     /**
@@ -1425,6 +1417,17 @@ class Builder
     }
 
     /**
+     * Add a descending "order by" clause to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function orderByDesc($column)
+    {
+        return $this->orderBy($column, 'desc');
+    }
+
+    /**
      * Add an "order by" clause for a timestamp to the query.
      *
      * @param  string  $column
@@ -1676,17 +1679,6 @@ class Builder
     }
 
     /**
-     * Execute the query and get the first result.
-     *
-     * @param  array   $columns
-     * @return \stdClass|array|null
-     */
-    public function first($columns = ['*'])
-    {
-        return $this->take(1)->get($columns)->first();
-    }
-
-    /**
      * Execute the query as a "select" statement.
      *
      * @param  array  $columns
@@ -1736,7 +1728,7 @@ class Builder
 
         $results = $total ? $this->forPage($page, $perPage)->get($columns) : collect();
 
-        return new LengthAwarePaginator($results, $total, $perPage, $page, [
+        return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
@@ -1759,7 +1751,7 @@ class Builder
 
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
-        return new Paginator($this->get($columns), $perPage, $page, [
+        return $this->simplePaginator($this->get($columns), $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
@@ -1790,7 +1782,7 @@ class Builder
     }
 
     /**
-     * Run a pagiantion count query.
+     * Run a pagination count query.
      *
      * @param  array  $columns
      * @return array
@@ -1831,44 +1823,6 @@ class Builder
         return $this->connection->cursor(
             $this->toSql(), $this->getBindings(), ! $this->useWritePdo
         );
-    }
-
-    /**
-     * Chunk the results of the query.
-     *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @return bool
-     */
-    public function chunk($count, callable $callback)
-    {
-        $this->enforceOrderBy();
-
-        $page = 1;
-
-        do {
-            // We'll execute the query for the given page and get the results. If there are
-            // no results we can just break and return from here. When there are results
-            // we will call the callback with the current chunk of these results here.
-            $results = $this->forPage($page, $count)->get();
-
-            $countResults = $results->count();
-
-            if ($countResults == 0) {
-                break;
-            }
-
-            // On each chunk result set, we will pass them to the callback and then let the
-            // developer take care of everything within the callback, which allows us to
-            // keep the memory low for spinning through large result sets for working.
-            if ($callback($results) === false) {
-                return false;
-            }
-
-            $page++;
-        } while ($countResults == $count);
-
-        return true;
     }
 
     /**
@@ -1925,24 +1879,6 @@ class Builder
         if (empty($this->orders) && empty($this->unionOrders)) {
             throw new RuntimeException('You must specify an orderBy clause when using this function.');
         }
-    }
-
-    /**
-     * Execute a callback over each item while chunking.
-     *
-     * @param  callable  $callback
-     * @param  int  $count
-     * @return bool
-     */
-    public function each(callable $callback, $count = 1000)
-    {
-        return $this->chunk($count, function ($results) use ($callback) {
-            foreach ($results as $key => $value) {
-                if ($callback($value, $key) === false) {
-                    return false;
-                }
-            }
-        });
     }
 
     /**
@@ -2137,6 +2073,12 @@ class Builder
     protected function setAggregate($function, $columns)
     {
         $this->aggregate = compact('function', 'columns');
+
+        if (empty($this->groups)) {
+            $this->orders = null;
+
+            $this->bindings['order'] = [];
+        }
 
         return $this;
     }

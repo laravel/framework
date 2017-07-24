@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 
 use PHPUnit_Framework_Constraint_Not as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
+use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
 
 trait InteractsWithDatabase
 {
@@ -39,6 +40,23 @@ trait InteractsWithDatabase
         );
 
         $this->assertThat($table, $constraint);
+
+        return $this;
+    }
+
+    /**
+     * Assert the given record has been deleted.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertSoftDeleted($table, array $data, $connection = null)
+    {
+        $this->assertThat(
+            $table, new SoftDeletedInDatabase($this->getConnection($connection), $data)
+        );
 
         return $this;
     }

@@ -605,6 +605,17 @@ class Route
     }
 
     /**
+     * Determine whether the route's name matches the given name.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public function named($name)
+    {
+        return $this->getName() === $name;
+    }
+
+    /**
      * Set the handler for the route.
      *
      * @param  \Closure|string  $action
@@ -645,6 +656,16 @@ class Route
     public function getActionName()
     {
         return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
+    }
+
+    /**
+     * Get the method name of the route action.
+     *
+     * @return string
+     */
+    public function getActionMethod()
+    {
+        return array_last(explode('@', $this->getActionName()));
     }
 
     /**

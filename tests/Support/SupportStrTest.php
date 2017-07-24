@@ -76,6 +76,15 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith(0.27, '8'));
     }
 
+    public function testStrAfter()
+    {
+        $this->assertEquals('nah', Str::after('hannah', 'han'));
+        $this->assertEquals('nah', Str::after('hannah', 'n'));
+        $this->assertEquals('nah', Str::after('ééé hannah', 'han'));
+        $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
+        $this->assertEquals('hannah', Str::after('hannah', ''));
+    }
+
     public function testStrContains()
     {
         $this->assertTrue(Str::contains('taylor', 'ylo'));
@@ -121,6 +130,11 @@ class SupportStrTest extends TestCase
 
         $this->assertTrue(Str::is('foo/bar/baz', $valueObject));
         $this->assertTrue(Str::is($patternObject, $valueObject));
+    }
+
+    public function testKebab()
+    {
+        $this->assertEquals('laravel-php-framework', Str::kebab('LaravelPhpFramework'));
     }
 
     public function testLower()
@@ -176,6 +190,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/qux? foo/bar?', Str::replaceFirst('bar?', 'qux?', 'foo/bar? foo/bar?'));
         $this->assertEquals('foo foobar', Str::replaceFirst('bar', '', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceFirst('', 'yyy', 'foobar foobar'));
     }
 
     public function testReplaceLast()
@@ -184,6 +199,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo/bar? foo/qux?', Str::replaceLast('bar?', 'qux?', 'foo/bar? foo/bar?'));
         $this->assertEquals('foobar foo', Str::replaceLast('bar', '', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceLast('xxx', 'yyy', 'foobar foobar'));
+        $this->assertEquals('foobar foobar', Str::replaceLast('', 'yyy', 'foobar foobar'));
     }
 
     public function testSnake()
