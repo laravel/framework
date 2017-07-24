@@ -542,7 +542,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function clearRememberToken(AuthenticatableContract $user)
     {
-        if($user->getRememberToken()) {
+        if ($user->getRememberToken()) {
 
             $user->setRememberToken('');
 
