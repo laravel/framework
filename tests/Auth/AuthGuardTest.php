@@ -227,6 +227,7 @@ class AuthGuardTest extends TestCase
         $mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('setRememberToken')->once();
+        $user->shouldReceive('getRememberToken')->once();
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
         $mock->expects($this->once())->method('recaller')->will($this->returnValue('non-null-cookie'));
@@ -248,6 +249,7 @@ class AuthGuardTest extends TestCase
         $mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('setRememberToken')->once();
+        $user->shouldReceive('getRememberToken')->once();
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $mock->expects($this->once())->method('recaller')->will($this->returnValue(null));
         $provider->shouldReceive('updateRememberToken')->once();
@@ -266,6 +268,7 @@ class AuthGuardTest extends TestCase
         $mock->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('setRememberToken')->once();
+        $user->shouldReceive('getRememberToken')->once();
         $provider->shouldReceive('updateRememberToken')->once();
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
         $mock->setUser($user);
