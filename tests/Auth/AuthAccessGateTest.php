@@ -287,6 +287,16 @@ class GateTest extends TestCase
         $gate->authorize('create', new AccessGateTestDummy);
     }
 
+    /**
+     * @expectedException \BadMethodCallException
+     */
+    public function test_undefined_policy_throws_exception()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->authorize('blah');
+    }
+
     public function test_authorize_returns_allowed_response()
     {
         $gate = $this->getBasicGate(true);
