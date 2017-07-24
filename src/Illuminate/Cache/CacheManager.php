@@ -9,6 +9,9 @@ use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
+/**
+ * @mixin \Illuminate\Contracts\Cache\Repository
+ */
 class CacheManager implements FactoryContract
 {
     /**
