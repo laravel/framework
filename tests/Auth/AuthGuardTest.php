@@ -226,12 +226,12 @@ class AuthGuardTest extends TestCase
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
-        $user->shouldReceive('setRememberToken')->once();
+        $user->shouldReceive('setRememberToken');
         $user->shouldReceive('getRememberToken')->once();
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $mock->expects($this->once())->method('getRecallerName')->will($this->returnValue('bar'));
         $mock->expects($this->once())->method('recaller')->will($this->returnValue('non-null-cookie'));
-        $provider->shouldReceive('updateRememberToken')->once();
+        $provider->shouldReceive('updateRememberToken');
 
         $cookie = m::mock('Symfony\Component\HttpFoundation\Cookie');
         $cookies->shouldReceive('forget')->once()->with('bar')->andReturn($cookie);
@@ -248,11 +248,11 @@ class AuthGuardTest extends TestCase
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
         $mock->setCookieJar($cookies = m::mock('Illuminate\Cookie\CookieJar'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
-        $user->shouldReceive('setRememberToken')->once();
+        $user->shouldReceive('setRememberToken');
         $user->shouldReceive('getRememberToken')->once();
         $mock->expects($this->once())->method('getName')->will($this->returnValue('foo'));
         $mock->expects($this->once())->method('recaller')->will($this->returnValue(null));
-        $provider->shouldReceive('updateRememberToken')->once();
+        $provider->shouldReceive('updateRememberToken');
 
         $mock->getSession()->shouldReceive('remove')->once()->with('foo');
         $mock->setUser($user);
@@ -267,9 +267,9 @@ class AuthGuardTest extends TestCase
         $mock->expects($this->once())->method('clearUserDataFromStorage');
         $mock->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
-        $user->shouldReceive('setRememberToken')->once();
+        $user->shouldReceive('setRememberToken');
         $user->shouldReceive('getRememberToken')->once();
-        $provider->shouldReceive('updateRememberToken')->once();
+        $provider->shouldReceive('updateRememberToken');
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
         $mock->setUser($user);
         $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Auth\Events\Logout'));
