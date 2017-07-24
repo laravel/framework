@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use \Mockery as m;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;

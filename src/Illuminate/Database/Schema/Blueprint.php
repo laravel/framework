@@ -411,7 +411,7 @@ class Blueprint
     /**
      * Create a new auto-incrementing tiny integer (1-byte) column on the table.
      *
-     * @param  string $column
+     * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
     public function tinyIncrements($column)
@@ -581,8 +581,8 @@ class Blueprint
     /**
      * Create a new unsigned integer (4-byte) column on the table.
      *
-     * @param  string $column
-     * @param  bool $autoIncrement
+     * @param  string  $column
+     * @param  bool  $autoIncrement
      * @return \Illuminate\Support\Fluent
      */
     public function unsignedInteger($column, $autoIncrement = false)
