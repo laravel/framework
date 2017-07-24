@@ -19,7 +19,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~3.0",
-        "doctrine/inflector": "~1.0",
+        "doctrine/inflector": "~1.1.0",
         "jeremeamia/superclosure": "~2.2",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
