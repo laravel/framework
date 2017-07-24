@@ -16,6 +16,9 @@ use Illuminate\Cache\Events\KeyForgotten;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
+/**
+ * @mixin \Illuminate\Contracts\Cache\Store 
+ */
 class Repository implements CacheContract, ArrayAccess
 {
     use Macroable {
