@@ -1,5 +1,17 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Changed
+- Renamed `MakeAuthCommand` to `AuthMakeCommand` ([#20216](https://github.com/laravel/framework/pull/20216))
+- Don't use `asset()` helper inside `mix()` ([#20197](https://github.com/laravel/framework/pull/20197))
+
+### Fixed
+- Make sure `Model::getDates()` returns unique columns ([#20193](https://github.com/laravel/framework/pull/20193))
+- Fixed pulled `doctrine/inflector` version ([#20227](https://github.com/laravel/framework/pull/20227))
+- Fixed issue with `chunkById()` when `orderByRaw()` is used ([#20236](https://github.com/laravel/framework/pull/20236))
+
+
 ## v5.4.30 (2017-07-19)
 
 ### Fixed
