@@ -328,6 +328,19 @@ abstract class Relation
     }
 
     /**
+     * Return the model associated to a custom polymorphic type.
+     *
+     * @param string $alias
+     * @return string|null
+     */
+    public static function getMorphedModel($alias)
+    {
+        return array_key_exists($alias, self::$morphMap)
+            ? self::$morphMap[$alias]
+            : null;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
