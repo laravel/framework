@@ -112,7 +112,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         }
     }
 
-    /*
+    /**
      * Clear the console application bootstrappers.
      *
      * @return void
