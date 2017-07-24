@@ -4,6 +4,7 @@ namespace Illuminate\Auth\Access;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use BadMethodCallException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
@@ -367,6 +368,8 @@ class Gate implements GateContract
      * @param  string  $ability
      * @param  array  $arguments
      * @return callable
+     *
+     * @throws \BadMethodCallException
      */
     protected function resolveAuthCallback($user, $ability, array $arguments)
     {
@@ -380,9 +383,7 @@ class Gate implements GateContract
             return $this->abilities[$ability];
         }
 
-        return function () {
-            return false;
-        };
+        throw new BadMethodCallException("Could not resolve policy for ability '$ability' - did you define this on the Gate?");
     }
 
     /**
