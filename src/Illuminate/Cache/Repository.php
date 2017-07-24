@@ -17,7 +17,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 /**
- * @mixin \Illuminate\Contracts\Cache\Store 
+ * @mixin \Illuminate\Contracts\Cache\Store
  */
 class Repository implements CacheContract, ArrayAccess
 {
