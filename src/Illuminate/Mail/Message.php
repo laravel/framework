@@ -5,6 +5,9 @@ namespace Illuminate\Mail;
 use Swift_Image;
 use Swift_Attachment;
 
+/**
+ * @mixin \Swift_Message
+ */
 class Message
 {
     /**
