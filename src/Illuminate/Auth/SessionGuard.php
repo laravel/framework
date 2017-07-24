@@ -491,7 +491,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $this->clearUserDataFromStorage();
 
         if (! is_null($this->user)) {
-            $this->cycleRememberToken($user);
+            $this->clearRememberToken($user);
         }
 
         if (isset($this->events)) {
@@ -532,6 +532,21 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         $user->setRememberToken($token = Str::random(60));
 
         $this->provider->updateRememberToken($user, $token);
+    }
+
+    /**
+     * Clear the "remember me" token for the user.
+     *
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @return void
+     */
+    protected function clearRememberToken(AuthenticatableContract $user)
+    {
+        if (! empty($user->getRememberToken())) {
+            $user->setRememberToken('');
+
+            $this->provider->updateRememberToken($user, '');
+        }
     }
 
     /**
