@@ -27,16 +27,13 @@ trait SendsPasswordResetEmails
     {
         $this->validateEmail($request);
 
-        // We will send the password reset link to this user. Once we have attempted
-        // to send the link, we will examine the response then see the message we
-        // need to show to the user. Finally, we'll send out a proper response.
-        $response = $this->broker()->sendResetLink(
+        // We will send the password reset link to this user. Attempted
+        // to send the link. Finally, we'll send out a the "proper" response.
+        $this->broker()->sendResetLink(
             $request->only('email')
         );
 
-        return $response == Password::RESET_LINK_SENT
-                    ? $this->sendResetLinkResponse($response)
-                    : $this->sendResetLinkFailedResponse($request, $response);
+        return $this->sendResetLinkResponse(Password::RESET_LINK_SENT);
     }
 
     /**
@@ -59,20 +56,6 @@ trait SendsPasswordResetEmails
     protected function sendResetLinkResponse($response)
     {
         return back()->with('status', trans($response));
-    }
-
-    /**
-     * Get the response for a failed password reset link.
-     *
-     * @param  \Illuminate\Http\Request
-     * @param  string  $response
-     * @return \Illuminate\Http\RedirectResponse
-     */
-    protected function sendResetLinkFailedResponse(Request $request, $response)
-    {
-        return back()->withErrors(
-            ['email' => trans($response)]
-        );
     }
 
     /**

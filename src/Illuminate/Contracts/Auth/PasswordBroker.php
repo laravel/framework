@@ -21,13 +21,6 @@ interface PasswordBroker
     const PASSWORD_RESET = 'passwords.reset';
 
     /**
-     * Constant representing the user not found response.
-     *
-     * @var string
-     */
-    const INVALID_USER = 'passwords.user';
-
-    /**
      * Constant representing an invalid password.
      *
      * @var string
@@ -45,7 +38,7 @@ interface PasswordBroker
      * Send a password reset link to a user.
      *
      * @param  array  $credentials
-     * @return string
+     * @return void
      */
     public function sendResetLink(array $credentials);
 
