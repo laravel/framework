@@ -3,6 +3,7 @@ language: php
 php:
   - 7.0.21
   - 7.1
+  - 7.2
 
 env:
   global:
@@ -18,7 +19,7 @@ matrix:
     - php: 7.1
       env: setup=lowest
     - php: 7.1
-      env: setup=stable
+      env: setup=stable    
 
 sudo: false
 
