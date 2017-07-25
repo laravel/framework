@@ -234,6 +234,19 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve a request payload item from the request.
+     *
+     * @param  string  $key
+     * @param  string|array|null  $default
+     *
+     * @return string|array
+     */
+    public function post($key = null, $default = null)
+    {
+        return $this->retrieveItem('request', $key, $default);
+    }
+
+    /**
      * Determine if a cookie is set on the request.
      *
      * @param  string  $key
