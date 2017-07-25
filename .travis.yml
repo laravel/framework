@@ -10,6 +10,8 @@ env:
     - setup=basic
 
 matrix:
+  allow_failures:
+    - php: 7.2
   fast_finish: true
   include:
     - php: 7.0.21
@@ -19,7 +21,7 @@ matrix:
     - php: 7.1
       env: setup=lowest
     - php: 7.1
-      env: setup=stable    
+      env: setup=stable
 
 sudo: false
 
