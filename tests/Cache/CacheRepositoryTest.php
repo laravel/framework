@@ -143,8 +143,8 @@ class CacheRepositoryTest extends TestCase
     {
         return [
             [Carbon::now()->addMinutes(5)],
-            [(new DateTime('2017-07-25 12:13:14 UTC'))->modify('+5 minutes')],
-            [(new DateTimeImmutable('2017-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [(new DateTime('2030-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [(new DateTimeImmutable('2030-07-25 12:13:14 UTC'))->modify('+5 minutes')],
             [new DateInterval('PT5M')],
             [5],
         ];
@@ -156,7 +156,7 @@ class CacheRepositoryTest extends TestCase
      */
     public function testGetMinutes($duration)
     {
-        Carbon::setTestNow(Carbon::parse('2017-07-25 12:13:14 UTC'));
+        Carbon::setTestNow(Carbon::parse('2030-07-25 12:13:14 UTC'));
 
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 5);
