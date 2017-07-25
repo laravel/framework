@@ -2,9 +2,10 @@
 
 namespace Illuminate\Support;
 
+use JsonSerializable;
 use Illuminate\Contracts\Support\Htmlable;
 
-class HtmlString implements Htmlable
+class HtmlString implements Htmlable, JsonSerializable
 {
     /**
      * The HTML string.
@@ -32,6 +33,16 @@ class HtmlString implements Htmlable
     public function toHtml()
     {
         return $this->html;
+    }
+
+    /**
+     * Convert the object into something JSON serializable.
+     *
+     * @return string
+     */
+    public function jsonSerialize()
+    {
+        return $this->toHtml();
     }
 
     /**
