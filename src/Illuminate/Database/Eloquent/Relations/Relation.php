@@ -328,9 +328,9 @@ abstract class Relation
     }
 
     /**
-     * Return the model associated to a custom polymorphic type.
+     * Get the model associated with a custom polymorphic type.
      *
-     * @param string $alias
+     * @param  string  $alias
      * @return string|null
      */
     public static function getMorphedModel($alias)
