@@ -234,7 +234,7 @@ trait InteractsWithInput
     }
 
     /**
-     * Retrieve a post string item from the request.
+     * Retrieve a request payload item from the request.
      *
      * @param  string  $key
      * @param  string|array|null  $default
