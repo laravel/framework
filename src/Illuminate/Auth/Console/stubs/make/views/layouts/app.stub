@@ -65,7 +65,7 @@
                                     </li>
                                 </ul>
                             </li>
-                        @endauth
+                        @endguest
                     </ul>
                 </div>
             </div>
