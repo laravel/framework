@@ -194,18 +194,24 @@ class Kernel implements KernelContract
     /**
      * Register all of the commands in the given directory.
      *
-     * @param  string  $path
+     * @param  array|string  $paths
      * @return void
      */
-    protected function load($path)
+    protected function load($paths)
     {
-        if (! is_dir($path)) {
+        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
+
+        $paths = array_filter($paths, function ($path) {
+            return is_dir($path);
+        });
+
+        if (empty($paths)) {
             return;
         }
 
         $namespace = $this->app->getNamespace();
 
-        foreach ((new Finder)->in($path)->files() as $command) {
+        foreach ((new Finder)->in($paths)->files() as $command) {
             $command = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
