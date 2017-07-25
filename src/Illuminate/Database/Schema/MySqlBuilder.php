@@ -45,7 +45,7 @@ class MySqlBuilder extends Builder
     {
         $this->disableForeignKeyConstraints();
 
-        foreach ($this->connection->select('SHOW TABLES') as $table) {
+        foreach ($this->connection->select('SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'') as $table) {
             $this->drop(get_object_vars($table)[key($table)]);
         }
 
