@@ -718,7 +718,7 @@ class Builder
      * @param  array   $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereRaw($sql, array $bindings = [])
+    public function orWhereRaw($sql, $bindings = [])
     {
         return $this->whereRaw($sql, $bindings, 'or');
     }
