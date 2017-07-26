@@ -7,7 +7,7 @@ use Closure;
 class PhpRedisConnection extends Connection
 {
     /**
-     * Create a new Predis connection.
+     * Create a new PhpRedis connection.
      *
      * @param  \Redis  $client
      * @return void
@@ -28,6 +28,17 @@ class PhpRedisConnection extends Connection
         $result = $this->client->get($key);
 
         return $result !== false ? $result : null;
+    }
+
+    /**
+     * Determine if the given keys exist.
+     *
+     * @param  dynamic  $key
+     * @return int
+     */
+    public function exists(...$keys)
+    {
+        return $this->executeRaw(array_merge(['exists'], $keys));
     }
 
     /**
@@ -58,7 +69,7 @@ class PhpRedisConnection extends Connection
         return $this->command('set', [
             $key,
             $value,
-            $expireResolution ? [$expireResolution, $flag => $expireTTL] : null,
+            $expireResolution ? [$flag, $expireResolution => $expireTTL] : null,
         ]);
     }
 
@@ -91,23 +102,129 @@ class PhpRedisConnection extends Connection
      * Add one or more members to a sorted set or update its score if it already exists.
      *
      * @param  string  $key
-     * @param  mixed  $dictionary
+     * @param  dynamic  $dictionary
      * @return int
      */
     public function zadd($key, ...$dictionary)
     {
-        if (count($dictionary) === 1) {
-            $_dictionary = [];
-
-            foreach ($dictionary[0] as $member => $score) {
-                $_dictionary[] = $score;
-                $_dictionary[] = $member;
+        if (is_array(end($dictionary))) {
+            foreach (array_pop($dictionary) as $member => $score) {
+                $dictionary[] = $score;
+                $dictionary[] = $member;
             }
-
-            $dictionary = $_dictionary;
         }
 
-        return $this->client->zadd($key, ...$dictionary);
+        return $this->executeRaw(array_merge(['zadd', $key], $dictionary));
+    }
+
+    /**
+     * Return elements with score between $min and $max.
+     *
+     * @param  string  $key
+     * @param  mixed  $min
+     * @param  mixed  $max
+     * @param  array  $options
+     * @return int
+     */
+    public function zrangebyscore($key, $min, $max, $options = [])
+    {
+        if (isset($options['limit'])) {
+            $options['limit'] = [
+                $options['limit']['offset'],
+                $options['limit']['count'],
+            ];
+        }
+
+        return $this->command('zRangeByScore', [$key, $min, $max, $options]);
+    }
+
+    /**
+     * Return elements with score between $min and $max.
+     *
+     * @param  string  $key
+     * @param  mixed  $min
+     * @param  mixed  $max
+     * @param  array  $options
+     * @return int
+     */
+    public function zrevrangebyscore($key, $min, $max, $options = [])
+    {
+        if (isset($options['limit'])) {
+            $options['limit'] = [
+                $options['limit']['offset'],
+                $options['limit']['count'],
+            ];
+        }
+
+        return $this->command('zRevRangeByScore', [$key, $min, $max, $options]);
+    }
+
+    /**
+     * Find the intersection between sets and store in a new set.
+     *
+     * @param  string  $output
+     * @param  array  $keys
+     * @param  array  $options
+     * @return int
+     */
+    public function zinterstore($output, $keys, $options = [])
+    {
+        return $this->zInter($output, $keys,
+            $options['weights'] ?? null,
+            $options['aggregate'] ?? 'sum'
+        );
+    }
+
+    /**
+     * Find the union between sets and store in a new set.
+     *
+     * @param  string  $output
+     * @param  array  $keys
+     * @param  array  $options
+     * @return int
+     */
+    public function zunionstore($output, $keys, $options = [])
+    {
+        return $this->zUnion($output, $keys,
+            $options['weights'] ?? null,
+            $options['aggregate'] ?? 'sum'
+        );
+    }
+
+    /**
+     * Set the given hash fields to their respective values.
+     *
+     * @param  string  $key
+     * @param  dynamic  $dictionary
+     * @return int
+     */
+    public function hmset($key, ...$dictionary)
+    {
+        if (count($dictionary) == 1) {
+            $dictionary = $dictionary[0];
+        } else {
+            $input = collect($dictionary);
+
+            $dictionary = $input->nth(2)->combine($input->nth(2, 1))->toArray();
+        }
+
+        return $this->command('hmset', [$key, $dictionary]);
+    }
+
+    /**
+     * Get the value of the given hash fields.
+     *
+     * @param  string  $key
+     * @param  dynamic  $dictionary
+     * @return int
+     */
+    public function hmget($key, ...$dictionary)
+    {
+        if (count($dictionary) == 1) {
+            $dictionary = $dictionary[0];
+        }
+
+        return array_values($this->command('hmget', [$key, $dictionary]));
     }
 
     /**
@@ -240,16 +357,6 @@ class PhpRedisConnection extends Connection
     public function __call($method, $parameters)
     {
         $method = strtolower($method);
-
-        if ($method == 'eval') {
-            return $this->proxyToEval($parameters);
-        }
-
-        if ($method == 'zrangebyscore' || $method == 'zrevrangebyscore') {
-            $parameters = array_map(function ($parameter) {
-                return is_array($parameter) ? array_change_key_case($parameter) : $parameter;
-            }, $parameters);
-        }
 
         return parent::__call($method, $parameters);
     }
