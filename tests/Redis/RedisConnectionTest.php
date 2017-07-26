@@ -496,6 +496,8 @@ class RedisConnectionTest extends TestCase
             $this->assertCount(4, $result);
             $this->assertEquals(1, $result[1]);
             $this->assertEquals(2, $result[3]);
+
+            $redis->flushall();
         }
     }
 
@@ -515,6 +517,8 @@ class RedisConnectionTest extends TestCase
             $this->assertCount(4, $result);
             $this->assertEquals(1, $result[1]);
             $this->assertEquals(2, $result[3]);
+
+            $redis->flushall();
         }
     }
 
@@ -529,6 +533,8 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(
                 1, $redis->executeRaw(['GET', 'test:raw:1'])
             );
+
+            $redis->flushall();
         }
     }
 
