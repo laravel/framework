@@ -29,6 +29,43 @@ trait CompilesIncludes
     }
 
     /**
+     * Compile the view statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileView($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return $this->compileInclude($expression);
+    }
+
+    /**
+     * Compile the view-exist statements into valid PHP.
+     *
+     * @param string $expression
+     * @return string
+     */
+    protected function compileViewExist($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php if (\$__env->exists({$expression})): ?>";
+    }
+
+    /**
+     * Compile the end-view-exist statements into valid PHP.
+     *
+     * @param string $expression
+     * @return string
+     */
+    protected function compileEndViewExist()
+    {
+        return '<?php endif; ?>';
+    }
+
+    /**
      * Compile the include-if statements into valid PHP.
      *
      * @param  string  $expression
@@ -38,7 +75,7 @@ trait CompilesIncludes
     {
         $expression = $this->stripParentheses($expression);
 
-        return "<?php if (\$__env->exists({$expression})) echo \$__env->make({$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        return $this->compileViewExist($expression).$this->compileInclude($expression).$this->compileEndViewExist();
     }
 
     /**
