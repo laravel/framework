@@ -708,6 +708,13 @@ trait HasAttributes
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 
+        // If the value is according to the ISO 8601 spec.we will instantiate the
+        // Carbon instances from that format. This is useful for dates that come
+        // from the default Js format.
+        if ($this->isIso8601DateFormat($value)) {
+            return Carbon::createFromFormat('Y-m-d\TH:i:s+', $value);
+        }
+
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
@@ -725,6 +732,20 @@ trait HasAttributes
     protected function isStandardDateFormat($value)
     {
         return preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $value);
+    }
+
+    /**
+     * Determine if the given value is is according to the ISO 8601 spec.
+     *  YYYY-MM-DDThh:mm:ss
+     *  YYYY-MM-DDThh:mm:ssTZD
+     *  YYYY-MM-DDThh:mm:ss.sTZD
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isIso8601DateFormat($value)
+    {
+        return preg_match('/^\d{4}-\d\d-\d\dT\d\d:\d\d:\d\d(\.\d+)?(([+-]\d\d:\d\d)|Z)?$/', $value);
     }
 
     /**
