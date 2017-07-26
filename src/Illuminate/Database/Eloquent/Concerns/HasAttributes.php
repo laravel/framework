@@ -738,7 +738,7 @@ trait HasAttributes
      * Determine if the given value is is according to the ISO 8601 spec.
      *  YYYY-MM-DDThh:mm:ss
      *  YYYY-MM-DDThh:mm:ssTZD
-     *  YYYY-MM-DDThh:mm:ss.sTZD
+     *  YYYY-MM-DDThh:mm:ss.sTZD.
      *
      * @param  string  $value
      * @return bool
