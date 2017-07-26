@@ -3,8 +3,9 @@
 namespace Illuminate\Contracts\Cache;
 
 use Closure;
+use Psr\SimpleCache\CacheInterface;
 
-interface Repository
+interface Repository extends CacheInterface
 {
     /**
      * Determine if an item exists in the cache.
