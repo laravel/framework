@@ -191,7 +191,13 @@ class Arr
     public static function last($array, callable $callback = null, $default = null)
     {
         if (is_null($callback)) {
-            return empty($array) ? value($default) : end($array);
+            if (empty($array)) {
+                return value($default);
+            }
+
+            foreach (array_slice($array, -1) as $item) {
+                return $item;
+            }
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
