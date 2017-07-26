@@ -1293,4 +1293,14 @@ class Builder
     {
         $this->query = clone $this->query;
     }
+
+	/**
+	 * return the query before render using the toSql function
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		return $this->toSql();
+	}
 }
