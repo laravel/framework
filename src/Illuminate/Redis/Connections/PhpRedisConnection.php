@@ -118,7 +118,7 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Return elements with score between $min and $max
+     * Return elements with score between $min and $max.
      *
      * @param  string  $key
      * @param  mixed  $min
@@ -139,7 +139,7 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Return elements with score between $min and $max
+     * Return elements with score between $min and $max.
      *
      * @param  string  $key
      * @param  mixed  $min

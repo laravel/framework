@@ -36,7 +36,7 @@ class RedisConnectionTest extends TestCase
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed', 'EX', 5, 'NX');
             $this->assertEquals('mohamed', $redis->get('one'));
-            $this->assertNotEquals(- 1, $redis->ttl('one'));
+            $this->assertNotEquals(-1, $redis->ttl('one'));
 
             // It doesn't override when NX mode
             $redis->set('one', 'taylor', 'EX', 5, 'NX');
@@ -52,8 +52,8 @@ class RedisConnectionTest extends TestCase
 
             $redis->set('three', 'mohamed', 'PX', 5000);
             $this->assertEquals('mohamed', $redis->get('three'));
-            $this->assertNotEquals(- 1, $redis->ttl('three'));
-            $this->assertNotEquals(- 1, $redis->pttl('three'));
+            $this->assertNotEquals(-1, $redis->ttl('three'));
+            $this->assertNotEquals(-1, $redis->pttl('three'));
 
             $redis->flushall();
         }
@@ -107,16 +107,16 @@ class RedisConnectionTest extends TestCase
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
-            $this->assertEquals(- 1, $redis->ttl('one'));
+            $this->assertEquals(-1, $redis->ttl('one'));
             $this->assertEquals(1, $redis->expire('one', 10));
-            $this->assertNotEquals(- 1, $redis->ttl('one'));
+            $this->assertNotEquals(-1, $redis->ttl('one'));
 
             $this->assertEquals(0, $redis->expire('nothing', 10));
 
             $redis->set('two', 'mohamed');
-            $this->assertEquals(- 1, $redis->ttl('two'));
+            $this->assertEquals(-1, $redis->ttl('two'));
             $this->assertEquals(1, $redis->pexpire('two', 10));
-            $this->assertNotEquals(- 1, $redis->pttl('two'));
+            $this->assertNotEquals(-1, $redis->pttl('two'));
 
             $this->assertEquals(0, $redis->pexpire('nothing', 10));
 
@@ -324,7 +324,7 @@ class RedisConnectionTest extends TestCase
                 'withscores' => true,
                 'limit' => [
                     'offset' => 1,
-                    'count' => 2
+                    'count' => 2,
                 ],
             ]));
 
@@ -344,7 +344,7 @@ class RedisConnectionTest extends TestCase
                 'withscores' => true,
                 'limit' => [
                     'offset' => 1,
-                    'count' => 2
+                    'count' => 2,
                 ],
             ]));
 
