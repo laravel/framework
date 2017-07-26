@@ -650,6 +650,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if an item does not exists in the collection by key.
+     *
+     * @param  mixed  $key
+     * @return bool
+     */
+    public function hasNot($key)
+    {
+        return ! $this->has($key);
+    }
+    
+    /**
      * Concatenate values of a given key as a string.
      *
      * @param  string  $value
