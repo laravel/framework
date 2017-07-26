@@ -21,6 +21,7 @@
         "illuminate/pipeline": "5.5.*",
         "illuminate/session": "5.5.*",
         "illuminate/support": "5.5.*",
+        "league/uri": "^5.0",
         "symfony/debug": "~3.3",
         "symfony/http-foundation": "~3.3",
         "symfony/http-kernel": "~3.3",

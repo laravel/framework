@@ -122,7 +122,7 @@ class FormRequest extends Request implements ValidatesWhenResolved
     /**
      * Get the URL to redirect to on a validation error.
      *
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      */
     protected function getRedirectUrl()
     {

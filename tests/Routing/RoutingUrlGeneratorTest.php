@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Psr\Http\Message\UriInterface;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RoutingUrlGeneratorTest extends TestCase
@@ -42,8 +43,13 @@ class RoutingUrlGeneratorTest extends TestCase
             $request = Request::create('http://www.foo.com/index.php/')
         );
 
-        $this->assertEquals('http://www.foo.com/foo/bar', $url->asset('foo/bar'));
-        $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
+        $nonSecure = $url->asset('foo/bar');
+        $this->assertEquals('http://www.foo.com/foo/bar', (string) $nonSecure);
+        $this->assertInstanceOf(UriInterface::class, $nonSecure);
+
+        $secure = $url->asset('foo/bar', true);
+        $this->assertEquals('https://www.foo.com/foo/bar', (string) $secure);
+        $this->assertInstanceOf(UriInterface::class, $secure);
     }
 
     public function testBasicGenerationWithFormatting()
@@ -136,6 +142,7 @@ class RoutingUrlGeneratorTest extends TestCase
         }]);
         $routes->add($route);
 
+        $this->assertInstanceOf(UriInterface::class, $url->route('plain', [], false));
         $this->assertEquals('/', $url->route('plain', [], false));
         $this->assertEquals('/?foo=bar', $url->route('plain', ['foo' => 'bar'], false));
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
@@ -197,6 +204,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], 'foo/invoke', ['controller' => 'namespace\InvokableActionStub']);
         $routes->add($route);
 
+        $this->assertInstanceOf(UriInterface::class, $url->action('foo@bar'));
         $this->assertEquals('http://www.foo.com/foo/bar', $url->action('foo@bar'));
         $this->assertEquals('http://www.foo.com/something/else', $url->action('\something\foo@bar'));
         $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
@@ -234,7 +242,9 @@ class RoutingUrlGeneratorTest extends TestCase
         $model = new RoutableInterfaceStub;
         $model->key = 'routable';
 
-        $this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
+        $result = $url->route('routable', [$model], false);
+        $this->assertEquals('/foo/routable', $result);
+        $this->assertInstanceOf(UriInterface::class, $result);
     }
 
     public function testRoutableInterfaceRoutingWithSingleParameter()
@@ -443,7 +453,9 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $url->getRequest()->headers->set('referer', 'http://www.bar.com/');
-        $this->assertEquals('http://www.bar.com/', $url->previous());
+        $previous = $url->previous();
+        $this->assertEquals('http://www.bar.com/', $previous);
+        $this->assertInstanceOf(UriInterface::class, $previous);
 
         $url->getRequest()->headers->remove('referer');
         $this->assertEquals($url->to('/'), $url->previous());

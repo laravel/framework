@@ -7,7 +7,7 @@ interface UrlGenerator
     /**
      * Get the current URL for the request.
      *
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      */
     public function current();
 
@@ -17,7 +17,7 @@ interface UrlGenerator
      * @param  string  $path
      * @param  mixed  $extra
      * @param  bool  $secure
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      */
     public function to($path, $extra = [], $secure = null);
 
@@ -26,7 +26,7 @@ interface UrlGenerator
      *
      * @param  string  $path
      * @param  array   $parameters
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      */
     public function secure($path, $parameters = []);
 
@@ -35,7 +35,7 @@ interface UrlGenerator
      *
      * @param  string  $path
      * @param  bool    $secure
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      */
     public function asset($path, $secure = null);
 
@@ -45,7 +45,7 @@ interface UrlGenerator
      * @param  string  $name
      * @param  mixed   $parameters
      * @param  bool  $absolute
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      *
      * @throws \InvalidArgumentException
      */
@@ -57,7 +57,7 @@ interface UrlGenerator
      * @param  string  $action
      * @param  mixed $parameters
      * @param  bool $absolute
-     * @return string
+     * @return \Psr\Http\Message\UriInterface|string
      */
     public function action($action, $parameters = [], $absolute = true);
 
