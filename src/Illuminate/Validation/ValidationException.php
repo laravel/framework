@@ -116,7 +116,7 @@ class ValidationException extends Exception
      * Set the URL to redirect to on a validation error.
      *
      * @param  string  $url
-     * @return string
+     * @return $this
      */
     public function redirectTo($url)
     {
