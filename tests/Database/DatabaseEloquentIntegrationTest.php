@@ -1041,7 +1041,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::orderBy('id', 'desc')->forPageAfterId(15, 1);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $results);
-        $this->assertEquals(2, $results->first()->id);        
+        $this->assertEquals(2, $results->first()->id);
     }
 
     public function testMorphToRelationsAcrossDatabaseConnections()
