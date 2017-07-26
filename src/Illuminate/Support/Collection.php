@@ -659,7 +659,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return ! $this->has($key);
     }
-    
+
     /**
      * Concatenate values of a given key as a string.
      *
