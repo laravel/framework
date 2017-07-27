@@ -4,6 +4,7 @@ use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Foundation\Bus\ChainConductor;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Bus\PendingDispatch;
 use Illuminate\Contracts\Routing\ResponseFactory;
@@ -369,14 +370,14 @@ if (! function_exists('decrypt')) {
 
 if (! function_exists('dispatch')) {
     /**
-     * Dispatch a job to its appropriate handler.
+     * Dispatch a jobs to their appropriate handler.
      *
-     * @param  mixed  $job
+     * @param  array|object  $jobs
      * @return \Illuminate\Foundation\Bus\PendingDispatch
      */
-    function dispatch($job)
+    function dispatch($jobs)
     {
-        return new PendingDispatch($job);
+        return new PendingDispatch($jobs, app(ChainConductor::class));
     }
 }
 

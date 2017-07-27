@@ -2,16 +2,24 @@
 
 namespace Illuminate\Foundation\Bus;
 
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Bus\Dispatcher;
 
 class PendingDispatch
 {
     /**
-     * The job.
+     * The list of jobs pending dispatch.
      *
-     * @var mixed
+     * @var \Illuminate\Support\Collection
      */
-    protected $job;
+    protected $jobs;
+
+    /**
+     * The chain conductor instance.
+     *
+     * @var \Illuminate\Foundation\Bus\ChainConductor
+     */
+    protected $chainConductor;
 
     /**
      * Create a new pending job dispatch.
@@ -19,9 +27,10 @@ class PendingDispatch
      * @param  mixed  $job
      * @return void
      */
-    public function __construct($job)
+    public function __construct($jobs, ChainConductor $chainConductor)
     {
-        $this->job = $job;
+        $this->jobs = Collection::wrap($jobs);
+        $this->chainConductor = $chainConductor;
     }
 
     /**
@@ -32,7 +41,7 @@ class PendingDispatch
      */
     public function onConnection($connection)
     {
-        $this->job->onConnection($connection);
+        $this->jobs->each->onConnection($connection);
 
         return $this;
     }
@@ -45,7 +54,7 @@ class PendingDispatch
      */
     public function onQueue($queue)
     {
-        $this->job->onQueue($queue);
+        $this->jobs->each->onQueue($queue);
 
         return $this;
     }
@@ -58,22 +67,27 @@ class PendingDispatch
      */
     public function delay($delay)
     {
-        $this->job->delay($delay);
+        $this->jobs->each->delay($delay);
 
         return $this;
     }
 
     /**
-     * Set the jobs that should run if this job is successful.
+     * Set up a chain of jobs.
      *
-     * @param  array  $chain
-     * @return $this
+     * @param  object|array  ...$jobs
+     * @return void
      */
-    public function chain($chain)
+    public function chain(...$jobs)
     {
-        $this->job->chain($chain);
+        // Here we transform the chain into a multi-dimensional collection.
+        // The outer collection holds the links in the chain, the inner
+        // collections are the jobs that should be run concurrently.
+        $chain = Collection::make($jobs)->map(function ($jobs) {
+            return Collection::wrap($jobs);
+        })->prepend($this->jobs);
 
-        return $this;
+        $this->chainConductor->createChain($chain);
     }
 
     /**
@@ -83,6 +97,10 @@ class PendingDispatch
      */
     public function __destruct()
     {
-        app(Dispatcher::class)->dispatch($this->job);
+        $dispactcher = app(Dispatcher::class);
+
+        foreach ($this->jobs as $job) {
+            $dispactcher->dispatch($job);
+        }
     }
 }
