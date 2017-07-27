@@ -680,15 +680,16 @@ class Blueprint
     /**
      * Create a new unsigned decimal column on the table.
      *
-     * @param string $column
-     * @param int    $total
-     * @param int    $places
-     * @param bool   $unsigned
+     * @param  string  $column
+     * @param  int  $total
+     * @param  int  $places
      * @return \Illuminate\Support\Fluent
      */
-    public function unsignedDecimal($column, $total = 8, $places = 2, $unsigned = true)
+    public function unsignedDecimal($column, $total = 8, $places = 2)
     {
-        return $this->addColumn('decimal', $column, compact('total', 'places', 'unsigned'));
+        return $this->addColumn('decimal', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => true,
+        ]);
     }
 
     /**
