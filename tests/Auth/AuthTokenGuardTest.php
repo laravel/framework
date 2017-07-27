@@ -59,6 +59,19 @@ class AuthTokenGuardTest extends TestCase
         $this->assertEquals(1, $user->id);
     }
 
+    public function testUserCanBeRetrievedByBearerTokenWithMutiAuthorizationHeader()
+    {
+        $provider = Mockery::mock(UserProvider::class);
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_AUTHORIZATION' => 'Basic dXNlcm5hbWU6cGFzc3dvcmQK, Bearer foo']);
+
+        $guard = new TokenGuard($provider, $request);
+
+        $user = $guard->user();
+
+        $this->assertEquals(1, $user->id);
+    }
+
     public function testValidateCanDetermineIfCredentialsAreValid()
     {
         $provider = Mockery::mock(UserProvider::class);
