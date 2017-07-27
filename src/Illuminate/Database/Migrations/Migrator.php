@@ -85,9 +85,25 @@ class Migrator
         // run each of the outstanding migrations against a database connection.
         $files = $this->getMigrationFiles($paths);
 
-        $this->requireFiles($migrations = $this->pendingMigrations(
+        $migrations = $this->pendingMigrations(
             $files, $this->repository->getRan()
-        ));
+        );
+
+        // Next we see if migrations should run until a certain point
+        // Remove migrations from the stack if target is used, after the given target
+        $target = Arr::get($options, 'target', false);
+        if($target) {
+            $key = array_search($target, $migrations);
+            if($key !== false) {
+                //remove migrations from the stack after the target
+                array_splice($migrations, $key + 1);
+            } else {
+                $this->note('<info>Migration target ' . $target . ' not found.</info>');
+                $migrations = array();
+            }
+        }
+
+        $this->requireFiles($migrations);
 
         // Once we have all these migrations that are outstanding we are ready to run
         // we will go ahead and run them "up". This will execute each migration as
