@@ -52,9 +52,14 @@ trait InteractsWithInput
     public function bearerToken()
     {
         $header = $this->header('Authorization', '');
-
-        if (Str::startsWith($header, 'Bearer ')) {
-            return Str::substr($header, 7);
+        $authorizationHeaders = explode(',', $header);
+        if (count($authorizationHeaders) > 0) {
+            foreach ($authorizationHeaders as $header) {
+                $header = trim($header);
+                if (Str::startsWith($header, 'Bearer ')) {
+                    return Str::substr($header, 7);
+                }
+            }
         }
     }
 
