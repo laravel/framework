@@ -92,14 +92,19 @@ class Migrator
         // Next we see if migrations should run until a certain point
         // Remove migrations from the stack if target is used, after the given target
         $target = Arr::get($options, 'target', false);
+
         if($target) {
-            $key = array_search($target, $migrations);
-            if($key !== false) {
-                //remove migrations from the stack after the target
-                array_splice($migrations, $key + 1);
+            if(isset($files[$target])) {
+                $targetpath = $files[$target];
+                $key = array_search($targetpath, $migrations);
+                if ($key !== false) {
+                    //remove migrations from the stack after the target
+                    array_splice($migrations, $key + 1);
+                } else {
+                    $this->note('<info>Could not find target : '. $target . '</info> ');
+                }
             } else {
-                $this->note('<info>Migration target ' . $target . ' not found.</info>');
-                $migrations = array();
+                $this->note('<info>Could not find target : '. $target . '</info> ');
             }
         }
 
