@@ -303,6 +303,29 @@ abstract class Relation
     }
 
     /**
+     * Return true if the relation is inverse, false otherwise.
+     *
+     * @return bool
+     */
+    public function isInverse()
+    {
+        return false;
+    }
+
+    /**
+     * Associate a model to its relative and then push the model.
+     * This default implementation does not associate anything
+     * because we don't know what kind of relation we have.
+     *
+     * @param Model $model
+     * @return bool
+     */
+    public function push(Model $model)
+    {
+        return $model->push();
+    }
+
+    /**
      * Set or get the morph map for polymorphic relations.
      *
      * @param  array|null  $map

@@ -14,6 +14,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\RelationPusher;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 /**
@@ -464,31 +465,44 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Save the model and all of its relationships.
+     * Save the model and all the non inverse relationships.
      *
      * @return bool
      */
     public function push()
     {
-        if (! $this->save()) {
-            return false;
-        }
+        $nonInverseRelations = $this->getRelationPushers()->reject->isInverse();
 
-        // To sync all of the relationships to the database, we will simply spin through
-        // the relationships and save each model via this "push" method, which allows
-        // us to recurse into all of these nested relations for the model instance.
-        foreach ($this->relations as $models) {
-            $models = $models instanceof Collection
-                        ? $models->all() : [$models];
+        return $this->save() && $nonInverseRelations->every->push();
+    }
 
-            foreach (array_filter($models) as $model) {
-                if (! $model->push()) {
-                    return false;
-                }
-            }
-        }
+    /**
+     * Save the model and all of its relationships.
+     *
+     * @return bool
+     */
+    public function pushAll()
+    {
+        // To sync all of the relationships to the database, it's important to split the inverse
+        // and the non-inverse ones, so we can: save the parents first, associate them to the
+        // main model (assign foreign keys), save the main model and then save the children.
+        list($inverseRelations, $nonInverseRelations) = $this->getRelationPushers()->partition->isInverse();
 
-        return true;
+        return $inverseRelations->every->push() && $this->save() && $nonInverseRelations->every->push();
+    }
+
+    /**
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getRelationPushers()
+    {
+        return collect($this->relations)
+            ->filter()
+            ->map(function ($models, $name) {
+                return new RelationPusher(
+                    $name, $models, method_exists($this, $name) ? $this->$name() : null
+                );
+            });
     }
 
     /**
