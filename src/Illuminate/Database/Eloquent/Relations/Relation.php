@@ -55,6 +55,13 @@ abstract class Relation
     protected static $morphMap = [];
 
     /**
+     * The inverse side of the relationship.
+     *
+     * @var string
+     */
+    protected $inverseSide;
+
+    /**
      * Create a new relation instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
