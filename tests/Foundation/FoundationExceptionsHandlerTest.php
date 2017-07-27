@@ -128,7 +128,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
 class CustomException extends Exception implements Responsable
 {
-    public function toResponse()
+    public function toResponse($request)
     {
         return response()->json(['response' => 'My custom exception response']);
     }

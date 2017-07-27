@@ -650,7 +650,7 @@ class Router implements RegistrarContract, BindingRegistrar
     public static function prepareResponse($request, $response)
     {
         if ($response instanceof Responsable) {
-            $response = $response->toResponse();
+            $response = $response->toResponse($request);
         }
 
         if ($response instanceof PsrResponseInterface) {

@@ -27,7 +27,7 @@ class ResponsableTest extends TestCase
 
 class TestResponsableResponse implements Responsable
 {
-    public function toResponse()
+    public function toResponse($request)
     {
         return response('hello world', 201, ['X-Test-Header' => 'Taylor']);
     }

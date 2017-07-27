@@ -168,7 +168,7 @@ class Handler implements ExceptionHandlerContract
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::prepareResponse($request, $response);
         } elseif ($e instanceof Responsable) {
-            return $e->toResponse();
+            return $e->toResponse($request);
         }
 
         $e = $this->prepareException($e);
