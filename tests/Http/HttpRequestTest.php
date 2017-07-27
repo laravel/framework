@@ -278,8 +278,13 @@ class HttpRequestTest extends TestCase
 
     public function testIntersectMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
-        $this->assertEquals(['name' => 'Taylor'], $request->intersect('name', 'age', 'email'));
+        $request = Request::create('/', 'GET', [
+            'name' => 'Taylor', 'age' => null, 'accepted' => false, 'agreed' => 0,
+        ]);
+        $this->assertEquals(
+            ['name' => 'Taylor', 'accepted' => false, 'agreed' => 0],
+            $request->intersect('name', 'age', 'accepted', 'agreed', 'email')
+        );
     }
 
     public function testQueryMethod()

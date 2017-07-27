@@ -181,7 +181,12 @@ trait InteractsWithInput
      */
     public function intersect($keys)
     {
-        return array_filter($this->only(is_array($keys) ? $keys : func_get_args()));
+        return array_filter(
+            $this->only(is_array($keys) ? $keys : func_get_args()),
+            function ($value) {
+                return ! is_null($value);
+            }
+        );
     }
 
     /**
