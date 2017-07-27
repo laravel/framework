@@ -79,7 +79,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
     public function testUnsignedDecimalTable()
     {
         $base = new Blueprint('users', function ($table) {
-            $table->unsignedDecimal('money', 10, 2, true)->useCurrent();
+            $table->unsignedDecimal('money', 10, 2)->useCurrent();
         });
 
         $connection = m::mock('Illuminate\Database\Connection');
