@@ -3,7 +3,6 @@
 namespace Illuminate\Support;
 
 use Countable;
-use Illuminate\Support\MessageBags;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 
 class ViewErrorBag implements Countable
