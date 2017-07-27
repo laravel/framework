@@ -6,6 +6,9 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 
+/**
+ * @mixin \Illuminate\Contracts\Auth\PasswordBroker
+ */
 class PasswordBrokerManager implements FactoryContract
 {
     /**

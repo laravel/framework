@@ -18,6 +18,9 @@ use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 
+/**
+ * @mixin \League\Flysystem\FilesystemInterface
+ */
 class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 {
     /**

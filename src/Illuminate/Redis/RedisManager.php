@@ -5,6 +5,9 @@ namespace Illuminate\Redis;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 
+/**
+ * @mixin \Illuminate\Redis\Connections\Connection
+ */
 class RedisManager implements Factory
 {
     /**

@@ -18,7 +18,7 @@
         "php": ">=7.0",
         "ext-mbstring": "*",
         "ext-openssl": "*",
-        "doctrine/inflector": "~1.0",
+        "doctrine/inflector": "~1.1.0",
         "erusev/parsedown": "~1.6",
         "filp/whoops": "~2.0",
         "league/flysystem": "~1.0",

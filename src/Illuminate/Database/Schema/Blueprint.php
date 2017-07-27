@@ -678,6 +678,21 @@ class Blueprint
     }
 
     /**
+     * Create a new unsigned decimal column on the table.
+     *
+     * @param  string  $column
+     * @param  int  $total
+     * @param  int  $places
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedDecimal($column, $total = 8, $places = 2)
+    {
+        return $this->addColumn('decimal', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => true,
+        ]);
+    }
+
+    /**
      * Create a new boolean column on the table.
      *
      * @param  string  $column

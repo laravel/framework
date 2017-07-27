@@ -7,6 +7,9 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 
+/**
+ * @mixin \Illuminate\Support\Collection
+ */
 abstract class AbstractPaginator implements Htmlable
 {
     /**

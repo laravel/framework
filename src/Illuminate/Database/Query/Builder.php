@@ -715,10 +715,10 @@ class Builder
      * Add a raw or where clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  mixed   $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereRaw($sql, array $bindings = [])
+    public function orWhereRaw($sql, $bindings = [])
     {
         return $this->whereRaw($sql, $bindings, 'or');
     }
@@ -1562,7 +1562,7 @@ class Builder
     }
 
     /**
-     * Get an array orders with all orders for an given column removed.
+     * Get an array with all orders with a given column removed.
      *
      * @param  string  $column
      * @return array
@@ -1571,7 +1571,8 @@ class Builder
     {
         return Collection::make($this->orders)
                     ->reject(function ($order) use ($column) {
-                        return $order['column'] === $column;
+                        return isset($order['column'])
+                               ? $order['column'] === $column : false;
                     })->values()->all();
     }
 

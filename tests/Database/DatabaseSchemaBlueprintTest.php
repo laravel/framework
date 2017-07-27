@@ -75,4 +75,16 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals(['alter table "users" add "created" datetime2(0) default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
     }
+
+    public function testUnsignedDecimalTable()
+    {
+        $base = new Blueprint('users', function ($table) {
+            $table->unsignedDecimal('money', 10, 2)->useCurrent();
+        });
+
+        $connection = m::mock('Illuminate\Database\Connection');
+
+        $blueprint = clone $base;
+        $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
+    }
 }

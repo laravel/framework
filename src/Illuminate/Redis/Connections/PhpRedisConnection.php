@@ -4,6 +4,9 @@ namespace Illuminate\Redis\Connections;
 
 use Closure;
 
+/**
+ * @mixin \Redis
+ */
 class PhpRedisConnection extends Connection
 {
     /**
