@@ -414,7 +414,11 @@ class Command extends SymfonyCommand
      */
     public function line($string, $style = null, $verbosity = null)
     {
-        $styled = $style ? "<$style>$string</$style>" : $string;
+        if ($style && str_contains($style, '=')) {
+            $styled = "<$style>$string</>";
+        } else {
+            $styled = $style ? "<$style>$string</$style>" : $string;
+        }
 
         $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }
