@@ -4,7 +4,6 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 
 class DatabaseEloquentHasOneThroughTest extends TestCase
 {
