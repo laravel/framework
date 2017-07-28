@@ -2,8 +2,8 @@
 
 namespace Illuminate\Console;
 
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Str;
+use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
