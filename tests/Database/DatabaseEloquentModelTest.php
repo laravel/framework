@@ -463,6 +463,9 @@ class DatabaseEloquentModelTest extends TestCase
         $model->color = 'blue';
         $this->assertEquals('blue', $model->color);
         $this->assertEquals($model->getAttributes(), ['color' => 0]);
+
+        $model->color = null;
+        $this->assertNull($model->color);
         
     }
 

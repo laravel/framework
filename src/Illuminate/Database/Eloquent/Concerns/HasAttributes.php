@@ -976,10 +976,14 @@ trait HasAttributes
      *
      * @param  string $key
      * @param  string $value
-     * @return int
+     * @return int|null
      */
     protected function getDynamicEnumInternalValue($key, $value)
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         $value = array_search($value, $this->enums[$key]);
 
         if ($value !== false) {
