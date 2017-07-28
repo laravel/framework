@@ -93,10 +93,10 @@ class Migrator
         // Remove migrations from the stack if target is used, after the given target
         $target = Arr::get($options, 'target', false);
 
-        if($target) {
+        if ($target) {
             $errortarget = false;
             // check if target exists, get the realpath of the target
-            if(isset($files[$target])) {
+            if (isset($files[$target])) {
                 $targetpath = $files[$target];
                 $key = array_search($targetpath, $migrations);
                 if ($key !== false) {
@@ -111,10 +111,10 @@ class Migrator
 
             // target not found, show error message
             // clear the migrations array, so no migrations can be done
-            if($errortarget) {
+            if ($errortarget) {
                 // on error, clear the migrations array, so that nothing gets migrated
-                $this->note('<info>Could not find target : '. $target . '</info> ');
-                $migrations = array();
+                $this->note('<info>Could not find target : '.$target.'</info> ');
+                $migrations = [];
             }
         }
 
