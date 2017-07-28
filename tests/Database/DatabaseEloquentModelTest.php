@@ -466,7 +466,6 @@ class DatabaseEloquentModelTest extends TestCase
 
         $model->color = null;
         $this->assertNull($model->color);
-        
     }
 
     public function testItCastsDynamicEnumValuesInAnArray()

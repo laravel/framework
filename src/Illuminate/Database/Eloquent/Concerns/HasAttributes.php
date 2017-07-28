@@ -79,7 +79,7 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
-     * The dynamic enums on this model
+     * The dynamic enums on this model.
      *
      * @var array
      */
@@ -208,7 +208,7 @@ trait HasAttributes
 
     /**
      * Add dynamic enum attributes to the attributes array.
-     * 
+     *
      * @param  array $attributes
      * @param  array $mutatedAttributes
      * @return array
@@ -930,7 +930,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the corresponding enum options array for an enum
+     * Get the corresponding enum options array for an enum.
      *
      * @param  string $enum
      * @return array
@@ -952,7 +952,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the corresponding enum option value based on the stored key
+     * Get the corresponding enum option value based on the stored key.
      *
      * @param  string $key
      * @param  string $value
@@ -972,7 +972,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the value that should be stored internally for an enum option
+     * Get the value that should be stored internally for an enum option.
      *
      * @param  string $key
      * @param  string $value

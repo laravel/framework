@@ -706,7 +706,7 @@ class Blueprint
     /**
      * Create a new enum column on the table.
      * If they don't pass an array, assume they want
-     * a dynamic enum
+     * a dynamic enum.
      *
      * @param  string      $column
      * @param  array|null  $allowed
@@ -714,7 +714,7 @@ class Blueprint
      */
     public function enum($column, array $allowed = null)
     {
-        return is_array($allowed) 
+        return is_array($allowed)
             ? $this->addColumn('enum', $column, compact('allowed'))
             : $this->unsignedSmallInteger($column);
     }
