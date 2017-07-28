@@ -48,6 +48,7 @@ use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Queue\Console\OnceCommand as QueueOnceCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
@@ -104,6 +105,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueFlush' => 'command.queue.flush',
         'QueueForget' => 'command.queue.forget',
         'QueueListen' => 'command.queue.listen',
+        'QueueOnce' => 'command.queue.once',
         'QueueRestart' => 'command.queue.restart',
         'QueueRetry' => 'command.queue.retry',
         'QueueWork' => 'command.queue.work',
@@ -652,6 +654,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.queue.listen', function ($app) {
             return new QueueListenCommand($app['queue.listener']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueueOnceCommand()
+    {
+        $this->app->singleton('command.queue.once', function ($app) {
+            return new QueueOnceCommand($app['queue.worker']);
         });
     }
 
