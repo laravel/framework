@@ -20,7 +20,7 @@ class MigrateCommand extends BaseCommand
                 {--pretend : Dump the SQL queries that would be run.}
                 {--seed : Indicates if the seed task should be re-run.}
                 {--step : Force the migrations to be run so they can be rolled back individually.}
-                {--target : Run the operation until the target is reached. }';
+                {--target= : Run the operation until the target is reached. }';
 
     /**
      * The console command description.
