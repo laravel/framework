@@ -404,11 +404,11 @@ class Handler implements ExceptionHandlerContract
     {
         if ($response instanceof SymfonyRedirectResponse) {
             $response = new RedirectResponse(
-                $response->getTargetUrl(), $response->getStatusCode(), $response->headers->all()
+                $response->getTargetUrl(), $response->getStatusCode(), $response->headers->allPreserveCase()
             );
         } else {
             $response = new Response(
-                $response->getContent(), $response->getStatusCode(), $response->headers->all()
+                $response->getContent(), $response->getStatusCode(), $response->headers->allPreserveCase()
             );
         }
 
