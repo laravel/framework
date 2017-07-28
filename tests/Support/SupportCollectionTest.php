@@ -930,7 +930,7 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
     {
@@ -1111,7 +1111,7 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection([[1, 'a'], [2, 'b']]);
 
-        $result = $c->mapSpread(function ($number, $character) use (&$result) {
+        $result = $c->mapSpread(function ($number, $character) {
             return "{$number}-{$character}";
         });
         $this->assertEquals(['1-a', '2-b'], $result->all());
@@ -1138,7 +1138,7 @@ class SupportCollectionTest extends TestCase
             ['id' => 4, 'name' => 'B'],
         ]);
 
-        $groups = $data->mapToGroups(function ($item, $key) {
+        $groups = $data->mapToGroups(function ($item) {
             return [$item['name'] => $item['id']];
         });
 
@@ -1804,7 +1804,7 @@ class SupportCollectionTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
      */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
     {
