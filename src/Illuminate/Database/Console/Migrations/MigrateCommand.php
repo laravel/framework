@@ -19,7 +19,8 @@ class MigrateCommand extends BaseCommand
                 {--path= : The path of migrations files to be executed.}
                 {--pretend : Dump the SQL queries that would be run.}
                 {--seed : Indicates if the seed task should be re-run.}
-                {--step : Force the migrations to be run so they can be rolled back individually.}';
+                {--step : Force the migrations to be run so they can be rolled back individually.}
+                {--target= : Run the operation until the target is reached. }';
 
     /**
      * The console command description.
@@ -67,6 +68,7 @@ class MigrateCommand extends BaseCommand
         $this->migrator->run($this->getMigrationPaths(), [
             'pretend' => $this->option('pretend'),
             'step' => $this->option('step'),
+            'target' => $this->option('target'),
         ]);
 
         // Once the migrator has run we will grab the note output and send it out to
