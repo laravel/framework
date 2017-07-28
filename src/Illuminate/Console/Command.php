@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -414,7 +415,11 @@ class Command extends SymfonyCommand
      */
     public function line($string, $style = null, $verbosity = null)
     {
-        $styled = $style ? "<$style>$string</$style>" : $string;
+        if ($style) {
+            $styled = Str::contains($style, '=') ? "<$style>$string</>" : "<$style>$string</$style>";
+        } else {
+            $styled = $string;
+        }
 
         $this->output->writeln($styled, $this->parseVerbosity($verbosity));
     }
