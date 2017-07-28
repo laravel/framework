@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\InvalidEnumValueException;
 
 trait HasAttributes
 {
@@ -78,6 +79,13 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
+     * The dynamic enums on this model
+     *
+     * @var array
+     */
+    protected $enums = [];
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -99,6 +107,10 @@ trait HasAttributes
         // the values to their appropriate type. If the attribute has a mutator we
         // will not perform the cast on those attributes to avoid any confusion.
         $attributes = $this->addCastAttributesToArray(
+            $attributes, $mutatedAttributes
+        );
+
+        $attributes = $this->addDynamicEnumAttributesToArray(
             $attributes, $mutatedAttributes
         );
 
@@ -189,6 +201,26 @@ trait HasAttributes
                 ($value === 'date' || $value === 'datetime')) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Add dynamic enum attributes to the attributes array.
+     * 
+     * @param  array $attributes
+     * @param  array $mutatedAttributes
+     * @return array
+     */
+    protected function addDynamicEnumAttributesToArray(array $attributes, array $mutatedAttributes)
+    {
+        foreach ($this->getDynamicEnums() as $key => $value) {
+            if (! array_key_exists($key, $attributes) || in_array($key, $mutatedAttributes)) {
+                continue;
+            }
+
+            $attributes[$key] = $this->getDynamicEnumValue($key, $attributes[$key]);
         }
 
         return $attributes;
@@ -332,6 +364,10 @@ trait HasAttributes
     public function getAttributeValue($key)
     {
         $value = $this->getAttributeFromArray($key);
+
+        if ($this->hasDynamicEnum($key)) {
+            $value = $this->getDynamicEnumValue($key, $value);
+        }
 
         // If the attribute has a get mutator, we will call that then return what
         // it returns as the value, which is useful for transforming values on
@@ -541,6 +577,10 @@ trait HasAttributes
         // attribute in the array's value in the case of deeply nested items.
         if (Str::contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
+        }
+
+        if ($this->hasDynamicEnum($key)) {
+            $value = $this->getDynamicEnumInternalValue($key, $value);
         }
 
         $this->attributes[$key] = $value;
@@ -864,7 +904,7 @@ trait HasAttributes
     /**
      * Set the array of model attributes. No checking is done.
      *
-     * @param  array  $attributes
+     * @param  array $attributes
      * @param  bool  $sync
      * @return $this
      */
@@ -877,6 +917,76 @@ trait HasAttributes
         }
 
         return $this;
+    }
+
+    /**
+     * Get the array of dynamic enums.
+     *
+     * @return array
+     */
+    protected function getDynamicEnums()
+    {
+        return $this->enums;
+    }
+
+    /**
+     * Get the corresponding enum options array for an enum
+     *
+     * @param  string $enum
+     * @return array
+     */
+    protected function getDynamicEnum($enum)
+    {
+        return $this->getDynamicEnums()[$enum];
+    }
+
+    /**
+     * Check if the model has a dynamic enum for this key.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function hasDynamicEnum($key)
+    {
+        return array_key_exists($key, $this->getDynamicEnums());
+    }
+
+    /**
+     * Get the corresponding enum option value based on the stored key
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return string
+     */
+    protected function getDynamicEnumValue($key, $value)
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        if (array_key_exists($value, $this->getDynamicEnum($key))) {
+            return $this->getDynamicEnum($key)[$value];
+        }
+
+        throw InvalidEnumValueException::make($this, $key, $value);
+    }
+
+    /**
+     * Get the value that should be stored internally for an enum option
+     *
+     * @param  string $key
+     * @param  string $value
+     * @return int
+     */
+    protected function getDynamicEnumInternalValue($key, $value)
+    {
+        $value = array_search($value, $this->enums[$key]);
+
+        if ($value !== false) {
+            return $value;
+        }
+
+        throw InvalidEnumValueException::make($this, $key, $value);
     }
 
     /**

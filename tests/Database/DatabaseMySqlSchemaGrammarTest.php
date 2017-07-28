@@ -549,6 +549,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `foo` enum(\'bar\', \'baz\') not null', $statements[0]);
     }
 
+    public function testAddingDynamicEnum()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` smallint unsigned not null', $statements[0]);
+    }
+
     public function testAddingJson()
     {
         $blueprint = new Blueprint('users');

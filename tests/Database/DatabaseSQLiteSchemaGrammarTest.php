@@ -340,6 +340,16 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
+    public function testAddingDynamicEnum()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "foo" integer not null', $statements[0]);
+    }
+
     public function testAddingJson()
     {
         $blueprint = new Blueprint('users');
