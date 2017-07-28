@@ -94,6 +94,8 @@ class Migrator
         $target = Arr::get($options, 'target', false);
 
         if($target) {
+            $errortarget = false;
+            // check if target exists, get the realpath of the target
             if(isset($files[$target])) {
                 $targetpath = $files[$target];
                 $key = array_search($targetpath, $migrations);
@@ -101,10 +103,18 @@ class Migrator
                     //remove migrations from the stack after the target
                     array_splice($migrations, $key + 1);
                 } else {
-                    $this->note('<info>Could not find target : '. $target . '</info> ');
+                    $errortarget = true;
                 }
             } else {
+                $errortarget = true;
+            }
+
+            // target not found, show error message
+            // clear the migrations array, so no migrations can be done
+            if($errortarget) {
+                // on error, clear the migrations array, so that nothing gets migrated
                 $this->note('<info>Could not find target : '. $target . '</info> ');
+                $migrations = array();
             }
         }
 
