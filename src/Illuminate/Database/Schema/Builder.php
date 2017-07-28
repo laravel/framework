@@ -131,7 +131,9 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        $results = $this->connection->select($this->grammar->compileColumnListing($table));
+        $search_path = $this->connection->getDoctrineSchemaManager()->getSchemaSearchPaths()[0];
+
+        $results = $this->connection->select($this->grammar->compileColumnListing($table, $search_path));
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
