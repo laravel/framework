@@ -398,6 +398,21 @@ class Blueprint
     }
 
     /**
+     * Makes an unsigned integer column with a foreign key reference.
+     *
+     * @param  string  $column
+     * @param  string  $table
+     * @param  string  $foreignColumn
+     * @return \Illuminate\Support\Fluent
+     */
+    public function foreignId($column, $table, $foreignColumn = 'id')
+    {
+        $this->unsignedInteger($column);
+
+        return $this->foreign($column)->references($foreignColumn)->on($table);
+    }
+
+    /**
      * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
