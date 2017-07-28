@@ -47,7 +47,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileColumnListing($table, $schema = null)
     {
-        if($schema) {
+        if ($schema) {
             return "select column_name from information_schema.columns where table_name = '$table' and table_schema = '$schema'";
         }
 
