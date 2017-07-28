@@ -409,6 +409,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(255) not null', $statements[0]);
     }
 
+    public function testAddingDynamicEnum()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->enum('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "foo" smallint not null', $statements[0]);
+    }
+
     public function testAddingJson()
     {
         $blueprint = new Blueprint('users');

@@ -453,6 +453,38 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('2015-04-17 22:59:01', $model->fromDateTime($value));
     }
 
+    public function testItCastsDynamicEnumValues()
+    {
+        $model = new EloquentDynamicEnumsStub;
+        $model->setRawAttributes(['color' => 1]);
+
+        $this->assertEquals('yellow', $model->color);
+
+        $model->color = 'blue';
+        $this->assertEquals('blue', $model->color);
+        $this->assertEquals($model->getAttributes(), ['color' => 0]);
+
+        $model->color = null;
+        $this->assertNull($model->color);
+    }
+
+    public function testItCastsDynamicEnumValuesInAnArray()
+    {
+        $model = new EloquentDynamicEnumsStub;
+        $model->setRawAttributes(['color' => 1]);
+
+        $this->assertEquals($model->toArray(), ['color' => 'yellow']);
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\InvalidEnumValueException
+     */
+    public function testItThrowsAnErrorOnSaveWithBadEnumValues()
+    {
+        $model = new EloquentDynamicEnumsStub;
+        $model->color = 'green';
+    }
+
     /**
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Call to undefined method Illuminate\Tests\Database\EloquentModelStub::badMethod()
@@ -2049,5 +2081,12 @@ class EloquentModelEventObjectStub extends \Illuminate\Database\Eloquent\Model
 {
     protected $dispatchesEvents = [
         'saving' => EloquentModelSavingEventStub::class,
+    ];
+}
+
+class EloquentDynamicEnumsStub extends Model
+{
+    protected $enums = [
+        'color' => ['blue', 'yellow'],
     ];
 }
