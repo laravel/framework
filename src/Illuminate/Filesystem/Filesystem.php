@@ -381,10 +381,15 @@ class Filesystem
      * Get an array of all files in a directory.
      *
      * @param  string  $directory
+     * @param  bool  $recursive
      * @return array
      */
-    public function files($directory)
+    public function files($directory, $recursive = false)
     {
+        if ($recursive) {
+            return $this->allFiles($directory);
+        }
+
         $glob = glob($directory.DIRECTORY_SEPARATOR.'*');
 
         if ($glob === false) {
