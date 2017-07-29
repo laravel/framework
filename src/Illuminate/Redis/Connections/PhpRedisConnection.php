@@ -35,6 +35,19 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Get the values of all the given keys.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function mget(array $keys)
+    {
+        return array_map(function ($value) {
+            return $value !== false ? $value : null;
+        }, $this->client->mget($keys));
+    }
+
+    /**
      * Determine if the given keys exist.
      *
      * @param  dynamic  $key
@@ -47,44 +60,6 @@ class PhpRedisConnection extends Connection
         })->all();
 
         return $this->executeRaw(array_merge(['exists'], $keys));
-    }
-
-    /**
-     * Set the given key if it doesn't exist.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return int
-     */
-    public function setnx($key, $value)
-    {
-        return (int) $this->client->setnx($key, $value);
-    }
-
-    /**
-     * Set the given hash field if it doesn't exist.
-     *
-     * @param  string  $hash
-     * @param  string  $key
-     * @param  string  $value
-     * @return int
-     */
-    public function hsetnx($hash, $key, $value)
-    {
-        return (int) $this->client->hsetnx($hash, $key, $value);
-    }
-
-    /**
-     * Get the values of all the given keys.
-     *
-     * @param  array  $keys
-     * @return array
-     */
-    public function mget(array $keys)
-    {
-        return array_map(function ($value) {
-            return $value !== false ? $value : null;
-        }, $this->client->mget($keys));
     }
 
     /**
@@ -104,6 +79,67 @@ class PhpRedisConnection extends Connection
             $value,
             $expireResolution ? [$flag, $expireResolution => $expireTTL] : null,
         ]);
+    }
+
+    /**
+     * Set the given key if it doesn't exist.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return int
+     */
+    public function setnx($key, $value)
+    {
+        return (int) $this->client->setnx($key, $value);
+    }
+
+    /**
+     * Get the value of the given hash fields.
+     *
+     * @param  string  $key
+     * @param  dynamic  $dictionary
+     * @return int
+     */
+    public function hmget($key, ...$dictionary)
+    {
+        if (count($dictionary) == 1) {
+            $dictionary = $dictionary[0];
+        }
+
+        return array_values($this->command('hmget', [$key, $dictionary]));
+    }
+
+    /**
+     * Set the given hash fields to their respective values.
+     *
+     * @param  string  $key
+     * @param  dynamic  $dictionary
+     * @return int
+     */
+    public function hmset($key, ...$dictionary)
+    {
+        if (count($dictionary) == 1) {
+            $dictionary = $dictionary[0];
+        } else {
+            $input = collect($dictionary);
+
+            $dictionary = $input->nth(2)->combine($input->nth(2, 1))->toArray();
+        }
+
+        return $this->command('hmset', [$key, $dictionary]);
+    }
+
+    /**
+     * Set the given hash field if it doesn't exist.
+     *
+     * @param  string  $hash
+     * @param  string  $key
+     * @param  string  $value
+     * @return int
+     */
+    public function hsetnx($hash, $key, $value)
+    {
+        return (int) $this->client->hsetnx($hash, $key, $value);
     }
 
     /**
@@ -224,42 +260,6 @@ class PhpRedisConnection extends Connection
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum'
         );
-    }
-
-    /**
-     * Set the given hash fields to their respective values.
-     *
-     * @param  string  $key
-     * @param  dynamic  $dictionary
-     * @return int
-     */
-    public function hmset($key, ...$dictionary)
-    {
-        if (count($dictionary) == 1) {
-            $dictionary = $dictionary[0];
-        } else {
-            $input = collect($dictionary);
-
-            $dictionary = $input->nth(2)->combine($input->nth(2, 1))->toArray();
-        }
-
-        return $this->command('hmset', [$key, $dictionary]);
-    }
-
-    /**
-     * Get the value of the given hash fields.
-     *
-     * @param  string  $key
-     * @param  dynamic  $dictionary
-     * @return int
-     */
-    public function hmget($key, ...$dictionary)
-    {
-        if (count($dictionary) == 1) {
-            $dictionary = $dictionary[0];
-        }
-
-        return array_values($this->command('hmget', [$key, $dictionary]));
     }
 
     /**
