@@ -42,10 +42,15 @@ class PostgresGrammar extends Grammar
      * Compile the query to determine the list of columns.
      *
      * @param  string  $table
+     * @param  string  $schema
      * @return string
      */
-    public function compileColumnListing($table)
+    public function compileColumnListing($table, $schema = null)
     {
+        if ($schema) {
+            return "select column_name from information_schema.columns where table_name = '$table' and table_schema = '$schema'";
+        }
+
         return "select column_name from information_schema.columns where table_name = '$table'";
     }
 
