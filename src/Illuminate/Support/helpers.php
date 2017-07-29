@@ -1022,3 +1022,69 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+    if (!function_exists('is_empty')) {
+       /*
+        * Customized is_empty
+        *
+        * @param Mixed  $data  - Mixed data
+        * 
+        * @return array
+        *---------------------------------------------------------------- */
+
+        function is_empty($data)
+        {
+            if (empty($data) === false) {
+                if (($data instanceof Illuminate\Database\Eloquent\Collection
+                        or $data instanceof Illuminate\Pagination\Paginator
+                        or $data instanceof Illuminate\Pagination\LengthAwarePaginator
+                        or $data instanceof Illuminate\Support\Collection)
+                    and ($data->count() <= 0)) {
+                    return true;
+                } elseif (is_object($data)) {
+                    $data = (array) $data;
+
+                    return empty($data);
+                }
+
+                return false;
+            }
+
+            return true;
+        }
+    }
+
+    if (!function_exists('if_issset')) {
+        /*
+          * Check isset & is_empty & return the result based on values sent
+          *
+          * @param Mixed  $data  - Mixed data - Note: Should no used direct function etc
+          * @param Mixed  $ifSetValue  - Value if result is true
+          * @param Mixed  $ifNotSetValue  - Value if result is false
+          * 
+          * @return array
+          *---------------------------------------------------------------- */        
+        function if_issset(&$data, $ifSetValue = '', $ifNotSetValue = '')
+        {
+            // check if value isset & not empty
+            if ((isset($data) === true) and (is_empty($data) === false)) {
+                if (! is_string($ifSetValue) and is_callable($ifSetValue) === true) {
+                    return call_user_func($ifSetValue, $data);
+                } elseif ($ifSetValue === true) {
+                    return $data;
+                } elseif ($ifSetValue !== '') {
+                    return $ifSetValue;
+                }
+
+                return true;
+            } else {
+                if (! is_string($ifNotSetValue) and is_callable($ifNotSetValue) === true) {
+                    return call_user_func($ifNotSetValue);
+                } elseif ($ifNotSetValue !== '') {
+                    return $ifNotSetValue;
+                }
+
+                return false;
+            }
+        }
+    }
