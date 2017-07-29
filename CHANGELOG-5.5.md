@@ -121,7 +121,7 @@
 - Use `json_last_error()` in `Encrypter` ([#20099](https://github.com/laravel/framework/pull/20099))
 
 ### Errors & Logging
-- Added default 404, 429 and 500 error pages ([#18483](https://github.com/laravel/framework/pull/18483), [4d8c2c1](https://github.com/laravel/framework/commit/4d8c2c1f53979a669a59793b4ec61c8e60ed5b29))
+- Added default 404, 419 and 500 error pages ([#18483](https://github.com/laravel/framework/pull/18483), [4d8c2c1](https://github.com/laravel/framework/commit/4d8c2c1f53979a669a59793b4ec61c8e60ed5b29))
 - ⚠️ Always show custom 500 error page for all exception types when not in debug mode ([#18481](https://github.com/laravel/framework/pull/18481), [3cb7b0f](https://github.com/laravel/framework/commit/3cb7b0f4304274f209ed0f776ef70ccd4f9fe5dd))
 - ⚠️ Show 419 error page on `TokenMismatchException` ([#18728](https://github.com/laravel/framework/pull/18728))
 - Support `render()` method on exceptions ([ed51160](https://github.com/laravel/framework/commit/ed51160b97d8c4cf16526a0f8ba57ce7cb131b53), [c8a9413](https://github.com/laravel/framework/commit/c8a9413e2dc3bf00c206742e2bc76a88134cba84))
