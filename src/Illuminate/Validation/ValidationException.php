@@ -65,7 +65,7 @@ class ValidationException extends Exception
      * @param  array  $messages
      * @return static
      */
-    public static function fromMessages(array $messages)
+    public static function withMessages(array $messages)
     {
         return new static(tap(ValidatorFacade::make([], []), function ($validator) use ($messages) {
             foreach ($messages as $key => $value) {

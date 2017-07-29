@@ -47,7 +47,7 @@ trait ThrottlesLogins
             $this->throttleKey($request)
         );
 
-        throw ValidationException::fromMessages([
+        throw ValidationException::withMessages([
             $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
         ])->status(423);
     }
