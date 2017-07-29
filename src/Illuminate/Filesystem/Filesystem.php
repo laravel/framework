@@ -386,10 +386,10 @@ class Filesystem
      */
     public function files($directory, $recursive = false)
     {
-        if($recursive){
+        if ($recursive) {
             return $this->allFiles($directory);
         }
-        
+
         $glob = glob($directory.DIRECTORY_SEPARATOR.'*');
 
         if ($glob === false) {
