@@ -130,9 +130,9 @@ class Builder
      */
     public function getColumnListing($table)
     {
-        $table = $this->connection->getTablePrefix().$table;
-
-        $results = $this->connection->select($this->grammar->compileColumnListing($table));
+        $results = $this->connection->select($this->grammar->compileColumnListing(
+            $this->connection->getTablePrefix().$table
+        ));
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
     }
