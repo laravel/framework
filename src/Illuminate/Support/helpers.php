@@ -1054,7 +1054,7 @@ if (! function_exists('with')) {
         }
     }
 
-    if (!function_exists('if_issset')) {
+    if (!function_exists('if_isset')) {
         /*
           * Check isset & is_empty & return the result based on values sent
           *
@@ -1064,7 +1064,7 @@ if (! function_exists('with')) {
           * 
           * @return array
           *---------------------------------------------------------------- */        
-        function if_issset(&$data, $ifSetValue = '', $ifNotSetValue = '')
+        function if_isset(&$data, $ifSetValue = '', $ifNotSetValue = '')
         {
             // check if value isset & not empty
             if ((isset($data) === true) and (is_empty($data) === false)) {
