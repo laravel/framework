@@ -47,6 +47,10 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
+        $response->setContent('{"foo": "bar"}');
+        $this->assertEquals('foo', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+
         $response->setContent('foo');
         $this->assertEquals('foo', $response->getContent());
         $this->assertNotEquals('application/json', $response->headers->get('Content-Type'));
