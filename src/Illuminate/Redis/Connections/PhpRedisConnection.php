@@ -2,6 +2,7 @@
 
 namespace Illuminate\Redis\Connections;
 
+use Redis;
 use Closure;
 
 /**
@@ -41,7 +42,36 @@ class PhpRedisConnection extends Connection
      */
     public function exists(...$keys)
     {
+        $keys = collect($keys)->map(function ($key) {
+            return $this->applyPrefix($key);
+        })->all();
+
         return $this->executeRaw(array_merge(['exists'], $keys));
+    }
+
+    /**
+     * Set the given key if it doesn't exist.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return int
+     */
+    public function setnx($key, $value)
+    {
+        return (int) $this->client->setnx($key, $value);
+    }
+
+    /**
+     * Set the given hash field if it doesn't exist.
+     *
+     * @param  string  $hash
+     * @param  string  $key
+     * @param  string  $value
+     * @return int
+     */
+    public function hsetnx($hash, $key, $value)
+    {
+        return (int) $this->client->hsetnx($hash, $key, $value);
     }
 
     /**
@@ -116,6 +146,8 @@ class PhpRedisConnection extends Connection
                 $dictionary[] = $member;
             }
         }
+
+        $key = $this->applyPrefix($key);
 
         return $this->executeRaw(array_merge(['zadd', $key], $dictionary));
     }
@@ -348,6 +380,18 @@ class PhpRedisConnection extends Connection
     public function disconnect()
     {
         $this->client->close();
+    }
+
+    /**
+     * Apply prefix to the given key if necessary.
+     *
+     * @param $key
+     */
+    private function applyPrefix($key)
+    {
+        $prefix = (string) $this->client->getOption(Redis::OPT_PREFIX);
+
+        return $prefix.$key;
     }
 
     /**
