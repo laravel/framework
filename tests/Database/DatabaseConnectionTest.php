@@ -342,14 +342,23 @@ class DatabaseConnectionTest extends TestCase
     public function testPrepareBindings()
     {
         $date = m::mock('DateTime');
-        $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
         $bindings = ['test' => $date];
-        $conn = $this->getMockConnection();
-        $grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
-        $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
-        $conn->setQueryGrammar($grammar);
+        $conn = $this->getMockConnection(['formatDateTime']);
+        $conn->expects($this->once())->method('formatDateTime')->with($date)->will($this->returnValue('bar'));
         $result = $conn->prepareBindings($bindings);
         $this->assertEquals(['test' => 'bar'], $result);
+    }
+
+    public function testFormatDateTime()
+    {
+        $date = \Illuminate\Support\Carbon::parse('2015-01-01T12:00:00+0300');
+        $conn = $this->getMockConnection(['getConfig']);
+        $grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
+        $grammar->shouldReceive('getDateFormat')->once()->andReturn('Y-m-d H:i:s');
+        $conn->setQueryGrammar($grammar);
+        $conn->expects($this->once())->method('getConfig')->with('timezone')->will($this->returnValue('Europe/Warsaw'));
+        $result = $conn->formatDateTime($date);
+        $this->assertEquals('2015-01-01 10:00:00', $result);
     }
 
     public function testLogQueryFiresEventsIfSet()

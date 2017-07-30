@@ -8,6 +8,7 @@ use Exception;
 use PDOStatement;
 use LogicException;
 use DateTimeInterface;
+use Carbon\Carbon;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -571,17 +572,35 @@ class Connection implements ConnectionInterface
         $grammar = $this->getQueryGrammar();
 
         foreach ($bindings as $key => $value) {
-            // We need to transform all instances of DateTimeInterface into the actual
-            // date string. Each query grammar maintains its own date string format
-            // so we'll just ask the grammar for the format to get from the date.
             if ($value instanceof DateTimeInterface) {
-                $bindings[$key] = $value->format($grammar->getDateFormat());
+                $bindings[$key] = $this->formatDateTime($value);
             } elseif ($value === false) {
                 $bindings[$key] = 0;
             }
         }
 
         return $bindings;
+    }
+
+    /**
+     * Transform instance of DateTimeInterface into the actual date string.
+     *
+     * @param  DateTimeInterface $date
+     * @return string
+     */
+    public function formatDateTime(DateTimeInterface $date)
+    {
+        // Each query grammar maintains its own date string format
+        // so we'll just ask the grammar for the format to get from the date.
+        $grammar = $this->getQueryGrammar();
+
+        // If DB timezone is specified, we neet convert the date object
+        // to transform it into the correct string format.
+        if ($timezone = $this->getConfig('timezone')) {
+            $date = Carbon::instance($date)->setTimezone($timezone);
+        }
+
+        return $date->format($grammar->getDateFormat());
     }
 
     /**
