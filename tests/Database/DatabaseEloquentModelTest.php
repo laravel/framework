@@ -1493,6 +1493,37 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage DateTime::__construct(): Failed to parse time string (FOOBAR) at position 0
+     */
+    public function testModelDatesAttributesCanNotBeParsed()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+
+        $model->datetimeAttribute = 'FOOBAR';
+    }
+
+    public function testModelDatesAttributesCanBeParsedWithManyFormats()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+
+        $date = Carbon::create(2017, 07, 28, 13, 14, 15);
+        $model->datetimeAttribute = $date;
+        $this->assertSame($model->datetimeAttribute->getTimestamp(), $date->getTimestamp());
+
+        $model->datetimeAttribute = $date->toW3cString();
+        $this->assertSame($model->datetimeAttribute->getTimestamp(), $date->getTimestamp());
+
+        $model->datetimeAttribute = $date->toIso8601String();
+        $this->assertSame($model->datetimeAttribute->getTimestamp(), $date->getTimestamp());
+
+        $model->datetimeAttribute = $date->toAtomString();
+        $this->assertSame($model->datetimeAttribute->getTimestamp(), $date->getTimestamp());
+    }
+
     public function testModelDateAttributeCastingResetsTime()
     {
         $model = new EloquentModelCastingStub;
