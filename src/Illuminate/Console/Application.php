@@ -82,7 +82,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         $exitCode = parent::run($input, $output);
 
         $this->events->fire(
-            new Events\CommandTerminating($commandName, $input, $exitCode)
+            new Events\CommandFinished($commandName, $input, $exitCode)
         );
 
         return $exitCode;

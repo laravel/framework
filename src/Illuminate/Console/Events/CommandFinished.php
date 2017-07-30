@@ -4,7 +4,7 @@ namespace Illuminate\Console\Events;
 
 use Symfony\Component\Console\Input\InputInterface;
 
-class CommandTerminating
+class CommandFinished
 {
     /**
      * The command name.
