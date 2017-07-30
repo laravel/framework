@@ -569,8 +569,6 @@ class Connection implements ConnectionInterface
      */
     public function prepareBindings(array $bindings)
     {
-        $grammar = $this->getQueryGrammar();
-
         foreach ($bindings as $key => $value) {
             if ($value instanceof DateTimeInterface) {
                 $bindings[$key] = $this->formatDateTime($value);
