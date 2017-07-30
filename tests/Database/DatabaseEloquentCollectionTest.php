@@ -224,6 +224,48 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($c));
     }
 
+    public function testFlatMap()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $oneChildren = new Collection($oneChildrenArray = [
+            m::mock('Illuminate\Database\Eloquent\Model'),
+            m::mock('Illuminate\Database\Eloquent\Model'),
+        ]);
+
+        $twoChildren = new Collection($twoChildrenArray = [
+            m::mock('Illuminate\Database\Eloquent\Model'),
+            m::mock('Illuminate\Database\Eloquent\Model'),
+        ]);
+
+        $c = new Collection([$one, $two]);
+
+        $cAfterMap = $c->flatMap(function ($item, $i) use($oneChildren, $twoChildren){
+            return $i == 0 ? $oneChildren : $twoChildren;
+        });
+
+        $this->assertEquals(array_merge($oneChildrenArray, $twoChildrenArray), $cAfterMap->all());
+        $this->assertInstanceOf(Collection::class, $cAfterMap);
+    }
+
+    public function testFlatMappingToNonModelsReturnsABaseCollection()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+        $oneChildren = new Collection($oneChildrenArray = [1,2]);
+
+        $twoChildren = new Collection($twoChildrenArray = [3,4]);
+
+        $c = new Collection([$one, $two]);
+
+        $cAfterMap = $c->flatMap(function ($item, $i) use($oneChildren, $twoChildren){
+            return $i == 0 ? $oneChildren : $twoChildren;
+        });
+
+        $this->assertEquals(array_merge($oneChildrenArray, $twoChildrenArray), $cAfterMap->all());
+        $this->assertInstanceOf(BaseCollection::class, $cAfterMap);
+    }
+
     public function testCollectionDiffsWithGivenCollection()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
