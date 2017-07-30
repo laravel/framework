@@ -17,8 +17,31 @@ class HttpResponseTest extends TestCase
         m::close();
     }
 
+    public function testResponseDoNotSetJSONHeaderForNonJsonContent()
+    {
+        $response = new \Illuminate\Http\Response('foobar');
+        $this->assertSame('foobar', $response->getContent());
+        $this->assertNull($response->headers->get('Content-Type'));
+
+        $response = new \Illuminate\Http\Response(null);
+        $this->assertEmpty($response->getContent());
+        $this->assertNull($response->headers->get('Content-Type'));
+
+        $response = new \Illuminate\Http\Response('');
+        $this->assertEmpty($response->getContent());
+        $this->assertNull($response->headers->get('Content-Type'));
+    }
+
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
+        $response = new \Illuminate\Http\Response('{}');
+        $this->assertSame('{}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+
+        $response = new \Illuminate\Http\Response('{"foo":"bar"}');
+        $this->assertSame('{"foo":"bar"}', $response->getContent());
+        $this->assertSame('application/json', $response->headers->get('Content-Type'));
+
         $response = new \Illuminate\Http\Response(new ArrayableStub);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
