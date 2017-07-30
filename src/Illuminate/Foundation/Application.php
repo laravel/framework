@@ -354,9 +354,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function useDatabasePath($path)
     {
-        $this->databasePath = $path;
+        $this->databasePath = rtrim($path, '\/');
 
-        $this->instance('path.database', $path);
+        $this->instance('path.database', $this->databasePath);
 
         return $this;
     }
@@ -399,9 +399,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function useStoragePath($path)
     {
-        $this->storagePath = $path;
+        $this->storagePath = rtrim($path, '\/');
 
-        $this->instance('path.storage', $path);
+        $this->instance('path.storage', $this->storagePath);
 
         return $this;
     }
@@ -435,7 +435,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function useEnvironmentPath($path)
     {
-        $this->environmentPath = $path;
+        $this->environmentPath = rtrim($path, '\/');
 
         return $this;
     }
