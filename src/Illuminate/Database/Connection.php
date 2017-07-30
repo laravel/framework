@@ -586,7 +586,7 @@ class Connection implements ConnectionInterface
      * @param  DateTimeInterface $date
      * @return string
      */
-    public function formatDateTime(DateTimeInterface $date)
+    protected function formatDateTime(DateTimeInterface $date)
     {
         // Each query grammar maintains its own date string format
         // so we'll just ask the grammar for the format to get from the date.
@@ -594,7 +594,7 @@ class Connection implements ConnectionInterface
 
         // If DB timezone is specified, we neet convert the date object
         // to transform it into the correct string format.
-        if ($timezone = $this->getConfig('timezone')) {
+        if ($timezone = $this->getTimezone()) {
             $date = Carbon::instance($date)->setTimezone($timezone);
         }
 
@@ -991,6 +991,16 @@ class Connection implements ConnectionInterface
     public function getDriverName()
     {
         return $this->getConfig('driver');
+    }
+
+    /**
+     * Get the database timezone.
+     *
+     * @return string|null
+     */
+    public function getTimezone()
+    {
+        return $this->getConfig('timezone');
     }
 
     /**
