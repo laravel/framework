@@ -26,9 +26,11 @@ class Response extends BaseResponse
         // If the content is "JSONable" we will set the appropriate header and convert
         // the content to JSON. This is useful when returning something like models
         // from routes that will be automatically transformed to their JSON form.
-        if ($this->shouldBeJson($content)) {
+        if ($this->shouldBeJson($content) || $this->isJson($content)) {
             $this->header('Content-Type', 'application/json');
+        }
 
+        if ($this->shouldBeJson($content)) {
             $content = $this->morphToJson($content);
         }
 
@@ -57,6 +59,19 @@ class Response extends BaseResponse
                $content instanceof ArrayObject ||
                $content instanceof JsonSerializable ||
                is_array($content);
+    }
+
+    /**
+     * Determine if the given content is JSON.
+     *
+     * @param  mixed  $content
+     * @return bool
+     */
+    protected function isJson($content)
+    {
+        json_decode($content);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     /**

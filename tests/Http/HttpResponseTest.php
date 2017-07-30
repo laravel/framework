@@ -19,6 +19,10 @@ class HttpResponseTest extends TestCase
 
     public function testJsonResponsesAreConvertedAndHeadersAreSet()
     {
+        $response = new \Illuminate\Http\Response('{"foo":"bar"}');
+        $this->assertEquals('{"foo":"bar"}', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+
         $response = new \Illuminate\Http\Response(new ArrayableStub);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
