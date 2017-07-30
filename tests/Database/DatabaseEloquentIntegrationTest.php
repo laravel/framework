@@ -1040,10 +1040,12 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $results = EloquentTestUser::forPageAfterId(15, 1);
-        $this->assertEquals(1, count($results));
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $results);
+        $this->assertEquals(2, $results->first()->id);
 
         $results = EloquentTestUser::orderBy('id', 'desc')->forPageAfterId(15, 1);
-        $this->assertEquals(1, count($results));
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $results);
+        $this->assertEquals(2, $results->first()->id);
     }
 
     public function testMorphToRelationsAcrossDatabaseConnections()

@@ -3,12 +3,15 @@ language: php
 php:
   - 7.0.21
   - 7.1
+  - 7.2
 
 env:
   global:
     - setup=basic
 
 matrix:
+  allow_failures:
+    - php: 7.2
   fast_finish: true
   include:
     - php: 7.0.21
