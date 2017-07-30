@@ -740,7 +740,7 @@ class BelongsToMany extends Relation
      * @param  bool   $touch
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes, array $joining = [], $touch = true)
+    public function create(array $attributes = [], array $joining = [], $touch = true)
     {
         $instance = $this->related->newInstance($attributes);
 
