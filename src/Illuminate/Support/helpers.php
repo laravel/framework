@@ -1014,10 +1014,10 @@ if (! function_exists('timer')) {
         if ($expression instanceof Closure) {
             $expression();
         } else {
-            eval(rtrim($expression, ';') . ';');
+            eval(rtrim($expression, ';').';');
         }
 
-        echo microtime(true) - LARAVEL_START . " seconds";
+        echo microtime(true) - LARAVEL_START .' seconds';
     }
 }
 
