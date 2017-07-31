@@ -63,6 +63,13 @@ interface MessageBag extends Arrayable
     public function all($format = null);
 
     /**
+     * Get the raw messages in the container.
+     *
+     * @return array
+     */
+    public function getMessages();
+
+    /**
      * Get the default message format.
      *
      * @return string
