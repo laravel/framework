@@ -15,7 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\BelongsToThrough;
 
 trait HasRelationships
 {
@@ -60,6 +62,25 @@ trait HasRelationships
         $localKey = $localKey ?: $this->getKeyName();
 
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+    }
+
+    /**
+     * Define a one-to-one relationship that goes through an intermediate model.
+     *
+     * @param  string  $related
+     * @param  string  $through
+     * @param  string  $thisForeignKey
+     * @param  string  $throughForeignKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasOneThrough
+     */
+    public function hasOneThrough($related, $through, $thisForeignKey = null, $throughForeignKey = null)
+    {
+        $related = $this->newRelatedInstance($related);
+        $through = new $through;
+        $thisForeignKey = $thisForeignKey ?: $this->getForeignKey();
+        $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
+
+        return new HasOneThrough($related->newQuery(), $this, $through, $thisForeignKey, $throughForeignKey);
     }
 
     /**
@@ -120,6 +141,25 @@ trait HasRelationships
         return new BelongsTo(
             $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
+    }
+
+    /**
+     * Define an inverse one-to-one relationship that goes through an intermediate model.
+     *
+     * @param  string  $related
+     * @param  string  $through
+     * @param  string  $throughForeignKey
+     * @param  string  $relatedForeignKey
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToThrough
+     */
+    public function belongsToThrough($related, $through, $throughForeignKey = null, $relatedForeignKey = null)
+    {
+        $related = $this->newRelatedInstance($related);
+        $through = new $through;
+        $throughForeignKey = $throughForeignKey ?: $through->getForeignKey();
+        $relatedForeignKey = $relatedForeignKey ?: $related->getForeignKey();
+
+        return new BelongsToThrough($related->newQuery(), $this, $through, $throughForeignKey, $relatedForeignKey);
     }
 
     /**
