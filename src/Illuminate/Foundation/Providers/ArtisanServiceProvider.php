@@ -24,6 +24,7 @@ use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Translation\Console\LangPublishCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
@@ -133,6 +134,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'EventMake' => 'command.event.make',
         'FactoryMake' => 'command.factory.make',
         'JobMake' => 'command.job.make',
+        'LangPublish' => 'command.lang.publish',
         'ListenerMake' => 'command.listener.make',
         'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
@@ -161,7 +163,8 @@ class ArtisanServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerCommands(array_merge(
-            $this->commands, $this->devCommands
+            $this->commands,
+            $this->devCommands
         ));
     }
 
@@ -393,6 +396,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.key.generate', function () {
             return new KeyGenerateCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerLangPublishCommand()
+    {
+        $this->app->singleton('command.lang.publish', function ($app) {
+            return new LangPublishCommand;
         });
     }
 
