@@ -131,7 +131,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function map(callable $callback)
     {
-        $result = parent::map($callback);
+        $result = parent::flatMap($callback);
 
         return $result->contains(function ($item) {
             return ! $item instanceof Model;

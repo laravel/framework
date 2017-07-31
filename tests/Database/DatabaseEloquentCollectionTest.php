@@ -240,7 +240,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
         $c = new Collection([$one, $two]);
 
-        $cAfterMap = $c->flatMap(function ($item, $i) use($oneChildren, $twoChildren){
+        $cAfterMap = $c->flatMap(function ($item, $i) use ($oneChildren, $twoChildren) {
             return $i == 0 ? $oneChildren : $twoChildren;
         });
 
@@ -252,13 +252,13 @@ class DatabaseEloquentCollectionTest extends TestCase
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
         $two = m::mock('Illuminate\Database\Eloquent\Model');
-        $oneChildren = new Collection($oneChildrenArray = [1,2]);
+        $oneChildren = new Collection($oneChildrenArray = [1, 2]);
 
-        $twoChildren = new Collection($twoChildrenArray = [3,4]);
+        $twoChildren = new Collection($twoChildrenArray = [3, 4]);
 
         $c = new Collection([$one, $two]);
 
-        $cAfterMap = $c->flatMap(function ($item, $i) use($oneChildren, $twoChildren){
+        $cAfterMap = $c->flatMap(function ($item, $i) use ($oneChildren, $twoChildren) {
             return $i == 0 ? $oneChildren : $twoChildren;
         });
 
