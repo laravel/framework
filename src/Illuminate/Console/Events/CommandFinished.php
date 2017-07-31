@@ -17,16 +17,9 @@ class CommandFinished
     /**
      * The console input.
      *
-     * @var string
+     * @var \Symfony\Component\Console\Input\InputInterface
      */
     public $input;
-
-    /**
-     * The command exit code.
-     *
-     * @var int
-     */
-    public $exitCode;
 
     /**
      * The command output.
@@ -34,6 +27,13 @@ class CommandFinished
      * @var \Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
+
+    /**
+     * The command exit code.
+     *
+     * @var int
+     */
+    public $exitCode;
 
     /**
      * Create a new event instance.

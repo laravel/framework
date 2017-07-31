@@ -76,7 +76,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         $commandName = $this->getCommandName($input);
 
         $this->events->fire(
-            new Events\CommandStarting($commandName, $input)
+            new Events\CommandStarting($commandName, $input, $output)
         );
 
         $exitCode = parent::run($input, $output);
