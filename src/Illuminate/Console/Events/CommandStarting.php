@@ -15,14 +15,14 @@ class CommandStarting
     public $command;
 
     /**
-     * The console input.
+     * The console input implementation.
      *
      * @var \Symfony\Component\Console\Input\InputInterface|null
      */
     public $input;
 
     /**
-     * The command output.
+     * The command output implementation.
      *
      * @var \Symfony\Component\Console\Output\OutputInterface|null
      */
@@ -38,8 +38,8 @@ class CommandStarting
      */
     public function __construct($command, InputInterface $input, OutputInterface $output)
     {
-        $this->command = $command;
         $this->input = $input;
         $this->output = $output;
+        $this->command = $command;
     }
 }
