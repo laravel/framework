@@ -141,9 +141,9 @@ class VendorPublishCommand extends Command
     {
         list($type, $value) = explode(': ', strip_tags($choice));
 
-        if ($type == 'Provider') {
+        if ($type === 'Provider') {
             $this->provider = $value;
-        } elseif ($type == 'Tag') {
+        } elseif ($type === 'Tag') {
             $this->tags = [$value];
         }
     }
