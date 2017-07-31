@@ -115,4 +115,11 @@ interface Repository extends CacheInterface
      * @return bool
      */
     public function forget($key);
+
+    /**
+     * Get the cache store implementation.
+     *
+     * @return \Illuminate\Contracts\Cache\Store
+     */
+    public function getStore();
 }
