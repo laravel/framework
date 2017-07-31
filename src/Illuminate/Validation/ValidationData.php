@@ -82,7 +82,7 @@ class ValidationData
 
         $value = Arr::get($masterData, $attribute, '__missing__');
 
-        if ($value != '__missing__') {
+        if ($value !== '__missing__') {
             Arr::set($results, $attribute, $value);
         }
 
