@@ -67,7 +67,7 @@ abstract class Job
      *
      * @return void
      */
-    public function fire()
+    public function dispatch()
     {
         $payload = $this->payload();
 

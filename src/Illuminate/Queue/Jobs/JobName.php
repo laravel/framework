@@ -14,7 +14,7 @@ class JobName
      */
     public static function parse($job)
     {
-        return Str::parseCallback($job, 'fire');
+        return Str::parseCallback($job, 'dispatch');
     }
 
     /**

@@ -5,11 +5,11 @@ namespace Illuminate\Contracts\Queue;
 interface Job
 {
     /**
-     * Fire the job.
+     * Dispatch the job.
      *
      * @return void
      */
-    public function fire();
+    public function dispatch();
 
     /**
      * Release the job back into the queue.
