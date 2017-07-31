@@ -17,14 +17,14 @@ class CommandFinished
     /**
      * The console input.
      *
-     * @var \Symfony\Component\Console\Input\InputInterface
+     * @var \Symfony\Component\Console\Input\InputInterface|null
      */
     public $input;
 
     /**
      * The command output.
      *
-     * @var \Symfony\Component\Console\Output\OutputInterface
+     * @var \Symfony\Component\Console\Output\OutputInterface|null
      */
     protected $output;
 
