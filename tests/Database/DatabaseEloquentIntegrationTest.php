@@ -1118,7 +1118,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
 
         $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
-        $this->assertEquals(null, $freshNotStoredUser);
+        $this->assertNull($freshNotStoredUser);
     }
 
     public function testFreshMethodOnCollection()
