@@ -172,7 +172,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $segments = explode('/', $this->decodedPath());
 
         return array_values(array_filter($segments, function ($v) {
-            return $v != '';
+            return $v !== '';
         }));
     }
 

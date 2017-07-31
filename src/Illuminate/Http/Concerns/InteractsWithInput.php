@@ -331,7 +331,7 @@ trait InteractsWithInput
      */
     protected function isValidFile($file)
     {
-        return $file instanceof SplFileInfo && $file->getPath() != '';
+        return $file instanceof SplFileInfo && $file->getPath() !== '';
     }
 
     /**
