@@ -341,15 +341,15 @@ class DatabaseConnectionTest extends TestCase
 
     public function testPrepareBindings()
     {
-        $date = m::mock('DateTime');
-        $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
+        $date = \Illuminate\Support\Carbon::parse('2015-01-01T12:00:00+0300');
         $bindings = ['test' => $date];
-        $conn = $this->getMockConnection();
+        $conn = $this->getMockConnection(['getTimezone']);
         $grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
-        $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
+        $grammar->shouldReceive('getDateFormat')->once()->andReturn('Y-m-d H:i:s');
         $conn->setQueryGrammar($grammar);
+        $conn->expects($this->once())->method('getTimezone')->will($this->returnValue('Europe/Warsaw'));
         $result = $conn->prepareBindings($bindings);
-        $this->assertEquals(['test' => 'bar'], $result);
+        $this->assertEquals(['test' => '2015-01-01 10:00:00'], $result);
     }
 
     public function testLogQueryFiresEventsIfSet()
