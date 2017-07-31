@@ -23,7 +23,7 @@ trait InteractsWithPivotTable
             'attached' => [], 'detached' => [],
         ];
 
-        $records = $this->formatRecordsList((array) $this->parseIds($ids));
+        $records = $this->formatRecordsList($this->parseIds($ids));
 
         // Next, we will determine which IDs should get removed from the join table by
         // checking which of the given ID/records is in the list of current records
@@ -93,7 +93,7 @@ trait InteractsWithPivotTable
         )->all();
 
         $detach = array_diff($current, array_keys(
-            $records = $this->formatRecordsList((array) $this->parseIds($ids))
+            $records = $this->formatRecordsList($this->parseIds($ids))
         ));
 
         // Next, we will take the differences of the currents and given IDs and detach
@@ -211,7 +211,7 @@ trait InteractsWithPivotTable
         // inserted the records, we will touch the relationships if necessary and the
         // function will return. We can parse the IDs before inserting the records.
         $this->newPivotStatement()->insert($this->formatAttachRecords(
-            (array) $this->parseIds($id), $attributes
+            $this->parseIds($id), $attributes
         ));
 
         if ($touch) {
@@ -348,12 +348,14 @@ trait InteractsWithPivotTable
         // If associated IDs were passed to the method we will only delete those
         // associations, otherwise all of the association ties will be broken.
         // We'll return the numbers of affected rows when we do the deletes.
-        if (! is_null($ids = $this->parseIds($ids))) {
-            if (count((array) $ids) === 0) {
+        if (! is_null($ids)) {
+            $ids = $this->parseIds($ids);
+
+            if (empty($ids)) {
                 return 0;
             }
 
-            $query->whereIn($this->relatedKey, (array) $ids);
+            $query->whereIn($this->relatedKey, $ids);
         }
 
         // Once we have all of the conditions set on the statement, we are ready
@@ -455,12 +457,12 @@ trait InteractsWithPivotTable
      * Get all of the IDs from the given mixed value.
      *
      * @param  mixed  $value
-     * @return mixed
+     * @return array
      */
     protected function parseIds($value)
     {
         if ($value instanceof Model) {
-            return $value->getKey();
+            return [$value->getKey()];
         }
 
         if ($value instanceof Collection) {
@@ -471,7 +473,7 @@ trait InteractsWithPivotTable
             return $value->toArray();
         }
 
-        return $value;
+        return (array) $value;
     }
 
     /**
