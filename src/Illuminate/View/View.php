@@ -158,7 +158,7 @@ class View implements ArrayAccess, ViewContract
     /**
      * Get the sections of the rendered view.
      *
-     * @return array
+     * @return string
      */
     public function renderSections()
     {

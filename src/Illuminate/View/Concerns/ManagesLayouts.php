@@ -24,7 +24,7 @@ trait ManagesLayouts
     /**
      * The parent placeholder for the request.
      *
-     * @var string
+     * @var mixed
      */
     protected static $parentPlaceholder = [];
 
@@ -55,7 +55,7 @@ trait ManagesLayouts
      */
     public function inject($section, $content)
     {
-        return $this->startSection($section, $content);
+        $this->startSection($section, $content);
     }
 
     /**
