@@ -351,7 +351,7 @@ trait InteractsWithPivotTable
         if (! is_null($ids)) {
             $ids = $this->parseIds($ids);
 
-            if (count($ids) === 0) {
+            if (empty($ids)) {
                 return 0;
             }
 
