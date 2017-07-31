@@ -1002,6 +1002,25 @@ if (! function_exists('throw_unless')) {
     }
 }
 
+if (! function_exists('timer')) {
+    /**
+     * Returns the execution time of the script.
+     *
+     * @param  mixed  $expression
+     * @return string
+     */
+    function timer($expression = null)
+    {
+        if ($expression instanceof Closure) {
+            $expression();
+        } else {
+            eval(rtrim($expression, ';') . ';');
+        }
+
+        echo microtime(true) - LARAVEL_START . " seconds";
+    }
+}
+
 if (! function_exists('title_case')) {
     /**
      * Convert a value to title case.
