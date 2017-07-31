@@ -1017,7 +1017,7 @@ if (! function_exists('timer')) {
             eval(rtrim($expression, ';').';');
         }
 
-        echo microtime(true) - LARAVEL_START .' seconds';
+        echo microtime(true) - LARAVEL_START.' seconds';
     }
 }
 
