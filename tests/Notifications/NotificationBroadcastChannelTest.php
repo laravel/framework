@@ -50,7 +50,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
         $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
         $events->shouldReceive('dispatch')->once()->with(Mockery::on(function ($event) {
-            return $event->connection == 'sync';
+            return $event->connection === 'sync';
         }));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);

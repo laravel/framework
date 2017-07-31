@@ -248,7 +248,7 @@ class ValidationRuleParser
      */
     protected static function parseParameters($rule, $parameter)
     {
-        if (strtolower($rule) == 'regex') {
+        if (strtolower($rule) === 'regex') {
             return [$parameter];
         }
 

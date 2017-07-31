@@ -647,7 +647,7 @@ trait ValidatesAttributes
             $id = $this->getValue($matches[1]);
         }
 
-        if (strtolower($id) == 'null') {
+        if (strtolower($id) === 'null') {
             $id = null;
         }
 

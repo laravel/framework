@@ -50,11 +50,11 @@ class FileLoader implements LoaderInterface
      */
     public function load($locale, $group, $namespace = null)
     {
-        if ($group == '*' && $namespace == '*') {
+        if ($group === '*' && $namespace === '*') {
             return $this->loadJsonPath($this->path, $locale);
         }
 
-        if (is_null($namespace) || $namespace == '*') {
+        if (is_null($namespace) || $namespace === '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 
