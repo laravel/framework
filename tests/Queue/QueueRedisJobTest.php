@@ -12,13 +12,13 @@ class QueueRedisJobTest extends TestCase
         m::close();
     }
 
-    public function testFireProperlyCallsTheJobHandler()
+    public function testDispatchProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('stdClass'));
-        $handler->shouldReceive('fire')->once()->with($job, ['data']);
+        $handler->shouldReceive('dispatch')->once()->with($job, ['data']);
 
-        $job->fire();
+        $job->dispatch();
     }
 
     public function testDeleteRemovesTheJobFromRedis()
