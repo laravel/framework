@@ -349,7 +349,7 @@ trait InteractsWithPivotTable
         // associations, otherwise all of the association ties will be broken.
         // We'll return the numbers of affected rows when we do the deletes.
         if (! is_null($ids = $this->parseIds($ids))) {
-            if (count($ids) === 0) {
+            if (count((array) $ids) === 0) {
                 return 0;
             }
 
@@ -455,12 +455,12 @@ trait InteractsWithPivotTable
      * Get all of the IDs from the given mixed value.
      *
      * @param  mixed  $value
-     * @return array
+     * @return mixed
      */
     protected function parseIds($value)
     {
         if ($value instanceof Model) {
-            return (array) $value->getKey();
+            return $value->getKey();
         }
 
         if ($value instanceof Collection) {
@@ -471,7 +471,7 @@ trait InteractsWithPivotTable
             return $value->toArray();
         }
 
-        return (array) $value;
+        return $value;
     }
 
     /**
