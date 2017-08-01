@@ -554,6 +554,10 @@ if (! function_exists('mix')) {
         $manifest = $manifests[$manifestPath];
 
         if (! isset($manifest[$path])) {
+            if (app()->environment() === 'production') {
+                return $path;
+            }
+
             throw new Exception(
                 "Unable to locate Mix file: {$path}. Please check your ".
                 'webpack.mix.js output paths and try again.'
