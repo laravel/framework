@@ -557,7 +557,7 @@ if (! function_exists('mix')) {
             $mixMessage = "Unable to locate Mix file: {$path}. Please check your ".
                           'webpack.mix.js output paths and try again.';
 
-            if (app()->environment() === 'production') {
+            if (! app('config')->get('app.debug')) {
                 app('log')->info($mixMessage);
 
                 return $path;
