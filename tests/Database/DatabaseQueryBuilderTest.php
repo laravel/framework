@@ -444,7 +444,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereIsset($request);
         $this->assertSame('select * from "users" where ("email" = ? and "id" <= ? and "is_admin" = ?)', $builder->toSql());
-
     }
 
     public function testBasicOrWheres()
