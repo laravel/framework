@@ -670,7 +670,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function __call($method, $parameters)
     {
-        if (preg_match("/with(.+)/", $method, $matches)) {
+        if (preg_match('/with(.+)/', $method, $matches)) {
             return $this->with(Str::snake($matches[1]), $parameters[0]);
         }
 

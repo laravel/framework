@@ -3,7 +3,6 @@
 namespace Illuminate\Encryption;
 
 use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 
 class EncryptionServiceProvider extends ServiceProvider
@@ -21,7 +20,7 @@ class EncryptionServiceProvider extends ServiceProvider
             // If the key starts with "base64:", we will need to decode the key before handing
             // it off to the encrypter. Keys may be base-64 encoded for presentation and we
             // want to make sure to convert them back to the raw bytes before encrypting.
-            if(preg_match("/base64:(.*)/", $key = $this->key($config), $matches)) {
+            if (preg_match('/base64:(.*)/', $key = $this->key($config), $matches)) {
                 $key = base64_decode($matches[1]);
             }
 

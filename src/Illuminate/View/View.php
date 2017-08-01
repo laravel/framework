@@ -395,7 +395,7 @@ class View implements ArrayAccess, ViewContract
      */
     public function __call($method, $parameters)
     {
-        if (preg_match("/with(.+)/", $method, $matches)) {
+        if (preg_match('/with(.+)/', $method, $matches)) {
             return $this->with(Str::camel($matches[1]), $parameters[0]);
         }
 

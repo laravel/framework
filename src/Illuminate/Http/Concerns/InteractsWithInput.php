@@ -5,7 +5,6 @@ namespace Illuminate\Http\Concerns;
 use stdClass;
 use SplFileInfo;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Http\UploadedFile;
 
 trait InteractsWithInput
@@ -54,7 +53,7 @@ trait InteractsWithInput
     {
         $header = $this->header('Authorization', '');
 
-        if (preg_match("/Bearer (.*)/", $header, $matches)) {
+        if (preg_match('/Bearer (.*)/', $header, $matches)) {
             return $matches[1];
         }
     }
