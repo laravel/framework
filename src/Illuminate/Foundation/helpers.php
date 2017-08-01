@@ -558,7 +558,7 @@ if (! function_exists('mix')) {
                           'webpack.mix.js output paths and try again.';
 
             if (app()->environment() === 'production') {
-                \Log::info($mixMessage);
+                app('log')->info($mixMessage);
 
                 return $path;
             }
