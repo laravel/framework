@@ -928,6 +928,48 @@ class Builder
     }
 
     /**
+     * Add an "where" statement to the query if value is set.
+     *
+     * @param  string|array|\Closure  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereIsset($column, $operator = null, $value = null, $boolean = 'and')
+    {
+        if (is_array($column)) {
+            return $this->addArrayOfWheres($column, $boolean, 'whereIsset');
+        }
+
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        return isset($value)
+            ? $this->where(...func_get_args())
+            : $this;
+    }
+
+    /**
+     * Add an "or where" statement to the query if value is set.
+     *
+     * @param  string|array|\Closure  $column
+     * @param  string  $operator
+     * @param  mixed   $value
+     *
+     * @return Builder
+     */
+    public function orWhereIsset($column, $operator = null, $value = null)
+    {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        return $this->whereIsset($column, $operator, $value, 'or');
+    }
+
+    /**
      * Add a where not between statement to the query.
      *
      * @param  string  $column
