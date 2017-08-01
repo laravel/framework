@@ -1009,7 +1009,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function isNot(Model $model)
     {
-        return !$this->is($model);
+        return ! $this->is($model);
     }
 
     /**
