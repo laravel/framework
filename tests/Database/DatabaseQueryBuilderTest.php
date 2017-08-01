@@ -418,6 +418,35 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
+    public function testWhereIsset()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereNested(function (Builder $builder) {
+                $builder->whereIsset('name', '=', 'Test')->orWhereIsset('id', '=', 1);
+            })->whereNested(function (Builder $builder) {
+                $builder->whereIsset('email', 'test')->orWhereIsset('is_active', true);
+            }, 'or');
+
+        $this->assertSame('select * from "users" where ("name" = ? or "id" = ?) or ("email" = ? or "is_active" = ?)', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIsset('name', null)->orWhereIsset('email', 'test');
+        $this->assertSame('select * from "users" where "email" = ?', $builder->toSql());
+
+        $request = [
+            ['email', 'test'],
+            ['id', '<=', 1],
+            ['is_admin', false],
+            ['created_at','=', null],
+        ];
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIsset($request);
+        $this->assertSame('select * from "users" where ("email" = ? and "id" <= ? and "is_admin" = ?)', $builder->toSql());
+
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
