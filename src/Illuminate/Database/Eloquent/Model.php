@@ -1002,6 +1002,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if two models do not have the same ID and belong to the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
+     */
+    public function isNot(Model $model)
+    {
+        return !$this->is($model);
+    }
+
+    /**
      * Get the database connection for the model.
      *
      * @return \Illuminate\Database\Connection
