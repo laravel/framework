@@ -555,6 +555,7 @@ if (! function_exists('mix')) {
 
         if (! isset($manifest[$path])) {
             if (app()->environment() === 'production') {
+                \Log::info('Unable to locate Mix file: '.$path.'. Please check your webpack.mix.js output paths and try again.');
                 return $path;
             }
 
