@@ -372,7 +372,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get a temporary URL for the file at the given path.
      *
-     * @param  string $path
+     * @param  string  $path
      * @param  \DateTime  $expiration
      * @return string
      */
