@@ -7,6 +7,13 @@ use Illuminate\Database\Migrations\Migration;
 class DummyClass extends Migration
 {
     /**
+     * The table name.
+     *
+     * @var string
+     */
+    protected $table = 'DummyTable';
+
+    /**
      * Run the migrations.
      *
      * @return void
