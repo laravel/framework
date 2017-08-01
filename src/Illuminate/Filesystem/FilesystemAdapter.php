@@ -370,6 +370,31 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Get a temporary URL for the file at the given path.
+     *
+     * @param  string $path
+     * @param  \DateTime  $expiration
+     * @return string
+     */
+    public function temporaryUrl($path, $expiration)
+    {
+        $adapter = $this->driver->getAdapter();
+
+        $client = $adapter->getClient();
+
+        if (! $adapter instanceof AwsS3Adapter) {
+            throw new RuntimeException('This driver does not support retrieving temporary URLs.');
+        }
+
+        $command = $client->getCommand('GetObject', [
+            'Bucket' => $adapter->getBucket(),
+            'Key' => $adapter->getPathPrefix().$path
+        ]);
+
+        return (string) $client->createPresignedRequest($command, $expiration)->getUri();
+    }
+
+    /**
      * Get an array of all files in a directory.
      *
      * @param  string|null  $directory
