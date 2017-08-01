@@ -272,7 +272,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Returns the client user agent
+     * Returns the client user agent.
      *
      * @return string
      */

@@ -208,7 +208,7 @@ class HttpRequestTest extends TestCase
     public function testUserAgentMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], [
-            'HTTP_USER_AGENT' => 'Laravel'
+            'HTTP_USER_AGENT' => 'Laravel',
         ]);
 
         $this->assertEquals('Laravel', $request->userAgent());
