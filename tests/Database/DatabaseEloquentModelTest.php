@@ -1614,6 +1614,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testMacroableSupport()
+    {
+        EloquentModelStub::macro('testMacro', function () {
+            return false;
+        });
+        $model = new EloquentModelStub;
+        $this->assertFalse($model->testMacro());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
