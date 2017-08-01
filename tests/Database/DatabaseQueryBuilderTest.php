@@ -438,7 +438,7 @@ class DatabaseQueryBuilderTest extends TestCase
             ['email', 'test'],
             ['id', '<=', 1],
             ['is_admin', false],
-            ['created_at','=', null],
+            ['created_at', '=', null],
         ];
 
         $builder = $this->getBuilder();

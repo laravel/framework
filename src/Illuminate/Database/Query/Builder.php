@@ -947,7 +947,7 @@ class Builder
         );
 
         return isset($value)
-            ? $this->where(... func_get_args())
+            ? $this->where(...func_get_args())
             : $this;
     }
 
