@@ -183,10 +183,10 @@ class Factory implements FactoryContract
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
-        else {
-            $result = Str::startsWith($empty, 'raw|')
-                        ? substr($empty, 4)
-                        : $this->make($empty)->render();
+        elseif (preg_match("/raw\|(.*)/", $empty, $matches)) {
+            $result = $matches[1];
+        } else {
+            $result = $this->make($empty)->render();
         }
 
         return $result;

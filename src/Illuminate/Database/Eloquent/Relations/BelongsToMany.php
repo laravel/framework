@@ -632,8 +632,8 @@ class BelongsToMany extends Relation
             // To get the pivots attributes we will just take any of the attributes which
             // begin with "pivot_" and add those to this arrays, as well as unsetting
             // them from the parent's models since they exist in a different table.
-            if (strpos($key, 'pivot_') === 0) {
-                $values[substr($key, 6)] = $value;
+            if (preg_match("/pivot_(.+)/", $key, $matches)) {
+                $values[$matches[1]] = $value;
 
                 unset($model->$key);
             }
