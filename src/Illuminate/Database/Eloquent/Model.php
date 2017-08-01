@@ -7,6 +7,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -28,6 +29,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes;
+    use Macroable {
+        __call as macroCall;
+        __callStatic as macroCallStatic;
+    }
 
     /**
      * The connection name for the model.
@@ -1356,6 +1361,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
+
+        // Macroable.
+        } elseif (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
         }
 
         return $this->newQuery()->$method(...$parameters);
