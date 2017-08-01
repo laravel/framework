@@ -563,7 +563,7 @@ if (! function_exists('mix')) {
                 return $path;
             }
 
-            throw new Exception( $mixMessage );
+            throw new Exception($mixMessage);
         }
 
         return new HtmlString($manifestDirectory.$manifest[$path]);
