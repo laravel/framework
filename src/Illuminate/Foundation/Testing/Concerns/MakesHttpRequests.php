@@ -261,8 +261,8 @@ trait MakesHttpRequests
      */
     protected function prepareUrlForRequest($uri)
     {
-        if (Str::startsWith($uri, '/')) {
-            $uri = substr($uri, 1);
+        if (preg_match("/\/(.+)/", $uri, $matches)) {
+            $uri = $matches[1];
         }
 
         if (! Str::startsWith($uri, 'http')) {

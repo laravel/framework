@@ -2,7 +2,6 @@
 
 namespace Illuminate\Auth\Passwords;
 
-use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 
@@ -86,8 +85,8 @@ class PasswordBrokerManager implements FactoryContract
     {
         $key = $this->app['config']['app.key'];
 
-        if (Str::startsWith($key, 'base64:')) {
-            $key = base64_decode(substr($key, 7));
+        if (preg_match('/base64:(.*)/', $key, $matches)) {
+            $key = base64_decode($matches[1]);
         }
 
         $connection = $config['connection'] ?? null;
