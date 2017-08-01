@@ -29,7 +29,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
         Concerns\GuardsAttributes;
-
     use Macroable {
         __call as macroCall;
         __callStatic as macroCallStatic;
