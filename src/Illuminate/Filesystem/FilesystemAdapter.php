@@ -373,7 +373,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * Get a temporary URL for the file at the given path.
      *
      * @param  string  $path
-     * @param  \DateTime  $expiration
+     * @param  \DateTimeInterface  $expiration
      * @return string
      */
     public function temporaryUrl($path, $expiration)
@@ -383,7 +383,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         $client = $adapter->getClient();
 
         if (! $adapter instanceof AwsS3Adapter) {
-            throw new RuntimeException('This driver does not support retrieving temporary URLs.');
+            throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
 
         $command = $client->getCommand('GetObject', [
@@ -391,7 +391,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             'Key' => $adapter->getPathPrefix().$path,
         ]);
 
-        return (string) $client->createPresignedRequest($command, $expiration)->getUri();
+        return (string) $client->createPresignedRequest(
+            $command, $expiration
+        )->getUri();
     }
 
     /**
