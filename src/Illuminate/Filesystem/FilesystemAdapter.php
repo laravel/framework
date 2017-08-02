@@ -79,6 +79,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Get the full path for the file at the given "short" path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function path($path)
+    {
+        return $this->driver->getAdapter()->getPathPrefix().$path;
+    }
+
+    /**
      * Get the contents of a file.
      *
      * @param  string  $path
@@ -303,17 +314,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function lastModified($path)
     {
         return $this->driver->getTimestamp($path);
-    }
-
-    /**
-     * Get the full path for the file at the given path.
-     *
-     * @param  string  $path
-     * @return string
-     */
-    public function path($path)
-    {
-        return $this->driver->getAdapter()->getPathPrefix().$path;
     }
 
     /**
