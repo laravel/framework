@@ -14,6 +14,15 @@ interface Dispatcher
     public function listen($events, $listener);
 
     /**
+     * Register an event listener and mark it as expendable.
+     *
+     * @param  string|array  $events
+     * @param  mixed  $listener
+     * @return void
+     */
+    public function once($events, $listener);
+
+    /**
      * Determine if a given event has listeners.
      *
      * @param  string  $eventName

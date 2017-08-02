@@ -23,6 +23,13 @@ class Dispatcher implements DispatcherContract
     protected $container;
 
     /**
+     * The single use events.
+     *
+     * @var array
+     */
+    protected $expendable = [];
+
+    /**
      * The registered event listeners.
      *
      * @var array
@@ -70,6 +77,20 @@ class Dispatcher implements DispatcherContract
                 $this->listeners[$event][] = $this->makeListener($listener);
             }
         }
+    }
+
+    /**
+     * Register an event listener and mark it as expendable.
+     *
+     * @param  string|array  $events
+     * @param  mixed  $listener
+     * @return void
+     */
+    public function once($events, $listener)
+    {
+        $this->listen($events, $listener);
+
+        $this->expendable = array_merge($this->expendable, (array) $events);
     }
 
     /**
@@ -214,6 +235,10 @@ class Dispatcher implements DispatcherContract
             }
 
             $responses[] = $response;
+        }
+
+        if ($this->isExpendable($event)) {
+            $this->forget($event);
         }
 
         return $halt ? null : $responses;
@@ -557,5 +582,16 @@ class Dispatcher implements DispatcherContract
         $this->queueResolver = $resolver;
 
         return $this;
+    }
+
+    /**
+     * Determine if a given event is expendable.
+     *
+     * @param  string  $eventName
+     * @return bool
+     */
+    protected function isExpendable($eventName)
+    {
+        return in_array($eventName, $this->expendable);
     }
 }

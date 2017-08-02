@@ -245,6 +245,39 @@ class EventsDispatcherTest extends TestCase
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }
+
+    public function testListenOnce()
+    {
+        $_SERVER['__event.test'] = 0;
+
+        $d = new Dispatcher;
+        $d->once('foo', function () {
+            $_SERVER['__event.test']++;
+        });
+
+        $d->fire('foo');
+        $d->fire('foo');
+
+        $this->assertEquals(1, $_SERVER['__event.test']);
+    }
+
+    public function testListenOnceWithMultipleListeners()
+    {
+        $_SERVER['__event.test'] = 0;
+
+        $d = new Dispatcher;
+        $d->once('foo', function () {
+            $_SERVER['__event.test']++;
+        });
+        $d->once('foo', function () {
+            $_SERVER['__event.test']++;
+        });
+
+        $d->fire('foo');
+        $d->fire('foo');
+
+        $this->assertEquals(2, $_SERVER['__event.test']);
+    }
 }
 
 class TestDispatcherQueuedHandler implements \Illuminate\Contracts\Queue\ShouldQueue
