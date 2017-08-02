@@ -385,9 +385,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
      * @return string
      */
-    public function temporaryUrl($path, $expiration)
+    public function temporaryUrl($path, $expiration, array $options = [])
     {
         $adapter = $this->driver->getAdapter();
 
@@ -397,10 +398,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
 
-        $command = $client->getCommand('GetObject', [
+        $command = $client->getCommand('GetObject', array_merge([
             'Bucket' => $adapter->getBucket(),
             'Key' => $adapter->getPathPrefix().$path,
-        ]);
+        ], $options));
 
         return (string) $client->createPresignedRequest(
             $command, $expiration
