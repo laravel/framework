@@ -917,7 +917,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
+        return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters);
     }
 
     /**
@@ -934,7 +934,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return $value->getPath() != '' &&
+        return $value->getPath() !== '' &&
                 (in_array($value->getMimeType(), $parameters) ||
                  in_array(explode('/', $value->getMimeType())[0].'/*', $parameters));
     }
@@ -1038,7 +1038,7 @@ trait ValidatesAttributes
         } elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
             return false;
         } elseif ($value instanceof File) {
-            return (string) $value->getPath() != '';
+            return (string) $value->getPath() !== '';
         }
 
         return true;

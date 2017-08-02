@@ -600,7 +600,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
             $q->where('email', 'taylorotwell@gmail.com');
         }])->first();
 
-        $this->assertEquals(null, $comment->owner);
+        $this->assertNull($comment->owner);
     }
 
     public function testMorphToWithoutConstraints()
@@ -622,7 +622,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail->delete();
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
 
-        $this->assertEquals(null, $comment->owner);
+        $this->assertNull($comment->owner);
     }
 
     public function testMorphToNonSoftDeletingModel()
@@ -642,7 +642,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $taylor->delete();
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
 
-        $this->assertEquals(null, $comment->owner);
+        $this->assertNull($comment->owner);
     }
 
     /**

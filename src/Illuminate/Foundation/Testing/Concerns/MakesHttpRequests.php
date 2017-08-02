@@ -295,7 +295,7 @@ trait MakesHttpRequests
      */
     protected function formatServerHeaderKey($name)
     {
-        if (! Str::startsWith($name, 'HTTP_') && $name != 'CONTENT_TYPE') {
+        if (! Str::startsWith($name, 'HTTP_') && $name !== 'CONTENT_TYPE') {
             return 'HTTP_'.$name;
         }
 

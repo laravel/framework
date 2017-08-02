@@ -83,9 +83,7 @@ class BroadcastManager implements FactoryContract
 
         $request = $request ?: $this->app['request'];
 
-        if ($request->hasHeader('X-Socket-ID')) {
-            return $request->header('X-Socket-ID');
-        }
+        return $request->header('X-Socket-ID');
     }
 
     /**

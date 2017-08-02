@@ -157,7 +157,7 @@ class MailgunTransport extends Transport
      * Set the domain being used by the transport.
      *
      * @param  string  $domain
-     * @return void
+     * @return string
      */
     public function setDomain($domain)
     {

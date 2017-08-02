@@ -112,7 +112,7 @@ class PusherBroadcaster extends Broadcaster
     /**
      * Get the Pusher SDK instance.
      *
-     * @return Pusher
+     * @return \Pusher\Pusher
      */
     public function getPusher()
     {
