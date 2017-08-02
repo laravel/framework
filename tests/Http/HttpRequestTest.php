@@ -205,6 +205,15 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->secure());
     }
 
+    public function testUserAgentMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_USER_AGENT' => 'Laravel',
+        ]);
+
+        $this->assertEquals('Laravel', $request->userAgent());
+    }
+
     public function testExistsMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);

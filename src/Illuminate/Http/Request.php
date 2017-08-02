@@ -272,6 +272,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Returns the client user agent.
+     *
+     * @return string
+     */
+    public function userAgent()
+    {
+        return $this->headers->get('User-Agent');
+    }
+
+    /**
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
