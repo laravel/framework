@@ -20,7 +20,7 @@ class Event
      *
      * @var string
      */
-    public $command;
+    public $command = null;
 
     /**
      * The cron expression representing the event's frequency.
@@ -92,6 +92,7 @@ class Event
      */
     protected $rejects = [];
 
+
     /**
      * The location that output should be sent to.
      *
@@ -125,7 +126,7 @@ class Event
      *
      * @var string
      */
-    public $description;
+    public $description = null;
 
     /**
      * The mutex implementation.
@@ -149,16 +150,6 @@ class Event
     }
 
     /**
-     * Get the default output depending on the OS.
-     *
-     * @return string
-     */
-    public function getDefaultOutput()
-    {
-        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
-    }
-
-    /**
      * Run the given event.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -177,30 +168,24 @@ class Event
     }
 
     /**
-     * Get the mutex name for the scheduled command.
-     *
-     * @return string
-     */
-    public function mutexName()
-    {
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
-    }
-
-    /**
      * Run the command in the foreground.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function runCommandInForeground(Container $container)
+    public function runCommandInForeground(Container $container)
     {
+        register_shutdown_function(function () {
+            $this->mutex->forget($this);
+        });
+
         $this->callBeforeCallbacks($container);
 
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
-
-        $this->callAfterCallbacks($container);
+        try {
+            $this->runForegroundProcess($container);
+        } finally {
+            $this->callAfterCallbacks($container);
+        }
     }
 
     /**
@@ -211,10 +196,21 @@ class Event
      */
     protected function runCommandInBackground(Container $container)
     {
-        $this->callBeforeCallbacks($container);
-
         (new Process(
-            $this->buildCommand(), base_path(), null, null, null
+            (new CommandBuilder)->buildBackgroundCommand($this), base_path(), null, null, null
+        ))->run();
+    }
+
+    /**
+     * Build the process to run.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return mixed
+     */
+    public function runForegroundProcess(Container $container)
+    {
+        return (new Process(
+            (new CommandBuilder)->buildForegroundCommand($this), base_path(), null, null, null
         ))->run();
     }
 
@@ -242,16 +238,6 @@ class Event
         foreach ($this->afterCallbacks as $callback) {
             $container->call($callback);
         }
-    }
-
-    /**
-     * Build the command string.
-     *
-     * @return string
-     */
-    public function buildCommand()
-    {
-        return (new CommandBuilder)->buildCommand($this);
     }
 
     /**
@@ -397,9 +383,19 @@ class Event
      */
     protected function ensureOutputIsBeingCapturedForEmail()
     {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
+        if ($this->outputNotBeingCaptured()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
         }
+    }
+
+    /**
+     * Check if output is being captured.
+     *
+     * @return bool
+     */
+    protected function outputNotBeingCaptured()
+    {
+        return is_null($this->output) || $this->output == $this->getDefaultOutput();
     }
 
     /**
@@ -516,7 +512,6 @@ class Event
     /**
      * Do not allow the event to overlap each other.
      *
-     * @param  int  $expiresAt
      * @return $this
      */
     public function withoutOverlapping($expiresAt = 1440)
@@ -525,9 +520,7 @@ class Event
 
         $this->expiresAt = $expiresAt;
 
-        return $this->then(function () {
-            $this->mutex->forget($this);
-        })->skip(function () {
+        return $this->skip(function () {
             return $this->mutex->exists($this);
         });
     }
@@ -581,17 +574,6 @@ class Event
      * @param  \Closure  $callback
      * @return $this
      */
-    public function after(Closure $callback)
-    {
-        return $this->then($callback);
-    }
-
-    /**
-     * Register a callback to be called after the operation.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
     public function then(Closure $callback)
     {
         $this->afterCallbacks[] = $callback;
@@ -600,14 +582,14 @@ class Event
     }
 
     /**
-     * Set the human-friendly description of the event.
+     * Alias of then().
      *
-     * @param  string  $description
+     * @param  \Closure  $callback
      * @return $this
      */
-    public function name($description)
+    public function after(Closure $callback)
     {
-        return $this->description($description);
+        return $this->then($callback);
     }
 
     /**
@@ -624,17 +606,36 @@ class Event
     }
 
     /**
+     * Alias of description().
+     *
+     * @param  string  $description
+     * @return $this
+     */
+    public function name($description)
+    {
+        return $this->description($description);
+    }
+
+    /**
      * Get the summary of the event for display.
      *
      * @return string
      */
     public function getSummaryForDisplay()
     {
-        if (is_string($this->description)) {
-            return $this->description;
+        if (! is_null($this->command)) {
+            return $this->expression.' : '.$this->command;
         }
 
-        return $this->buildCommand();
+        if (! is_null($this->description)) {
+            return $this->expression.' : '.$this->description;
+        }
+
+        if (isset($this->callback) && is_string($this->callback)) {
+            return $this->expression.' : '.$this->callback;
+        }
+
+        return $this->expression.' : '.$this->mutexName();
     }
 
     /**
@@ -673,5 +674,25 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
+    }
+
+    /**
+     * Get the default output depending on the OS.
+     *
+     * @return string
+     */
+    public function getDefaultOutput()
+    {
+        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
+    }
+
+    /**
+     * Get the mutex name for the scheduled command.
+     *
+     * @return string
+     */
+    public function mutexName()
+    {
+        return 'schedule-mutex-'.sha1($this->expression.$this->command);
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Log;
+use Exception;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
@@ -46,47 +48,66 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Run the given event.
+     * Build the process to run.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return mixed
-     *
-     * @throws \Exception
      */
-    public function run(Container $container)
+    public function runForegroundProcess(Container $container)
     {
-        if ($this->description && $this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
-            return;
+        if ($this->outputNotBeingCaptured()) {
+            return $container->call($this->callback, $this->parameters);
         }
 
-        register_shutdown_function(function () {
-            $this->removeMutex();
-        });
+        ob_start();
+        $container->call($this->callback, $this->parameters);
+        $output = $this->storeOutput(ob_get_contents());
+        ob_end_flush();
 
-        parent::callBeforeCallbacks($container);
-
-        try {
-            $response = $container->call($this->callback, $this->parameters);
-        } finally {
-            $this->removeMutex();
-
-            parent::callAfterCallbacks($container);
-        }
-
-        return $response;
+        return $output;
     }
 
     /**
-     * Clear the mutex for the event.
+     * Store any captured output.
      *
-     * @return void
+     * @param  string  $output
+     * @return mixed
      */
-    protected function removeMutex()
+    public function storeOutput($output)
     {
-        if ($this->description) {
-            $this->mutex->forget($this);
+        try {
+            file_put_contents($this->output, $output.PHP_EOL, $this->shouldAppendOutput ? FILE_APPEND : null);
+        } catch (Exception $e) {
+            Log::error('Unable to store output from event due to: '.$e->getMessage());
         }
+
+        return $output;
+    }
+
+    /**
+     * Get the mutex name for the scheduled command.
+     *
+     * @return string
+     */
+    public function mutexName()
+    {
+        return 'schedule-mutex-'.sha1($this->expression.$this->description);
+    }
+
+    /**
+     * Do not allow the event to run in background without a name.
+     *
+     * @return $this
+     */
+    public function runInBackground()
+    {
+         if (! $this->description) {
+             throw new LogicException(
+                 "A scheduled event name is required to run in the background. Use the 'name' method before 'runInBackground'."
+             );
+         }
+
+        return parent::runInBackground();
     }
 
     /**
@@ -97,42 +118,12 @@ class CallbackEvent extends Event
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
-        if (! isset($this->description)) {
+        if (! $this->description) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );
         }
 
-        $this->withoutOverlapping = true;
-
-        $this->expiresAt = $expiresAt;
-
-        return $this->skip(function () {
-            return $this->mutex->exists($this);
-        });
-    }
-
-    /**
-     * Get the mutex name for the scheduled command.
-     *
-     * @return string
-     */
-    public function mutexName()
-    {
-        return 'framework/schedule-'.sha1($this->description);
-    }
-
-    /**
-     * Get the summary of the event for display.
-     *
-     * @return string
-     */
-    public function getSummaryForDisplay()
-    {
-        if (is_string($this->description)) {
-            return $this->description;
-        }
-
-        return is_string($this->callback) ? $this->callback : 'Closure';
+        return parent::withoutOverlapping($expiresAt);
     }
 }
