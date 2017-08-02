@@ -1,15 +1,27 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.31 (2017-08-02)
+
+### Added
+- Added `Blueprint::unsignedDecimal()` method ([#20243](https://github.com/laravel/framework/pull/20243), [3b4483d](https://github.com/laravel/framework/commit/3b4483d1ad885ca0943558b896c6f27f937c193a), [06dcaaa](https://github.com/laravel/framework/commit/06dcaaafe3add4a1bd2a41610278fc7f3d8c43df))
+- Added `Relation::getMorphedModel()` method ([#20244](https://github.com/laravel/framework/pull/20244))
+- Added `Model::isNot()` method ([#20354](https://github.com/laravel/framework/pull/20354))
+- Added `FilesystemAdapter::temporaryUrl()` method ([#20375](https://github.com/laravel/framework/pull/20375), [09cfd7f](https://github.com/laravel/framework/commit/09cfd7f5d2982f4faca915125d88eb4552ca3db4))
+- Added `Request::userAgent()` method ([#20367](https://github.com/laravel/framework/pull/20367))
 
 ### Changed
 - Renamed `MakeAuthCommand` to `AuthMakeCommand` ([#20216](https://github.com/laravel/framework/pull/20216))
 - Don't use `asset()` helper inside `mix()` ([#20197](https://github.com/laravel/framework/pull/20197))
+- Removed `array` type-hint in `Builder::orWhereRaw()` signature ([#20234](https://github.com/laravel/framework/pull/20234))
+- Added empty array default to `$attributes` on `BelongsToMany::create()` ([#20321](https://github.com/laravel/framework/pull/20321))
+- Prepare for PHP 7.2 ([#20258](https://github.com/laravel/framework/pull/20258), [#20330](https://github.com/laravel/framework/pull/20330), [#20336](https://github.com/laravel/framework/pull/20336), [#20378](https://github.com/laravel/framework/pull/20378))
+- Use `unsignedTinyInteger()` in `jobs.stub` ([#20382](https://github.com/laravel/framework/pull/20382))
 
 ### Fixed
 - Make sure `Model::getDates()` returns unique columns ([#20193](https://github.com/laravel/framework/pull/20193))
 - Fixed pulled `doctrine/inflector` version ([#20227](https://github.com/laravel/framework/pull/20227))
 - Fixed issue with `chunkById()` when `orderByRaw()` is used ([#20236](https://github.com/laravel/framework/pull/20236))
+- Terminate user defined database connections after rollback during testing ([#20340](https://github.com/laravel/framework/pull/20340))
 
 
 ## v5.4.30 (2017-07-19)

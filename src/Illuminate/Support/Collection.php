@@ -1144,7 +1144,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get one or more items randomly from the collection.
+     * Get zero or more items randomly from the collection.
      *
      * @param  int|null  $amount
      * @return mixed
@@ -1161,6 +1161,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         if (is_null($amount)) {
             return Arr::random($this->items);
+        }
+
+        if ($amount === 0) {
+            return new static;
         }
 
         return new static(Arr::random($this->items, $amount));
