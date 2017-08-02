@@ -116,7 +116,7 @@ class DatabaseEloquentBelongsToManyTest extends TestCase
         $this->assertEquals(2, $models[1]->foo[0]->pivot->user_id);
         $this->assertEquals(2, $models[1]->foo[1]->pivot->user_id);
         $this->assertEquals(2, count($models[1]->foo));
-        $this->assertEquals(0, count((array) $models[2]->foo));
+        $this->assertNull($models[2]->foo);
     }
 
     public function testRelationIsProperlyInitialized()
