@@ -394,7 +394,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } else if (! $adapter instanceof AwsS3Adapter) {
+        } elseif (! $adapter instanceof AwsS3Adapter) {
             throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
 
