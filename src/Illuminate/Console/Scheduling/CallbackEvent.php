@@ -63,7 +63,7 @@ class CallbackEvent extends Event
         register_shutdown_function(function () {
             $this->removeMutex();
         });
-        
+
         parent::callBeforeCallbacks($container);
 
         try {
