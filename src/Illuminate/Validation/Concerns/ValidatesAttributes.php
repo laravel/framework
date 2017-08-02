@@ -948,7 +948,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Check if we have explicity allowed a PHP upload, and check accordingly.
+     * Check if PHP uploads are explicitly allowed.
      *
      * @param  mixed  $value
      * @param  array  $parameters
