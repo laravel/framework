@@ -477,13 +477,14 @@ class Command extends SymfonyCommand
      * Write a string in an alert box.
      *
      * @param  string  $string
+     * @param  string  $type
      * @return void
      */
-    public function alert($string)
+    public function alert($string, $type = 'comment')
     {
-        $this->comment(str_repeat('*', strlen($string) + 12));
-        $this->comment('*     '.$string.'     *');
-        $this->comment(str_repeat('*', strlen($string) + 12));
+        $this->$type(str_repeat('*', strlen($string) + 12));
+        $this->$type('*     '.$string.'     *');
+        $this->$type(str_repeat('*', strlen($string) + 12));
 
         $this->output->writeln('');
     }
