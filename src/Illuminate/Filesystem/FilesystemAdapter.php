@@ -306,6 +306,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Get the full path for the file at the given path.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function path($path)
+    {
+        return $this->driver->getAdapter()->getPathPrefix().$path;
+    }
+
+    /**
      * Get the URL for the file at the given path.
      *
      * @param  string  $path
