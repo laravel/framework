@@ -950,7 +950,7 @@ trait ValidatesAttributes
     /**
      * Check if we have explicity allowed a PHP upload, and check accordingly.
      *
-     * @param  string  $filename
+     * @param  mixed  $value
      * @param  array  $parameters
      * @return bool
      */
