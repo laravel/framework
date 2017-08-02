@@ -252,7 +252,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Returns the client IP address.
+     * Get the client IP address.
      *
      * @return string
      */
@@ -262,7 +262,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Returns the client IP addresses.
+     * Get the client IP addresses.
      *
      * @return array
      */
@@ -272,7 +272,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Returns the client user agent.
+     * Get the client user agent.
      *
      * @return string
      */
