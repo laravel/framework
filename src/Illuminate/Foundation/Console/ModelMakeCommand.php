@@ -56,7 +56,10 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table = Str::snake(class_basename($this->argument('name')));
+        if (! $this->option('pivot')) {
+            $table = Str::plural($table);
+        }
 
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
@@ -117,6 +120,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
+
+            ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if it is a model on a pivot table']
         ];
     }
 }
