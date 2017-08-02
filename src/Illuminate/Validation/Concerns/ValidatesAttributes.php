@@ -960,7 +960,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return strtolower($value->getExtension()) === "php";
+        return strtolower($value->getExtension()) === 'php';
     }
 
     /**
