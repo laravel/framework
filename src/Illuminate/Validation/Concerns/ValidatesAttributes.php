@@ -917,6 +917,10 @@ trait ValidatesAttributes
             return false;
         }
 
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
         return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
     }
 
@@ -934,9 +938,29 @@ trait ValidatesAttributes
             return false;
         }
 
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
         return $value->getPath() != '' &&
                 (in_array($value->getMimeType(), $parameters) ||
                  in_array(explode('/', $value->getMimeType())[0].'/*', $parameters));
+    }
+
+    /**
+     * Check if we have explicity allowed a PHP upload, and check accordingly.
+     *
+     * @param  string  $filename
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function shouldBlockPhpUpload($value, $parameters)
+    {
+        if (in_array('php', $parameters)) {
+            return false;
+        }
+
+        return strtolower($value->getExtension()) === "php";
     }
 
     /**
