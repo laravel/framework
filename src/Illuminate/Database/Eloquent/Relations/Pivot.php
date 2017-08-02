@@ -95,6 +95,10 @@ class Pivot extends Model
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return parent::setKeysForSaveQuery($query);
+        }
+
         $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
 
         return $query->where($this->relatedKey, $this->getAttribute($this->relatedKey));
@@ -107,6 +111,10 @@ class Pivot extends Model
      */
     public function delete()
     {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return parent::delete();
+        }
+
         return $this->getDeleteQuery()->delete();
     }
 
