@@ -911,6 +911,10 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection([1, 2, 3, 4, 5, 6]);
 
+        $random = $data->random(0);
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(0, $random);
+
         $random = $data->random(1);
         $this->assertInstanceOf(Collection::class, $random);
         $this->assertCount(1, $random);

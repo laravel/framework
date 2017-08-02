@@ -1089,6 +1089,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return Arr::random($this->items);
         }
 
+        if ($amount === 0) {
+            return new static;
+        }
+
         return new static(Arr::random($this->items, $amount));
     }
 
