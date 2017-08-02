@@ -139,6 +139,21 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Map a collection and flatten the result by a single level.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Support\Collection|static
+     */
+    public function flatMap(callable $callback)
+    {
+        $result = parent::flatMap($callback);
+
+        return ! $result->count() || $result->contains(function ($item) {
+            return ! $item instanceof Model;
+        }) ? $result : new static($result);
+    }
+
+    /**
      * Reload a fresh model instance from the database for all the entities.
      *
      * @param  array|string  $with
