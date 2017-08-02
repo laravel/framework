@@ -960,7 +960,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return ($value instanceOf UploadedFile)
+        return ($value instanceof UploadedFile)
            ? strtolower($value->getClientOriginalExtension()) === 'php'
            : strtolower($value->getExtension()) === 'php';
     }
