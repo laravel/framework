@@ -1,5 +1,21 @@
 # Release Notes for 5.4.x
 
+## v5.4.32 (2017-08-03)
+
+### Added
+- Added `FilesystemAdapter::path()` method  ([#20395](https://github.com/laravel/framework/pull/20395))
+
+### Changed
+- Allow `Collection::random()` to return `0` items ([#20396](https://github.com/laravel/framework/pull/20396), [#20402](https://github.com/laravel/framework/pull/20402))
+- Accept options on `FilesystemAdapter::temporaryUrl()` ([#20394](https://github.com/laravel/framework/pull/20394))
+- Sync `withoutOverlapping` method on `Event` and `CallbackEvent` ([#20389](https://github.com/laravel/framework/pull/20389))
+- Prevent PHP file uploads by default unless explicitly allowed ([#20392](https://github.com/laravel/framework/pull/20392), [#20400](https://github.com/laravel/framework/pull/20400))
+- Allow other filesystem adapter to implement `temporaryUrl()` ([#20398](https://github.com/laravel/framework/pull/20398))
+
+### Fixed
+- Reverted breaking change on `BelongsToMany::create()` ([#20407](https://github.com/laravel/framework/pull/20407))
+
+
 ## v5.4.31 (2017-08-02)
 
 ### Added
