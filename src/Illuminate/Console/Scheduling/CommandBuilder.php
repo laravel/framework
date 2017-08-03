@@ -35,7 +35,7 @@ class CommandBuilder
         $output = ProcessUtils::escapeArgument($event->getDefaultOutput());
 
         return $this->ensureCorrectUser(
-            $event, '('.$background. ' > '. $output.' 2>&1) > ' . $output . ' 2>&1 &'
+            $event, '('.$background.' > '.$output.' 2>&1) > '.$output.' 2>&1 &'
         );
     }
 

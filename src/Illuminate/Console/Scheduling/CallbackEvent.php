@@ -101,11 +101,11 @@ class CallbackEvent extends Event
      */
     public function runInBackground()
     {
-         if (! $this->description) {
-             throw new LogicException(
-                 "A scheduled event name is required to run in the background. Use the 'name' method before 'runInBackground'."
-             );
-         }
+        if (! $this->description) {
+            throw new LogicException(
+                "A scheduled event name is required to run in the background. Use the 'name' method before 'runInBackground'."
+            );
+        }
 
         return parent::runInBackground();
     }

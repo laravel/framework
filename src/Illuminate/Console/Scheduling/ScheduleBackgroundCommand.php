@@ -63,7 +63,7 @@ class ScheduleBackgroundCommand extends Command
     }
 
     /**
-     * Find the event that matches the id
+     * Find the event that matches the id.
      *
      * @return mixd
      */

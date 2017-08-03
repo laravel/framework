@@ -92,7 +92,6 @@ class Event
      */
     protected $rejects = [];
 
-
     /**
      * The location that output should be sent to.
      *
