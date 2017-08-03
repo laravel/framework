@@ -308,7 +308,7 @@ class Handler implements ExceptionHandlerContract
         $statusCode = $this->isHttpException($e) ? $e->getStatusCode() : 500;
 
         try {
-            $content = config('app.debug')
+            $content = config('app.debug') && class_exists(Whoops::class)
                     ? $this->renderExceptionWithWhoops($e)
                     : $this->renderExceptionWithSymfony($e, config('app.debug'));
         } catch (Exception $e) {
