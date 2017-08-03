@@ -360,14 +360,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Determine if all items in the collection pass the given test.
      *
-     * @param  string|callable  $key
+     * @param  string|callable|null  $key
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return bool
      */
-    public function every($key, $operator = null, $value = null)
+    public function every($key = null, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() <= 1) {
             $callback = $this->valueRetriever($key);
 
             foreach ($this->items as $k => $v) {
@@ -633,11 +633,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Group an associative array by a field or using a callback.
      *
-     * @param  callable|string  $groupBy
+     * @param  callable|string |null $groupBy
      * @param  bool  $preserveKeys
      * @return static
      */
-    public function groupBy($groupBy, $preserveKeys = false)
+    public function groupBy($groupBy = null, $preserveKeys = false)
     {
         $groupBy = $this->valueRetriever($groupBy);
 
@@ -667,10 +667,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Key an associative array by a field or using a callback.
      *
-     * @param  callable|string  $keyBy
+     * @param  callable|string|null  $keyBy
      * @return static
      */
-    public function keyBy($keyBy)
+    public function keyBy($keyBy = null)
     {
         $keyBy = $this->valueRetriever($keyBy);
 
