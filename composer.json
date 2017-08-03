@@ -20,7 +20,6 @@
         "ext-openssl": "*",
         "doctrine/inflector": "~1.1.0",
         "erusev/parsedown": "~1.6",
-        "filp/whoops": "~2.0",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.12",
         "mtdowling/cron-expression": "~1.0",
@@ -75,6 +74,7 @@
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
         "doctrine/dbal": "~2.5",
+        "filp/whoops": "~2.0",
         "mockery/mockery": "~0.9.4",
         "orchestra/testbench-core": "3.5.*",
         "pda/pheanstalk": "~3.0",
