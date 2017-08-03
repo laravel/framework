@@ -6,6 +6,7 @@ use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Routing\UrlGenerator;
 use Illuminate\Foundation\Bus\PendingDispatch;
+use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Routing\ResponseFactory;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -638,6 +639,19 @@ if (! function_exists('redirect')) {
         }
 
         return app('redirect')->to($to, $status, $headers, $secure);
+    }
+}
+
+if (! function_exists('report')) {
+    /**
+     * Report an exception.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    function report($exception)
+    {
+        app(ExceptionHandler::class)->report($exception);
     }
 }
 
