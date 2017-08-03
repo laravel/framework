@@ -48,7 +48,7 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Build the process to run.
+     * Run the given event in the foreground.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return mixed
@@ -95,22 +95,6 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Do not allow the event to run in background without a name.
-     *
-     * @return $this
-     */
-    public function runInBackground()
-    {
-        if (! $this->description) {
-            throw new LogicException(
-                "A scheduled event name is required to run in the background. Use the 'name' method before 'runInBackground'."
-            );
-        }
-
-        return parent::runInBackground();
-    }
-
-    /**
      * Do not allow the event to overlap each other.
      *
      * @param  int  $expiresAt
@@ -125,5 +109,21 @@ class CallbackEvent extends Event
         }
 
         return parent::withoutOverlapping($expiresAt);
+    }
+
+    /**
+     * Do not allow the event to run in background without a name.
+     *
+     * @return $this
+     */
+    public function runInBackground()
+    {
+        if (! $this->description) {
+            throw new LogicException(
+                "A scheduled event name is required to run in the background. Use the 'name' method before 'runInBackground'."
+            );
+        }
+
+        return parent::runInBackground();
     }
 }

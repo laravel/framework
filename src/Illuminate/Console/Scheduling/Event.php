@@ -149,6 +149,16 @@ class Event
     }
 
     /**
+     * Get the default output depending on the OS.
+     *
+     * @return string
+     */
+    public function getDefaultOutput()
+    {
+        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
+    }
+
+    /**
      * Run the given event.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -164,6 +174,16 @@ class Event
         $this->runInBackground
                     ? $this->runCommandInBackground($container)
                     : $this->runCommandInForeground($container);
+    }
+
+    /**
+     * Get the mutex name for the scheduled command.
+     *
+     * @return string
+     */
+    public function mutexName()
+    {
+        return 'schedule-mutex-'.sha1($this->expression.$this->command);
     }
 
     /**
@@ -568,6 +588,17 @@ class Event
     }
 
     /**
+     * Alias of then().
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function after(Closure $callback)
+    {
+        return $this->then($callback);
+    }
+
+    /**
      * Register a callback to be called after the operation.
      *
      * @param  \Closure  $callback
@@ -581,14 +612,14 @@ class Event
     }
 
     /**
-     * Alias of then().
+     * Alias of description().
      *
-     * @param  \Closure  $callback
+     * @param  string  $description
      * @return $this
      */
-    public function after(Closure $callback)
+    public function name($description)
     {
-        return $this->then($callback);
+        return $this->description($description);
     }
 
     /**
@@ -602,17 +633,6 @@ class Event
         $this->description = $description;
 
         return $this;
-    }
-
-    /**
-     * Alias of description().
-     *
-     * @param  string  $description
-     * @return $this
-     */
-    public function name($description)
-    {
-        return $this->description($description);
     }
 
     /**
@@ -673,25 +693,5 @@ class Event
         $this->mutex = $mutex;
 
         return $this;
-    }
-
-    /**
-     * Get the default output depending on the OS.
-     *
-     * @return string
-     */
-    public function getDefaultOutput()
-    {
-        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
-    }
-
-    /**
-     * Get the mutex name for the scheduled command.
-     *
-     * @return string
-     */
-    public function mutexName()
-    {
-        return 'schedule-mutex-'.sha1($this->expression.$this->command);
     }
 }
