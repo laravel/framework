@@ -73,7 +73,7 @@ class DatabaseStore implements Store
         // If this cache expiration date is past the current time, we will remove this
         // item from the cache. Then we will return a null value since the cache is
         // expired. We will use "Carbon" to make this comparison with the column.
-        if ($this->currentTime() >= $cache->expiration) {
+        if ($this->currentTime() >= $cache->expiration && $cache->expiration > 0) {
             $this->forget($key);
 
             return;
@@ -199,7 +199,7 @@ class DatabaseStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 5256000);
+        $this->put($key, $value, 0);
     }
 
     /**
