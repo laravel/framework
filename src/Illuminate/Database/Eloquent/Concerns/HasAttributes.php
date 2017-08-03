@@ -113,17 +113,40 @@ trait HasAttributes
      */
     protected function addDateAttributesToArray(array $attributes)
     {
+        $originalDateFormat = $this->dateFormat;
+
         foreach ($this->getDates() as $key) {
             if (! isset($attributes[$key])) {
                 continue;
             }
 
+            $this->dateFormat = $this->getFormatForDate($key);
+
             $attributes[$key] = $this->serializeDate(
                 $this->asDateTime($attributes[$key])
             );
+
+            $this->dateFormat = $originalDateFormat;
         }
 
         return $attributes;
+    }
+
+    /**
+     * Get the format for the date attribute.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    public function getFormatForDate($attribute)
+    {
+        foreach ($this->dates as $date) {
+            if (Str::startsWith($date, $attribute.':')) {
+                return explode(':', $date)[1];
+            }
+        }
+
+        return $this->getDateFormat();
     }
 
     /**
@@ -765,9 +788,13 @@ trait HasAttributes
     {
         $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
-        return $this->usesTimestamps()
+        $dates = $this->usesTimestamps()
                     ? array_unique(array_merge($this->dates, $defaults))
                     : $this->dates;
+
+        return array_map(function ($date) {
+            return Str::contains($date, ':') ? explode(':', $date)[0] : $date;
+        }, $dates);
     }
 
     /**
