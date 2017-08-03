@@ -56,6 +56,7 @@ class ScheduleBackgroundCommand extends Command
     {
         if (! $event = $this->findEventMutex()) {
             $this->error('No scheduled event could be found that matches the given id.');
+
             return;
         }
 
