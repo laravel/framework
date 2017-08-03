@@ -1153,6 +1153,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function random($amount = null)
     {
+        if ($amount === 0) {
+            return new static;
+        }
+
         if (($requested = $amount ?: 1) > ($count = $this->count())) {
             throw new InvalidArgumentException(
                 "You requested {$requested} items, but there are only {$count} items in the collection."
@@ -1161,10 +1165,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         if (is_null($amount)) {
             return Arr::random($this->items);
-        }
-
-        if ($amount === 0) {
-            return new static;
         }
 
         return new static(Arr::random($this->items, $amount));
