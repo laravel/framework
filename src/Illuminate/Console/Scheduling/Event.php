@@ -531,6 +531,7 @@ class Event
     /**
      * Do not allow the event to overlap each other.
      *
+     * @param  int  $expiresAt
      * @return $this
      */
     public function withoutOverlapping($expiresAt = 1440)
@@ -588,7 +589,7 @@ class Event
     }
 
     /**
-     * Alias of then().
+     * Register a callback to be called after the operation.
      *
      * @param  \Closure  $callback
      * @return $this
@@ -612,7 +613,7 @@ class Event
     }
 
     /**
-     * Alias of description().
+     * Set the human-friendly description of the event.
      *
      * @param  string  $description
      * @return $this

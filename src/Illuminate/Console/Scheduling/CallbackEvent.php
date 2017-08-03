@@ -85,16 +85,6 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Get the mutex name for the scheduled command.
-     *
-     * @return string
-     */
-    public function mutexName()
-    {
-        return 'schedule-mutex-'.sha1($this->expression.$this->description);
-    }
-
-    /**
      * Do not allow the event to overlap each other.
      *
      * @param  int  $expiresAt
@@ -109,6 +99,16 @@ class CallbackEvent extends Event
         }
 
         return parent::withoutOverlapping($expiresAt);
+    }
+
+    /**
+     * Get the mutex name for the scheduled command.
+     *
+     * @return string
+     */
+    public function mutexName()
+    {
+        return 'schedule-mutex-'.sha1($this->expression.$this->description);
     }
 
     /**
