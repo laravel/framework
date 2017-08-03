@@ -940,6 +940,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Merge the collection with the given items.
+     * Items on the same key will be merge using the callback.
+     *
+     * @param  mixed  $items
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mergeWith($items, callable $callback)
+    {
+        $items = $this->getArrayableItems($items);
+
+        return $this->merge($items)
+            ->map(function ($value, $key) use ($callback, $items) {
+                if ($this->has($key) && array_key_exists($key, $items)) {
+                    return $callback($this->get($key), $value, $key);
+                }
+
+                return $value;
+            });
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @param  mixed  $values

@@ -506,6 +506,43 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testMergeWithCallback()
+    {
+        $initial = new Collection(['foo' => 1, 'bar' => 40]);
+        $other = new Collection(['bar' => 2, 'baz' => 1337]);
+
+        $result = $initial->mergeWith($other, function ($a, $b) {
+            return $a + $b;
+        })->all();
+
+        $this->assertEquals([
+            'foo' => 1,
+            'bar' => 40 + 2,
+            'baz' => 1337,
+        ], $result);
+    }
+
+    public function testMergeWithCallbackWithArrays()
+    {
+        $initial = new Collection([
+            'individuals' => ['Taylor', 'Adam'],
+            'companies' => ['Laravel'],
+        ]);
+        $other = new Collection([
+            'individuals' => ['Jeffrey'],
+            'companies' => ['Laracasts'],
+        ]);
+
+        $result = $initial->mergeWith($other, function ($a, $b) {
+            return array_merge($a, $b);
+        })->all();
+
+        $this->assertEquals([
+            'individuals' => ['Taylor', 'Adam', 'Jeffrey'],
+            'companies' => ['Laravel', 'Laracasts'],
+        ], $result);
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);
