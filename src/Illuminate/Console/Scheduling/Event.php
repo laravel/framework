@@ -20,7 +20,7 @@ class Event
      *
      * @var string
      */
-    public $command = null;
+    public $command;
 
     /**
      * The cron expression representing the event's frequency.
@@ -125,7 +125,7 @@ class Event
      *
      * @var string
      */
-    public $description = null;
+    public $description;
 
     /**
      * The mutex implementation.

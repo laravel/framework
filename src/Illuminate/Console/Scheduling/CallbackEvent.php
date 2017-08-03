@@ -68,23 +68,6 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Store any captured output.
-     *
-     * @param  string  $output
-     * @return mixed
-     */
-    public function storeOutput($output)
-    {
-        try {
-            file_put_contents($this->output, $output.PHP_EOL, $this->shouldAppendOutput ? FILE_APPEND : null);
-        } catch (Exception $e) {
-            Log::error('Unable to store output from event due to: '.$e->getMessage());
-        }
-
-        return $output;
-    }
-
-    /**
      * Do not allow the event to overlap each other.
      *
      * @param  int  $expiresAt
@@ -125,5 +108,22 @@ class CallbackEvent extends Event
         }
 
         return parent::runInBackground();
+    }
+
+    /**
+     * Store any captured output.
+     *
+     * @param  string  $output
+     * @return mixed
+     */
+    public function storeOutput($output)
+    {
+        try {
+            file_put_contents($this->output, $output.PHP_EOL, $this->shouldAppendOutput ? FILE_APPEND : null);
+        } catch (Exception $e) {
+            Log::error('Unable to store output from event due to: '.$e->getMessage());
+        }
+
+        return $output;
     }
 }
