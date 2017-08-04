@@ -100,6 +100,6 @@ trait CompilesEchos
      */
     public function compileEchoDefaults($value)
     {
-        return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/s', 'isset($1) ? $1 : $2', $value);
+        return preg_replace('/^(?=\$)(.+?)(?:\s+or\s+)(.+?)$/si', 'isset($1) ? $1 : $2', $value);
     }
 }
