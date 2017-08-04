@@ -13,8 +13,7 @@ class DatabaseNotificationCollection extends Collection
      */
     public function markAsRead()
     {
-        $this->each(function ($notification) {
-            $notification->markAsRead();
-        });
+        DatabaseNotification::whereIn('id', $this->pluck('id')->toArray())
+            ->update(['read_at' => new \Carbon\Carbon]);
     }
 }
