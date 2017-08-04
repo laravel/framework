@@ -153,6 +153,10 @@ class SQLiteGrammar extends Grammar
         // grammar insert builder because no special syntax is needed for the single
         // row inserts in SQLite. However, if there are multiples, we'll continue.
         if (count($values) == 1) {
+            if (empty(reset($values))) {
+                return "insert into $table default values";
+            }
+
             return parent::compileInsert($query, reset($values));
         }
 
