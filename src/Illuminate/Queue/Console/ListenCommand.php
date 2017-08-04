@@ -18,7 +18,7 @@ class ListenCommand extends Command
                             {--delay=0 : Amount of time to delay failed jobs}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
-                            {--queue= : The queue to listen on}
+                            {--queue= : The queue to listen to}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--timeout=60 : The number of seconds a child process can run}
                             {--tries=0 : Number of times to attempt a job before logging it failed}';
@@ -28,7 +28,7 @@ class ListenCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Listen to a given queue';
+    protected $description = 'Listen to a given queue (also runs the queue unless in maintenance mode)';
 
     /**
      * The queue listener instance.
