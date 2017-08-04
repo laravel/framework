@@ -97,7 +97,7 @@ class BelongsToMany extends Relation
     protected $using;
 
     /**
-     * The name of the accessor to use for the relationship.
+     * The name of the accessor to use for the "pivot" relationship.
      *
      * @var string
      */
