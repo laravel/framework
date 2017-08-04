@@ -111,7 +111,14 @@ class EloquentBelongsToManyTest extends TestCase
 
         $post->tagsWithCustomPivot()->attach($tag->id);
 
+        $post->tagsWithCustomAccessor()->attach($tag->id);
+
         $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivot[0]->pivot);
+
+        $this->assertEquals([
+            'post_id' => '1',
+            'tag_id' => '1',
+        ], $post->tagsWithCustomAccessor[0]->tag->toArray());
     }
 
     /**
@@ -578,6 +585,13 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(CustomPivot::class)
             ->withTimestamps();
+    }
+
+    public function tagsWithCustomAccessor()
+    {
+        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
+            ->using(CustomPivot::class)
+            ->as('tag');
     }
 }
 
