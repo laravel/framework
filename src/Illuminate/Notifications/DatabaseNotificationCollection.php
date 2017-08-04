@@ -14,6 +14,7 @@ class DatabaseNotificationCollection extends Collection
     public function markAsRead()
     {
         DatabaseNotification::whereIn('id', $this->pluck('id')->toArray())
+            ->whereNull('read_at')
             ->update(['read_at' => new \Carbon\Carbon]);
     }
 }
