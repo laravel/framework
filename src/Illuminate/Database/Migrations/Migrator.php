@@ -89,9 +89,9 @@ class Migrator
             $files, $this->repository->getRan()
         ));
 
-        // Once we have all these migrations that are outstanding we are ready to run
-        // we will go ahead and run them "up". This will execute each migration as
-        // an operation against a database. Then we'll return this list of them.
+        // Once we have all the outstanding migrations, we will go ahead and run
+        // them "up". This will execute each migration as an operation against
+        // a database connection. We'll then return a list of the migrations.
         $this->runPending($migrations, $options);
 
         return $migrations;
