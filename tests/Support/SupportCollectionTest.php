@@ -865,6 +865,12 @@ class SupportCollectionTest extends TestCase
             return $item === null;
         }));
 
+        $c = new Collection([true, true]);
+        $this->assertTrue($c->every());
+
+        $c = new Collection([null, true]);
+        $this->assertFalse($c->every());
+
         $c = new Collection([['active' => true], ['active' => true]]);
         $this->assertTrue($c->every('active'));
         $this->assertTrue($c->every->active);
@@ -1361,6 +1367,21 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => [['rating' => 1, 'url' => '1'], ['rating' => 1, 'url' => '1']], 2 => [['rating' => 2, 'url' => '2']]], $result->toArray());
     }
 
+    public function testGroupByValue()
+    {
+        $data = new Collection([
+            'foo',
+            'foo',
+            'bar',
+        ]);
+
+        $result = $data->groupBy();
+        $this->assertEquals([
+            'foo' => ['foo', 'foo'],
+            'bar' => ['bar'],
+        ], $result->toArray());
+    }
+
     public function testGroupByAttributePreservingKeys()
     {
         $data = new Collection([10 => ['rating' => 1, 'url' => '1'],  20 => ['rating' => 1, 'url' => '1'],  30 => ['rating' => 2, 'url' => '2']]);
@@ -1471,6 +1492,22 @@ class SupportCollectionTest extends TestCase
             return $item['rating'] * 2;
         });
         $this->assertEquals([2 => ['rating' => 1, 'name' => '1'], 4 => ['rating' => 2, 'name' => '2'], 6 => ['rating' => 3, 'name' => '3']], $result->all());
+    }
+
+    public function testKeyByValue()
+    {
+        $data = new Collection([
+            'foo',
+            'bar',
+            'baz',
+        ]);
+
+        $result = $data->keyBy();
+        $this->assertEquals([
+            'foo' => 'foo',
+            'bar' => 'bar',
+            'baz' => 'baz',
+        ], $result->all());
     }
 
     public function testKeyByClosure()
