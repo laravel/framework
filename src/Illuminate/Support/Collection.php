@@ -1079,10 +1079,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function random($amount = null)
     {
-        if ($amount === 0) {
-            return new static;
-        }
-
         $requested = is_null($amount) ? 1 : $amount;
         $count = $this->count();
 
