@@ -114,7 +114,7 @@ class CallbackEvent extends Event
      * Store any captured output.
      *
      * @param  string  $output
-     * @return mixed
+     * @return string
      */
     public function storeOutput($output)
     {
