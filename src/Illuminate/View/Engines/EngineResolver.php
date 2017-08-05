@@ -38,7 +38,7 @@ class EngineResolver
     }
 
     /**
-     * Resolver an engine instance by name.
+     * Resolve an engine instance by name.
      *
      * @param  string  $engine
      * @return \Illuminate\View\Engines\EngineInterface
