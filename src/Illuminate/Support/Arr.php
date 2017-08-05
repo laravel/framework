@@ -477,7 +477,7 @@ class Arr
             return $array[array_rand($array)];
         }
 
-        if ($amount === 0) {
+        if ((int) $amount === 0) {
             return [];
         }
 
