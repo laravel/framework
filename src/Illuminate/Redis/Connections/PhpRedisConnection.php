@@ -266,7 +266,7 @@ class PhpRedisConnection extends Connection
      * Execute commands in a pipeline.
      *
      * @param  callable  $callback
-     * @return array|\Redis
+     * @return \Redis|array
      */
     public function pipeline(callable $callback = null)
     {
@@ -281,7 +281,7 @@ class PhpRedisConnection extends Connection
      * Execute commands in a transaction.
      *
      * @param  callable  $callback
-     * @return array|\Redis
+     * @return \Redis|array
      */
     public function transaction(callable $callback = null)
     {
