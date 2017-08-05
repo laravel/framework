@@ -454,7 +454,7 @@ class Arr
     }
 
     /**
-     * Get a random value from an array.
+     * Get one or a specified number of random values from an array.
      *
      * @param  array  $array
      * @param  int|null  $amount
@@ -475,6 +475,10 @@ class Arr
 
         if (is_null($amount)) {
             return $array[array_rand($array)];
+        }
+
+        if ($amount === 0) {
+            return [];
         }
 
         $keys = array_rand($array, $amount);

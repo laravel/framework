@@ -1070,7 +1070,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get zero or more items randomly from the collection.
+     * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $amount
      * @return mixed
