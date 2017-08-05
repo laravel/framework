@@ -118,13 +118,13 @@ class FoundationTestResponseTest extends TestCase
                 'foobar_bar',
             ],
             'bars'   => [
-                '*' => ['bar', 'foo']
+                '*' => ['bar', 'foo'],
             ],
             'baz'    => [
                 '*' => [
                     'foo',
-                    'bar' => ['foo', 'bar']
-                ]
+                    'bar' => ['foo', 'bar'],
+                ],
             ],
         ]);
 

@@ -376,9 +376,8 @@ class TestResponse
             }
         }
 
-
         array_walk($structure, function (&$item, $key) {
-            if (!is_int($key)) {
+            if (! is_int($key)) {
                 $item = $key;
             }
         });
