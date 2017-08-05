@@ -1944,6 +1944,24 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:php']);
         $this->assertTrue($v->passes());
 
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:pdf']);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('pdf'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:pdf']);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:pdf,php']);
+        $this->assertTrue($v->passes());
+
         $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'isValid'])->setConstructorArgs($uploadedFile)->getMock();
         $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
         $file2->expects($this->any())->method('isValid')->will($this->returnValue(false));
