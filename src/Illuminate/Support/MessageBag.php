@@ -326,6 +326,16 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      *
      * @return bool
      */
+    public function isNotEmpty()
+    {
+        return $this->any();
+    }
+
+    /**
+     * Determine if the message bag has any messages.
+     *
+     * @return bool
+     */
     public function any()
     {
         return $this->count() > 0;

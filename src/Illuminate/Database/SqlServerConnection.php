@@ -5,6 +5,7 @@ namespace Illuminate\Database;
 use Closure;
 use Exception;
 use Throwable;
+use Illuminate\Database\Schema\SqlServerBuilder;
 use Doctrine\DBAL\Driver\PDOSqlsrv\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
@@ -64,6 +65,20 @@ class SqlServerConnection extends Connection
     protected function getDefaultQueryGrammar()
     {
         return $this->withTablePrefix(new QueryGrammar);
+    }
+
+    /**
+     * Get a schema builder instance for the connection.
+     *
+     * @return \Illuminate\Database\Schema\SqlServerBuilder
+     */
+    public function getSchemaBuilder()
+    {
+        if (is_null($this->schemaGrammar)) {
+            $this->useDefaultSchemaGrammar();
+        }
+
+        return new SqlServerBuilder($this);
     }
 
     /**

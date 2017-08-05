@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
 
 class MailgunTransport extends Transport
@@ -53,7 +53,7 @@ class MailgunTransport extends Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->beforeSendPerformed($message);
 
@@ -71,11 +71,11 @@ class MailgunTransport extends Transport
     /**
      * Get the HTTP payload for sending the Mailgun message.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param  \Swift_Mime_SimpleMessage  $message
      * @param  string  $to
      * @return array
      */
-    protected function payload(Swift_Mime_Message $message, $to)
+    protected function payload(Swift_Mime_SimpleMessage $message, $to)
     {
         return [
             'auth' => [
@@ -99,10 +99,10 @@ class MailgunTransport extends Transport
     /**
      * Get the "to" payload field for the API request.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param  \Swift_Mime_SimpleMessage  $message
      * @return string
      */
-    protected function getTo(Swift_Mime_Message $message)
+    protected function getTo(Swift_Mime_SimpleMessage $message)
     {
         return collect($this->allContacts($message))->map(function ($display, $address) {
             return $display ? $display." <{$address}>" : $address;
@@ -112,10 +112,10 @@ class MailgunTransport extends Transport
     /**
      * Get all of the contacts for the message.
      *
-     * @param  \Swift_Mime_Message  $message
+     * @param  \Swift_Mime_SimpleMessage  $message
      * @return array
      */
-    protected function allContacts(Swift_Mime_Message $message)
+    protected function allContacts(Swift_Mime_SimpleMessage $message)
     {
         return array_merge(
             (array) $message->getTo(), (array) $message->getCc(), (array) $message->getBcc()
@@ -157,7 +157,7 @@ class MailgunTransport extends Transport
      * Set the domain being used by the transport.
      *
      * @param  string  $domain
-     * @return void
+     * @return string
      */
     public function setDomain($domain)
     {

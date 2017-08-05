@@ -37,4 +37,11 @@ interface Validator extends MessageProvider
      * @return $this
      */
     public function after($callback);
+
+    /**
+     * Get all of the validation error messages.
+     *
+     * @return array
+     */
+    public function errors();
 }

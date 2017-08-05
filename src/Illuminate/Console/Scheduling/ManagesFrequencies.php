@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 trait ManagesFrequencies
 {
@@ -301,7 +301,7 @@ trait ManagesFrequencies
         return $this->spliceIntoPosition(1, 0)
                     ->spliceIntoPosition(2, 0)
                     ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, '*/3');
+                    ->spliceIntoPosition(4, '1-12/3');
     }
 
     /**

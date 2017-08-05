@@ -40,13 +40,38 @@ class Repository implements ArrayAccess, ConfigContract
     /**
      * Get the specified configuration value.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return mixed
      */
     public function get($key, $default = null)
     {
+        if (is_array($key)) {
+            return $this->getMany($key);
+        }
+
         return Arr::get($this->items, $key, $default);
+    }
+
+    /**
+     * Get many configuration values.
+     *
+     * @param  array  $keys
+     * @return array
+     */
+    public function getMany($keys)
+    {
+        $config = [];
+
+        foreach ($keys as $key => $default) {
+            if (is_numeric($key)) {
+                list($key, $default) = [$default, null];
+            }
+
+            $config[$key] = Arr::get($this->items, $key, $default);
+        }
+
+        return $config;
     }
 
     /**

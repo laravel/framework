@@ -144,6 +144,17 @@ abstract class Relation
     }
 
     /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function get($columns = ['*'])
+    {
+        return $this->query->get($columns);
+    }
+
+    /**
      * Touch all of the related models for the relationship.
      *
      * @return void
@@ -353,7 +364,7 @@ abstract class Relation
             return $this->macroCall($method, $parameters);
         }
 
-        $result = call_user_func_array([$this->query, $method], $parameters);
+        $result = $this->query->{$method}(...$parameters);
 
         if ($result === $this->query) {
             return $this;

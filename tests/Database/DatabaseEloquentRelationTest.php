@@ -30,13 +30,13 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $builder->shouldReceive('getModel')->andReturn($related = m::mock(\StdClass::class));
+        $builder->shouldReceive('getModel')->andReturn($related = m::mock(\stdClass::class));
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $now = \Carbon\Carbon::now();
+        $now = \Illuminate\Support\Carbon::now();
         $related->shouldReceive('freshTimestampString')->andReturn($now);
         $builder->shouldReceive('update')->once()->with(['updated_at' => $now]);
 
@@ -71,7 +71,7 @@ class DatabaseEloquentRelationTest extends TestCase
             return 'foo';
         });
 
-        $model = new EloquentRelationResetModelStub();
+        $model = new EloquentRelationResetModelStub;
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();

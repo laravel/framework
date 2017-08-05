@@ -9,7 +9,7 @@ class PendingMail
     /**
      * The mailer instance.
      *
-     * @var array
+     * @var \Illuminate\Mail\Mailer
      */
     protected $mailer;
 
@@ -130,7 +130,7 @@ class PendingMail
     /**
      * Deliver the queued message after the given delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  Mailable  $mailable
      * @return mixed
      */

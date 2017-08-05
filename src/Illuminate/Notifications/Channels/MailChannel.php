@@ -2,9 +2,9 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Mail\Markdown;
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Notifications\Notification;
@@ -19,21 +19,23 @@ class MailChannel
     protected $mailer;
 
     /**
-     * The Markdown resolver callback.
+     * The markdown implementation.
      *
-     * @var \Closure
+     * @var \Illuminate\Mail\Markdown
      */
-    protected $markdownResolver;
+    protected $markdown;
 
     /**
      * Create a new mail channel instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Mail\Markdown  $markdown
      * @return void
      */
-    public function __construct(Mailer $mailer)
+    public function __construct(Mailer $mailer, Markdown $markdown)
     {
         $this->mailer = $mailer;
+        $this->markdown = $markdown;
     }
 
     /**
@@ -45,19 +47,37 @@ class MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $notifiable->routeNotificationFor('mail')) {
+        $message = $notification->toMail($notifiable);
+
+        if (! $notifiable->routeNotificationFor('mail') &&
+            ! $message instanceof Mailable) {
             return;
         }
-
-        $message = $notification->toMail($notifiable);
 
         if ($message instanceof Mailable) {
             return $message->send($this->mailer);
         }
 
-        $this->mailer->send($this->buildView($message), $message->data(), function ($mailMessage) use ($notifiable, $notification, $message) {
+        $this->mailer->send(
+            $this->buildView($message),
+            $message->data(),
+            $this->messageBuilder($notifiable, $notification, $message)
+        );
+    }
+
+    /**
+     * Get the mailer Closure for the message.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return \Closure
+     */
+    protected function messageBuilder($notifiable, $notification, $message)
+    {
+        return function ($mailMessage) use ($notifiable, $notification, $message) {
             $this->buildMessage($mailMessage, $notifiable, $notification, $message);
-        });
+        };
     }
 
     /**
@@ -72,11 +92,9 @@ class MailChannel
             return $message->view;
         }
 
-        $markdown = call_user_func($this->markdownResolver);
-
         return [
-            'html' => $markdown->render($message->markdown, $message->data()),
-            'text' => $markdown->renderText($message->markdown, $message->data()),
+            'html' => $this->markdown->render($message->markdown, $message->data()),
+            'text' => $this->markdown->renderText($message->markdown, $message->data()),
         ];
     }
 
@@ -179,18 +197,5 @@ class MailChannel
         foreach ($message->rawAttachments as $attachment) {
             $mailMessage->attachData($attachment['data'], $attachment['name'], $attachment['options']);
         }
-    }
-
-    /**
-     * Set the Markdown resolver callback.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function setMarkdownResolver(Closure $callback)
-    {
-        $this->markdownResolver = $callback;
-
-        return $this;
     }
 }

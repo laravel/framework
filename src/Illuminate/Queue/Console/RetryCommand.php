@@ -4,16 +4,15 @@ namespace Illuminate\Queue\Console;
 
 use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Input\InputArgument;
 
 class RetryCommand extends Command
 {
     /**
-     * The console command name.
+     * The console command signature.
      *
      * @var string
      */
-    protected $name = 'queue:retry';
+    protected $signature = 'queue:retry {id* : The ID of the failed job.}';
 
     /**
      * The console command description.
@@ -27,7 +26,7 @@ class RetryCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         foreach ($this->getJobIds() as $id) {
             $job = $this->laravel['queue.failer']->find($id);
@@ -51,7 +50,7 @@ class RetryCommand extends Command
      */
     protected function getJobIds()
     {
-        $ids = $this->argument('id');
+        $ids = (array) $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
             $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
@@ -90,17 +89,5 @@ class RetryCommand extends Command
         }
 
         return json_encode($payload);
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['id', InputArgument::IS_ARRAY, 'The ID of the failed job'],
-        ];
     }
 }

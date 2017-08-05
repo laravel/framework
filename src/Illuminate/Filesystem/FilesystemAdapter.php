@@ -111,14 +111,14 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @param  string|resource  $contents
-     * @param  array  $options
+     * @param  mixed  $options
      * @return bool
      */
     public function put($path, $contents, $options = [])
     {
-        if (is_string($options)) {
-            $options = ['visibility' => $options];
-        }
+        $options = is_string($options)
+                     ? ['visibility' => $options]
+                     : (array) $options;
 
         // If the given contents is actually a file or uploaded file instance than we will
         // automatically store the file using a stream. This provides a convenient path

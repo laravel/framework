@@ -61,7 +61,7 @@ class ValidationData
         $data = [];
 
         foreach ($keys as $key) {
-            $data[$key] = array_get($masterData, $key);
+            $data[$key] = Arr::get($masterData, $key);
         }
 
         return $data;
@@ -82,7 +82,7 @@ class ValidationData
 
         $value = Arr::get($masterData, $attribute, '__missing__');
 
-        if ($value != '__missing__') {
+        if ($value !== '__missing__') {
             Arr::set($results, $attribute, $value);
         }
 

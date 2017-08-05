@@ -21,7 +21,7 @@ class NotificationRoutesNotificationsTest extends TestCase
         $factory = Mockery::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
-        $instance = new StdClass;
+        $instance = new stdClass;
         $factory->shouldReceive('send')->with($notifiable, $instance);
         Container::setInstance($container);
 

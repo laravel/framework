@@ -26,7 +26,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentHasOneModelStub();
+        $newModel = new EloquentHasOneModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -43,7 +43,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentHasOneModelStub();
+        $newModel = new EloquentHasOneModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -62,7 +62,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentHasOneModelStub();
+        $newModel = new EloquentHasOneModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 

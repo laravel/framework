@@ -11,6 +11,7 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 use InvalidArgumentException;
+use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -59,23 +60,47 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection by invoking the callback a given amount of times.
+     * Wrap the given value in a collection if applicable.
      *
-     * @param  int  $amount
-     * @param  callable  $callback
+     * @param  mixed  $value
      * @return static
      */
-    public static function times($amount, callable $callback = null)
+    public static function wrap($value)
     {
-        if ($amount < 1) {
+        return $value instanceof self
+            ? new static($value)
+            : new static(Arr::wrap($value));
+    }
+
+    /**
+     * Get the underlying items from the given collection if applicable.
+     *
+     * @param  array|static  $value
+     * @return array
+     */
+    public static function unwrap($value)
+    {
+        return $value instanceof self ? $value->all() : $value;
+    }
+
+    /**
+     * Create a new collection by invoking the callback a given number of times.
+     *
+     * @param  int  $number
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public static function times($number, callable $callback = null)
+    {
+        if ($number < 1) {
             return new static;
         }
 
         if (is_null($callback)) {
-            return new static(range(1, $amount));
+            return new static(range(1, $number));
         }
 
-        return (new static(range(1, $amount)))->map($callback);
+        return (new static(range(1, $number)))->map($callback);
     }
 
     /**
@@ -126,7 +151,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return;
         }
 
-        $values = with(isset($key) ? $this->pluck($key) : $this)
+        $values = (isset($key) ? $this->pluck($key) : $this)
                     ->sort()->values();
 
         $middle = (int) ($count / 2);
@@ -241,6 +266,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new static(Arr::crossJoin(
             $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
         ));
+    }
+
+    /**
+     * Dump the collection and end the script.
+     *
+     * @return void
+     */
+    public function dd()
+    {
+        dd($this->all());
+    }
+
+    /**
+     * Dump the collection.
+     *
+     * @return void
+     */
+    public function dump()
+    {
+        (new static(func_get_args()))
+            ->push($this)
+            ->each(function ($item) {
+                (new Dumper)->dump($item);
+            });
+
+        return $this;
     }
 
     /**
@@ -646,7 +697,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function has($key)
     {
-        return $this->offsetExists($key);
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (! $this->offsetExists($value)) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
@@ -684,9 +743,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $items
      * @return static
      */
-    public function intersectKey($items)
+    public function intersectByKeys($items)
     {
-        return new static(array_intersect_key($this->items, $this->getArrayableItems($items)));
+        return new static(array_intersect_key(
+            $this->items, $this->getArrayableItems($items)
+        ));
     }
 
     /**
@@ -833,6 +894,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function flatMap(callable $callback)
     {
         return $this->map($callback)->collapse();
+    }
+
+    /**
+     * Map the values into a new class.
+     *
+     * @param  string  $class
+     * @return static
+     */
+    public function mapInto($class)
+    {
+        return $this->map(function ($value, $key) use ($class) {
+            return new $class($value, $key);
+        });
     }
 
     /**
@@ -1072,28 +1146,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get zero or more items randomly from the collection.
      *
-     * @param  int|null  $amount
+     * @param  int|null  $number
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function random($amount = null)
+    public function random($number = null)
     {
-        if ($amount === 0) {
+        if ($number === 0) {
             return new static;
         }
 
-        if (($requested = $amount ?: 1) > ($count = $this->count())) {
+        if (($requested = $number ?: 1) > ($count = $this->count())) {
             throw new InvalidArgumentException(
                 "You requested {$requested} items, but there are only {$count} items in the collection."
             );
         }
 
-        if (is_null($amount)) {
+        if (is_null($number)) {
             return Arr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $amount));
+        return new static(Arr::random($this->items, $number));
     }
 
     /**
