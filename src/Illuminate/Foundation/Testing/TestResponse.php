@@ -385,7 +385,7 @@ class TestResponse
      * @param  array|null  $responseData
      * @return $this
      */
-    public function assertJsonMissingStructure(array $structure = null, $responseData = null)
+    public function assertJsonStructureMissing(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
             return $this->assertJson($this->json());
@@ -400,12 +400,12 @@ class TestResponse
                 PHPUnit::assertInternalType('array', $responseData);
 
                 foreach ($responseData as $responseDataItem) {
-                    $this->assertJsonMissingStructure($structure['*'], $responseDataItem);
+                    $this->assertJsonStructureMissing($structure['*'], $responseDataItem);
                 }
             } elseif (is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $responseData);
 
-                $this->assertJsonMissingStructure($structure[$key], $responseData[$key]);
+                $this->assertJsonStructureMissing($structure[$key], $responseData[$key]);
             } else {
                 PHPUnit::assertArrayNotHasKey($value, $responseData);
             }

@@ -137,24 +137,24 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
         // Without structure
-        $response->assertJsonMissingStructure();
+        $response->assertJsonStructureMissing();
 
         // At root
-        $response->assertJsonMissingStructure(['foo_bar']);
+        $response->assertJsonStructureMissing(['foo_bar']);
 
         // Nested
-        $response->assertJsonMissingStructure(['foobar' => ['foobar_foo_bar', 'foobar_bar_baz']]);
+        $response->assertJsonStructureMissing(['foobar' => ['foobar_foo_bar', 'foobar_bar_baz']]);
 
         // Wildcard (repeating structure)
-        $response->assertJsonMissingStructure(['bars' => ['*' => ['baz', 'foobar']]]);
+        $response->assertJsonStructureMissing(['bars' => ['*' => ['baz', 'foobar']]]);
 
         // Nested after wildcard
-        $response->assertJsonMissingStructure(['baz' => ['*' => ['baz', 'bar' => ['foobar', 'baz']]]]);
+        $response->assertJsonStructureMissing(['baz' => ['*' => ['baz', 'bar' => ['foobar', 'baz']]]]);
 
         // Wildcard (repeating structure) at root
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
 
-        $response->assertJsonMissingStructure(['*' => ['baz', 'qux', 'quux']]);
+        $response->assertJsonStructureMissing(['*' => ['baz', 'qux', 'quux']]);
     }
 
     public function testMacroable()
