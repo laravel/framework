@@ -154,6 +154,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->syncOriginal();
 
         $this->fill($attributes);
+        
+        $this->setConnection($this->getConnection()->getName());
     }
 
     /**
