@@ -466,6 +466,31 @@ class SupportArrTest extends TestCase
         $this->assertCount(0, $random);
     }
 
+    public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
+    {
+        $exceptions = 0;
+
+        try {
+            Arr::random([]);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        try {
+            Arr::random([], 1);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        try {
+            Arr::random([], 2);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        $this->assertSame(3, $exceptions);
+    }
+
     public function testSet()
     {
         $array = ['products' => ['desk' => ['price' => 100]]];

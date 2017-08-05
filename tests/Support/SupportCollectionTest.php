@@ -953,12 +953,30 @@ class SupportCollectionTest extends TestCase
         $this->assertCount(0, $random);
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
     {
-        (new Collection)->random();
+        $data = new Collection();
+        $exceptions = 0;
+
+        try {
+            $data->random();
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        try {
+            $data->random(1);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        try {
+            $data->random(2);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        $this->assertSame(3, $exceptions);
     }
 
     public function testTakeLast()
