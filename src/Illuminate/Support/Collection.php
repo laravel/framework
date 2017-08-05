@@ -84,23 +84,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection by invoking the callback a given amount of times.
+     * Create a new collection by invoking the callback a given number of times.
      *
-     * @param  int  $amount
+     * @param  int  $number
      * @param  callable|null  $callback
      * @return static
      */
-    public static function times($amount, callable $callback = null)
+    public static function times($number, callable $callback = null)
     {
-        if ($amount < 1) {
+        if ($number < 1) {
             return new static;
         }
 
         if (is_null($callback)) {
-            return new static(range(1, $amount));
+            return new static(range(1, $number));
         }
 
-        return (new static(range(1, $amount)))->map($callback);
+        return (new static(range(1, $number)))->map($callback);
     }
 
     /**
@@ -1146,28 +1146,28 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get zero or more items randomly from the collection.
      *
-     * @param  int|null  $amount
+     * @param  int|null  $number
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public function random($amount = null)
+    public function random($number = null)
     {
-        if ($amount === 0) {
+        if ($number === 0) {
             return new static;
         }
 
-        if (($requested = $amount ?: 1) > ($count = $this->count())) {
+        if (($requested = $number ?: 1) > ($count = $this->count())) {
             throw new InvalidArgumentException(
                 "You requested {$requested} items, but there are only {$count} items in the collection."
             );
         }
 
-        if (is_null($amount)) {
+        if (is_null($number)) {
             return Arr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $amount));
+        return new static(Arr::random($this->items, $number));
     }
 
     /**
