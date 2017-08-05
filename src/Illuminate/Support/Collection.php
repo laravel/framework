@@ -1083,7 +1083,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static;
         }
 
-        if (($requested = $amount ?: 1) > ($count = $this->count())) {
+        $requested = is_null($amount) ? 1 : $amount;
+        $count = $this->count();
+
+        if ($requested > $count) {
             throw new InvalidArgumentException(
                 "You requested {$requested} items, but there are only {$count} items in the collection."
             );

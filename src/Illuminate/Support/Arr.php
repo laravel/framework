@@ -464,7 +464,10 @@ class Arr
      */
     public static function random($array, $amount = null)
     {
-        if (($requested = $amount ?: 1) > ($count = count($array))) {
+        $requested = is_null($amount) ? 1 : $amount;
+        $count = count($array);
+
+        if ($requested > $count) {
             throw new InvalidArgumentException(
                 "You requested {$requested} items, but there are only {$count} items in the array."
             );
