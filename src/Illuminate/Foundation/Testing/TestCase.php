@@ -134,8 +134,7 @@ abstract class TestCase extends BaseTestCase
     protected function setUpTraitsDynamically()
     {
         foreach (class_uses_recursive(static::class) as $trait) {
-
-            $method = 'setUp' . class_basename($trait);
+            $method = 'setUp'.class_basename($trait);
 
             if (method_exists($this, $method)) {
                 call_user_func([$this, $method]);
