@@ -98,6 +98,8 @@ class CallbackEvent extends Event
      * Do not allow the event to run in background without a name.
      *
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function runInBackground()
     {

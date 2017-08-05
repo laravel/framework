@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
 class ScheduleBackgroundCommand extends Command
@@ -66,12 +67,12 @@ class ScheduleBackgroundCommand extends Command
     /**
      * Find the event that matches the id.
      *
-     * @return mixd
+     * @return \Illuminate\Console\Scheduling\Event|null
      */
     protected function findEventMutex()
     {
-        return collect($this->schedule->events())->filter(function ($value) {
+        return Arr::first($this->schedule->events(), (function ($value) {
             return $value->mutexName() === $this->argument('id');
-        })->first();
+        }));
     }
 }
