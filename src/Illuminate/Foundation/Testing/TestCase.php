@@ -70,6 +70,8 @@ abstract class TestCase extends BaseTestCase
 
         $this->setUpTraits();
 
+        $this->setUpTraitsDynamically();
+
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             call_user_func($callback);
         }
@@ -121,6 +123,24 @@ abstract class TestCase extends BaseTestCase
         }
 
         return $uses;
+    }
+
+    /**
+     * Boot the setUp function of a trait dynamically following
+     * the naming convention: setUpTraitName.
+     *
+     * @return void
+     */
+    protected function setUpTraitsDynamically()
+    {
+        foreach (class_uses_recursive(static::class) as $trait) {
+
+            $method = 'setUp' . class_basename($trait);
+
+            if (method_exists($this, $method)) {
+                call_user_func([$this, $method]);
+            }
+        }
     }
 
     /**
