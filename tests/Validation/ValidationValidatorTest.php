@@ -1749,6 +1749,27 @@ class ValidationValidatorTest extends PHPUnit_Framework_TestCase
         $v->setFiles(['x' => $file]);
         $this->assertTrue($v->passes());
 
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension', 'getClientOriginalExtension'], $uploadedFile);
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, [], ['x' => 'mimes:pdf']);
+        $v->setFiles(['x' => $file]);
+        $this->assertFalse($v->passes());
+
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension', 'getClientOriginalExtension'], $uploadedFile);
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('pdf'));
+        $v = new Validator($trans, [], ['x' => 'mimes:pdf']);
+        $v->setFiles(['x' => $file]);
+        $this->assertTrue($v->passes());
+
+        $file = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension', 'getClientOriginalExtension'], $uploadedFile);
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, [], ['x' => 'mimes:pdf,php']);
+        $v->setFiles(['x' => $file]);
+        $this->assertTrue($v->passes());
+
         $file2 = $this->getMock('Symfony\Component\HttpFoundation\File\UploadedFile', ['guessExtension', 'isValid'], $uploadedFile);
         $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
         $file2->expects($this->any())->method('isValid')->will($this->returnValue(false));
