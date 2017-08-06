@@ -469,7 +469,7 @@ class Arr
 
         if ($requested > $count) {
             throw new InvalidArgumentException(
-                "You requested {$requested} items, but there are only {$count} items in the array."
+                "You requested {$requested} items, but there are only {$count} items available."
             );
         }
 

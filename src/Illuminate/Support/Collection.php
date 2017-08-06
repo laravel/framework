@@ -10,7 +10,6 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -1079,15 +1078,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function random($amount = null)
     {
-        $requested = is_null($amount) ? 1 : $amount;
-        $count = $this->count();
-
-        if ($requested > $count) {
-            throw new InvalidArgumentException(
-                "You requested {$requested} items, but there are only {$count} items in the collection."
-            );
-        }
-
         if (is_null($amount)) {
             return Arr::random($this->items);
         }
