@@ -465,6 +465,7 @@ class Arr
     public static function random($array, $amount = null)
     {
         $requested = is_null($amount) ? 1 : $amount;
+
         $count = count($array);
 
         if ($requested > $count) {
