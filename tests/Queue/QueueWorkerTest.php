@@ -41,8 +41,8 @@ class QueueWorkerTest extends TestCase
         $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
         $worker->runNextJob('default', 'queue', new WorkerOptions);
         $this->assertTrue($job->fired);
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobProcessing::class))->once();
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobProcessed::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessing::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessed::class))->once();
     }
 
     public function test_job_can_be_fired_based_on_priority()
@@ -98,8 +98,8 @@ class QueueWorkerTest extends TestCase
         $this->assertEquals(10, $job->releaseAfter);
         $this->assertFalse($job->deleted);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
     public function test_job_is_not_released_if_it_has_exceeded_max_attempts()
@@ -121,9 +121,9 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($job->deleted);
         $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
-        $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
     public function test_job_is_failed_if_it_has_already_exceeded_max_attempts()
@@ -141,9 +141,9 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($job->deleted);
         $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(MaxAttemptsExceededException::class));
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobExceptionOccurred::class))->once();
-        $this->events->shouldHaveReceived('fire')->with(Mockery::type(JobFailed::class))->once();
-        $this->events->shouldNotHaveReceived('fire', [Mockery::type(JobProcessed::class)]);
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
     public function test_job_based_max_retries()
