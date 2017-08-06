@@ -343,6 +343,56 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has exact given JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function assertExactJsonStructure(array $structure, $responseData = null)
+    {
+        if (is_null($responseData)) {
+            $responseData = $this->decodeResponseJson();
+        }
+
+        foreach ($structure as $key => $value) {
+            if (is_array($value) && $key === '*') {
+                PHPUnit::assertInternalType('array', $responseData);
+
+                foreach ($responseData as $responseDataItem) {
+                    $this->assertJsonStructure($value, $responseDataItem);
+                }
+            } elseif (is_array($value)) {
+                PHPUnit::assertArrayHasKey($key, $responseData);
+
+                $this->assertJsonStructure($value, $responseData[$key]);
+            } else {
+                PHPUnit::assertArrayHasKey($value, $responseData);
+
+                if (is_array($responseData[$value])) {
+                    // It's ok if the value of $responseData[$value] is a sequential array
+                    PHPUnit::assertEquals(array_values($responseData[$value]), $responseData[$value]);
+                }
+            }
+        }
+
+        array_walk($structure, function (&$item, $key) {
+            if (! is_int($key)) {
+                $item = $key;
+            }
+        });
+        $structure = array_flip($structure);
+
+        // Skip checking root keys if structure root key is '*'
+        if (array_keys($structure) != ['*']) {
+            // At the end we check response root keys is exactly match with structure root keys
+            PHPUnit::assertEquals(array_keys($structure), array_keys($responseData));
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a given JSON structure.
      *
      * @param  array|null  $structure

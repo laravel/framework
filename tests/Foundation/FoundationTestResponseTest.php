@@ -107,6 +107,33 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
     }
 
+    public function testAssertExactJsonStructure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $response->assertExactJsonStructure([
+            'foo',
+            'foobar' => [
+                'foobar_foo',
+                'foobar_bar',
+            ],
+            'bars'   => [
+                '*' => ['bar', 'foo'],
+            ],
+            'baz'    => [
+                '*' => [
+                    'foo',
+                    'bar' => ['foo', 'bar'],
+                ],
+            ],
+        ]);
+
+        // Wildcard (repeating structure) at root
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertExactJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
+    }
+
     public function testAssertJsonStructure()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
