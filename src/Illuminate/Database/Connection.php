@@ -109,11 +109,11 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
-     * The number of changes to the database.
+     * Have there been changes to the database.
      *
      * @var int
      */
-    protected $changes = 0;
+    protected $recordsModified = false;
 
     /**
      * All of the queries run against the connection.
@@ -400,6 +400,19 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Set if any records have been modified.
+     *
+     * @param  bool  $changes
+     * @return void
+     */
+    public function setRecordsModified($changes = true)
+    {
+        if (! $this->recordsModified) {
+            $this->recordsModified = $changes;
+        }
+    }
+
+    /**
      * Run an insert statement against the database.
      *
      * @param  string  $query
@@ -453,7 +466,7 @@ class Connection implements ConnectionInterface
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 
-            $this->changes++;
+            $this->setRecordsModified();
 
             return $statement->execute();
         });
@@ -482,6 +495,8 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
+            $this->setRecordsModified($statement->rowCount() > 0);
+
             return $statement->rowCount();
         });
     }
@@ -499,7 +514,11 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            return $this->getPdo()->exec($query) === false ? false : true;
+            $change = ($this->getPdo()->exec($query) === false ? false : true);
+
+            $this->setRecordsModified($change);
+
+            return $change;
         });
     }
 
@@ -902,11 +921,7 @@ class Connection implements ConnectionInterface
      */
     public function getReadPdo()
     {
-        if ($this->transactions >= 1) {
-            return $this->getPdo();
-        }
-
-        if ($this->changes >= 1) {
+        if ($this->transactions > 0 || $this->recordsModified) {
             return $this->getPdo();
         }
 
