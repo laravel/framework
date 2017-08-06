@@ -109,6 +109,13 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
+     * The number of changes to the database.
+     *
+     * @var int
+     */
+    protected $changes = 0;
+
+    /**
      * All of the queries run against the connection.
      *
      * @var array
@@ -445,6 +452,8 @@ class Connection implements ConnectionInterface
             $statement = $this->getPdo()->prepare($query);
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
+
+            $this->changes++;
 
             return $statement->execute();
         });
@@ -894,6 +903,10 @@ class Connection implements ConnectionInterface
     public function getReadPdo()
     {
         if ($this->transactions >= 1) {
+            return $this->getPdo();
+        }
+
+        if ($this->changes >= 1) {
             return $this->getPdo();
         }
 
