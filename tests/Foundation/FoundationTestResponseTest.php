@@ -132,6 +132,31 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertJsonMissingStructure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // Without structure
+        $response->assertJsonStructureMissing();
+
+        // At root
+        $response->assertJsonStructureMissing(['foo_bar']);
+
+        // Nested
+        $response->assertJsonStructureMissing(['foobar' => ['foobar_foo_bar', 'foobar_bar_baz']]);
+
+        // Wildcard (repeating structure)
+        $response->assertJsonStructureMissing(['bars' => ['*' => ['baz', 'foobar']]]);
+
+        // Nested after wildcard
+        $response->assertJsonStructureMissing(['baz' => ['*' => ['baz', 'bar' => ['foobar', 'baz']]]]);
+
+        // Wildcard (repeating structure) at root
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonStructureMissing(['*' => ['baz', 'qux', 'quux']]);
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {

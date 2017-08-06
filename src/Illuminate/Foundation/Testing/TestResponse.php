@@ -379,6 +379,42 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has not given JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return $this
+     */
+    public function assertJsonStructureMissing(array $structure = null, $responseData = null)
+    {
+        if (is_null($structure)) {
+            return $this->assertJson($this->json());
+        }
+
+        if (is_null($responseData)) {
+            $responseData = $this->decodeResponseJson();
+        }
+
+        foreach ($structure as $key => $value) {
+            if (is_array($value) && $key === '*') {
+                PHPUnit::assertInternalType('array', $responseData);
+
+                foreach ($responseData as $responseDataItem) {
+                    $this->assertJsonStructureMissing($structure['*'], $responseDataItem);
+                }
+            } elseif (is_array($value)) {
+                PHPUnit::assertArrayHasKey($key, $responseData);
+
+                $this->assertJsonStructureMissing($structure[$key], $responseData[$key]);
+            } else {
+                PHPUnit::assertArrayNotHasKey($value, $responseData);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @return array
