@@ -1272,6 +1272,10 @@ class Validator implements ValidatorContract
             return false;
         }
 
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
         return $value->getPath() != '' && in_array($value->guessExtension(), $parameters);
     }
 
@@ -1289,7 +1293,29 @@ class Validator implements ValidatorContract
             return false;
         }
 
+        if ($this->shouldBlockPhpUpload($value, $parameters)) {
+            return false;
+        }
+
         return $value->getPath() != '' && in_array($value->getMimeType(), $parameters);
+    }
+
+    /*
+     * Check if PHP uploads are explicitly allowed.
+     *
+     * @param  mixed  $value
+     * @param  array  $parameters
+     * @return bool
+     */
+    protected function shouldBlockPhpUpload($value, $parameters)
+    {
+        if (in_array('php', $parameters)) {
+            return false;
+        }
+
+        return ($value instanceof UploadedFile)
+           ? strtolower($value->getClientOriginalExtension()) === 'php'
+           : strtolower($value->getExtension()) === 'php';
     }
 
     /**
