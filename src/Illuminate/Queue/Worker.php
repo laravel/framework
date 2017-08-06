@@ -429,7 +429,7 @@ class Worker
      */
     protected function raiseBeforeJobEvent($connectionName, $job)
     {
-        $this->events->fire(new Events\JobProcessing(
+        $this->events->dispatch(new Events\JobProcessing(
             $connectionName, $job
         ));
     }
@@ -443,7 +443,7 @@ class Worker
      */
     protected function raiseAfterJobEvent($connectionName, $job)
     {
-        $this->events->fire(new Events\JobProcessed(
+        $this->events->dispatch(new Events\JobProcessed(
             $connectionName, $job
         ));
     }
@@ -458,7 +458,7 @@ class Worker
      */
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e)
     {
-        $this->events->fire(new Events\JobExceptionOccurred(
+        $this->events->dispatch(new Events\JobExceptionOccurred(
             $connectionName, $job, $e
         ));
     }
@@ -473,7 +473,7 @@ class Worker
      */
     protected function raiseFailedJobEvent($connectionName, $job, $e)
     {
-        $this->events->fire(new Events\JobFailed(
+        $this->events->dispatch(new Events\JobFailed(
             $connectionName, $job, $e
         ));
     }
@@ -555,7 +555,7 @@ class Worker
      */
     public function stop($status = 0)
     {
-        $this->events->fire(new Events\WorkerStopping);
+        $this->events->dispatch(new Events\WorkerStopping);
 
         exit($status);
     }
