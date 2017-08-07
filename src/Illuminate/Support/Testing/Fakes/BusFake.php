@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Bus\Dispatcher;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class BusFake implements Dispatcher
