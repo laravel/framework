@@ -109,7 +109,7 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
-     * Have there been changes to the database.
+     * Indicates if changes have been made to the database.
      *
      * @var int
      */
@@ -400,19 +400,6 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set if any records have been modified.
-     *
-     * @param  bool  $changes
-     * @return void
-     */
-    public function setRecordsModified($changes = true)
-    {
-        if (! $this->recordsModified) {
-            $this->recordsModified = $changes;
-        }
-    }
-
-    /**
      * Run an insert statement against the database.
      *
      * @param  string  $query
@@ -466,7 +453,7 @@ class Connection implements ConnectionInterface
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 
-            $this->setRecordsModified();
+            $this->recordsHaveBeenModified();
 
             return $statement->execute();
         });
@@ -495,7 +482,7 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            $this->setRecordsModified($statement->rowCount() > 0);
+            $this->recordsHaveBeenModified($statement->rowCount() > 0);
 
             return $statement->rowCount();
         });
@@ -514,9 +501,9 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            $change = ($this->getPdo()->exec($query) === false ? false : true);
-
-            $this->setRecordsModified($change);
+            $this->recordsHaveBeenModified(
+                $change = ($this->getPdo()->exec($query) === false ? false : true)
+            );
 
             return $change;
         });
@@ -846,6 +833,19 @@ class Connection implements ConnectionInterface
     public function raw($value)
     {
         return new Expression($value);
+    }
+
+    /**
+     * Indicate if any records have been modified.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public function recordsHaveBeenModified($value = true)
+    {
+        if (! $this->recordsModified) {
+            $this->recordsModified = $value;
+        }
     }
 
     /**
