@@ -3,9 +3,8 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use InvalidArgumentException;
-use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Mail\Mailable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
@@ -18,7 +17,7 @@ class MailFake implements Mailer
     protected $mailables = [];
 
     /**
-     * All of the mailables that have been queued;
+     * All of the mailables that have been queued.
      *
      * @var array
      */
@@ -247,10 +246,10 @@ class MailFake implements Mailer
      */
     public function queue($view, array $data = [], $callback = null, $queue = null)
     {
-        if (! $view instanceof MailableContract) {
+        if (! $view instanceof Mailable) {
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
-        
+
         $this->queuedMailables[] = $view;
     }
 
