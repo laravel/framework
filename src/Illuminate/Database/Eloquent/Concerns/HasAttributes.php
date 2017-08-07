@@ -57,6 +57,13 @@ trait HasAttributes
     protected $dateFormat;
 
     /**
+     * The storage format of the model's datetime columns.
+     *
+     * @var string
+     */
+    protected $dateTimeFormat;
+
+    /**
      * The accessors to append to the model's array form.
      *
      * @var array
@@ -125,7 +132,7 @@ trait HasAttributes
                 continue;
             }
 
-            $attributes[$key] = $this->serializeDate(
+            $attributes[$key] = $this->serializeDateTime(
                 $this->asDateTime($attributes[$key])
             );
         }
@@ -185,9 +192,12 @@ trait HasAttributes
             // If the attribute cast was a date or a datetime, we will serialize the date as
             // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
-            if ($attributes[$key] &&
-                ($value === 'date' || $value === 'datetime')) {
+            if ($attributes[$key] && $value === 'date') {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
+            }
+
+            if ($attributes[$key] && $value === 'datetime') {
+                $attributes[$key] = $this->serializeDateTime($attributes[$key]);
             }
         }
 
@@ -712,7 +722,7 @@ trait HasAttributes
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
         return Carbon::createFromFormat(
-            $this->getDateFormat(), $value
+            $this->getDateTimeFormat(), $value
         );
     }
 
@@ -736,7 +746,7 @@ trait HasAttributes
     public function fromDateTime($value)
     {
         return is_null($value) ? $value : $this->asDateTime($value)->format(
-            $this->getDateFormat()
+            $this->getDateTimeFormat()
         );
     }
 
@@ -749,6 +759,17 @@ trait HasAttributes
     protected function asTimestamp($value)
     {
         return $this->asDateTime($value)->getTimestamp();
+    }
+
+    /**
+     * Prepare a datetime for array / JSON serialization.
+     *
+     * @param  \DateTimeInterface  $date
+     * @return string
+     */
+    protected function serializeDateTime(DateTimeInterface $date)
+    {
+        return $date->format($this->getDateTimeFormat());
     }
 
     /**
@@ -774,6 +795,29 @@ trait HasAttributes
         return $this->usesTimestamps()
                     ? array_unique(array_merge($this->dates, $defaults))
                     : $this->dates;
+    }
+
+    /**
+     * Get the format for database stored dates-time fields.
+     *
+     * @return string
+     */
+    protected function getDateTimeFormat()
+    {
+        return $this->dateTimeFormat ?: $this->getConnection()->getQueryGrammar()->getDateTimeFormat();
+    }
+
+    /**
+     * Set the datetime format used by the model.
+     *
+     * @param  string  $format
+     * @return $this
+     */
+    public function setDateTimeFormat($format)
+    {
+        $this->dateTimeFormat = $format;
+
+        return $this;
     }
 
     /**

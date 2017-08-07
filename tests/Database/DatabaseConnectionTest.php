@@ -346,7 +346,7 @@ class DatabaseConnectionTest extends TestCase
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
         $grammar = m::mock('Illuminate\Database\Query\Grammars\Grammar');
-        $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
+        $grammar->shouldReceive('getDateTimeFormat')->once()->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
         $this->assertEquals(['test' => 'bar'], $result);

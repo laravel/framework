@@ -980,7 +980,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testToArrayIncludesCustomFormattedTimestamps()
     {
         $model = new EloquentTestUser;
-        $model->setDateFormat('d-m-y');
+        $model->setDateTimeFormat('d-m-y');
 
         $model->setRawAttributes([
             'created_at' => '2012-12-04',

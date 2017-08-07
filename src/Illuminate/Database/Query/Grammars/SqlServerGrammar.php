@@ -398,7 +398,7 @@ class SqlServerGrammar extends Grammar
      *
      * @return string
      */
-    public function getDateFormat()
+    public function getDateTimeFormat()
     {
         return 'Y-m-d H:i:s.000';
     }
