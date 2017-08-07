@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class Builder
 {
@@ -725,10 +726,17 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
+        // If the value is an eloquent builder instance we will assume the developer wants to
+        // look for any values that exists within this given query. So we will access the
+        // internal query builder which will then be used as a subquery.
+        if ($values instanceof EloquentBuilder) {
+            $values = $values->getQuery();
+        }
+
         // If the value is a query builder instance we will assume the developer wants to
         // look for any values that exists within this given query. So we will add the
         // query accordingly so that this query is properly executed when it is run.
-        if ($values instanceof static) {
+        if ($values instanceof self) {
             return $this->whereInExistingQuery(
                 $column, $values, $boolean, $not
             );
