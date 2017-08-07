@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
@@ -65,7 +66,7 @@ class MailFake implements Mailer
     public function sent($mailable, $callback = null)
     {
         if (! $this->hasSent($mailable)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {

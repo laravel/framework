@@ -75,7 +75,7 @@ class NotificationFake implements NotificationFactory
     public function sent($notifiable, $notification, $callback = null)
     {
         if (! $this->hasSent($notifiable, $notification)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {

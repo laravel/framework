@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Queue
@@ -74,7 +75,7 @@ class QueueFake extends QueueManager implements Queue
     public function pushed($job, $callback = null)
     {
         if (! $this->hasPushed($job)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {
