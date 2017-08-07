@@ -3,6 +3,7 @@
 namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Events\Dispatcher;
 
@@ -83,7 +84,7 @@ class EventFake implements Dispatcher
     public function dispatched($event, $callback = null)
     {
         if (! $this->hasDispatched($event)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {

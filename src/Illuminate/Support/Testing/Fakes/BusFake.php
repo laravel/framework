@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Bus\Dispatcher;
 use PHPUnit\Framework\Assert as PHPUnit;
 
@@ -54,7 +55,7 @@ class BusFake implements Dispatcher
     public function dispatched($command, $callback = null)
     {
         if (! $this->hasDispatched($command)) {
-            return collect();
+            return new Collection;
         }
 
         $callback = $callback ?: function () {
