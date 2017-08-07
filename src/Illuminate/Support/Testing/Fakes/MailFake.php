@@ -19,6 +19,7 @@ class MailFake implements Mailer
 
     /**
      * All of the mailables that have been queued;
+     *
      * @var array
      */
     protected $queuedMailables = [];
@@ -85,7 +86,7 @@ class MailFake implements Mailer
      * @param  callable|null  $callback
      * @return void
      */
-    public function assertNotSent($mailable, $callback = null)
+    public function assertNotQueued($mailable, $callback = null)
     {
         PHPUnit::assertTrue(
             $this->queued($mailable, $callback)->count() === 0,
@@ -100,7 +101,7 @@ class MailFake implements Mailer
      */
     public function assertNothingQueued()
     {
-        PHPUnit::assertEmpty($this->mailables, 'Mailables were queued unexpectedly.');
+        PHPUnit::assertEmpty($this->queuedMailables, 'Mailables were queued unexpectedly.');
     }
 
     /**
