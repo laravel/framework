@@ -41,7 +41,7 @@ class SqlServerProcessor extends Processor
      */
     protected function processInsertGetIdForOdbc(Connection $connection)
     {
-        $result = $connection->select(
+        $result = $connection->selectFromWriteConnection(
             'SELECT CAST(COALESCE(SCOPE_IDENTITY(), @@IDENTITY) AS int) AS insertid'
         );
 

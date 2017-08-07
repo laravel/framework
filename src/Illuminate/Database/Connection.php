@@ -495,9 +495,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            $this->setRecordsModified($statement->rowCount() > 0);
+            $count = $statement->rowCount();
 
-            return $statement->rowCount();
+            $this->setRecordsModified($count > 0);
+
+            return $count;
         });
     }
 
@@ -921,7 +923,11 @@ class Connection implements ConnectionInterface
      */
     public function getReadPdo()
     {
-        if ($this->transactions > 0 || $this->recordsModified) {
+        if ($this->transactions >= 1) {
+            return $this->getPdo();
+        }
+
+        if ($this->getConfig('sticky') && $this->recordsModified) {
             return $this->getPdo();
         }
 
