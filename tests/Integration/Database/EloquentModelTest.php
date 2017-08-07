@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use stdClass;
 use Carbon\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
-use stdClass;
 
 /**
  * @group integration
