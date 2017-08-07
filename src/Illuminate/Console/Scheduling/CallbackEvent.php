@@ -2,7 +2,6 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Log;
 use Exception;
 use LogicException;
 use InvalidArgumentException;
@@ -120,11 +119,7 @@ class CallbackEvent extends Event
      */
     public function storeOutput($output)
     {
-        try {
-            file_put_contents($this->output, $output.PHP_EOL, $this->shouldAppendOutput ? FILE_APPEND : null);
-        } catch (Exception $e) {
-            Log::error('Unable to store output from event due to: '.$e->getMessage());
-        }
+        file_put_contents($this->output, $output.PHP_EOL, $this->shouldAppendOutput ? FILE_APPEND : null);
 
         return $output;
     }
