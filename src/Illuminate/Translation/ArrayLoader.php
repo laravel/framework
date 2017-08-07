@@ -2,7 +2,9 @@
 
 namespace Illuminate\Translation;
 
-class ArrayLoader implements LoaderInterface
+use Illuminate\Contracts\Translation\Loader;
+
+class ArrayLoader implements Loader
 {
     /**
      * All of the translation messages.
