@@ -5,7 +5,7 @@ namespace Illuminate\Support\Testing\Fakes;
 use InvalidArgumentException;
 use Illuminate\Contracts\Mail\Mailable;
 use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Mail\MailableContract;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
@@ -250,7 +250,7 @@ class MailFake implements Mailer
         if (! $view instanceof MailableContract) {
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
-
+        
         $this->queuedMailables[] = $view;
     }
 
