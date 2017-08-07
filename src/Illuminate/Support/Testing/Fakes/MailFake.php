@@ -173,7 +173,7 @@ class MailFake implements Mailer
      * Get all of the mailed mailables for a given type.
      *
      * @param  string  $type
-     * @param  boolean $queued
+     * @param  bool $queued
      * @return \Illuminate\Support\Collection
      */
     protected function mailablesOf($type, $queued = false)
