@@ -2,8 +2,10 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Mail\Mailer;
+use InvalidArgumentException;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Mail\MailableContract;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
@@ -14,6 +16,12 @@ class MailFake implements Mailer
      * @var array
      */
     protected $mailables = [];
+
+    /**
+     * All of the mailables that have been queued;
+     * @var array
+     */
+    protected $queuedMailables = [];
 
     /**
      * Assert if a mailable was sent based on a truth-test callback.
@@ -56,6 +64,46 @@ class MailFake implements Mailer
     }
 
     /**
+     * Assert if a mailable was queued based on a truth-test callback.
+     *
+     * @param  string  $mailable
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertQueued($mailable, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->queued($mailable, $callback)->count() > 0,
+            "The expected [{$mailable}] mailable was not queued."
+        );
+    }
+
+    /**
+     * Determine if a mailable was not queued based on a truth-test callback.
+     *
+     * @param  string  $mailable
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertNotSent($mailable, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->queued($mailable, $callback)->count() === 0,
+            "The unexpected [{$mailable}] mailable was queued."
+        );
+    }
+
+    /**
+     * Assert that no mailables were queued.
+     *
+     * @return void
+     */
+    public function assertNothingQueued()
+    {
+        PHPUnit::assertEmpty($this->mailables, 'Mailables were queued unexpectedly.');
+    }
+
+    /**
      * Get all of the mailables matching a truth-test callback.
      *
      * @param  string  $mailable
@@ -89,14 +137,49 @@ class MailFake implements Mailer
     }
 
     /**
+     * Get all of the queued mailables matching a truth-test callback.
+     *
+     * @param  string  $mailable
+     * @param  callable|null  $callback
+     * @return \Illuminate\Support\Collection
+     */
+    public function queued($mailable, $callback = null)
+    {
+        if (! $this->hasQueued($mailable)) {
+            return collect();
+        }
+
+        $callback = $callback ?: function () {
+            return true;
+        };
+
+        return $this->mailablesOf($mailable, true)->filter(function ($mailable) use ($callback) {
+            return $callback($mailable);
+        });
+    }
+
+    /**
+     * Determine if the given mailable has been queued.
+     *
+     * @param  string  $mailable
+     * @return bool
+     */
+    public function hasQueued($mailable)
+    {
+        return $this->mailablesOf($mailable, true)->count() > 0;
+    }
+
+    /**
      * Get all of the mailed mailables for a given type.
      *
      * @param  string  $type
      * @return \Illuminate\Support\Collection
      */
-    protected function mailablesOf($type)
+    protected function mailablesOf($type, $queued = false)
     {
-        return collect($this->mailables)->filter(function ($mailable) use ($type) {
+        $mailables = $queued ? $this->queuedMailables : $this->mailables;
+
+        return collect($mailables)->filter(function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }
@@ -163,7 +246,11 @@ class MailFake implements Mailer
      */
     public function queue($view, array $data = [], $callback = null, $queue = null)
     {
-        $this->send($view);
+        if (! $view instanceof MailableContract) {
+            throw new InvalidArgumentException('Only mailables may be queued.');
+        }
+
+        $this->queuedMailables[] = $view;
     }
 
     /**
