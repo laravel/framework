@@ -3,8 +3,9 @@
 namespace Illuminate\Translation;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Translation\Loader;
 
-class FileLoader implements LoaderInterface
+class FileLoader implements Loader
 {
     /**
      * The filesystem instance.
