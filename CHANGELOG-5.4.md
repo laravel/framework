@@ -1,5 +1,16 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Changed
+- Moved `tap()` method from `Builder` to `BuildsQueries` ([#20384](https://github.com/laravel/framework/pull/20384))
+- Made Blade `or` operator case-insensitive ([#20425](https://github.com/laravel/framework/pull/20425))
+- Support `$amount = 0` in `Arr::random()` ([#20439](https://github.com/laravel/framework/pull/20439))
+
+### Fixed
+- Fixed bug when using empty values in `SQLiteGrammar::compileInsert()` ([#20424](https://github.com/laravel/framework/pull/20424))
+
+
 ## v5.4.32 (2017-08-03)
 
 ### Added
