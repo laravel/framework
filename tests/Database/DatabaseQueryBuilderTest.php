@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression as Raw;
@@ -265,6 +266,43 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('id', '=', 1);
         $this->assertEquals('select * from "users" where "id" = ?', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testArrayWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+    }
+
+    public function testArrayNotWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '<>', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '!=', [1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" not in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+    }
+
+    public function testCollectionWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', Collection::make([1, 2, 3]));
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
+    }
+
+    public function testArrayDynamicWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereId([1, 2, 3]);
+        $this->assertEquals('select * from "users" where "id" in (?, ?, ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2, 2 => 3], $builder->getBindings());
     }
 
     public function testMySqlWrappingProtectsQuotationMarks()

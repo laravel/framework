@@ -546,6 +546,10 @@ class Builder
             $value = new Expression($value ? 'true' : 'false');
         }
 
+        if (is_array($value) || $value instanceof Arrayable) {
+            return $this->whereIn($column, $value, $boolean, $this->notEqualOperator($operator));
+        }
+
         // Now that we are working with just a simple query we can put the elements
         // in our array and add the query binding to our array of bindings that
         // will be bound to each SQL statements when it is finally executed.
@@ -629,6 +633,17 @@ class Builder
     {
         return ! in_array(strtolower($operator), $this->operators, true) &&
                ! in_array(strtolower($operator), $this->grammar->getOperators(), true);
+    }
+
+    /**
+     * Determine if the given operator is used to determine not equals.
+     *
+     * @param  string  $operator
+     * @return bool
+     */
+    protected function notEqualOperator($operator)
+    {
+        return in_array($operator, ['<>', '!=']);
     }
 
     /**
