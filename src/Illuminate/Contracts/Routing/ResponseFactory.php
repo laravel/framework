@@ -76,7 +76,7 @@ interface ResponseFactory
      * @param  array  $headers
      * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
      */
-    public function file($file, array $headers = [])
+    public function file($file, array $headers = []);
         
     /**
      * Create a new redirect response to the given path.
