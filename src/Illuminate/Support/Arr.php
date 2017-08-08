@@ -457,14 +457,14 @@ class Arr
      * Get one or a specified number of random values from an array.
      *
      * @param  array  $array
-     * @param  int|null  $amount
+     * @param  int|null  $number
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public static function random($array, $amount = null)
+    public static function random($array, $number = null)
     {
-        $requested = is_null($amount) ? 1 : $amount;
+        $requested = is_null($number) ? 1 : $number;
 
         $count = count($array);
 
@@ -474,15 +474,15 @@ class Arr
             );
         }
 
-        if (is_null($amount)) {
+        if (is_null($number)) {
             return $array[array_rand($array)];
         }
 
-        if ((int) $amount === 0) {
+        if ((int) $number === 0) {
             return [];
         }
 
-        $keys = array_rand($array, $amount);
+        $keys = array_rand($array, $number);
 
         $results = [];
 
