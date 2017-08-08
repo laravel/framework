@@ -521,7 +521,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // which is typically an auto-increment value managed by the database.
         else {
             $saved = $this->performInsert($query);
-            if (! $this->getConnectionName() && $connection = $query->getConnection()) {
+
+            if (! $this->getConnectionName() &&
+                $connection = $query->getConnection()) {
                 $this->setConnection($connection->getName());
             }
         }
