@@ -636,7 +636,7 @@ class Builder
     }
 
     /**
-     * Determine if the given operator is used to determine not equals
+     * Determine if the given operator is used to determine not equals.
      *
      * @param  string  $operator
      * @return bool
