@@ -153,7 +153,7 @@ class MailFake implements Mailer
             return true;
         };
 
-        return $this->mailablesOf($mailable, true)->filter(function ($mailable) use ($callback) {
+        return $this->queuedMailablesOf($mailable)->filter(function ($mailable) use ($callback) {
             return $callback($mailable);
         });
     }
@@ -173,14 +173,24 @@ class MailFake implements Mailer
      * Get all of the mailed mailables for a given type.
      *
      * @param  string  $type
-     * @param  bool $queued
      * @return \Illuminate\Support\Collection
      */
-    protected function mailablesOf($type, $queued = false)
+    protected function mailablesOf($type)
     {
-        $mailables = $queued ? $this->queuedMailables : $this->mailables;
+        return collect($this->mailables)->filter(function ($mailable) use ($type) {
+            return $mailable instanceof $type;
+        });
+    }
 
-        return collect($mailables)->filter(function ($mailable) use ($type) {
+    /**
+     * Get all of the mailed mailables for a given type.
+     *
+     * @param  string  $type
+     * @return \Illuminate\Support\Collection
+     */
+    protected function queuedMailablesOf($type)
+    {
+        return collect($this->queuedMailables)->filter(function ($mailable) use ($type) {
             return $mailable instanceof $type;
         });
     }
@@ -248,7 +258,7 @@ class MailFake implements Mailer
     public function queue($view, array $data = [], $callback = null, $queue = null)
     {
         if (! $view instanceof Mailable) {
-            throw new InvalidArgumentException('Only mailables may be queued.');
+            return;
         }
 
         $this->queuedMailables[] = $view;
