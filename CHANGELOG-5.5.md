@@ -8,14 +8,14 @@
 - ⚠️ Removed deprecated `Str::quickRandom()` method ([2ef257a](https://github.com/laravel/framework/pull/17048/commits/2ef257a4197b7e6efeb0d6ac4a3958f82b7fed39))
 - Removed `build` scripts ([7c16b15](https://github.com/laravel/framework/pull/17048/commits/7c16b154ede10ff9a37756e32d7dddf317524634))
 - Support callable/invokable objects in `Pipeline` ([#18264](https://github.com/laravel/framework/pull/18264))
-- Support for `Responsable` objects ([c0c89fd](https://github.com/laravel/framework/commit/c0c89fd73cebf9ed56e6c5e69ad35106df03d9db), [1229b7f](https://github.com/laravel/framework/commit/1229b7f45d3f574d7e0262cc2d5aec80ccbb1626), [#19614](https://github.com/laravel/framework/pull/19614))
+- Support for `Responsable` objects ([c0c89fd](https://github.com/laravel/framework/commit/c0c89fd73cebf9ed56e6c5e69ad35106df03d9db), [1229b7f](https://github.com/laravel/framework/commit/1229b7f45d3f574d7e0262cc2d5aec80ccbb1626), [#19614](https://github.com/laravel/framework/pull/19614), [ef0e37d](https://github.com/laravel/framework/commit/ef0e37d44182ac5043b5459bb25b1861e8e036df))
 - ⚠️ Prevent access to protected properties using array access on `Model` and `Fluent` ([#18403](https://github.com/laravel/framework/pull/18403))
 - ⚠️ Extend `MessageBag` interface from `Arrayable` ([#19768](https://github.com/laravel/framework/pull/19768))
 - Added `isNotEmpty()` method to message bags and paginators ([#19944](https://github.com/laravel/framework/pull/19944))
 - Return the collection iterator from `AbstractPaginator::getIterator()` ([#20098](https://github.com/laravel/framework/pull/20098))
 - Throw `RuntimeException` when app key is missing ([#19145](https://github.com/laravel/framework/pull/19145), [8adbaa7](https://github.com/laravel/framework/commit/8adbaa714d37bb7214f29b12c52354900a1c6dc5))
 - Autoload package providers ([#19420](https://github.com/laravel/framework/pull/19420), [a5a0f3e](https://github.com/laravel/framework/commit/a5a0f3e7b82a1a4dc00037c5463a31d42c94903a), [2954091](https://github.com/laravel/framework/commit/295409189af589c6389d01e9d55f5568741149ee), [#19455](https://github.com/laravel/framework/pull/19455), [#19561](https://github.com/laravel/framework/pull/19561), [#19646](https://github.com/laravel/framework/pull/19646))
-- Use Symfony 3.3 components ([4db7031](https://github.com/laravel/framework/commit/4db70311b1b3813359b250d3f5a58743fa436453), [67a5367](https://github.com/laravel/framework/commit/67a536758d1636935ab5502bb6faedd73b30810f))
+- Upgraded to Symfony 3.3 components ([4db7031](https://github.com/laravel/framework/commit/4db70311b1b3813359b250d3f5a58743fa436453), [67a5367](https://github.com/laravel/framework/commit/67a536758d1636935ab5502bb6faedd73b30810f))
 - Support registering macros using classes ([#19782](https://github.com/laravel/framework/pull/19782), [353adbd](https://github.com/laravel/framework/commit/353adbd696e36764227e39980272d38147899d14))
 - Made `Carbon` macroable ([#19771](https://github.com/laravel/framework/pull/19771))
 - ⚠️ Moved `InteractsWithTime` to `Illuminate\Support` ([#20119](https://github.com/laravel/framework/pull/20119), [#20206](https://github.com/laravel/framework/pull/20206))
@@ -36,6 +36,8 @@
 - Generate `make:policy` with real user model namespace ([#20047](https://github.com/laravel/framework/pull/20047))
 - Added `Kernel::load()` to auto register a directory of commands ([2e7ddca](https://github.com/laravel/framework/commit/2e7ddca682214ea5ffd21aadc93d33b7a2805e94), [d607b9c](https://github.com/laravel/framework/commit/d607b9c670d9c7f7c749cda0a12a1dc6f55da6e4))
 - ⚠️ Removed `array` type hint from `Command::table()` ([#20120](https://github.com/laravel/framework/pull/20120))
+- Support loading multiple paths in `Kernel::load()` ([#20251](https://github.com/laravel/framework/pull/20251))
+- Added `CommandStarting` and `CommandFinished` events ([#20298](https://github.com/laravel/framework/pull/20298))
 
 ### Assets
 - Added frontend preset commands (_too many commits, sorry_)
@@ -61,9 +63,10 @@
 
 ### Broadcasting
 - ⚠️ Use `AccessDeniedHttpException` instead if `HttpException` ([#19611](https://github.com/laravel/framework/pull/19611))
-- ⚠️ Upgraded to Pusher v3 ([#20016](https://github.com/laravel/framework/pull/20016))
+- ⚠️ Upgraded to Pusher SDK v3 ([#20016](https://github.com/laravel/framework/pull/20016))
 
 ### Cache
+- ⚠️ PSR-16 compliance ([#20194](https://github.com/laravel/framework/pull/20194))
 - Don't encrypt database cache values ([f0c72ec](https://github.com/laravel/framework/commit/f0c72ec9bcbdecb7e6267f7ec8f7ecbf8169a388))
 - Added support cache locks ([4e6b2e4](https://github.com/laravel/framework/commit/4e6b2e4ecbbec5a4b265f4d5a57ad1399227cf12), [045e6f2](https://github.com/laravel/framework/commit/045e6f25a860763942c928c4e6d8857d59741486), [#19669](https://github.com/laravel/framework/pull/19669))
 - Accept `DatetimeInterface` and `DateInterval` in cache repository ([#20034](https://github.com/laravel/framework/pull/20034))
@@ -83,7 +86,7 @@
 - ⚠️ Removed `Controller::missingMethod()` ([bf5d221](https://github.com/laravel/framework/commit/bf5d221037d9857a74020f2623839e282035a420))
 
 ### Database
-- ⚠️ Added `dropAllTables()` to schema builder ([#18484](https://github.com/laravel/framework/pull/18484), [d910bc8](https://github.com/laravel/framework/commit/d910bc8039f3cec2d906797818984e825601a3f5), [#19644](https://github.com/laravel/framework/pull/19644), [#19645](https://github.com/laravel/framework/pull/19645))
+- ⚠️ Added `dropAllTables()` to schema builder ([#18484](https://github.com/laravel/framework/pull/18484), [d910bc8](https://github.com/laravel/framework/commit/d910bc8039f3cec2d906797818984e825601a3f5), [#19644](https://github.com/laravel/framework/pull/19644), [#19645](https://github.com/laravel/framework/pull/19645), [#20239](https://github.com/laravel/framework/pull/20239))
 - Added precision to `dateTime` and `timestamp` column types ([#18847](https://github.com/laravel/framework/pull/18847), [f85f6db](https://github.com/laravel/framework/commit/f85f6db7c00a43ae45d963d089458477cf3e44b3), [#18962](https://github.com/laravel/framework/pull/18962))
 - Pass page number to `chunk()` callback ([#19316](https://github.com/laravel/framework/pull/19316))
 - Improve memory usage in `chunk()` and `chunkById()` ([#19345](https://github.com/laravel/framework/pull/19345), [#19369](https://github.com/laravel/framework/pull/19369), [#19368](https://github.com/laravel/framework/pull/19368))
@@ -114,6 +117,7 @@
 - Added `Relation::get()` method ([#20052](https://github.com/laravel/framework/pull/20052))
 - Added `hasChanges()`, `wasChanged()`, `getChanges()` and `syncChanges()` ([#20129](https://github.com/laravel/framework/pull/20129), [#20130](https://github.com/laravel/framework/pull/20130))
 - Better exception message when calling non existing methods on models ([#20196](https://github.com/laravel/framework/pull/20196), [91c1f03](https://github.com/laravel/framework/commit/91c1f03be2835f5b15998ead9f47f37d5397c0cc))
+- Added support for connections on model factories ([#20191](https://github.com/laravel/framework/pull/20191))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -134,7 +138,7 @@
 - Changed how exceptions are logged ([#19698](https://github.com/laravel/framework/pull/19698), [f1971c2](https://github.com/laravel/framework/commit/f1971c2242e4882440162fe504126a1475f7f2b4))
 - ⚠️ Return `HttpException` with code `413` from `PostTooLargeException` ([#19773](https://github.com/laravel/framework/pull/19773))
 - Support custom logger channel names ([#20133](https://github.com/laravel/framework/pull/20133))
-- ⚠️ Unify exception formatting ([#20173](https://github.com/laravel/framework/pull/20173), [#20067](https://github.com/laravel/framework/pull/20067), [#20167](https://github.com/laravel/framework/pull/20167), [87485e6](https://github.com/laravel/framework/commit/87485e681ca658978f8a131fd0b783ac8c8bab61), [b7e231b](https://github.com/laravel/framework/commit/b7e231b99aecb95a26ec89e5fe73346d4fad7fdc), [5dfe72d](https://github.com/laravel/framework/commit/5dfe72d790ef68cbacd329a351e4706b30422acd), [#20177](https://github.com/laravel/framework/pull/20177))
+- ⚠️ Unify exception formatting ([#20173](https://github.com/laravel/framework/pull/20173), [#20067](https://github.com/laravel/framework/pull/20067), [#20167](https://github.com/laravel/framework/pull/20167), [87485e6](https://github.com/laravel/framework/commit/87485e681ca658978f8a131fd0b783ac8c8bab61), [b7e231b](https://github.com/laravel/framework/commit/b7e231b99aecb95a26ec89e5fe73346d4fad7fdc), [5dfe72d](https://github.com/laravel/framework/commit/5dfe72d790ef68cbacd329a351e4706b30422acd), [#20177](https://github.com/laravel/framework/pull/20177), [b3b3eb1](https://github.com/laravel/framework/commit/b3b3eb1b974dd9f126d0ea7c279092c0b050628a))
 - Added default `Handler::unauthenticated()` method ([11b0de0](https://github.com/laravel/framework/commit/11b0de0485632d5712f7fb59071a4acbc4af2bdc))
 
 ### Events
@@ -184,7 +188,8 @@
 - Accept `DatetimeInterface` and `DateInterval` in queue ([#20102](https://github.com/laravel/framework/pull/20102), [92e2aff](https://github.com/laravel/framework/commit/92e2aff2fd9569fedf3164ef9a1a834e553a6881))
 
 ### Redis
-- Removed `PhpRedisConnection::proxyToEval()` method ([#17360](https://github.com/laravel/framework/pull/17360))
+- ⚠️ Several improvements on `PhpRedisConnection` ([#20269](https://github.com/laravel/framework/pull/20269), [#20316](https://github.com/laravel/framework/pull/20316))
+- ⚠️ Removed `PhpRedisConnection::proxyToEval()` method ([#17360](https://github.com/laravel/framework/pull/17360))
 
 ### Requests
 - ⚠️ Made `Request::has()` work like `Collection::has()` ([#18715](https://github.com/laravel/framework/pull/18715))
@@ -201,6 +206,7 @@
 - Made `Request::routeIs()` work like `Request()::fullUrlIs()` ([#19267](https://github.com/laravel/framework/pull/19267), [bfc5321](https://github.com/laravel/framework/commit/bfc53213f67d50444d3db078737990fa14081d1b), [#19334](https://github.com/laravel/framework/pull/19334))
 - Added `Request::hasAny()` method  ([#19367](https://github.com/laravel/framework/pull/19367))
 - ⚠️ Throw validation exception from `ValidatesRequests` without formatting response ([#19929](https://github.com/laravel/framework/pull/19929), [6d33675](https://github.com/laravel/framework/commit/6d33675691aae86c71454b731ceed847256b9dac), [ec88362](https://github.com/laravel/framework/commit/ec88362ee06ad418db93eb0e19f6d285eed7e701), [c264807](https://github.com/laravel/framework/commit/c2648070eb2108b0f9a4189bfbabea195282b963))
+- Added `Request::post()` method ([#20238](https://github.com/laravel/framework/pull/20238))
 
 ### Routing
 - Support fluent resource options ([#18767](https://github.com/laravel/framework/pull/18767), [bb02fb2](https://github.com/laravel/framework/commit/bb02fb27387a8aeb2a47da1fe5ff2e086920b744))
@@ -219,7 +225,7 @@
 - ⚠️ Ensure `Arrayable` objects are also morphed by `Response` ([#17868](https://github.com/laravel/framework/pull/17868))
 - Added `SameSite` support to `CookieJar` ([#18040](https://github.com/laravel/framework/pull/18040), [#18059](https://github.com/laravel/framework/pull/18059), [e69d722](https://github.com/laravel/framework/commit/e69d72296cfd9969db569b950721461a521100c4))
 - Accept `HeaderBag` in `ResponseTrait::withHeaders()` ([#18161](https://github.com/laravel/framework/pull/18161))
-- ⚠️ Reset response content-type in `Response::setContent()` ([#18314](https://github.com/laravel/framework/pull/18314))
+- ⚠️ Reset response content-type in `Response::setContent()` ([#18314](https://github.com/laravel/framework/pull/18314), [#20313](https://github.com/laravel/framework/pull/20313))
 - ⚠️ Always retrieve the real original content ([#20002](https://github.com/laravel/framework/pull/20002))
 
 ### Service Container
@@ -240,7 +246,7 @@
 ### Testing
 - ⚠️ Switched to PHPUnit 6 ([#17755](https://github.com/laravel/framework/pull/17755), [#17864](https://github.com/laravel/framework/pull/17864))
 - ⚠️ Renamed authentication assertion methods ([#17924](https://github.com/laravel/framework/pull/17924), [494a177](https://github.com/laravel/framework/commit/494a1774f217f0cd6b4efade63e200e3ac65f201))
-- ⚠️ Unify database testing traits into `RefreshDatabase` trait ([79c6f67](https://github.com/laravel/framework/commit/79c6f6774eecf77aef8ed5e2f270551a6f378f1d), [0322e32](https://github.com/laravel/framework/commit/0322e3226196a435db436e2a00c035be892c2466))
+- ⚠️ Unify database testing traits into `RefreshDatabase` trait ([79c6f67](https://github.com/laravel/framework/commit/79c6f6774eecf77aef8ed5e2f270551a6f378f1d), [0322e32](https://github.com/laravel/framework/commit/0322e3226196a435db436e2a00c035be892c2466), [#20308](https://github.com/laravel/framework/pull/20308))
 - ⚠️ Changed Blade tests namespace to `Illuminate\Tests\View\Blade` ([#19675](https://github.com/laravel/framework/pull/19675))
 - Added integration tests for the framework itself ([182027d](https://github.com/laravel/framework/commit/182027d3290e9a2e1bd9e2d52c125177ef6c6af6), [#18438](https://github.com/laravel/framework/pull/18438), [#18780](https://github.com/laravel/framework/pull/18780), [#19001](https://github.com/laravel/framework/pull/19001), [#20073](https://github.com/laravel/framework/pull/20073))
 - Allow disabling of specific middleware ([#18673](https://github.com/laravel/framework/pull/18673))
