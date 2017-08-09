@@ -17,7 +17,7 @@ class DatabaseEloquentPivotTest extends TestCase
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
-        $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
+        $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateTimeFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'created_at' => '2015-09-12'], 'table', true);
 

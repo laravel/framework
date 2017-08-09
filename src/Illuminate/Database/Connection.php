@@ -575,7 +575,7 @@ class Connection implements ConnectionInterface
             // date string. Each query grammar maintains its own date string format
             // so we'll just ask the grammar for the format to get from the date.
             if ($value instanceof DateTimeInterface) {
-                $bindings[$key] = $value->format($grammar->getDateFormat());
+                $bindings[$key] = $value->format($grammar->getDateTimeFormat());
             } elseif ($value === false) {
                 $bindings[$key] = 0;
             }

@@ -171,13 +171,23 @@ abstract class Grammar
     }
 
     /**
+     * Get the format for database stored date-time feilds.
+     *
+     * @return string
+     */
+    public function getDateTimeFormat()
+    {
+        return 'Y-m-d H:i:s';
+    }
+
+    /**
      * Get the format for database stored dates.
      *
      * @return string
      */
     public function getDateFormat()
     {
-        return 'Y-m-d H:i:s';
+        return 'Y-m-d';
     }
 
     /**

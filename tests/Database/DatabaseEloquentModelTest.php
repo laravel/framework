@@ -72,7 +72,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testDirtyOnCastOrDateAttributes()
     {
         $model = new EloquentModelCastingStub;
-        $model->setDateFormat('Y-m-d H:i:s');
+        $model->setDateTimeFormat('Y-m-d H:i:s');
         $model->boolAttribute = 1;
         $model->foo = 1;
         $model->bar = '2017-03-18';
@@ -157,30 +157,6 @@ class DatabaseEloquentModelTest extends TestCase
         $instance = $model->newInstance(['name' => 'taylor']);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentModelStub', $instance);
         $this->assertEquals('taylor', $instance->name);
-    }
-
-    public function testCreateMethodSavesNewModel()
-    {
-        $_SERVER['__eloquent.saved'] = false;
-        $model = EloquentModelSaveStub::create(['name' => 'taylor']);
-        $this->assertTrue($_SERVER['__eloquent.saved']);
-        $this->assertEquals('taylor', $model->name);
-    }
-
-    public function testMakeMethodDoesNotSaveNewModel()
-    {
-        $_SERVER['__eloquent.saved'] = false;
-        $model = EloquentModelSaveStub::make(['name' => 'taylor']);
-        $this->assertFalse($_SERVER['__eloquent.saved']);
-        $this->assertEquals('taylor', $model->name);
-    }
-
-    public function testForceCreateMethodSavesNewModelWithGuardedAttributes()
-    {
-        $_SERVER['__eloquent.saved'] = false;
-        $model = EloquentModelSaveStub::forceCreate(['id' => 21]);
-        $this->assertTrue($_SERVER['__eloquent.saved']);
-        $this->assertEquals(21, $model->id);
     }
 
     public function testFindMethodUseWritePdo()
@@ -347,8 +323,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testTimestampsAreReturnedAsObjects()
     {
-        $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d'));
+        $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateTimeFormat'])->getMock();
+        $model->expects($this->any())->method('getDateTimeFormat')->will($this->returnValue('Y-m-d'));
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => '2012-12-05',
@@ -360,8 +336,8 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testTimestampsAreReturnedAsObjectsFromPlainDatesAndTimestamps()
     {
-        $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateFormat'])->getMock();
-        $model->expects($this->any())->method('getDateFormat')->will($this->returnValue('Y-m-d H:i:s'));
+        $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentDateModelStub')->setMethods(['getDateTimeFormat'])->getMock();
+        $model->expects($this->any())->method('getDateTimeFormat')->will($this->returnValue('Y-m-d H:i:s'));
         $model->setRawAttributes([
             'created_at' => '2012-12-04',
             'updated_at' => $this->currentTime(),
@@ -369,58 +345,6 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->updated_at);
-    }
-
-    public function testTimestampsAreReturnedAsObjectsOnCreate()
-    {
-        $timestamps = [
-            'created_at' => \Illuminate\Support\Carbon::now(),
-            'updated_at' => \Illuminate\Support\Carbon::now(),
-        ];
-        $model = new EloquentDateModelStub;
-        \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('stdClass'));
-        $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
-        $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
-        $instance = $model->newInstance($timestamps);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $instance->updated_at);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $instance->created_at);
-    }
-
-    public function testDateTimeAttributesReturnNullIfSetToNull()
-    {
-        $timestamps = [
-            'created_at' => \Illuminate\Support\Carbon::now(),
-            'updated_at' => \Illuminate\Support\Carbon::now(),
-        ];
-        $model = new EloquentDateModelStub;
-        \Illuminate\Database\Eloquent\Model::setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
-        $resolver->shouldReceive('connection')->andReturn($mockConnection = m::mock('stdClass'));
-        $mockConnection->shouldReceive('getQueryGrammar')->andReturn($mockConnection);
-        $mockConnection->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
-        $instance = $model->newInstance($timestamps);
-
-        $instance->created_at = null;
-        $this->assertNull($instance->created_at);
-    }
-
-    public function testTimestampsAreCreatedFromStringsAndIntegers()
-    {
-        $model = new EloquentDateModelStub;
-        $model->created_at = '2013-05-22 00:00:00';
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
-
-        $model = new EloquentDateModelStub;
-        $model->created_at = $this->currentTime();
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
-
-        $model = new EloquentDateModelStub;
-        $model->created_at = 0;
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
-
-        $model = new EloquentDateModelStub;
-        $model->created_at = '2012-01-01';
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->created_at);
     }
 
     public function testFromDateTime()
@@ -1445,75 +1369,6 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setRelation('partner', null);
 
         $model->touchOwners();
-    }
-
-    public function testModelAttributesAreCastedWhenPresentInCastsArray()
-    {
-        $model = new EloquentModelCastingStub;
-        $model->setDateFormat('Y-m-d H:i:s');
-        $model->intAttribute = '3';
-        $model->floatAttribute = '4.0';
-        $model->stringAttribute = 2.5;
-        $model->boolAttribute = 1;
-        $model->booleanAttribute = 0;
-        $model->objectAttribute = ['foo' => 'bar'];
-        $obj = new stdClass;
-        $obj->foo = 'bar';
-        $model->arrayAttribute = $obj;
-        $model->jsonAttribute = ['foo' => 'bar'];
-        $model->dateAttribute = '1969-07-20';
-        $model->datetimeAttribute = '1969-07-20 22:56:00';
-        $model->timestampAttribute = '1969-07-20 22:56:00';
-
-        $this->assertInternalType('int', $model->intAttribute);
-        $this->assertInternalType('float', $model->floatAttribute);
-        $this->assertInternalType('string', $model->stringAttribute);
-        $this->assertInternalType('boolean', $model->boolAttribute);
-        $this->assertInternalType('boolean', $model->booleanAttribute);
-        $this->assertInternalType('object', $model->objectAttribute);
-        $this->assertInternalType('array', $model->arrayAttribute);
-        $this->assertInternalType('array', $model->jsonAttribute);
-        $this->assertTrue($model->boolAttribute);
-        $this->assertFalse($model->booleanAttribute);
-        $this->assertEquals($obj, $model->objectAttribute);
-        $this->assertEquals(['foo' => 'bar'], $model->arrayAttribute);
-        $this->assertEquals(['foo' => 'bar'], $model->jsonAttribute);
-        $this->assertEquals('{"foo":"bar"}', $model->jsonAttributeValue());
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->dateAttribute);
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->datetimeAttribute);
-        $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
-        $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
-        $this->assertEquals(-14173440, $model->timestampAttribute);
-
-        $arr = $model->toArray();
-        $this->assertInternalType('int', $arr['intAttribute']);
-        $this->assertInternalType('float', $arr['floatAttribute']);
-        $this->assertInternalType('string', $arr['stringAttribute']);
-        $this->assertInternalType('boolean', $arr['boolAttribute']);
-        $this->assertInternalType('boolean', $arr['booleanAttribute']);
-        $this->assertInternalType('object', $arr['objectAttribute']);
-        $this->assertInternalType('array', $arr['arrayAttribute']);
-        $this->assertInternalType('array', $arr['jsonAttribute']);
-        $this->assertTrue($arr['boolAttribute']);
-        $this->assertFalse($arr['booleanAttribute']);
-        $this->assertEquals($obj, $arr['objectAttribute']);
-        $this->assertEquals(['foo' => 'bar'], $arr['arrayAttribute']);
-        $this->assertEquals(['foo' => 'bar'], $arr['jsonAttribute']);
-        $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
-        $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
-        $this->assertEquals(-14173440, $arr['timestampAttribute']);
-    }
-
-    public function testModelDateAttributeCastingResetsTime()
-    {
-        $model = new EloquentModelCastingStub;
-        $model->setDateFormat('Y-m-d H:i:s');
-        $model->dateAttribute = '1969-07-20 22:56:00';
-
-        $this->assertEquals('1969-07-20 00:00:00', $model->dateAttribute->toDateTimeString());
-
-        $arr = $model->toArray();
-        $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
     }
 
     public function testModelAttributeCastingPreservesNull()
