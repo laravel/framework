@@ -24,6 +24,10 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushed($job, $callback = null)
     {
+        if(is_array($job)) {
+            return $this->assertPushedTimes($mailable[0], $mailable[1], $callback);
+        }
+
         PHPUnit::assertTrue(
             $this->pushed($job, $callback)->count() > 0,
             "The expected [{$job}] job was not pushed."
