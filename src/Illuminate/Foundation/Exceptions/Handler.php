@@ -368,6 +368,8 @@ class Handler implements ExceptionHandlerContract
                     array_flip($files->directories(base_path())), [base_path('vendor')]
                 ))
             );
+
+            $this->customizeWhoopsPage($handler);
         });
     }
 
@@ -473,5 +475,16 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Exception $e)
     {
         return $e instanceof HttpException;
+    }
+
+    /**
+     * Allow to customize Whoops Handler.
+     *
+     * @param  \Whoops\Handler\PrettyPageHandler  $handler
+     * @return void
+     */
+    protected function customizeWhoopsPage($handler)
+    {
+        //
     }
 }
