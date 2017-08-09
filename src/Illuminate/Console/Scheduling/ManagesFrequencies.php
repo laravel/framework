@@ -363,7 +363,7 @@ trait ManagesFrequencies
      * @param  int $max
      * @return $this
      */
-    public function everyRandomMinutes($min, $max)
+    public function everyRandomMinutes($min = 1, $max = 59)
     {
         return $this->spliceIntoPosition(1, '*/'.rand($min, $max));
     }
