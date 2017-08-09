@@ -38,7 +38,7 @@ class QueueFake extends QueueManager implements Queue
      * Assert if a job was pushed a number of times based on a truth-test callback.
      *
      * @param  string  $job
-     * @param  integer $times
+     * @param  int $times
      * @param  callable|null  $callback
      * @return void
      */

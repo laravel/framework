@@ -38,7 +38,7 @@ class MailFake implements Mailer
      * Assert if a mailable was sent a number of times based on a truth-test callback.
      *
      * @param  string  $mailable
-     * @param  integer $times
+     * @param  int $times
      * @param  callable|null  $callback
      * @return void
      */
