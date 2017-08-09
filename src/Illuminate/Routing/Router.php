@@ -662,6 +662,8 @@ class Router implements RegistrarContract, BindingRegistrar
                     $response instanceof JsonSerializable ||
                     is_array($response))) {
             $response = new JsonResponse($response);
+        } elseif (static::isJson($response)) {
+            $response = new JsonResponse(json_decode($response));
         } elseif (! $response instanceof SymfonyResponse) {
             $response = new Response($response);
         }
@@ -671,6 +673,19 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         return $response->prepare($request);
+    }
+
+    /**
+     * Checks if the value is a valid JSON.
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    protected static function isJson($value)
+    {
+        json_decode($value);
+
+        return json_last_error() === JSON_ERROR_NONE;
     }
 
     /**

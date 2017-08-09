@@ -168,6 +168,17 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($response->getLastModified());
     }
 
+    public function testJsonContent()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', function () {
+            return '{"foo":"bar"}';
+        });
+        $response = $router->dispatch(Request::create('foo/bar', 'GET'));
+        $this->assertEquals('{"foo":"bar"}', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
+    }
+
     public function testClosureMiddleware()
     {
         $router = $this->getRouter();
