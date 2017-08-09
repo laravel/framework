@@ -457,8 +457,10 @@ class EloquentBelongsToManyTest extends TestCase
             Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
         );
 
-        $tag->update(['name' => str_random('asd')]);
+        $tag->update(['name' => $tag->name]);
+        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
 
+        $tag->update(['name' => str_random()]);
         $this->assertEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
     }
 
