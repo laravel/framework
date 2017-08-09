@@ -360,12 +360,12 @@ trait ManagesFrequencies
     /**
      * Schedule the event to run every a random number of minutes.
      * @param  int $min
-     * @param  int $max 
+     * @param  int $max
      * @return $this
      */
     public function everyRandomMinutes($min, $max)
     {
-        return $this->spliceIntoPosition(1, '*/' . rand($min, $max));
+        return $this->spliceIntoPosition(1, '*/'.rand($min, $max));
     }
 
     /**
