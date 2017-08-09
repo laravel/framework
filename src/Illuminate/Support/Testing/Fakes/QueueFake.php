@@ -38,7 +38,7 @@ class QueueFake extends QueueManager implements Queue
      * @param  callable|null  $callback
      * @return void
      */
-    public function assertPushed($job, $times, $callback = null)
+    public function assertPushedTimes($job, $times, $callback = null)
     {
         PHPUnit::assertTrue(
             ($count = $this->pushed($job, $callback)->count()) === $times,
