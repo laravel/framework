@@ -548,7 +548,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return "datetime($column->precision)";
+        return $column->precision ? "datetime($column->precision)" : 'datetime';
     }
 
     /**
@@ -559,7 +559,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return "datetime($column->precision)";
+        return $this->typeDateTime($column);
     }
 
     /**
@@ -593,10 +593,12 @@ class MySqlGrammar extends Grammar
     protected function typeTimestamp(Fluent $column)
     {
         if ($column->useCurrent) {
-            return "timestamp($column->precision) default CURRENT_TIMESTAMP";
+            return $column->precision
+                    ? "timestamp($column->precision) default CURRENT_TIMESTAMP"
+                    : 'timestamp default CURRENT_TIMESTAMP';
         }
 
-        return "timestamp($column->precision)";
+        return $column->precision ? "timestamp($column->precision)" : 'timestamp';
     }
 
     /**
@@ -607,11 +609,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) default CURRENT_TIMESTAMP";
-        }
-
-        return "timestamp($column->precision)";
+        return $this->typeTimestamp($column);
     }
 
     /**
