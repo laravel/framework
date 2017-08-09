@@ -358,6 +358,17 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every a random number of minutes.
+     * @param  int $min
+     * @param  int $max 
+     * @return $this
+     */
+    public function everyRandomMinutes($min, $max)
+    {
+        return $this->spliceIntoPosition(1, '*/' . rand($min, $max));
+    }
+
+    /**
      * Set the days of the week the command should run on.
      *
      * @param  array|mixed  $days
