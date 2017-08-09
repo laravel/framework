@@ -363,6 +363,7 @@ class Handler implements ExceptionHandlerContract
             $files = new Filesystem;
 
             $handler->handleUnconditionally(true);
+
             $handler->setApplicationPaths(
                 array_flip(Arr::except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]
