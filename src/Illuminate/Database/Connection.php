@@ -109,6 +109,13 @@ class Connection implements ConnectionInterface
     protected $transactions = 0;
 
     /**
+     * Have there been changes to the database.
+     *
+     * @var int
+     */
+    protected $recordsModified = false;
+
+    /**
      * All of the queries run against the connection.
      *
      * @var array
@@ -393,6 +400,19 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Set if any records have been modified.
+     *
+     * @param  bool  $changes
+     * @return void
+     */
+    public function setRecordsModified($changes = true)
+    {
+        if (! $this->recordsModified) {
+            $this->recordsModified = $changes;
+        }
+    }
+
+    /**
      * Run an insert statement against the database.
      *
      * @param  string  $query
@@ -446,6 +466,8 @@ class Connection implements ConnectionInterface
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 
+            $this->setRecordsModified();
+
             return $statement->execute();
         });
     }
@@ -473,7 +495,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            return $statement->rowCount();
+            $count = $statement->rowCount();
+
+            $this->setRecordsModified($count > 0);
+
+            return $count;
         });
     }
 
@@ -490,7 +516,11 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            return $this->getPdo()->exec($query) === false ? false : true;
+            $change = ($this->getPdo()->exec($query) === false ? false : true);
+
+            $this->setRecordsModified($change);
+
+            return $change;
         });
     }
 
@@ -894,6 +924,10 @@ class Connection implements ConnectionInterface
     public function getReadPdo()
     {
         if ($this->transactions >= 1) {
+            return $this->getPdo();
+        }
+
+        if ($this->getConfig('sticky') && $this->recordsModified) {
             return $this->getPdo();
         }
 
