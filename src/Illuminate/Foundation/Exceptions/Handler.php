@@ -369,7 +369,7 @@ class Handler implements ExceptionHandlerContract
                 ))
             );
 
-            $this->customizeWhoopsHandler($handler);
+            $this->customizeWhoopsPage($handler);
         });
     }
 
@@ -483,7 +483,8 @@ class Handler implements ExceptionHandlerContract
      * @param  \Whoops\Handler\PrettyPageHandler  $handler
      * @return void
      */
-    protected function customizeWhoopsHandler($handler) {
+    protected function customizeWhoopsPage($handler)
+    {
         //
     }
 }
