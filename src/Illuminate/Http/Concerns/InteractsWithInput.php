@@ -185,27 +185,6 @@ trait InteractsWithInput
      * @param  array|mixed  $keys
      * @return array
      */
-    public function pick($keys)
-    {
-        $keys = is_array($keys) ? $keys : func_get_args();
-
-        $results = [];
-
-        $input = $this->all();
-
-        foreach ($keys as $key) {
-            Arr::set($results, $key, data_get($input, $key));
-        }
-
-        return $results;
-    }
-
-    /**
-     * Get a subset containing the provided keys with values from the input data.
-     *
-     * @param  array|mixed  $keys
-     * @return array
-     */
     public function only($keys)
     {
         $results = [];
