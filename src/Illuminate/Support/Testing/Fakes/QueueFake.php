@@ -31,6 +31,22 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * Assert if a job was pushed a number of times based on a truth-test callback.
+     *
+     * @param  string  $job
+     * @param  integer $times
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertPushed($job, $times, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->pushed($job, $callback)->count()) === $times,
+            "The expected [{$job}] job was pushed {$count} times instead of {$times} times."
+        );
+    }
+
+    /**
      * Assert if a job was pushed based on a truth-test callback.
      *
      * @param  string  $queue
