@@ -86,14 +86,33 @@ class MailFake implements Mailer
      * Assert if a mailable was queued based on a truth-test callback.
      *
      * @param  string  $mailable
-     * @param  callable|null  $callback
+     * @param  callable|int|null  $callback
      * @return void
      */
     public function assertQueued($mailable, $callback = null)
     {
+        if (is_numeric($callback)) {
+            return $this->assertQueuedTimes($mailable, $callback);
+        }
+
         PHPUnit::assertTrue(
             $this->queued($mailable, $callback)->count() > 0,
             "The expected [{$mailable}] mailable was not queued."
+        );
+    }
+
+    /**
+     * Assert if a mailable was queued a number of times.
+     *
+     * @param  string  $mailable
+     * @param  int  $times
+     * @return void
+     */
+    protected function assertQueuedTimes($mailable, $times = 1)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->queued($mailable)->count()) === $times,
+            "The expected [{$mailable}] mailable was queued {$count} times instead of {$times} times."
         );
     }
 
