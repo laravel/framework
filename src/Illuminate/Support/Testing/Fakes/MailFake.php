@@ -24,9 +24,29 @@ class MailFake implements Mailer
      */
     public function assertSent($mailable, $callback = null)
     {
+        if(is_array($mailable)) {
+            return $this->assertSentTimes($mailable[0], $mailable[1], $callback);
+        }
+
         PHPUnit::assertTrue(
             $this->sent($mailable, $callback)->count() > 0,
             "The expected [{$mailable}] mailable was not sent."
+        );
+    }
+
+    /**
+     * Assert if a mailable was sent a number of times based on a truth-test callback.
+     *
+     * @param  string  $mailable
+     * @param  int $times
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertSentTimes($mailable, $times = 1, $callback = null)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->sent($mailable, $callback)->count()) === $times,
+            "The expected [{$mailable}] mailable was sent {$count} times instead of {$times} times."
         );
     }
 
