@@ -482,9 +482,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            $this->recordsHaveBeenModified($statement->rowCount() > 0);
+            $this->recordsHaveBeenModified(
+                ($count = $statement->rowCount()) > 0
+            );
 
-            return $statement->rowCount();
+            return $count;
         });
     }
 
