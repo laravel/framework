@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
@@ -184,7 +185,7 @@ class MailFake implements Mailer
      */
     public function hasQueued($mailable)
     {
-        return $this->mailablesOf($mailable, true)->count() > 0;
+        return $this->queuedMailablesOf($mailable)->count() > 0;
     }
 
     /**
@@ -259,6 +260,10 @@ class MailFake implements Mailer
     {
         if (! $view instanceof Mailable) {
             return;
+        }
+
+        if ($view instanceof ShouldQueue) {
+            return $this->queue($view, $data, $callback);
         }
 
         $this->mailables[] = $view;
