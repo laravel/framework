@@ -579,6 +579,114 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the second item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function second(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 2, $callback, $default);
+    }
+
+    /**
+     * Get the third item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function third(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 3, $callback, $default);
+    }
+
+    /**
+     * Get the fourth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function fourth(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 4, $callback, $default);
+    }
+
+    /**
+     * Get the fifth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function fifth(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 5, $callback, $default);
+    }
+
+    /**
+     * Get the sixth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function sixth(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 6, $callback, $default);
+    }
+
+    /**
+     * Get the seventh item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function seventh(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 7, $callback, $default);
+    }
+
+    /**
+     * Get the eighth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function eighth(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 8, $callback, $default);
+    }
+
+    /**
+     * Get the ninth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function ninth(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 9, $callback, $default);
+    }
+
+    /**
+     * Get the tenth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function tenth(callable $callback = null, $default = null)
+    {
+        return Arr::nth($this->items, 10, $callback, $default);
+    }
+
+    /**
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth

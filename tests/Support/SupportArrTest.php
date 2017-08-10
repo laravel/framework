@@ -136,6 +136,18 @@ class SupportArrTest extends TestCase
         $this->assertEquals(100, Arr::first($array));
     }
 
+    public function testNth()
+    {
+        $array = [100, 200, 300, 400, 500];
+
+        $value = Arr::nth($array, 2, function ($value) {
+            return $value >= 200;
+        });
+
+        $this->assertEquals(300, $value);
+        $this->assertEquals(500, Arr::nth($array, 5));
+    }
+
     public function testLast()
     {
         $array = [100, 200, 300];

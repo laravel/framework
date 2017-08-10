@@ -45,6 +45,20 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testOrdinalReturnsCorrectItemInCollection()
+    {
+        $c = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+        $this->assertEquals(2, $c->second());
+        $this->assertEquals(3, $c->third());
+        $this->assertEquals(4, $c->fourth());
+        $this->assertEquals(5, $c->fifth());
+        $this->assertEquals(6, $c->sixth());
+        $this->assertEquals(7, $c->seventh());
+        $this->assertEquals(8, $c->eighth());
+        $this->assertEquals(9, $c->ninth());
+        $this->assertEquals(10, $c->tenth());
+    }
+
     public function testLastReturnsLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
