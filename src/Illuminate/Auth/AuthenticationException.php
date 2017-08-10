@@ -7,10 +7,10 @@ use Exception;
 class AuthenticationException extends Exception
 {
     /**
-    * Unauthorized Response Code
-    *
-    * @var int
-    */
+     * Unauthorized Response Code
+     *
+     * @var int
+     */
     protected $code = 401;
 
     /**
