@@ -7,7 +7,7 @@ use Exception;
 class AuthenticationException extends Exception
 {
     /**
-     * Unauthorized Response Code
+     * Unauthorized Response Code.
      *
      * @var int
      */
