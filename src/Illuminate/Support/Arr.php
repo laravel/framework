@@ -161,18 +161,41 @@ class Arr
      */
     public static function first($array, callable $callback = null, $default = null)
     {
+        return static::nth($array, 1, $callback, $default);
+    }
+
+    /**
+     * Return the nth element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function nth($array, $offset, callable $callback = null, $default = null)
+    {
         if (is_null($callback)) {
             if (empty($array)) {
                 return value($default);
             }
 
+            $matches = 0;
             foreach ($array as $item) {
-                return $item;
+                $matches++;
+
+                if ($matches >= $offset) {
+                    return $item;
+                }
             }
         }
 
+        $matches = 0;
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $value, $key)) {
+                $matches++;
+            }
+
+            if ($matches >= $offset) {
                 return $value;
             }
         }
