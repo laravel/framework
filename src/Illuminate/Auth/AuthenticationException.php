@@ -7,6 +7,13 @@ use Exception;
 class AuthenticationException extends Exception
 {
     /**
+    * Unauthorized Response Code
+    *
+    * @var int
+    */
+    protected $code = 401;
+
+    /**
      * All of the guards that were checked.
      *
      * @var array
