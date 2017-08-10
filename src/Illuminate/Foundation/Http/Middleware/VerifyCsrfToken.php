@@ -133,7 +133,9 @@ class VerifyCsrfToken
      */
     protected function getTokenFromRequest($request)
     {
-        $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
+        // to resolve TokenMismatchException error
+        parse_str($request->get('inputs'),$inputs);               
+        $token = $inputs['_token'] ?: $request->header('X-CSRF-TOKEN');
 
         if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
             $token = $this->encrypter->decrypt($header);
