@@ -1040,7 +1040,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  int  $perPage
      * @param  int  $total
      * @param  int  $page
-     * @param  str  $pageName
+     * @param  string  $pageName
      * @return LengthAwarePaginator
      */
     public function paginate($perPage, $total = null, $page = null, $pageName = 'page')
