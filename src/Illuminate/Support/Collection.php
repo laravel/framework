@@ -15,6 +15,7 @@ use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Pagination\LengthAwarePaginator;
 
 class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate, Jsonable, JsonSerializable
 {
@@ -1031,6 +1032,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function forPage($page, $perPage)
     {
         return $this->slice(($page - 1) * $perPage, $perPage);
+    }
+
+    /**
+     * Paginate the collection using a LengthAwarePaginator instance.
+     *
+     * @param  int  $perPage
+     * @param  int  $total
+     * @param  int  $page
+     * @param  string  $pageName
+     * @return LengthAwarePaginator
+     */
+    public function paginate($perPage, $total = null, $page = null, $pageName = 'page')
+    {
+        $page = $page ?: LengthAwarePaginator::resolveCurrentPage($pageName);
+
+        return new LengthAwarePaginator($this->forPage($page, $perPage), $total ?: $this->count(), $perPage, $page, [
+            'path' => LengthAwarePaginator::resolveCurrentPath(),
+            'pageName' => $pageName,
+        ]);
     }
 
     /**
