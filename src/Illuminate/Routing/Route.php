@@ -211,7 +211,6 @@ class Route
      */
     public function getController()
     {
-        
         if (! $this->controller) {
           
             $class = $this->parseControllerCallback()[0];
