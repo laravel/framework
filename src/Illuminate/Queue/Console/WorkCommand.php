@@ -23,6 +23,7 @@ class WorkCommand extends Command
                             {--queue= : The names of the queues to work}
                             {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
+                            {--oncefull : Only process until queue is empty}
                             {--delay=0 : Amount of time to delay failed jobs}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
@@ -97,7 +98,7 @@ class WorkCommand extends Command
     {
         $this->worker->setCache($this->laravel['cache']->driver());
 
-        return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
+        return $this->worker->{$this->option('once')||$this->option('oncefull') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
         );
     }
@@ -112,7 +113,8 @@ class WorkCommand extends Command
         return new WorkerOptions(
             $this->option('delay'), $this->option('memory'),
             $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries'), $this->option('force')
+            $this->option('tries'), $this->option('force'),
+            $this->option('once')
         );
     }
 

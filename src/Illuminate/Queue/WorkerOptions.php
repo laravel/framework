@@ -47,6 +47,13 @@ class WorkerOptions
     public $force;
 
     /**
+     * Indicates if the worker should run in only once.
+     *
+     * @var bool
+     */
+    public $once;
+
+    /**
      * Create a new worker options instance.
      *
      * @param  int  $delay
@@ -56,7 +63,7 @@ class WorkerOptions
      * @param  int  $maxTries
      * @param  bool  $force
      */
-    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false)
+    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false , $once = false)
     {
         $this->delay = $delay;
         $this->sleep = $sleep;
@@ -64,5 +71,6 @@ class WorkerOptions
         $this->memory = $memory;
         $this->timeout = $timeout;
         $this->maxTries = $maxTries;
+        $this->once = $once;
     }
 }
