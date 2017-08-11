@@ -35,17 +35,15 @@ class FreshCommand extends Command
             return;
         }
 
-        $this->dropAllTables(
-            $database = $this->input->getOption('database')
-        );
+        $database = $this->input->getOption('database');
 
-        $this->info('Dropped all tables successfully.');
+        $path = $this->input->getOption('path');
 
-        $this->call('migrate', [
-            '--database' => $database,
-            '--path' => $this->input->getOption('path'),
-            '--force' => $this->input->getOption('force'),
-        ]);
+        $force = $this->input->getOption('force');
+
+        $this->runDrop($database, $force);
+
+        $this->runMigrate($database, $path, $force);
 
         if ($this->needsSeeding()) {
             $this->runSeeder($database);
@@ -53,16 +51,35 @@ class FreshCommand extends Command
     }
 
     /**
-     * Drop all of the database tables.
+     * Run the migrate drop command.
      *
-     * @param  string  $database
+     * @param  string $database
+     * @param bool $force
      * @return void
      */
-    protected function dropAllTables($database)
+    protected function runDrop($database, $force)
     {
-        $this->laravel['db']->connection($database)
-                    ->getSchemaBuilder()
-                    ->dropAllTables();
+        $this->call('migrate:drop', [
+            '--database' => $database,
+            '--force' => $force,
+        ]);
+    }
+
+    /**
+     * Run the migrate command.
+     *
+     * @param  string  $database
+     * @param  string  $path
+     * @param  bool  $force
+     * @return void
+     */
+    protected function runMigrate($database, $path, $force)
+    {
+        $this->call('migrate', [
+            '--database' => $database,
+            '--path' => $path,
+            '--force' => $force,
+        ]);
     }
 
     /**

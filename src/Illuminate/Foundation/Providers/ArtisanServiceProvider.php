@@ -59,6 +59,7 @@ use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
 use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
+use Illuminate\Database\Console\Migrations\DropCommand as MigrateDropCommand;
 use Illuminate\Database\Console\Migrations\FreshCommand as MigrateFreshCommand;
 use Illuminate\Database\Console\Migrations\ResetCommand as MigrateResetCommand;
 use Illuminate\Database\Console\Migrations\StatusCommand as MigrateStatusCommand;
@@ -96,6 +97,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'MigrateRefresh' => 'command.migrate.refresh',
         'MigrateReset' => 'command.migrate.reset',
         'MigrateRollback' => 'command.migrate.rollback',
+        'MigrateDrop' => 'command.migrate.drop',
         'MigrateStatus' => 'command.migrate.status',
         'Optimize' => 'command.optimize',
         'PackageDiscover' => 'command.package.discover',
@@ -520,6 +522,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.migrate.rollback', function ($app) {
             return new MigrateRollbackCommand($app['migrator']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerMigrateDropCommand()
+    {
+        $this->app->singleton('command.migrate.drop', function () {
+            return new MigrateDropCommand;
         });
     }
 
