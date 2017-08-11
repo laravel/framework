@@ -198,7 +198,6 @@
 - ⚠️ Made `Request::has()` work like `Collection::has()` ([#18715](https://github.com/laravel/framework/pull/18715))
 - Added `Request::filled()` ([#18715](https://github.com/laravel/framework/pull/18715))
 - ⚠️ Made `Request::only()` work like `Collection::only()` ([#18695](https://github.com/laravel/framework/pull/18695))
-- ⚠️ Renamed `Request::exists()` to `Request::filled()` ([#18715](https://github.com/laravel/framework/pull/18715))
 - Aliased `Request::exists()` to `Request::has()` ([183bf16](https://github.com/laravel/framework/commit/183bf16a2c939889f4461e237a851b55cf858f8e))
 - Allow passing keys to `Request::all()` to behave like old `Request::only()` ([#18754](https://github.com/laravel/framework/pull/18754))
 - ⚠️ Removed `Request::intersect()` ([#18695](https://github.com/laravel/framework/pull/18695))
