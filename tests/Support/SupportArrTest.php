@@ -421,22 +421,74 @@ class SupportArrTest extends TestCase
 
     public function testRandom()
     {
-        $randomValue = Arr::random(['foo', 'bar', 'baz']);
+        $random = Arr::random(['foo', 'bar', 'baz']);
+        $this->assertContains($random, ['foo', 'bar', 'baz']);
 
-        $this->assertContains($randomValue, ['foo', 'bar', 'baz']);
+        $random = Arr::random(['foo', 'bar', 'baz'], 0);
+        $this->assertInternalType('array', $random);
+        $this->assertCount(0, $random);
 
-        $randomValues = Arr::random(['foo', 'bar', 'baz'], 1);
+        $random = Arr::random(['foo', 'bar', 'baz'], 1);
+        $this->assertInternalType('array', $random);
+        $this->assertCount(1, $random);
+        $this->assertContains($random[0], ['foo', 'bar', 'baz']);
 
-        $this->assertInternalType('array', $randomValues);
-        $this->assertCount(1, $randomValues);
-        $this->assertContains($randomValues[0], ['foo', 'bar', 'baz']);
+        $random = Arr::random(['foo', 'bar', 'baz'], 2);
+        $this->assertInternalType('array', $random);
+        $this->assertCount(2, $random);
+        $this->assertContains($random[0], ['foo', 'bar', 'baz']);
+        $this->assertContains($random[1], ['foo', 'bar', 'baz']);
 
-        $randomValues = Arr::random(['foo', 'bar', 'baz'], 2);
+        $random = Arr::random(['foo', 'bar', 'baz'], '0');
+        $this->assertInternalType('array', $random);
+        $this->assertCount(0, $random);
 
-        $this->assertInternalType('array', $randomValues);
-        $this->assertCount(2, $randomValues);
-        $this->assertContains($randomValues[0], ['foo', 'bar', 'baz']);
-        $this->assertContains($randomValues[1], ['foo', 'bar', 'baz']);
+        $random = Arr::random(['foo', 'bar', 'baz'], '1');
+        $this->assertInternalType('array', $random);
+        $this->assertCount(1, $random);
+        $this->assertContains($random[0], ['foo', 'bar', 'baz']);
+
+        $random = Arr::random(['foo', 'bar', 'baz'], '2');
+        $this->assertInternalType('array', $random);
+        $this->assertCount(2, $random);
+        $this->assertContains($random[0], ['foo', 'bar', 'baz']);
+        $this->assertContains($random[1], ['foo', 'bar', 'baz']);
+    }
+
+    public function testRandomOnEmptyArray()
+    {
+        $random = Arr::random([], 0);
+        $this->assertInternalType('array', $random);
+        $this->assertCount(0, $random);
+
+        $random = Arr::random([], '0');
+        $this->assertInternalType('array', $random);
+        $this->assertCount(0, $random);
+    }
+
+    public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
+    {
+        $exceptions = 0;
+
+        try {
+            Arr::random([]);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        try {
+            Arr::random([], 1);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        try {
+            Arr::random([], 2);
+        } catch (\InvalidArgumentException $e) {
+            ++$exceptions;
+        }
+
+        $this->assertSame(3, $exceptions);
     }
 
     public function testSet()
