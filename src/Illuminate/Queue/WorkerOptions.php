@@ -47,11 +47,11 @@ class WorkerOptions
     public $force;
 
     /**
-     * Indicates if the worker should run in only once.
+     * Indicates if the worker should run until queue empty.
      *
      * @var bool
      */
-    public $once;
+    public $oncefull;
 
     /**
      * Create a new worker options instance.
@@ -63,7 +63,7 @@ class WorkerOptions
      * @param  int  $maxTries
      * @param  bool  $force
      */
-    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $once = null)
+    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $oncefull = false)
     {
         $this->delay = $delay;
         $this->sleep = $sleep;
@@ -71,6 +71,6 @@ class WorkerOptions
         $this->memory = $memory;
         $this->timeout = $timeout;
         $this->maxTries = $maxTries;
-        $this->once = $once;
+        $this->oncefull = $oncefull;
     }
 }

@@ -225,7 +225,7 @@ class Worker
                 $this->runJob($job, $connectionName, $options);
             }
 
-            if (! $options->once === false) {
+            if (! $options->oncefull) {
                 break;
             }
         } while ($job);
