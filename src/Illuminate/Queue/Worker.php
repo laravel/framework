@@ -214,7 +214,6 @@ class Worker
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
         do {
-
             $job = $this->getNextJob(
                 $this->manager->connection($connectionName), $queue
             );
