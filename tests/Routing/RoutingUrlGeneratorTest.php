@@ -465,6 +465,11 @@ class RoutableInterfaceStub implements UrlRoutable
     {
         return 'key';
     }
+
+    public function resolveRouteBinding($routeKey)
+    {
+        return null;
+    }
 }
 
 class InvokableActionStub

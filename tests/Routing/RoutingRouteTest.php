@@ -1593,7 +1593,7 @@ class RouteBindingStub
     }
 }
 
-class RouteModelBindingStub
+class RouteModelBindingStub extends Model
 {
     public function getRouteKeyName()
     {
@@ -1613,7 +1613,7 @@ class RouteModelBindingStub
     }
 }
 
-class RouteModelBindingNullStub
+class RouteModelBindingNullStub extends Model
 {
     public function getRouteKeyName()
     {

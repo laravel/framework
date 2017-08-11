@@ -1252,6 +1252,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Retrieve model for route model binding
+     *
+     * @param  mixed  $routeKey
+     * @return null|\Illuminate\Database\Eloquent\Model
+     */
+    public function resolveRouteBinding($routeKey)
+    {
+        return $this->where($this->getRouteKeyName(), $routeKey)->first();
+    }
+
+    /**
      * Get the default foreign key name for the model.
      *
      * @return string
