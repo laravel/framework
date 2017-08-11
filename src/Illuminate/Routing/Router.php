@@ -61,6 +61,13 @@ class Router implements RegistrarContract, BindingRegistrar
      * @var \Illuminate\Http\Request
      */
     protected $currentRequest;
+    
+    /**
+     * All of the route groups.
+     *
+     * @var array
+     */
+    protected $groups = [];
 
     /**
      * All of the short-hand keys for middlewares.
@@ -269,7 +276,9 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function group(array $attributes, $routes)
     {
-        $this->updateGroupStack($attributes);
+        $group = new RouteGroup($attributes, $routes);
+
+        $this->registerGroup($group);
 
         // Once we have updated the group stack, we'll load the provided routes and
         // merge in the group's attributes when the routes are created. After we
@@ -277,6 +286,12 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->loadRoutes($routes);
 
         array_pop($this->groupStack);
+    }
+
+    public function registerGroup(RouteGroup $group)
+    {
+        $this->groups[] = $group;
+        $this->updateGroupStack($group->toArray());
     }
 
     /**
@@ -669,6 +684,11 @@ class Router implements RegistrarContract, BindingRegistrar
     public function matched($callback)
     {
         $this->events->listen(Events\RouteMatched::class, $callback);
+    }
+
+    public function getGroups()
+    {
+        return $this->groups;
     }
 
     /**

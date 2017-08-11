@@ -2,23 +2,24 @@
 
 namespace Illuminate\Tests\Routing;
 
-use stdClass;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Routing\Route;
-use UnexpectedValueException;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\RouteGroup;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Routing\Controller;
-use Illuminate\Routing\RouteGroup;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Routing\ResourceRegistrar;
-use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Auth\Middleware\Authenticate;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Routing\Middleware\SubstituteBindings;
+use UnexpectedValueException;
+use stdClass;
 
 class RoutingRouteTest extends TestCase
 {
@@ -896,6 +897,41 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(
             ['boo:foo', 'baz:gaz'],
             $route->middleware()
+        );
+    }
+
+    public function testGettingRouteGroups()
+    {
+        $router = $this->getRouter();
+
+        $router->group(['prefix' => 'foo', 'middleware' => 'boo:foo'], function () use ($router) {
+            $router->get('bar', function () {
+                return 'hello';
+            });
+        });
+
+        $router->group([], function () use ($router) {
+            $router->get('baz', function () {
+                return 'zello';
+            });
+        });
+
+        $routes = $router->getRoutes()->getRoutes();
+        $bar = $routes[0];
+        $baz = $routes[1];
+
+        $this->assertEquals(
+            [
+                (new RouteGroup([
+                    'prefix' => 'foo',
+                    'middleware' => 'boo:foo',
+                    'routes' => (new RouteCollection)->add($bar)
+                ])),
+                (new RouteGroup([
+                    'routes' => (new RouteCollection)->add($baz)
+                ])),
+            ],
+            $router->getGroups()
         );
     }
 

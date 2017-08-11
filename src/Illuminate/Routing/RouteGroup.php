@@ -2,10 +2,36 @@
 
 namespace Illuminate\Routing;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Arr;
 
-class RouteGroup
+class RouteGroup implements Arrayable
 {
+    protected $attributes = [];
+
+    public function __construct(array $attributes)
+    {
+        $this->attributes = $attributes;
+    }
+
+    /**
+     * Get the attributes as a plain array.
+     *
+     * @return array
+     */
+    public function toArray()
+    {
+        return array_map(function ($value) {
+            return $value instanceof Arrayable ? $value->toArray() : $value;
+        }, $this->attributes);
+    }
+
+    public function getAttributes()
+    {
+        return $this->attributes;
+    }
+
     /**
      * Merge route groups into a new array.
      *
