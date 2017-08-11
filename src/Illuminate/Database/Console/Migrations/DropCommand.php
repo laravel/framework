@@ -35,9 +35,7 @@ class DropCommand extends Command
             return;
         }
 
-        $this->dropAllTables(
-            $database = $this->input->getOption('database')
-        );
+        $this->dropAllTables($this->input->getOption('database'));
 
         $this->info('Dropped all tables successfully.');
     }
