@@ -226,9 +226,10 @@ class Worker
                 $this->runJob($job, $connectionName, $options);
             }
 
-            if ($options->once) break;
-
-        } while($job);
+            if ($options->once) {
+                break;
+            }
+        } while ($job);
 
         $this->sleep($options->sleep);
     }

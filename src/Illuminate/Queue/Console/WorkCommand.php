@@ -98,7 +98,7 @@ class WorkCommand extends Command
     {
         $this->worker->setCache($this->laravel['cache']->driver());
 
-        return $this->worker->{$this->option('once')||$this->option('oncefull') ? 'runNextJob' : 'daemon'}(
+        return $this->worker->{$this->option('once') || $this->option('oncefull') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
         );
     }
