@@ -19,7 +19,7 @@ interface UrlRoutable
     public function getRouteKeyName();
 
     /**
-     * Retrieve model for route model binding
+     * Retrieve model for route model binding.
      *
      * @param  mixed  $routeKey
      * @return null|\Illuminate\Database\Eloquent\Model

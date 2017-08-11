@@ -1252,7 +1252,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Retrieve model for route model binding
+     * Retrieve model for route model binding.
      *
      * @param  mixed  $routeKey
      * @return null|\Illuminate\Database\Eloquent\Model
