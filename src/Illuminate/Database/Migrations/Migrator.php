@@ -245,7 +245,8 @@ class Migrator
             $migration = (object) $migration;
 
             if (! $file = Arr::get($files, $migration->migration)) {
-                $this->note("<fg=red>Can't find class to rollback for migration</> {$migration->migration}");
+                $this->note("<fg=red>Migration not found:</> {$migration->migration}");
+
                 continue;
             }
 
