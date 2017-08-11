@@ -21,6 +21,48 @@ interface Application extends Container
     public function basePath();
 
     /**
+     * Get the path to the bootstrap directory.
+     *
+     * @return string
+     */
+    public function bootstrapPath();
+
+    /**
+     * Get the path to the application configuration files.
+     *
+     * @return string
+     */
+    public function configPath();
+
+    /**
+     * Get the path to the database directory.
+     *
+     * @return string
+     */
+    public function databasePath();
+
+    /**
+     * Get the path to the public / web directory.
+     *
+     * @return string
+     */
+    public function publicPath();
+
+    /**
+     * Get the path to the resources directory.
+     *
+     * @return string
+     */
+    public function resourcePath();
+
+    /**
+     * Get the path to the storage directory.
+     *
+     * @return string
+     */
+    public function storagePath();
+
+    /**
      * Get or check the current application environment.
      *
      * @return string
