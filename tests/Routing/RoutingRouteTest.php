@@ -925,11 +925,8 @@ class RoutingRouteTest extends TestCase
                 (new RouteGroup([
                     'prefix' => 'foo',
                     'middleware' => 'boo:foo',
-                    'routes' => (new RouteCollection)->add($bar)
-                ])),
-                (new RouteGroup([
-                    'routes' => (new RouteCollection)->add($baz)
-                ])),
+                ]))->addRoute($bar),
+                (new RouteGroup)->addRoute($baz),
             ],
             $router->getGroups()
         );
