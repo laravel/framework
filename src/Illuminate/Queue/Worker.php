@@ -213,16 +213,22 @@ class Worker
      */
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
-        $job = $this->getNextJob(
-            $this->manager->connection($connectionName), $queue
-        );
+        do {
+            $job = $this->getNextJob(
+                $this->manager->connection($connectionName), $queue
+            );
 
-        // If we're able to pull a job off of the stack, we will process it and then return
-        // from this method. If there is no job on the queue, we will "sleep" the worker
-        // for the specified number of seconds, then keep processing jobs after sleep.
-        if ($job) {
-            return $this->runJob($job, $connectionName, $options);
-        }
+            // If we're able to pull a job off of the stack, we will process it and then return
+            // from this method. If there is no job on the queue, we will "sleep" the worker
+            // for the specified number of seconds, then keep processing jobs after sleep.
+            if ($job) {
+                $this->runJob($job, $connectionName, $options);
+            }
+
+            if (! $options->oncefull) {
+                break;
+            }
+        } while ($job);
 
         $this->sleep($options->sleep);
     }
