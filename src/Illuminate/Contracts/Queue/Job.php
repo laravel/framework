@@ -99,10 +99,10 @@ interface Job
      */
     public function getQueue();
 
-     /**
-      * Get the raw body string for the job.
-      *
-      * @return string
-      */
-     public function getRawBody();
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    public function getRawBody();
 }
