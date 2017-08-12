@@ -65,7 +65,7 @@ class RouteBinding
             // throw a not found exception otherwise we will return the instance.
             $instance = $container->make($class);
 
-            if ($model = $instance->resolveRouteBinding($value)) {
+            if ($model = $instance->where($instance->getRouteKeyName(), $value)->first()) {
                 return $model;
             }
 
