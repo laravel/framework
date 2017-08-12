@@ -50,18 +50,15 @@ class SortedMiddleware extends Collection
                 // middleware, we will move this middleware to be above the previous encounter.
                 if (isset($lastPriorityIndex) && $priorityIndex < $lastPriorityIndex) {
                     return $this->sortMiddleware(
-                        $priorityMap, array_values(
-                            $this->moveMiddleware($middlewares, $index, $lastIndex)
-                        )
+                        $priorityMap, array_values($this->moveMiddleware($middlewares, $index, $lastIndex))
                     );
+                }
 
                 // This middleware is in the priority map; but, this is the first middleware we have
                 // encountered from the map thus far. We'll save its current index plus its index
                 // from the priority map so we can compare against them on the next iterations.
-                } else {
-                    $lastIndex = $index;
-                    $lastPriorityIndex = $priorityIndex;
-                }
+                $lastIndex = $index;
+                $lastPriorityIndex = $priorityIndex;
             }
         }
 
