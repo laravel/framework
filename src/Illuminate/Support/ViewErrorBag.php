@@ -84,6 +84,16 @@ class ViewErrorBag implements Countable
     }
 
     /**
+     * Get MessageBags instance.
+     *
+     * @return \Illuminate\Support\MessageBags
+     */
+    public function bags()
+    {
+        return new MessageBags($this->getBags());
+    }
+
+    /**
      * Dynamically call methods on the default bag.
      *
      * @param  string  $method
