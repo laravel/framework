@@ -1118,7 +1118,7 @@ class RoutingRouteTest extends TestCase
 
         $router = $this->getRouter();
         $router->resource('foos', 'FooController', ['parameters' => 'singular']);
-        $router->resource('foos.bars', 'FooController', ['parameters' => 'singular']);
+        $router->resource('foos.bars', 'FooController')->parameters('singular');
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
@@ -1127,6 +1127,13 @@ class RoutingRouteTest extends TestCase
 
         $router = $this->getRouter();
         $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[3]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foos.bars', 'FooController')->parameter('foos', 'foo')->parameter('bars', 'bar');
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 

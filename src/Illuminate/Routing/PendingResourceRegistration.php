@@ -105,10 +105,10 @@ class PendingResourceRegistration
     /**
      * Override the route parameter names.
      *
-     * @param  array  $parameters
+     * @param  array|string  $parameters
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function parameters(array $parameters)
+    public function parameters($parameters)
     {
         $this->options['parameters'] = $parameters;
 
