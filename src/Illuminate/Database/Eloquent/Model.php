@@ -1252,6 +1252,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($routeKey)
+    {
+        return $this->where($this->getRouteKeyName(), $routeKey)->first();
+    }
+
+    /**
      * Get the default foreign key name for the model.
      *
      * @return string
