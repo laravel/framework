@@ -6,6 +6,7 @@ use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailFakeTest extends TestCase
 {
@@ -88,6 +89,20 @@ Failed asserting that false is true.', $exception->getMessage());
         $this->fake->assertQueued(MailableStub::class, 2);
     }
 
+    public function testSendQueuesAMailable()
+    {
+        $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub);
+
+        try {
+            $this->fake->assertSent(QueueableMailableStub::class);
+        } catch (ExpectationFailedException $exception) {
+            $this->assertEquals('The expected [Illuminate\Tests\Support\QueueableMailableStub] mailable was not sent.
+Failed asserting that false is true.', $exception->getMessage());
+        }
+
+        $this->fake->assertQueued(QueueableMailableStub::class);
+    }
+
     public function testAssertNothingSent()
     {
         $this->fake->assertNothingSent();
@@ -104,6 +119,24 @@ Failed asserting that an array is empty.', $exception->getMessage());
 }
 
 class MailableStub extends Mailable
+{
+    public $framework = 'Laravel';
+
+    protected $version = '5.5';
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        $this->with('first_name', 'Taylor')
+             ->withLastName('Otwell');
+    }
+}
+
+class QueueableMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 
