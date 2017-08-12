@@ -44,6 +44,20 @@ Failed asserting that false is true.', $exception->getMessage());
         }
     }
 
+    public function testAssertPushedOn()
+    {
+        $this->fake->push($this->job, '', 'foo');
+
+        try {
+            $this->fake->assertPushedOn('bar', JobStub::class);
+        } catch (ExpectationFailedException $exception) {
+            $this->assertEquals('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
+Failed asserting that false is true.', $exception->getMessage());
+        }
+
+        $this->fake->assertPushedOn('foo', JobStub::class);
+    }
+
     public function testAssertPushedTimes()
     {
         $this->fake->push($this->job);
