@@ -20,7 +20,7 @@ class MailFakeTest extends TestCase
     {
         try {
             $this->fake->assertSent(MailableStub::class);
-        } catch(ExpectationFailedException $exception) {
+        } catch (ExpectationFailedException $exception) {
             $this->assertEquals('The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent.
 Failed asserting that false is true.', $exception->getMessage());
         }
@@ -38,7 +38,7 @@ Failed asserting that false is true.', $exception->getMessage());
 
         try {
             $this->fake->assertNotSent(MailableStub::class);
-        } catch(ExpectationFailedException $exception) {
+        } catch (ExpectationFailedException $exception) {
             $this->assertEquals('The unexpected [Illuminate\Tests\Support\MailableStub] mailable was sent.
 Failed asserting that false is true.', $exception->getMessage());
         }
@@ -51,7 +51,7 @@ Failed asserting that false is true.', $exception->getMessage());
 
         try {
             $this->fake->assertSent(MailableStub::class, 1);
-        } catch(ExpectationFailedException $exception) {
+        } catch (ExpectationFailedException $exception) {
             $this->assertEquals('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 times.
 Failed asserting that false is true.', $exception->getMessage());
         }
@@ -67,7 +67,7 @@ Failed asserting that false is true.', $exception->getMessage());
 
         try {
             $this->fake->assertNothingSent();
-        } catch(ExpectationFailedException $exception) {
+        } catch (ExpectationFailedException $exception) {
             $this->assertEquals('Mailables were sent unexpectedly.
 Failed asserting that an array is empty.', $exception->getMessage());
         }
