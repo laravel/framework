@@ -59,6 +59,35 @@ Failed asserting that false is true.', $exception->getMessage());
         $this->fake->assertSent(MailableStub::class, 2);
     }
 
+    public function testAssertQueued()
+    {
+        try {
+            $this->fake->assertQueued(MailableStub::class);
+        } catch (ExpectationFailedException $exception) {
+            $this->assertEquals('The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued.
+Failed asserting that false is true.', $exception->getMessage());
+        }
+
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class);
+    }
+
+    public function testAssertQueuedTimes()
+    {
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        try {
+            $this->fake->assertQueued(MailableStub::class, 1);
+        } catch (ExpectationFailedException $exception) {
+            $this->assertEquals('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 times.
+Failed asserting that false is true.', $exception->getMessage());
+        }
+
+        $this->fake->assertQueued(MailableStub::class, 2);
+    }
+
     public function testAssertNothingSent()
     {
         $this->fake->assertNothingSent();
