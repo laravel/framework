@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Support;
 
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class MailFakeTest extends TestCase
 {
@@ -89,7 +89,7 @@ Failed asserting that false is true.', $exception->getMessage());
         $this->fake->assertQueued(MailableStub::class, 2);
     }
 
-    public function testSendQueuesAMailable()
+    public function testSendQueuesAMailableThatShouldBeQueued()
     {
         $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub);
 
