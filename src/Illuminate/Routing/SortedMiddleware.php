@@ -55,7 +55,7 @@ class SortedMiddleware extends Collection
                         )
                     );
 
-                // This middleware is in the priority map; but, this is the first middleware we have
+                    // This middleware is in the priority map; but, this is the first middleware we have
                 // encountered from the map thus far. We'll save its current index plus its index
                 // from the priority map so we can compare against them on the next iterations.
                 } else {
