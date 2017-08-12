@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Mail\Mailable;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\TestCase;
 
 class MailFakeTest extends TestCase
 {
