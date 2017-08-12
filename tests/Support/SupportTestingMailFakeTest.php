@@ -74,7 +74,6 @@ Failed asserting that an array is empty.', $exception->getMessage());
     }
 }
 
-
 class MailableStub extends Mailable
 {
     public $framework = 'Laravel';
