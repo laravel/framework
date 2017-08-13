@@ -22,7 +22,7 @@ interface UrlRoutable
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $routeKey
-     * @return UrlRoutable
+     * @return UrlRoutable|null
      */
     public function resolveRouteBinding($routeKey);
 }
