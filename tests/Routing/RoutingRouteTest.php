@@ -17,8 +17,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 

@@ -21,8 +21,8 @@ interface UrlRoutable
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @param  mixed  $routeKey
+     * @return UrlRoutable
      */
-    public function resolveRouteBinding($value);
+    public function resolveRouteBinding($routeKey);
 }

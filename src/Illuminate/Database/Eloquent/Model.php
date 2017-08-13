@@ -1254,7 +1254,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
+     * @param  mixed  $routeKey
      * @return \Illuminate\Database\Eloquent\Model|null
      */
     public function resolveRouteBinding($routeKey)
