@@ -155,6 +155,27 @@ trait InteractsWithInput
 
         return $results;
     }
+    
+    /**
+     * Get all of the input except for a specified array of items after changing names in the form of an array
+     *
+     * @param  array|mixed  $array
+     * @return array
+     */
+    public function change($array)
+    {
+        $array = is_array($array) ? $array : func_get_args();
+
+        $results = [];
+
+        $input = $this->all();
+        
+        foreach ($array as $key=>$value) {
+            Arr::set($results, $value, data_get($input, $key));
+        }
+        
+        return $results;
+    }
 
     /**
      * Get all of the input except for a specified array of items.
