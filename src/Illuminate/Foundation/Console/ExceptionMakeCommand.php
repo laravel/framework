@@ -58,5 +58,5 @@ class ExceptionMakeCommand extends GeneratorCommand
     {
         return $rootNamespace.'\Exceptions';
     }
-    
+
 }
