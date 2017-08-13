@@ -94,7 +94,7 @@ class Store implements Session
     protected function readFromHandler()
     {
         if ($data = $this->handler->read($this->getId())) {
-            $data = @unserialize($this->prepareForUnserialize($data));
+            $data = unserialize($this->prepareForUnserialize($data));
 
             if ($data !== false && ! is_null($data) && is_array($data)) {
                 return $data;
