@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Support;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use PHPUnit\Framework\ExpectationFailedException;
 
 class QueueFakeTest extends TestCase
 {
@@ -16,59 +15,55 @@ class QueueFakeTest extends TestCase
         $this->job = new JobStub;
     }
 
+    /**
+     * @expectedException PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
+     */
     public function testAssertPushed()
     {
-        try {
-            $this->fake->assertPushed(JobStub::class);
-        } catch (ExpectationFailedException $exception) {
-            $this->assertEquals('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
-Failed asserting that false is true.', $exception->getMessage());
-        }
+        $this->fake->assertPushed(JobStub::class);
 
         $this->fake->push($this->job);
 
         $this->fake->assertPushed(JobStub::class);
     }
 
+    /**
+     * @expectedException PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.
+     */
     public function testAssertNotPushed()
     {
         $this->fake->assertNotPushed(JobStub::class);
 
         $this->fake->push($this->job);
 
-        try {
-            $this->fake->assertNotPushed(JobStub::class);
-        } catch (ExpectationFailedException $exception) {
-            $this->assertEquals('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.
-Failed asserting that false is true.', $exception->getMessage());
-        }
+        $this->fake->assertNotPushed(JobStub::class);
     }
 
+    /**
+     * @expectedException PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
+     */
     public function testAssertPushedOn()
     {
         $this->fake->push($this->job, '', 'foo');
 
-        try {
-            $this->fake->assertPushedOn('bar', JobStub::class);
-        } catch (ExpectationFailedException $exception) {
-            $this->assertEquals('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
-Failed asserting that false is true.', $exception->getMessage());
-        }
+        $this->fake->assertPushedOn('bar', JobStub::class);
 
         $this->fake->assertPushedOn('foo', JobStub::class);
     }
 
+    /**
+     * @expectedException PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.
+     */
     public function testAssertPushedTimes()
     {
         $this->fake->push($this->job);
         $this->fake->push($this->job);
 
-        try {
-            $this->fake->assertPushed(JobStub::class, 1);
-        } catch (ExpectationFailedException $exception) {
-            $this->assertEquals('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.
-Failed asserting that false is true.', $exception->getMessage());
-        }
+        $this->fake->assertPushed(JobStub::class, 1);
 
         $this->fake->assertPushed(JobStub::class, 2);
     }
