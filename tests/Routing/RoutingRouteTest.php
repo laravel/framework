@@ -18,6 +18,7 @@ use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
@@ -1308,6 +1309,21 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
+    public function testImplicitBindingsWithUrlRoutableInterface()
+    {
+        $phpunit = $this;
+        $router = $this->getRouter();
+        $router->get('foo/{bar}', [
+            'middleware' => SubstituteBindings::class,
+            'uses' => function (RoutingTestUrlRoutableModel $bar) use ($phpunit) {
+                $phpunit->assertInstanceOf(RoutingTestUrlRoutableModel::class, $bar);
+
+                return $bar->value;
+            },
+        ]);
+        $this->assertEquals('taylor', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
+    }
+
     public function testImplicitBindingsWithOptionalParameterWithExistingKeyInUri()
     {
         $phpunit = $this;
@@ -1684,6 +1700,26 @@ class RoutingTestUserModel extends Model
 
     public function firstOrFail()
     {
+        return $this;
+    }
+}
+
+class RoutingTestUrlRoutableModel implements UrlRoutable
+{
+    public function getRouteKeyName()
+    {
+        return 'id';
+    }
+
+    public function getRouteKey()
+    {
+        return $this->id;
+    }
+
+    public function resolveRouteBinding($value)
+    {
+        $this->value = $value;
+
         return $this;
     }
 }

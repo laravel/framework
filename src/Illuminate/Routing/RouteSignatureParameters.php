@@ -22,7 +22,7 @@ class RouteSignatureParameters
                         : (new ReflectionFunction($action['uses']))->getParameters();
 
         return is_null($subClass) ? $parameters : array_filter($parameters, function ($p) use ($subClass) {
-            return $p->getClass() && $p->getClass()->isSubclassOf($subClass);
+            return $p->getClass() && ($p->getClass()->isSubclassOf($subClass) || $p->getClass()->implementsInterface($subClass));
         });
     }
 
