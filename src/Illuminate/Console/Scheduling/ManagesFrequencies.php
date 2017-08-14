@@ -89,8 +89,10 @@ trait ManagesFrequencies
      */
     public function daily()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0);
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => 0,
+        ]);
     }
 
     /**
@@ -114,8 +116,10 @@ trait ManagesFrequencies
     {
         $segments = explode(':', $time);
 
-        return $this->spliceIntoPosition(2, (int) $segments[0])
-                    ->spliceIntoPosition(1, count($segments) == 2 ? (int) $segments[1] : '0');
+        return $this->spliceIntoPosition([
+            2 => (int) $segments[0],
+            1 => count($segments) == 2 ? (int) $segments[1] : '0',
+        ]);
     }
 
     /**
@@ -129,8 +133,10 @@ trait ManagesFrequencies
     {
         $hours = $first.','.$second;
 
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, $hours);
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => $hours,
+        ]);
     }
 
     /**
@@ -230,9 +236,11 @@ trait ManagesFrequencies
      */
     public function weekly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(5, 0);
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => 0,
+            5 => 0,
+        ]);
     }
 
     /**
@@ -256,9 +264,11 @@ trait ManagesFrequencies
      */
     public function monthly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1);
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => 0,
+            3 => 1,
+        ]);
     }
 
     /**
@@ -286,9 +296,11 @@ trait ManagesFrequencies
     {
         $days = $first.','.$second;
 
-        return $this->spliceIntoPosition(1, 0)
-            ->spliceIntoPosition(2, 0)
-            ->spliceIntoPosition(3, $days);
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => 0,
+            3 => $days,
+        ]);
     }
 
     /**
@@ -298,10 +310,12 @@ trait ManagesFrequencies
      */
     public function quarterly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, '1-12/3');
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => 0,
+            3 => 1,
+            4 => '1-12/3',
+        ]);
     }
 
     /**
@@ -311,10 +325,12 @@ trait ManagesFrequencies
      */
     public function yearly()
     {
-        return $this->spliceIntoPosition(1, 0)
-                    ->spliceIntoPosition(2, 0)
-                    ->spliceIntoPosition(3, 1)
-                    ->spliceIntoPosition(4, 1);
+        return $this->spliceIntoPosition([
+            1 => 0,
+            2 => 0,
+            3 => 1,
+            4 => 1,
+        ]);
     }
 
     /**
@@ -386,16 +402,20 @@ trait ManagesFrequencies
     /**
      * Splice the given value into the given position of the expression.
      *
-     * @param  int  $position
-     * @param  string  $value
+     * @param  array|int  $position
+     * @param  string|null  $value
      * @return $this
      */
-    protected function spliceIntoPosition($position, $value)
+    protected function spliceIntoPosition($position, $value = null)
     {
-        $segments = explode(' ', $this->expression);
+        $positions = is_array($position) ? $position : [$position => $value];
 
-        $segments[$position - 1] = $value;
+        foreach ($positions as $position => $value) {
+            $segments = explode(' ', $this->expression);
+            $segments[$position - 1] = $value;
+            $this->cron(implode(' ', $segments));
+        }
 
-        return $this->cron(implode(' ', $segments));
+        return $this;
     }
 }
