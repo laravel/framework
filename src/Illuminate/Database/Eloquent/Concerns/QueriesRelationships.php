@@ -68,7 +68,7 @@ trait QueriesRelationships
     {
         $relations = explode('.', $relations);
 
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback) {
+        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
             // reference to itself so it calls itself recursively on each segment.
@@ -215,7 +215,7 @@ trait QueriesRelationships
         $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
-                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not = ($operator === '<' && $count === 1))
+                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
                 : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
     }
 
