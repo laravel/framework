@@ -16,7 +16,8 @@ class AuthMakeCommand extends Command
      */
     protected $signature = 'make:auth
                     {--views : Only scaffold the authentication views}
-                    {--force : Overwrite existing views by default}';
+                    {--force : Overwrite existing views by default}
+                    {--no-tests : Do not generate tests}';
 
     /**
      * The console command description.
@@ -63,6 +64,28 @@ class AuthMakeCommand extends Command
             );
         }
 
+        if (! $this->option('no-tests')) {
+            file_put_contents(
+                base_path('tests/Feature/Auth/LoginTest.php'),
+                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/LoginTest.stub')
+            );
+
+            file_put_contents(
+                base_path('tests/Feature/Auth/RegisterTest.php'),
+                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/RegisterTest.stub')
+            );
+
+            file_put_contents(
+                base_path('tests/Feature/Auth/ForgotPasswordTest.php'),
+                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/ForgotPasswordTest.stub')
+            );
+
+            file_put_contents(
+                base_path('tests/Feature/Auth/ResetPasswordTest.php'),
+                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/ResetPasswordTest.stub')
+            );
+        }
+
         $this->info('Authentication scaffolding generated successfully.');
     }
 
@@ -79,6 +102,12 @@ class AuthMakeCommand extends Command
 
         if (! is_dir(resource_path('views/auth/passwords'))) {
             mkdir(resource_path('views/auth/passwords'), 0755, true);
+        }
+
+        if (! $this->option('no-tests')) {
+            if (! is_dir(base_path('tests/Feature/Auth'))) {
+                mkdir(base_path('tests/Feature/Auth'), 0755, true);
+            }
         }
     }
 
