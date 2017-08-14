@@ -1235,7 +1235,7 @@ class Builder
             return $this->localMacros[$method](...$parameters);
         }
 
-        if (isset(static::$macros[$method]) and static::$macros[$method] instanceof Closure) {
+        if (isset(static::$macros[$method]) && static::$macros[$method] instanceof Closure) {
             return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
         }
 
