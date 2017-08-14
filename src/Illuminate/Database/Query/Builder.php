@@ -623,7 +623,7 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|string  $column
+     * @param  string|array|\Closure  $column
      * @param  string  $operator
      * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
