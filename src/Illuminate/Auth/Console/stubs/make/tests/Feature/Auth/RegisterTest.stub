@@ -43,13 +43,14 @@ class RegisterTest extends TestCase
         ]);
 
         $users = User::all();
+        $user = $users->first();
 
         $response->assertRedirect(route('home'));
         $this->assertCount(1, $users);
-        $this->assertEquals('John Doe', $users->first()->name);
-        $this->assertEquals('john@example.com', $users->first()->email);
-        $this->assertTrue(Hash::check('i-love-laravel', $users->first()->password));
-        $this->assertAuthenticatedAs(User::where('email', 'john@example.com')->first());
+        $this->assertEquals('John Doe', $user->name);
+        $this->assertEquals('john@example.com', $user->email);
+        $this->assertTrue(Hash::check('i-love-laravel', $user->password));
+        $this->assertAuthenticatedAs($user);
     }
 
     public function testUserCannotRegisterWithoutName()
