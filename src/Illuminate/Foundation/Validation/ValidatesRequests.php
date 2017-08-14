@@ -53,7 +53,7 @@ trait ValidatesRequests
             $rules = $request;
             $request = request();
         }
-        
+
         $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
 
         if ($validator->fails()) {
