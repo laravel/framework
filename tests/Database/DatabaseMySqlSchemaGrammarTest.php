@@ -778,6 +778,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
     }
 
+    public function testDropAllTables()
+    {
+        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop table `alpha`,`beta`,`gamma`', $statement);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');
