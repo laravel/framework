@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Console;
 
 trait MakeMailTrait
 {
-
     /**
      * Execute the console command.
      *
