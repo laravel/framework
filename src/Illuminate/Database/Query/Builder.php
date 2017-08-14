@@ -726,9 +726,6 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
-        // If the value is an eloquent builder instance we will assume the developer wants to
-        // look for any values that exists within this given query. So we will access the
-        // internal query builder which will then be used as a subquery.
         if ($values instanceof EloquentBuilder) {
             $values = $values->getQuery();
         }
