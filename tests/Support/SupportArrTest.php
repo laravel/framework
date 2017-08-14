@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use stdClass;
 use ArrayObject;
-use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 
