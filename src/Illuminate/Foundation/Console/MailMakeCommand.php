@@ -7,6 +7,8 @@ use Symfony\Component\Console\Input\InputOption;
 
 class MailMakeCommand extends GeneratorCommand
 {
+    use MakeMailTrait;
+
     /**
      * The console command name.
      *
