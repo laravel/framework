@@ -3,7 +3,6 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use ReflectionFunction;
-use ReflectionParameter;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
