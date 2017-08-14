@@ -779,7 +779,7 @@ class Route
     /**
      * Get the dispatcher for the route's controller.
      *
-     * @return ControllerDispatcherContract
+     * @return \Illuminate\Routing\Contracts\ControllerDispatcher
      */
     public function controllerDispatcher()
     {

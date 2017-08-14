@@ -233,7 +233,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Register a callback to run before a bootstrapper.
      *
      * @param  string  $bootstrapper
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function beforeBootstrapping($bootstrapper, Closure $callback)
@@ -245,7 +245,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Register a callback to run after a bootstrapper.
      *
      * @param  string  $bootstrapper
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function afterBootstrapping($bootstrapper, Closure $callback)

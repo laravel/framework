@@ -21,7 +21,7 @@ class ClosureCommand extends Command
      * Create a new command instance.
      *
      * @param  string  $signature
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function __construct($signature, Closure $callback)
