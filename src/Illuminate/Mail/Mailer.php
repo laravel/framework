@@ -241,7 +241,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Send the given mailable.
      *
-     * @param  MailableContract  $mailable
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     protected function sendMailable(MailableContract $mailable)

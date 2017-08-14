@@ -167,7 +167,7 @@ class NotificationSender
      * Format the notifiables into a Collection / array if necessary.
      *
      * @param  mixed  $notifiables
-     * @return ModelCollection|array
+     * @return \Illuminate\Database\Eloquent\Collection|array
      */
     protected function formatNotifiables($notifiables)
     {

@@ -146,7 +146,7 @@ class Mailable implements MailableContract, Renderable
      * Deliver the queued message after the given delay.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  Queue  $queue
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function later($delay, Queue $queue)

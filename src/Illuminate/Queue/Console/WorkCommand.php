@@ -178,7 +178,7 @@ class WorkCommand extends Command
     /**
      * Store a failed job event.
      *
-     * @param  JobFailed  $event
+     * @param  \Illuminate\Queue\Events\JobFailed  $event
      * @return void
      */
     protected function logFailedJob(JobFailed $event)

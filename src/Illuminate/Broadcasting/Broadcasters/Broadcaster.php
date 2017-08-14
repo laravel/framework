@@ -164,7 +164,7 @@ abstract class Broadcaster implements BroadcasterContract
      * Determine if a given key and parameter is implicitly bindable.
      *
      * @param  string  $key
-     * @param  ReflectionParameter  $parameter
+     * @param  \ReflectionParameter  $parameter
      * @return bool
      */
     protected function isImplicitlyBindable($key, $parameter)
@@ -189,7 +189,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Get the model binding registrar instance.
      *
-     * @return BindingRegistrar
+     * @return \Illuminate\Contracts\Routing\BindingRegistrar
      */
     protected function binder()
     {
