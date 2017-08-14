@@ -358,7 +358,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        // Reset the day parameter
         $format = $parameters[0] == 'Y-m' ? '!Y-m' : $parameters[0];
 
         $date = DateTime::createFromFormat($format, $value);
