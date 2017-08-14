@@ -39,6 +39,7 @@
 - ⚠️ Removed `array` type hint from `Command::table()` ([#20120](https://github.com/laravel/framework/pull/20120))
 - Support loading multiple paths in `Kernel::load()` ([#20251](https://github.com/laravel/framework/pull/20251))
 - Added `CommandStarting` and `CommandFinished` events ([#20298](https://github.com/laravel/framework/pull/20298))
+- Show error message if a reverted migration is not found ([#20499](https://github.com/laravel/framework/pull/20499), [a895b1e](https://github.com/laravel/framework/commit/a895b1eb0e50683c4583c24bb17b3f8d9e8127ab))
 
 ### Assets
 - Added frontend preset commands (_too many commits, sorry_)
@@ -89,19 +90,21 @@
 
 ### Database
 - ⚠️ Added `dropAllTables()` to schema builder ([#18484](https://github.com/laravel/framework/pull/18484), [d910bc8](https://github.com/laravel/framework/commit/d910bc8039f3cec2d906797818984e825601a3f5), [#19644](https://github.com/laravel/framework/pull/19644), [#19645](https://github.com/laravel/framework/pull/19645), [#20239](https://github.com/laravel/framework/pull/20239))
-- Added precision to `dateTime` and `timestamp` column types ([#18847](https://github.com/laravel/framework/pull/18847), [f85f6db](https://github.com/laravel/framework/commit/f85f6db7c00a43ae45d963d089458477cf3e44b3), [#18962](https://github.com/laravel/framework/pull/18962))
+- Added precision to `dateTime` and `timestamp` column types ([#18847](https://github.com/laravel/framework/pull/18847), [f85f6db](https://github.com/laravel/framework/commit/f85f6db7c00a43ae45d963d089458477cf3e44b3), [#18962](https://github.com/laravel/framework/pull/18962), [#20464](https://github.com/laravel/framework/pull/20464))
 - Pass page number to `chunk()` callback ([#19316](https://github.com/laravel/framework/pull/19316))
 - Improve memory usage in `chunk()` and `chunkById()` ([#19345](https://github.com/laravel/framework/pull/19345), [#19369](https://github.com/laravel/framework/pull/19369), [#19368](https://github.com/laravel/framework/pull/19368))
 - Fixed `compileColumnListing()` when using PostgreSQL with multiple schemas ([#19553](https://github.com/laravel/framework/pull/19553))
 - Allow the seeder to call multiple commands at once ([#19912](https://github.com/laravel/framework/pull/19912))
+- Added pgpool message to `DetectsLostConnections` ([#20418](https://github.com/laravel/framework/pull/20418))
+- Prevent race conditions on replicated databases ([#20445](https://github.com/laravel/framework/pull/20445), [0ec1522](https://github.com/laravel/framework/commit/0ec1522a74f4ef7b6a01d617a482ae3f46c81a70), [3824a36](https://github.com/laravel/framework/commit/3824a366b0cd8a081bef26d3b4509c5db2fe7aae))
 
 ### Eloquent ORM
 - ⚠️ Indicate soft deleted models as existing ([#17613](https://github.com/laravel/framework/pull/17613))
 - ⚠️ Added `$localKey` parameter to `HasRelationships::belongsToMany()` and `BelongsToMany` ([#17903](https://github.com/laravel/framework/pull/17903), [7c7c3bc](https://github.com/laravel/framework/commit/7c7c3bc4be3052afe0889fe323230dfd92f81000))
+- ⚠️ Added `$parentKey` parameter to `belongsToMany()`, `BelongsToMany` and `MorphToMany` ([#17915](https://github.com/laravel/framework/pull/17915), [#18380](https://github.com/laravel/framework/pull/18380))
 - ⚠️ Renamed `$parent` property to `$pivotParent` in `Pivot` class ([#17933](https://github.com/laravel/framework/pull/17933), [#18150](https://github.com/laravel/framework/pull/18150))
 - ⚠️ Don't add `_count` suffix to column name when using `withCount()` with an alias ([#17871](https://github.com/laravel/framework/pull/17871))
 - ⚠️ Renamed `$events` to `$dispatchesEvents` ([#17961](https://github.com/laravel/framework/pull/17961), [b6472bf](https://github.com/laravel/framework/commit/b6472bf6fec1af6e76604aaf3f7fed665440ac66), [3dbe12f](https://github.com/laravel/framework/commit/3dbe12f16f470e3bca868576d517d57876bc50af))
-- ⚠️ Added `$parentKey` parameter to `belongsToMany()`, `BelongsToMany` and `MorphToMany` ([#17915](https://github.com/laravel/framework/pull/17915), [#18380](https://github.com/laravel/framework/pull/18380))
 - ⚠️ Only return query builder when the result is null for `callScope()` ([#18845](https://github.com/laravel/framework/pull/18845))
 - Allow setting a factory's attribute to a factory instance ([#18879](https://github.com/laravel/framework/pull/18879))
 - Support `null` comparison in `Model::is()` ([#18511](https://github.com/laravel/framework/pull/18511))
@@ -121,6 +124,10 @@
 - Better exception message when calling non existing methods on models ([#20196](https://github.com/laravel/framework/pull/20196), [91c1f03](https://github.com/laravel/framework/commit/91c1f03be2835f5b15998ead9f47f37d5397c0cc))
 - Added support for connections on model factories ([#20191](https://github.com/laravel/framework/pull/20191))
 - Check for real primary key in `Pivot` methods ([8d82618](https://github.com/laravel/framework/commit/8d826189bb2db1c177d8605eb9218daa973acb6a))
+- Default `$attributes` on `BelongsToMany::create()` to empty array ([973bff4](https://github.com/laravel/framework/commit/973bff4527a433fa039fd937ecfe048ed2325a5f))
+- Add ability to set a custom pivot accessor ([#20411](https://github.com/laravel/framework/pull/20411))
+- ⚠️ Call `setConnection()` in `Model::save()` ([#20466](https://github.com/laravel/framework/pull/20466))
+- ⚠️ Touch parent timestamp only if the model is dirty ([#20489](https://github.com/laravel/framework/pull/20489))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -155,6 +162,7 @@
 - ⚠️ Fixed compatibility between `FilesystemAdapter` and the `Filesystem` interface ([#19389](https://github.com/laravel/framework/pull/19389))
 
 ### Helpers
+- Added `report()` helper ([2b67619](https://github.com/laravel/framework/commit/2b676191b1688b8edc9d43317a2989642fe95b5d))
 - Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843), [#19166](https://github.com/laravel/framework/pull/19166), [#19255](https://github.com/laravel/framework/pull/19255))
 - Added `dispatch_now()` helper function ([#18668](https://github.com/laravel/framework/pull/18668), [61f2e7b](https://github.com/laravel/framework/commit/61f2e7b4106f8eb0b79603d9792426f7c6a6d273))
 - Added `$language` parameter to `str_slug()` helper ([#19011](https://github.com/laravel/framework/pull/19011))
@@ -165,6 +173,7 @@
 - Speed up `Arr::get()` calls without dot notations ([#20139](https://github.com/laravel/framework/pull/20139))
 
 ### Localization
+- ⚠️ Moved `LoaderInterface` to contracts ([#20460](https://github.com/laravel/framework/pull/20460))
 - Support language specific characters in `Str` ([#18974](https://github.com/laravel/framework/pull/18974), [#19694](https://github.com/laravel/framework/pull/19694))
 
 ### Mail
@@ -189,6 +198,7 @@
 - ⚠️ Fail (or optionally silently delete) job when model is missing during deserialization ([44b1f85](https://github.com/laravel/framework/commit/44b1f859bbaf8f33733c804857cc269de92b1fd4), [bceded6](https://github.com/laravel/framework/commit/bceded6fef79760b9907dbe105829f7d2d62f899))
 - Added `CallQueuedListener::__clone()` method ([#20022](https://github.com/laravel/framework/pull/20022))
 - Accept `DatetimeInterface` and `DateInterval` in queue ([#20102](https://github.com/laravel/framework/pull/20102), [92e2aff](https://github.com/laravel/framework/commit/92e2aff2fd9569fedf3164ef9a1a834e553a6881))
+- ⚠️ Use `dispatch()` instead of `fire()` ([#20446](https://github.com/laravel/framework/pull/20446))
 
 ### Redis
 - ⚠️ Several improvements on `PhpRedisConnection` ([#20269](https://github.com/laravel/framework/pull/20269), [#20316](https://github.com/laravel/framework/pull/20316))
@@ -259,6 +269,7 @@
 - Skip tests if Memcached is not found ([#20018](https://github.com/laravel/framework/pull/20018))
 - ⚠️ Clear `Carbon` mock during tear down ([#19934](https://github.com/laravel/framework/pull/19934))
 - Added debug info to `NotFoundHttpException` in `InteractsWithExceptionHandling` ([#20000](https://github.com/laravel/framework/pull/20000))
+- Added `MailFake::assertSentTimes()`, `QueueFake::assertPushedTimes()` and `BusFake::assertDispatchedTimes()` methods ([#20485](https://github.com/laravel/framework/pull/20485), [e657f6e](https://github.com/laravel/framework/commit/e657f6ec20867fc748e4f8b8ca1bbaa344c07acb))
 
 ### Validation
 - Added support for custom validation rule objects ([#19155](https://github.com/laravel/framework/pull/19155), [2aa5ea8](https://github.com/laravel/framework/commit/2aa5ea8a898bd220015ab9be453b36723ffb186e))
