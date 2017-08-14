@@ -44,6 +44,13 @@ class Command extends SymfonyCommand
     protected $signature;
 
     /**
+     * The options and arguments of the console command.
+     *
+     * @var string
+     */
+    protected $optionsAndArguments;
+
+    /**
      * The console command name.
      *
      * @var string
@@ -94,8 +101,8 @@ class Command extends SymfonyCommand
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
         // so they don't have to all be manually specified in the constructors.
-        if (isset($this->signature)) {
-            $this->configureUsingFluentDefinition();
+        if ($signature = $this->resolveSignature()) {
+            $this->configureUsingFluentDefinition($signature);
         } else {
             parent::__construct($this->name);
         }
@@ -113,13 +120,28 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Resolve the signature.
+     *
+     * @return string|null
+     */
+    protected function resolveSignature()
+    {
+        if (isset($this->signature)) {
+            return $this->signature;
+        } elseif (isset($this->name, $this->optionsAndArguments)) {
+            return $this->name.' '.$this->optionsAndArguments;
+        }
+    }
+
+    /**
      * Configure the console command using a fluent definition.
      *
+     * @param  string  $signature
      * @return void
      */
-    protected function configureUsingFluentDefinition()
+    protected function configureUsingFluentDefinition($signature)
     {
-        list($name, $arguments, $options) = Parser::parse($this->signature);
+        list($name, $arguments, $options) = Parser::parse($signature);
 
         parent::__construct($this->name = $name);
 
