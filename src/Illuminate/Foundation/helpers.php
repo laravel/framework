@@ -325,9 +325,9 @@ if (! function_exists('env')) {
      */
     function env($key, $default = null)
     {
-        $value = getenv($key);
+        $value = Dotenv::findEnvironmentVariable($key);
 
-        if ($value === false) {
+        if (is_null($value)) {
             return value($default);
         }
 
