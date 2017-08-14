@@ -47,8 +47,13 @@ trait ValidatesRequests
      * @param  array  $customAttributes
      * @return void
      */
-    public function validate(Request $request, array $rules, array $messages = [], array $customAttributes = [])
+    public function validate($request, array $rules = null, array $messages = [], array $customAttributes = [])
     {
+        if(is_array($request) && $rules == null){
+            $rules = $request;
+            $request = request();
+        }
+        
         $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
 
         if ($validator->fails()) {
