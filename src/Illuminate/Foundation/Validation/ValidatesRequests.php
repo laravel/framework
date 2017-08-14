@@ -49,7 +49,7 @@ trait ValidatesRequests
      */
     public function validate($request, array $rules = null, array $messages = [], array $customAttributes = [])
     {
-        if(is_array($request) && $rules == null){
+        if (is_array($request) && $rules == null){
             $rules = $request;
             $request = request();
         }
