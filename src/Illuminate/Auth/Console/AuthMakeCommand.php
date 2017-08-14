@@ -41,6 +41,18 @@ class AuthMakeCommand extends Command
     ];
 
     /**
+     * The tests that need to be exported.
+     *
+     * @var array
+     */
+    protected $tests = [
+        'Feature/Auth/LoginTest.stub' => 'Feature/Auth/LoginTest.php',
+        'Feature/Auth/RegisterTest.stub' => 'Feature/Auth/RegisterTest.php',
+        'Feature/Auth/ForgotPasswordTest.stub' => 'Feature/Auth/ForgotPasswordTest.php',
+        'Feature/Auth/ResetPasswordTest.stub' => 'Feature/Auth/ResetPasswordTest.php',
+    ];
+
+    /**
      * Execute the console command.
      *
      * @return void
@@ -65,25 +77,7 @@ class AuthMakeCommand extends Command
         }
 
         if (! $this->option('no-tests')) {
-            file_put_contents(
-                base_path('tests/Feature/Auth/LoginTest.php'),
-                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/LoginTest.stub')
-            );
-
-            file_put_contents(
-                base_path('tests/Feature/Auth/RegisterTest.php'),
-                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/RegisterTest.stub')
-            );
-
-            file_put_contents(
-                base_path('tests/Feature/Auth/ForgotPasswordTest.php'),
-                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/ForgotPasswordTest.stub')
-            );
-
-            file_put_contents(
-                base_path('tests/Feature/Auth/ResetPasswordTest.php'),
-                file_get_contents(__DIR__.'/stubs/make/tests/Feature/Auth/ResetPasswordTest.stub')
-            );
+            $this->exportTests();
         }
 
         $this->info('Authentication scaffolding generated successfully.');
@@ -128,6 +122,27 @@ class AuthMakeCommand extends Command
             copy(
                 __DIR__.'/stubs/make/views/'.$key,
                 resource_path('views/'.$value)
+            );
+        }
+    }
+
+    /**
+     * Export the authentication tests.
+     *
+     * @return void
+     */
+    public function exportTests()
+    {
+        foreach ($this->tests as $key => $value) {
+            if (file_exists(base_path('tests/'.$value)) && ! $this->option('force')) {
+                if (! $this->confirm("The [{$value}] test already exists. Do you want to replace it?")) {
+                    continue;
+                }
+            }
+
+            copy(
+                __DIR__.'/stubs/make/tests/'.$key,
+                base_path('tests/'.$value)
             );
         }
     }
