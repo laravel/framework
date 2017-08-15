@@ -85,6 +85,10 @@ class FormRequest extends Request implements ValidatesWhenResolved
             $this->withValidator($validator);
         }
 
+        if (method_exists($this, 'after')) {
+            $validator->after([$this, 'after']);
+        }
+
         return $validator;
     }
 
