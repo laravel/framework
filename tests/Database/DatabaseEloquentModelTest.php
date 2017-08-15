@@ -1618,7 +1618,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelStub;
 
-        $result = $model->tap(function ($tapModel)  use ($model) {
+        $result = $model->tap(function ($tapModel) use ($model) {
             $this->assertEquals($model, $tapModel);
         });
 

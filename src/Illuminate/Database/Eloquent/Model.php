@@ -1335,7 +1335,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Pass the model to a given callback and then return it
+     * Pass the model to a given callback and then return it.
+     *
      * @param  callable  $callback
      * @return $this
      */
