@@ -111,15 +111,10 @@ class AuthMakeCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (file_exists(resource_path('views/'.$value)) && ! $this->option('force')) {
-                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
-                    continue;
-                }
-            }
-
-            copy(
+            $this->exportStub(
                 __DIR__.'/stubs/make/views/'.$key,
-                resource_path('views/'.$value)
+                resource_path($filename = 'views/'.$value),
+                $filename
             );
         }
     }
@@ -132,17 +127,31 @@ class AuthMakeCommand extends Command
     public function exportTests()
     {
         foreach ($this->tests as $key => $value) {
-            if (file_exists(base_path('tests/'.$value)) && ! $this->option('force')) {
-                if (! $this->confirm("The [{$value}] test already exists. Do you want to replace it?")) {
-                    continue;
-                }
-            }
-
-            copy(
+            $this->exportStub(
                 __DIR__.'/stubs/make/tests/'.$key,
-                base_path('tests/'.$value)
+                base_path($filename = 'tests/'.$value),
+                $filename
             );
         }
+    }
+
+    /**
+     * Export a stub from the source location to the given location.
+     *
+     * @param  string  $source
+     * @param  string  $destination
+     * @param  string  $filename
+     * @return void
+     */
+    protected function exportStub($source, $destination, $filename)
+    {
+        if (file_exists($destination) && ! $this->option('force')) {
+            if (! $this->confirm("The [{$filename}] file already exists. Do you want to replace it?")) {
+                return;
+            }
+        }
+
+        copy($source, $destination);
     }
 
     /**
