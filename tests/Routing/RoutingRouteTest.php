@@ -761,9 +761,6 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('12345', $router->dispatch(Request::create('foo-bar/12345', 'GET'))->getContent());
     }
 
-    /**
-     * @group shit
-     */
     public function testModelBindingWithCompoundParameterNameAndRouteBinding()
     {
         $router = $this->getRouter();
