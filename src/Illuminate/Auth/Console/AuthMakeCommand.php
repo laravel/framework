@@ -98,10 +98,8 @@ class AuthMakeCommand extends Command
             mkdir(resource_path('views/auth/passwords'), 0755, true);
         }
 
-        if (! $this->option('no-tests')) {
-            if (! is_dir(base_path('tests/Feature/Auth'))) {
-                mkdir(base_path('tests/Feature/Auth'), 0755, true);
-            }
+        if (! $this->option('no-tests') && ! is_dir(base_path('tests/Feature/Auth'))) {
+            mkdir(base_path('tests/Feature/Auth'), 0755, true);
         }
     }
 
