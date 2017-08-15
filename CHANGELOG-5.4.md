@@ -1,14 +1,21 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.33 (2017-08-14)
+
+### Added
+- Show error message if a reverted migration is not found ([#20499](https://github.com/laravel/framework/pull/20499), [a895b1e](https://github.com/laravel/framework/commit/a895b1eb0e50683c4583c24bb17b3f8d9e8127ab))
 
 ### Changed
 - Moved `tap()` method from `Builder` to `BuildsQueries` ([#20384](https://github.com/laravel/framework/pull/20384))
 - Made Blade `or` operator case-insensitive ([#20425](https://github.com/laravel/framework/pull/20425))
 - Support `$amount = 0` in `Arr::random()` ([#20439](https://github.com/laravel/framework/pull/20439))
+- Reverted `doctrine/inflector` version change made in v5.4.31 ([#20227](https://github.com/laravel/framework/pull/20227))
 
 ### Fixed
 - Fixed bug when using empty values in `SQLiteGrammar::compileInsert()` ([#20424](https://github.com/laravel/framework/pull/20424))
+- Fixed `$boolean` parameter being ignored in `Builder::addArrayOfWheres()` ([#20553](https://github.com/laravel/framework/pull/20553))
+- Fixed `JoinClause::whereIn()` when using a subquery ([#20453](https://github.com/laravel/framework/pull/20453))
+- Reset day parameter when using `Y-m` with `date_format` rule ([#20566](https://github.com/laravel/framework/pull/20566))
 
 
 ## v5.4.32 (2017-08-03)
