@@ -107,6 +107,13 @@ class Event
     public $shouldAppendOutput = false;
 
     /**
+     * The array of email addresses to send the output.
+     *
+     * @var array
+     */
+    public $emailOutputAddresses = [];
+
+    /**
      * The array of callbacks to be run before the event is started.
      *
      * @var array
@@ -371,6 +378,8 @@ class Event
         $this->ensureOutputIsBeingCapturedForEmail();
 
         $addresses = is_array($addresses) ? $addresses : [$addresses];
+
+        $this->emailOutputAddresses = $addresses;
 
         return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
             $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
