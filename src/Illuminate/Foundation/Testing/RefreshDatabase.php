@@ -75,7 +75,9 @@ trait RefreshDatabase
 
         $this->beforeApplicationDestroyed(function () use ($database) {
             foreach ($this->connectionsToTransact() as $name) {
-                $database->connection($name)->rollBack();
+                $database->connection($name)
+                    ->getSchemaBuilder()
+                    ->dropAllTables();
             }
         });
     }
