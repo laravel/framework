@@ -55,7 +55,7 @@ class PresetCommand extends Command
     }
 
     /**
-     * Install the "fresh" preset.
+     * Install the "bootstrap" preset.
      *
      * @return void
      */
@@ -72,7 +72,7 @@ class PresetCommand extends Command
      *
      * @return void
      */
-    public function vue()
+    protected function vue()
     {
         Presets\Vue::install();
 
@@ -85,7 +85,7 @@ class PresetCommand extends Command
      *
      * @return void
      */
-    public function react()
+    protected function react()
     {
         Presets\React::install();
 
