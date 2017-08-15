@@ -18,7 +18,19 @@ trait DatabaseMigrations
         $this->app[Kernel::class]->setArtisan(null);
 
         $this->beforeApplicationDestroyed(function () {
-            $this->artisan('migrate:rollback');
+            $this->dropAllTables();
         });
+    }
+
+    /**
+     * Drop all of the database tables.
+     *
+     * @return void
+     */
+    protected function dropAllTables()
+    {
+        $this->app['db']->connection()
+            ->getSchemaBuilder()
+            ->dropAllTables();
     }
 }
