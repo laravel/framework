@@ -4,8 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Command;
 use Symfony\Component\Console\Helper\Table;
-use Illuminate\Container\Container;
-use Illuminate\Console\Scheduling\Event;
 
 class ScheduleListCommand extends Command
 {
@@ -60,7 +58,7 @@ class ScheduleListCommand extends Command
         $events = $this->getEvents();
 
         if (empty($events)) {
-            return $this->info("Your application has no scheduled commands to run.");
+            return $this->info('Your application has no scheduled commands to run.');
         }
 
         $this->displayScheduledEvents($events);
@@ -106,7 +104,7 @@ class ScheduleListCommand extends Command
      */
     protected function getEventCommandName(Event $event)
     {
-        if(is_null($event->command) && property_exists($event, 'callback')) {
+        if (is_null($event->command) && property_exists($event, 'callback')) {
             return 'Closure';
         }
 
@@ -121,7 +119,7 @@ class ScheduleListCommand extends Command
      */
     protected function getEventCommandOutput(Event $event)
     {
-        if($this->eventEmailsOutput($event)) {
+        if ($this->eventEmailsOutput($event)) {
             return implode(',', $event->emailOutputAddresses);
         }
 
@@ -138,7 +136,7 @@ class ScheduleListCommand extends Command
      */
     protected function getEventAppend(Event $event)
     {
-        if($this->eventEmailsOutput($event)) {
+        if ($this->eventEmailsOutput($event)) {
             return 'Email';
         }
 
