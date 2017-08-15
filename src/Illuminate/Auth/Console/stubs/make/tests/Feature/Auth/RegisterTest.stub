@@ -42,15 +42,12 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'i-love-laravel',
         ]);
 
-        $users = User::all();
-        $user = $users->first();
-
         $response->assertRedirect(route('home'));
-        $this->assertCount(1, $users);
+        $this->assertCount(1, $users = User::all());
+        $this->assertAuthenticatedAs($user = $users->first());
         $this->assertEquals('John Doe', $user->name);
         $this->assertEquals('john@example.com', $user->email);
         $this->assertTrue(Hash::check('i-love-laravel', $user->password));
-        $this->assertAuthenticatedAs($user);
     }
 
     public function testUserCannotRegisterWithoutName()
@@ -62,9 +59,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'i-love-laravel',
         ]);
 
-        $users = User::all();
-
-        $this->assertCount(0, $users);
+        $this->assertCount(0, User::all());
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('name');
         $this->assertTrue(session()->hasOldInput('email'));
@@ -81,9 +76,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'i-love-laravel',
         ]);
 
-        $users = User::all();
-
-        $this->assertCount(0, $users);
+        $this->assertCount(0, User::all());
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
         $this->assertTrue(session()->hasOldInput('name'));
@@ -120,9 +113,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => '',
         ]);
 
-        $users = User::all();
-
-        $this->assertCount(0, $users);
+        $this->assertCount(0, User::all());
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
         $this->assertTrue(session()->hasOldInput('name'));
@@ -140,9 +131,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => '',
         ]);
 
-        $users = User::all();
-
-        $this->assertCount(0, $users);
+        $this->assertCount(0, User::all());
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
         $this->assertTrue(session()->hasOldInput('name'));
@@ -160,9 +149,7 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'i-love-symfony',
         ]);
 
-        $users = User::all();
-
-        $this->assertCount(0, $users);
+        $this->assertCount(0, User::all());
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('password');
         $this->assertTrue(session()->hasOldInput('name'));
