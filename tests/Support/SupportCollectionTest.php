@@ -907,6 +907,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['taylor', 'dayle'], $data->all());
     }
 
+    public function testTakeAsPercentage()
+    {
+        // Take 40% from the beginning
+        $data = new Collection(['taylor', 'dayle', 'shawn', 'adam', 'mohamed']);
+        $data = $data->take(.4);
+        $this->assertEquals(['taylor', 'dayle'], $data->all());
+
+        // Take 1% from the beginning (rounding up)
+        $data = new Collection(['taylor', 'dayle', 'shawn', 'adam', 'mohamed']);
+        $data = $data->take(.01);
+        $this->assertEquals(['taylor'], $data->all());
+
+        // Take 40% from the end
+        $data = new Collection(['taylor', 'dayle', 'shawn', 'adam', 'mohamed']);
+        $data = $data->take(-.4);
+        $this->assertEquals([3 => 'adam', 4 => 'mohamed'], $data->all());
+    }
+
     public function testRandom()
     {
         $data = new Collection([1, 2, 3, 4, 5, 6]);

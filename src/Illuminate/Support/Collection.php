@@ -1331,13 +1331,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Take the first or last {$limit} items.
+     * Take the first or last {$limit} items. With float, takes 100 * $limit items (i.e. a percentage of the count of the items)
      *
-     * @param  int  $limit
+     * @param  float|int  $limit
      * @return static
      */
     public function take($limit)
     {
+        if (is_float($limit)) {
+            // Percentage
+            $limit = ceil($this->count() * $limit);
+        }
         if ($limit < 0) {
             return $this->slice($limit, abs($limit));
         }
