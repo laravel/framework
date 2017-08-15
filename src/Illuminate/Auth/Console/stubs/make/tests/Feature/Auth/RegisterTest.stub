@@ -93,9 +93,29 @@ class RegisterTest extends TestCase
             'password_confirmation' => 'i-love-laravel',
         ]);
 
-        $users = User::all();
+        $this->assertCount(0, User::all());
+        $response->assertRedirect(route('register'));
+        $response->assertSessionHasErrors('email');
+        $this->assertTrue(session()->hasOldInput('name'));
+        $this->assertTrue(session()->hasOldInput('email'));
+        $this->assertFalse(session()->hasOldInput('password'));
+        $this->assertGuest();
+    }
 
-        $this->assertCount(0, $users);
+    public function testUserCannotRegisterWithEmailThatAlreadyExists()
+    {
+        $existingUser = factory(User::class)->create([
+            'email' => 'john@example.com',
+        ]);
+
+        $response = $this->fromPage(route('register'))->post(route('register'), [
+            'name' => 'John Doe',
+            'email' => $existingUser->email,
+            'password' => 'i-love-laravel',
+            'password_confirmation' => 'i-love-laravel',
+        ]);
+
+        $this->assertCount(1, User::all());
         $response->assertRedirect(route('register'));
         $response->assertSessionHasErrors('email');
         $this->assertTrue(session()->hasOldInput('name'));
