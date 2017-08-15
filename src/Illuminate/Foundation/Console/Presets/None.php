@@ -36,6 +36,7 @@ class None extends Preset
         unset(
             $packages['bootstrap-sass'],
             $packages['jquery'],
+            $packages['lodash'],
             $packages['vue'],
             $packages['babel-preset-react'],
             $packages['react'],
