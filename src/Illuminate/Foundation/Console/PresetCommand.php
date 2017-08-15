@@ -67,7 +67,7 @@ class PresetCommand extends Command
         $this->comment('Please run "npm install && npm run dev" to compile your fresh scaffolding.');
     }
 
-     /**
+    /**
      * Install the "lodash" preset.
      *
      * @return void
