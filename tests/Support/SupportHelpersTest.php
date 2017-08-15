@@ -275,6 +275,13 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
     }
 
+    public function testStrStart()
+    {
+        $this->assertEquals('/test/string', Str::start('test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
+    }
+
     public function testSnakeCase()
     {
         $this->assertEquals('foo_bar', Str::snake('fooBar'));

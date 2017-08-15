@@ -920,6 +920,20 @@ if (! function_exists('str_slug')) {
     }
 }
 
+if (! function_exists('str_start')) {
+    /**
+     * Begin a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $prefix
+     * @return string
+     */
+    function str_start($value, $prefix)
+    {
+        return Str::start($value, $prefix);
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
