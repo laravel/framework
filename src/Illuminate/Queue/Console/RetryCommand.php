@@ -68,6 +68,7 @@ class RetryCommand extends Command
      */
     protected function retryJob($job)
     {
+        $job = (object) $job;
         $this->laravel['queue']->connection($job->connection)->pushRaw(
             $this->resetAttempts($job->payload), $job->queue
         );
