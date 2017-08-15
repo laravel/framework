@@ -1331,7 +1331,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Take the first or last {$limit} items. With float, takes 100 * $limit items (i.e. a percentage of the count of the items)
+     * Take the first or last {$limit} items. With float, takes 100 * $limit items (i.e. a percentage of the count of the items).
      *
      * @param  float|int  $limit
      * @return static
