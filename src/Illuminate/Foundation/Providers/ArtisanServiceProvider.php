@@ -35,6 +35,7 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
+use Illuminate\Console\Scheduling\ScheduleListCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -104,6 +105,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'RouteList' => 'command.route.list',
         'Seed' => 'command.seed',
         'ScheduleFinish' => ScheduleFinishCommand::class,
+        'ScheduleList' => ScheduleListCommand::class,
         'ScheduleRun' => ScheduleRunCommand::class,
         'StorageLink' => 'command.storage.link',
         'Up' => 'command.up',
@@ -761,6 +763,16 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerScheduleFinishCommand()
     {
         $this->app->singleton(ScheduleFinishCommand::class);
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerScheduleListCommand()
+    {
+        $this->app->singleton(ScheduleListCommand::class);
     }
 
     /**
