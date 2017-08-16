@@ -78,6 +78,20 @@ trait MakesHttpRequests
     }
 
     /**
+     * Adds a header to be sent with the requests.
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return $this
+     */
+    public function withHeader(string $name, string $value)
+    {
+        $this->defaultHeaders[$name] = $value;
+
+        return $this;
+    }
+
+    /**
      * Removes all the predefined headers to be sent with the requests.
      *
      * @return $this
