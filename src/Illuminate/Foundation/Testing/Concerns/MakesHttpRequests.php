@@ -58,6 +58,19 @@ trait MakesHttpRequests
     }
 
     /**
+     * Define a set of headers to be sent with the requests.
+     *
+     * @param array $headers
+     * @return $this
+     */
+    public function addRequestHeaders(array $headers)
+    {
+        $this->defaultHeaders = $headers;
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
@@ -280,11 +293,22 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect($headers)->mapWithKeys(function ($value, $name) {
+        return collect($this->getHeaders($headers))->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];
         })->all();
+    }
+
+    /**
+     * Merges the given headers and the default request headers.
+     * 
+     * @param  array  $headers
+     * @return array
+     */
+    protected function getHeaders(array $headers)
+    {
+        return array_merge($headers, $this->defaultHeaders);
     }
 
     /**
