@@ -78,6 +78,18 @@ trait MakesHttpRequests
     }
 
     /**
+     * Removes all the predefined headers to be sent with the requests.
+     * 
+     * @return $this
+     */
+    public function cleanRequestHeaders()
+    {
+        $this->defaultHeaders = [];
+
+        return $this;
+    }
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
