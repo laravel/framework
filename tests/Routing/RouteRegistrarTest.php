@@ -285,6 +285,36 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('users.index', $this->getRoute()->getName());
     }
 
+    public function testRouteLastMethod()
+    {
+        $this->router->name('users.index')->get('users', function () {
+            return 'all-users';
+        });
+
+        $route = $this->getRoute()->name('users.index');
+        $this->assertSame(['GET', 'HEAD'], $route->methods());
+        $this->assertSame('HEAD', $route->lastMethod());
+    }
+
+    public function testRouteHasManyMethods()
+    {
+        $this->router->name('users.index')->get('users', function () {
+            return 'all-users';
+        });
+
+        $route = $this->getRoute()->name('users.index');
+        $this->assertSame(['GET', 'HEAD'], $route->methods());
+        $this->assertTrue($route->hasManyMethods());
+
+        $this->router->name('users.store')->post('users', function () {
+            return 'user-stored';
+        });
+
+        $route = $this->getRoute()->name('users.store');
+        $this->assertSame(['POST'], $route->methods());
+        $this->assertFalse($route->hasManyMethods());
+    }
+
     /**
      * Get the last route registered with the router.
      *

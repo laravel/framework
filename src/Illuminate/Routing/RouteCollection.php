@@ -70,7 +70,7 @@ class RouteCollection implements Countable, IteratorAggregate
             $this->routes[$method][$domainAndUri] = $route;
         }
 
-        $this->allRoutes[$method.$domainAndUri] = $route;
+        $this->allRoutes[$route->lastMethod().$domainAndUri] = $route;
     }
 
     /**
