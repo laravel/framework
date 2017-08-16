@@ -6,6 +6,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
+use Illuminate\Support\HigherOrderWithProxy;
 
 if (! function_exists('append_config')) {
     /**
@@ -1084,7 +1085,7 @@ if (! function_exists('with')) {
     function with($object, callable $callback = null)
     {
         if (is_null($callback)) {
-            return $object;
+            return new HigherOrderWithProxy($object);
         }
 
         if (! is_null($object)) {

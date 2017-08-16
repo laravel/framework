@@ -762,12 +762,16 @@ class SupportHelpersTest extends TestCase
 
         // Only passing the object
         $this->assertEquals('foo', with($object)->value);
-        $this->assertEquals(['pong', 1], with($object)->ping(1));
+        $this->assertEquals(['pong', 1, 2], with($object)->ping(1, 2));
 
         // Also passing a callback
         $this->assertEquals('foo', with($object, function ($object) {
             return $object->value;
         }));
+
+        // Actually passing null
+        $this->assertEquals(null, with(null)->value);
+        $this->assertEquals(null, with(null)->ping(1, 2));
 
         // Passing null with a callback
         $this->assertEquals(null, with(null, function () {
