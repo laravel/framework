@@ -1614,6 +1614,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testTapMethodCallbackInstance()
+    {
+        $model = new EloquentModelStub;
+
+        $result = $model->tap(function ($tapModel) use ($model) {
+            $this->assertEquals($model, $tapModel);
+        });
+
+        $this->assertEquals($model, $result);
+    }
+
+    public function testHigherOrderTapMethod()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = new EloquentModelSaveStub;
+
+        $result = $model->tap()->save()->getTable();
+
+        $this->assertEquals('save_stub', $result);
+        $this->assertTrue($_SERVER['__eloquent.saved']);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));

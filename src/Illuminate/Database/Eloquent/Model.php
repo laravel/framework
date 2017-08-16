@@ -1335,6 +1335,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Pass the model to a given callback and then return it.
+     *
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function tap($callback = null)
+    {
+        return tap($this, $callback);
+    }
+
+    /**
      * Determine if an attribute or relation exists on the model.
      *
      * @param  string  $key
