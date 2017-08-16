@@ -45,6 +45,17 @@ class ArrayLoader implements Loader
     }
 
     /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJsonPath($path)
+    {
+        //
+    }
+
+    /**
      * Add messages to the loader.
      *
      * @param  string  $locale
