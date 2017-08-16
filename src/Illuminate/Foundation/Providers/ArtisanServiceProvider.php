@@ -34,6 +34,7 @@ use Illuminate\Foundation\Console\ConsoleMakeCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
 use Illuminate\Foundation\Console\KeyGenerateCommand;
 use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ResponseMakeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
@@ -145,6 +146,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueFailedTable' => 'command.queue.failed-table',
         'QueueTable' => 'command.queue.table',
         'RequestMake' => 'command.request.make',
+        'ResponseMake' => 'command.response.make',
         'RuleMake' => 'command.rule.make',
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
@@ -724,6 +726,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.request.make', function ($app) {
             return new RequestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerResponseMakeCommand()
+    {
+        $this->app->singleton('command.response.make', function ($app) {
+            return new ResponseMakeCommand($app['files']);
         });
     }
 
