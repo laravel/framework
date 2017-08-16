@@ -79,7 +79,7 @@ trait MakesHttpRequests
 
     /**
      * Removes all the predefined headers to be sent with the requests.
-     * 
+     *
      * @return $this
      */
     public function cleanRequestHeaders()
@@ -312,7 +312,7 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect($this->getHeaders($headers))->mapWithKeys(function ($value, $name) {
+        return collect($this->mergeDefaultHeaders($headers))->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];
@@ -321,11 +321,11 @@ trait MakesHttpRequests
 
     /**
      * Merges the given headers and the default request headers.
-     * 
+     *
      * @param  array  $headers
      * @return array
      */
-    protected function getHeaders(array $headers)
+    protected function mergeDefaultHeaders(array $headers)
     {
         return array_merge($headers, $this->defaultHeaders);
     }
