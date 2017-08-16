@@ -70,7 +70,7 @@ trait MakesHttpRequests
      * @param array $headers
      * @return $this
      */
-    public function addRequestHeaders(array $headers)
+    public function withHeaders(array $headers)
     {
         $this->defaultHeaders = $headers;
 
@@ -82,7 +82,7 @@ trait MakesHttpRequests
      *
      * @return $this
      */
-    public function cleanRequestHeaders()
+    public function cleanHeaders()
     {
         $this->defaultHeaders = [];
 
