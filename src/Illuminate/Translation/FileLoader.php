@@ -22,7 +22,7 @@ class FileLoader implements Loader
     protected $path;
 
     /**
-     * All of the paths of JSON files.
+     * All of the registered paths to JSON translation files.
      *
      * @var string
      */
@@ -155,16 +155,6 @@ class FileLoader implements Loader
     }
 
     /**
-     * Get an array of all the registered namespaces.
-     *
-     * @return array
-     */
-    public function namespaces()
-    {
-        return $this->hints;
-    }
-
-    /**
      * Add a new JSON path to the loader.
      *
      * @param  string  $path
@@ -173,5 +163,15 @@ class FileLoader implements Loader
     public function addJsonPath($path)
     {
         $this->jsonPaths[] = $path;
+    }
+
+    /**
+     * Get an array of all the registered namespaces.
+     *
+     * @return array
+     */
+    public function namespaces()
+    {
+        return $this->hints;
     }
 }
