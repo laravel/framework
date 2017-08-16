@@ -19,6 +19,13 @@ trait MakesHttpRequests
     protected $serverVariables = [];
 
     /**
+     * Additional headers for the request.
+     *
+     * @var array
+     */
+    protected $defaultHeaders = [];
+
+    /**
      * Define a set of server variables to be sent with the requests.
      *
      * @param  array  $server
