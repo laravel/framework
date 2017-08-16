@@ -1075,13 +1075,20 @@ if (! function_exists('windows_os')) {
 
 if (! function_exists('with')) {
     /**
-     * Return the given object. Useful for chaining.
+     * Call the given Closure if the given value is not null.
      *
      * @param  mixed  $object
+     * @param  callable|null  $callback
      * @return mixed
      */
-    function with($object)
+    function with($object, callable $callback = null)
     {
-        return $object;
+        if (is_null($callback)) {
+            return $object;
+        }
+
+        if (! is_null($object)) {
+            return $callback($object);
+        }
     }
 }

@@ -755,6 +755,27 @@ class SupportHelpersTest extends TestCase
     {
         throw_if(true, RuntimeException::class, 'Test Message');
     }
+
+    public function testWith()
+    {
+        $object = new SupportTestWith('foo');
+
+        // Only passing the object
+        $this->assertEquals('foo', with($object)->value);
+        $this->assertEquals(['pong', 1], with($object)->ping(1));
+
+        // Also passing a callback
+        $this->assertEquals('foo', with($object, function ($object) {
+            return $object->value;
+        }));
+
+        // Passing null with a callback
+        $this->assertEquals(null, with(null, function () {
+            throw new RuntimeException(
+                'The "with" callback should not be called when the value is null'
+            );
+        }));
+    }
 }
 
 trait SupportTestTraitOne
@@ -802,5 +823,20 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestWith
+{
+    public $value;
+
+    public function __construct($value = null)
+    {
+        $this->value = $value;
+    }
+
+    public function ping(...$params)
+    {
+        return array_merge(['pong'], $params);
     }
 }
