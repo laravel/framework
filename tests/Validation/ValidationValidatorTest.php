@@ -1999,9 +1999,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @group dimension
-     */
     public function testValidateImageDimensions()
     {
         // Knowing that demo image.png has width = 3 and height = 2
@@ -2712,9 +2709,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    /**
-     * @group validation
-     */
     public function testSometimesOnArraysInImplicitRules()
     {
         $trans = $this->getIlluminateArrayTranslator();

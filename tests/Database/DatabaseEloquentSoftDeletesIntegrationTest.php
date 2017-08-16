@@ -425,9 +425,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(0, count($users));
     }
 
-    /**
-     * @group test
-     */
     public function testWhereHasWithNestedDeletedRelationshipAndOnlyTrashedCondition()
     {
         $this->createUsers();
@@ -450,9 +447,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(1, count($users));
     }
 
-    /**
-     * @group test
-     */
     public function testWhereHasWithNestedDeletedRelationship()
     {
         $this->createUsers();
@@ -469,9 +463,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(1, count($users));
     }
 
-    /**
-     * @group test
-     */
     public function testWhereHasWithNestedDeletedRelationshipAndWithTrashedCondition()
     {
         $this->createUsers();
@@ -484,9 +475,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(1, count($users));
     }
 
-    /**
-     * @group test
-     */
     public function testWithCountWithNestedDeletedRelationshipAndOnlyTrashedCondition()
     {
         $this->createUsers();
