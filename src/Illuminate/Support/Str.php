@@ -517,6 +517,29 @@ class Str
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
 
+
+    /**
+     * Check if a string is surrounded by a string or character.
+     *
+     * @param string $string
+     * @param array $needles
+     * @return bool
+     */
+    public static function isSurrounded($string, $needles)
+    {
+        if (strlen($string) < 3) {
+            return false;
+        }
+
+        foreach ($needles as $character) {
+            if (static::startsWith($string, $character) && static::endsWith($string, $character)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     /**
      * Returns the replacements for the ascii method.
      *
