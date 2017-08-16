@@ -106,7 +106,7 @@ abstract class ServiceProvider
      * @param  string  $path
      * @return void
      */
-    protected function loadJSONTranslationsFrom($path)
+    protected function loadJsonTranslationsFrom($path)
     {
         $this->app['translator']->addJSONPath($path);
     }

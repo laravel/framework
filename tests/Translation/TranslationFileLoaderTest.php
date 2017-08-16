@@ -74,7 +74,7 @@ class TranslationFileLoaderTest extends TestCase
     public function testLoadMethodForJSONProperlyCallsLoaderForMultiplePaths()
     {
         $loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
-        $loader->addJSONPath(__DIR__.'/another');
+        $loader->addJsonPath(__DIR__.'/another');
 
         $files->shouldReceive('exists')->once()->with(__DIR__.'/en.json')->andReturn(true);
         $files->shouldReceive('exists')->once()->with(__DIR__.'/another/en.json')->andReturn(true);

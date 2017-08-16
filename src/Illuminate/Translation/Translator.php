@@ -357,9 +357,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $path
      * @return void
      */
-    public function addJSONPath($path)
+    public function addJsonPath($path)
     {
-        $this->loader->addJSONPath($path);
+        $this->loader->addJsonPath($path);
     }
 
     /**

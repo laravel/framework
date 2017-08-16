@@ -50,7 +50,7 @@ class ArrayLoader implements Loader
      * @param  string  $path
      * @return void
      */
-    public function addJSONPath($path)
+    public function addJsonPath($path)
     {
         //
     }

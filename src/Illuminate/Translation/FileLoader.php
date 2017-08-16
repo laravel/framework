@@ -170,7 +170,7 @@ class FileLoader implements Loader
      * @param  string  $path
      * @return void
      */
-    public function addJSONPath($path)
+    public function addJsonPath($path)
     {
         $this->jsonPaths[] = $path;
     }
