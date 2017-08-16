@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
 
 class SupportMessageBagTest extends TestCase
@@ -47,6 +48,15 @@ class SupportMessageBagTest extends TestCase
         $otherContainer = new MessageBag(['foo' => ['baz'], 'bar' => ['foo']]);
         $container->merge($otherContainer);
         $this->assertEquals(['foo' => ['bar', 'baz'], 'bar' => ['foo']], $container->getMessages());
+    }
+
+    public function testMessageBagsCanConvertToArrays()
+    {
+        $container = new MessageBag([
+            Collection::make(['foo', 'bar']),
+            Collection::make(['baz', 'qux']),
+        ]);
+        $this->assertSame([['foo', 'bar'], ['baz', 'qux']], $container->getMessages());
     }
 
     public function testGetReturnsArrayOfMessagesByKey()
