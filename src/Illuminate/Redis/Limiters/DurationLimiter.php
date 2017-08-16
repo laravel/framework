@@ -104,21 +104,20 @@ class DurationLimiter
     private function luaScript()
     {
         return <<<'LUA'
-local endTime = ARGV[2] + ARGV[3]
+local function reset()
+    redis.call('HMSET', KEYS[1], 'start', ARGV[2], 'end', ARGV[2] + ARGV[3], 'count', 1)
+    return redis.call('EXPIRE', KEYS[1], ARGV[3] * 2)
+end
 
 if redis.call('EXISTS', KEYS[1]) == 0 then
-    redis.call('HMSET', KEYS[1], 'start', ARGV[2], 'end', endTime, 'count', 1)
-    redis.call('EXPIRE', KEYS[1], ARGV[3] * 2)
-    return 1
+    return reset()
 end
 
 if ARGV[1] >= redis.call('HGET', KEYS[1], 'start') and ARGV[1] <= redis.call('HGET', KEYS[1], 'end') then
     return tonumber(redis.call('HINCRBY', KEYS[1], 'count', 1)) <= tonumber(ARGV[4])
 end
 
-redis.call('HMSET', KEYS[1], 'start', ARGV[2], 'end', endTime, 'count', 1)
-redis.call('EXPIRE', KEYS[1], ARGV[3] * 2)
-return 1
+return reset()
 LUA;
     }
 }
