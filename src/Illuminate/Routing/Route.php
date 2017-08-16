@@ -494,6 +494,26 @@ class Route
     }
 
     /**
+     * Get the last method.
+     *
+     * @return string
+     */
+    public function lastMethod()
+    {
+        return Arr::last($this->methods);
+    }
+
+    /**
+     * Indicates that the route has many methods.
+     *
+     * @return bool
+     */
+    public function hasManyMethods()
+    {
+        return count($this->methods) > 1;
+    }
+
+    /**
      * Determine if the route only responds to HTTP requests.
      *
      * @return bool
