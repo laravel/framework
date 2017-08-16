@@ -47,7 +47,7 @@ abstract class Queue
      * Push a new job onto the queue after a delay.
      *
      * @param  string  $queue
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @return mixed
