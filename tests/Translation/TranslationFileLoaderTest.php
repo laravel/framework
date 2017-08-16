@@ -70,4 +70,17 @@ class TranslationFileLoaderTest extends TestCase
 
         $this->assertEquals(['foo' => 'bar'], $loader->load('en', '*', '*'));
     }
+
+    public function testLoadMethodForJSONProperlyCallsLoaderForMultiplePaths()
+    {
+        $loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $loader->addJSONPath(__DIR__.'/another');
+
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en.json')->andReturn(true);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/another/en.json')->andReturn(true);
+        $files->shouldReceive('get')->once()->with(__DIR__.'/en.json')->andReturn('{"foo":"bar"}');
+        $files->shouldReceive('get')->once()->with(__DIR__.'/another/en.json')->andReturn('{"foo":"backagebar", "baz": "backagesplash"}');
+
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'backagesplash'], $loader->load('en', '*', '*'));
+    }
 }

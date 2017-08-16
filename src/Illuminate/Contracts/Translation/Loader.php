@@ -24,6 +24,14 @@ interface Loader
     public function addNamespace($namespace, $hint);
 
     /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJSONPath($path);
+
+    /**
      * Get an array of all the registered namespaces.
      *
      * @return array

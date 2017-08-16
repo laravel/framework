@@ -22,6 +22,13 @@ class FileLoader implements Loader
     protected $path;
 
     /**
+     * All of the paths of JSON files.
+     *
+     * @var string
+     */
+    protected $jsonPaths = [];
+
+    /**
      * All of the namespace hints.
      *
      * @var array
@@ -52,7 +59,7 @@ class FileLoader implements Loader
     public function load($locale, $group, $namespace = null)
     {
         if ($group == '*' && $namespace == '*') {
-            return $this->loadJsonPath($this->path, $locale);
+            return $this->loadJsonPaths($locale);
         }
 
         if (is_null($namespace) || $namespace == '*') {
@@ -121,17 +128,18 @@ class FileLoader implements Loader
     /**
      * Load a locale from the given JSON file path.
      *
-     * @param  string  $path
      * @param  string  $locale
      * @return array
      */
-    protected function loadJsonPath($path, $locale)
+    protected function loadJsonPaths($locale)
     {
-        if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-            return json_decode($this->files->get($full), true);
-        }
-
-        return [];
+        return collect(array_merge($this->jsonPaths, [$this->path]))
+            ->reduce(function ($output, $path) use ($locale) {
+                return $this->files->exists($full = "{$path}/{$locale}.json")
+                    ? array_merge($output,
+                        json_decode($this->files->get($full), true)
+                    ) : $output;
+            }, []);
     }
 
     /**
@@ -154,5 +162,16 @@ class FileLoader implements Loader
     public function namespaces()
     {
         return $this->hints;
+    }
+
+    /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJSONPath($path)
+    {
+        $this->jsonPaths[] = $path;
     }
 }
