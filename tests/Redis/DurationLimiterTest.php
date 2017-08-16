@@ -98,7 +98,6 @@ class DurationLimiterTest extends TestCase
         }
     }
 
-
     /**
      * @return Client
      */

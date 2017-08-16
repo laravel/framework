@@ -142,7 +142,6 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1], $store);
     }
 
-
     /**
      * @return Client
      */
