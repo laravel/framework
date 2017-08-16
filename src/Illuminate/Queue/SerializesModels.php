@@ -41,6 +41,12 @@ trait SerializesModels
                 $this->getPropertyValue($property)
             ));
         }
+
+        if (isset($this->reloadedRelationships)) {
+            foreach ($this->reloadedRelationships as $property => $relationships) {
+                $this->{$property}->load($relationships);
+            }
+        }
     }
 
     /**
