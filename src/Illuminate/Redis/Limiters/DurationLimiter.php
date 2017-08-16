@@ -93,11 +93,11 @@ class DurationLimiter
     /**
      * Get the Lua script for acquiring a lock.
      *
-     * KEYS[1] - The lock name
+     * KEYS[1] - The limiter name
      * ARGV[1] - Current time in microseconds
      * ARGV[2] - Current time in seconds
-     * ARGV[3] - Duration
-     * ARGV[4] - Limit
+     * ARGV[3] - Duration of the bucket
+     * ARGV[4] - Allowed number of tasks
      *
      * @return string
      */

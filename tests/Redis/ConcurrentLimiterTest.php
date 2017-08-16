@@ -5,6 +5,9 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 
+/**
+ * @group redislimiters
+ */
 class ConcurrentLimiterTest extends TestCase
 {
     public $redis;

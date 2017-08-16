@@ -99,9 +99,9 @@ class ConcurrencyLimiter
     /**
      * Get the Lua script for acquiring a lock.
      *
-     * KEYS    - The keys that represent available slots.
-     * ARGV[1] - Lock name
-     * ARGV[2] - Lock age in seconds
+     * KEYS    - The keys that represent available slots
+     * ARGV[1] - The limiter name
+     * ARGV[2] - The number of seconds the slot should be reserved
      *
      * @return string
      */
