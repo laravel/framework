@@ -149,11 +149,13 @@ abstract class Broadcaster implements BroadcasterContract
                 continue;
             }
 
-            $model = $parameter->getClass()->newInstance();
+            $instance = $parameter->getClass()->newInstance();
 
-            return $model->where($model->getRouteKeyName(), $value)->firstOr(function () {
+            if (! $model = $instance->resolveRouteBinding($value)) {
                 throw new AccessDeniedHttpException;
-            });
+            }
+
+            return $model;
         }
 
         return $value;
