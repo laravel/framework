@@ -2,8 +2,8 @@
 
 namespace Illuminate\Routing;
 
-use ArrayObject;
 use Closure;
+use ArrayObject;
 use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -13,8 +13,8 @@ use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
