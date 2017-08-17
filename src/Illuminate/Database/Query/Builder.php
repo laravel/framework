@@ -1845,7 +1845,7 @@ class Builder
 
             $countResults = $results->count();
 
-            if ($countResults == 0) {
+            if ($countResults === 0) {
                 break;
             }
 
