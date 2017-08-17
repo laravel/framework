@@ -147,6 +147,10 @@ abstract class TestCase extends BaseTestCase
         }
 
         if (class_exists('Mockery')) {
+            if ($container = Mockery::getContainer()) {
+                $this->addToAssertionCount($container->mockery_getExpectationCount());
+            }
+
             Mockery::close();
         }
 
