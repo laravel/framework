@@ -22,7 +22,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->getAttributes());
     }
 
-    public function testAttributesAreSetByConstructorGivenStdClass()
+    public function testAttributesAreSetByConstructorGivenstdClass()
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent((object) $array);

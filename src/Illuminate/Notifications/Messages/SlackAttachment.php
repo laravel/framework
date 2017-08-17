@@ -2,7 +2,7 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 class SlackAttachment
 {
@@ -249,7 +249,7 @@ class SlackAttachment
     /**
      * Set the timestamp.
      *
-     * @param  Carbon  $timestamp
+     * @param  \Illuminate\Support\Carbon  $timestamp
      * @return $this
      */
     public function timestamp(Carbon $timestamp)

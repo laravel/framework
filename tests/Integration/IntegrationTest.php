@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration;
+
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 

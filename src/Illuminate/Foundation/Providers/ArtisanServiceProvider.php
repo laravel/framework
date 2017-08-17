@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Queue\Console\TableCommand;
-use Illuminate\Auth\Console\MakeAuthCommand;
+use Illuminate\Auth\Console\AuthMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
@@ -17,6 +17,7 @@ use Illuminate\Foundation\Console\JobMakeCommand;
 use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
+use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
@@ -144,6 +145,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueFailedTable' => 'command.queue.failed-table',
         'QueueTable' => 'command.queue.table',
         'RequestMake' => 'command.request.make',
+        'RuleMake' => 'command.rule.make',
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
@@ -198,7 +200,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerAuthMakeCommand()
     {
         $this->app->singleton('command.auth.make', function ($app) {
-            return new MakeAuthCommand;
+            return new AuthMakeCommand;
         });
     }
 
@@ -722,6 +724,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.request.make', function ($app) {
             return new RequestMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerRuleMakeCommand()
+    {
+        $this->app->singleton('command.rule.make', function ($app) {
+            return new RuleMakeCommand($app['files']);
         });
     }
 

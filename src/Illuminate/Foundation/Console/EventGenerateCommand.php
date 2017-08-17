@@ -27,7 +27,7 @@ class EventGenerateCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $provider = $this->laravel->getProvider(EventServiceProvider::class);
 
@@ -68,7 +68,9 @@ class EventGenerateCommand extends Command
         foreach ($listeners as $listener) {
             $listener = preg_replace('/@.+$/', '', $listener);
 
-            $this->callSilent('make:listener', ['name' => $listener, '--event' => $event]);
+            $this->callSilent('make:listener', array_filter(
+                ['name' => $listener, '--event' => $event]
+            ));
         }
     }
 }

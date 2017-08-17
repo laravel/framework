@@ -2,10 +2,12 @@
 
 namespace Illuminate\Redis;
 
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
 
+/**
+ * @mixin \Illuminate\Redis\Connections\Connection
+ */
 class RedisManager implements Factory
 {
     /**
@@ -70,7 +72,7 @@ class RedisManager implements Factory
     {
         $name = $name ?: 'default';
 
-        $options = Arr::get($this->config, 'options', []);
+        $options = $this->config['options'] ?? [];
 
         if (isset($this->config[$name])) {
             return $this->connector()->connect($this->config[$name], $options);
@@ -93,10 +95,10 @@ class RedisManager implements Factory
      */
     protected function resolveCluster($name)
     {
-        $clusterOptions = Arr::get($this->config, 'clusters.options', []);
+        $clusterOptions = $this->config['clusters']['options'] ?? [];
 
         return $this->connector()->connectToCluster(
-            $this->config['clusters'][$name], $clusterOptions, Arr::get($this->config, 'options', [])
+            $this->config['clusters'][$name], $clusterOptions, $this->config['options'] ?? []
         );
     }
 

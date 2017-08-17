@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\Application as Artisan;
@@ -93,7 +94,7 @@ abstract class TestCase extends BaseTestCase
     /**
      * Boot the testing helper traits.
      *
-     * @return void
+     * @return array
      */
     protected function setUpTraits()
     {
@@ -118,6 +119,8 @@ abstract class TestCase extends BaseTestCase
         if (isset($uses[WithoutEvents::class])) {
             $this->disableEventsForAllTests();
         }
+
+        return $uses;
     }
 
     /**
@@ -144,7 +147,15 @@ abstract class TestCase extends BaseTestCase
         }
 
         if (class_exists('Mockery')) {
+            if ($container = Mockery::getContainer()) {
+                $this->addToAssertionCount($container->mockery_getExpectationCount());
+            }
+
             Mockery::close();
+        }
+
+        if (class_exists(Carbon::class)) {
+            Carbon::setTestNow();
         }
 
         $this->afterApplicationCreatedCallbacks = [];

@@ -53,6 +53,11 @@ class FrequencyTest extends TestCase
         $this->assertEquals('0 15 4 * * *', $this->event->monthlyOn(4, '15:00')->getExpression());
     }
 
+    public function testTwiceMonthly()
+    {
+        $this->assertEquals('0 0 1,16 * * *', $this->event->twiceMonthly(1, 16)->getExpression());
+    }
+
     public function testMonthlyOnWithMinutes()
     {
         $this->assertEquals('15 15 4 * * *', $this->event->monthlyOn(4, '15:15')->getExpression());
@@ -106,6 +111,11 @@ class FrequencyTest extends TestCase
     public function testSaturdays()
     {
         $this->assertEquals('* * * * 6 *', $this->event->saturdays()->getExpression());
+    }
+
+    public function testQuarterly()
+    {
+        $this->assertEquals('0 0 1 1-12/3 * *', $this->event->quarterly()->getExpression());
     }
 
     public function testFrequencyMacro()

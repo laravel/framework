@@ -5,7 +5,7 @@ namespace Illuminate\Auth\Console;
 use Illuminate\Console\Command;
 use Illuminate\Console\DetectsApplicationNamespace;
 
-class MakeAuthCommand extends Command
+class AuthMakeCommand extends Command
 {
     use DetectsApplicationNamespace;
 
@@ -44,7 +44,7 @@ class MakeAuthCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->createDirectories();
 

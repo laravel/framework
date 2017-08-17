@@ -46,8 +46,8 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 
         $this->total = $total;
         $this->perPage = $perPage;
-        $this->lastPage = (int) ceil($total / $perPage);
-        $this->path = $this->path != '/' ? rtrim($this->path, '/') : $this->path;
+        $this->lastPage = max((int) ceil($total / $perPage), 1);
+        $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
     }
@@ -71,7 +71,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     public function links($view = null, $data = [])
     {

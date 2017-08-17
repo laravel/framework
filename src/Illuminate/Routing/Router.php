@@ -215,6 +215,36 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Create a redirect from one URI to another.
+     *
+     * @param string  $uri
+     * @param string  $destination
+     * @param int  $status
+     * @return \Illuminate\Routing\Route
+     */
+    public function redirect($uri, $destination, $status = 301)
+    {
+        return $this->any($uri, '\Illuminate\Routing\RedirectController')
+                ->defaults('destination', $destination)
+                ->defaults('status', $status);
+    }
+
+    /**
+     * Register a new route that returns a view.
+     *
+     * @param  string  $uri
+     * @param  string  $view
+     * @param  array  $data
+     * @return \Illuminate\Routing\Route
+     */
+    public function view($uri, $view, $data = [])
+    {
+        return $this->get($uri, '\Illuminate\Routing\ViewController')
+                ->defaults('view', $view)
+                ->defaults('data', $data);
+    }
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods
@@ -267,11 +297,11 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @param  string  $controller
      * @param  array  $options
-     * @return void
+     * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function apiResource($name, $controller, array $options = [])
     {
-        $this->resource($name, $controller, array_merge([
+        return $this->resource($name, $controller, array_merge([
             'only' => ['index', 'show', 'store', 'update', 'destroy'],
         ], $options));
     }
@@ -348,7 +378,7 @@ class Router implements RegistrarContract, BindingRegistrar
         if (! empty($this->groupStack)) {
             $last = end($this->groupStack);
 
-            return isset($last['prefix']) ? $last['prefix'] : '';
+            return $last['prefix'] ?? '';
         }
 
         return '';
@@ -491,7 +521,7 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function addWhereClausesToRoute($route)
     {
         $route->where(array_merge(
-            $this->patterns, isset($route->getAction()['where']) ? $route->getAction()['where'] : []
+            $this->patterns, $route->getAction()['where'] ?? []
         ));
 
         return $route;
@@ -620,7 +650,7 @@ class Router implements RegistrarContract, BindingRegistrar
     public static function prepareResponse($request, $response)
     {
         if ($response instanceof Responsable) {
-            $response = $response->toResponse();
+            $response = $response->toResponse($request);
         }
 
         if ($response instanceof PsrResponseInterface) {
@@ -634,6 +664,10 @@ class Router implements RegistrarContract, BindingRegistrar
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
             $response = new Response($response);
+        }
+
+        if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
+            $response->setNotModified();
         }
 
         return $response->prepare($request);
@@ -987,23 +1021,20 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function currentRouteAction()
     {
-        if (! $this->current()) {
-            return;
+        if ($this->current()) {
+            return $this->current()->getAction()['controller'] ?? null;
         }
-
-        $action = $this->current()->getAction();
-
-        return isset($action['controller']) ? $action['controller'] : null;
     }
 
     /**
      * Alias for the "currentRouteUses" method.
      *
+     * @param  array  ...$patterns
      * @return bool
      */
-    public function uses()
+    public function uses(...$patterns)
     {
-        foreach (func_get_args() as $pattern) {
+        foreach ($patterns as $pattern) {
             if (Str::is($pattern, $this->currentRouteAction())) {
                 return true;
             }

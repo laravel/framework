@@ -6,18 +6,22 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeEndphpStatementsTest extends TestCase
+class BladeIfGuestStatementsTest extends TestCase
 {
     public function tearDown()
     {
         m::close();
     }
 
-    public function testEndphpStatementsAreCompiled()
+    public function testIfStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
-        $string = '@endphp';
-        $expected = ' ?>';
+        $string = '@guest("api")
+breeze
+@endguest';
+        $expected = '<?php if(auth()->guard("api")->guest()): ?>
+breeze
+<?php endif; ?>';
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 

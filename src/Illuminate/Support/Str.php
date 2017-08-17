@@ -38,13 +38,7 @@ class Str
      */
     public static function after($subject, $search)
     {
-        if (! static::contains($subject, $search)) {
-            return $subject;
-        }
-
-        $end = strpos($subject, $search) + static::length($search);
-
-        return static::substr($subject, $end, static::length($subject));
+        return $search === '' ? $subject : array_reverse(explode($search, $subject, 2))[0];
     }
 
     /**
@@ -67,6 +61,18 @@ class Str
         }
 
         return preg_replace('/[^\x20-\x7E]/u', '', $value);
+    }
+
+    /**
+     * Get the portion of a string before a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    public static function before($subject, $search)
+    {
+        return $search === '' ? $subject : explode($search, $subject)[0];
     }
 
     /**
@@ -94,7 +100,7 @@ class Str
     public static function contains($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && mb_strpos($haystack, $needle) !== false) {
+            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;
             }
         }
@@ -143,18 +149,33 @@ class Str
      */
     public static function is($pattern, $value)
     {
-        if ($pattern == $value) {
-            return true;
+        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+
+        if (empty($patterns)) {
+            return false;
         }
 
-        $pattern = preg_quote($pattern, '#');
+        foreach ($patterns as $pattern) {
+            // If the given value is an exact match we can of course return true right
+            // from the beginning. Otherwise, we will translate asterisks and do an
+            // actual pattern match against the two strings to see if they match.
+            if ($pattern == $value) {
+                return true;
+            }
 
-        // Asterisks are translated into zero-or-more regular expression wildcards
-        // to make it convenient to check if the strings starts with the given
-        // pattern such as "library/*", making any string check convenient.
-        $pattern = str_replace('\*', '.*', $pattern);
+            $pattern = preg_quote($pattern, '#');
 
-        return (bool) preg_match('#^'.$pattern.'\z#u', $value);
+            // Asterisks are translated into zero-or-more regular expression wildcards
+            // to make it convenient to check if the strings starts with the given
+            // pattern such as "library/*", making any string check convenient.
+            $pattern = str_replace('\*', '.*', $pattern);
+
+            if (preg_match('#^'.$pattern.'\z#u', $value) === 1) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -303,6 +324,10 @@ class Str
      */
     public static function replaceFirst($search, $replace, $subject)
     {
+        if ($search == '') {
+            return $subject;
+        }
+
         $position = strpos($subject, $search);
 
         if ($position !== false) {
@@ -329,6 +354,20 @@ class Str
         }
 
         return $subject;
+    }
+
+    /**
+     * Begin a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $prefix
+     * @return string
+     */
+    public static function start($value, $prefix)
+    {
+        $quoted = preg_quote($prefix, '/');
+
+        return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
     }
 
     /**
@@ -427,7 +466,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle != '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
@@ -483,7 +522,7 @@ class Str
      *
      * Note: Adapted from Stringy\Stringy.
      *
-     * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
+     * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      *
      * @return array
      */
@@ -507,7 +546,7 @@ class Str
             '8'    => ['⁸', '₈', '۸', '８'],
             '9'    => ['⁹', '₉', '۹', '９'],
             'a'    => ['à', 'á', 'ả', 'ã', 'ạ', 'ă', 'ắ', 'ằ', 'ẳ', 'ẵ', 'ặ', 'â', 'ấ', 'ầ', 'ẩ', 'ẫ', 'ậ', 'ā', 'ą', 'å', 'α', 'ά', 'ἀ', 'ἁ', 'ἂ', 'ἃ', 'ἄ', 'ἅ', 'ἆ', 'ἇ', 'ᾀ', 'ᾁ', 'ᾂ', 'ᾃ', 'ᾄ', 'ᾅ', 'ᾆ', 'ᾇ', 'ὰ', 'ά', 'ᾰ', 'ᾱ', 'ᾲ', 'ᾳ', 'ᾴ', 'ᾶ', 'ᾷ', 'а', 'أ', 'အ', 'ာ', 'ါ', 'ǻ', 'ǎ', 'ª', 'ა', 'अ', 'ا', 'ａ', 'ä'],
-            'b'    => ['б', 'β', 'Ъ', 'Ь', 'ب', 'ဗ', 'ბ', 'ｂ'],
+            'b'    => ['б', 'β', 'ب', 'ဗ', 'ბ', 'ｂ'],
             'c'    => ['ç', 'ć', 'č', 'ĉ', 'ċ', 'ｃ'],
             'd'    => ['ď', 'ð', 'đ', 'ƌ', 'ȡ', 'ɖ', 'ɗ', 'ᵭ', 'ᶁ', 'ᶑ', 'д', 'δ', 'د', 'ض', 'ဍ', 'ဒ', 'დ', 'ｄ'],
             'e'    => ['é', 'è', 'ẻ', 'ẽ', 'ẹ', 'ê', 'ế', 'ề', 'ể', 'ễ', 'ệ', 'ë', 'ē', 'ę', 'ě', 'ĕ', 'ė', 'ε', 'έ', 'ἐ', 'ἑ', 'ἒ', 'ἓ', 'ἔ', 'ἕ', 'ὲ', 'έ', 'е', 'ё', 'э', 'є', 'ə', 'ဧ', 'ေ', 'ဲ', 'ე', 'ए', 'إ', 'ئ', 'ｅ'],
@@ -617,7 +656,7 @@ class Str
      *
      * Note: Adapted from Stringy\Stringy.
      *
-     * @see https://github.com/danielstjules/Stringy/blob/3.0.1/LICENSE.txt
+     * @see https://github.com/danielstjules/Stringy/blob/3.1.0/LICENSE.txt
      *
      * @param  string  $language
      * @return array|null
@@ -628,6 +667,10 @@ class Str
 
         if (! isset($languageSpecific)) {
             $languageSpecific = [
+                'bg' => [
+                    ['х', 'Х', 'щ', 'Щ', 'ъ', 'Ъ', 'ь', 'Ь'],
+                    ['h', 'H', 'sht', 'SHT', 'a', 'А', 'y', 'Y'],
+                ],
                 'de' => [
                     ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
                     ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],

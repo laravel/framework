@@ -4,9 +4,10 @@ namespace Illuminate\View\Engines;
 
 use Exception;
 use Throwable;
+use Illuminate\Contracts\View\Engine;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
-class PhpEngine implements EngineInterface
+class PhpEngine implements Engine
 {
     /**
      * Get the evaluated contents of the view.
@@ -56,7 +57,7 @@ class PhpEngine implements EngineInterface
      * @param  int  $obLevel
      * @return void
      *
-     * @throws $e
+     * @throws \Exception
      */
     protected function handleViewException(Exception $e, $obLevel)
     {

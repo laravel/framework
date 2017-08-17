@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Parsedown;
-use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use TijsVerkoyen\CssToInlineStyles\CssToInlineStyles;
@@ -13,7 +12,7 @@ class Markdown
     /**
      * The view factory implementation.
      *
-     * @var \Illuminate\View\Factory
+     * @var \Illuminate\Contracts\View\Factory
      */
     protected $view;
 
@@ -34,15 +33,15 @@ class Markdown
     /**
      * Create a new Markdown renderer instance.
      *
-     * @param  \Illuminate\View\Factory  $view
+     * @param  \Illuminate\Contracts\View\Factory  $view
      * @param  array  $options
      * @return void
      */
     public function __construct(ViewFactory $view, array $options = [])
     {
         $this->view = $view;
-        $this->theme = Arr::get($options, 'theme', 'default');
-        $this->loadComponentsFrom(Arr::get($options, 'paths', []));
+        $this->theme = $options['theme'] ?? 'default';
+        $this->loadComponentsFrom($options['paths'] ?? []);
     }
 
     /**
@@ -77,16 +76,20 @@ class Markdown
     {
         $this->view->flushFinderCache();
 
-        return new HtmlString(preg_replace("/[\r\n]{2,}/", "\n\n", $this->view->replaceNamespace(
+        $contents = $this->view->replaceNamespace(
             'mail', $this->markdownComponentPaths()
-        )->make($view, $data)->render()));
+        )->make($view, $data)->render();
+
+        return new HtmlString(
+            html_entity_decode(preg_replace("/[\r\n]{2,}/", "\n\n", $contents), ENT_QUOTES, 'UTF-8')
+        );
     }
 
     /**
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     public static function parse($text)
     {

@@ -24,7 +24,8 @@ class AuthPasswordBrokerTest extends TestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage User must implement CanResetPassword interface.
      */
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {

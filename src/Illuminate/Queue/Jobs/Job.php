@@ -2,8 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Support\Arr;
-use Illuminate\Queue\InteractsWithTime;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
 {
@@ -55,6 +54,13 @@ abstract class Job
      * @var string
      */
     protected $queue;
+
+    /**
+     * Get the raw body of the job.
+     *
+     * @return string
+     */
+    abstract public function getRawBody();
 
     /**
      * Fire the job.
@@ -188,7 +194,7 @@ abstract class Job
      */
     public function maxTries()
     {
-        return Arr::get($this->payload(), 'maxTries');
+        return $this->payload()['maxTries'] ?? null;
     }
 
     /**
@@ -198,7 +204,7 @@ abstract class Job
      */
     public function timeout()
     {
-        return Arr::get($this->payload(), 'timeout');
+        return $this->payload()['timeout'] ?? null;
     }
 
     /**

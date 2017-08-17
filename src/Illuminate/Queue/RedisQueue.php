@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Contracts\Redis\Factory as Redis;
@@ -95,13 +94,13 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->getConnection()->rpush($this->getQueue($queue), $payload);
 
-        return Arr::get(json_decode($payload, true), 'id');
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  object|string  $job
      * @param  mixed   $data
      * @param  string  $queue
@@ -115,7 +114,7 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Push a raw job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $payload
      * @param  string  $queue
      * @return mixed
@@ -126,7 +125,7 @@ class RedisQueue extends Queue implements QueueContract
             $this->getQueue($queue).':delayed', $this->availableAt($delay), $payload
         );
 
-        return Arr::get(json_decode($payload, true), 'id');
+        return json_decode($payload, true)['id'] ?? null;
     }
 
     /**
@@ -261,7 +260,7 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Get the connection for the queue.
      *
-     * @return \Predis\ClientInterface
+     * @return \Illuminate\Redis\Connections\Connection
      */
     protected function getConnection()
     {

@@ -53,6 +53,13 @@ class SupportMacroableTest extends TestCase
         $result = TestMacroable::tryStatic();
         $this->assertEquals('static', $result);
     }
+
+    public function testClassBasedMacros()
+    {
+        TestMacroable::mixin(new TestMixin);
+        $instance = new TestMacroable;
+        $this->assertEquals('instance-Adam', $instance->methodOne('Adam'));
+    }
 }
 
 class TestMacroable
@@ -64,5 +71,22 @@ class TestMacroable
     protected static function getProtectedStatic()
     {
         return 'static';
+    }
+}
+
+class TestMixin
+{
+    public function methodOne()
+    {
+        return function ($value) {
+            return $this->methodTwo($value);
+        };
+    }
+
+    protected function methodTwo()
+    {
+        return function ($value) {
+            return $this->protectedVariable.'-'.$value;
+        };
     }
 }

@@ -4,8 +4,9 @@ namespace Illuminate\Tests\Validation;
 
 use DateTime;
 use Mockery as m;
-use Carbon\Carbon;
+use DateTimeImmutable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
@@ -242,7 +243,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], ['name' => 'required']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addReplacer('required', 'Foo@bar');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
         $foo->shouldReceive('bar')->once()->andReturn('replaced!');
         $v->passes();
         $v->messages()->setFormat(':message');
@@ -1015,6 +1016,15 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => '1e2', 'baz' => '100'], ['foo' => 'Different:baz']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'fuu' => 'baa', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar', 'fuu' => 'bar', 'baz' => 'boom'], ['foo' => 'Different:fuu,baz']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateAccepted()
@@ -1944,37 +1954,58 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $uploadedFile = [__FILE__, '', null, null, null, true];
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
         $v = new Validator($trans, ['x' => $file], ['x' => 'Image']);
         $this->assertFalse($v->passes());
 
-        $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('jpeg'));
+        $file2->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('jpeg'));
         $v = new Validator($trans, ['x' => $file2], ['x' => 'Image']);
         $this->assertTrue($v->passes());
 
-        $file3 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file3 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file3->expects($this->any())->method('guessExtension')->will($this->returnValue('gif'));
+        $file3->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('gif'));
         $v = new Validator($trans, ['x' => $file3], ['x' => 'Image']);
         $this->assertTrue($v->passes());
 
-        $file4 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file4 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file4->expects($this->any())->method('guessExtension')->will($this->returnValue('bmp'));
+        $file4->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('bmp'));
         $v = new Validator($trans, ['x' => $file4], ['x' => 'Image']);
         $this->assertTrue($v->passes());
 
-        $file5 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file5 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file5->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
+        $file5->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('png'));
         $v = new Validator($trans, ['x' => $file5], ['x' => 'Image']);
         $this->assertTrue($v->passes());
 
-        $file6 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file6 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file6->expects($this->any())->method('guessExtension')->will($this->returnValue('svg'));
+        $file6->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('svg'));
         $v = new Validator($trans, ['x' => $file6], ['x' => 'Image']);
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateImageDoesNotAllowPhpExtensionsOnImageMime()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('jpeg'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'Image']);
+        $this->assertFalse($v->passes());
+    }
+
+    /**
+     * @group dimension
+     */
     public function testValidateImageDimensions()
     {
         // Knowing that demo image.png has width = 3 and height = 2
@@ -2040,21 +2071,27 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => $emptyUploadedFile], ['x' => 'dimensions:min_width=1']);
         $this->assertTrue($v->fails());
+
+        // Knowing that demo image3.png has width = 7 and height = 10
+        $uploadedFile = new \Symfony\Component\HttpFoundation\File\UploadedFile(__DIR__.'/fixtures/image3.png', '', null, null, null, true);
+        $trans = $this->getIlluminateArrayTranslator();
+
+        // Ensure validation doesn't erroneously fail when ratio has no fractional part
+        $v = new Validator($trans, ['x' => $uploadedFile], ['x' => 'dimensions:ratio=2/3']);
+        $this->assertTrue($v->passes());
     }
 
     /**
      * @requires extension fileinfo
      */
-    public function testValidateMimetypes()
+    public function testValidatePhpMimetypes()
     {
         $trans = $this->getIlluminateArrayTranslator();
         $uploadedFile = [__FILE__, '', null, null, null, true];
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
-        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
-
-        $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/x-php']);
-        $this->assertTrue($v->passes());
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('rtf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('rtf'));
 
         $v = new Validator($trans, ['x' => $file], ['x' => 'mimetypes:text/*']);
         $this->assertTrue($v->passes());
@@ -2065,16 +2102,35 @@ class ValidationValidatorTest extends TestCase
         $trans = $this->getIlluminateArrayTranslator();
         $uploadedFile = [__FILE__, '', null, null, null, true];
 
-        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension'])->setConstructorArgs($uploadedFile)->getMock();
-        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
-        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:php']);
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('pdf'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:pdf']);
         $this->assertTrue($v->passes());
 
         $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'isValid'])->setConstructorArgs($uploadedFile)->getMock();
-        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
         $file2->expects($this->any())->method('isValid')->will($this->returnValue(false));
-        $v = new Validator($trans, ['x' => $file2], ['x' => 'mimes:php']);
+        $v = new Validator($trans, ['x' => $file2], ['x' => 'mimes:pdf']);
         $this->assertFalse($v->passes());
+    }
+
+    public function testValidateMimeEnforcesPhpCheck()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('pdf'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, ['x' => $file], ['x' => 'mimes:pdf']);
+        $this->assertFalse($v->passes());
+
+        $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('php'));
+        $file2->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('php'));
+        $v = new Validator($trans, ['x' => $file2], ['x' => 'mimes:pdf,php']);
+        $this->assertTrue($v->passes());
     }
 
     /**
@@ -2250,7 +2306,10 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['x' => new DateTime()], ['x' => 'date']);
+        $v = new Validator($trans, ['x' => new DateTime], ['x' => 'date']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => new DateTimeImmutable], ['x' => 'date']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
@@ -2270,6 +2329,10 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => ['Not', 'a', 'date']], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->fails());
+
+        // Set current machine date to 31/xx/xxxx
+        $v = new Validator($trans, ['x' => '2013-02'], ['x' => 'date_format:Y-m']);
+        $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01T00:00:00Atlantic/Azores'], ['x' => 'date_format:Y-m-d\TH:i:se']);
         $this->assertTrue($v->passes());
@@ -2532,7 +2595,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addExtension('foo', 'Foo@bar');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
         $foo->shouldReceive('bar')->once()->andReturn(false);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -2546,7 +2609,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
         $v->setContainer($container = m::mock('Illuminate\Container\Container'));
         $v->addExtension('foo', 'Foo');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
         $foo->shouldReceive('validate')->once()->andReturn(false);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -2579,7 +2642,8 @@ class ValidationValidatorTest extends TestCase
     }
 
     /**
-     * @expectedException InvalidArgumentException
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Validation rule required_if requires at least 2 parameters.
      */
     public function testExceptionThrownOnIncorrectParameterCount()
     {
@@ -3276,7 +3340,7 @@ class ValidationValidatorTest extends TestCase
 
     public function testGetLeadingExplicitAttributePath()
     {
-        $this->assertEquals(null, \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('*.email'));
+        $this->assertNull(\Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('*.email'));
         $this->assertEquals('foo', \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.*'));
         $this->assertEquals('foo.bar', \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.bar.*.baz'));
         $this->assertEquals('foo.bar.1', \Illuminate\Validation\ValidationData::getLeadingExplicitAttributePath('foo.bar.1'));

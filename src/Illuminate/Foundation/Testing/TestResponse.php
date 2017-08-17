@@ -10,6 +10,9 @@ use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Symfony\Component\HttpFoundation\Cookie;
 
+/**
+ * @mixin \Illuminate\Http\Response
+ */
 class TestResponse
 {
     use Macroable {
@@ -161,7 +164,7 @@ class TestResponse
             ? app('encrypter')->decrypt($cookieValue) : $cookieValue;
 
         PHPUnit::assertEquals(
-            $actual, $value,
+            $value, $actual,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
         );
 

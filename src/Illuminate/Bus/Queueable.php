@@ -21,7 +21,7 @@ trait Queueable
     /**
      * The number of seconds before the job should be made available.
      *
-     * @var \DateTime|int|null
+     * @var \DateTimeInterface|\DateInterval|int|null
      */
     public $delay;
 
@@ -61,7 +61,7 @@ trait Queueable
     /**
      * Set the desired delay for the job.
      *
-     * @param  \DateTime|int|null  $delay
+     * @param  \DateTimeInterface|\DateInterval|int|null  $delay
      * @return $this
      */
     public function delay($delay)

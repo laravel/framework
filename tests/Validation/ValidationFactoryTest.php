@@ -86,4 +86,16 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals(['baz' => ['boom']], $validator->getRules());
         unset($_SERVER['__validator.factory']);
     }
+
+    public function testValidateMethodCanBeCalledPublicly()
+    {
+        $translator = m::mock(TranslatorInterface::class);
+        $factory = new Factory($translator);
+        $factory->extend('foo', function ($attribute, $value, $parameters, $validator) {
+            return $validator->validateArray($attribute, $value);
+        });
+
+        $validator = $factory->make(['bar' => ['baz']], ['bar' => 'foo']);
+        $this->assertTrue($validator->passes());
+    }
 }

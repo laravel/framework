@@ -36,6 +36,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\AuthenticationException
+     * @expectedExceptionMessage Unauthenticated.
      */
     public function testDefaultUnauthenticatedThrows()
     {
@@ -81,6 +82,7 @@ class AuthenticateMiddlewareTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\AuthenticationException
+     * @expectedExceptionMessage Unauthenticated.
      */
     public function testMultipleDriversUnauthenticatedThrows()
     {
@@ -110,7 +112,7 @@ class AuthenticateMiddlewareTest extends TestCase
         return $this->fail();
     }
 
-    public function testMultipleDriversAuthenticatedUdatesDefault()
+    public function testMultipleDriversAuthenticatedUpdatesDefault()
     {
         $this->registerAuthDriver('default', false);
 

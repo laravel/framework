@@ -4,9 +4,12 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 
@@ -89,6 +92,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->morphs('imageable');
                 $table->string('name');
                 $table->timestamps();
+            });
+
+            $this->schema($connection)->create('soft_deleted_users', function ($table) {
+                $table->increments('id');
+                $table->string('name')->nullable();
+                $table->string('email');
+                $table->timestamps();
+                $table->softDeletes();
             });
         }
 
@@ -394,6 +405,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1
      */
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
@@ -402,6 +414,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2
      */
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
@@ -558,8 +571,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testAggregatedValuesOfDatetimeField()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => \Carbon\Carbon::now()]);
-        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => \Carbon\Carbon::now()]);
+        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => \Illuminate\Support\Carbon::now()]);
+        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => \Illuminate\Support\Carbon::now()]);
 
         $this->assertEquals('2016-08-10 09:21:00', EloquentTestUser::max('created_at'));
         $this->assertEquals('2016-08-01 12:00:00', EloquentTestUser::min('created_at'));
@@ -855,7 +868,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage SQLSTATE[23000]:
      */
     public function testSaveOrFailWithDuplicatedEntry()
     {
@@ -1012,16 +1026,26 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNotNull($user->fresh());
     }
 
+    public function testGlobalScopeCanBeRemovedByOtherGlobalScope()
+    {
+        $user = EloquentTestUserWithGlobalScopeRemovingOtherScope::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $user->delete();
+
+        $this->assertNotNull(EloquentTestUserWithGlobalScopeRemovingOtherScope::find($user->id));
+    }
+
     public function testForPageAfterIdCorrectlyPaginates()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $results = EloquentTestUser::forPageAfterId(15, 1);
-        $this->assertEquals(1, count($results));
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $results);
+        $this->assertEquals(2, $results->first()->id);
 
         $results = EloquentTestUser::orderBy('id', 'desc')->forPageAfterId(15, 1);
-        $this->assertEquals(1, count($results));
+        $this->assertInstanceOf('Illuminate\Database\Eloquent\Builder', $results);
+        $this->assertEquals(2, $results->first()->id);
     }
 
     public function testMorphToRelationsAcrossDatabaseConnections()
@@ -1067,6 +1091,51 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $retrieved = EloquentTestUser::find(1);
 
         $this->assertTrue($saved->is($retrieved));
+    }
+
+    public function testFreshMethodOnModel()
+    {
+        $now = \Illuminate\Support\Carbon::now();
+        \Illuminate\Support\Carbon::setTestNow($now);
+
+        $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
+        $freshStoredUser1 = $storedUser1->fresh();
+
+        $storedUser2 = EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+        $storedUser2->newQuery()->update(['email' => 'dev@mathieutu.ovh']);
+        $freshStoredUser2 = $storedUser2->fresh();
+
+        $notStoredUser = new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']);
+        $freshNotStoredUser = $notStoredUser->fresh();
+
+        $this->assertEquals(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser1->toArray());
+        $this->assertEquals(['id' => 1, 'name' => 'Mathieu TUDISCO', 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser1->toArray());
+        $this->assertInstanceOf(EloquentTestUser::class, $storedUser1);
+
+        $this->assertEquals(['id' => 2, 'email' => 'taylorotwell@gmail.com', 'created_at' => $now, 'updated_at' => $now], $storedUser2->toArray());
+        $this->assertEquals(['id' => 2, 'name' => null, 'email' => 'dev@mathieutu.ovh', 'created_at' => $now, 'updated_at' => $now], $freshStoredUser2->toArray());
+        $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
+
+        $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
+        $this->assertNull($freshNotStoredUser);
+    }
+
+    public function testFreshMethodOnCollection()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'taylorotwell@gmail.com']);
+
+        $users = EloquentTestUser::all()
+            ->add(new EloquentTestUser(['id' => 3, 'email' => 'taylorotwell@gmail.com']));
+
+        EloquentTestUser::find(1)->update(['name' => 'Mathieu TUDISCO']);
+        EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
+
+        $this->assertEquals($users->map->fresh(), $users->fresh());
+
+        $users = new Collection();
+        $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 
     /**
@@ -1179,6 +1248,24 @@ class EloquentTestUserWithOmittingGlobalScope extends EloquentTestUser
         static::addGlobalScope(function ($builder) {
             $builder->where('email', '!=', 'taylorotwell@gmail.com');
         });
+    }
+}
+
+class EloquentTestUserWithGlobalScopeRemovingOtherScope extends Eloquent
+{
+    use SoftDeletes;
+
+    protected $table = 'soft_deleted_users';
+
+    protected $guarded = [];
+
+    public static function boot()
+    {
+        static::addGlobalScope(function ($builder) {
+            $builder->withoutGlobalScope(SoftDeletingScope::class);
+        });
+
+        parent::boot();
     }
 }
 

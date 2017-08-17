@@ -10,6 +10,9 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
 
+/**
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ */
 abstract class Relation
 {
     use Macroable {
@@ -138,6 +141,17 @@ abstract class Relation
     public function getEager()
     {
         return $this->get();
+    }
+
+    /**
+     * Execute the query as a "select" statement.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function get($columns = ['*'])
+    {
+        return $this->query->get($columns);
     }
 
     /**
@@ -325,6 +339,19 @@ abstract class Relation
     }
 
     /**
+     * Get the model associated with a custom polymorphic type.
+     *
+     * @param  string  $alias
+     * @return string|null
+     */
+    public static function getMorphedModel($alias)
+    {
+        return array_key_exists($alias, self::$morphMap)
+            ? self::$morphMap[$alias]
+            : null;
+    }
+
+    /**
      * Handle dynamic method calls to the relationship.
      *
      * @param  string  $method
@@ -337,7 +364,7 @@ abstract class Relation
             return $this->macroCall($method, $parameters);
         }
 
-        $result = call_user_func_array([$this->query, $method], $parameters);
+        $result = $this->query->{$method}(...$parameters);
 
         if ($result === $this->query) {
             return $this;

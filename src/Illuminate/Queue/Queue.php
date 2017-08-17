@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Queue
 {
@@ -46,7 +47,7 @@ abstract class Queue
      * Push a new job onto the queue after a delay.
      *
      * @param  string  $queue
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @return mixed
@@ -85,7 +86,9 @@ abstract class Queue
         $payload = json_encode($this->createPayloadArray($job, $data));
 
         if (JSON_ERROR_NONE !== json_last_error()) {
-            throw new InvalidPayloadException;
+            throw new InvalidPayloadException(
+                'Unable to JSON encode payload. Error code: '.json_last_error()
+            );
         }
 
         return $payload;
@@ -116,8 +119,8 @@ abstract class Queue
         return [
             'displayName' => $this->getDisplayName($job),
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-            'maxTries' => isset($job->tries) ? $job->tries : null,
-            'timeout' => isset($job->timeout) ? $job->timeout : null,
+            'maxTries' => $job->tries ?? null,
+            'timeout' => $job->timeout ?? null,
             'data' => [
                 'commandName' => get_class($job),
                 'command' => serialize(clone $job),

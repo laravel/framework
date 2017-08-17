@@ -22,8 +22,7 @@
         <whitelist processUncoveredFilesFromWhitelist="true">
             <directory suffix=".php">./src</directory>
             <exclude>
-                <directory>./src/Illuminate/Pagination/resources/views</directory>
-                <file>./src/Illuminate/Foundation/Console/Optimize/config.php</file>
+                <directory suffix=".blade.php">./src/</directory>
             </exclude>
         </whitelist>
     </filter>

@@ -220,6 +220,18 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Str::is('foo.ar', 'foobar'));
         $this->assertFalse(Str::is('foo?bar', 'foobar'));
         $this->assertFalse(Str::is('foo?bar', 'fobar'));
+
+        $this->assertTrue(Str::is([
+            '*.dev',
+            '*oc*',
+        ], 'localhost.dev'));
+
+        $this->assertFalse(Str::is([
+            '/',
+            'a*',
+        ], 'localhost.dev'));
+
+        $this->assertFalse(Str::is([], 'localhost.dev'));
     }
 
     public function testStrRandom()
@@ -277,6 +289,13 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
     }
 
+    public function testStrStart()
+    {
+        $this->assertEquals('/test/string', Str::start('test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
+    }
+
     public function testSnakeCase()
     {
         $this->assertEquals('foo_bar', Str::snake('fooBar'));
@@ -329,8 +348,8 @@ class SupportHelpersTest extends TestCase
 
     public function testObjectGet()
     {
-        $class = new StdClass;
-        $class->name = new StdClass;
+        $class = new stdClass;
+        $class->name = new stdClass;
         $class->name->first = 'Taylor';
 
         $this->assertEquals('Taylor', object_get($class, 'name.first'));
@@ -721,7 +740,7 @@ class SupportHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testThrow()
     {
@@ -729,7 +748,7 @@ class SupportHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Test Message
      */
     public function testThrowWithString()

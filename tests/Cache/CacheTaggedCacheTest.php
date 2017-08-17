@@ -27,7 +27,7 @@ class CacheTaggedCacheTest extends TestCase
     {
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
-        $duration = new DateTime();
+        $duration = new DateTime;
         $duration->add(new DateInterval('PT10M'));
         $store->tags($tags)->put('foo', 'bar', $duration);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
@@ -68,7 +68,7 @@ class CacheTaggedCacheTest extends TestCase
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
         $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
-        $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
+        $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
 
@@ -85,7 +85,7 @@ class CacheTaggedCacheTest extends TestCase
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
         $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
-        $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
+        $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $store->shouldReceive('push')->with(sha1('foo|bar').':key1', 'key1:value');
@@ -100,7 +100,7 @@ class CacheTaggedCacheTest extends TestCase
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
-        $store->shouldReceive('connection')->andReturn($conn = m::mock('StdClass'));
+        $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
 
         // Forever tag keys
         $conn->shouldReceive('smembers')->once()->with('prefix:foo:forever_ref')->andReturn(['key1', 'key2']);

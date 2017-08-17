@@ -8,6 +8,9 @@ use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
+/**
+ * @mixin \Illuminate\Database\Connection
+ */
 class DatabaseManager implements ConnectionResolverInterface
 {
     /**
@@ -68,7 +71,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // set the "fetch mode" for PDO which determines the query return types.
         if (! isset($this->connections[$name])) {
             $this->connections[$name] = $this->configure(
-                $connection = $this->makeConnection($database), $type
+                $this->makeConnection($database), $type
             );
         }
 

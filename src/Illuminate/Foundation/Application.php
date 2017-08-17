@@ -7,6 +7,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Log\LogServiceProvider;
@@ -232,7 +233,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Register a callback to run before a bootstrapper.
      *
      * @param  string  $bootstrapper
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function beforeBootstrapping($bootstrapper, Closure $callback)
@@ -244,7 +245,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * Register a callback to run after a bootstrapper.
      *
      * @param  string  $bootstrapper
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return void
      */
     public function afterBootstrapping($bootstrapper, Closure $callback)
@@ -517,9 +518,9 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function detectEnvironment(Closure $callback)
     {
-        $args = isset($_SERVER['argv']) ? $_SERVER['argv'] : null;
+        $args = $_SERVER['argv'] ?? null;
 
-        return $this['env'] = (new EnvironmentDetector())->detect($callback, $args);
+        return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
     }
 
     /**
@@ -549,10 +550,15 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerConfiguredProviders()
     {
-        $providers = $this->make(PackageManifest::class)->providers();
+        $providers = Collection::make($this->config['app.providers'])
+                        ->partition(function ($provider) {
+                            return Str::startsWith($provider, 'Illuminate\\');
+                        });
+
+        $providers->splice(1, 0, [$this->make(PackageManifest::class)->providers()]);
 
         (new ProviderRepository($this, new Filesystem, $this->getCachedServicesPath()))
-                    ->load(array_merge($providers, $this->config['app.providers']));
+                    ->load($providers->collapse()->toArray());
     }
 
     /**
@@ -1088,8 +1094,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function registerCoreContainerAliases()
     {
-        $aliases = [
-            'app'                  => [\Illuminate\Foundation\Application::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class],
+        foreach ([
+            'app'                  => [\Illuminate\Foundation\Application::class, \Illuminate\Contracts\Container\Container::class, \Illuminate\Contracts\Foundation\Application::class,  \Psr\Container\ContainerInterface::class],
             'auth'                 => [\Illuminate\Auth\AuthManager::class, \Illuminate\Contracts\Auth\Factory::class],
             'auth.driver'          => [\Illuminate\Contracts\Auth\Guard::class],
             'blade.compiler'       => [\Illuminate\View\Compilers\BladeCompiler::class],
@@ -1123,9 +1129,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'url'                  => [\Illuminate\Routing\UrlGenerator::class, \Illuminate\Contracts\Routing\UrlGenerator::class],
             'validator'            => [\Illuminate\Validation\Factory::class, \Illuminate\Contracts\Validation\Factory::class],
             'view'                 => [\Illuminate\View\Factory::class, \Illuminate\Contracts\View\Factory::class],
-        ];
-
-        foreach ($aliases as $key => $aliases) {
+        ] as $key => $aliases) {
             foreach ($aliases as $alias) {
                 $this->alias($key, $alias);
             }

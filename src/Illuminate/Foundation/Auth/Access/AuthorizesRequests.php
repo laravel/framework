@@ -67,7 +67,7 @@ trait AuthorizesRequests
     {
         $map = $this->resourceAbilityMap();
 
-        return isset($map[$ability]) ? $map[$ability] : $ability;
+        return $map[$ability] ?? $ability;
     }
 
     /**
@@ -81,7 +81,7 @@ trait AuthorizesRequests
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $parameter = $parameter ?: lcfirst(class_basename($model));
+        $parameter = $parameter ?: snake_case(lcfirst(class_basename($model)));
 
         $middleware = [];
 

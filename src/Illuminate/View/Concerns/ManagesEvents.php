@@ -176,7 +176,7 @@ trait ManagesEvents
      */
     public function callComposer(ViewContract $view)
     {
-        $this->events->fire('composing: '.$view->name(), [$view]);
+        $this->events->dispatch('composing: '.$view->name(), [$view]);
     }
 
     /**
@@ -187,6 +187,6 @@ trait ManagesEvents
      */
     public function callCreator(ViewContract $view)
     {
-        $this->events->fire('creating: '.$view->name(), [$view]);
+        $this->events->dispatch('creating: '.$view->name(), [$view]);
     }
 }

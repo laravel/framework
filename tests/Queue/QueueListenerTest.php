@@ -36,7 +36,7 @@ class QueueListenerTest extends TestCase
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {
         $listener = new \Illuminate\Queue\Listener(__DIR__);
-        $options = new \Illuminate\Queue\ListenerOptions();
+        $options = new \Illuminate\Queue\ListenerOptions;
         $options->delay = 1;
         $options->memory = 2;
         $options->timeout = 3;

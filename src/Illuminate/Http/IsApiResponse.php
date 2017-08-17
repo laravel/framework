@@ -114,10 +114,11 @@ trait IsApiResponse
     /**
      * Create an HTTP response that represents the object.
      *
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      * @throws \InvalidArgumentException
      */
-    public function toResponse()
+    public function toResponse($request)
     {
         if (isset($this->resource)) {
             return response()->json($this->transform(),

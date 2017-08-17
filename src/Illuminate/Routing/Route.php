@@ -14,6 +14,7 @@ use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
 class Route
 {
@@ -199,7 +200,7 @@ class Route
      */
     protected function runController()
     {
-        return (new ControllerDispatcher($this->container))->dispatch(
+        return $this->controllerDispatcher()->dispatch(
             $this, $this->getController(), $this->getControllerMethod()
         );
     }
@@ -211,9 +212,9 @@ class Route
      */
     public function getController()
     {
-        $class = $this->parseControllerCallback()[0];
-
         if (! $this->controller) {
+            $class = $this->parseControllerCallback()[0];
+
             $this->controller = $this->container->make($class);
         }
 
@@ -526,7 +527,7 @@ class Route
      * Get or set the domain for the route.
      *
      * @param  string|null  $domain
-     * @return $this
+     * @return $this|string|null
      */
     public function domain($domain = null)
     {
@@ -557,7 +558,7 @@ class Route
      */
     public function getPrefix()
     {
-        return isset($this->action['prefix']) ? $this->action['prefix'] : null;
+        return $this->action['prefix'] ?? null;
     }
 
     /**
@@ -605,7 +606,7 @@ class Route
      */
     public function getName()
     {
-        return isset($this->action['as']) ? $this->action['as'] : null;
+        return $this->action['as'] ?? null;
     }
 
     /**
@@ -682,7 +683,7 @@ class Route
      */
     public function getActionName()
     {
-        return isset($this->action['controller']) ? $this->action['controller'] : 'Closure';
+        return $this->action['controller'] ?? 'Closure';
     }
 
     /**
@@ -745,7 +746,7 @@ class Route
     public function middleware($middleware = null)
     {
         if (is_null($middleware)) {
-            return (array) Arr::get($this->action, 'middleware', []);
+            return (array) ($this->action['middleware'] ?? []);
         }
 
         if (is_string($middleware)) {
@@ -753,7 +754,7 @@ class Route
         }
 
         $this->action['middleware'] = array_merge(
-            (array) Arr::get($this->action, 'middleware', []), $middleware
+            (array) ($this->action['middleware'] ?? []), $middleware
         );
 
         return $this;
@@ -770,9 +771,23 @@ class Route
             return [];
         }
 
-        return ControllerDispatcher::getMiddleware(
+        return $this->controllerDispatcher()->getMiddleware(
             $this->getController(), $this->getControllerMethod()
         );
+    }
+
+    /**
+     * Get the dispatcher for the route's controller.
+     *
+     * @return \Illuminate\Routing\Contracts\ControllerDispatcher
+     */
+    public function controllerDispatcher()
+    {
+        if ($this->container->bound(ControllerDispatcherContract::class)) {
+            return $this->container->make(ControllerDispatcherContract::class);
+        }
+
+        return new ControllerDispatcher($this->container);
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Carbon\Carbon;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
@@ -27,6 +27,13 @@ trait HasAttributes
      * @var array
      */
     protected $original = [];
+
+    /**
+     * The changed model attributes.
+     *
+     * @var array
+     */
+    protected $changes = [];
 
     /**
      * The attributes that should be cast to native types.
@@ -176,7 +183,7 @@ trait HasAttributes
             );
 
             // If the attribute cast was a date or a datetime, we will serialize the date as
-            // a string. This allows the developers to customize hwo dates are serialized
+            // a string. This allows the developers to customize how dates are serialized
             // into an array without affecting how they are persisted into the storage.
             if ($attributes[$key] &&
                 ($value === 'date' || $value === 'datetime')) {
@@ -656,7 +663,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object with time set to 00:00:00.
      *
      * @param  mixed  $value
-     * @return \Carbon\Carbon
+     * @return \Illuminate\Support\Carbon
      */
     protected function asDate($value)
     {
@@ -667,7 +674,7 @@ trait HasAttributes
      * Return a timestamp as DateTime object.
      *
      * @param  mixed  $value
-     * @return \Carbon\Carbon
+     * @return \Illuminate\Support\Carbon
      */
     protected function asDateTime($value)
     {
@@ -678,9 +685,9 @@ trait HasAttributes
             return $value;
         }
 
-         // If the value is already a DateTime instance, we will just skip the rest of
-         // these checks since they will be a waste of time, and hinder performance
-         // when checking the field. We will just return the DateTime right away.
+        // If the value is already a DateTime instance, we will just skip the rest of
+        // these checks since they will be a waste of time, and hinder performance
+        // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTimeInterface) {
             return new Carbon(
                 $value->format('Y-m-d H:i:s.u'), $value->getTimezone()
@@ -728,7 +735,7 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return $this->asDateTime($value)->format(
+        return is_null($value) ? $value : $this->asDateTime($value)->format(
             $this->getDateFormat()
         );
     }
@@ -764,7 +771,9 @@ trait HasAttributes
     {
         $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
-        return $this->usesTimestamps() ? array_merge($this->dates, $defaults) : $this->dates;
+        return $this->usesTimestamps()
+                    ? array_unique(array_merge($this->dates, $defaults))
+                    : $this->dates;
     }
 
     /**
@@ -883,6 +892,23 @@ trait HasAttributes
     }
 
     /**
+     * Get a subset of the model's attributes.
+     *
+     * @param  array|mixed  $attributes
+     * @return array
+     */
+    public function only($attributes)
+    {
+        $results = [];
+
+        foreach (is_array($attributes) ? $attributes : func_get_args() as $attribute) {
+            $results[$attribute] = $this->getAttribute($attribute);
+        }
+
+        return $results;
+    }
+
+    /**
      * Sync the original attributes with the current.
      *
      * @return $this
@@ -908,6 +934,18 @@ trait HasAttributes
     }
 
     /**
+     * Sync the changed attributes.
+     *
+     * @return $this
+     */
+    public function syncChanges()
+    {
+        $this->changes = $this->getDirty();
+
+        return $this;
+    }
+
+    /**
      * Determine if the model or given attribute(s) have been modified.
      *
      * @param  array|string|null  $attributes
@@ -915,28 +953,9 @@ trait HasAttributes
      */
     public function isDirty($attributes = null)
     {
-        $dirty = $this->getDirty();
-
-        // If no specific attributes were provided, we will just see if the dirty array
-        // already contains any attributes. If it does we will just return that this
-        // count is greater than zero. Else, we need to check specific attributes.
-        if (is_null($attributes)) {
-            return count($dirty) > 0;
-        }
-
-        $attributes = is_array($attributes)
-                            ? $attributes : func_get_args();
-
-        // Here we will spin through every attribute and see if this is in the array of
-        // dirty attributes. If it is, we will return true and if we make it through
-        // all of the attributes for the entire array we will return false at end.
-        foreach ($attributes as $attribute) {
-            if (array_key_exists($attribute, $dirty)) {
-                return true;
-            }
-        }
-
-        return false;
+        return $this->hasChanges(
+            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+        );
     }
 
     /**
@@ -948,6 +967,47 @@ trait HasAttributes
     public function isClean($attributes = null)
     {
         return ! $this->isDirty(...func_get_args());
+    }
+
+    /**
+     * Determine if the model or given attribute(s) have been modified.
+     *
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    public function wasChanged($attributes = null)
+    {
+        return $this->hasChanges(
+            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+        );
+    }
+
+    /**
+     * Determine if the given attributes were changed.
+     *
+     * @param  array  $changes
+     * @param  array|string|null  $attributes
+     * @return bool
+     */
+    protected function hasChanges($changes, $attributes = null)
+    {
+        // If no specific attributes were provided, we will just see if the dirty array
+        // already contains any attributes. If it does we will just return that this
+        // count is greater than zero. Else, we need to check specific attributes.
+        if (empty($attributes)) {
+            return count($changes) > 0;
+        }
+
+        // Here we will spin through every attribute and see if this is in the array of
+        // dirty attributes. If it is, we will return true and if we make it through
+        // all of the attributes for the entire array we will return false at end.
+        foreach (Arr::wrap($attributes) as $attribute) {
+            if (array_key_exists($attribute, $changes)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -966,6 +1026,16 @@ trait HasAttributes
         }
 
         return $dirty;
+    }
+
+    /**
+     * Get the attributes that was changed.
+     *
+     * @return array
+     */
+    public function getChanges()
+    {
+        return $this->changes;
     }
 
     /**

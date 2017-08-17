@@ -5,10 +5,13 @@ namespace Illuminate\Database\Schema;
 use Closure;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Blueprint
 {
+    use Macroable;
+
     /**
      * The table the blueprint describes.
      *
@@ -672,6 +675,21 @@ class Blueprint
     public function decimal($column, $total = 8, $places = 2)
     {
         return $this->addColumn('decimal', $column, compact('total', 'places'));
+    }
+
+    /**
+     * Create a new unsigned decimal column on the table.
+     *
+     * @param  string  $column
+     * @param  int  $total
+     * @param  int  $places
+     * @return \Illuminate\Support\Fluent
+     */
+    public function unsignedDecimal($column, $total = 8, $places = 2)
+    {
+        return $this->addColumn('decimal', $column, [
+            'total' => $total, 'places' => $places, 'unsigned' => true,
+        ]);
     }
 
     /**

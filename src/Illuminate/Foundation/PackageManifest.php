@@ -45,7 +45,7 @@ class PackageManifest
     /**
      * Create a new package manifest instance.
      *
-     * @param  \Illuminate\Foundation\Filesystem  $files
+     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $basePath
      * @param  string  $manifestPath
      * @return void
@@ -65,9 +65,7 @@ class PackageManifest
      */
     public function providers()
     {
-        $this->ensureManifestIsLoaded();
-
-        return collect($this->manifest)->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
             return (array) ($configuration['providers'] ?? []);
         })->filter()->all();
     }
@@ -79,33 +77,28 @@ class PackageManifest
      */
     public function aliases()
     {
-        $this->ensureManifestIsLoaded();
-
-        return collect($this->manifest)->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
             return (array) ($configuration['aliases'] ?? []);
         })->filter()->all();
     }
 
     /**
-     * Ensure the manifest has been loaded into memory.
+     * Get the current package manifest.
      *
-     * @return void
+     * @return array
      */
-    protected function ensureManifestIsLoaded()
+    protected function getManifest()
     {
         if (! is_null($this->manifest)) {
-            return;
+            return $this->manifest;
         }
 
         if (! file_exists($this->manifestPath)) {
             $this->build();
         }
 
-        if (file_exists($this->manifestPath)) {
-            $this->manifest = $this->files->getRequire($this->manifestPath);
-        } else {
-            $this->manifest = [];
-        }
+        return $this->manifest = file_exists($this->manifestPath) ?
+            $this->files->getRequire($this->manifestPath) : [];
     }
 
     /**
@@ -115,20 +108,18 @@ class PackageManifest
      */
     public function build()
     {
-        $vendors = $this->files->directories($this->vendorPath);
+        $packages = [];
 
-        $ignore = $this->packagesToIgnore();
+        if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
+            $packages = json_decode($this->files->get($path), true);
+        }
 
-        $this->write(collect($vendors)->flatMap(function ($vendor) {
-            return $this->files->directories($vendor);
-        })->filter(function ($package) {
-            return $this->files->exists($package.'/composer.json');
-        })->mapWithKeys(function ($package) {
-            return [$this->format($package) => json_decode(
-                $this->files->get($package.'/composer.json'), true
-            )['extra']['laravel'] ?? []];
-        })->reject(function ($configuration, $package) use ($ignore) {
-            return in_array($package, $ignore);
+        $ignoreAll = in_array('*', $ignore = $this->packagesToIgnore());
+
+        $this->write(collect($packages)->mapWithKeys(function ($package) {
+            return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
+        })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
+            return $ignoreAll || in_array($package, $ignore);
         })->filter()->all());
     }
 
@@ -162,8 +153,9 @@ class PackageManifest
     /**
      * Write the given manifest array to disk.
      *
-     * @param  arary  $manifest
+     * @param  array  $manifest
      * @return void
+     * @throws \Exception
      */
     protected function write(array $manifest)
     {

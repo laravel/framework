@@ -21,7 +21,7 @@ class MailChannel
     /**
      * The markdown implementation.
      *
-     * @var \Illuminate\Contracts\Mail\Mailer
+     * @var \Illuminate\Mail\Markdown
      */
     protected $markdown;
 
@@ -47,19 +47,37 @@ class MailChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $notifiable->routeNotificationFor('mail')) {
+        $message = $notification->toMail($notifiable);
+
+        if (! $notifiable->routeNotificationFor('mail') &&
+            ! $message instanceof Mailable) {
             return;
         }
-
-        $message = $notification->toMail($notifiable);
 
         if ($message instanceof Mailable) {
             return $message->send($this->mailer);
         }
 
-        $this->mailer->send($this->buildView($message), $message->data(), function ($mailMessage) use ($notifiable, $notification, $message) {
+        $this->mailer->send(
+            $this->buildView($message),
+            $message->data(),
+            $this->messageBuilder($notifiable, $notification, $message)
+        );
+    }
+
+    /**
+     * Get the mailer Closure for the message.
+     *
+     * @param  mixed  $notifiable
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @param  \Illuminate\Notifications\Messages\MailMessage  $message
+     * @return \Closure
+     */
+    protected function messageBuilder($notifiable, $notification, $message)
+    {
+        return function ($mailMessage) use ($notifiable, $notification, $message) {
             $this->buildMessage($mailMessage, $notifiable, $notification, $message);
-        });
+        };
     }
 
     /**
@@ -117,6 +135,14 @@ class MailChannel
         $this->addSender($mailMessage, $message);
 
         $mailMessage->to($this->getRecipients($notifiable, $message));
+
+        if ($message->cc) {
+            $mailMessage->cc($message->cc[0], Arr::get($message->cc, 1));
+        }
+
+        if ($message->bcc) {
+            $mailMessage->bcc($message->bcc[0], Arr::get($message->bcc, 1));
+        }
     }
 
     /**

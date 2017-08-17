@@ -156,6 +156,14 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     *  {@inheritdoc}
+     */
+    public function has($id)
+    {
+        return $this->bound($id);
+    }
+
+    /**
      * Determine if the given abstract type has been resolved.
      *
      * @param  string  $abstract
@@ -579,6 +587,18 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     *  {@inheritdoc}
+     */
+    public function get($id)
+    {
+        if ($this->has($id)) {
+            return $this->resolve($id);
+        }
+
+        throw new EntryNotFoundException;
+    }
+
+    /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
@@ -788,7 +808,7 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $results[] = is_null($class = $dependency->getClass())
+            $results[] = is_null($dependency->getClass())
                             ? $this->resolvePrimitive($dependency)
                             : $this->resolveClass($dependency);
         }

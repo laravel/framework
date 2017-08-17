@@ -70,6 +70,8 @@ class BroadcastEvent implements ShouldQueue
             $payload[$property->getName()] = $this->formatProperty($property->getValue($event));
         }
 
+        unset($payload['broadcastQueue']);
+
         return $payload;
     }
 

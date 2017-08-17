@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
@@ -15,6 +16,10 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
+/**
+ * @mixin \Illuminate\Database\Eloquent\Builder
+ * @mixin \Illuminate\Database\Query\Builder
+ */
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
@@ -516,6 +521,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // which is typically an auto-increment value managed by the database.
         else {
             $saved = $this->performInsert($query);
+
+            if (! $this->getConnectionName() &&
+                $connection = $query->getConnection()) {
+                $this->setConnection($connection->getName());
+            }
         }
 
         // If the model is successfully saved, we need to do a few more things once
@@ -553,11 +563,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $this->fireModelEvent('saved', false);
 
-        $this->syncOriginal();
-
-        if (Arr::get($options, 'touch', true)) {
+        if ($this->isDirty() && ($options['touch'] ?? true)) {
             $this->touchOwners();
         }
+
+        $this->syncOriginal();
     }
 
     /**
@@ -591,6 +601,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $this->setKeysForSaveQuery($query)->update($dirty);
 
             $this->fireModelEvent('updated', false);
+
+            $this->syncChanges();
         }
 
         return true;
@@ -616,9 +628,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getKeyForSaveQuery()
     {
-        return isset($this->original[$this->getKeyName()])
-                        ? $this->original[$this->getKeyName()]
-                        : $this->getAttribute($this->getKeyName());
+        return $this->original[$this->getKeyName()]
+                        ?? $this->getAttribute($this->getKeyName());
     }
 
     /**
@@ -883,7 +894,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null)
     {
         return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
-                      : new Pivot($parent, $attributes, $table, $exists);
+                      : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 
     /**
@@ -996,6 +1007,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                $this->getKey() === $model->getKey() &&
                $this->getTable() === $model->getTable() &&
                $this->getConnectionName() === $model->getConnectionName();
+    }
+
+    /**
+     * Determine if two models are not the same.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return bool
+     */
+    public function isNot(Model $model)
+    {
+        return ! $this->is($model);
     }
 
     /**
@@ -1200,6 +1222,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get the queueable connection for the entity.
+     *
+     * @return mixed
+     */
+    public function getQueueableConnection()
+    {
+        return $this->getConnectionName();
+    }
+
+    /**
      * Get the value of the model's route key.
      *
      * @return mixed
@@ -1217,6 +1249,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function getRouteKeyName()
     {
         return $this->getKeyName();
+    }
+
+    /**
+     * Retrieve the model for a bound value.
+     *
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function resolveRouteBinding($value)
+    {
+        return $this->where($this->getRouteKeyName(), $value)->first();
     }
 
     /**
@@ -1355,7 +1398,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        return $this->newQuery()->$method(...$parameters);
+        try {
+            return $this->newQuery()->$method(...$parameters);
+        } catch (BadMethodCallException $e) {
+            throw new BadMethodCallException(
+                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
+            );
+        }
     }
 
     /**

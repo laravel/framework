@@ -55,7 +55,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        return (int) $this->pheanstalk->statsTube($queue)->total_jobs;
+        return (int) $this->pheanstalk->statsTube($queue)->current_jobs_ready;
     }
 
     /**
@@ -89,7 +89,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue

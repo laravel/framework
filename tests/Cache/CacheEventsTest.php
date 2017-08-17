@@ -182,7 +182,7 @@ class CacheEventsTest extends TestCase
 
     protected function getRepository($dispatcher)
     {
-        $repository = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore());
+        $repository = new \Illuminate\Cache\Repository(new \Illuminate\Cache\ArrayStore);
         $repository->put('baz', 'qux', 99);
         $repository->tags('taylor')->put('baz', 'qux', 99);
         $repository->setEventDispatcher($dispatcher);

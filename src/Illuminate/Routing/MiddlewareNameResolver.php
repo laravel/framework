@@ -12,7 +12,7 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
-     * @return string|array
+     * @return \Closure|string|array
      */
     public static function resolve($name, $map, $middlewareGroups)
     {
@@ -21,26 +21,25 @@ class MiddlewareNameResolver
         // convenient on occasions when the developers are experimenting with them.
         if ($name instanceof Closure) {
             return $name;
-        } elseif (isset($map[$name]) && $map[$name] instanceof Closure) {
+        }
+
+        if (isset($map[$name]) && $map[$name] instanceof Closure) {
             return $map[$name];
+        }
 
         // If the middleware is the name of a middleware group, we will return the array
         // of middlewares that belong to the group. This allows developers to group a
         // set of middleware under single keys that can be conveniently referenced.
-        } elseif (isset($middlewareGroups[$name])) {
-            return static::parseMiddlewareGroup(
-                $name, $map, $middlewareGroups
-            );
+        if (isset($middlewareGroups[$name])) {
+            return static::parseMiddlewareGroup($name, $map, $middlewareGroups);
+        }
 
         // Finally, when the middleware is simply a string mapped to a class name the
         // middleware name will get parsed into the full class name and parameters
         // which may be run using the Pipeline which accepts this string format.
-        } else {
-            list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
+        list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
-            return (isset($map[$name]) ? $map[$name] : $name).
-                   (! is_null($parameters) ? ':'.$parameters : '');
-        }
+        return ($map[$name] ?? $name).(! is_null($parameters) ? ':'.$parameters : '');
     }
 
     /**

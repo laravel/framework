@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Exception;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Symfony\Component\Console\Application as ConsoleApplication;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 trait InteractsWithExceptionHandling
 {
@@ -49,6 +50,12 @@ trait InteractsWithExceptionHandling
 
             public function render($request, Exception $e)
             {
+                if ($e instanceof NotFoundHttpException) {
+                    throw new NotFoundHttpException(
+                        "{$request->method()} {$request->url()}", null, $e->getCode()
+                    );
+                }
+
                 throw $e;
             }
 

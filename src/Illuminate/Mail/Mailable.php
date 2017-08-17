@@ -145,8 +145,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Deliver the queued message after the given delay.
      *
-     * @param  \DateTime|int  $delay
-     * @param  Queue  $queue
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function later($delay, Queue $queue)
@@ -211,7 +211,7 @@ class Mailable implements MailableContract, Renderable
 
         return [
             'html' => $markdown->render($this->markdown, $data),
-            'text' => $markdown->renderText($this->markdown, $data),
+            'text' => $this->buildMarkdownText($markdown, $data),
         ];
     }
 
@@ -231,6 +231,19 @@ class Mailable implements MailableContract, Renderable
         }
 
         return $data;
+    }
+
+    /**
+     * Build the text view for a Markdown message.
+     *
+     * @param  \Illuminate\Mail\Markdown  $markdown
+     * @param  array  $data
+     * @return string
+     */
+    protected function buildMarkdownText($markdown, $data)
+    {
+        return $this->textView
+                ?? $markdown->renderText($this->markdown, $data);
     }
 
     /**
@@ -459,7 +472,7 @@ class Mailable implements MailableContract, Renderable
             $recipient = $this->normalizeRecipient($recipient);
 
             $this->{$property}[] = [
-                'name' => isset($recipient->name) ? $recipient->name : null,
+                'name' => $recipient->name ?? null,
                 'address' => $recipient->email,
             ];
         }
@@ -515,7 +528,7 @@ class Mailable implements MailableContract, Renderable
         );
 
         $expected = [
-            'name' => isset($expected->name) ? $expected->name : null,
+            'name' => $expected->name ?? null,
             'address' => $expected->email,
         ];
 
