@@ -571,7 +571,8 @@ if (! function_exists('mix')) {
 
         if (! isset($manifest[$path])) {
 
-            $mixMessage = "Unable to locate Mix file: {$path}. Please check your " . 'webpack.mix.js output paths and try again.';
+            $mixMessage = "Unable to locate Mix file: {$path}. Please check your ".
+                          'webpack.mix.js output paths and try again.';
 
             report(new Exception($mixMessage));
 
