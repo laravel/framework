@@ -664,7 +664,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $response = new JsonResponse($response);
         }
 
-        if ($response instanceof SymfonyResponse) {
+        if ($response instanceof SymfonyResponse && ! $response instanceof Response) {
             $response = new Response($response->getContent(),
                 $response->getStatusCode(), $response->headers->all()
             );
