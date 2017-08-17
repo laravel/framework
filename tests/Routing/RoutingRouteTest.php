@@ -1398,7 +1398,7 @@ class RoutingRouteTest extends TestCase
         $this->assertNotInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
-    public function testJsonResponseIsReturned()
+    public function testIlluminateResponseIsReturnedFromArray()
     {
         $router = $this->getRouter();
         $router->get('foo/bar', function () {
@@ -1406,8 +1406,8 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo/bar', 'GET'));
-        $this->assertNotInstanceOf(\Illuminate\Http\Response::class, $response);
-        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertNotInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
     public function testRouteRedirect()

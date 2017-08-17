@@ -8,7 +8,6 @@ use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
@@ -542,7 +541,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Dispatch the request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function dispatch(Request $request)
     {
@@ -645,7 +644,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  mixed  $response
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public static function prepareResponse($request, $response)
     {
@@ -654,15 +653,14 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         if ($response instanceof PsrResponseInterface) {
-            $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif (! $response instanceof SymfonyResponse &&
-                   ($response instanceof Arrayable ||
-                    $response instanceof Jsonable ||
-                    $response instanceof ArrayObject ||
-                    $response instanceof JsonSerializable ||
-                    is_array($response))) {
-            $response = new JsonResponse($response);
-        } elseif (! $response instanceof SymfonyResponse) {
+            $response = new Response($response->getBody(),
+                $response->getStatusCode(), $response->getHeaders()
+            );
+        } elseif ($response instanceof SymfonyResponse) {
+            $response = new Response($response->getContent(),
+                $response->getStatusCode(), $response->headers->all()
+            );
+        } else {
             $response = new Response($response);
         }
 
