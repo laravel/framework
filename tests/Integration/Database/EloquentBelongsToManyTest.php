@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
@@ -111,7 +111,14 @@ class EloquentBelongsToManyTest extends TestCase
 
         $post->tagsWithCustomPivot()->attach($tag->id);
 
+        $post->tagsWithCustomAccessor()->attach($tag->id);
+
         $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivot[0]->pivot);
+
+        $this->assertEquals([
+            'post_id' => '1',
+            'tag_id' => '1',
+        ], $post->tagsWithCustomAccessor[0]->tag->toArray());
     }
 
     /**
@@ -450,8 +457,10 @@ class EloquentBelongsToManyTest extends TestCase
             Carbon::createFromFormat('Y-m-d H:i:s', '2017-10-10 10:10:10')
         );
 
-        $tag->update(['name' => str_random('asd')]);
+        $tag->update(['name' => $tag->name]);
+        $this->assertNotEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
 
+        $tag->update(['name' => str_random()]);
         $this->assertEquals('2017-10-10 10:10:10', $post->fresh()->updated_at->toDateTimeString());
     }
 
@@ -578,6 +587,13 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(CustomPivot::class)
             ->withTimestamps();
+    }
+
+    public function tagsWithCustomAccessor()
+    {
+        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
+            ->using(CustomPivot::class)
+            ->as('tag');
     }
 }
 

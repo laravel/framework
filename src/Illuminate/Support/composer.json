@@ -16,7 +16,7 @@
     "require": {
         "php": ">=7.0",
         "ext-mbstring": "*",
-        "doctrine/inflector": "~1.0",
+        "doctrine/inflector": "~1.1",
         "illuminate/contracts": "5.5.*",
         "nesbot/carbon": "^1.20"
     },

@@ -134,7 +134,7 @@ class Handler implements ExceptionHandlerContract
     {
         $dontReport = array_merge($this->dontReport, $this->internalDontReport);
 
-        return ! is_null(collect($dontReport)->first(function ($type) use ($e) {
+        return ! is_null(Arr::first($dontReport, function ($type) use ($e) {
             return $e instanceof $type;
         }));
     }
@@ -308,7 +308,7 @@ class Handler implements ExceptionHandlerContract
         $statusCode = $this->isHttpException($e) ? $e->getStatusCode() : 500;
 
         try {
-            $content = config('app.debug')
+            $content = config('app.debug') && class_exists(Whoops::class)
                     ? $this->renderExceptionWithWhoops($e)
                     : $this->renderExceptionWithSymfony($e, config('app.debug'));
         } catch (Exception $e) {
@@ -363,6 +363,7 @@ class Handler implements ExceptionHandlerContract
             $files = new Filesystem;
 
             $handler->handleUnconditionally(true);
+
             $handler->setApplicationPaths(
                 array_flip(Arr::except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]

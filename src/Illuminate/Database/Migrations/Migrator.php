@@ -245,6 +245,8 @@ class Migrator
             $migration = (object) $migration;
 
             if (! $file = Arr::get($files, $migration->migration)) {
+                $this->note("<fg=red>Migration not found:</> {$migration->migration}");
+
                 continue;
             }
 
@@ -392,7 +394,7 @@ class Migrator
         // queries against the database returning the array of raw SQL statements
         // that would get fired against the database system for this migration.
         $db = $this->resolveConnection(
-            $connection = $migration->getConnection()
+            $migration->getConnection()
         );
 
         return $db->pretend(function () use ($migration, $method) {

@@ -922,30 +922,46 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection([1, 2, 3, 4, 5, 6]);
 
+        $random = $data->random();
+        $this->assertInternalType('integer', $random);
+        $this->assertContains($random, $data->all());
+
+        $random = $data->random(0);
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(0, $random);
+
         $random = $data->random(1);
         $this->assertInstanceOf(Collection::class, $random);
         $this->assertCount(1, $random);
 
-        $random = $data->random(3);
+        $random = $data->random(2);
         $this->assertInstanceOf(Collection::class, $random);
-        $this->assertCount(3, $random);
+        $this->assertCount(2, $random);
+
+        $random = $data->random('0');
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(0, $random);
+
+        $random = $data->random('1');
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(1, $random);
+
+        $random = $data->random('2');
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(2, $random);
     }
 
-    public function testRandomWithoutArgument()
+    public function testRandomOnEmptyCollection()
     {
-        $data = new Collection([1, 2, 3, 4, 5, 6]);
+        $data = new Collection();
 
-        $random = $data->random();
-        $this->assertInternalType('integer', $random);
-        $this->assertContains($random, $data->all());
-    }
+        $random = $data->random(0);
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(0, $random);
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testRandomThrowsAnErrorWhenRequestingMoreItemsThanAreAvailable()
-    {
-        (new Collection)->random();
+        $random = $data->random('0');
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(0, $random);
     }
 
     public function testTakeLast()

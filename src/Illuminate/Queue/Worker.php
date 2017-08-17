@@ -126,7 +126,7 @@ class Worker
      * Register the worker timeout handler (PHP 7.1+).
      *
      * @param  \Illuminate\Contracts\Queue\Job|null  $job
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return void
      */
     protected function registerTimeoutHandler($job, WorkerOptions $options)
@@ -149,7 +149,7 @@ class Worker
      * Get the appropriate timeout for the given job.
      *
      * @param  \Illuminate\Contracts\Queue\Job|null  $job
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @return int
      */
     protected function timeoutForJob($job, WorkerOptions $options)
@@ -160,7 +160,7 @@ class Worker
     /**
      * Determine if the daemon should process on this iteration.
      *
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  string  $connectionName
      * @param  string  $queue
      * @return bool
@@ -175,7 +175,7 @@ class Worker
     /**
      * Pause the worker for the current loop.
      *
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
      * @return void
      */
@@ -189,7 +189,7 @@ class Worker
     /**
      * Stop the process if necessary.
      *
-     * @param  WorkerOptions  $options
+     * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart)
@@ -429,7 +429,7 @@ class Worker
      */
     protected function raiseBeforeJobEvent($connectionName, $job)
     {
-        $this->events->fire(new Events\JobProcessing(
+        $this->events->dispatch(new Events\JobProcessing(
             $connectionName, $job
         ));
     }
@@ -443,7 +443,7 @@ class Worker
      */
     protected function raiseAfterJobEvent($connectionName, $job)
     {
-        $this->events->fire(new Events\JobProcessed(
+        $this->events->dispatch(new Events\JobProcessed(
             $connectionName, $job
         ));
     }
@@ -458,7 +458,7 @@ class Worker
      */
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e)
     {
-        $this->events->fire(new Events\JobExceptionOccurred(
+        $this->events->dispatch(new Events\JobExceptionOccurred(
             $connectionName, $job, $e
         ));
     }
@@ -473,7 +473,7 @@ class Worker
      */
     protected function raiseFailedJobEvent($connectionName, $job, $e)
     {
-        $this->events->fire(new Events\JobFailed(
+        $this->events->dispatch(new Events\JobFailed(
             $connectionName, $job, $e
         ));
     }
@@ -555,7 +555,7 @@ class Worker
      */
     public function stop($status = 0)
     {
-        $this->events->fire(new Events\WorkerStopping);
+        $this->events->dispatch(new Events\WorkerStopping);
 
         exit($status);
     }
