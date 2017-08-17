@@ -14,6 +14,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
 use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
+use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class Router implements RegistrarContract, BindingRegistrar
@@ -645,13 +646,11 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
+        } elseif ($response instanceof PsrResponseInterface) {
+            $response = (new HttpFoundationFactory)->createResponse($response);
         }
 
-        if ($response instanceof PsrResponseInterface) {
-            $response = new Response($response->getBody(),
-                $response->getStatusCode(), $response->getHeaders()
-            );
-        } elseif ($response instanceof SymfonyResponse) {
+        if ($response instanceof SymfonyResponse) {
             $response = new Response($response->getContent(),
                 $response->getStatusCode(), $response->headers->all()
             );
