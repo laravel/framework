@@ -308,6 +308,27 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['developer' => ['name' => 'Taylor', 'age' => null]], $request->all());
     }
 
+    public function testKeysMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals(['name', 'age'], $request->keys());
+
+        $files = [
+            'foo' => [
+                'size' => 500,
+                'name' => 'foo.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'blah',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertEquals(['foo'], $request->keys());
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor'], [], $files);
+        $this->assertEquals(['name', 'foo'], $request->keys());
+    }
+
     public function testOnlyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
