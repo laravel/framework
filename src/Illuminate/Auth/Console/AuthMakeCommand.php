@@ -16,7 +16,8 @@ class AuthMakeCommand extends Command
      */
     protected $signature = 'make:auth
                     {--views : Only scaffold the authentication views}
-                    {--force : Overwrite existing views by default}';
+                    {--force : Overwrite existing views by default}
+                    {--no-tests : Do not generate tests}';
 
     /**
      * The console command description.
@@ -37,6 +38,18 @@ class AuthMakeCommand extends Command
         'auth/passwords/reset.stub' => 'auth/passwords/reset.blade.php',
         'layouts/app.stub' => 'layouts/app.blade.php',
         'home.stub' => 'home.blade.php',
+    ];
+
+    /**
+     * The tests that need to be exported.
+     *
+     * @var array
+     */
+    protected $tests = [
+        'Feature/Auth/LoginTest.stub' => 'Feature/Auth/LoginTest.php',
+        'Feature/Auth/RegisterTest.stub' => 'Feature/Auth/RegisterTest.php',
+        'Feature/Auth/ForgotPasswordTest.stub' => 'Feature/Auth/ForgotPasswordTest.php',
+        'Feature/Auth/ResetPasswordTest.stub' => 'Feature/Auth/ResetPasswordTest.php',
     ];
 
     /**
@@ -63,6 +76,10 @@ class AuthMakeCommand extends Command
             );
         }
 
+        if (! $this->option('no-tests')) {
+            $this->exportTests();
+        }
+
         $this->info('Authentication scaffolding generated successfully.');
     }
 
@@ -80,6 +97,10 @@ class AuthMakeCommand extends Command
         if (! is_dir(resource_path('views/auth/passwords'))) {
             mkdir(resource_path('views/auth/passwords'), 0755, true);
         }
+
+        if (! $this->option('no-tests') && ! is_dir(base_path('tests/Feature/Auth'))) {
+            mkdir(base_path('tests/Feature/Auth'), 0755, true);
+        }
     }
 
     /**
@@ -90,17 +111,47 @@ class AuthMakeCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (file_exists(resource_path('views/'.$value)) && ! $this->option('force')) {
-                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
-                    continue;
-                }
-            }
-
-            copy(
+            $this->exportStub(
                 __DIR__.'/stubs/make/views/'.$key,
-                resource_path('views/'.$value)
+                resource_path($filename = 'views/'.$value),
+                $filename
             );
         }
+    }
+
+    /**
+     * Export the authentication tests.
+     *
+     * @return void
+     */
+    public function exportTests()
+    {
+        foreach ($this->tests as $key => $value) {
+            $this->exportStub(
+                __DIR__.'/stubs/make/tests/'.$key,
+                base_path($filename = 'tests/'.$value),
+                $filename
+            );
+        }
+    }
+
+    /**
+     * Export a stub from the source location to the given location.
+     *
+     * @param  string  $source
+     * @param  string  $destination
+     * @param  string  $filename
+     * @return void
+     */
+    protected function exportStub($source, $destination, $filename)
+    {
+        if (file_exists($destination) && ! $this->option('force')) {
+            if (! $this->confirm("The [{$filename}] file already exists. Do you want to replace it?")) {
+                return;
+            }
+        }
+
+        copy($source, $destination);
     }
 
     /**
