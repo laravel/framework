@@ -2,13 +2,18 @@
 
 namespace Illuminate\Routing;
 
+use ArrayObject;
 use Closure;
+use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Routing\BindingRegistrar;
@@ -648,6 +653,15 @@ class Router implements RegistrarContract, BindingRegistrar
             $response = $response->toResponse($request);
         } elseif ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
+        }
+
+        if ($response instanceof Arrayable ||
+            $response instanceof Jsonable ||
+            $response instanceof ArrayObject ||
+            $response instanceof JsonSerializable ||
+            is_array($response)
+        ) {
+            $response = new JsonResponse($response);
         }
 
         if ($response instanceof SymfonyResponse) {
