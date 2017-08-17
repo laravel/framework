@@ -501,7 +501,13 @@ trait ValidatesAttributes
      */
     protected function validateDistinct($attribute, $value, $parameters)
     {
+        $parameters = $this->parseNamedParameters($parameters);
+
         $attributeName = $this->getPrimaryAttribute($attribute);
+
+        if (isset($parameters) && array_key_exists('strict', $parameters)) {
+            $attributeName = $this->getNestedAttribute($attribute);
+        }
 
         $attributeData = ValidationData::extractDataFromPath(
             ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
