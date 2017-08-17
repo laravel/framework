@@ -104,7 +104,8 @@ class BroadcasterTestEloquentModelStub extends Model
         return $this;
     }
 
-    public function first(){
+    public function first()
+    {
         return "model.{$this->value}.instance";
     }
 }

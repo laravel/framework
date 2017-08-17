@@ -35,7 +35,7 @@ class ImplicitRouteBinding
             if (! $model = $instance->resolveRouteBinding($parameterValue)) {
                 throw (new ModelNotFoundException)->setModel($parameter->getClass());
             }
- 
+
             $route->setParameter($parameterName, $model);
         }
     }
