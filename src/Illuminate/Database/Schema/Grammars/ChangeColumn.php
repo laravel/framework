@@ -200,6 +200,6 @@ class ChangeColumn
      */
     protected static function mapFluentValueToDoctrine($option, $value)
     {
-        return $option == 'notnull' ? ! $value : $value;
+        return $option === 'notnull' ? ! $value : $value;
     }
 }

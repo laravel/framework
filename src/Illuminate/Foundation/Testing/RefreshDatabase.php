@@ -27,7 +27,7 @@ trait RefreshDatabase
     {
         return config('database.connections')[
             config('database.default')
-        ]['database'] == ':memory:';
+        ]['database'] === ':memory:';
     }
 
     /**
