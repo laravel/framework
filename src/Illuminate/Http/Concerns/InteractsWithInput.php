@@ -166,6 +166,16 @@ trait InteractsWithInput
     }
 
     /**
+     * Get the keys for all input and files for the request.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_merge(array_keys($this->input()), $this->files->keys());
+    }
+
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string  $key
