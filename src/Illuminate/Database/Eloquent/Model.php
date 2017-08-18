@@ -385,7 +385,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array|string  $relations
      * @return $this
      */
-    public function loadIfNotLaded($relations)
+    public function loadMissing($relations)
     {
         $relations = is_string($relations) ? func_get_args() : $relations;
 
