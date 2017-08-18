@@ -59,7 +59,49 @@ class MigrateCommand extends BaseCommand
             return;
         }
 
-        $this->prepareDatabase();
+        if ($this->hasOption('database') && (strpos(',', $this->option('database')) !== false)) {
+            foreach (explode(',', $this->option('database')) as $database) {
+                $this->runMigrations($database);
+            }
+        } else {
+            $this->runMigrations(
+                $this->option('database')
+            );
+        }
+    }
+
+    /**
+     * Prepare the migration database for running.
+     *
+     * @param string $database
+     *
+     * @return void
+     */
+    protected function prepareDatabase($database)
+    {
+        $this->migrator->setConnection($database);
+
+        if (! $this->migrator->repositoryExists()) {
+            $this->call(
+                'migrate:install', ['--database' => $database]
+            );
+        }
+    }
+
+    /**
+     * Run migrations for database.
+     *
+     * @param string $database
+     *
+     * @return void
+     */
+    protected function runMigrations($database)
+    {
+        $this->prepareDatabase($database);
+
+        if (! empty($database)) {
+            $this->output->writeln("<comment>Running migrations for database</comment>: {$database}");
+        }
 
         // Next, we will check to see if a path option has been defined. If it has
         // we will use the path relative to the root of this installation folder
@@ -81,22 +123,6 @@ class MigrateCommand extends BaseCommand
         // a migration and a seed at the same time, as it is only this command.
         if ($this->option('seed')) {
             $this->call('db:seed', ['--force' => true]);
-        }
-    }
-
-    /**
-     * Prepare the migration database for running.
-     *
-     * @return void
-     */
-    protected function prepareDatabase()
-    {
-        $this->migrator->setConnection($this->option('database'));
-
-        if (! $this->migrator->repositoryExists()) {
-            $this->call(
-                'migrate:install', ['--database' => $this->option('database')]
-            );
         }
     }
 }

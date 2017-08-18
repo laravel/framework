@@ -38,7 +38,9 @@ class RefreshCommand extends Command
         // Next we'll gather some of the options so that we can have the right options
         // to pass to the commands. This includes options such as which database to
         // use and the path to use for the migration. Then we'll run the command.
-        $database = $this->input->getOption('database');
+        $database = $this->hasOption('database') ?
+            explode(',', $this->input->getOption('database')) :
+            $this->input->getOption('database');
 
         $path = $this->input->getOption('path');
 
@@ -49,6 +51,25 @@ class RefreshCommand extends Command
         // only rollback and remigrate the latest four migrations instead of all.
         $step = $this->input->getOption('step') ?: 0;
 
+        if (is_array($database)) {
+            foreach ($database as $db) {
+                $this->refreshMigrations($db, $path, $step, $force);
+            }
+        } else {
+            $this->refreshMigrations($database, $path, $step, $force);
+        }
+    }
+
+    /**
+     * Rollback & migrate all migrations.
+     *
+     * @param string $database
+     * @param string $path
+     * @param string $step
+     * @param string $force
+     */
+    protected function refreshMigrations($database, $path, $step, $force)
+    {
         if ($step > 0) {
             $this->runRollback($database, $path, $step, $force);
         } else {
