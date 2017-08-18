@@ -4,7 +4,6 @@ namespace Illuminate\Auth;
 
 use RuntimeException;
 use Illuminate\Support\Str;
-use Illuminate\Http\Response;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Contracts\Auth\UserProvider;
@@ -13,6 +12,7 @@ use Illuminate\Contracts\Auth\StatefulGuard;
 use Symfony\Component\HttpFoundation\Request;
 use Illuminate\Contracts\Auth\SupportsBasicAuth;
 use Illuminate\Contracts\Cookie\QueueingFactory as CookieJar;
+use Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 
 class SessionGuard implements StatefulGuard, SupportsBasicAuth
@@ -331,11 +331,12 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the response for basic authentication.
      *
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return void
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
     protected function failedBasicResponse()
     {
-        return new Response('Invalid credentials.', 401, ['WWW-Authenticate' => 'Basic']);
+        throw new UnauthorizedHttpException('Basic');
     }
 
     /**
