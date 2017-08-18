@@ -363,7 +363,8 @@ trait ValidatesAttributes
         return $date && $date->format($parameters[0]) == $value;
     }
 
-    /** Validates if an attribute is equal to another date
+    /**
+     * Validate that an attribute is equal to another date
      * @param string $attribute
      * @param mixed $value
      * @param array $parameters
@@ -379,9 +380,9 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is different from another attribute.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed $value
+     * @param array $parameters
      * @return bool
      */
     public function validateDifferent($attribute, $value, $parameters)
