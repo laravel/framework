@@ -19,14 +19,24 @@ class Failed
     public $credentials;
 
     /**
+     * The request.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    protected $request;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $credentials
+     * @param  \Illuminate\Http\Request  $request
+     * @return void
      */
-    public function __construct($user, $credentials)
+    public function __construct($user, $credentials, $request)
     {
         $this->user = $user;
         $this->credentials = $credentials;
+        $this->request = $request;
     }
 }
