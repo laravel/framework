@@ -76,6 +76,21 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command, ['--database' => 'foo']);
     }
 
+    public function testMigrateCommandWithMultipleDatabases()
+    {
+        $command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');
+        $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('setConnection')->once()->with('foo,bar');
+        $migrator->shouldReceive('run')->once()->with([__DIR__.DIRECTORY_SEPARATOR.'migrations'], ['pretend' => false, 'step' => false]);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+
+        $this->runCommand($command, ['--database' => 'foo,bar']);
+    }
+
     public function testStepMayBeSet()
     {
         $command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'), __DIR__.'/vendor');

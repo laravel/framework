@@ -44,6 +44,21 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
+    public function testResetCommandCanBePretendedWithMultipleDatabases()
+    {
+        $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('setConnection')->once()->with('foo,bar');
+        $migrator->shouldReceive('repositoryExists')->once()->andReturn(true);
+        $migrator->shouldReceive('reset')->once()->with([__DIR__.'/migrations'], true);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+
+        $this->runCommand($command, ['--pretend' => true, '--database' => 'foo,bar']);
+    }
+
     protected function runCommand($command, $input = [])
     {
         return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);

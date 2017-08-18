@@ -55,7 +55,31 @@ class ResetCommand extends BaseCommand
             return;
         }
 
-        $this->migrator->setConnection($this->option('database'));
+        if ($this->hasOption('database') && (strpos(',', $this->option('database')) !== false)) {
+            foreach (explode(',', $this->option('database')) as $database) {
+                $this->resetMigrations($database);
+            }
+        } else {
+            $this->resetMigrations(
+                $this->option('database')
+            );
+        }
+    }
+
+    /**
+     * Revert all migrations.
+     *
+     * @param string $database
+     *
+     * @return void
+     */
+    protected function resetMigrations($database)
+    {
+        $this->migrator->setConnection($database);
+
+        if (! empty($database)) {
+            $this->output->writeln("<comment>Reverting all migrations for database</comment>: {$database}");
+        }
 
         // First, we'll make sure that the migration table actually exists before we
         // start trying to rollback and re-run all of the migrations. If it's not

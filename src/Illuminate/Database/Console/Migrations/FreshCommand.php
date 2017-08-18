@@ -35,9 +35,31 @@ class FreshCommand extends Command
             return;
         }
 
-        $this->dropAllTables(
-            $database = $this->input->getOption('database')
-        );
+        if ($this->hasOption('database') && (strpos(',', $this->option('database')) !== false)) {
+            foreach (explode(',', $this->option('database')) as $database) {
+                $this->freshMigrations($database);
+            }
+        } else {
+            $this->freshMigrations(
+                $this->option('database')
+            );
+        }
+    }
+
+    /**
+     * Remove all table from database & run all migrations.
+     *
+     * @param string $database
+     *
+     * @return void
+     */
+    protected function freshMigrations($database)
+    {
+        if (! empty($database)) {
+            $this->output->writeln("<comment>Dropping all tables from database</comment>: {$database}");
+        }
+
+        $this->dropAllTables($database);
 
         $this->info('Dropped all tables successfully.');
 

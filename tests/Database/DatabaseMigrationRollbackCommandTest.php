@@ -56,6 +56,20 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
+    public function testRollbackCommandWithMultipleDatabases()
+    {
+        $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
+        $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $migrator->shouldReceive('paths')->once()->andReturn([]);
+        $migrator->shouldReceive('setConnection')->once()->with('foo,bar');
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], true);
+        $migrator->shouldReceive('getNotes')->andReturn([]);
+
+        $this->runCommand($command, ['--database' => 'foo,bar']);
+    }
+
     public function testRollbackCommandCanBePretendedWithStepOption()
     {
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));

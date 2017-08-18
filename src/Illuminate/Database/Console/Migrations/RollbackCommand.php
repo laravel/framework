@@ -55,7 +55,31 @@ class RollbackCommand extends BaseCommand
             return;
         }
 
-        $this->migrator->setConnection($this->option('database'));
+        if ($this->hasOption('database') && (strpos(',', $this->option('database')) !== false)) {
+            foreach (explode(',', $this->option('database')) as $database) {
+                $this->rollbackMigrations($database);
+            }
+        } else {
+            $this->rollbackMigrations(
+                $this->option('database')
+            );
+        }
+    }
+
+    /**
+     * Rollback migrations for database.
+     *
+     * @param string $database
+     *
+     * @return void
+     */
+    protected function rollbackMigrations($database)
+    {
+        $this->migrator->setConnection($database);
+
+        if (! empty($database)) {
+            $this->output->writeln("<comment>Rolling back migrations for database</comment>: {$database}");
+        }
 
         $this->migrator->rollback(
             $this->getMigrationPaths(), [
