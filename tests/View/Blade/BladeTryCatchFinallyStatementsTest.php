@@ -69,6 +69,30 @@ bang
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
+    public function testTryMultipleCatchFinallyStatementsAreCompiled()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $string = '@try
+breeze
+@catch(\Exception $e)
+boom
+@catch(\Error $e)
+bang
+@finally
+bang
+@endtry';
+        $expected = '<?php try { ?>
+breeze
+<?php } catch (\Exception $e) { ?>
+boom
+<?php } catch (\Error $e) { ?>
+bang
+<?php } finally { ?>
+bang
+<?php } ?>';
+        $this->assertEquals($expected, $compiler->compileString($string));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');
