@@ -380,6 +380,21 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Eager load relations on the model if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadIfNotLaded($relations)
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        return $this->load(array_filter($relations, function ($relation) {
+            return ! $this->relationLoaded($relation);
+        }));
+    }
+
+    /**
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
