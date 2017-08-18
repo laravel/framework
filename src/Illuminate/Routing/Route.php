@@ -268,7 +268,7 @@ class Route
     /**
      * Compile the route into a Symfony CompiledRoute instance.
      *
-     * @return void
+     * @return \Symfony\Component\Routing\CompiledRoute
      */
     protected function compileRoute()
     {
