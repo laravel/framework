@@ -167,6 +167,18 @@ if (! function_exists('back')) {
     }
 }
 
+if (! function_exists('backUrl')) {
+    /**
+     * Get the url of the previous location.
+     *
+     * @return string
+     */
+    function backUrl()
+    {
+        return back()->getTargetUrl();
+    }
+}
+
 if (! function_exists('base_path')) {
     /**
      * Get the path to the base of the install.
