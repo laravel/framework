@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ImplicitRouteBinding
 {
@@ -29,11 +30,13 @@ class ImplicitRouteBinding
                 continue;
             }
 
-            $model = $container->make($parameter->getClass()->name);
+            $instance = $container->make($parameter->getClass()->name);
 
-            $route->setParameter($parameterName, $model->where(
-                $model->getRouteKeyName(), $parameterValue
-            )->firstOrFail());
+            if (! $model = $instance->resolveRouteBinding($parameterValue)) {
+                throw (new ModelNotFoundException)->setModel($parameter->getClass());
+            }
+
+            $route->setParameter($parameterName, $model);
         }
     }
 

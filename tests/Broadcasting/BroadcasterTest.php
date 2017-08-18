@@ -104,7 +104,7 @@ class BroadcasterTestEloquentModelStub extends Model
         return $this;
     }
 
-    public function firstOr()
+    public function first()
     {
         return "model.{$this->value}.instance";
     }
@@ -124,8 +124,8 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
         return $this;
     }
 
-    public function firstOr($callback)
+    public function first()
     {
-        return call_user_func($callback);
+        return null;
     }
 }
