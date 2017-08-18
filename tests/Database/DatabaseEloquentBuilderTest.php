@@ -475,7 +475,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\RelationNotFoundException
-     * @expectedExceptionMessage Call to undefined relationship [invalid] on model [Mockery_18_Illuminate_Database_Eloquent_Model].
      */
     public function testGetRelationThrowsException()
     {
