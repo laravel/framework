@@ -542,7 +542,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Dispatch the request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public function dispatch(Request $request)
     {
@@ -645,24 +645,30 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  mixed  $response
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public static function prepareResponse($request, $response)
     {
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
+        } elseif ($response instanceof PsrResponseInterface) {
+            $response = (new HttpFoundationFactory)->createResponse($response);
         }
 
-        if ($response instanceof PsrResponseInterface) {
-            $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif (! $response instanceof SymfonyResponse &&
-                   ($response instanceof Arrayable ||
-                    $response instanceof Jsonable ||
-                    $response instanceof ArrayObject ||
-                    $response instanceof JsonSerializable ||
-                    is_array($response))) {
+        if ($response instanceof Arrayable ||
+            $response instanceof Jsonable ||
+            $response instanceof ArrayObject ||
+            $response instanceof JsonSerializable ||
+            is_array($response)
+        ) {
             $response = new JsonResponse($response);
-        } elseif (! $response instanceof SymfonyResponse) {
+        }
+
+        if ($response instanceof SymfonyResponse && ! $response instanceof Response) {
+            $response = new Response($response->getContent(),
+                $response->getStatusCode(), $response->headers->all()
+            );
+        } elseif (! $response instanceof Response) {
             $response = new Response($response);
         }
 
