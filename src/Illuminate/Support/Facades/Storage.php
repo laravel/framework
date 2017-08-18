@@ -16,8 +16,10 @@ class Storage extends Facade
      *
      * @return void
      */
-    public static function fake($disk)
+    public static function fake($disk = '')
     {
+        $disk = $disk ?: self::$app['config']->get('filesystems.default');
+
         (new Filesystem)->cleanDirectory(
             $root = storage_path('framework/testing/disks/'.$disk)
         );
@@ -31,8 +33,10 @@ class Storage extends Facade
      * @param  string  $disk
      * @return void
      */
-    public static function persistentFake($disk)
+    public static function persistentFake($disk = '')
     {
+        $disk = $disk ?: self::$app['config']->get('filesystems.default');
+
         static::set($disk, self::createLocalDriver([
             'root' => storage_path('framework/testing/disks/'.$disk),
         ]));
