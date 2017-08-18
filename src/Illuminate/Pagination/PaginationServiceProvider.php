@@ -38,7 +38,13 @@ class PaginationServiceProvider extends ServiceProvider
         });
 
         Paginator::currentPageResolver(function ($pageName = 'page') {
-            $page = $this->app['request']->input($pageName);
+            // It is using array notation
+            if(preg_match('/(\w+)\[(\w+)\]/', $pageName, $matches)) {
+                $param = $this->app['request']->input($matches[1]);
+                $page = $param[$matches[2]] ?: null;
+            } else {
+                $page = $this->app['request']->input($pageName);
+            }
 
             if (filter_var($page, FILTER_VALIDATE_INT) !== false && (int) $page >= 1) {
                 return $page;
