@@ -14,6 +14,7 @@ use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
+use Illuminate\Log\Configurator as LogConfigurator;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Contracts\Http\Kernel as HttpKernelContract;
@@ -93,6 +94,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      * @var array
      */
     protected $deferredServices = [];
+
+    /**
+     * The class used to configure logging.
+     *
+     * @var string
+     */
+    protected $logConfigurator = LogConfigurator::class;
 
     /**
      * A custom callback used to configure Monolog.
@@ -1049,6 +1057,29 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function getMonologConfigurator()
     {
         return $this->monologConfigurator;
+    }
+
+    /**
+     * Specify a class to be used for configuring the log.
+     *
+     * @param  string  $configurator
+     * @return $this
+     */
+    public function configureLogWith($configurator)
+    {
+        $this->logConfigurator = $configurator;
+
+        return $this;
+    }
+
+    /**
+     * Retrieve the class used for log configuration.
+     *
+     * @return string
+     */
+    public function getLogConfigurator()
+    {
+        return $this->logConfigurator;
     }
 
     /**
