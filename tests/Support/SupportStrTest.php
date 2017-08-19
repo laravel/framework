@@ -9,8 +9,6 @@ class SupportStrTest extends TestCase
 {
     /**
      * Test the Str::words method.
-     *
-     * @group laravel
      */
     public function testStringCanBeLimitedByWords()
     {
