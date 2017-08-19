@@ -10,6 +10,7 @@ class MessageSent
      * @var \Swift_Message
      */
     public $message;
+    public $data;
 
     /**
      * Create a new event instance.
@@ -17,8 +18,9 @@ class MessageSent
      * @param  \Swift_Message  $message
      * @return void
      */
-    public function __construct($message)
+    public function __construct($message, $data = [])
     {
         $this->message = $message;
+        $this->data = $data;
     }
 }
