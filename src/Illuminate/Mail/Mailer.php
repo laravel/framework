@@ -460,7 +460,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Swift_Message  $message
      * @return bool
      */
-    protected function shouldSendMessage($message, $data)
+    protected function shouldSendMessage($message, $data = [])
     {
         if (! $this->events) {
             return true;
@@ -477,7 +477,7 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  \Illuminate\Mail\Message  $message
      * @return void
      */
-    protected function dispatchSentEvent($message, $data)
+    protected function dispatchSentEvent($message, $data = [])
     {
         if ($this->events) {
             $this->events->dispatch(

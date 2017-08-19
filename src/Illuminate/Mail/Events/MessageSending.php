@@ -18,7 +18,7 @@ class MessageSending
      * @param  \Swift_Message  $message
      * @return void
      */
-    public function __construct($message, $data)
+    public function __construct($message, $data = [])
     {
         $this->message = $message;
         $this->data = $data;
