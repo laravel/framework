@@ -135,7 +135,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function get($uri, $action = null)
+    public function get(string $uri, $action = null)
     {
         return $this->addRoute(['GET', 'HEAD'], $uri, $action);
     }
@@ -147,7 +147,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function post($uri, $action = null)
+    public function post(string $uri, $action = null)
     {
         return $this->addRoute('POST', $uri, $action);
     }
@@ -159,7 +159,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function put($uri, $action = null)
+    public function put(string $uri, $action = null)
     {
         return $this->addRoute('PUT', $uri, $action);
     }
@@ -171,7 +171,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function patch($uri, $action = null)
+    public function patch(string $uri, $action = null)
     {
         return $this->addRoute('PATCH', $uri, $action);
     }
@@ -183,7 +183,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function delete($uri, $action = null)
+    public function delete(string $uri, $action = null)
     {
         return $this->addRoute('DELETE', $uri, $action);
     }
@@ -195,7 +195,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function options($uri, $action = null)
+    public function options(string $uri, $action = null)
     {
         return $this->addRoute('OPTIONS', $uri, $action);
     }
@@ -207,7 +207,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function any($uri, $action = null)
+    public function any(string $uri, $action = null)
     {
         $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
 
@@ -222,7 +222,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param int  $status
      * @return \Illuminate\Routing\Route
      */
-    public function redirect($uri, $destination, $status = 301)
+    public function redirect(string $uri, string $destination, int $status = 301)
     {
         return $this->any($uri, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
@@ -237,7 +237,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  $data
      * @return \Illuminate\Routing\Route
      */
-    public function view($uri, $view, $data = [])
+    public function view(string $uri, string $view, array $data = [])
     {
         return $this->get($uri, '\Illuminate\Routing\ViewController')
                 ->defaults('view', $view)
@@ -252,7 +252,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function match($methods, $uri, $action = null)
+    public function match($methods, string $uri, $action = null)
     {
         return $this->addRoute(array_map('strtoupper', (array) $methods), $uri, $action);
     }
@@ -278,7 +278,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function resource($name, $controller, array $options = [])
+    public function resource(string $name, string $controller, array $options = [])
     {
         if ($this->container && $this->container->bound(ResourceRegistrar::class)) {
             $registrar = $this->container->make(ResourceRegistrar::class);
@@ -299,7 +299,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function apiResource($name, $controller, array $options = [])
+    public function apiResource(string $name, string $controller, array $options = [])
     {
         return $this->resource($name, $controller, array_merge([
             'only' => ['index', 'show', 'store', 'update', 'destroy'],
@@ -346,7 +346,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  $new
      * @return array
      */
-    public function mergeWithLastGroup($new)
+    public function mergeWithLastGroup(array $new)
     {
         return RouteGroup::merge($new, end($this->groupStack));
     }
@@ -392,7 +392,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    protected function addRoute($methods, $uri, $action)
+    protected function addRoute($methods, string $uri, $action)
     {
         return $this->routes->add($this->createRoute($methods, $uri, $action));
     }
@@ -405,7 +405,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
-    protected function createRoute($methods, $uri, $action)
+    protected function createRoute($methods, string $uri, $action)
     {
         // If the route is routing to a controller we will parse the route action into
         // an acceptable array format before registering it and creating this route
@@ -478,7 +478,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $class
      * @return string
      */
-    protected function prependGroupNamespace($class)
+    protected function prependGroupNamespace(string $class)
     {
         $group = end($this->groupStack);
 
@@ -494,7 +494,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $action
      * @return \Illuminate\Routing\Route
      */
-    protected function newRoute($methods, $uri, $action)
+    protected function newRoute($methods, string $uri, $action)
     {
         return (new Route($methods, $uri, $action))
                     ->setRouter($this)
@@ -507,7 +507,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $uri
      * @return string
      */
-    protected function prefix($uri)
+    protected function prefix(string $uri)
     {
         return trim(trim($this->getLastGroupPrefix(), '/').'/'.trim($uri, '/'), '/') ?: '/';
     }
@@ -518,7 +518,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
      */
-    protected function addWhereClausesToRoute($route)
+    protected function addWhereClausesToRoute(Route $route)
     {
         $route->where(array_merge(
             $this->patterns, $route->getAction()['where'] ?? []
@@ -533,7 +533,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Illuminate\Routing\Route  $route
      * @return void
      */
-    protected function mergeGroupAttributesIntoRoute($route)
+    protected function mergeGroupAttributesIntoRoute(Route $route)
     {
         $route->setAction($this->mergeWithLastGroup($route->getAction()));
     }
@@ -581,7 +581,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Routing\Route
      */
-    protected function findRoute($request)
+    protected function findRoute(Request $request)
     {
         $this->current = $route = $this->routes->match($request);
 
@@ -709,7 +709,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Illuminate\Routing\Route  $route
      * @return mixed
      */
-    protected function performBinding($key, $value, $route)
+    protected function performBinding(string $key, string $value, Route $route)
     {
         return call_user_func($this->binders[$key], $value, $route);
     }
@@ -742,7 +742,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $class
      * @return $this
      */
-    public function aliasMiddleware($name, $class)
+    public function aliasMiddleware(string $name, string $class)
     {
         $this->middleware[$name] = $class;
 
@@ -755,7 +755,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @return bool
      */
-    public function hasMiddlewareGroup($name)
+    public function hasMiddlewareGroup(string $name)
     {
         return array_key_exists($name, $this->middlewareGroups);
     }
@@ -777,7 +777,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  $middleware
      * @return $this
      */
-    public function middlewareGroup($name, array $middleware)
+    public function middlewareGroup(string $name, array $middleware)
     {
         $this->middlewareGroups[$name] = $middleware;
 
@@ -793,7 +793,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $middleware
      * @return $this
      */
-    public function prependMiddlewareToGroup($group, $middleware)
+    public function prependMiddlewareToGroup(string $group, string $middleware)
     {
         if (isset($this->middlewareGroups[$group]) && ! in_array($middleware, $this->middlewareGroups[$group])) {
             array_unshift($this->middlewareGroups[$group], $middleware);
@@ -811,7 +811,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $middleware
      * @return $this
      */
-    public function pushMiddlewareToGroup($group, $middleware)
+    public function pushMiddlewareToGroup(string $group, string $middleware)
     {
         if (! array_key_exists($group, $this->middlewareGroups)) {
             $this->middlewareGroups[$group] = [];
@@ -831,7 +831,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string|callable  $binder
      * @return void
      */
-    public function bind($key, $binder)
+    public function bind(string $key, $binder)
     {
         $this->binders[str_replace('-', '_', $key)] = RouteBinding::forCallback(
             $this->container, $binder
@@ -848,7 +848,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
-    public function model($key, $class, Closure $callback = null)
+    public function model(string $key, string $class, Closure $callback = null)
     {
         $this->bind($key, RouteBinding::forModel($this->container, $class, $callback));
     }
@@ -859,7 +859,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $key
      * @return \Closure|null
      */
-    public function getBindingCallback($key)
+    public function getBindingCallback(string $key)
     {
         if (isset($this->binders[$key = str_replace('-', '_', $key)])) {
             return $this->binders[$key];
@@ -883,7 +883,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $pattern
      * @return void
      */
-    public function pattern($key, $pattern)
+    public function pattern(string $key, string $pattern)
     {
         $this->patterns[$key] = $pattern;
     }
@@ -894,7 +894,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  $patterns
      * @return void
      */
-    public function patterns($patterns)
+    public function patterns(array $patterns)
     {
         foreach ($patterns as $key => $pattern) {
             $this->pattern($key, $pattern);
@@ -928,7 +928,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $default
      * @return mixed
      */
-    public function input($key, $default = null)
+    public function input(string $key, string $default = null)
     {
         return $this->current()->parameter($key, $default);
     }
@@ -958,7 +958,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @return \Illuminate\Routing\Route
      */
-    public function current()
+    public function current(): Route
     {
         return $this->current;
     }
@@ -969,7 +969,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @return bool
      */
-    public function has($name)
+    public function has(string $name): bool
     {
         $names = is_array($name) ? $name : func_get_args();
 
@@ -1009,7 +1009,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  dynamic  $patterns
      * @return bool
      */
-    public function currentRouteNamed(...$patterns)
+    public function currentRouteNamed(...$patterns): bool
     {
         return $this->current() && $this->current()->named(...$patterns);
     }
@@ -1032,7 +1032,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  array  ...$patterns
      * @return bool
      */
-    public function uses(...$patterns)
+    public function uses(...$patterns): bool
     {
         foreach ($patterns as $pattern) {
             if (Str::is($pattern, $this->currentRouteAction())) {
@@ -1049,7 +1049,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $action
      * @return bool
      */
-    public function currentRouteUses($action)
+    public function currentRouteUses(string $action): bool
     {
         return $this->currentRouteAction() == $action;
     }
@@ -1083,7 +1083,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  bool  $singular
      * @return void
      */
-    public function singularResourceParameters($singular = true)
+    public function singularResourceParameters(bool $singular = true)
     {
         ResourceRegistrar::singularParameters($singular);
     }
@@ -1115,7 +1115,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @return \Illuminate\Routing\RouteCollection
      */
-    public function getRoutes()
+    public function getRoutes(): RouteCollection
     {
         return $this->routes;
     }
