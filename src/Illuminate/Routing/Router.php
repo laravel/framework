@@ -742,7 +742,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $class
      * @return $this
      */
-    public function aliasMiddleware(string $name, string $class)
+    public function aliasMiddleware(string $name, $class)
     {
         $this->middleware[$name] = $class;
 
@@ -958,7 +958,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @return \Illuminate\Routing\Route
      */
-    public function current(): Route
+    public function current()
     {
         return $this->current;
     }
