@@ -10,6 +10,8 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
  * @method static \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
  * @method static \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
+ * @method static \Illuminate\Routing\Route redirect(string $uri, string $destination, int $status = 301)
+ * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [])
  * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, \Closure|array|string|null $action = null)
  * @method static \Illuminate\Routing\Route prefix(string  $prefix)
  * @method static void resource(string $name, string $controller, array $options = [])

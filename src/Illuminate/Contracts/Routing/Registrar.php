@@ -11,7 +11,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function get($uri, $action);
+    public function get(string $uri, $action);
 
     /**
      * Register a new POST route with the router.
@@ -20,7 +20,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function post($uri, $action);
+    public function post(string $uri, $action);
 
     /**
      * Register a new PUT route with the router.
@@ -29,7 +29,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function put($uri, $action);
+    public function put(string $uri, $action);
 
     /**
      * Register a new DELETE route with the router.
@@ -38,7 +38,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function delete($uri, $action);
+    public function delete(string $uri, $action);
 
     /**
      * Register a new PATCH route with the router.
@@ -47,7 +47,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function patch($uri, $action);
+    public function patch(string $uri, $action);
 
     /**
      * Register a new OPTIONS route with the router.
@@ -56,7 +56,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function options($uri, $action);
+    public function options(string $uri, $action);
 
     /**
      * Register a new route with the given verbs.
@@ -66,7 +66,7 @@ interface Registrar
      * @param  \Closure|array|string  $action
      * @return \Illuminate\Routing\Route
      */
-    public function match($methods, $uri, $action);
+    public function match($methods, string $uri, $action);
 
     /**
      * Route a resource to a controller.
@@ -76,7 +76,7 @@ interface Registrar
      * @param  array   $options
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function resource($name, $controller, array $options = []);
+    public function resource(string $name, string $controller, array $options = []);
 
     /**
      * Create a route group with shared attributes.
