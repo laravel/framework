@@ -22,6 +22,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
+        Concerns\HasReplication,
         Concerns\HasEvents,
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,
@@ -961,31 +962,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $this->load(array_keys($this->relations));
 
         $this->setRawAttributes(static::findOrFail($this->getKey())->attributes);
-    }
-
-    /**
-     * Clone the model into a new, non-existing instance.
-     *
-     * @param  array|null  $except
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function replicate(array $except = null)
-    {
-        $defaults = [
-            $this->getKeyName(),
-            $this->getCreatedAtColumn(),
-            $this->getUpdatedAtColumn(),
-        ];
-
-        $attributes = Arr::except(
-            $this->attributes, $except ? array_unique(array_merge($except, $defaults)) : $defaults
-        );
-
-        return tap(new static, function ($instance) use ($attributes) {
-            $instance->setRawAttributes($attributes);
-
-            $instance->setRelations($this->relations);
-        });
     }
 
     /**

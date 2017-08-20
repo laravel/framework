@@ -1310,6 +1310,25 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($replicated->updated_at);
     }
 
+    public function testReplicateCreatesANewModelWithoutIrreplicableAttributes()
+    {
+        $model = new EloquentModelStub;
+        $model->id = 'id';
+        $model->foo = 'bar';
+        $model->created_at = new DateTime;
+        $model->updated_at = new DateTime;
+        $model->irreplicable(['foo']);
+        $replicated = $model->replicate();
+
+        $this->assertFalse($model->isReplicable('id'));
+        $this->assertFalse($model->isReplicable('foo'));
+
+        $this->assertNull($replicated->id);
+        $this->assertNull($replicated->foo);
+        $this->assertNull($replicated->created_at);
+        $this->assertNull($replicated->updated_at);
+    }
+
     public function testIncrementOnExistingModelCallsQueryAndSetsAttribute()
     {
         $model = m::mock('Illuminate\Tests\Database\EloquentModelStub[newQuery]');
