@@ -44,7 +44,7 @@ class FreshCommand extends Command
         $this->call('migrate', [
             '--database' => $database,
             '--path' => $this->input->getOption('path'),
-            '--force' => $this->input->getOption('force'),
+            '--force' => true,
         ]);
 
         if ($this->needsSeeding()) {
