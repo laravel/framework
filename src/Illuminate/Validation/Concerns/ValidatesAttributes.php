@@ -366,11 +366,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is equal to another date
+     * @param string $attribute
+     * @param mixed $value
+     * @param array $parameters
+     * @return bool
+     */
+    public function validateDateEquals($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'equals');
+
+        return $this->compareDates($attribute, $value, $parameters, '=');
+    }
+
+    /**
      * Validate that an attribute is different from another attribute.
      *
-     * @param  string  $attribute
-     * @param  mixed   $value
-     * @param  array   $parameters
+     * @param string $attribute
+     * @param mixed $value
+     * @param array $parameters
      * @return bool
      */
     public function validateDifferent($attribute, $value, $parameters)
@@ -1416,6 +1430,8 @@ trait ValidatesAttributes
                 return $first <= $second;
             case '>=':
                 return $first >= $second;
+            case '=':
+                return $first === $second;
             default:
                 throw new InvalidArgumentException;
         }
