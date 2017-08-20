@@ -32,7 +32,7 @@ class PresetCommand extends Command
     public function handle()
     {
         if (static::hasMacro($this->argument('type'))) {
-            return call_user_func(static::$macros[$this->argument('type')], $this);
+            return call_user_func(array_get(static::$macros, $this->argument('type')), $this);
         }
 
         if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
