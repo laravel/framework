@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
