@@ -75,6 +75,7 @@ trait ManagesComponents
         return array_merge(
             $this->componentData[count($this->componentStack)],
             ['slot' => new HtmlString(trim(ob_get_clean()))],
+            ['_data' => $this->componentData[count($this->componentStack)]],
             $this->slots[count($this->componentStack)]
         );
     }
