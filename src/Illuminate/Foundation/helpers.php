@@ -716,11 +716,7 @@ if (! function_exists('response')) {
     {
         $factory = app(ResponseFactory::class);
 
-        if (func_num_args() === 0) {
-            return $factory;
-        }
-
-        return $factory->make($content, $status, $headers);
+        return func_num_args() === 0 ? $factory : $factory->make($content, $status, $headers);
     }
 }
 
@@ -886,11 +882,7 @@ if (! function_exists('validator')) {
     {
         $factory = app(ValidationFactory::class);
 
-        if (func_num_args() === 0) {
-            return $factory;
-        }
-
-        return $factory->make($data, $rules, $messages, $customAttributes);
+        return func_num_args() === 0 ? $factory : $factory->make($data, $rules, $messages, $customAttributes);
     }
 }
 
@@ -907,10 +899,6 @@ if (! function_exists('view')) {
     {
         $factory = app(ViewFactory::class);
 
-        if (func_num_args() === 0) {
-            return $factory;
-        }
-
-        return $factory->make($view, $data, $mergeData);
+        return func_num_args() === 0 ? $factory : $factory->make($view, $data, $mergeData);
     }
 }
