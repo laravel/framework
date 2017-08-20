@@ -6,6 +6,7 @@ use ReflectionFunction;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
@@ -171,7 +172,7 @@ abstract class Broadcaster implements BroadcasterContract
     protected function isImplicitlyBindable($key, $parameter)
     {
         return $parameter->name === $key && $parameter->getClass() &&
-                $parameter->getClass()->isSubclassOf(Model::class);
+                        $parameter->getClass()->isSubclassOf(UrlRoutable::class);
     }
 
     /**
