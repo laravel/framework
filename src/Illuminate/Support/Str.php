@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Traits\Macroable;
 
 class Str
@@ -679,5 +680,15 @@ class Str
         }
 
         return $languageSpecific[$language] ?? null;
+    }
+
+    /**
+     * Generate new UUID4.
+     *
+     * @return string
+     */
+    public static function uuid4()
+    {
+        return Uuid::uuid4()->toString();
     }
 }
