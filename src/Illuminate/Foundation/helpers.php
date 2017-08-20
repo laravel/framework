@@ -570,8 +570,7 @@ if (! function_exists('mix')) {
         $manifest = $manifests[$manifestPath];
 
         if (! isset($manifest[$path])) {
-            report(new Exception("Unable to locate Mix file: {$path}. Please check your ".
-                           'webpack.mix.js output paths and try again.'));
+            report(new Exception("Unable to locate Mix file: {$path}."));
 
             if (! app('config')->get('app.debug')) {
                 return $path;
