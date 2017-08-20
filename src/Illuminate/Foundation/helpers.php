@@ -496,7 +496,7 @@ if (! function_exists('info')) {
      */
     function info($message, $context = [])
     {
-        return app('log')->info($message, $context);
+        app('log')->info($message, $context);
     }
 }
 
