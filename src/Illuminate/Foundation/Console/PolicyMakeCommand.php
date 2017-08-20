@@ -82,6 +82,11 @@ class PolicyMakeCommand extends GeneratorCommand
             $stub = str_replace('NamespacedDummyModel', $this->laravel->getNamespace().$model, $stub);
         }
 
+        $namspaceModel = $this->laravel->getNamespace().$model;
+
+        $stub = str_replace("use {$namspaceModel};\nuse {$namspaceModel};",
+            "use {$namspaceModel};", $stub);
+
         $model = class_basename(trim($model, '\\'));
 
         $stub = str_replace('DummyModel', $model, $stub);
