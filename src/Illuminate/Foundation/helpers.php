@@ -644,7 +644,7 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Exception  $e
+     * @param  \Exception  $exception
      * @return void
      */
     function report($exception)
