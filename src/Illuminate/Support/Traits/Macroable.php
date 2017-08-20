@@ -27,7 +27,7 @@ trait Macroable
      */
     public static function macro($name, $macro)
     {
-        static::$macros[$name] = $macro;
+        array_add(static::$macros, $name, $macro);
     }
 
     /**
@@ -57,7 +57,7 @@ trait Macroable
      */
     public static function hasMacro($name)
     {
-        return isset(static::$macros[$name]);
+        return array_has(static::$macros, $name);
     }
 
     /**
@@ -75,11 +75,11 @@ trait Macroable
             throw new BadMethodCallException("Method {$method} does not exist.");
         }
 
-        if (static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(Closure::bind(static::$macros[$method], null, static::class), $parameters);
+        if (array_get(static::$macros, $method) instanceof Closure) {
+            return call_user_func_array(Closure::bind(array_get(static::$macros, $method), null, static::class), $parameters);
         }
 
-        return call_user_func_array(static::$macros[$method], $parameters);
+        return call_user_func_array(array_get(static::$macros, $method), $parameters);
     }
 
     /**
@@ -97,7 +97,7 @@ trait Macroable
             throw new BadMethodCallException("Method {$method} does not exist.");
         }
 
-        $macro = static::$macros[$method];
+        $macro = array_get(static::$macros, $method);
 
         if ($macro instanceof Closure) {
             return call_user_func_array($macro->bindTo($this, static::class), $parameters);
