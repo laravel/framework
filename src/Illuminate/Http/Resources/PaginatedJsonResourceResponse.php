@@ -17,7 +17,7 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
         $this->addPaginationInformation($request);
 
         return $this->build($request, response()->json(
-            array_merge($this->wrap($this->instance()->toJson($request)), $this->with),
+            array_merge($this->wrap($this->resource->toJson($request)), $this->with),
             $this->calculateStatus(), $this->headers
         ));
     }
@@ -31,7 +31,7 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
     protected function addPaginationInformation($request)
     {
         return $this->with([
-            'links' => $this->paginationLinks($paginated = $this->resource->toArray($request)),
+            'links' => $this->paginationLinks($paginated = $this->resource->resource->toArray($request)),
             'meta' => $this->meta($paginated),
         ]);
     }
@@ -67,17 +67,5 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
             'prev_page_url',
             'next_page_url',
         ]));
-    }
-
-    /**
-     * Get an instance of the resource class.
-     *
-     * @return mixed
-     */
-    protected function instance()
-    {
-        $class = $this->class;
-
-        return new $class($this->resource->getCollection());
     }
 }

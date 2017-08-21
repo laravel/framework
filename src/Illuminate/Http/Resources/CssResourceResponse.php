@@ -13,7 +13,7 @@ class CssResourceResponse extends ResourceResponse
     public function toResponse($request)
     {
         return $this->build($request, response(
-            $this->instance()->toCss($request),
+            $this->resource->toCss($request),
             200, ['Content-Type' => 'text/css']
         ));
     }
@@ -28,7 +28,7 @@ class CssResourceResponse extends ResourceResponse
     protected function build($request, $response)
     {
         return tap(parent::build($request, $response), function ($response) use ($request) {
-            $this->instance()->withCssResponse($request, $response);
+            $this->resource->withCssResponse($request, $response);
         });
     }
 }

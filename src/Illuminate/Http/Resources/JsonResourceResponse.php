@@ -22,7 +22,7 @@ class JsonResourceResponse extends ResourceResponse
     public function toResponse($request)
     {
         return $this->build($request, response()->json(
-            array_merge($this->wrap($this->instance()->toJson($request)), $this->with),
+            array_merge($this->wrap($this->resource->toJson($request)), $this->with),
             $this->calculateStatus(), $this->headers
         ));
     }
@@ -92,7 +92,7 @@ class JsonResourceResponse extends ResourceResponse
      */
     protected function wrapper()
     {
-        $class = $this->class;
+        $class = get_class($this->resource);
 
         return $class::$wrap;
     }
@@ -107,7 +107,7 @@ class JsonResourceResponse extends ResourceResponse
     protected function build($request, $response)
     {
         return tap(parent::build($request, $response), function ($response) use ($request) {
-            $this->instance()->withJsonResponse($request, $response);
+            $this->resource->withJsonResponse($request, $response);
         });
     }
 }

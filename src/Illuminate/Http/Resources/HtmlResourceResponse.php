@@ -13,7 +13,7 @@ class HtmlResourceResponse extends ResourceResponse
     public function toResponse($request)
     {
         return $this->build($request, response(
-            $this->instance()->toHtml($request),
+            $this->resource->toHtml($request),
             $this->calculateStatus(), $this->headers
         ));
     }
@@ -28,7 +28,7 @@ class HtmlResourceResponse extends ResourceResponse
     protected function build($request, $response)
     {
         return tap(parent::build($request, $response), function ($response) use ($request) {
-            $this->instance()->withHtmlResponse($request, $response);
+            $this->resource->withHtmlResponse($request, $response);
         });
     }
 }

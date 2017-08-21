@@ -9,13 +9,6 @@ use Symfony\Component\HttpFoundation\HeaderBag;
 abstract class ResourceResponse implements Responsable
 {
     /**
-     * The class name of the resource.
-     *
-     * @var string
-     */
-    public $class;
-
-    /**
      * The underlying resource.
      *
      * @var mixed
@@ -46,13 +39,11 @@ abstract class ResourceResponse implements Responsable
     /**
      * Create a new resource repsonse.
      *
-     * @param  string  $class
      * @param  mixed  $resource
      * @return void
      */
-    public function __construct($class, $resource)
+    public function __construct($resource)
     {
-        $this->class = $class;
         $this->resource = $resource;
 
         $this->withResponse(function ($request, $response) {
@@ -118,7 +109,7 @@ abstract class ResourceResponse implements Responsable
         return tap($response, function ($response) use ($request) {
             call_user_func($this->callback, $request, $response);
 
-            $this->instance()->withResponse($request, $response);
+            $this->resource->withResponse($request, $response);
         });
     }
 
@@ -148,17 +139,5 @@ abstract class ResourceResponse implements Responsable
 
         return $this->resource instanceof Model &&
                $this->resource->wasRecentlyCreated ? 201 : 200;
-    }
-
-    /**
-     * Get an instance of the resource class.
-     *
-     * @return mixed
-     */
-    protected function instance()
-    {
-        $class = $this->class;
-
-        return new $class($this->resource);
     }
 }

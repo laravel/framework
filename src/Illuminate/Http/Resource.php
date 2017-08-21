@@ -93,7 +93,7 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     public function html()
     {
-        return new Resources\HtmlResourceResponse(get_class($this), $this->resource);
+        return new Resources\HtmlResourceResponse($this);
     }
 
     /**
@@ -103,7 +103,7 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     public function css()
     {
-        return new Resources\CssResourceResponse(get_class($this), $this->resource);
+        return new Resources\CssResourceResponse($this);
     }
 
     /**
@@ -114,8 +114,8 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public function json()
     {
         return $this->resource instanceof AbstractPaginator
-                    ? new Resources\PaginatedJsonResourceResponse(get_class($this), $this->resource)
-                    : new Resources\JsonResourceResponse(get_class($this), $this->resource);
+                    ? new Resources\PaginatedJsonResourceResponse($this)
+                    : new Resources\JsonResourceResponse($this);
     }
 
     /**
