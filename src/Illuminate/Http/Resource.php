@@ -314,7 +314,7 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      * @param  \Closure  $callback
      * @return void
      */
-    public static function extend($format, $callback)
+    public static function format($format, $callback)
     {
         static::$extensions[$format] = $callback;
     }

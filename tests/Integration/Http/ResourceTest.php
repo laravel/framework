@@ -428,7 +428,7 @@ class ResourceTest extends TestCase
 
     public function test_resource_types_may_be_macroed()
     {
-        Resource::extend('xml', function ($resource) {
+        Resource::format('xml', function ($resource) {
             $this->assertInstanceOf(PostResource::class, $resource);
 
             return new class implements Responsable {
