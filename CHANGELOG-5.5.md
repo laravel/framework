@@ -130,6 +130,7 @@
 - ⚠️ Call `setConnection()` in `Model::save()` ([#20466](https://github.com/laravel/framework/pull/20466))
 - ⚠️ Touch parent timestamp only if the model is dirty ([#20489](https://github.com/laravel/framework/pull/20489))
 - Added `Model::loadMissing()` method ([#20630](https://github.com/laravel/framework/pull/20630), [4166c12](https://github.com/laravel/framework/commit/4166c12492ce7b1112911299caf4cdb17efc9364))
+- Return the model instance from `Model::refresh()` ([#20657](https://github.com/laravel/framework/pull/20657))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -168,12 +169,12 @@
 - Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843), [#19166](https://github.com/laravel/framework/pull/19166), [#19255](https://github.com/laravel/framework/pull/19255))
 - Added `dispatch_now()` helper function ([#18668](https://github.com/laravel/framework/pull/18668), [61f2e7b](https://github.com/laravel/framework/commit/61f2e7b4106f8eb0b79603d9792426f7c6a6d273))
 - Added `$language` parameter to `str_slug()` helper ([#19011](https://github.com/laravel/framework/pull/19011))
-- Added `str_start()` helper ([#20569](https://github.com/laravel/framework/pull/20569))
 - Added `str_before()` helper ([#19940](https://github.com/laravel/framework/pull/19940), [#20049](https://github.com/laravel/framework/pull/20049))
 - Handle lower case words better in as `Str::snake()` ([#18764](https://github.com/laravel/framework/pull/18764))
 - Removed usages of the `with()` helper ([#17888](https://github.com/laravel/framework/pull/17888))
 - Support multiple patterns in `Str::is()` ([#20108](https://github.com/laravel/framework/pull/20108))
 - Speed up `Arr::get()` calls without dot notations ([#20139](https://github.com/laravel/framework/pull/20139))
+- Use `report()` helper in `mix()` ([#20603](https://github.com/laravel/framework/pull/20603), [bf0cb82](https://github.com/laravel/framework/commit/bf0cb82a8990d99a0ed504c2fa6684b1c59c9d7e))
 
 ### Localization
 - ⚠️ Moved `LoaderInterface` to contracts ([#20460](https://github.com/laravel/framework/pull/20460))
@@ -236,7 +237,7 @@
 - ⚠️ Improved `ThrottleRequests` middleware ([#19807](https://github.com/laravel/framework/pull/19807), [#19860](https://github.com/laravel/framework/pull/19860))
 - ⚠️ Return proper 304 responses ([#19867](https://github.com/laravel/framework/pull/19867))
 - Return the resource from `Router::apiResource()` ([#20029](https://github.com/laravel/framework/pull/20029))
-- ⚠️ Moved route model binding resolution logic to model ([#20521](https://github.com/laravel/framework/pull/20521), [370e626](https://github.com/laravel/framework/commit/370e626e5cf7d5763bbb0e58aa2a2cd3c01e2b61), [#20542](https://github.com/laravel/framework/pull/20542), [#20618](https://github.com/laravel/framework/pull/20618))
+- ⚠️ Moved route model binding resolution logic to model ([#20521](https://github.com/laravel/framework/pull/20521), [370e626](https://github.com/laravel/framework/commit/370e626e5cf7d5763bbb0e58aa2a2cd3c01e2b61), [#20542](https://github.com/laravel/framework/pull/20542), [#20618](https://github.com/laravel/framework/pull/20618), [d911fa8](https://github.com/laravel/framework/commit/d911fa8f5db0100a861a3c1696d426624ec27b4e))
 - Accept string on `parameters()` and `names()` methods ([#20531](https://github.com/laravel/framework/pull/20531), [#20529](https://github.com/laravel/framework/pull/20529))
 
 ### Responses
@@ -277,8 +278,11 @@
 - ⚠️ Clear `Carbon` mock during tear down ([#19934](https://github.com/laravel/framework/pull/19934))
 - Added debug info to `NotFoundHttpException` in `InteractsWithExceptionHandling` ([#20000](https://github.com/laravel/framework/pull/20000))
 - Added `MailFake::assertSentTimes()`, `QueueFake::assertPushedTimes()` and `BusFake::assertDispatchedTimes()` methods ([#20485](https://github.com/laravel/framework/pull/20485), [e657f6e](https://github.com/laravel/framework/commit/e657f6ec20867fc748e4f8b8ca1bbaa344c07acb))
+- Added queue assertions to `MailFake` ([#20454](https://github.com/laravel/framework/pull/20454))
+- Added `assertNothingSent()` and `assertSentTimes()` methods to `NotificationFake` ([#20651](https://github.com/laravel/framework/pull/20651))
 - Added Mockery expectations to the assertion count ([#20606](https://github.com/laravel/framework/pull/20606))
 - Fake the default storage disk by default ([#20625](https://github.com/laravel/framework/pull/20625))
+- Support sending default headers with requests ([#20590](https://github.com/laravel/framework/pull/20590), [c32418e](https://github.com/laravel/framework/commit/c32418e8ca13e1fef3908d3a497ea49df0cebbb3))
 
 ### Validation
 - Added support for custom validation rule objects ([#19155](https://github.com/laravel/framework/pull/19155), [2aa5ea8](https://github.com/laravel/framework/commit/2aa5ea8a898bd220015ab9be453b36723ffb186e))
@@ -286,6 +290,7 @@
 - ⚠️ Made several method in `ValidatesAttributes` public  ([#20200](https://github.com/laravel/framework/pull/20200))
 - ⚠️ Added `errors()` method to `Validator` interface ([#20337](https://github.com/laravel/framework/pull/20337))
 - Extend `Exists` and `Unique` rule from `DatabaseRule` class ([#20563](https://github.com/laravel/framework/pull/20563))
+- Added `date_equals` rule ([#20646](https://github.com/laravel/framework/pull/20646))
 
 ### Views
 - ⚠️ Camel case variables names passed to views ([#18083](https://github.com/laravel/framework/pull/18083))
