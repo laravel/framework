@@ -6,7 +6,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class BladeElseStatementsTest extends TestCase
+class BladeTryCatchFinallyStatementsTest extends TestCase
 {
     public function tearDown()
     {
