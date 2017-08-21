@@ -151,13 +151,13 @@ class NotificationFake implements NotificationFactory
             ];
 
             /**
-             * if $notifiable has no chnnels defines, get out of here
+             * if $notifiable has no chnnels defines, get out of here.
              */
             if (empty($notification->via($notifiable))) {
                 continue;
             }
 
-            /**
+            /*
              * for each notification sent, trigger the NotificationSent event
              * @todo NotificationSent should be inject-able
              */
