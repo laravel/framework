@@ -67,7 +67,7 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public function response($request)
     {
         if (static::hasMacro($format = $request->format())) {
-            return call_user_func_array(static::$macros[$format], $request);
+            return call_user_func(static::$macros[$format]);
         }
 
         if ($request->expectsJson()) {
