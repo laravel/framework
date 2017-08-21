@@ -92,7 +92,7 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $stub = str_replace('DummyModel', $model, $stub);
 
-        $variableName = Str::camel($model) == 'user' : 'model' : Str::camel($model);
+        $variableName = Str::camel($model) == 'user' ? 'model' : Str::camel($model);
 
         $stub = str_replace('dummyModel', $variableName, $stub);
 
