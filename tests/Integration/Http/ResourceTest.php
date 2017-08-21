@@ -40,6 +40,34 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resource_is_url_routable()
+    {
+        $post = new PostResource(new Post([
+            'id' => 5,
+            'title' => 'Test Title',
+        ]));
+
+        $this->assertEquals('http://localhost/post/5', url('/post', $post));
+    }
+
+    public function test_named_routes_are_url_routable()
+    {
+        $post = new PostResource(new Post([
+            'id' => 5,
+            'title' => 'Test Title',
+        ]));
+
+        $route = Route::get('/post/{id}', function () use ($post) {
+            return route('post.show', $post);
+        })->name('post.show');
+
+        $this->app['router']->getRoutes()->refreshNameLookups();
+
+        $response = $this->withoutExceptionHandling()->get('/post/1');
+
+        $this->assertEquals('http://localhost/post/5', $response->original);
+    }
+
     public function test_models_may_be_cast_by_middleware()
     {
         Route::get('/', function () {
