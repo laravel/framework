@@ -152,7 +152,7 @@ trait CompilesConditionals
      */
     protected function compileTry()
     {
-        return "<?php try { ?>";
+        return '<?php try { ?>';
     }
 
     /**
