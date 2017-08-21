@@ -2,10 +2,12 @@
 
 namespace Illuminate\Notifications\Messages;
 
-use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
 
 class SlackAttachment
 {
+    use InteractsWithTime;
+
     /**
      * The attachment's title.
      *
@@ -249,12 +251,12 @@ class SlackAttachment
     /**
      * Set the timestamp.
      *
-     * @param  \Illuminate\Support\Carbon  $timestamp
+     * @param  \DateTimeInterface|\DateInterval|int  $timestamp
      * @return $this
      */
-    public function timestamp(Carbon $timestamp)
+    public function timestamp($timestamp)
     {
-        $this->timestamp = $timestamp->getTimestamp();
+        $this->timestamp = $this->availableAt($timestamp);
 
         return $this;
     }
