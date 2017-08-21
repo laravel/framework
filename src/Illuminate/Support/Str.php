@@ -517,7 +517,6 @@ class Str
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
     }
 
-
     /**
      * Check if a string is surrounded by a string or character.
      *

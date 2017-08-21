@@ -278,7 +278,7 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::isSurrounded('', ['z']));
         $this->assertFalse(Str::isSurrounded('rr', ['z']));
         $this->assertFalse(Str::isSurrounded('zfoo|', ['z', '|']));
-        
+
         $this->assertTrue(Str::isSurrounded('zRz', ['z']));
         $this->assertTrue(Str::isSurrounded('|r|', ['z', '|']));
         $this->assertTrue(Str::isSurrounded('|foo|', ['z', '|']));
