@@ -4,16 +4,12 @@ namespace Illuminate\Tests\Integration\Http;
 
 use JsonSerializable;
 use Illuminate\Http\Resource;
-use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Middleware\CastToResource;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Database\CastsToResource;
 
 /**
