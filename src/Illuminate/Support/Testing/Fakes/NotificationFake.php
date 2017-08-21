@@ -34,7 +34,7 @@ class NotificationFake implements NotificationFactory
             return;
         }
 
-        if(is_numeric($callback)) {
+        if (is_numeric($callback)) {
             return $this->assertSentToTimes($notifiable, $notification, $callback);
         }
 
