@@ -75,7 +75,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function replaceModel($stub, $model)
     {
         $model = str_replace('/', '\\', $model);
-        
+
         $namespaceModel = $this->laravel->getNamespace().$model;
 
         if (Str::startsWith($model, '\\')) {
