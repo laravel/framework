@@ -155,7 +155,7 @@ class Event
      */
     public function getDefaultOutput()
     {
-        return (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
+        return (DIRECTORY_SEPARATOR === '\\') ? 'NUL' : '/dev/null';
     }
 
     /**

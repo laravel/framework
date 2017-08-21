@@ -358,7 +358,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        $format = $parameters[0] == 'Y-m' ? '!Y-m' : $parameters[0];
+        $format = $parameters[0] === 'Y-m' ? '!Y-m' : $parameters[0];
 
         $date = DateTime::createFromFormat($format, $value);
 
@@ -664,7 +664,7 @@ trait ValidatesAttributes
             $id = $this->getValue($matches[1]);
         }
 
-        if (strtolower($id) == 'null') {
+        if (strtolower($id) === 'null') {
             $id = null;
         }
 
