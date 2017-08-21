@@ -30,8 +30,10 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
      */
     protected function addPaginationInformation($request)
     {
+        $paginated = $this->resource->resource->toArray();
+
         return $this->with([
-            'links' => $this->paginationLinks($paginated = $this->resource->resource->toArray($request)),
+            'links' => $this->paginationLinks($paginated),
             'meta' => $this->meta($paginated),
         ]);
     }
