@@ -130,7 +130,6 @@
 - ⚠️ Call `setConnection()` in `Model::save()` ([#20466](https://github.com/laravel/framework/pull/20466))
 - ⚠️ Touch parent timestamp only if the model is dirty ([#20489](https://github.com/laravel/framework/pull/20489))
 - Added `Model::loadMissing()` method ([#20630](https://github.com/laravel/framework/pull/20630), [4166c12](https://github.com/laravel/framework/commit/4166c12492ce7b1112911299caf4cdb17efc9364))
-- Return the model instance from `Model::refresh()` ([#20657](https://github.com/laravel/framework/pull/20657))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
