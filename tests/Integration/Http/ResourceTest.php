@@ -11,8 +11,10 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Middleware\CastToResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Contracts\Database\CastsToResource;
 
 /**
  * @group integration
@@ -39,6 +41,56 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'title' => 'Test Title',
             ]
+        ]);
+    }
+
+    public function test_models_may_be_cast_by_middleware()
+    {
+        Route::get('/', function () {
+            return new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+        })->middleware(CastToResource::class);
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+                'custom' => true,
+            ]
+        ]);
+    }
+
+    public function test_collections_are_cast_by_middleware()
+    {
+        Route::get('/', function () {
+            return collect([new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])]);
+        })->middleware(CastToResource::class);
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                    'custom' => true,
+                ],
+            ],
         ]);
     }
 
@@ -80,6 +132,45 @@ class ResourceTest extends TestCase
 
         $response->assertStatus(200);
         $response->assertHeader('X-Resource', 'True');
+    }
+
+    public function test_resources_may_customize_extra_data()
+    {
+        Route::get('/', function () {
+            return (new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])))->json()->with(['foo' => 'bar']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+            ],
+            'foo' => 'bar',
+        ]);
+    }
+
+    public function test_custom_headers_may_be_set_on_responses()
+    {
+        Route::get('/', function () {
+            return (new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])))->json()->status(202)->header('X-Custom', 'True');
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(202);
+        $response->assertHeader('X-Custom', 'True');
     }
 
     public function test_resources_may_be_converted_to_html()
@@ -204,9 +295,50 @@ class ResourceTest extends TestCase
             ],
         ]);
     }
+
+    public function test_paginators_are_cast_by_middleware()
+    {
+        Route::get('/', function () {
+            return new LengthAwarePaginator(
+                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
+                10, 15, 1
+            );
+        })->middleware(CastToResource::class);
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                    'custom' => true,
+                ],
+            ],
+            'links' => [
+                'first' => '/?page=1',
+                'last' => '/?page=1',
+                'prev' => null,
+                'next' => null,
+            ],
+            'meta' => [
+                'current_page' => 1,
+                'from' => 1,
+                'last_page' => 1,
+                'path' => '/',
+                'per_page' => 15,
+                'to' => 1,
+                'total' => 10,
+            ],
+        ]);
+    }
 }
 
-class Post extends Model
+class Post extends Model implements CastsToResource
 {
     /**
      * The attributes that aren't mass assignable.
@@ -214,6 +346,28 @@ class Post extends Model
      * @var array
      */
     protected $guarded = [];
+
+    /**
+     * Cast the given model into a resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  mixed  $model
+     */
+    public static function castToResource($request, $model)
+    {
+        return new PostResource($model);
+    }
+
+    /**
+     * Cast the given collection into a resource.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Support\Collection  $collection
+     */
+    public static function castCollectionToResource($request, $collection)
+    {
+        return new PostCollectionResource($collection);
+    }
 }
 
 
@@ -231,7 +385,7 @@ class PostResource extends Resource
 
     public function toJson($request)
     {
-        return ['id' => $this->id, 'title' => $this->title];
+        return ['id' => $this->id, 'title' => $this->title, 'custom' => true];
     }
 
     public function withJsonResponse($request, $response)

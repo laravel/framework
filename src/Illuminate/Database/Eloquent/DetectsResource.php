@@ -11,6 +11,7 @@ trait DetectsResource
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $model
+     * @return mixed
      */
     public static function castToResource($request, $model)
     {
@@ -20,10 +21,11 @@ trait DetectsResource
     }
 
     /**
-     * Cast the given collection into a resource.
+     * Cast the given paginator or collection into a resource.
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Support\Collection  $collection
+     * @return mixed
      */
     public static function castCollectionToResource($request, $collection)
     {

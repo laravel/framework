@@ -83,7 +83,7 @@ class CastToResource
         $collection = $response->original->getCollection();
 
         return $collection->first()->castCollectionToResource(
-            $request, $collection
+            $request, $response->original
         )->toResponse($request);
     }
 }
