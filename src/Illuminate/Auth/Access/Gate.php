@@ -409,6 +409,17 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
+        // If different abilities share common logic if it allows user.
+        if (
+            method_exists($policy, 'abilities') && 
+            method_exists($policy, 'allows') && 
+            in_array($ability, $policy->abilities())
+        ) {
+            return function () use ($user, $ability, $arguments, $policy) {
+                return $policy->allows($user, $ability, $arguments);
+            };
+        }
+        
         return function () use ($user, $ability, $arguments, $policy) {
             // This callback will be responsible for calling the policy's before method and
             // running this policy method if necessary. This is used to when objects are
