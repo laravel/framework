@@ -94,7 +94,7 @@ trait ValidatesRequests
         $filtered = [];
 
         foreach ($keys as $key) {
-            if (($position = strpos($key, '.')) !== false) {
+            if (($position = mb_strpos($key, '.')) !== false) {
                 $filtered[] = Str::substr($key, 0, $position);
             } else {
                 $filtered[] = $key;
