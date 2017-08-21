@@ -100,6 +100,34 @@ class Exists
     }
 
     /**
+     * Set a "where in" constraint on the query.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function whereIn($column, array $values)
+    {
+        return $this->where(function($query) use ($column, $values) {
+            $query->whereIn($column, $values);
+        });
+    }
+
+    /**
+     * Set a "where not in" constraint on the query.
+     *
+     * @param  string  $column
+     * @param  array  $values
+     * @return $this
+     */
+    public function whereNotIn($column, array $values)
+    {
+        return $this->where(function($query) use ($column, $values) {
+            $query->whereNotIn($column, $values);
+        });
+    }
+
+    /**
      * Register a custom query callback.
      *
      * @param  \Closure $callback
