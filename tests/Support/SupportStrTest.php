@@ -29,6 +29,13 @@ class SupportStrTest extends TestCase
         $this->assertEquals('Jefferson Costella', Str::title('jefFErson coSTella'));
     }
 
+    public function testStringUuid()
+    {
+        $this->assertSame(1,
+            preg_match('/[a-z\d]{8}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{4}-[a-z\d]{12}/', Str::uuid4())
+        );
+    }
+
     public function testStringWithoutWordsDoesntProduceError()
     {
         $nbsp = chr(0xC2).chr(0xA0);
