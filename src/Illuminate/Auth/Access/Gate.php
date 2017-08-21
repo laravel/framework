@@ -413,7 +413,6 @@ class Gate implements GateContract
         if (
             method_exists($policy, 'abilities') && 
             method_exists($policy, 'allows') && 
-            !method_exists($policy, $ability) && 
             in_array($ability, $policy->abilities())
         ) {
             return function () use ($user, $ability, $arguments, $policy) {
