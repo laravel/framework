@@ -36,7 +36,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->container->singleton(Auth::class, function () {
             $auth = m::mock(Auth::class);
-            $auth->shouldReceive('authenticate')->once()->andReturn(null);
+            $auth->shouldReceive('check')->zeroOrMoreTimes()->andReturn($this->user);
 
             return $auth;
         });
@@ -90,6 +90,50 @@ class AuthorizeMiddlewareTest extends TestCase
         ]);
 
         $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertEquals($response->content(), 'success');
+    }
+
+    /**
+     * @expectedException \Illuminate\Auth\AuthenticationException
+     * @expectedExceptionMessage Unauthenticated.
+     */
+    public function testSimpleAbilityUnauthenticatedForGuests()
+    {
+        $this->user = null;
+
+        $this->gate()->define('view-dashboard', function ($user) {
+            return true;
+        });
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':view-dashboard',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $this->router->dispatch(Request::create('dashboard', 'GET'));
+    }
+
+    public function testSimpleAbilityAuthorizedForGuestsIfSpecified()
+    {
+        $this->user = null;
+
+        $this->gate()->define('view-homepage', function ($user) {
+            $this->assertNull($user);
+
+            return true;
+        }, ['guestable' => true]);
+
+        $this->router->get('homepage', [
+            'middleware' => Authorize::class.':view-homepage',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('homepage', 'GET'));
 
         $this->assertEquals($response->content(), 'success');
     }
