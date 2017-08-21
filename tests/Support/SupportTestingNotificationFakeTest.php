@@ -3,10 +3,9 @@
 namespace Illuminate\Tests\Support;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Illuminate\Notifications\Notification;
-use Illuminate\Foundation\Auth\User;
 
 class NotificationFakeTest extends TestCase
 {
@@ -15,7 +14,7 @@ class NotificationFakeTest extends TestCase
         parent::setUp();
         $this->fake = new NotificationFake;
         $this->notification = new NotificationStub;
-        $this->userStub = new UserStub;
+        $this->user = new UserStub;
     }
 
     /**
@@ -24,11 +23,11 @@ class NotificationFakeTest extends TestCase
      */
     public function testAssertSentTo()
     {
-        $this->fake->assertSentTo($this->userStub, NotificationStub::class);
+        $this->fake->assertSentTo($this->user, NotificationStub::class);
 
-        $this->fake->send($this->userStub, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub);
 
-        $this->fake->assertSentTo($this->userStub, NotificationStub::class);
+        $this->fake->assertSentTo($this->user, NotificationStub::class);
     }
 
     /**
@@ -37,11 +36,11 @@ class NotificationFakeTest extends TestCase
      */
     public function testAssertNotSentTo()
     {
-        $this->fake->assertNotSentTo($this->userStub, NotificationStub::class);
+        $this->fake->assertNotSentTo($this->user, NotificationStub::class);
 
-        $this->fake->send($this->userStub, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub);
 
-        $this->fake->assertNotSentTo($this->userStub, NotificationStub::class);
+        $this->fake->assertNotSentTo($this->user, NotificationStub::class);
     }
 }
 
