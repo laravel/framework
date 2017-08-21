@@ -137,7 +137,7 @@ abstract class ResourceResponse implements Responsable
             return $this->status;
         }
 
-        return $this->resource instanceof Model &&
-               $this->resource->wasRecentlyCreated ? 201 : 200;
+        return $this->resource->resource instanceof Model &&
+               $this->resource->resource->wasRecentlyCreated ? 201 : 200;
     }
 }
