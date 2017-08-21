@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Auth\User;
-use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Illuminate\Notifications\Notification;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 class NotificationFakeTest extends TestCase
 {
@@ -54,5 +54,4 @@ class NotificationStub extends Notification
 
 class UserStub extends User
 {
-
 }
