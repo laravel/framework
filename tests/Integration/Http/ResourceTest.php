@@ -8,6 +8,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Middleware\CastToResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Contracts\Database\CastsToResource;
@@ -360,6 +361,99 @@ class ResourceTest extends TestCase
             ],
         ]);
     }
+
+    public function test_to_json_may_be_left_off_of_collection()
+    {
+        Route::get('/', function () {
+            return new EmptyPostCollectionResource(new LengthAwarePaginator(
+                collect([new Post(['id' => 5, 'title' => 'Test Title'])]),
+                10, 15, 1
+            ));
+        })->middleware(CastToResource::class);
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                [
+                    'id' => 5,
+                    'title' => 'Test Title',
+                    'custom' => true,
+                ],
+            ],
+            'links' => [
+                'first' => '/?page=1',
+                'last' => '/?page=1',
+                'prev' => null,
+                'next' => null,
+            ],
+            'meta' => [
+                'current_page' => 1,
+                'from' => 1,
+                'last_page' => 1,
+                'path' => '/',
+                'per_page' => 15,
+                'to' => 1,
+                'total' => 10,
+            ],
+        ]);
+    }
+
+    public function test_to_json_may_be_left_off_of_single_resource()
+    {
+        Route::get('/', function () {
+            return new ReallyEmptyPostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+            ]
+        ]);
+    }
+
+    public function test_resource_types_may_be_macroed()
+    {
+        Resource::extend('xml', function ($resource) {
+            $this->assertInstanceOf(PostResource::class, $resource);
+
+            return new class implements Responsable {
+                public function toResponse($request)
+                {
+                    return 'xml response';
+                }
+            };
+        });
+
+        Route::get('/', function () {
+            return new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/xml']
+        );
+
+        $response->assertStatus(200);
+
+        $this->assertEquals('xml response', $response->original);
+    }
 }
 
 class Post extends Model implements CastsToResource
@@ -436,6 +530,20 @@ class PostCollectionResource extends Resource
     }
 }
 
+class EmptyPostCollectionResource extends Resource
+{
+    //
+}
+
+class EmptyPostResource extends PostResource
+{
+    //
+}
+
+class ReallyEmptyPostResource extends Resource
+{
+    //
+}
 
 class JsonSerializableResource implements JsonSerializable
 {

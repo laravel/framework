@@ -10,15 +10,12 @@ use IteratorAggregate;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 
 class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Responsable, UrlRoutable
 {
-    use Macroable;
-
     /**
      * The resource instance.
      *
@@ -48,6 +45,13 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public static $wrap = 'data';
 
     /**
+     * The custom format extensions.
+     *
+     * @var array
+     */
+    public static $extensions = [];
+
+    /**
      * Create a new resource instance.
      *
      * @param  mixed  $resource
@@ -66,8 +70,8 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     public function response($request)
     {
-        if (static::hasMacro($format = $request->format())) {
-            return call_user_func(static::$macros[$format]);
+        if (isset(static::$extensions[$format = $request->format()])) {
+            return call_user_func(static::$extensions[$format], $this);
         }
 
         if ($request->expectsJson()) {
@@ -138,8 +142,9 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     protected function isCollectionResource()
     {
-        return $this->resource instanceof Collection &&
-                        Str::endsWith(get_class($this), 'Collection');
+        return ($this->resource instanceof Collection ||
+               $this->resource instanceof AbstractPaginator) &&
+               Str::contains(get_class($this), 'Collection');
     }
 
     /**
@@ -300,6 +305,18 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public function toResponse($request)
     {
         return $this->response($request)->toResponse($request);
+    }
+
+    /**
+     * Extend the resource with a new format.
+     *
+     * @param  string  $format
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public static function extend($format, $callback)
+    {
+        static::$extensions[$format] = $callback;
     }
 
     /**
