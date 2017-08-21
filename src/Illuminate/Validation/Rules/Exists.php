@@ -108,7 +108,7 @@ class Exists
      */
     public function whereIn($column, array $values)
     {
-        return $this->where(function($query) use ($column, $values) {
+        return $this->where(function ($query) use ($column, $values) {
             $query->whereIn($column, $values);
         });
     }
@@ -122,7 +122,7 @@ class Exists
      */
     public function whereNotIn($column, array $values)
     {
-        return $this->where(function($query) use ($column, $values) {
+        return $this->where(function ($query) use ($column, $values) {
             $query->whereNotIn($column, $values);
         });
     }
