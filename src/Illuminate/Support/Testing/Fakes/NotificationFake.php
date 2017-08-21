@@ -149,6 +149,23 @@ class NotificationFake implements NotificationFactory
                 'notification' => $notification,
                 'channels' => $notification->via($notifiable),
             ];
+
+            /**
+             * if $notifiable has no chnnels defines, get out of here.
+             */
+            if (empty($notification->via($notifiable))) {
+                continue;
+            }
+
+            /*
+             * for each notification sent, trigger the NotificationSent event
+             * @todo NotificationSent should be inject-able
+             */
+            foreach ((array) $notification->via($notifiable) as $channel) {
+                event(
+                    new \Illuminate\Notifications\Events\NotificationSent($notifiable, $notification, $channel, null)
+                );
+            }
         }
     }
 
