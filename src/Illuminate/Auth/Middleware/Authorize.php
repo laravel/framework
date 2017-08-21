@@ -5,10 +5,14 @@ namespace Illuminate\Auth\Middleware;
 use Closure;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Access\Gate;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Contracts\Auth\Factory as Auth;
+use Illuminate\Auth\Access\HandlesAuthorization;
 
 class Authorize
 {
+    use HandlesAuthorization;
+
     /**
      * The authentication factory instance.
      *
@@ -50,9 +54,13 @@ class Authorize
      */
     public function handle($request, Closure $next, $ability, ...$models)
     {
-        $this->auth->authenticate();
-
-        $this->gate->authorize($ability, $this->getGateArguments($request, $models));
+        if ($this->gate->denies($ability, $this->getGateArguments($request, $models))) {
+            if ($this->auth->check()) {
+                $this->deny();
+            } else {
+                throw new AuthenticationException;
+            }
+        }
 
         return $next($request);
     }

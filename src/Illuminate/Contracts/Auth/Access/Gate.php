@@ -17,9 +17,10 @@ interface Gate
      *
      * @param  string  $ability
      * @param  callable|string  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function define($ability, $callback);
+    public function define($ability, $callback, array $options = []);
 
     /**
      * Define a policy class for a given class type.
@@ -34,17 +35,19 @@ interface Gate
      * Register a callback to run before all Gate checks.
      *
      * @param  callable  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function before(callable $callback);
+    public function before(callable $callback, array $options = []);
 
     /**
      * Register a callback to run after all Gate checks.
      *
      * @param  callable  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function after(callable $callback);
+    public function after(callable $callback, array $options = []);
 
     /**
      * Determine if the given ability should be granted for the current user.

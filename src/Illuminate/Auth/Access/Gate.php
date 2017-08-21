@@ -100,19 +100,24 @@ class Gate implements GateContract
      *
      * @param  string  $ability
      * @param  callable|string  $callback
+     * @param  array  $options
      * @return $this
      *
      * @throws \InvalidArgumentException
      */
-    public function define($ability, $callback)
+    public function define($ability, $callback, array $options = [])
     {
+        $options += ['guestable' => false];
+
         if (is_callable($callback)) {
-            $this->abilities[$ability] = $callback;
+            // already callable
         } elseif (is_string($callback) && Str::contains($callback, '@')) {
-            $this->abilities[$ability] = $this->buildAbilityCallback($callback);
+            $callback = $this->buildAbilityCallback($callback);
         } else {
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
         }
+
+        $this->abilities[$ability] = compact('callback', 'options');
 
         return $this;
     }
@@ -123,19 +128,27 @@ class Gate implements GateContract
      * @param  string  $name
      * @param  string  $class
      * @param  array   $abilities
+     * @param  array   $options
      * @return $this
      */
-    public function resource($name, $class, array $abilities = null)
+    public function resource($name, $class, array $abilities = [], array $options = [])
     {
         $abilities = $abilities ?: [
+            'index'   => 'index',
             'view'   => 'view',
             'create' => 'create',
             'update' => 'update',
             'delete' => 'delete',
         ];
 
+        $options += ['guestable' => ['index', 'view']];
+
         foreach ($abilities as $ability => $method) {
-            $this->define($name.'.'.$ability, $class.'@'.$method);
+            $this->define(
+                $name.'.'.$ability,
+                $class.'@'.$method,
+                ['guestable' => in_array($ability, (array) $options['guestable'])]
+            );
         }
 
         return $this;
@@ -174,11 +187,14 @@ class Gate implements GateContract
      * Register a callback to run before all Gate checks.
      *
      * @param  callable  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function before(callable $callback)
+    public function before(callable $callback, array $options = [])
     {
-        $this->beforeCallbacks[] = $callback;
+        $options += ['guestable' => false];
+
+        $this->beforeCallbacks[] = compact('callback', 'options');
 
         return $this;
     }
@@ -187,11 +203,14 @@ class Gate implements GateContract
      * Register a callback to run after all Gate checks.
      *
      * @param  callable  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function after(callable $callback)
+    public function after(callable $callback, array $options = [])
     {
-        $this->afterCallbacks[] = $callback;
+        $options += ['guestable' => false];
+
+        $this->afterCallbacks[] = compact('callback', 'options');
 
         return $this;
     }
@@ -281,9 +300,7 @@ class Gate implements GateContract
      */
     protected function raw($ability, $arguments = [])
     {
-        if (! $user = $this->resolveUser()) {
-            return false;
-        }
+        $user = $this->resolveUser();
 
         $arguments = Arr::wrap($arguments);
 
@@ -311,7 +328,7 @@ class Gate implements GateContract
     /**
      * Resolve and call the appropriate authorization callback.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @return bool
@@ -326,7 +343,7 @@ class Gate implements GateContract
     /**
      * Call all of the before callbacks and return if a result is given.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @return bool|null
@@ -336,8 +353,10 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
-            if (! is_null($result = $before(...$arguments))) {
-                return $result;
+            if ($user || $before['options']['guestable']) {
+                if (! is_null($result = $before['callback'](...$arguments))) {
+                    return $result;
+                }
             }
         }
     }
@@ -345,7 +364,7 @@ class Gate implements GateContract
     /**
      * Call all of the after callbacks with check result.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @param  bool  $result
@@ -356,14 +375,16 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
-            $after(...$arguments);
+            if ($user || $after['options']['guestable']) {
+                $after['callback'](...$arguments);
+            }
         }
     }
 
     /**
      * Resolve the callable for the given ability and arguments.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @return callable
@@ -376,8 +397,9 @@ class Gate implements GateContract
             return $callback;
         }
 
-        if (isset($this->abilities[$ability])) {
-            return $this->abilities[$ability];
+        if (isset($this->abilities[$ability]) &&
+            ($user || $this->abilities[$ability]['options']['guestable'])) {
+            return $this->abilities[$ability]['callback'];
         }
 
         return function () {
@@ -426,7 +448,7 @@ class Gate implements GateContract
     /**
      * Resolve the callback for a policy check.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
      * @param  mixed  $policy
@@ -439,11 +461,13 @@ class Gate implements GateContract
         }
 
         return function () use ($user, $ability, $arguments, $policy) {
+            $guestable = isset($policy->guestable) ? (array) $policy->guestable : [];
+
             // This callback will be responsible for calling the policy's before method and
             // running this policy method if necessary. This is used to when objects are
             // mapped to policy objects in the user's configurations or on this class.
             $result = $this->callPolicyBefore(
-                $policy, $user, $ability, $arguments
+                $policy, $user, $ability, $arguments, $guestable
             );
 
             // When we receive a non-null result from this before method, we will return it
@@ -462,7 +486,7 @@ class Gate implements GateContract
                 array_shift($arguments);
             }
 
-            return is_callable([$policy, $ability])
+            return ($user || in_array($ability, $guestable))
                         ? $policy->{$ability}($user, ...$arguments)
                         : false;
         };
@@ -472,14 +496,15 @@ class Gate implements GateContract
      * Call the "before" method on the given policy, if applicable.
      *
      * @param  mixed  $policy
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  string  $ability
      * @param  array  $arguments
+     * @param  array  $guestable
      * @return mixed
      */
-    protected function callPolicyBefore($policy, $user, $ability, $arguments)
+    protected function callPolicyBefore($policy, $user, $ability, $arguments, $guestable)
     {
-        if (method_exists($policy, 'before')) {
+        if (method_exists($policy, 'before') && ($user || in_array('before', $guestable))) {
             return $policy->before($user, $ability, ...$arguments);
         }
     }
