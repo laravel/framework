@@ -12,6 +12,13 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 trait MakesHttpRequests
 {
     /**
+     * Additional headers for the request.
+     *
+     * @var array
+     */
+    protected $defaultHeaders = [];
+
+    /**
      * Additional server variables for the request.
      *
      * @var array
@@ -19,11 +26,43 @@ trait MakesHttpRequests
     protected $serverVariables = [];
 
     /**
-     * Additional headers for the request.
+     * Define additional headers to be sent with the request.
      *
-     * @var array
+     * @param  array $headers
+     * @return $this
      */
-    protected $defaultHeaders = [];
+    public function withHeaders(array $headers)
+    {
+        $this->defaultHeaders = array_merge($this->defaultHeaders, $headers);
+
+        return $this;
+    }
+
+    /**
+     * Add a header to be sent with the request.
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return $this
+     */
+    public function withHeader(string $name, string $value)
+    {
+        $this->defaultHeaders[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Flush all the configured headers.
+     *
+     * @return $this
+     */
+    public function flushHeaders()
+    {
+        $this->defaultHeaders = [];
+
+        return $this;
+    }
 
     /**
      * Define a set of server variables to be sent with the requests.
@@ -60,45 +99,6 @@ trait MakesHttpRequests
                 }
             });
         }
-
-        return $this;
-    }
-
-    /**
-     * Define a set of headers to be sent with the requests.
-     *
-     * @param array $headers
-     * @return $this
-     */
-    public function withHeaders(array $headers)
-    {
-        $this->defaultHeaders = $headers;
-
-        return $this;
-    }
-
-    /**
-     * Adds a header to be sent with the requests.
-     *
-     * @param  string $name
-     * @param  string $value
-     * @return $this
-     */
-    public function withHeader(string $name, string $value)
-    {
-        $this->defaultHeaders[$name] = $value;
-
-        return $this;
-    }
-
-    /**
-     * Removes all the predefined headers to be sent with the requests.
-     *
-     * @return $this
-     */
-    public function cleanHeaders()
-    {
-        $this->defaultHeaders = [];
 
         return $this;
     }
@@ -326,22 +326,11 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect($this->mergeDefaultHeaders($headers))->mapWithKeys(function ($value, $name) {
+        return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];
         })->all();
-    }
-
-    /**
-     * Merges the given headers and the default request headers.
-     *
-     * @param  array  $headers
-     * @return array
-     */
-    protected function mergeDefaultHeaders(array $headers)
-    {
-        return array_merge($headers, $this->defaultHeaders);
     }
 
     /**
