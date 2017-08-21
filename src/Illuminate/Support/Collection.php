@@ -146,7 +146,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $count = $this->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             return;
         }
 
@@ -174,7 +174,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $count = $this->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             return;
         }
 
