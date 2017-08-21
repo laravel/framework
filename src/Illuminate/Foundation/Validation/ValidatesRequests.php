@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Validation;
 
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
 trait ValidatesRequests
@@ -26,7 +27,7 @@ trait ValidatesRequests
         $validator->validate();
 
         return $request->only(
-            array_keys($validator->getRules())
+            $this->getValidationRuleKeys(array_keys($validator->getRules()))
         );
     }
 
@@ -46,7 +47,7 @@ trait ValidatesRequests
              ->make($request->all(), $rules, $messages, $customAttributes)
              ->validate();
 
-        return $request->only(array_keys($rules));
+        return $request->only($this->getValidationRuleKeys(array_keys($rules)));
     }
 
     /**
@@ -81,5 +82,25 @@ trait ValidatesRequests
     protected function getValidationFactory()
     {
         return app(Factory::class);
+    }
+
+    /**
+     * @param  array  $keys
+     *
+     * @return array
+     */
+    protected function getValidationRuleKeys(array $keys)
+    {
+        $filtered = [];
+
+        foreach ($keys as $key) {
+            if (($position = mb_strpos($key, '.')) !== false) {
+                $filtered[] = Str::substr($key, 0, $position);
+            } else {
+                $filtered[] = $key;
+            }
+        }
+
+        return array_unique($filtered);
     }
 }
