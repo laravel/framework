@@ -600,7 +600,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function fireFailedEvent($user, array $credentials)
     {
         if (isset($this->events)) {
-            $this->events->dispatch(new Events\Failed($user, $credentials));
+            $this->events->dispatch(new Events\Failed($user, $credentials, $this->getRequest()));
         }
     }
 
