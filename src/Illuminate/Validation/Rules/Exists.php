@@ -28,11 +28,11 @@ class Exists
     protected $wheres = [];
 
     /**
-     * The custom query callback.
+     * The array of custom query callbacks.
      *
-     * @var \Closure|null
+     * @var array
      */
-    protected $using;
+    protected $using = [];
 
     /**
      * Create a new exists rule instance.
@@ -135,7 +135,7 @@ class Exists
      */
     public function using(Closure $callback)
     {
-        $this->using = $callback;
+        $this->using[] = $callback;
 
         return $this;
     }
@@ -159,7 +159,7 @@ class Exists
      */
     public function queryCallbacks()
     {
-        return $this->using ? [$this->using] : [];
+        return $this->using;
     }
 
     /**
