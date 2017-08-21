@@ -30,10 +30,10 @@ class Failed
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $credentials
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request|null  $request
      * @return void
      */
-    public function __construct($user, $credentials, $request)
+    public function __construct($user, $credentials, $request = null)
     {
         $this->user = $user;
         $this->credentials = $credentials;
