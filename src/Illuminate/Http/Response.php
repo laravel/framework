@@ -14,6 +14,13 @@ class Response extends BaseResponse
     use ResponseTrait;
 
     /**
+     * The base response object.
+     *
+     * @var mixed
+     */
+    public $baseResponse;
+
+    /**
      * Set the content on the response.
      *
      * @param  mixed  $content
@@ -74,5 +81,32 @@ class Response extends BaseResponse
         }
 
         return json_encode($content);
+    }
+
+    /**
+     * Set the base response object.
+     *
+     * @param  mixed  $response
+     * @return $this
+     */
+    public function setBaseResponse($response)
+    {
+        $this->baseResponse = $response;
+
+        return $this;
+    }
+
+    /**
+     * Handle dynamic method calls into the response.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if ($this->baseResponse) {
+            $this->baseResponse->$method(...$parameters);
+        }
     }
 }
