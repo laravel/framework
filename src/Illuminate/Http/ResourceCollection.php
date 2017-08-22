@@ -43,15 +43,27 @@ class ResourceCollection extends Resource
      */
     protected function collectResource($resource)
     {
-        if (! $this->collects) {
-            throw new Exception('The ['.get_class($this).'] resource must specify the models it collects.');
-        }
-
-        $this->collection = $resource->mapInto($this->collects);
+        $this->collection = $resource->mapInto($this->collects());
 
         return $resource instanceof Collection
                     ? $this->collection
                     : $resource->setCollection($this->collection);
+    }
+
+    /**
+     * Get the resource that this resource collects.
+     *
+     * @return string
+     */
+    protected function collects()
+    {
+        if ($this->collects) {
+            return $this->collects;
+        }
+
+        throw new Exception(
+            'The ['.get_class($this).'] resource must specify the models it collects.'
+        );
     }
 
     /**
