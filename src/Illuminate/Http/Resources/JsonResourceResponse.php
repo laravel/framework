@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Collection;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class JsonResourceResponse extends ResourceResponse
 {
@@ -21,6 +22,10 @@ class JsonResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
+        if (! method_exists($this->resource, 'toJson')) {
+            throw new NotFoundHttpException;
+        }
+
         return $this->build($request, response()->json(
             array_merge($this->wrap($this->resource->toJson($request)), $this->with),
             $this->calculateStatus(), $this->headers

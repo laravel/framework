@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Contracts\View\View;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 class HtmlResourceResponse extends ResourceResponse
 {
@@ -14,6 +15,10 @@ class HtmlResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
+        if (! method_exists($this->resource, 'toHtml')) {
+            throw new NotFoundHttpException;
+        }
+
         $view = $this->resource->toHtml($request);
 
         if ($view instanceof View && ! isset($view->resource)) {

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Resources;
 
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+
 class CssResourceResponse extends ResourceResponse
 {
     /**
@@ -12,6 +14,10 @@ class CssResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
+        if (! method_exists($this->resource, 'toCss')) {
+            throw NotFoundHttpException;
+        }
+
         return $this->build($request, response(
             $this->resource->toCss($request),
             200, ['Content-Type' => 'text/css']
