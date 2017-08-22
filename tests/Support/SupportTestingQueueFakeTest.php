@@ -67,6 +67,19 @@ class QueueFakeTest extends TestCase
 
         $this->fake->assertPushed(JobStub::class, 2);
     }
+
+    /**
+     * @expectedException PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage Jobs were pushed unexpectedly.
+     */
+    public function testAssertNothingPushed()
+    {
+        $this->fake->assertNothingPushed();
+
+        $this->fake->push($this->job);
+
+        $this->fake->assertNothingPushed();
+    }
 }
 
 class JobStub

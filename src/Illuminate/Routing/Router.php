@@ -239,7 +239,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function view($uri, $view, $data = [])
     {
-        return $this->get($uri, '\Illuminate\Routing\ViewController')
+        return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\ViewController')
                 ->defaults('view', $view)
                 ->defaults('data', $data);
     }

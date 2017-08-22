@@ -40,6 +40,10 @@ class AuthGuardTest extends TestCase
         $guard->basic('email');
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
+     * @expectedExceptionMessage
+     */
     public function testBasicReturnsResponseOnFailure()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
@@ -48,10 +52,7 @@ class AuthGuardTest extends TestCase
         $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(false);
         $request = \Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
-        $response = $guard->basic('email');
-
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertEquals(401, $response->getStatusCode());
+        $guard->basic('email');
     }
 
     public function testBasicWithExtraConditions()

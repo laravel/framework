@@ -146,6 +146,10 @@ abstract class TestCase extends BaseTestCase
             $this->serverVariables = [];
         }
 
+        if (property_exists($this, 'defaultHeaders')) {
+            $this->defaultHeaders = [];
+        }
+
         if (class_exists('Mockery')) {
             if ($container = Mockery::getContainer()) {
                 $this->addToAssertionCount($container->mockery_getExpectationCount());
