@@ -106,7 +106,7 @@ class Response extends BaseResponse
     public function __call($method, $parameters)
     {
         if ($this->baseResponse) {
-            $this->baseResponse->$method(...$parameters);
+            return $this->baseResponse->$method(...$parameters);
         }
     }
 }

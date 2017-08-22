@@ -1409,6 +1409,7 @@ class RoutingRouteTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
         $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response->baseResponse);
         $this->assertEquals(0, $response->getEncodingOptions());
+        $this->assertEquals(['foo', 'bar'], $response->getData());
     }
 
     public function testRouteRedirect()
