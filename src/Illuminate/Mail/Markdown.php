@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail;
 
-use Parsedown;
+use ParsedownExtra;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory as ViewFactory;
