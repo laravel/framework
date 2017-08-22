@@ -4,16 +4,13 @@ namespace Illuminate\Http;
 
 use Exception;
 use ArrayAccess;
-use ArrayIterator;
 use JsonSerializable;
-use IteratorAggregate;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
-use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 
-class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Responsable, UrlRoutable
+class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
     /**
      * The resource instance.
@@ -287,24 +284,6 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public static function format($format, $callback)
     {
         static::$extensions[$format] = $callback;
-    }
-
-    /**
-     * Get an iterator for the resource.
-     *
-     * @return \ArrayIterator
-     */
-    public function getIterator()
-    {
-        if (is_array($this->resource)) {
-            return new ArrayIterator($this->resource);
-        } elseif ($this->resource instanceof IteratorAggregate) {
-            return $this->resource->getIterator();
-        }
-
-        throw new Exception(
-            "Unable to generate an iterator for this resource."
-        );
     }
 
     /**

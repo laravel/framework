@@ -3,11 +3,12 @@
 namespace Illuminate\Http;
 
 use Exception;
+use IteratorAggregate;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 
-class ResourceCollection extends Resource
+class ResourceCollection extends Resource implements IteratorAggregate
 {
     /**
      * The resource that this resource collects.
@@ -95,7 +96,21 @@ class ResourceCollection extends Resource
         return $this->resource->map(function ($item) use ($request) {
             return $item->toJson($request);
         })->all();
+    }
 
-        // return static::$wrap ? [static::$wrap => $data] : $data;
+    /**
+     * Get an iterator for the resource collection.
+     *
+     * @return \ArrayIterator
+     */
+    public function getIterator()
+    {
+        if ($this->collection instanceof IteratorAggregate) {
+            return $this->collection->getIterator();
+        }
+
+        throw new Exception(
+            "Unable to generate an iterator for this resource collection."
+        );
     }
 }
