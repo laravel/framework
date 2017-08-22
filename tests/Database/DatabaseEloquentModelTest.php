@@ -1281,6 +1281,15 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
+    public function testInModelObserversAreAttachedToModels()
+    {
+        EloquentInModelEventObjectStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher', ['fire' => 'return value true']));
+        $events->shouldReceive('listen')->once()->with('eloquent.saving: Illuminate\Tests\Database\EloquentInModelEventObjectStub', 'Illuminate\Tests\Database\EloquentInModelEventObjectStub@onSaving');
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentInModelEventObjectStub', 'Illuminate\Tests\Database\EloquentInModelEventObjectStub@onCreating');
+        $events->shouldReceive('forget');
+        EloquentInModelEventObjectStub::flushEventListeners();
+    }
+
     public function testSetObservableEvents()
     {
         $class = new EloquentModelStub;
@@ -2063,4 +2072,17 @@ class EloquentModelEventObjectStub extends \Illuminate\Database\Eloquent\Model
     protected $dispatchesEvents = [
         'saving' => EloquentModelSavingEventStub::class,
     ];
+}
+
+class EloquentInModelEventObjectStub extends EloquentModelStub
+{
+    public function onCreating(EloquentInModelEventObjectStub $model)
+    {
+        return true;
+    }
+
+    public function onSaving(EloquentInModelEventObjectStub $model)
+    {
+        return true;
+    }
 }

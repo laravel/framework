@@ -119,6 +119,24 @@ trait HasEvents
     }
 
     /**
+     * Register model event observers within the model.
+     *
+     * @return void
+     */
+    protected static function registerInModelEventObservers()
+    {
+        $class = static::class;
+
+        $instance = new static;
+
+        foreach ($instance->getObservableEvents() as $event) {
+            if (method_exists($instance, 'on'.ucfirst($event))) {
+                static::registerModelEvent($event, $class.'@on'.ucfirst($event));
+            }
+        }
+    }
+
+    /**
      * Fire the given event for the model.
      *
      * @param  string  $event
