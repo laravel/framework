@@ -684,11 +684,17 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     private static function createResponseFromBase($response)
     {
-        return (new Response(
+        $new = (new Response(
             $response->getContent(),
             $response->getStatusCode(),
             $response->headers->all()
-        ))->setBaseResponse($response)->withException(null);
+        ))->setBaseResponse($response);
+
+        if (isset($response->exception)) {
+            $new->withException($response->exception);
+        }
+
+        return $new;
     }
 
     /**
