@@ -1,5 +1,18 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added `Str::start()` and `str_start()` helper ([#20569](https://github.com/laravel/framework/pull/20569))
+
+### Changed
+- Return the model instance from `Model::refresh()` ([#20657](https://github.com/laravel/framework/pull/20657))
+
+### Fixed
+- Fix duplicate user model import in `make:policy` ([#20645](https://github.com/laravel/framework/pull/20645), [48f5f23](https://github.com/laravel/framework/commit/48f5f23fd8615f48f2aee27a301c1f2f1505bdfb))
+- Fix PHP 7.2 incompatibility in `Builder::mergeWheres()` ([#20635](https://github.com/laravel/framework/pull/20635))
+
+
 ## v5.4.33 (2017-08-14)
 
 ### Added
