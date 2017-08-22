@@ -1,5 +1,6 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -581,6 +582,18 @@ if (! function_exists('mix')) {
     }
 }
 
+if (! function_exists('now')) {
+    /**
+     * Create a new Carbon instance for the current time.
+     *
+     * @return \Carbon\Carbon
+     */
+    function now()
+    {
+        return Carbon::now();
+    }
+}
+
 if (! function_exists('old')) {
     /**
      * Retrieve an old input item.
@@ -803,6 +816,18 @@ if (! function_exists('storage_path')) {
     function storage_path($path = '')
     {
         return app('path.storage').($path ? DIRECTORY_SEPARATOR.$path : $path);
+    }
+}
+
+if (! function_exists('today')) {
+    /**
+     * Create a new Carbon instance for the current date.
+     *
+     * @return \Carbon\Carbon
+     */
+    function today()
+    {
+        return Carbon::today();
     }
 }
 
