@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Resources;
 
+use Illuminate\Contracts\View\View;
+
 class HtmlResourceResponse extends ResourceResponse
 {
     /**
@@ -12,9 +14,14 @@ class HtmlResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
+        $view = $this->resource->toHtml($request);
+
+        if ($view instanceof View && ! isset($view->resource)) {
+            $view->with('resource', $this->resource);
+        }
+
         return $this->build($request, response(
-            $this->resource->toHtml($request),
-            $this->calculateStatus(), $this->headers
+            $view, $this->calculateStatus(), $this->headers
         ));
     }
 
