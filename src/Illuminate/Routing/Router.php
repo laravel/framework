@@ -688,7 +688,7 @@ class Router implements RegistrarContract, BindingRegistrar
             $response->getContent(),
             $response->getStatusCode(),
             $response->headers->all()
-        ))->setBaseResponse($response);
+        ))->setBaseResponse($response)->withException(null);
     }
 
     /**
