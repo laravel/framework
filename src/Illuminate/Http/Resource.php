@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
+use Symfony\Component\HttpFoundation\HeaderBag;
 
 class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
@@ -48,6 +49,27 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public $collection;
 
     /**
+     * The status code that should be used for the response.
+     *
+     * @var int
+     */
+    public $status;
+
+    /**
+     * The headers that should be added to the response.
+     *
+     * @var array
+     */
+    public $headers = [];
+
+    /**
+     * The callback that should customize the response.
+     *
+     * @var \Closure
+     */
+    public $callback;
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string
@@ -70,6 +92,10 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public function __construct($resource)
     {
         $this->resource = $resource;
+
+        $this->callback = function () {
+            //
+        };
     }
 
     /**
@@ -294,6 +320,65 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public function jsonSerialize()
     {
         return $this->toJson(Container::getInstance()->make('request'));
+    }
+
+    /**
+     * Set the HTTP status code that should be added to the response.
+     *
+     * @param  int  $status
+     * @return $this
+     */
+    public function status($status)
+    {
+        $this->status = $status;
+
+        return $this;
+    }
+
+    /**
+     * Define a header that should be added to the response.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function header($key, $value)
+    {
+        $this->headers[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Add an array of headers that should be added to the response.
+     *
+     * @param  \Symfony\Component\HttpFoundation\HeaderBag|array  $headers
+     * @return $this
+     */
+    public function withHeaders($headers)
+    {
+        if ($headers instanceof HeaderBag) {
+            $headers = $headers->all();
+        }
+
+        foreach ($headers as $key => $value) {
+            $this->headers[$key] = $value;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Define a custom callback that should customize the response.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function using($callback)
+    {
+        $this->callback = $callback;
+
+        return $this;
     }
 
     /**

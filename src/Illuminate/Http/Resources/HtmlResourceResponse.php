@@ -26,7 +26,7 @@ class HtmlResourceResponse extends ResourceResponse
         }
 
         return $this->build($request, response(
-            $view, $this->calculateStatus(), $this->headers
+            $view, $this->calculateStatus(), $this->resource->headers
         ));
     }
 

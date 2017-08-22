@@ -23,7 +23,7 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
 
         return $this->build($request, response()->json(
             array_merge_recursive($this->wrap($this->resource->toJson($request)), $this->with),
-            $this->calculateStatus(), $this->headers
+            $this->calculateStatus(), $this->resource->headers
         ));
     }
 

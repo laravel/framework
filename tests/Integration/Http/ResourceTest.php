@@ -186,7 +186,7 @@ class ResourceTest extends TestCase
             return (new PostResource(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
-            ])))->json()->status(202)->header('X-Custom', 'True');
+            ])))->status(202)->header('X-Custom', 'True')->json();
         });
 
         $response = $this->withoutExceptionHandling()->get(
@@ -194,6 +194,24 @@ class ResourceTest extends TestCase
         );
 
         $response->assertStatus(202);
+        $response->assertHeader('X-Custom', 'True');
+    }
+
+    public function test_custom_headers_may_be_set_on_responses_using_callback()
+    {
+        Route::get('/', function () {
+            return (new PostResource(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])))->using(function ($request, $response) {
+                $response->header('X-Custom', 'True');
+            })->json();
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
         $response->assertHeader('X-Custom', 'True');
     }
 
