@@ -92,10 +92,10 @@ class ResourceCollection extends Resource
      */
     public function toJson($request)
     {
-        $data = $this->resource->map(function ($item) use ($request) {
+        return $this->resource->map(function ($item) use ($request) {
             return $item->toJson($request);
         })->all();
 
-        return static::$wrap ? [static::$wrap => $data] : $data;
+        // return static::$wrap ? [static::$wrap => $data] : $data;
     }
 }

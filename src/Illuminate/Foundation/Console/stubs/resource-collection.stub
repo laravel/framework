@@ -1,0 +1,19 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Http\ResourceCollection;
+
+class DummyClass extends ResourceCollection
+{
+    /**
+     * Transform the resource collection into a JSON array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toJson($request)
+    {
+        return parent::toJson($request);
+    }
+}

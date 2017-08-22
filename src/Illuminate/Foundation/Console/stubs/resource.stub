@@ -1,0 +1,26 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Http\Resource;
+
+class DummyClass extends Resource
+{
+    /**
+     * The attributes that should be hidden when serialized.
+     *
+     * @var array
+     */
+    public $hidden = [];
+
+    /**
+     * Transform the resource into a JSON array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toJson($request)
+    {
+        return parent::toJson($request);
+    }
+}
