@@ -3,7 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Arr;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class PaginatedJsonResourceResponse extends JsonResourceResponse
 {
@@ -16,7 +16,7 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
     public function toResponse($request)
     {
         if (! method_exists($this->resource, 'toJson')) {
-            throw new NotFoundHttpException;
+            throw new HttpException(406);
         }
 
         $this->addPaginationInformation($request);

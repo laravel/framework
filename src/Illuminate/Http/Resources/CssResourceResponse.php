@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class CssResourceResponse extends ResourceResponse
 {
@@ -15,7 +15,7 @@ class CssResourceResponse extends ResourceResponse
     public function toResponse($request)
     {
         if (! method_exists($this->resource, 'toCss')) {
-            throw new NotFoundHttpException;
+            throw new HttpException(406);
         }
 
         return $this->build($request, response(
