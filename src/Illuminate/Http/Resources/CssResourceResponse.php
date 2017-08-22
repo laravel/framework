@@ -15,7 +15,7 @@ class CssResourceResponse extends ResourceResponse
     public function toResponse($request)
     {
         if (! method_exists($this->resource, 'toCss')) {
-            throw NotFoundHttpException;
+            throw new NotFoundHttpException;
         }
 
         return $this->build($request, response(
