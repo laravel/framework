@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -35,18 +36,11 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if ($this->option('collection')) {
+        if ($this->collection()) {
             $this->type = 'Resource collection';
         }
 
         parent::handle();
-
-        if (! $this->option('collection')) {
-            $this->call('make:resource', [
-                'name' => $this->argument('name').'Collection',
-                '--collection' => true,
-            ]);
-        }
     }
 
     /**
@@ -56,9 +50,20 @@ class ResourceMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return $this->option('collection')
+        return $this->collection()
                     ? __DIR__.'/stubs/resource-collection.stub'
                     : __DIR__.'/stubs/resource.stub';
+    }
+
+    /**
+     * Determine if the command is generating a resource collection.
+     *
+     * @return bool
+     */
+    protected function collection()
+    {
+        return $this->option('collection') ||
+               Str::endsWith($this->argument('name'), 'Collection');
     }
 
     /**
