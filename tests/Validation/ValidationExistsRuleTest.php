@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Validation\DatabasePresenceVerifier;
-use Illuminate\Validation\Rules\Exists;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\Validator;
+use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use Illuminate\Validation\Validator;
+use Illuminate\Validation\DatabasePresenceVerifier;
 
 class ValidationExistsRuleTest extends TestCase
 {
@@ -29,8 +29,8 @@ class ValidationExistsRuleTest extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
-    }    
-    
+    }
+
     public function testItCorrectlyFormatsAStringVersionOfTheRule()
     {
         $rule = new Exists('table');
@@ -116,7 +116,7 @@ class ValidationExistsRuleTest extends TestCase
 
     protected function createSchema()
     {
-        $this->schema('default')->create('users', function($table) {
+        $this->schema('default')->create('users', function ($table) {
             $table->unsignedInteger('id');
             $table->string('type');
         });
@@ -143,7 +143,7 @@ class ValidationExistsRuleTest extends TestCase
     }
 
     /**
-     * Get connection resolver
+     * Get connection resolver.
      *
      * @return \Illuminate\Database\ConnectionResolverInterface
      */
@@ -171,7 +171,7 @@ class ValidationExistsRuleTest extends TestCase
 }
 
 /**
- * Eloquent Models
+ * Eloquent Models.
  */
 class EloquentTestUser extends Eloquent
 {
