@@ -62,8 +62,6 @@ class ResourceTest extends TestCase
             return route('post.show', $post);
         })->name('post.show');
 
-        $this->app['router']->getRoutes()->refreshNameLookups();
-
         $response = $this->withoutExceptionHandling()->get('/post/1');
 
         $this->assertEquals('http://localhost/post/5', $response->original);
