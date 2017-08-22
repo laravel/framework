@@ -6,6 +6,7 @@ use JsonSerializable;
 use Illuminate\Http\Resource;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\ResourceCollection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Contracts\Support\Responsable;
@@ -520,7 +521,7 @@ class SerializablePostResource extends Resource
 }
 
 
-class PostCollectionResource extends Resource
+class PostCollectionResource extends ResourceCollection
 {
     public $collects = PostResource::class;
 
@@ -530,7 +531,7 @@ class PostCollectionResource extends Resource
     }
 }
 
-class EmptyPostCollectionResource extends Resource
+class EmptyPostCollectionResource extends ResourceCollection
 {
     public $collects = PostResource::class;
 }
