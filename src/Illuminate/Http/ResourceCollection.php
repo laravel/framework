@@ -3,6 +3,7 @@
 namespace Illuminate\Http;
 
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 
@@ -59,6 +60,11 @@ class ResourceCollection extends Resource
     {
         if ($this->collects) {
             return $this->collects;
+        }
+
+        if (Str::endsWith(class_basename($this), 'Collection') &&
+            class_exists($class = Str::replaceLast('Collection', '', get_class($this)))) {
+            return $class;
         }
 
         throw new Exception(
