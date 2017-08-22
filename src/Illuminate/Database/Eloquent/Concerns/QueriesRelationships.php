@@ -107,6 +107,17 @@ trait QueriesRelationships
     }
 
     /**
+     * Add a relationship count / exists condition to the query with an "or".
+     *
+     * @param  string  $relation
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orDoesntHave($relation)
+    {
+        return $this->doesntHave($relation, 'or');
+    }
+
+    /**
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
@@ -144,6 +155,18 @@ trait QueriesRelationships
     public function whereDoesntHave($relation, Closure $callback = null)
     {
         return $this->doesntHave($relation, 'and', $callback);
+    }
+
+    /**
+     * Add a relationship count / exists condition to the query with where clauses and an "or".
+     *
+     * @param  string    $relation
+     * @param  \Closure  $callback
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function orWhereDoesntHave($relation, Closure $callback = null)
+    {
+        return $this->doesntHave($relation, 'or', $callback);
     }
 
     /**
