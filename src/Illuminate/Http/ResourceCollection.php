@@ -45,9 +45,9 @@ class ResourceCollection extends Resource
     {
         $this->collection = $resource->mapInto($this->collects());
 
-        return $resource instanceof Collection
-                    ? $this->collection
-                    : $resource->setCollection($this->collection);
+        return $resource instanceof AbstractPaginator
+                    ? $resource->setCollection($this->collection)
+                    : $this->collection;
     }
 
     /**
