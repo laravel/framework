@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail;
 
-use Parsedown;
+use ParsedownExtra;
 use Illuminate\Support\Arr;
 use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory as ViewFactory;
@@ -94,7 +94,7 @@ class Markdown
      */
     public static function parse($text)
     {
-        $parsedown = new Parsedown;
+        $parsedown = new ParsedownExtra;
 
         return new HtmlString($parsedown->text($text));
     }
