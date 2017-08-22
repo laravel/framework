@@ -38,6 +38,20 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public $visible = [];
 
     /**
+     * The resource that this resource collects.
+     *
+     * @var string
+     */
+    public $collects;
+
+    /**
+     * The mapped collection instance.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    public $collection;
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string
@@ -60,6 +74,29 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
     public function __construct($resource)
     {
         $this->resource = $resource;
+
+        if ($this->isCollectionResource()) {
+            $this->resource = $this->collectResource($resource);
+        }
+    }
+
+    /**
+     * Map the given collection resource into its individual resources.
+     *
+     * @param  mixed  $resource
+     * @return mixed
+     */
+    protected function collectResource($resource)
+    {
+        if (! $this->collects) {
+            throw new Exception('The ['.get_class($this).'] resource must specify the models it collects.');
+        }
+
+        $this->collection = $resource->mapInto($this->collects);
+
+        return $resource instanceof Collection
+                    ? $this->collection
+                    : $resource->setCollection($this->collection);
     }
 
     /**
@@ -130,7 +167,7 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     public function toJson($request)
     {
-        return $this->isCollectionResource() && $this->singularResource()
+        return $this->isCollectionResource()
                     ? $this->collectionToJson($request)
                     : $this->resourceToJson($request);
     }
@@ -142,9 +179,8 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     protected function isCollectionResource()
     {
-        return ($this->resource instanceof Collection ||
-               $this->resource instanceof AbstractPaginator) &&
-               Str::contains(get_class($this), 'Collection');
+        return $this->resource instanceof Collection ||
+               $this->resource instanceof AbstractPaginator;
     }
 
     /**
@@ -155,23 +191,11 @@ class Resource implements ArrayAccess, IteratorAggregate, JsonSerializable, Resp
      */
     public function collectionToJson($request)
     {
-        $data = $this->mapInto(
-            $this->singularResource()
-        )->map->toJson($request)->all();
+        $data = $this->resource->map(function ($item) use ($request) {
+            return $item->toJson($request);
+        })->all();
 
         return static::$wrap ? [static::$wrap => $data] : $data;
-    }
-
-    /**
-     * Get the singular version of this resource class, if applicable.
-     *
-     * @return string|null
-     */
-    protected function singularResource()
-    {
-        if (class_exists($class = Str::replaceLast('Collection', '', get_class($this)))) {
-            return $class;
-        }
     }
 
     /**

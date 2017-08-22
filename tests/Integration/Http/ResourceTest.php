@@ -522,15 +522,17 @@ class SerializablePostResource extends Resource
 
 class PostCollectionResource extends Resource
 {
+    public $collects = PostResource::class;
+
     public function toJson($request)
     {
-        return ['data' => $this->mapInto(PostResource::class)];
+        return ['data' => $this->collection];
     }
 }
 
 class EmptyPostCollectionResource extends Resource
 {
-    //
+    public $collects = PostResource::class;
 }
 
 class EmptyPostResource extends PostResource
