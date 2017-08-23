@@ -37,6 +37,13 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public $visible = [];
 
     /**
+     * The additional data that should be added to the top-level resource array.
+     *
+     * @var array
+     */
+    public $with = [];
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string
@@ -137,6 +144,19 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Merge the given data into the resource array.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function merge(array $data)
+    {
+        $this->with = $data;
+
+        return $this;
+    }
+
+    /**
      * Get any additional data that should be returned with the resource array.
      *
      * @param \Illuminate\Http\Request  $request
@@ -144,7 +164,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public function with($request)
     {
-        return [];
+        return $this->with;
     }
 
     /**
