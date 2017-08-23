@@ -51,7 +51,7 @@ trait DetectsResource
         }
 
         throw new Exception(
-            "Unable to detect the resource for the [".get_class($this)."] model."
+            'Unable to detect the resource for the ['.get_class($this).'] model.'
         );
     }
 }

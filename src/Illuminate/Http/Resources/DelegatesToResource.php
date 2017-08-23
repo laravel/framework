@@ -34,7 +34,7 @@ trait DelegatesToResource
      */
     public function resolveRouteBinding($value)
     {
-        throw new Exception("Resources may not be implicitly resolved from route bindings.");
+        throw new Exception('Resources may not be implicitly resolved from route bindings.');
     }
 
     /**
