@@ -20,25 +20,9 @@ trait CollectsResources
     {
         $this->collection = $resource->mapInto($this->collects());
 
-        if ($this->containsModels()) {
-            $this->collection = new EloquentCollection($this->collection->all());
-        }
-
         return $resource instanceof AbstractPaginator
                     ? $resource->setCollection($this->collection)
                     : $this->collection;
-    }
-
-    /**
-     * Determine if the collection contains models.
-     *
-     * @return bool
-     */
-    protected function containsModels()
-    {
-        return $this->collection->contains(function ($item) {
-            return $item->resource instanceof Model;
-        });
     }
 
     /**

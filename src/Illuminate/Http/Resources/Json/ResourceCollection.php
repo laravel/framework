@@ -6,6 +6,7 @@ use IteratorAggregate;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
+use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ResourceCollection extends Resource implements IteratorAggregate
 {
@@ -36,6 +37,31 @@ class ResourceCollection extends Resource implements IteratorAggregate
         parent::__construct($resource);
 
         $this->resource = $this->collectResource($resource);
+    }
+
+    /**
+     * Eager load relations on the resource.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function load($relations)
+    {
+        $this->collection = (new EloquentCollection($this->collection->all()))
+                    ->load($relations)->toBase();
+
+        return $this;
+    }
+
+    /**
+     * Eager load relations on the resource if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadMissing($relations)
+    {
+        return $this->load($relations);
     }
 
     /**
