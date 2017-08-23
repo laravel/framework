@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Collection;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Illuminate\Http\Resources\ResourceResponse as BaseResourceResponse;
 
 class ResourceResponse extends BaseResourceResponse

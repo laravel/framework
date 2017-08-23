@@ -4,11 +4,8 @@ namespace Illuminate\Http\Resources;
 
 use Exception;
 use ArrayAccess;
-use Illuminate\Support\Collection;
-use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 abstract class Resource implements ArrayAccess, Responsable, UrlRoutable
 {

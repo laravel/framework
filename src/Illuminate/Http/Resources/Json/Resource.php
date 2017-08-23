@@ -2,14 +2,11 @@
 
 namespace Illuminate\Http\Resources\Json;
 
-use Exception;
 use ArrayAccess;
 use JsonSerializable;
-use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
-use Symfony\Component\HttpFoundation\HeaderBag;
 use Illuminate\Http\Resources\Resource as BaseResource;
 
 class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable

@@ -2,13 +2,10 @@
 
 namespace Illuminate\Http\Resources\Json;
 
-use Exception;
 use IteratorAggregate;
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
-use Illuminate\Http\Resources\UnknownExceptionCollection;
 
 class ResourceCollection extends Resource implements IteratorAggregate
 {

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Resources;
 
-use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;

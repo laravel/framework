@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Responsable;
-use Symfony\Component\HttpFoundation\HeaderBag;
 
 abstract class ResourceResponse implements Responsable
 {
