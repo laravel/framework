@@ -7,13 +7,6 @@ use Illuminate\Http\Resources\Json\Resource;
 class DummyClass extends Resource
 {
     /**
-     * The attributes that should be hidden when serialized.
-     *
-     * @var array
-     */
-    public $hidden = [];
-
-    /**
      * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request
