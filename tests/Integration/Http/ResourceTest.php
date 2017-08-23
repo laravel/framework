@@ -7,8 +7,6 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Resources\Json\Resource;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
@@ -36,7 +34,7 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'title' => 'Test Title',
-            ]
+            ],
         ]);
     }
 
@@ -84,7 +82,7 @@ class ResourceTest extends TestCase
         $response->assertJson([
             'data' => [
                 'id' => 5,
-            ]
+            ],
         ]);
     }
 
@@ -313,7 +311,7 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'title' => 'Test Title',
-            ]
+            ],
         ]);
     }
 }
@@ -327,7 +325,6 @@ class Post extends Model
      */
     protected $guarded = [];
 }
-
 
 class PostResource extends Resource
 {
@@ -357,7 +354,6 @@ class SerializablePostResource extends Resource
         return new JsonSerializableResource($this);
     }
 }
-
 
 class PostCollectionResource extends ResourceCollection
 {
