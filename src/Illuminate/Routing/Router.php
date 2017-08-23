@@ -645,7 +645,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  mixed  $response
-     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\Response
      */
     public static function prepareResponse($request, $response)
     {
@@ -655,15 +655,18 @@ class Router implements RegistrarContract, BindingRegistrar
 
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
-        } elseif (! $response instanceof SymfonyResponse &&
-                   ($response instanceof Arrayable ||
-                    $response instanceof Jsonable ||
-                    $response instanceof ArrayObject ||
-                    $response instanceof JsonSerializable ||
-                    is_array($response))) {
+        } elseif ($response instanceof Arrayable ||
+            $response instanceof Jsonable ||
+            $response instanceof ArrayObject ||
+            $response instanceof JsonSerializable ||
+            is_array($response)) {
             $response = new JsonResponse($response);
-        } elseif (! $response instanceof SymfonyResponse) {
-            $response = new Response($response);
+        }
+
+        if (! $response instanceof Response) {
+            $response = $response instanceof SymfonyResponse
+                        ? static::createResponseFromBase($response)
+                        : new Response($response);
         }
 
         if ($response->getStatusCode() === Response::HTTP_NOT_MODIFIED) {
@@ -671,6 +674,27 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         return $response->prepare($request);
+    }
+
+    /**
+     * Create an illuminate response from a given base response object.
+     *
+     * @param  mixed  $response
+     * @return \Illuminate\Http\Response
+     */
+    private static function createResponseFromBase($response)
+    {
+        $new = (new Response(
+            $response->getContent(),
+            $response->getStatusCode(),
+            $response->headers->all()
+        ))->setBaseResponse($response);
+
+        if (isset($response->exception)) {
+            $new->withException($response->exception);
+        }
+
+        return $new;
     }
 
     /**
