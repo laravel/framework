@@ -1,19 +1,13 @@
 <?php
 
-namespace Illuminate\Http\Resources;
+namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Collection;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Http\Resources\ResourceResponse as BaseResourceResponse;
 
-class JsonResourceResponse extends ResourceResponse
+class ResourceResponse extends BaseResourceResponse
 {
-    /**
-     * The extra data that should be added to the response.
-     *
-     * @var array
-     */
-    public $with = [];
-
     /**
      * Create an HTTP response that represents the object.
      *
@@ -22,12 +16,8 @@ class JsonResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
-        if (! method_exists($this->resource, 'toJson')) {
-            throw new HttpException(406);
-        }
-
         return $this->build($request, response()->json(
-            array_merge_recursive($this->wrap($this->resource->toJson($request)), $this->with),
+            $this->wrap($this->resource->toJson($request)),
             $this->calculateStatus(), $this->resource->headers
         ));
     }
@@ -78,19 +68,6 @@ class JsonResourceResponse extends ResourceResponse
     }
 
     /**
-     * Add the given array to the response body.
-     *
-     * @param  array  $values
-     * @return $this
-     */
-    public function with(array $values)
-    {
-        $this->with = array_merge($this->with, $values);
-
-        return $this;
-    }
-
-    /**
      * Get the default data wrapper for the resource.
      *
      * @return string
@@ -100,19 +77,5 @@ class JsonResourceResponse extends ResourceResponse
         $class = get_class($this->resource);
 
         return $class::$wrap;
-    }
-
-    /**
-     * Build the finished HTTP response.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
-     * @return \Illuminate\Http\Response
-     */
-    protected function build($request, $response)
-    {
-        return tap(parent::build($request, $response), function ($response) use ($request) {
-            $this->resource->withJsonResponse($request, $response);
-        });
     }
 }

@@ -1,11 +1,10 @@
 <?php
 
-namespace Illuminate\Http\Resources;
+namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Arr;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class PaginatedJsonResourceResponse extends JsonResourceResponse
+class PaginatedResourceResponse extends ResourceResponse
 {
     /**
      * Create an HTTP response that represents the object.
@@ -15,14 +14,11 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
      */
     public function toResponse($request)
     {
-        if (! method_exists($this->resource, 'toJson')) {
-            throw new HttpException(406);
-        }
-
-        $this->addPaginationInformation($request);
-
         return $this->build($request, response()->json(
-            array_merge_recursive($this->wrap($this->resource->toJson($request)), $this->with),
+            array_merge_recursive(
+                $this->wrap($this->resource->toJson($request)),
+                $this->paginationInformation($request)
+            ),
             $this->calculateStatus(), $this->resource->headers
         ));
     }
@@ -31,16 +27,16 @@ class PaginatedJsonResourceResponse extends JsonResourceResponse
      * Add the pagination information to the response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return void
+     * @return array
      */
-    protected function addPaginationInformation($request)
+    protected function paginationInformation($request)
     {
         $paginated = $this->resource->resource->toArray();
 
-        return $this->with([
+        return [
             'links' => $this->paginationLinks($paginated),
             'meta' => $this->meta($paginated),
-        ]);
+        ];
     }
 
     /**
