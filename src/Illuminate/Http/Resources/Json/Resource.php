@@ -26,13 +26,6 @@ class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Re
     public $visible = [];
 
     /**
-     * The callback that should customize the response.
-     *
-     * @var \Closure
-     */
-    public $callback;
-
-    /**
      * The "data" wrapper that should be applied.
      *
      * @var string
@@ -96,19 +89,6 @@ class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Re
     public function withResponse($request, $response)
     {
         //
-    }
-
-    /**
-     * Define a custom callback that should customize the response.
-     *
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function using($callback)
-    {
-        $this->callback = $callback;
-
-        return $this;
     }
 
     /**

@@ -35,8 +35,6 @@ abstract class ResourceResponse implements Responsable
     protected function build($request, $response)
     {
         return tap($response, function ($response) use ($request) {
-            call_user_func($this->resource->callback, $request, $response);
-
             $this->resource->withResponse($request, $response);
         });
     }
