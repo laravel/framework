@@ -1215,6 +1215,17 @@ class Builder
     }
 
     /**
+     * Checks if macro is registered.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    public static function hasMacro($name)
+    {
+        return isset(static::$macros[$name]);
+    }
+
+    /**
      * Dynamically handle calls into the query instance.
      *
      * @param  string  $method
