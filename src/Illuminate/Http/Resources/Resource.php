@@ -25,10 +25,6 @@ abstract class Resource implements ArrayAccess, Responsable, UrlRoutable
     public function __construct($resource)
     {
         $this->resource = $resource;
-
-        $this->callback = function () {
-            //
-        };
     }
 
     /**
