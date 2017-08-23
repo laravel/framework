@@ -23,20 +23,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public $resource;
 
     /**
-     * The attributes that should be hidden when serialized.
-     *
-     * @var array
-     */
-    public $hidden = [];
-
-    /**
-     * The attributes that should be visible when serialized.
-     *
-     * @var array
-     */
-    public $visible = [];
-
-    /**
      * The additional data that should be added to the top-level resource array.
      *
      * @var array
@@ -156,17 +142,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public function toArray($request)
     {
-        $values = $this->resource->toArray();
-
-        if (count($this->visible) > 0) {
-            $values = array_intersect_key($values, array_flip($this->visible));
-        }
-
-        if (count($this->hidden) > 0) {
-            $values = array_diff_key($values, array_flip($this->hidden));
-        }
-
-        return $values;
+        return $this->resource->toArray();
     }
 
     /**
