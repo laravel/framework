@@ -15,7 +15,7 @@ class DummyClass
      *
      * @param  \DummyRootNamespaceUser  $user
      * @param  \NamespacedDummyModel  $dummyModel
-     * @return mixed
+     * @return boolean
      */
     public function view(User $user, DummyModel $dummyModel)
     {
@@ -26,7 +26,7 @@ class DummyClass
      * Determine whether the user can create dummyPluralModel.
      *
      * @param  \DummyRootNamespaceUser  $user
-     * @return mixed
+     * @return boolean
      */
     public function create(User $user)
     {
@@ -38,7 +38,7 @@ class DummyClass
      *
      * @param  \DummyRootNamespaceUser  $user
      * @param  \NamespacedDummyModel  $dummyModel
-     * @return mixed
+     * @return boolean
      */
     public function update(User $user, DummyModel $dummyModel)
     {
@@ -50,7 +50,7 @@ class DummyClass
      *
      * @param  \DummyRootNamespaceUser  $user
      * @param  \NamespacedDummyModel  $dummyModel
-     * @return mixed
+     * @return boolean
      */
     public function delete(User $user, DummyModel $dummyModel)
     {
