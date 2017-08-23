@@ -614,6 +614,27 @@ if (! function_exists('head')) {
     }
 }
 
+if (! function_exists('is_any')) {
+	/**
+	 * Checks if the object is an instance of any of the provided classes or their parents.
+	 *
+	 * @param object $object
+	 * @param array ...$classes
+	 * @return bool
+	 */
+	function is_any($object, ...$classes)
+	{
+		foreach ($classes as $class)
+        {
+			if ($object instanceof $class) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+}
+
 if (! function_exists('kebab_case')) {
     /**
      * Convert a string to kebab case.
