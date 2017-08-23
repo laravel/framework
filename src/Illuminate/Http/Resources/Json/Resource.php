@@ -57,6 +57,31 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Create new anonymous resource collection.
+     *
+     * @param  mixed  $resource
+     * @return mixed
+     */
+    public static function collection($resource)
+    {
+        return new class($resource, get_called_class()) extends ResourceCollection {
+            /**
+             * Create a new anonymous resource collection.
+             *
+             * @param  mixed  $resource
+             * @param  string  $collects
+             * @return void
+             */
+            public function __construct($resource, $collects)
+            {
+                $this->collects = $collects;
+
+                parent::__construct($resource);
+            }
+        };
+    }
+
+    /**
      * Transform the resource into a JSON array.
      *
      * @param  \Illuminate\Http\Request
