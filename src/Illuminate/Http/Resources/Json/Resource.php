@@ -88,32 +88,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
-     * Eager load relations on the resource.
-     *
-     * @param  array|string  $relations
-     * @return $this
-     */
-    public function load($relations)
-    {
-        $this->resource->load($relations);
-
-        return $this;
-    }
-
-    /**
-     * Eager load relations on the resource if they are not already eager loaded.
-     *
-     * @param  array|string  $relations
-     * @return $this
-     */
-    public function loadMissing($relations)
-    {
-        $this->resource->loadMissing($relations);
-
-        return $this;
-    }
-
-    /**
      * Resolve the resource to an array.
      *
      * @param  \Illuminate\Http\Request  $request

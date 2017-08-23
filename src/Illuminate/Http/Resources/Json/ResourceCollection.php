@@ -40,31 +40,6 @@ class ResourceCollection extends Resource implements IteratorAggregate
     }
 
     /**
-     * Eager load relations on the resource.
-     *
-     * @param  array|string  $relations
-     * @return $this
-     */
-    public function load($relations)
-    {
-        $this->collection = (new EloquentCollection($this->collection->all()))
-                    ->load($relations)->toBase();
-
-        return $this;
-    }
-
-    /**
-     * Eager load relations on the resource if they are not already eager loaded.
-     *
-     * @param  array|string  $relations
-     * @return $this
-     */
-    public function loadMissing($relations)
-    {
-        return $this->load($relations);
-    }
-
-    /**
      * Transform the resource into a JSON array.
      *
      * @param  \Illuminate\Http\Request
