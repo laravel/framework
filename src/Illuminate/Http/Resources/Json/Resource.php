@@ -7,10 +7,20 @@ use JsonSerializable;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Resources\DelegatesToResource;
 use Illuminate\Http\Resources\Resource as BaseResource;
 
-class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
+class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
+    use DelegatesToResource;
+
+    /**
+     * The resource instance.
+     *
+     * @var mixed
+     */
+    public $resource;
+
     /**
      * The attributes that should be hidden when serialized.
      *
@@ -40,7 +50,7 @@ class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Re
      */
     public function __construct($resource)
     {
-        parent::__construct($resource);
+        $this->resource = $resource;
 
         $this->callback = function () {
             //

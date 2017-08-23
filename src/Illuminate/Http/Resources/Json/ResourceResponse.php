@@ -3,10 +3,29 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Resources\ResourceResponse as BaseResourceResponse;
 
-class ResourceResponse extends BaseResourceResponse
+class ResourceResponse implements Responsable
 {
+    /**
+     * The underlying resource.
+     *
+     * @var mixed
+     */
+    public $resource;
+
+    /**
+     * Create a new resource repsonse.
+     *
+     * @param  mixed  $resource
+     * @return void
+     */
+    public function __construct($resource)
+    {
+        $this->resource = $resource;
+    }
+
     /**
      * Create an HTTP response that represents the object.
      *
@@ -15,10 +34,11 @@ class ResourceResponse extends BaseResourceResponse
      */
     public function toResponse($request)
     {
-        return $this->build($request, response()->json(
-            $this->wrap($this->resource->toJson($request)),
-            $this->calculateStatus()
-        ));
+        return tap(response()->json(
+            $this->wrap($this->resource->toJson($request)), $this->calculateStatus()
+        ), function ($response) use ($request) {
+            $this->resource->withResponse($request, $response);
+        });
     }
 
     /**
@@ -33,37 +53,9 @@ class ResourceResponse extends BaseResourceResponse
             $data = $data->all();
         }
 
-        if ($this->haveDefaultWrapperAndDataIsUnwrapped($data)) {
-            $data = [$this->wrapper() => $data];
-        } elseif ($this->haveAdditionalInformationAndDataIsUnwrapped($data)) {
-            $data = [($this->wrapper() ?? 'data') => $data];
-        }
-
-        return $data;
-    }
-
-    /**
-     * Determine if we have a default wrapper and the given data is unwrapped.
-     *
-     * @param  array  $data
-     * @return bool
-     */
-    protected function haveDefaultWrapperAndDataIsUnwrapped($data)
-    {
-        return $this->wrapper() && ! array_key_exists($this->wrapper(), $data);
-    }
-
-    /**
-     * Determine if "with" data has been added and our data is unwrapped.
-     *
-     * @param  array  $data
-     * @return bool
-     */
-    protected function haveAdditionalInformationAndDataIsUnwrapped($data)
-    {
-        return ! empty($this->with) &&
-              (! $this->wrapper() ||
-               ! array_key_exists($this->wrapper(), $data));
+        return $this->wrapper() && ! array_key_exists($this->wrapper(), $data)
+                     ? [$this->wrapper() => $data]
+                     : $data;
     }
 
     /**
@@ -73,8 +65,17 @@ class ResourceResponse extends BaseResourceResponse
      */
     protected function wrapper()
     {
-        $class = get_class($this->resource);
+        return get_class($this->resource)::$wrap;
+    }
 
-        return $class::$wrap;
+    /**
+     * Calculate the appropriate status code for the response.
+     *
+     * @return int
+     */
+    protected function calculateStatus()
+    {
+        return $this->resource->resource instanceof Model &&
+               $this->resource->resource->wasRecentlyCreated ? 201 : 200;
     }
 }

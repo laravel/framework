@@ -14,10 +14,12 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     public function toResponse($request)
     {
-        return $this->build($request, response()->json(array_merge_recursive(
+        return tap(response()->json(array_merge_recursive(
             $this->wrap($this->resource->toJson($request)),
             $this->paginationInformation($request)
-        ), $this->calculateStatus()));
+        ), $this->calculateStatus()), function ($response) use ($request) {
+            $this->resource->withResponse($request, $response);
+        });
     }
 
     /**
