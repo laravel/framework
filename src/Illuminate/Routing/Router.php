@@ -203,9 +203,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function any($uri, $action = null)
     {
-        $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
-
-        return $this->addRoute($verbs, $uri, $action);
+        return $this->addRoute(self::$verbs, $uri, $action);
     }
 
     /**
