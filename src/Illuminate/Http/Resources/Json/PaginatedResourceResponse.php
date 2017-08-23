@@ -46,12 +46,12 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function paginationLinks($paginated)
     {
-        return array_merge($this->with['link'] ?? [], [
+        return [
             'first' => $paginated['first_page_url'] ?? null,
             'last' => $paginated['last_page_url'] ?? null,
             'prev' => $paginated['prev_page_url'] ?? null,
             'next' => $paginated['next_page_url'] ?? null,
-        ]);
+        ];
     }
 
     /**
@@ -62,12 +62,12 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function meta($paginated)
     {
-        return array_merge($this->with['meta'] ?? [], Arr::except($paginated, [
+        return Arr::except($paginated, [
             'data',
             'first_page_url',
             'last_page_url',
             'prev_page_url',
             'next_page_url',
-        ]));
+        ]);
     }
 }
