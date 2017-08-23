@@ -4,9 +4,7 @@ namespace Illuminate\Http\Resources;
 
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 trait CollectsResources
 {

@@ -6,7 +6,6 @@ use IteratorAggregate;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
-use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 
 class ResourceCollection extends Resource implements IteratorAggregate
 {
