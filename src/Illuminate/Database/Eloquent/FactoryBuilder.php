@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -314,7 +313,7 @@ class FactoryBuilder
     protected function expandAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
-            if ($attribute instanceof Closure) {
+            if (is_callable($attribute)) {
                 $attribute = $attribute($attributes);
             }
 
