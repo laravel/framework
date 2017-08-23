@@ -53,6 +53,21 @@ class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Re
     public static $wrap = 'data';
 
     /**
+     * Create a new resource instance.
+     *
+     * @param  mixed  $resource
+     * @return void
+     */
+    public function __construct($resource)
+    {
+        parent::__construct($resource);
+
+        $this->callback = function () {
+            //
+        };
+    }
+
+    /**
      * Transform the resource into a JSON array.
      *
      * @param  \Illuminate\Http\Request
