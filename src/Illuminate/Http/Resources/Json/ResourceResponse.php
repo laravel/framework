@@ -17,7 +17,7 @@ class ResourceResponse extends BaseResourceResponse
     {
         return $this->build($request, response()->json(
             $this->wrap($this->resource->toJson($request)),
-            $this->calculateStatus(), $this->resource->headers
+            $this->calculateStatus()
         ));
     }
 

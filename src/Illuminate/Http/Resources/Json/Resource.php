@@ -26,19 +26,6 @@ class Resource extends BaseResource implements ArrayAccess, JsonSerializable, Re
     public $visible = [];
 
     /**
-     * The status code that should be used for the response.
-     *
-     * @var int
-     */
-    public $status;
-    /**
-     * The headers that should be added to the response.
-     *
-     * @var array
-     */
-    public $headers = [];
-
-    /**
      * The callback that should customize the response.
      *
      * @var \Closure

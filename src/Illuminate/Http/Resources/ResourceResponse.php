@@ -48,10 +48,6 @@ abstract class ResourceResponse implements Responsable
      */
     protected function calculateStatus()
     {
-        if ($this->resource->status) {
-            return $this->resource->status;
-        }
-
         return $this->resource->resource instanceof Model &&
                $this->resource->resource->wasRecentlyCreated ? 201 : 200;
     }
