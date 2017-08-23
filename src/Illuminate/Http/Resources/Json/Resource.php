@@ -4,7 +4,9 @@ namespace Illuminate\Http\Resources\Json;
 
 use ArrayAccess;
 use JsonSerializable;
+use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Resources\DelegatesToResource;
@@ -57,6 +59,17 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Create a new resource instance.
+     *
+     * @param  dynamic  $parameters
+     * @return static
+     */
+    public static function make(...$parameters)
+    {
+        return new static(...$parameters);
+    }
+
+    /**
      * Create new anonymous resource collection.
      *
      * @param  mixed  $resource
@@ -82,23 +95,33 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
-     * Transform the resource into a JSON array.
-     *
-     * @param  \Illuminate\Http\Request
-     * @return array
-     */
-    public function toJson($request)
-    {
-        return $this->resourceToJson($request);
-    }
-
-    /**
-     * Convert the resource into a JSON array.
+     * Resolve the resource to an array.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
-    protected function resourceToJson($request)
+    public function resolve($request)
+    {
+        $data = $this->toArray($request);
+
+        if (is_array($data)) {
+            return $data;
+        } elseif ($data instanceof Arrayable || $data instanceof Collection) {
+            return $data->toArray();
+        } elseif ($data instanceof JsonSerializable) {
+            return $data->jsonSerialize();
+        }
+
+        return (array) $data;
+    }
+
+    /**
+     * Transform the resource into an array.
+     *
+     * @param  \Illuminate\Http\Request
+     * @return array
+     */
+    public function toArray($request)
     {
         $values = $this->resource->toArray();
 
@@ -114,6 +137,17 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Get any additional data that should be returned with the resource array.
+     *
+     * @param \Illuminate\Http\Request  $request
+     * @return array
+     */
+    public function with($request)
+    {
+        return [];
+    }
+
+    /**
      * Customize the response for a request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -126,7 +160,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
-     * Set the string that should wrap the outer-most JSON array.
+     * Set the string that should wrap the outer-most resource array.
      *
      * @param  string  $value
      * @return void
@@ -137,7 +171,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
-     * Disable wrapping of the outer-most JSON array.
+     * Disable wrapping of the outer-most resource array.
      *
      * @param  string  $value
      * @return void
@@ -145,6 +179,19 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public static function withoutWrapping()
     {
         static::$wrap = null;
+    }
+
+    /**
+     * Transform the resource into an HTTP response.
+     *
+     * @param  \Illuminate\Http\Request|null  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function response($request = null)
+    {
+        return $this->toResponse(
+            $request ?: Container::getInstance()->make('request')
+        );
     }
 
     /**
@@ -165,6 +212,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public function jsonSerialize()
     {
-        return $this->toJson(Container::getInstance()->make('request'));
+        return $this->toArray(Container::getInstance()->make('request'));
     }
 }

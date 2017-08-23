@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Responsable;
 
 class ResourceResponse implements Responsable
@@ -34,7 +35,11 @@ class ResourceResponse implements Responsable
     public function toResponse($request)
     {
         return tap(response()->json(
-            $this->wrap($this->resource->toJson($request)), $this->calculateStatus()
+            $this->wrap(
+                $this->resource->resolve($request),
+                $this->resource->with($request)
+            ),
+            $this->calculateStatus()
         ), function ($response) use ($request) {
             $this->resource->withResponse($request, $response);
         });
@@ -44,17 +49,47 @@ class ResourceResponse implements Responsable
      * Wrap the given data if necessary.
      *
      * @param  array  $data
+     * @param  array  $with
      * @return array
      */
-    protected function wrap($data)
+    protected function wrap($data, $with = [])
     {
         if ($data instanceof Collection) {
             $data = $data->all();
         }
 
-        return $this->wrapper() && ! array_key_exists($this->wrapper(), $data)
-                     ? [$this->wrapper() => $data]
-                     : $data;
+        if ($this->haveDefaultWrapperAndDataIsUnwrapped($data)) {
+            $data = [$this->wrapper() => $data];
+        } elseif ($this->haveAdditionalInformationAndDataIsUnwrapped($data, $with)) {
+            $data = [($this->wrapper() ?? 'data') => $data];
+        }
+
+        return array_merge_recursive($data, $with);
+    }
+
+    /**
+     * Determine if we have a default wrapper and the given data is unwrapped.
+     *
+     * @param  array  $data
+     * @return bool
+     */
+    protected function haveDefaultWrapperAndDataIsUnwrapped($data)
+    {
+        return $this->wrapper() && ! array_key_exists($this->wrapper(), $data);
+    }
+
+    /**
+     * Determine if "with" data has been added and our data is unwrapped.
+     *
+     * @param  array  $data
+     * @param  array  $with
+     * @return bool
+     */
+    protected function haveAdditionalInformationAndDataIsUnwrapped($data, $with)
+    {
+        return ! empty($this->with) &&
+              (! $this->wrapper() ||
+               ! array_key_exists($this->wrapper(), $data));
     }
 
     /**

@@ -44,11 +44,9 @@ class ResourceCollection extends Resource implements IteratorAggregate
      * @param  \Illuminate\Http\Request
      * @return array
      */
-    public function toJson($request)
+    public function toArray($request)
     {
-        return $this->resource->map(function ($item) use ($request) {
-            return $item->toJson($request);
-        })->all();
+        return $this->collection->map->toArray($request)->all();
     }
 
     /**
