@@ -144,7 +144,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
-     * Merge the given data into the resource array.
+     * Merge additional data into the resource array.
      *
      * @param  array  $data
      * @return $this
