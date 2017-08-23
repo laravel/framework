@@ -392,6 +392,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($this->getBuilder()->foo('bar'), 'bar');
     }
 
+    public function testHasMacroWorksForGlobalMacros()
+    {
+        Builder::macro('foo', function ($bar) {
+            return $bar;
+        });
+
+        $this->assertTrue(Builder::hasMacro('foo'));
+        $this->assertFalse(Builder::hasMacro('bar'));
+    }
+
     public function testGetModelsProperlyHydratesModels()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
