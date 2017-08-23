@@ -144,6 +144,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         return [
             'current_page' => $this->currentPage(),
             'data' => $this->items->toArray(),
+            'first_page_url' => $this->url(1),
             'from' => $this->firstItem(),
             'next_page_url' => $this->nextPageUrl(),
             'path' => $this->path,
