@@ -45,6 +45,28 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->exists('bar'));
     }
 
+    public function testEitherCreatesNewViewInstanceWithProperPath()
+    {
+        unset($_SERVER['__test.view']);
+
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+        $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow('InvalidArgumentException');
+        $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock(\Illuminate\Contracts\View\Engine::class));
+        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
+        $factory->setDispatcher(new \Illuminate\Events\Dispatcher);
+        $factory->creator('view', function ($view) {
+            $_SERVER['__test.view'] = $view;
+        });
+        $factory->addExtension('php', 'php');
+        $view = $factory->either('bar', 'view', ['foo' => 'bar'], ['baz' => 'boom']);
+
+        $this->assertSame($engine, $view->getEngine());
+        $this->assertSame($_SERVER['__test.view'], $view);
+
+        unset($_SERVER['__test.view']);
+    }
+
     public function testRenderEachCreatesViewForEachItemInArray()
     {
         $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());

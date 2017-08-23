@@ -245,6 +245,23 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Get the evaluated view contents for the given view, or for a fallback
+     * view if the given view doesn't exist.
+     *
+     * @param  string  $view
+     * @param  string  $fallback
+     * @param  array   $data
+     * @param  array   $mergeData
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function either($view, $fallback, $data = [], $mergeData = [])
+    {
+        $view = $this->exists($view) ? $view : $fallback;
+
+        return $this->make($view, $data, $mergeData);
+    }
+
+    /**
      * Get the appropriate view engine for the given path.
      *
      * @param  string  $path
