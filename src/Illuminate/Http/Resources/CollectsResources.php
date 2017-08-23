@@ -16,7 +16,9 @@ trait CollectsResources
      */
     protected function collectResource($resource)
     {
-        $this->collection = $resource->mapInto($this->collects());
+        $this->collection = ($collects = $this->collects())
+                    ? $resource->mapInto($collects)
+                    : $resource->toBase();
 
         return $resource instanceof AbstractPaginator
                     ? $resource->setCollection($this->collection)
@@ -38,8 +40,6 @@ trait CollectsResources
             class_exists($class = Str::replaceLast('Collection', '', get_class($this)))) {
             return $class;
         }
-
-        throw new UnknownCollectionException($this);
     }
 
     /**
