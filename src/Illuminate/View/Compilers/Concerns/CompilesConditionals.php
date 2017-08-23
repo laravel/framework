@@ -201,4 +201,45 @@ trait CompilesConditionals
     {
         return '<?php endswitch; ?>';
     }
+
+    /**
+     * Compile the try statement into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileTry()
+    {
+        return '<?php try { ?>';
+    }
+
+    /**
+     * Compile the catch statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileCatch($expression)
+    {
+        return "<?php } catch {$expression} { ?>";
+    }
+
+    /**
+     * Compile the finally statement into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileFinally()
+    {
+        return '<?php } finally { ?>';
+    }
+
+    /**
+     * Compile the endtry statement into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndTry()
+    {
+        return '<?php } ?>';
+    }
 }
