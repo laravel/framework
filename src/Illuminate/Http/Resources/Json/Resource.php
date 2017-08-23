@@ -45,10 +45,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public function __construct($resource)
     {
         $this->resource = $resource;
-
-        $this->callback = function () {
-            //
-        };
     }
 
     /**
