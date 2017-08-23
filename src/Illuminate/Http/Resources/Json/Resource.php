@@ -122,7 +122,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public function loadMissing($relations)
     {
-        $this->resource->load($relations);
+        $this->resource->loadMissing($relations);
 
         return $this;
     }
