@@ -87,7 +87,7 @@ class ResourceResponse implements Responsable
      */
     protected function haveAdditionalInformationAndDataIsUnwrapped($data, $with)
     {
-        return ! empty($this->with) &&
+        return ! empty($with) &&
               (! $this->wrapper() ||
                ! array_key_exists($this->wrapper(), $data));
     }
