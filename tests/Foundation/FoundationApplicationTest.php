@@ -88,6 +88,15 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals(1, ApplicationDeferredServiceProviderCountStub::$count);
     }
 
+    public function testDeferredServiceDontRunWhenInstanceSet()
+    {
+        $app = new Application;
+        $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
+        $app->instance('foo', 'bar');
+        $instance = $app->make('foo');
+        $this->assertEquals($instance, 'bar');
+    }
+
     public function testDeferredServicesAreLazilyInitialized()
     {
         ApplicationDeferredServiceProviderStub::$initialized = false;
