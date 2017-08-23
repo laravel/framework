@@ -48,6 +48,6 @@ class PendingMailFake extends PendingMail
      */
     public function queue(Mailable $mailable)
     {
-        return $this->mailer->queue($mailable);
+        return $this->mailer->queue($this->fill($mailable));
     }
 }
