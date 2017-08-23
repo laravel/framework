@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Http\Resource;
+use Illuminate\Http\Resources\Json\Resource;
 
 class DummyClass extends Resource
 {
@@ -14,13 +14,13 @@ class DummyClass extends Resource
     public $hidden = [];
 
     /**
-     * Transform the resource into a JSON array.
+     * Transform the resource into an array.
      *
      * @param  \Illuminate\Http\Request
      * @return array
      */
-    public function toJson($request)
+    public function toArray($request)
     {
-        return parent::toJson($request);
+        return parent::toArray($request);
     }
 }
