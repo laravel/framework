@@ -4,7 +4,6 @@ namespace Illuminate\Http\Resources\Json;
 
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Resources\ResourceResponse as BaseResourceResponse;
 
 class ResourceResponse implements Responsable
 {

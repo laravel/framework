@@ -8,7 +8,6 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Resources\DelegatesToResource;
-use Illuminate\Http\Resources\Resource as BaseResource;
 
 class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {

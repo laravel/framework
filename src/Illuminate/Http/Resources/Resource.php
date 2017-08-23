@@ -2,7 +2,6 @@
 
 namespace Illuminate\Http\Resources;
 
-use Exception;
 use ArrayAccess;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
