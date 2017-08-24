@@ -351,7 +351,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function eachSpread(callable $callback)
     {
-        return $this->each(function ($chunk) use ($callback) {
+        return $this->each(function ($chunk, $key) use ($callback) {
+            array_push($chunk, $key);
+
             return $callback(...$chunk);
         });
     }
@@ -837,7 +839,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapSpread(callable $callback)
     {
-        return $this->map(function ($chunk) use ($callback) {
+        return $this->map(function ($chunk, $key) use ($callback) {
+            array_push($chunk, $key);
+
             return $callback(...$chunk);
         });
     }
