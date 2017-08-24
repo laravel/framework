@@ -6,8 +6,8 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
-use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Resources\DelegatesToResource;
@@ -123,7 +123,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
             }
 
             if ($value instanceof MissingValue ||
-                ($value instanceof Resource &&
+                ($value instanceof self &&
                 $value->resource instanceof MissingValue)) {
                 unset($data[$key]);
             }
