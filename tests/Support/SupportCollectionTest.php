@@ -2195,6 +2195,50 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testDropWhile()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5]);
+
+        $result = $collection->dropWhile(function ($x) {
+            return $x < 3;
+        });
+
+        $this->assertSame([3, 4, 5], $result->values()->toArray());
+    }
+
+    public function testDropWhileWithEmptyList()
+    {
+        $collection = new Collection([]);
+
+        $result = $collection->dropWhile(function ($x) {
+            return $x < 3;
+        });
+
+        $this->assertSame([], $result->values()->toArray());
+    }
+
+    public function testDropWhileWithNoPredicateMatches()
+    {
+        $collection = new Collection([1, 2, 3, 4]);
+
+        $result = $collection->dropWhile(function ($x) {
+            return $x > 5;
+        });
+
+        $this->assertSame([1, 2, 3, 4], $result->values()->toArray());
+    }
+
+    public function testDropWhileWithAllPredicateMatches()
+    {
+        $collection = new Collection([1, 2, 3, 4]);
+
+        $result = $collection->dropWhile(function ($x) {
+            return $x < 5;
+        });
+
+        $this->assertSame([], $result->values()->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem

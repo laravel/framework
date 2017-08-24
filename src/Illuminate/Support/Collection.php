@@ -276,6 +276,27 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Returns a new collection containing a slice of the original collection with elements
+     * dropped from the front. Drops items until the provided predicate returns false.
+     *
+     * @param  callable $predicate
+     *
+     * @return static
+     */
+    public function dropWhile(callable $predicate)
+    {
+        $index = $this->search(function ($item) use ($predicate) {
+            return !$predicate($item);
+        });
+
+        if ($index === false) {
+            return new static([]);
+        }
+
+        return $this->slice($index);
+    }
+
+    /**
      * Execute a callback over each item.
      *
      * @param  callable  $callback
