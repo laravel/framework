@@ -3,6 +3,8 @@
 namespace Illuminate\Support;
 
 use Illuminate\Console\Application as Artisan;
+use Symfony\Component\Finder\Finder;
+use Illuminate\Console\Command;
 
 abstract class ServiceProvider
 {
@@ -125,6 +127,40 @@ abstract class ServiceProvider
             }
         });
     }
+    
+    /**
+     * Register all of the commands in the given directory.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function loadCommandsFrom($paths, $namespace)
+    {
+        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
+
+        $paths = array_filter($paths, function ($path) {
+            return is_dir($path);
+        });
+
+        if (empty($paths)) {
+            return;
+        }
+
+        foreach ((new Finder)->in($paths)->files() as $command) {
+
+            $command = $namespace.str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    basename($command)
+                );
+
+            if (is_subclass_of($command, Command::class)) {
+                Artisan::starting(function ($artisan) use ($command) {
+                    $artisan->resolve($command);
+                });
+            }
+        }
+    }    
 
     /**
      * Register paths to be published by the publish command.
