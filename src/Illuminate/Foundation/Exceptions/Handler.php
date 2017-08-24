@@ -162,7 +162,6 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
-     * @throws \Exception  $e
      */
     public function render($request, Exception $e)
     {
@@ -180,10 +179,6 @@ class Handler implements ExceptionHandlerContract
             return $this->unauthenticated($request, $e);
         } elseif ($e instanceof ValidationException) {
             return $this->convertValidationExceptionToResponse($e, $request);
-        }
-
-        if (! $this->isHttpException($e) && app()->runningUnitTests()) {
-            throw $e;
         }
 
         return $request->expectsJson()
@@ -282,10 +277,15 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception $e
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \Exception
      */
     protected function prepareResponse($request, Exception $e)
     {
         if (! $this->isHttpException($e) && config('app.debug')) {
+            if (app()->runningUnitTests()) {
+                throw $e;
+            }
+
             return $this->toIlluminateResponse(
                 $this->convertExceptionToResponse($e), $e
             );
