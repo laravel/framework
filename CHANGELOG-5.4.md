@@ -1,16 +1,28 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.35 (2017-08-24)
+
+### Fixed
+- Fixed breaking change in `FactoryBuilder` ([#20727](https://github.com/laravel/framework/pull/20727))
+
+
+## v5.4.34 (2017-08-23)
 
 ### Added
 - Added `Str::start()` and `str_start()` helper ([#20569](https://github.com/laravel/framework/pull/20569))
+- Added `orDoesntHave()` and `orWhereDoesntHave()` to `QueriesRelationships` ([#20685](https://github.com/laravel/framework/pull/20685))
+- Added support for callables in model factory attributes ([#20692](https://github.com/laravel/framework/pull/20692))
 
 ### Changed
 - Return the model instance from `Model::refresh()` ([#20657](https://github.com/laravel/framework/pull/20657))
+- Use `self::$verbs` in `Router::any()` ([#20698](https://github.com/laravel/framework/pull/20698))
 
 ### Fixed
-- Fix duplicate user model import in `make:policy` ([#20645](https://github.com/laravel/framework/pull/20645), [48f5f23](https://github.com/laravel/framework/commit/48f5f23fd8615f48f2aee27a301c1f2f1505bdfb))
-- Fix PHP 7.2 incompatibility in `Builder::mergeWheres()` ([#20635](https://github.com/laravel/framework/pull/20635))
+- Fixed duplicate user model import in `make:policy` ([#20645](https://github.com/laravel/framework/pull/20645), [48f5f23](https://github.com/laravel/framework/commit/48f5f23fd8615f48f2aee27a301c1f2f1505bdfb))
+- Fixed PHP 7.2 incompatibility in `Builder::mergeWheres()` ([#20635](https://github.com/laravel/framework/pull/20635))
+- Fixed issue in `RateLimiter` ([#20684](https://github.com/laravel/framework/pull/20684))
+- Fixed success message after password reset ([#20707](https://github.com/laravel/framework/pull/20707))
+- Fail job only if it didn't fail already ([#20654](https://github.com/laravel/framework/pull/20654))
 
 
 ## v5.4.33 (2017-08-14)
