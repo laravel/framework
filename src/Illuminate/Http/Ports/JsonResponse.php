@@ -41,7 +41,7 @@ class JsonResponse extends Response
      * @param array $headers An array of response headers
      * @param bool  $json    If the data is already a JSON string
      */
-    public function __construct($data = null, $status = 200, $headers = array(), $json = false)
+    public function __construct($data = null, $status = 200, $headers = [], $json = false)
     {
         parent::__construct('', $status, $headers);
 
@@ -66,7 +66,7 @@ class JsonResponse extends Response
      *
      * @return static
      */
-    public static function create($data = null, $status = 200, $headers = array())
+    public static function create($data = null, $status = 200, $headers = [])
     {
         return new static($data, $status, $headers);
     }
@@ -74,7 +74,7 @@ class JsonResponse extends Response
     /**
      * Make easier the creation of JsonResponse from raw json.
      */
-    public static function fromJsonString($data = null, $status = 200, $headers = array())
+    public static function fromJsonString($data = null, $status = 200, $headers = [])
     {
         return new static($data, $status, $headers, true);
     }
@@ -96,14 +96,14 @@ class JsonResponse extends Response
             //      JsonpCallbackValidator is released under the MIT License. See https://github.com/willdurand/JsonpCallbackValidator/blob/v1.1.0/LICENSE for details.
             //      (c) William Durand <william.durand1@gmail.com>
             $pattern = '/^[$_\p{L}][$_\p{L}\p{Mn}\p{Mc}\p{Nd}\p{Pc}\x{200C}\x{200D}]*(?:\[(?:"(?:\\\.|[^"\\\])*"|\'(?:\\\.|[^\'\\\])*\'|\d+)\])*?$/u';
-            $reserved = array(
+            $reserved = [
                 'break', 'do', 'instanceof', 'typeof', 'case', 'else', 'new', 'var', 'catch', 'finally', 'return', 'void', 'continue', 'for', 'switch', 'while',
                 'debugger', 'function', 'this', 'with', 'default', 'if', 'throw', 'delete', 'in', 'try', 'class', 'enum', 'extends', 'super',  'const', 'export',
                 'import', 'implements', 'let', 'private', 'public', 'yield', 'interface', 'package', 'protected', 'static', 'null', 'true', 'false',
-            );
+            ];
             $parts = explode('.', $callback);
             foreach ($parts as $part) {
-                if (!preg_match($pattern, $part) || in_array($part, $reserved, true)) {
+                if (! preg_match($pattern, $part) || in_array($part, $reserved, true)) {
                     throw new \InvalidArgumentException('The callback name is not valid.');
                 }
             }
@@ -139,7 +139,7 @@ class JsonResponse extends Response
      *
      * @throws \InvalidArgumentException
      */
-    public function setData($data = array())
+    public function setData($data = [])
     {
         if (defined('HHVM_VERSION')) {
             // HHVM does not trigger any warnings and let exceptions
@@ -207,7 +207,7 @@ class JsonResponse extends Response
 
         // Only set the header when there is none or when it equals 'text/javascript' (from a previous update with callback)
         // in order to not overwrite a custom definition.
-        if (!$this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
+        if (! $this->headers->has('Content-Type') || 'text/javascript' === $this->headers->get('Content-Type')) {
             $this->headers->set('Content-Type', 'application/json');
         }
 
