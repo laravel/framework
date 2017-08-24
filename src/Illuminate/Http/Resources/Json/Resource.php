@@ -116,19 +116,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
-     * Merge additional data into the resource array.
-     *
-     * @param  array  $data
-     * @return $this
-     */
-    public function merge(array $data)
-    {
-        $this->with = $data;
-
-        return $this;
-    }
-
-    /**
      * Get any additional data that should be returned with the resource array.
      *
      * @param \Illuminate\Http\Request  $request

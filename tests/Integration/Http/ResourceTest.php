@@ -125,28 +125,6 @@ class ResourceTest extends TestCase
         ]);
     }
 
-    public function test_resources_may_customize_adhoc_extra_data()
-    {
-        Route::get('/', function () {
-            return PostResource::make(new Post([
-                'id' => 5,
-                'title' => 'Test Title',
-            ]))->merge(['foo' => 'bar']);
-        });
-
-        $response = $this->withoutExceptionHandling()->get(
-            '/', ['Accept' => 'application/json']
-        );
-
-        $response->assertJson([
-            'data' => [
-                'id' => 5,
-                'title' => 'Test Title',
-            ],
-            'foo' => 'bar',
-        ]);
-    }
-
     public function test_custom_headers_may_be_set_on_responses()
     {
         Route::get('/', function () {
