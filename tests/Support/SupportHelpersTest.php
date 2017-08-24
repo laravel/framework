@@ -755,6 +755,29 @@ class SupportHelpersTest extends TestCase
     {
         throw_if(true, RuntimeException::class, 'Test Message');
     }
+
+    public function testOptional()
+    {
+        $this->assertNull(optional(null)->something());
+
+        $this->assertEquals(10, optional(new class {
+            public function something()
+            {
+                return 10;
+            }
+        })->something());
+    }
+
+    public function testTransform()
+    {
+        $this->assertEquals(10, transform(5, function ($value) {
+            return $value * 2;
+        }));
+
+        $this->assertNull(transform(null, function () {
+            return 10;
+        }));
+    }
 }
 
 trait SupportTestTraitOne

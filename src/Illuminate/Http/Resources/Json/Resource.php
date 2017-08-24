@@ -173,13 +173,13 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * @param  mixed  $value
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function when($condition, $value)
+    protected function when($condition, $value, $default = null)
     {
         if ($condition) {
             return value($value);
         }
 
-        return new MissingValue;
+        return func_num_args() === 3 ? value($default) : new MissingValue;
     }
 
     /**
@@ -188,13 +188,44 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * @param  string  $relationship
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function optional($relationship)
+    protected function whenLoaded($relationship)
     {
         if ($this->resource->relationLoaded($relationship)) {
             return $this->resource->{$relationship};
         }
 
         return new MissingValue;
+    }
+
+    /**
+     * Execute a callback if the given pivot table has been loaded.
+     *
+     * @param  string  $table
+     * @param  callable  $value
+     * @param  mixed  $default
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function whenPivotLoaded($table, callable $value, $default = null)
+    {
+        return $this->when(
+            $this->pivot && ($this->pivot instanceof $table || $this->pivot->getTable() === $table),
+            ...array_filter([$value, $default])
+        );
+    }
+
+    /**
+     * Transform the given value if it is present.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected function transform($value, callable $callback, $default = null)
+    {
+        return transform(
+            $value, $callback, func_num_args() === 3 ? $default : new MissingValue
+        );
     }
 
     /**

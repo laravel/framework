@@ -38,6 +38,29 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resources_may_have_optional_values()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalData(new Post([
+                'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'second' => 'value',
+                'third' => 'value',
+            ],
+        ]);
+    }
+
     public function test_resources_may_have_optional_relationships()
     {
         Route::get('/', function () {
@@ -56,6 +79,31 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
+            ],
+        ]);
+    }
+
+    public function test_resources_may_have_optional_pivot_relationships()
+    {
+        Route::get('/', function () {
+            $post = new Post(['id' => 5]);
+            $post->setRelation('pivot', new Subscription);
+
+            return new PostResourceWithOptionalPivotRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'subscription' => [
+                    'foo' => 'bar',
+                ],
             ],
         ]);
     }
@@ -339,16 +387,48 @@ class PostResource extends Resource
     }
 }
 
+class PostResourceWithOptionalData extends Resource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'first' => $this->when(false, 'value'),
+            'second' => $this->when(true, 'value'),
+            'third' => $this->when(true, function () {
+                return 'value';
+            }),
+        ];
+    }
+}
+
 class PostResourceWithOptionalRelationship extends PostResource
 {
     public function toArray($request)
     {
         return [
             'id' => $this->id,
-            'comments' => new CommentCollection($this->optional('comments')),
+            'comments' => new CommentCollection($this->whenLoaded('comments')),
         ];
     }
 }
+
+class PostResourceWithOptionalPivotRelationship extends PostResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'subscription' => $this->whenPivotLoaded(Subscription::class, function () {
+                return [
+                    'foo' => 'bar',
+                ];
+            }),
+        ];
+    }
+}
+
+class Subscription {}
 
 class CommentCollection extends ResourceCollection
 {
