@@ -228,7 +228,7 @@ class Command extends SymfonyCommand
     /**
      * Get the value of a command argument.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @return string|array
      */
     public function argument($key = null)
