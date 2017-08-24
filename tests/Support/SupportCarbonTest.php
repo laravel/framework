@@ -56,4 +56,19 @@ class SupportCarbonTest extends TestCase
     {
         Carbon::now()->nonExistingMacro();
     }
+
+    public function testCarbonAllowsCustomSerializer()
+    {
+        Carbon::serializeUsing(function ($carbon) {
+            return $carbon->getTimestamp();
+        });
+
+        $carbon = Carbon::now();
+
+        $result = json_decode(json_encode(['carbon' => $carbon]), true);
+
+        $this->assertTrue(is_numeric($result['carbon']));
+
+        Carbon::serializeUsing(null);
+    }
 }
