@@ -174,6 +174,7 @@
 - Support multiple patterns in `Str::is()` ([#20108](https://github.com/laravel/framework/pull/20108))
 - Speed up `Arr::get()` calls without dot notations ([#20139](https://github.com/laravel/framework/pull/20139))
 - Use `report()` helper in `mix()` ([#20603](https://github.com/laravel/framework/pull/20603), [bf0cb82](https://github.com/laravel/framework/commit/bf0cb82a8990d99a0ed504c2fa6684b1c59c9d7e))
+- Added `now()` and `today()` helpers ([#3c888b6](https://github.com/laravel/framework/commit/3c888b6c7b89c3d3f90e9024ffbebed3ee80bd23))
 
 ### Localization
 - ⚠️ Moved `LoaderInterface` to contracts ([#20460](https://github.com/laravel/framework/pull/20460))
