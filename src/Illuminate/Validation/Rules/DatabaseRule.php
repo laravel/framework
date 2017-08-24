@@ -51,11 +51,15 @@ trait DatabaseRule
      * Set a "where" constraint on the query.
      *
      * @param  string  $column
-     * @param  string  $value
+     * @param  string|array  $value
      * @return $this
      */
     public function where($column, $value = null)
     {
+        if (is_array($value)) {
+            return $this->whereIn($column, $value);
+        }
+
         if ($column instanceof Closure) {
             return $this->using($column);
         }
@@ -69,11 +73,15 @@ trait DatabaseRule
      * Set a "where not" constraint on the query.
      *
      * @param  string  $column
-     * @param  string  $value
+     * @param  string|array  $value
      * @return $this
      */
     public function whereNot($column, $value)
     {
+        if (is_array($value)) {
+            return $this->whereNotIn($column, $value);
+        }
+
         return $this->where($column, '!'.$value);
     }
 
@@ -103,11 +111,15 @@ trait DatabaseRule
      * Set a "where in" constraint on the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  string|array  $values
      * @return $this
      */
-    public function whereIn($column, array $values)
+    public function whereIn($column, $values)
     {
+        if (! is_array($values)) {
+            return $this->where($column, $values);
+        }
+
         return $this->where(function ($query) use ($column, $values) {
             $query->whereIn($column, $values);
         });
@@ -117,11 +129,15 @@ trait DatabaseRule
      * Set a "where not in" constraint on the query.
      *
      * @param  string  $column
-     * @param  array  $values
+     * @param  string|array  $values
      * @return $this
      */
-    public function whereNotIn($column, array $values)
+    public function whereNotIn($column, $values)
     {
+        if (! is_array($values)) {
+            return $this->whereNot($column, $values);
+        }
+
         return $this->where(function ($query) use ($column, $values) {
             $query->whereNotIn($column, $values);
         });
