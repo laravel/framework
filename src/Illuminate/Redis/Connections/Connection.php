@@ -35,11 +35,12 @@ abstract class Connection
      * @param  int  $maxLocks
      * @param  int  $seconds
      * @param  callable  $callback
+     * @param  int  $timeout
      * @return mixed
      */
-    public function funnel($name, $maxLocks, $seconds, callable $callback)
+    public function funnel($name, $maxLocks, $seconds, callable $callback, $timeout = 10)
     {
-        return (new ConcurrencyLimiter($this, $name, $maxLocks, $seconds))->block($callback);
+        return (new ConcurrencyLimiter($this, $name, $maxLocks, $seconds))->block($timeout, $callback);
     }
 
     /**
@@ -49,11 +50,12 @@ abstract class Connection
      * @param  int  $maxLocks
      * @param  int  $seconds
      * @param  callable  $callback
+     * @param  int  $timeout
      * @return mixed
      */
-    public function throttle($name, $maxLocks, $seconds, callable $callback)
+    public function throttle($name, $maxLocks, $seconds, callable $callback, $timeout = 10)
     {
-        return (new DurationLimiter($this, $name, $maxLocks, $seconds))->block($callback);
+        return (new DurationLimiter($this, $name, $maxLocks, $seconds))->block($timeout, $callback);
     }
 
     /**
