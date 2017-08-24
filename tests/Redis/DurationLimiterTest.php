@@ -56,6 +56,42 @@ class DurationLimiterTest extends TestCase
     /**
      * @test
      */
+    // public function it_throttles_tasks()
+    // {
+    //     $store = [];
+
+    //     (new DurationLimiter($this->redis(), 'key', 3, 10))->block(0, function () use (&$store) {
+    //         $store[] = 1;
+    //     });
+
+    //     sleep(7);
+
+    //     (new DurationLimiter($this->redis(), 'key', 3, 10))->block(0, function () use (&$store) {
+    //         $store[] = 2;
+    //     });
+
+    //     (new DurationLimiter($this->redis(), 'key', 3, 10))->block(0, function () use (&$store) {
+    //         $store[] = 3;
+    //     });
+
+    //     sleep(5);
+
+    //     // Should only be able to trigger 1 more time... (first attempt should be expired now, but other 2 fired within the last 10 seconds)
+
+    //     (new DurationLimiter($this->redis(), 'key', 3, 10))->block(0, function () use (&$store) {
+    //         $store[] = 4;
+    //     });
+
+    //     (new DurationLimiter($this->redis(), 'key', 3, 10))->block(0, function () use (&$store) {
+    //         $this->fail('This should not be allowed... allowed 4 jobs in ~5 seconds...');
+    //     });
+
+    //     $this->assertTrue(true);
+    // }
+
+    /**
+     * @test
+     */
     public function it_fails_immediately_or_retries_for_a_while_based_on_a_given_timeout()
     {
         $store = [];

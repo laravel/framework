@@ -32,7 +32,7 @@ class ConcurrencyLimiter
      *
      * @var int
      */
-    protected $seconds;
+    protected $releaseAfter;
 
     /**
      * Create a new concurrency limiter instance.
@@ -40,15 +40,15 @@ class ConcurrencyLimiter
      * @param  \Illuminate\Redis\Connections\Connection  $redis
      * @param  string  $name
      * @param  int  $maxLocks
-     * @param  int  $seconds
+     * @param  int  $releaseAfter
      * @return void
      */
-    public function __construct($redis, $name, $maxLocks, $seconds)
+    public function __construct($redis, $name, $maxLocks, $releaseAfter)
     {
         $this->name = $name;
         $this->redis = $redis;
-        $this->seconds = $seconds;
         $this->maxLocks = $maxLocks;
+        $this->releaseAfter = $releaseAfter;
     }
 
     /**
@@ -92,7 +92,7 @@ class ConcurrencyLimiter
         }, range(1, $this->maxLocks));
 
         return $this->redis->eval($this->luaScript(), count($slots),
-            ...array_merge($slots, [$this->name, $this->seconds])
+            ...array_merge($slots, [$this->name, $this->releaseAfter])
         );
     }
 

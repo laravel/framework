@@ -32,7 +32,7 @@ class DurationLimiter
      *
      * @var int
      */
-    private $seconds;
+    private $decay;
 
     /**
      * Create a new duration limiter instance.
@@ -40,14 +40,14 @@ class DurationLimiter
      * @param  \Illuminate\Redis\Connections\Connection $redis
      * @param  string $name
      * @param  int $maxLocks
-     * @param  int $seconds
+     * @param  int $decay
      * @return void
      */
-    public function __construct($redis, $name, $maxLocks, $seconds)
+    public function __construct($redis, $name, $maxLocks, $decay)
     {
         $this->name = $name;
+        $this->decay = $decay;
         $this->redis = $redis;
-        $this->seconds = $seconds;
         $this->maxLocks = $maxLocks;
     }
 
@@ -64,7 +64,7 @@ class DurationLimiter
         $starting = time();
 
         while (! $this->acquire()) {
-            if ($this->seconds > 1 || time() - $timeout >= $starting) {
+            if ($this->decay > 1 || time() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
 
@@ -86,7 +86,7 @@ class DurationLimiter
     protected function acquire()
     {
         return $this->redis->eval($this->luaScript(), 1,
-            $this->name, microtime(true), time(), $this->seconds, $this->maxLocks
+            $this->name, microtime(true), time(), $this->decay, $this->maxLocks
         );
     }
 

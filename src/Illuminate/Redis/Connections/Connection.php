@@ -48,14 +48,14 @@ abstract class Connection
      *
      * @param  string  $name
      * @param  int  $maxLocks
-     * @param  int  $seconds
+     * @param  int  $decay
      * @param  callable  $callback
      * @param  int  $timeout
      * @return mixed
      */
-    public function throttle($name, $maxLocks, $seconds, callable $callback, $timeout = 10)
+    public function throttle($name, $maxLocks, $decay, callable $callback, $timeout = 10)
     {
-        return (new DurationLimiter($this, $name, $maxLocks, $seconds))->block($timeout, $callback);
+        return (new DurationLimiter($this, $name, $maxLocks, $decay))->block($timeout, $callback);
     }
 
     /**
