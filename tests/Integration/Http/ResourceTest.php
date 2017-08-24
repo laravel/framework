@@ -428,7 +428,9 @@ class PostResourceWithOptionalPivotRelationship extends PostResource
     }
 }
 
-class Subscription {}
+class Subscription
+{
+}
 
 class CommentCollection extends ResourceCollection
 {
