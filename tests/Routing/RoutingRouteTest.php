@@ -1403,7 +1403,7 @@ class RoutingRouteTest extends TestCase
         });
 
         $response = $router->dispatch(Request::create('foo/bar', 'GET'));
-        $this->assertNotInstanceOf(\Illuminate\Http\Response::class, $response);
+        $this->assertInstanceOf(\Illuminate\Http\Response::class, $response);
         $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $response);
     }
 
