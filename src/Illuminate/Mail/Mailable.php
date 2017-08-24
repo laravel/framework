@@ -132,6 +132,10 @@ class Mailable implements MailableContract
      */
     public function queue(Queue $queue)
     {
+        if (property_exists($this, 'delay')) {
+            return $this->later($this->delay, $queue);
+        }
+
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
