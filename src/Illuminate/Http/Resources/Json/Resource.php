@@ -122,7 +122,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
                 continue;
             }
 
-            if ($value instanceof Resource &&
+            if ($value instanceof self &&
                 $value->resource instanceof MissingResource) {
                 unset($data[$key]);
             }
@@ -177,7 +177,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
             return $this->resource->{$relationship};
         }
 
-        return new MissingResource;;
+        return new MissingResource;
     }
 
     /**
