@@ -10,11 +10,10 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Session\Store as SessionStore;
 use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
-use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
-class RedirectResponse extends BaseRedirectResponse
+class RedirectResponse extends Ports\RedirectResponse
 {
-    use ResponseTrait, Macroable {
+    use Macroable {
         Macroable::__call as macroCall;
     }
 

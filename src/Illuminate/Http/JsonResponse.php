@@ -6,14 +6,11 @@ use JsonSerializable;
 use InvalidArgumentException;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
-class JsonResponse extends BaseJsonResponse
+class JsonResponse extends Ports\JsonResponse
 {
-    use ResponseTrait;
-
     /**
-     * Constructor.
+     * Create a new JSON response instance.
      *
      * @param  mixed  $data
      * @param  int    $status
@@ -28,7 +25,7 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
-     * Sets the JSONP callback.
+     * Set the JSONP callback.
      *
      * @param  string|null  $callback
      * @return $this
