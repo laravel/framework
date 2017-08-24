@@ -286,7 +286,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function dropWhile(callable $predicate)
     {
         $index = $this->search(function ($item) use ($predicate) {
-            return !$predicate($item);
+            return ! $predicate($item);
         });
 
         if ($index === false) {
