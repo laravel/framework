@@ -38,6 +38,28 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resources_may_have_optional_relationships()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalRelationship(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+            ],
+        ]);
+    }
+
     public function test_resource_is_url_routable()
     {
         $post = new PostResource(new Post([
@@ -315,6 +337,22 @@ class PostResource extends Resource
     {
         $response->header('X-Resource', 'True');
     }
+}
+
+class PostResourceWithOptionalRelationship extends PostResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'comments' => new CommentCollection($this->optional('comments')),
+        ];
+    }
+}
+
+class CommentCollection extends ResourceCollection
+{
+    //
 }
 
 class PostResourceWithExtraData extends PostResource

@@ -16,6 +16,10 @@ trait CollectsResources
      */
     protected function collectResource($resource)
     {
+        if ($resource instanceof MissingResource) {
+            return $resource;
+        }
+
         $this->collection = ($collects = $this->collects())
                     ? $resource->mapInto($collects)
                     : $resource->toBase();

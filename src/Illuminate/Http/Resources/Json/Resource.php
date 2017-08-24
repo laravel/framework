@@ -9,6 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\Resources\MissingResource;
 use Illuminate\Http\Resources\DelegatesToResource;
 
 class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
@@ -86,12 +87,14 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     /**
      * Resolve the resource to an array.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request|null  $request
      * @return array
      */
-    public function resolve($request)
+    public function resolve($request = null)
     {
-        $data = $this->toArray($request);
+        $data = $this->toArray(
+            $request = $request ?: Container::getInstance()->make('request')
+        );
 
         if (is_array($data)) {
             $data = $data;
@@ -101,7 +104,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
             $data = $data->jsonSerialize();
         }
 
-        return (array) $data;
+        return $this->filter((array) $data);
     }
 
     /**
@@ -117,6 +120,11 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
                 $data[$key] = $this->filter($value);
 
                 continue;
+            }
+
+            if ($value instanceof Resource &&
+                $value->resource instanceof MissingResource) {
+                unset($data[$key]);
             }
         }
 
@@ -155,6 +163,21 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public function withResponse($request, $response)
     {
         //
+    }
+
+    /**
+     * Retrieve a relationship if it has been loaded.
+     *
+     * @param  string  $relationship
+     * @return \Illuminate\Http\Resources\MissingResource|mixed
+     */
+    public function optional($relationship)
+    {
+        if ($this->resource->relationLoaded($relationship)) {
+            return $this->resource->{$relationship};
+        }
+
+        return new MissingResource;;
     }
 
     /**
@@ -210,6 +233,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public function jsonSerialize()
     {
-        return $this->toArray(Container::getInstance()->make('request'));
+        return $this->resolve(Container::getInstance()->make('request'));
     }
 }
