@@ -38,6 +38,25 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resources_may_have_no_wrap()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithoutWrap(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertJson([
+            'id' => 5,
+            'title' => 'Test Title',
+        ]);
+    }
+
     public function test_resources_may_have_optional_values()
     {
         Route::get('/', function () {
@@ -385,6 +404,11 @@ class PostResource extends Resource
     {
         $response->header('X-Resource', 'True');
     }
+}
+
+class PostResourceWithoutWrap extends PostResource
+{
+    public static $wrap = null;
 }
 
 class PostResourceWithOptionalData extends Resource
