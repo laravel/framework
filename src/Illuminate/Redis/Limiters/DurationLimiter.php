@@ -32,23 +32,23 @@ class DurationLimiter
      *
      * @var int
      */
-    private $duration;
+    private $seconds;
 
     /**
-     * Create a new concurrency lock instance.
+     * Create a new duration limiter instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection $redis
      * @param  string $name
      * @param  int $size
-     * @param  int $duration
+     * @param  int $seconds
      * @return void
      */
-    public function __construct($redis, $name, $size, $duration)
+    public function __construct($redis, $name, $size, $seconds)
     {
         $this->name = $name;
         $this->size = $size;
-        $this->duration = $duration;
         $this->redis = $redis;
+        $this->seconds = $seconds;
     }
 
     /**
@@ -64,7 +64,7 @@ class DurationLimiter
         $starting = time();
 
         while (! $this->acquire()) {
-            if ($this->duration > 1 || time() - $timeout >= $starting) {
+            if ($this->seconds > 1 || time() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
 
@@ -83,10 +83,10 @@ class DurationLimiter
      *
      * @return mixed
      */
-    private function acquire()
+    protected function acquire()
     {
         return $this->redis->eval($this->luaScript(), 1,
-            $this->name, microtime(true), time(), $this->duration, $this->size
+            $this->name, microtime(true), time(), $this->seconds, $this->size
         );
     }
 
@@ -101,7 +101,7 @@ class DurationLimiter
      *
      * @return string
      */
-    private function luaScript()
+    protected function luaScript()
     {
         return <<<'LUA'
 local function reset()

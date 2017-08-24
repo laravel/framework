@@ -32,23 +32,23 @@ class ConcurrencyLimiter
      *
      * @var int
      */
-    protected $age;
+    protected $seconds;
 
     /**
-     * Create a new concurrency lock instance.
+     * Create a new concurrency limiter instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $redis
      * @param  string  $name
      * @param  int  $size
-     * @param  int  $age
+     * @param  int  $seconds
      * @return void
      */
-    public function __construct($redis, $name, $size, $age)
+    public function __construct($redis, $name, $size, $seconds)
     {
         $this->name = $name;
         $this->size = $size;
-        $this->age = $age;
         $this->redis = $redis;
+        $this->seconds = $seconds;
     }
 
     /**
@@ -85,14 +85,14 @@ class ConcurrencyLimiter
      *
      * @return mixed
      */
-    private function acquire()
+    protected function acquire()
     {
         $slots = array_map(function ($i) {
             return $this->name.$i;
         }, range(1, $this->size));
 
         return $this->redis->eval($this->luaScript(), count($slots),
-            ...array_merge($slots, [$this->name, $this->age])
+            ...array_merge($slots, [$this->name, $this->seconds])
         );
     }
 
@@ -105,11 +105,11 @@ class ConcurrencyLimiter
      *
      * @return string
      */
-    private function luaScript()
+    protected function luaScript()
     {
         return <<<'LUA'
 for index, value in pairs(redis.call('mget', unpack(KEYS))) do
-    if not value then 
+    if not value then
         redis.call('set', ARGV[1]..index, "1", "EX", ARGV[2])
         return ARGV[1]..index
     end
