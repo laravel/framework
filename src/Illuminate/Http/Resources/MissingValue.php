@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Resources;
 
-class MissingResource
+class MissingValue
 {
     //
 }

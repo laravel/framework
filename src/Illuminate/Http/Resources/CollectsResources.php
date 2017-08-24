@@ -16,7 +16,7 @@ trait CollectsResources
      */
     protected function collectResource($resource)
     {
-        if ($resource instanceof MissingResource) {
+        if ($resource instanceof MissingValue) {
             return $resource;
         }
 

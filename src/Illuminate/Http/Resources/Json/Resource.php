@@ -6,10 +6,10 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Http\Resources\MissingResource;
 use Illuminate\Http\Resources\DelegatesToResource;
 
 class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
@@ -122,8 +122,9 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
                 continue;
             }
 
-            if ($value instanceof Resource &&
-                $value->resource instanceof MissingResource) {
+            if ($value instanceof MissingValue ||
+                ($value instanceof Resource &&
+                $value->resource instanceof MissingValue)) {
                 unset($data[$key]);
             }
         }
@@ -166,18 +167,34 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Retrieve a value based on a given condition.
+     *
+     * @param  bool  $condition
+     * @param  mixed  $value
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function when($condition, $value)
+    {
+        if ($condition) {
+            return value($value);
+        }
+
+        return new MissingValue;
+    }
+
+    /**
      * Retrieve a relationship if it has been loaded.
      *
      * @param  string  $relationship
-     * @return \Illuminate\Http\Resources\MissingResource|mixed
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    public function optional($relationship)
+    protected function optional($relationship)
     {
         if ($this->resource->relationLoaded($relationship)) {
             return $this->resource->{$relationship};
         }
 
-        return new MissingResource;;
+        return new MissingValue;
     }
 
     /**
