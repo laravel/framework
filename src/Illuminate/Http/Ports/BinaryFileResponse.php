@@ -47,7 +47,7 @@ class BinaryFileResponse extends Response
      * @param bool                $autoEtag           Whether the ETag header should be automatically set
      * @param bool                $autoLastModified   Whether the Last-Modified header should be automatically set
      */
-    public function __construct($file, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
+    public function __construct($file, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         parent::__construct(null, $status, $headers);
 
@@ -69,7 +69,7 @@ class BinaryFileResponse extends Response
      *
      * @return static
      */
-    public static function create($file = null, $status = 200, $headers = array(), $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
+    public static function create($file = null, $status = 200, $headers = [], $public = true, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
         return new static($file, $status, $headers, $public, $contentDisposition, $autoEtag, $autoLastModified);
     }
@@ -88,7 +88,7 @@ class BinaryFileResponse extends Response
      */
     public function setFile($file, $contentDisposition = null, $autoEtag = false, $autoLastModified = true)
     {
-        if (!$file instanceof File) {
+        if (! $file instanceof File) {
             if ($file instanceof \SplFileInfo) {
                 $file = new File($file->getPathname());
             } else {
@@ -96,7 +96,7 @@ class BinaryFileResponse extends Response
             }
         }
 
-        if (!$file->isReadable()) {
+        if (! $file->isReadable()) {
             throw new FileException('File must be readable.');
         }
 
@@ -162,7 +162,7 @@ class BinaryFileResponse extends Response
             $filename = $this->file->getFilename();
         }
 
-        if ('' === $filenameFallback && (!preg_match('/^[\x20-\x7e]*$/', $filename) || false !== strpos($filename, '%'))) {
+        if ('' === $filenameFallback && (! preg_match('/^[\x20-\x7e]*$/', $filename) || false !== strpos($filename, '%'))) {
             $encoding = mb_detect_encoding($filename, null, true);
 
             for ($i = 0, $filenameLength = mb_strlen($filename, $encoding); $i < $filenameLength; ++$i) {
@@ -187,7 +187,7 @@ class BinaryFileResponse extends Response
      */
     public function prepare(Request $request)
     {
-        if (!$this->headers->has('Content-Type')) {
+        if (! $this->headers->has('Content-Type')) {
             $this->headers->set('Content-Type', $this->file->getMimeType() ?: 'application/octet-stream');
         }
 
@@ -205,7 +205,7 @@ class BinaryFileResponse extends Response
         }
         $this->headers->set('Content-Length', $fileSize);
 
-        if (!$this->headers->has('Accept-Ranges')) {
+        if (! $this->headers->has('Accept-Ranges')) {
             // Only accept ranges on safe HTTP methods
             $this->headers->set('Accept-Ranges', $request->isMethodSafe(false) ? 'bytes' : 'none');
         }
@@ -239,10 +239,10 @@ class BinaryFileResponse extends Response
             $this->maxlen = 0;
         } elseif ($request->headers->has('Range')) {
             // Process the range headers.
-            if (!$request->headers->has('If-Range') || $this->hasValidIfRangeHeader($request->headers->get('If-Range'))) {
+            if (! $request->headers->has('If-Range') || $this->hasValidIfRangeHeader($request->headers->get('If-Range'))) {
                 $range = $request->headers->get('Range');
 
-                list($start, $end) = explode('-', substr($range, 6), 2) + array(0);
+                list($start, $end) = explode('-', substr($range, 6), 2) + [0];
 
                 $end = ('' === $end) ? $fileSize - 1 : (int) $end;
 
@@ -292,7 +292,7 @@ class BinaryFileResponse extends Response
      */
     public function sendContent()
     {
-        if (!$this->isSuccessful()) {
+        if (! $this->isSuccessful()) {
             return parent::sendContent();
         }
 
