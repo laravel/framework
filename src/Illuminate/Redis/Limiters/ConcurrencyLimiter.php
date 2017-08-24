@@ -25,7 +25,7 @@ class ConcurrencyLimiter
      *
      * @var int
      */
-    protected $size;
+    protected $maxLocks;
 
     /**
      * The number of seconds a slot should be maintained.
@@ -39,16 +39,16 @@ class ConcurrencyLimiter
      *
      * @param  \Illuminate\Redis\Connections\Connection  $redis
      * @param  string  $name
-     * @param  int  $size
+     * @param  int  $maxLocks
      * @param  int  $seconds
      * @return void
      */
-    public function __construct($redis, $name, $size, $seconds)
+    public function __construct($redis, $name, $maxLocks, $seconds)
     {
         $this->name = $name;
-        $this->size = $size;
         $this->redis = $redis;
         $this->seconds = $seconds;
+        $this->maxLocks = $maxLocks;
     }
 
     /**
@@ -89,7 +89,7 @@ class ConcurrencyLimiter
     {
         $slots = array_map(function ($i) {
             return $this->name.$i;
-        }, range(1, $this->size));
+        }, range(1, $this->maxLocks));
 
         return $this->redis->eval($this->luaScript(), count($slots),
             ...array_merge($slots, [$this->name, $this->seconds])

@@ -25,7 +25,7 @@ class DurationLimiter
      *
      * @var int
      */
-    private $size;
+    private $maxLocks;
 
     /**
      * The number of seconds a slot should be maintained.
@@ -39,16 +39,16 @@ class DurationLimiter
      *
      * @param  \Illuminate\Redis\Connections\Connection $redis
      * @param  string $name
-     * @param  int $size
+     * @param  int $maxLocks
      * @param  int $seconds
      * @return void
      */
-    public function __construct($redis, $name, $size, $seconds)
+    public function __construct($redis, $name, $maxLocks, $seconds)
     {
         $this->name = $name;
-        $this->size = $size;
         $this->redis = $redis;
         $this->seconds = $seconds;
+        $this->maxLocks = $maxLocks;
     }
 
     /**
@@ -86,7 +86,7 @@ class DurationLimiter
     protected function acquire()
     {
         return $this->redis->eval($this->luaScript(), 1,
-            $this->name, microtime(true), time(), $this->seconds, $this->size
+            $this->name, microtime(true), time(), $this->seconds, $this->maxLocks
         );
     }
 
