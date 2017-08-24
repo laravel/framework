@@ -714,7 +714,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $abstract = $this->getAlias($abstract);
 
-        if (isset($this->deferredServices[$abstract])) {
+        if (isset($this->deferredServices[$abstract]) && ! isset($this->instances[$abstract])) {
             $this->loadDeferredProvider($abstract);
         }
 
