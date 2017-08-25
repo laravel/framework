@@ -32,25 +32,22 @@ trait InteractsWithExceptionHandling
     }
 
     /**
-     * Disable exception handling for the test.
+     * Only handle the given exceptions via the exception handler.
      *
-     * @return $this
-     */
-    protected function withoutExceptionHandling()
-    {
-        return $this->turnOffExceptionHandling();
-    }
-
-    /**
      * @param  array  $exceptions
      * @return $this
      */
     protected function handleExceptions(array $exceptions)
     {
-        return $this->turnOffExceptionHandling($exceptions);
+        return $this->withoutExceptionHandling($exceptions);
     }
 
-    protected function handleValidationException()
+    /**
+     * Only handle validation exceptions via the exception handler.
+     *
+     * @return $this
+     */
+    protected function handleValidationExceptions()
     {
         return $this->handleExceptions([ValidationException::class]);
     }
@@ -58,10 +55,9 @@ trait InteractsWithExceptionHandling
     /**
      * Disable exception handling for the test.
      *
-     * @param  array  $except
      * @return $this
      */
-    protected function turnOffExceptionHandling(array $except = [])
+    protected function withoutExceptionHandling(array $except = [])
     {
         $this->previousExceptionHandler = app(ExceptionHandler::class);
 
@@ -69,16 +65,37 @@ trait InteractsWithExceptionHandling
             protected $except;
             protected $previousHandler;
 
+            /**
+             * Create a new class instance.
+             *
+             * @param \Illuminate\Contracts\Debug\ExceptionHandler
+             * @param  array  $except
+             * @return void
+             */
             public function __construct($previousHandler, $except = [])
             {
-                $this->previousHandler = $previousHandler;
                 $this->except = $except;
+                $this->previousHandler = $previousHandler;
             }
 
+            /**
+             * Report the given exception.
+             *
+             * @param  \Exception  $e
+             * @return void
+             */
             public function report(Exception $e)
             {
+                //
             }
 
+            /**
+             * Render the given exception.
+             *
+             * @param  \Illuminate\Http\Request  $request
+             * @param  \Exception  $e
+             * @return mixed
+             */
             public function render($request, Exception $e)
             {
                 if ($e instanceof NotFoundHttpException) {
@@ -96,6 +113,13 @@ trait InteractsWithExceptionHandling
                 throw $e;
             }
 
+            /**
+             * Render the exception for the console.
+             *
+             * @param  \Symfony\Component\Console\Output\OutputInterface
+             * @param  \Exception  $e
+             * @return void
+             */
             public function renderForConsole($output, Exception $e)
             {
                 (new ConsoleApplication)->renderException($e, $output);
