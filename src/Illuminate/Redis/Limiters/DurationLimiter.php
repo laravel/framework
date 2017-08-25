@@ -35,6 +35,20 @@ class DurationLimiter
     private $decay;
 
     /**
+     * The timestamp of the end of the current duration.
+     *
+     * @var int
+     */
+    public $decaysAt;
+
+    /**
+     * The number of remaining slots.
+     *
+     * @var int
+     */
+    public $remaining;
+
+    /**
      * Create a new duration limiter instance.
      *
      * @param  \Illuminate\Redis\Connections\Connection $redis
@@ -81,13 +95,19 @@ class DurationLimiter
     /**
      * Attempt to acquire the lock.
      *
-     * @return mixed
+     * @return bool
      */
-    protected function acquire()
+    public function acquire()
     {
-        return $this->redis->eval($this->luaScript(), 1,
+        $results = $this->redis->eval($this->luaScript(), 1,
             $this->name, microtime(true), time(), $this->decay, $this->maxLocks
         );
+
+        $this->decaysAt = $results[1];
+
+        $this->remaining = max(0, $results[2]);
+
+        return (bool) $results[0];
     }
 
     /**
@@ -110,14 +130,18 @@ local function reset()
 end
 
 if redis.call('EXISTS', KEYS[1]) == 0 then
-    return reset()
+    return {reset(), ARGV[2] + ARGV[3], ARGV[4] - 1}
 end
 
 if ARGV[1] >= redis.call('HGET', KEYS[1], 'start') and ARGV[1] <= redis.call('HGET', KEYS[1], 'end') then
-    return tonumber(redis.call('HINCRBY', KEYS[1], 'count', 1)) <= tonumber(ARGV[4])
+    return {
+        tonumber(redis.call('HINCRBY', KEYS[1], 'count', 1)) <= tonumber(ARGV[4]),
+        redis.call('HGET', KEYS[1], 'end'),
+        ARGV[4] - redis.call('HGET', KEYS[1], 'count')
+    }
 end
 
-return reset()
+return {reset(), ARGV[2] + ARGV[3], ARGV[4] - 1}
 LUA;
     }
 }

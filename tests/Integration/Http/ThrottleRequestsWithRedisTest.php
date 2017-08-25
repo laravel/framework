@@ -5,32 +5,22 @@ namespace Illuminate\Tests\Integration\Http;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
 
 /**
  * @group integration
  */
-class ThrottleRequestsTest extends TestCase
+class ThrottleRequestsWithRedisTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('cache.default', 'redis');
-    }
-
-    public function setup()
-    {
-        parent::setup();
-
-        resolve('redis')->flushall();
-    }
-
     public function test_lock_opens_immediately_after_decay()
     {
         Carbon::setTestNow(null);
-        
+
+        resolve('redis')->flushall();
+
         Route::get('/', function () {
             return 'yes';
-        })->middleware(ThrottleRequests::class.':2,1');
+        })->middleware(ThrottleRequestsWithRedis::class.':2,1');
 
         $response = $this->withoutExceptionHandling()->get('/');
         $this->assertEquals('yes', $response->getContent());
@@ -52,8 +42,8 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(429, $e->getStatusCode());
             $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
             $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
-            $this->assertEquals(2, $e->getHeaders()['Retry-After']);
-            $this->assertEquals(now()->timestamp + 2, $e->getHeaders()['X-RateLimit-Reset']);
+            $this->assertTrue(in_array($e->getHeaders()['Retry-After'], [2, 3]));
+            $this->assertTrue(in_array($e->getHeaders()['X-RateLimit-Reset'], [now()->timestamp + 2, now()->timestamp + 3]));
         }
     }
 }
