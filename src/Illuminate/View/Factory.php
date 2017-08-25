@@ -153,7 +153,7 @@ class Factory implements FactoryContract
         });
 
         if (! $view) {
-            throw new InvalidArgumentException("None of the views in the given array exist.");
+            throw new InvalidArgumentException('None of the views in the given array exist.');
         }
 
         return $this->make($view, $data, $mergeData);
