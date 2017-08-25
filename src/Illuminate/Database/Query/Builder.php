@@ -4,7 +4,6 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use RuntimeException;
-use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -2444,6 +2443,6 @@ class Builder
 
         $className = static::class;
 
-        throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
+        return $this->get()->{$method}(...$parameters);
     }
 }
