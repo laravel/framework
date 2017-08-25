@@ -765,9 +765,27 @@ trait HasAttributes
     {
         $defaults = [static::CREATED_AT, static::UPDATED_AT];
 
+        $this->getDatesFromTraits($defaults);
+
         return $this->usesTimestamps()
                     ? array_unique(array_merge($this->dates, $defaults))
                     : $this->dates;
+    }
+
+    /**
+     * Get the attributes from traits that should be converted to dates.
+     *
+     * @return array
+     */
+    protected function getDatesFromTraits($defaults)
+    {
+        $class = static::class;
+
+        foreach (class_uses_recursive($class) as $trait) {
+            if (method_exists($class, $method = 'get'.class_basename($trait).'Dates')) {
+                $defaults = array_merge($defaults, $this->{$method}());
+            }
+        }
     }
 
     /**
