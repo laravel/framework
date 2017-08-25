@@ -3,8 +3,8 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
-use Illuminate\Redis\Limiters\DurationLimiter;
-use Illuminate\Redis\Limiters\ConcurrencyLimiter;
+use Illuminate\Redis\Limiters\DurationLimiterBuilder;
+use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 
 /**
  * @mixin \Predis\Client
@@ -32,14 +32,12 @@ abstract class Connection
      * Funnel a callback for a maximum number of simultaneous executions.
      *
      * @param  string  $name
-     * @param  int  $maxLocks
-     * @param  int  $seconds
-     * @param  callable  $callback
-     * @param  int  $timeout
-     * @return mixed
+     * @return \Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder
      */
-    public function funnel($name, $maxLocks, $seconds, callable $callback, $timeout = 10)
+    public function funnel($name)
     {
+        return new ConcurrencyLimiterBuilder($this, $name);
+
         return (new ConcurrencyLimiter($this, $name, $maxLocks, $seconds))->block($timeout, $callback);
     }
 
@@ -47,15 +45,11 @@ abstract class Connection
      * Throttle a callback for a maximum number of executions over a given duration.
      *
      * @param  string  $name
-     * @param  int  $maxLocks
-     * @param  int  $decay
-     * @param  callable  $callback
-     * @param  int  $timeout
-     * @return mixed
+     * @return \Illuminate\Redis\Limiters\DurationLimiterBuilder
      */
-    public function throttle($name, $maxLocks, $decay, callable $callback, $timeout = 10)
+    public function throttle($name)
     {
-        return (new DurationLimiter($this, $name, $maxLocks, $decay))->block($timeout, $callback);
+        return new DurationLimiterBuilder($this, $name);
     }
 
     /**
