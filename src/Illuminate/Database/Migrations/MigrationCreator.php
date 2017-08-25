@@ -48,9 +48,9 @@ class MigrationCreator
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
-        // First we will get the stub file for the migration, which serves as a type
-        // of template for the migration. Once we have those we will populate the
-        // various place-holders, save the file, and run the post create event.
+        // First we will get the file path for the migration and generate the contents
+        // dynamically based on the arguments provided by the developer. Once we
+        // have these we will save the file and fire the post create event.
         $path = $this->getPath($name, $path);
         $content = $this->getContent($name, $table, $create);
 
@@ -92,6 +92,10 @@ class MigrationCreator
         $stub = $this->getStub($name, $table, $create);
         $placeholders = $this->getPlaceholders($name, $table);
 
+        // Here we will replace the any place-holders with the values specified by
+        // the developer, which is useful for quickly creating a tables creation
+        // or update migration from the console instead of typing it manually.
+
         return $this->populateStub($stub, $placeholders);
     }
 
@@ -105,9 +109,9 @@ class MigrationCreator
      */
     protected function getStub($name, $table, $create)
     {
-        // We also have stubs for creating new tables and modifying existing tables
-        // to save the developer some typing when they are creating a new tables
-        // or modifying existing tables. We'll grab the appropriate stub here.
+        // We also have stubs for creating, dropping, renaming tables as well as
+        // adding, removing, or renaming columns. This saves the developer
+        // some typing when they making migrations.
 
         if ($create) {
             return $this->files->get($this->stubPath().'/create.stub');
@@ -149,9 +153,6 @@ class MigrationCreator
             'DummyClass' => $this->getClassName($name),
         ];
 
-        // Here we will replace the table place-holders with the table specified by
-        // the developer, which is useful for quickly creating a tables creation
-        // or update migration from the console instead of typing it manually.
         if ($this->nameFollowsConvention($name)) {
             $placeholders += $this->extractPlaceholderValuesFromName($name);
         }
