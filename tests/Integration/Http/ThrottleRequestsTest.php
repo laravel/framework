@@ -27,7 +27,7 @@ class ThrottleRequestsTest extends TestCase
     public function test_lock_opens_immediately_after_decay()
     {
         Carbon::setTestNow(null);
-        
+
         Route::get('/', function () {
             return 'yes';
         })->middleware(ThrottleRequests::class.':2,1');

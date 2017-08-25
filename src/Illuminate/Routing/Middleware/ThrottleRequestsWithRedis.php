@@ -211,6 +211,6 @@ class ThrottleRequestsWithRedis
 
         $this->remaining = $limiter->remaining;
 
-        return !$attempt;
+        return ! $attempt;
     }
 }
