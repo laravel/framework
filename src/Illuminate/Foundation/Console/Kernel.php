@@ -5,13 +5,13 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
-use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
+use Psr\Container\ContainerExceptionInterface;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Cache\Repository as Cache;
@@ -219,9 +219,13 @@ class Kernel implements KernelContract
                 Str::after($command->getPathname(), app_path().DIRECTORY_SEPARATOR)
             );
 
-            if (is_subclass_of($command, Command::class) && ! (new ReflectionClass($command))->isAbstract()) {
+            if (is_subclass_of($command, Command::class)) {
                 Artisan::starting(function ($artisan) use ($command) {
-                    $artisan->resolve($command);
+                    try {
+                        $artisan->resolve($command);
+                    } catch (ContainerExceptionInterface $e) {
+                        $this->reportException($e);
+                    }
                 });
             }
         }
