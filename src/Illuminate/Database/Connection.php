@@ -923,7 +923,11 @@ class Connection implements ConnectionInterface
      */
     public function getReadPdo()
     {
-        if ($this->transactions > 0 || $this->recordsModified) {
+        if ($this->transactions > 0) {
+            return $this->getPdo();
+        }
+
+        if ($this->getConfig('sticky') && $this->recordsModified) {
             return $this->getPdo();
         }
 
