@@ -23,5 +23,4 @@ class MergeValue
     {
         $this->data = $data instanceof Collection ? $data->all() : $data;
     }
-
 }
