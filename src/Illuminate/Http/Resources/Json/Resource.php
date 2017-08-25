@@ -6,6 +6,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Http\Resources\MissingValue;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -115,11 +116,19 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     protected function filter($data)
     {
+        $index = -1;
+
         foreach ($data as $key => $value) {
+            $index++;
+
             if (is_array($value)) {
                 $data[$key] = $this->filter($value);
 
                 continue;
+            }
+
+            if (is_numeric($key) && $value instanceof MergeValue) {
+                return $this->merge($data, $index, $this->filter($value->data));
             }
 
             if ($value instanceof MissingValue ||
@@ -130,6 +139,28 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
         }
 
         return $data;
+    }
+
+    /**
+     * Merge the given data in at the given index.
+     *
+     * @param  array  $data
+     * @param  int  $index
+     * @param  array  $merge
+     * @return array
+     */
+    protected function merge($data, $index, $merge)
+    {
+        if (array_values($data) === $data) {
+            return array_merge(
+                array_merge(array_slice($data, 0, $index, true), $merge),
+                $this->filter(array_slice($data, $index + 1, null, true))
+            );
+        } else {
+            return array_slice($data, 0, $index, true) +
+                    $merge +
+                    $this->filter(array_slice($data, $index + 1, null, true));
+        }
     }
 
     /**
@@ -180,6 +211,18 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
         }
 
         return func_num_args() === 3 ? value($default) : new MissingValue;
+    }
+
+    /**
+     * Merge a value based on a given condition.
+     *
+     * @param  bool  $condition
+     * @param  mixed  $value
+     * @return \Illuminate\Http\Resources\MissingValue|mixed
+     */
+    protected function mergeWhen($condition, $value)
+    {
+        return $condition ? new MergeValue(value($value)) : new MissingValue;
     }
 
     /**
