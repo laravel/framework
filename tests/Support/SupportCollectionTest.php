@@ -2195,6 +2195,64 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testNext()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $fire = $collection->next('falls');
+        $five = $collection->next('leeloo');
+
+        $this->assertSame('burns', $fire);
+        $this->assertSame('korben', $five);
+    }
+
+    public function testNextReturnsNullAtTheEnd()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $next = $collection->next('korben');
+
+        $this->assertNull($next);
+    }
+
+    public function testNextReturnsNullWhenValueIsNotFound()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $next = $collection->next('dne');
+
+        $this->assertNull($next);
+    }
+
+    public function testPrevious()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $wind = $collection->previous('falls');
+        $fire = $collection->previous('leeloo');
+
+        $this->assertSame('blows', $wind);
+        $this->assertSame('burns', $fire);
+    }
+
+    public function testPreviousReturnsNullAtTheBeginning()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $previous = $collection->previous('blows');
+
+        $this->assertNull($previous);
+    }
+
+    public function testPreviousReturnsNullWhenValueIsNotFound()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $previous = $collection->previous('dne');
+
+        $this->assertNull($previous);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem

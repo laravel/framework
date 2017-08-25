@@ -906,6 +906,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the item after the searched item.
+     *
+     * @param  string  $value
+     * @param  bool    $strict
+     * @return mixed|null
+     */
+    public function next($value, $strict = false)
+    {
+        if (! $key = $this->search($value, $strict)) {
+            return null;
+        }
+
+        $keys = array_keys($this->items);
+
+        $nextKey = array_search($key, $keys) + 1;
+
+        if ($nextKey >= count($keys)) {
+            return null;
+        }
+
+        return $this->items[$keys[$nextKey]];
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step
@@ -1010,6 +1034,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $this->items = Arr::prepend($this->items, $value, $key);
 
         return $this;
+    }
+
+    /**
+     * Get the item before the searched item.
+     *
+     * @param  string  $value
+     * @param  bool    $strict
+     * @return mixed|null
+     */
+    public function previous($value, $strict = false)
+    {
+        if (! $key = $this->search($value, $strict)) {
+            return null;
+        }
+
+        $keys = array_keys($this->items);
+
+        $previousKey = array_search($key, $keys) - 1;
+
+        if ($previousKey < 0) {
+            return null;
+        }
+
+        return $this->items[$keys[$previousKey]];
     }
 
     /**
