@@ -93,6 +93,20 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     /**
      * Tests...
      */
+    public function testNonSoftDeletingModelDoesNotHaveDeletedAtColumnInGetDates()
+    {
+        $abigail = TestUserWithoutSoftDelete::create(['id' => 1, 'email' =>'abigailotwell@gmail.com']);
+
+        $this->assertNotContains('deleted_at', $abigail->getDates());
+    }
+
+    public function testSoftDeletingModelHasDeletedAtColumnInGetDates()
+    {
+        $taylor = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $this->assertContains('deleted_at', $taylor->getDates());
+    }
+
     public function testSoftDeletesAreNotRetrieved()
     {
         $this->createUsers();

@@ -22,6 +22,16 @@ trait SoftDeletes
     }
 
     /**
+     * Get the attributes that should be converted to dates.
+     *
+     * @return array
+     */
+    public function getSoftDeletesDates()
+    {
+        return ['deleted_at'];
+    }
+
+    /**
      * Force a hard delete on a soft deleted model.
      *
      * @return bool|null
