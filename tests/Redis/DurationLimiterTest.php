@@ -26,16 +26,16 @@ class DurationLimiterTest extends TestCase
     {
         $store = [];
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(2, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
             $store[] = 1;
         });
 
-        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(2, function () use (&$store) {
+        (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
             $store[] = 2;
         });
 
         try {
-            (new DurationLimiter($this->redis(), 'key', 2, 2))->block(2, function () use (&$store) {
+            (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
                 $store[] = 3;
             });
         } catch (\Throwable $e) {
@@ -77,28 +77,6 @@ class DurationLimiterTest extends TestCase
         });
 
         $this->assertEquals([1, 3], $store);
-    }
-
-    /**
-     * @test
-     */
-    public function it_doesnt_retry_if_duration_more_than_1_second()
-    {
-        $store = [];
-
-        (new DurationLimiter($this->redis(), 'key', 1, 60))->block(2, function () use (&$store) {
-            $store[] = 1;
-        });
-
-        try {
-            $this->assertEquals([1], $store);
-
-            (new DurationLimiter($this->redis(), 'key', 1, 60))->block(120, function () use (&$store) {
-                $store[] = 3;
-            });
-        } catch (\Throwable $e) {
-            $this->assertInstanceOf(LimiterTimeoutException::class, $e);
-        }
     }
 
     /**

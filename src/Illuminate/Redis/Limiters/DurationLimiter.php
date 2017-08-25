@@ -78,7 +78,7 @@ class DurationLimiter
         $starting = time();
 
         while (! $this->acquire()) {
-            if ($this->decay > 1 || time() - $timeout >= $starting) {
+            if (time() - $timeout >= $starting) {
                 throw new LimiterTimeoutException;
             }
 
