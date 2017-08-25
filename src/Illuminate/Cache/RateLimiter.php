@@ -59,8 +59,8 @@ class RateLimiter
      */
     public function hit($key, $decayMinutes = 1)
     {
-        $this->cache->add($key.':timer', $this->availableAt($decayMinutes * 60),
-            $decayMinutes
+        $this->cache->add(
+            $key.':timer', $this->availableAt($decayMinutes * 60), $decayMinutes
         );
 
         $added = $this->cache->add($key, 0, $decayMinutes);
