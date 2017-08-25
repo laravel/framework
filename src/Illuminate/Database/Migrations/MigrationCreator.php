@@ -146,7 +146,7 @@ class MigrationCreator
     protected function getPlaceholders($name, $table)
     {
         $placeholders = [
-            'DummyClass' => $this->getClassName($name)
+            'DummyClass' => $this->getClassName($name),
         ];
 
         // Here we will replace the table place-holders with the table specified by
@@ -187,7 +187,7 @@ class MigrationCreator
     }
 
     /**
-     * Does name follow a convention
+     * Does the migration name follow one of the convenient naming conventions.
      *
      * @param  string  $name
      * @return bool
@@ -200,7 +200,7 @@ class MigrationCreator
     }
 
     /**
-     * Extact the stub file name from the migration name
+     * Extract the stub file name from the migration name.
      *
      * @param  string  $name
      * @return bool
@@ -217,7 +217,7 @@ class MigrationCreator
     }
 
     /**
-     * Extact the stub file name from the migration name
+     * Extract the place-holders from the migration name.
      *
      * @param  string  $name
      * @return array
@@ -230,14 +230,14 @@ class MigrationCreator
             'rename_(?P<DummyColumnFrom>\w+)_to_(?P<DummyColumnTo>\w+)_in_(?P<DummyTable>\w+)',
             'rename_(?P<DummyTableFrom>\w+)_to_(?P<DummyTableTo>\w+)',
             'add_(?P<DummyColumn>\w+)_to_(?P<DummyTable>\w+)',
-            'remove_(?P<DummyColumn>\w+)_from_(?P<DummyTable>\w+)'
+            'remove_(?P<DummyColumn>\w+)_from_(?P<DummyTable>\w+)',
         ];
 
         preg_match('/'.implode('|', $patterns).'/J', $name, $matches);
 
         $placeholders = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
 
-        array_walk($placeholders, function(&$value, $key) {
+        array_walk($placeholders, function (&$value, $key) {
             if (Str::startsWith($key, 'DummyTable') && Str::endsWith($value, '_table')) {
                 $value = Str::replaceLast('_table', '', $value);
             }
