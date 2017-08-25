@@ -25,14 +25,14 @@ class ThrottleRequestsWithRedis
     /**
      * The timestamp of the end of the current duration.
      *
-     * @var integer
+     * @var int
      */
     public $decaysAt;
 
     /**
      * The number of remaining slots.
      *
-     * @var integer
+     * @var int
      */
     public $remaining;
 

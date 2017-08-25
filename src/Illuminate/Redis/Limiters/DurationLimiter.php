@@ -36,15 +36,15 @@ class DurationLimiter
 
     /**
      * The timestamp of the end of the current duration.
-     * 
-     * @var integer
+     *
+     * @var int
      */
     public $decaysAt;
 
     /**
      * The number of remaining slots.
-     * 
-     * @var integer
+     *
+     * @var int
      */
     public $remaining;
 
@@ -104,7 +104,7 @@ class DurationLimiter
         );
 
         $this->decaysAt = $results[1];
-        
+
         $this->remaining = max(0, $results[2]);
 
         return (bool) $results[0];
