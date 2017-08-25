@@ -1826,7 +1826,6 @@ class DatabaseQueryBuilderTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method noValidMethodHere does not exist.
      */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
@@ -2022,29 +2021,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users(1,2)');
         $this->assertEquals('select * from [users](1,2)', $builder->toSql());
-    }
-
-    public function testUnresolvableCallsArePassedToResultsCollection()
-    {
-        $builder = $this->getBuilder();
-        $builder->getProcessor()
-            ->shouldReceive('processSelect')
-            ->andReturn([tap(new \StdClass, function ($item) {
-                $item->first_name = 'Taylor';
-                $item->last_name = 'Otwell';
-            })]);
-        $builder->getConnection()->shouldReceive('select');
-
-        $results = $builder->select('*')->from('users')
-            ->map(function ($user) {
-                return [
-                    'name' => $user->first_name.' '.$user->last_name,
-                ];
-            });
-
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $results);
-        $this->assertCount(1, $results);
-        $this->assertEquals(['name' => 'Taylor Otwell'], $results->first());
     }
 
     public function testChunkWithLastChunkComplete()

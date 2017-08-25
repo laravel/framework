@@ -552,7 +552,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method thisMethodDoesNotExist does not exist.
      */
     public function testMorphToWithBadMethodCall()
     {
