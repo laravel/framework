@@ -44,9 +44,9 @@ class ThrottleRequestsTest extends TestCase
             Carbon::now()->addSeconds(58)
         );
 
-        try{
+        try {
             $response = $this->withoutExceptionHandling()->get('/');
-        }catch(\Throwable $e){
+        } catch (\Throwable $e) {
             $this->assertEquals(429, $e->getStatusCode());
             $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
             $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
