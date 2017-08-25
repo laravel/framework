@@ -3,11 +3,11 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
-use Illuminate\Support\Str;
-use Symfony\Component\Finder\Finder;
 use Throwable;
+use Illuminate\Support\Str;
 use Illuminate\Routing\Router;
 use Illuminate\Routing\Pipeline;
+use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
@@ -99,7 +99,7 @@ class Kernel implements KernelContract
             $router->middlewareGroup($key, $middleware);
         }
 
-	    $this->register();
+        $this->register();
 
         foreach ($this->routeMiddleware as $key => $middleware) {
             $router->aliasMiddleware($key, $middleware);
@@ -167,64 +167,66 @@ class Kernel implements KernelContract
         }
     }
 
-	/**
-	 * Register all of the middlewares in the given directory.
-	 *
-	 * @param  array|string  $paths
-	 * @return void
-	 */
-	protected function load($paths)
-	{
-		$paths = array_unique(is_array($paths) ? $paths : (array) $paths);
+    /**
+     * Register all of the middlewares in the given directory.
+     *
+     * @param  array|string  $paths
+     * @return void
+     */
+    protected function load($paths)
+    {
+        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
 
-		$paths = array_filter($paths, function ($path) {
-			return is_dir($path);
-		});
+        $paths = array_filter($paths, function ($path) {
+            return is_dir($path);
+        });
 
-		if (empty($paths)) {
-			return;
-		}
+        if (empty($paths)) {
+            return;
+        }
 
-		$namespace = $this->app->getNamespace();
-		foreach ((new Finder)->in($paths)->files() as $middleware) {
-			$middleware = $namespace.str_replace(
-					['/', '.php'],
-					['\\', ''],
-					Str::after($middleware->getPathname(), app_path().DIRECTORY_SEPARATOR)
-				);
+        $namespace = $this->app->getNamespace();
+        foreach ((new Finder)->in($paths)->files() as $middleware) {
+            $middleware = $namespace.str_replace(
+                    ['/', '.php'],
+                    ['\\', ''],
+                    Str::after($middleware->getPathname(), app_path().DIRECTORY_SEPARATOR)
+                );
 
-			if ($this->registerable($middleware)) {
-				$name = $this->app->make($middleware)->name;
-				$this->routeMiddleware[$name] = $middleware;
-			}
-		}
-	}
+            if ($this->registerable($middleware)) {
+                $name = $this->app->make($middleware)->name;
+                $this->routeMiddleware[$name] = $middleware;
+            }
+        }
+    }
 
-	/**
-	 * Automatically register route middlewares.
-	 *
-	 * @return void
-	 */
-	public function register() {
-		//
-	}
+    /**
+     * Automatically register route middlewares.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        //
+    }
 
-	/**
-	 * Is the middleware auto registerable.
-	 *
-	 * @param $middleware
-	 * @return bool
-	 */
-	protected function registerable($middleware) {
-		$middlewares = array_merge(
-			$this->middleware,
-			array_values($this->routeMiddleware),
-			array_flatten($this->middlewareGroups)
-		);
+    /**
+     * Is the middleware auto registerable.
+     *
+     * @param $middleware
+     * @return bool
+     */
+    protected function registerable($middleware)
+    {
+        $middlewares = array_merge(
+            $this->middleware,
+            array_values($this->routeMiddleware),
+            array_flatten($this->middlewareGroups)
+        );
 
-		return in_array('handle', get_class_methods($middleware)) &&
-		       ! in_array($middleware, array_unique($middlewares));
-	}
+        return in_array('handle', get_class_methods($middleware)) &&
+               ! in_array($middleware, array_unique($middlewares));
+    }
 
     /**
      * Get the route dispatcher callback.
