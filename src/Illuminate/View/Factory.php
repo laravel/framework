@@ -139,6 +139,27 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Get the first view that actually exists from the given list.
+     *
+     * @param  array  $views
+     * @param  array   $data
+     * @param  array   $mergeData
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function first(array $views, $data = [], $mergeData = [])
+    {
+        $view = collect($views)->first(function ($view) {
+            return $this->exists($view);
+        });
+
+        if (! $view) {
+            throw new InvalidArgumentException("None of the views in the given array exist.");
+        }
+
+        return $this->make($view, $data, $mergeData);
+    }
+
+    /**
      * Get the rendered content of the view based on a given condition.
      *
      * @param  bool  $condition
@@ -242,23 +263,6 @@ class Factory implements FactoryContract
         }
 
         return true;
-    }
-
-    /**
-     * Get the evaluated view contents for the given view, or for a fallback
-     * view if the given view doesn't exist.
-     *
-     * @param  string  $view
-     * @param  string  $fallback
-     * @param  array   $data
-     * @param  array   $mergeData
-     * @return \Illuminate\Contracts\View\View
-     */
-    public function either($view, $fallback, $data = [], $mergeData = [])
-    {
-        $view = $this->exists($view) ? $view : $fallback;
-
-        return $this->make($view, $data, $mergeData);
     }
 
     /**

@@ -45,12 +45,12 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->exists('bar'));
     }
 
-    public function testEitherCreatesNewViewInstanceWithProperPath()
+    public function testFirstCreatesNewViewInstanceWithProperPath()
     {
         unset($_SERVER['__test.view']);
 
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
+        $factory->getFinder()->shouldReceive('find')->twice()->with('view')->andReturn('path.php');
         $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow('InvalidArgumentException');
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock(\Illuminate\Contracts\View\Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
@@ -59,12 +59,26 @@ class ViewFactoryTest extends TestCase
             $_SERVER['__test.view'] = $view;
         });
         $factory->addExtension('php', 'php');
-        $view = $factory->either('bar', 'view', ['foo' => 'bar'], ['baz' => 'boom']);
+        $view = $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
 
         $this->assertSame($engine, $view->getEngine());
         $this->assertSame($_SERVER['__test.view'], $view);
 
         unset($_SERVER['__test.view']);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testFirstThrowsInvalidArgumentExceptionIfNoneFound()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andThrow('InvalidArgumentException');
+        $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow('InvalidArgumentException');
+        $factory->getEngineResolver()->shouldReceive('resolve')->with('php')->andReturn($engine = m::mock(\Illuminate\Contracts\View\Engine::class));
+        $factory->getFinder()->shouldReceive('addExtension')->with('php');
+        $factory->addExtension('php', 'php');
+        $view = $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
     }
 
     public function testRenderEachCreatesViewForEachItemInArray()
