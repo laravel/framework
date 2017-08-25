@@ -914,7 +914,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function next($value, $strict = false)
     {
-        if (!$key = $this->search($value, $strict)) {
+        if (! $key = $this->search($value, $strict)) {
             return null;
         }
 
@@ -1045,7 +1045,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function previous($value, $strict = false)
     {
-        if (!$key = $this->search($value, $strict)) {
+        if (! $key = $this->search($value, $strict)) {
             return null;
         }
 
