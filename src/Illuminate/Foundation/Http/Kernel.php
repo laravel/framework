@@ -194,8 +194,11 @@ class Kernel implements KernelContract
                 );
 
             if ($this->registerable($middleware)) {
-                $name = $this->app->make($middleware)->name;
-                $this->routeMiddleware[$name] = $middleware;
+                $instance = $this->app->make($middleware);
+                if (! property_exists($instance, 'name')) {
+                    continue;
+                }
+                $this->routeMiddleware[$instance->name] = $middleware;
             }
         }
     }

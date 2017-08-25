@@ -7,13 +7,6 @@ use Closure;
 class DummyClass
 {
     /**
-     * Middleware name.
-     *
-     * @var string
-     */
-    public $name = 'DummyName';
-
-    /**
      * Handle an incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
