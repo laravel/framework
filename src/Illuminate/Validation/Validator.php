@@ -171,6 +171,16 @@ class Validator implements ValidatorContract
     ];
 
     /**
+     * The validation rules which depend on other fields as parameters and should have replaced
+     * array parameters with real values.
+     *
+     * @var array
+     */
+    protected $dependantReplaceParametersRules = [
+        'Exists',
+    ];
+
+    /**
      * The size related validation rules.
      *
      * @var array
@@ -329,7 +339,7 @@ class Validator implements ValidatorContract
         // If so, we will replace any asterisks found in the parameters with the correct keys.
         if (($keys = $this->getExplicitKeys($attribute)) &&
             $this->dependsOnOtherFields($rule)) {
-            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+            $parameters = $this->getReplacedParameters($parameters, $keys, $rule);
         }
 
         $value = $this->getValue($attribute);
@@ -362,6 +372,31 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get replaced parameters.
+     *
+     * @param array  $parameters
+     * @param array  $keys
+     * @param string  $rule
+     *
+     * @return array
+     */
+    protected function getReplacedParameters(array $parameters, array $keys, $rule)
+    {
+        $replacedParameters = $this->replaceAsterisksInParameters($parameters, $keys);
+
+        if (! $this->shouldReplaceParametersWithValues($rule)) {
+            return $replacedParameters;
+        }
+        // For all data arguments try to verify if they are set in input and if they are,
+        // immediately use valid value from input otherwise leave it unchanged
+        for ($i = 3, $c = count($parameters); $i < $c; $i += 2) {
+            $parameters[$i] = Arr::get($this->data, $replacedParameters[$i], $parameters[$i]);
+        }
+
+        return $parameters;
+    }
+
+    /**
      * Determine if the given rule depends on other fields.
      *
      * @param  string  $rule
@@ -369,7 +404,19 @@ class Validator implements ValidatorContract
      */
     protected function dependsOnOtherFields($rule)
     {
-        return in_array($rule, $this->dependentRules);
+        return in_array($rule, $this->dependentRules)
+            || $this->shouldReplaceParametersWithValues($rule);
+    }
+
+    /**
+     * Determine if the given rule should have replaced asterisk parameters.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected function shouldReplaceParametersWithValues($rule)
+    {
+        return in_array($rule, $this->dependantReplaceParametersRules);
     }
 
     /**
