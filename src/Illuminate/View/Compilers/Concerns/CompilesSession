@@ -1,0 +1,76 @@
+<?php
+
+namespace Illuminate\View\Compilers\Concerns;
+
+
+trait CompilesSession
+{
+
+    protected function compileSetSession($expression)
+    {
+        preg_match('/\( *(.*) +=> *(.*)\)$/is', $expression, $matches);
+
+        $key = $matches[1];
+
+        $value = $matches[2];
+
+        return "<?php session({$key} , {$value}) ; ?>";
+    }
+
+
+    protected function compileGetSession($expression)
+    {
+        return "<?php session()->get({$expression}) ; ?>";
+    }
+
+    protected function compileForgetSession($expression)
+    {
+        return "<?php session()->forget({$expression}) ; ?>";
+    }
+
+
+    protected function compileAllSession()
+    {
+        return "<?php dump(session()->all()) ; ?>";
+    }
+
+
+    protected function compileHasSession($expression)
+    {
+        return "<?php if(session()->has({$expression})): ?>";
+    }
+
+
+    protected function compileEndHasSession()
+    {
+        return '<?php endif; ?>';
+    }
+
+
+    protected function compileForEachSession($expression)
+    {
+        if (count($expression) <= 0) {
+            return false;
+        }
+
+        preg_match('/\( *(.*) +as *(.*)\)$/is', $expression, $matches);
+
+        $iteratee = trim($matches[1]);
+
+        $iteration = trim($matches[2]);
+
+        $initLoop = "\$__currentLoopData = {$iteratee}; \$__env->addLoop(\$__currentLoopData);";
+
+        $iterateLoop = '$__env->incrementLoopIndices(); $loop = $__env->getLastLoop();';
+
+        return "<?php {$initLoop} foreach(\$__currentLoopData->all() as {$iteration}): {$iterateLoop} ?>";
+    }
+
+    protected function compileEndforEachSession()
+    {
+        return '<?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>';
+
+    }
+
+
+}
