@@ -18,9 +18,10 @@
 - Autoload package providers ([#19420](https://github.com/laravel/framework/pull/19420), [a5a0f3e](https://github.com/laravel/framework/commit/a5a0f3e7b82a1a4dc00037c5463a31d42c94903a), [2954091](https://github.com/laravel/framework/commit/295409189af589c6389d01e9d55f5568741149ee), [#19455](https://github.com/laravel/framework/pull/19455), [#19561](https://github.com/laravel/framework/pull/19561), [#19646](https://github.com/laravel/framework/pull/19646))
 - Upgraded to Symfony 3.3 components ([4db7031](https://github.com/laravel/framework/commit/4db70311b1b3813359b250d3f5a58743fa436453), [67a5367](https://github.com/laravel/framework/commit/67a536758d1636935ab5502bb6faedd73b30810f))
 - Support registering macros using classes ([#19782](https://github.com/laravel/framework/pull/19782), [353adbd](https://github.com/laravel/framework/commit/353adbd696e36764227e39980272d38147899d14))
-- Made `Carbon` macroable ([#19771](https://github.com/laravel/framework/pull/19771), [#20568](https://github.com/laravel/framework/pull/20568))
+- Made `Carbon` macroable and serializeable ([#19771](https://github.com/laravel/framework/pull/19771), [#20568](https://github.com/laravel/framework/pull/20568), [6a18209](https://github.com/laravel/framework/commit/6a18209863a934446d21ad8bc82c83d4b7dee5e7))
 - ⚠️ Moved `InteractsWithTime` to `Illuminate\Support` ([#20119](https://github.com/laravel/framework/pull/20119), [#20206](https://github.com/laravel/framework/pull/20206))
 - ⚠️ Fixed minimum value of paginator `last_page` field ([#20335](https://github.com/laravel/framework/pull/20335))
+- Added API resources ([#20710](https://github.com/laravel/framework/pull/20710), [2d8b803](https://github.com/laravel/framework/commit/2d8b803e93455db7ce70aed822f62b8d8ad2f4eb), [80a8ca9](https://github.com/laravel/framework/commit/80a8ca9be1b2f86849c07f4705c6660172e54177), [f8db604](https://github.com/laravel/framework/commit/f8db60430d4b811f8ab771d25ec23b1c70edd302), [a07d028](https://github.com/laravel/framework/commit/a07d028d732780249539dc6c33396dafc3bfa173), [88d5f21](https://github.com/laravel/framework/commit/88d5f21fb73b52578be3057b4f373f204955b1c8), [814043e](https://github.com/laravel/framework/commit/814043e30fcf6bf37aa442c09edadd74568ec997), [d64cf19](https://github.com/laravel/framework/commit/d64cf191354ef3a0467c2cd839dfd9feb79b374e), [ec87d74](https://github.com/laravel/framework/commit/ec87d74c7715ac5f32a4d06126b0e226fee3babe))
 
 ### Artisan Console
 - Added interactive prompt to `vendor:publish` ([#18230](https://github.com/laravel/framework/pull/18230))
@@ -41,6 +42,7 @@
 - Support loading multiple paths in `Kernel::load()` ([#20251](https://github.com/laravel/framework/pull/20251), [#20595](https://github.com/laravel/framework/pull/20595))
 - Added `CommandStarting` and `CommandFinished` events ([#20298](https://github.com/laravel/framework/pull/20298))
 - Show error message if a reverted migration is not found ([#20499](https://github.com/laravel/framework/pull/20499), [a895b1e](https://github.com/laravel/framework/commit/a895b1eb0e50683c4583c24bb17b3f8d9e8127ab))
+- Set correct namespace in model factories when using the `app:name` command ([#20766](https://github.com/laravel/framework/pull/20766))
 
 ### Assets
 - Added frontend preset commands (_too many commits, sorry_)
@@ -74,6 +76,7 @@
 - Added support cache locks ([4e6b2e4](https://github.com/laravel/framework/commit/4e6b2e4ecbbec5a4b265f4d5a57ad1399227cf12), [045e6f2](https://github.com/laravel/framework/commit/045e6f25a860763942c928c4e6d8857d59741486), [#19669](https://github.com/laravel/framework/pull/19669))
 - Accept `DatetimeInterface` and `DateInterval` in cache repository ([#20034](https://github.com/laravel/framework/pull/20034))
 - Added `getStore()` method to cache `Repository` interface ([#20338](https://github.com/laravel/framework/pull/20338))
+- ⚠️ Made `RateLimiter` less aggressive ([#20759](https://github.com/laravel/framework/pull/20759))
 
 ### Collections
 - Support multiple values in `Collection::has()` ([#18758](https://github.com/laravel/framework/pull/18758))
@@ -81,6 +84,7 @@
 - Added `Collection::dd()` method ([f5fafad](https://github.com/laravel/framework/commit/f5fafad80dbb08353824483f5b849031693cc477))
 - Added `Collection::dump()` method ([#19755](https://github.com/laravel/framework/pull/19755))
 - Added `wrap()` and `unwrap()` methods ([#20055](https://github.com/laravel/framework/pull/20055), [#20068](https://github.com/laravel/framework/pull/20068))
+- Added keys to `eachSpread()` and `mapSpread` callback ([#20723](https://github.com/laravel/framework/pull/20723))
 
 ### Configuration
 - Added `Config::getMany()` method ([#19770](https://github.com/laravel/framework/pull/19770))
@@ -98,6 +102,7 @@
 - Allow the seeder to call multiple commands at once ([#19912](https://github.com/laravel/framework/pull/19912))
 - Added pgpool message to `DetectsLostConnections` ([#20418](https://github.com/laravel/framework/pull/20418))
 - Prevent race conditions on replicated databases ([#20445](https://github.com/laravel/framework/pull/20445), [0ec1522](https://github.com/laravel/framework/commit/0ec1522a74f4ef7b6a01d617a482ae3f46c81a70), [3824a36](https://github.com/laravel/framework/commit/3824a366b0cd8a081bef26d3b4509c5db2fe7aae))
+- ⚠️ Support sticky database connections ([#20746](https://github.com/laravel/framework/pull/20746))
 
 ### Eloquent ORM
 - ⚠️ Indicate soft deleted models as existing ([#17613](https://github.com/laravel/framework/pull/17613))
@@ -166,15 +171,16 @@
 ### Helpers
 - Added `report()` helper ([2b67619](https://github.com/laravel/framework/commit/2b676191b1688b8edc9d43317a2989642fe95b5d))
 - Added `throw_if()` and `throw_unless()` helpers ([18bb4df](https://github.com/laravel/framework/commit/18bb4dfc77c7c289e9b40c4096816ebeff1cd843), [#19166](https://github.com/laravel/framework/pull/19166), [#19255](https://github.com/laravel/framework/pull/19255))
-- Added `dispatch_now()` helper function ([#18668](https://github.com/laravel/framework/pull/18668), [61f2e7b](https://github.com/laravel/framework/commit/61f2e7b4106f8eb0b79603d9792426f7c6a6d273))
+- Added `dispatch_now()` helper ([#18668](https://github.com/laravel/framework/pull/18668), [61f2e7b](https://github.com/laravel/framework/commit/61f2e7b4106f8eb0b79603d9792426f7c6a6d273))
 - Added `$language` parameter to `str_slug()` helper ([#19011](https://github.com/laravel/framework/pull/19011))
 - Added `str_before()` helper ([#19940](https://github.com/laravel/framework/pull/19940), [#20049](https://github.com/laravel/framework/pull/20049))
+- Added `now()` and `today()` helpers ([3c888b6](https://github.com/laravel/framework/commit/3c888b6c7b89c3d3f90e9024ffbebed3ee80bd23), [#20716](https://github.com/laravel/framework/pull/20716))
+- Added `blank()`, `optional()`, `present()` and `transform()` helpers ([06de9b2](https://github.com/laravel/framework/commit/06de9b2beb9e3c13758d93cee86a1657545cb435))
 - Handle lower case words better in as `Str::snake()` ([#18764](https://github.com/laravel/framework/pull/18764))
 - Removed usages of the `with()` helper ([#17888](https://github.com/laravel/framework/pull/17888))
 - Support multiple patterns in `Str::is()` ([#20108](https://github.com/laravel/framework/pull/20108))
 - Speed up `Arr::get()` calls without dot notations ([#20139](https://github.com/laravel/framework/pull/20139))
 - Use `report()` helper in `mix()` ([#20603](https://github.com/laravel/framework/pull/20603), [bf0cb82](https://github.com/laravel/framework/commit/bf0cb82a8990d99a0ed504c2fa6684b1c59c9d7e))
-- Added `now()` and `today()` helpers ([#3c888b6](https://github.com/laravel/framework/commit/3c888b6c7b89c3d3f90e9024ffbebed3ee80bd23))
 
 ### Localization
 - ⚠️ Moved `LoaderInterface` to contracts ([#20460](https://github.com/laravel/framework/pull/20460))
@@ -188,10 +194,12 @@
 - ⚠️ Made `Markdown` a dependency of `MailChannel` ([#19349](https://github.com/laravel/framework/pull/19349))
 - ⚠️ Upgraded to SwiftMailer 6 ([#19356](https://github.com/laravel/framework/pull/19356))
 - ⚠️ Added `to()` and `bcc()` to `Mailer` contract ([#19955](https://github.com/laravel/framework/pull/19955))
+- ⚠️ Honor `$delay` property on `Mailable::queue()` ([#20717](https://github.com/laravel/framework/pull/20717))
 
 ### Notifications
 - Added methods for Slack's `thumb_url` and `unfurl_*` options ([#19150](https://github.com/laravel/framework/pull/19150), [#19200](https://github.com/laravel/framework/pull/19200))
 - Support sending notifications via `AnonymousNotifiable` ([#19998](https://github.com/laravel/framework/pull/19998), [ba82579](https://github.com/laravel/framework/commit/ba825798f107c961a2337f13928bc6f4acac9447))
+- Accept other types on `SlackAttachment::timestamp()` ([#20671](https://github.com/laravel/framework/pull/20671))
 
 ### Queues
 - Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065), [91f5357](https://github.com/laravel/framework/commit/91f535704d4f6cff5e8393825dbdf46965234fa3), [434245f](https://github.com/laravel/framework/commit/434245f73e694f90476437da8554b58d54ced25c), [b880ad1](https://github.com/laravel/framework/commit/b880ad19282db768718cfd1629ebbc41054daadc), [6af6c8d](https://github.com/laravel/framework/commit/6af6c8d386424b9064ecc1b1bde7a6a9a1bf81b3))
@@ -204,10 +212,12 @@
 - Added `CallQueuedListener::__clone()` method ([#20022](https://github.com/laravel/framework/pull/20022))
 - Accept `DatetimeInterface` and `DateInterval` in queue ([#20102](https://github.com/laravel/framework/pull/20102), [92e2aff](https://github.com/laravel/framework/commit/92e2aff2fd9569fedf3164ef9a1a834e553a6881))
 - ⚠️ Use `dispatch()` instead of `fire()` ([#20446](https://github.com/laravel/framework/pull/20446))
+- Removed `reserved_at` index from jobs table stub ([#20702](https://github.com/laravel/framework/pull/20702))
 
 ### Redis
 - ⚠️ Several improvements on `PhpRedisConnection` ([#20269](https://github.com/laravel/framework/pull/20269), [#20316](https://github.com/laravel/framework/pull/20316))
 - ⚠️ Removed `PhpRedisConnection::proxyToEval()` method ([#17360](https://github.com/laravel/framework/pull/17360))
+- Added Redis limiters ([#20597](https://github.com/laravel/framework/pull/20597), [ceb260e](https://github.com/laravel/framework/commit/ceb260e6e8825a150651299b017b6a1dd5bd4db3), [#20761](https://github.com/laravel/framework/pull/20761), [aba76bf](https://github.com/laravel/framework/commit/aba76bf36ae9b301da3c778d7d4fc427a58f8aa4), [3684f0c](https://github.com/laravel/framework/commit/3684f0cfce1effabeb5d02c929d2b5335800f759), [#20772](https://github.com/laravel/framework/pull/20772))
 
 ### Requests
 - ⚠️ Made `Request::has()` work like `Collection::has()` ([#18715](https://github.com/laravel/framework/pull/18715))
@@ -239,6 +249,8 @@
 - Return the resource from `Router::apiResource()` ([#20029](https://github.com/laravel/framework/pull/20029))
 - ⚠️ Moved route model binding resolution logic to model ([#20521](https://github.com/laravel/framework/pull/20521), [370e626](https://github.com/laravel/framework/commit/370e626e5cf7d5763bbb0e58aa2a2cd3c01e2b61), [#20542](https://github.com/laravel/framework/pull/20542), [#20618](https://github.com/laravel/framework/pull/20618), [d911fa8](https://github.com/laravel/framework/commit/d911fa8f5db0100a861a3c1696d426624ec27b4e))
 - Accept string on `parameters()` and `names()` methods ([#20531](https://github.com/laravel/framework/pull/20531), [#20529](https://github.com/laravel/framework/pull/20529))
+- Handle `HEAD` requests in `Router::view()` ([#20672](https://github.com/laravel/framework/pull/20672))
+- Added `ThrottleRequestsWithRedis` middleware ([#20761](https://github.com/laravel/framework/pull/20761))
 
 ### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))
@@ -252,10 +264,12 @@
 - ⚠️ Refactored `Container` ([#19201](https://github.com/laravel/framework/pull/19201))
 - ⚠️ Made container PSR-11 compliant ([#19822](https://github.com/laravel/framework/pull/19822), [a6068b0](https://github.com/laravel/framework/commit/a6068b06ba42700f25b613a7bc3036be75d5bc43), [66325c2](https://github.com/laravel/framework/commit/66325c2c5768a5b10376e1838288c5212e3c9c40))
 - Return the bound instance from `Container::instance()` ([#19442](https://github.com/laravel/framework/pull/19442))
+- ⚠️ Use instance instead of deferred service provider ([#20714](https://github.com/laravel/framework/pull/20714))
 
 ### Session
 - ⚠️ Default value to `true` in `Store::flash()` ([#18136](https://github.com/laravel/framework/pull/18136))
 - ⚠️ Store the user password hash when logging in ([#19843](https://github.com/laravel/framework/pull/19843))
+- ⚠️ Throw `UnauthorizedHttpException` from `failedBasicResponse` ([#20673](https://github.com/laravel/framework/pull/20673))
 
 ### Task Scheduling
 - Fire before callbacks on closure-based scheduling events ([#18861](https://github.com/laravel/framework/pull/18861))
@@ -278,21 +292,23 @@
 - ⚠️ Clear `Carbon` mock during tear down ([#19934](https://github.com/laravel/framework/pull/19934))
 - Added debug info to `NotFoundHttpException` in `InteractsWithExceptionHandling` ([#20000](https://github.com/laravel/framework/pull/20000))
 - Added `MailFake::assertSentTimes()`, `QueueFake::assertPushedTimes()` and `BusFake::assertDispatchedTimes()` methods ([#20485](https://github.com/laravel/framework/pull/20485), [e657f6e](https://github.com/laravel/framework/commit/e657f6ec20867fc748e4f8b8ca1bbaa344c07acb))
-- Added queue assertions to `MailFake` ([#20454](https://github.com/laravel/framework/pull/20454))
+- Added queue assertions to `MailFake` ([#20454](https://github.com/laravel/framework/pull/20454), [#20701](https://github.com/laravel/framework/pull/20701))
 - Added `assertNothingSent()` and `assertSentTimes()` methods to `NotificationFake` ([#20651](https://github.com/laravel/framework/pull/20651))
 - Added Mockery expectations to the assertion count ([#20606](https://github.com/laravel/framework/pull/20606))
 - Fake the default storage disk by default ([#20625](https://github.com/laravel/framework/pull/20625))
 - Support sending default headers with requests ([#20590](https://github.com/laravel/framework/pull/20590), [c32418e](https://github.com/laravel/framework/commit/c32418e8ca13e1fef3908d3a497ea49df0cebbb3))
+- Support disabling of exception handling for specified exceptions ([#20729](https://github.com/laravel/framework/pull/20729), [2db9716](https://github.com/laravel/framework/commit/2db9716186c71cd0604277fc377a2654a6f10aaf))
 
 ### Validation
 - Added support for custom validation rule objects ([#19155](https://github.com/laravel/framework/pull/19155), [2aa5ea8](https://github.com/laravel/framework/commit/2aa5ea8a898bd220015ab9be453b36723ffb186e))
 - Validate against `DateTimeInterface` instead of `DateTime` ([#20110](https://github.com/laravel/framework/pull/20110))
 - ⚠️ Made several method in `ValidatesAttributes` public  ([#20200](https://github.com/laravel/framework/pull/20200))
 - ⚠️ Added `errors()` method to `Validator` interface ([#20337](https://github.com/laravel/framework/pull/20337))
-- Extend `Exists` and `Unique` rule from `DatabaseRule` class ([#20563](https://github.com/laravel/framework/pull/20563))
+- Extend `Exists` and `Unique` rule from `DatabaseRule` class ([#20563](https://github.com/laravel/framework/pull/20563), [#20691](https://github.com/laravel/framework/pull/20691))
 - Added `date_equals` rule ([#20646](https://github.com/laravel/framework/pull/20646))
 
 ### Views
 - ⚠️ Camel case variables names passed to views ([#18083](https://github.com/laravel/framework/pull/18083))
 - Added pagination template for Semantic UI ([#18463](https://github.com/laravel/framework/pull/18463))
 - Allow easier `ViewFactory` overriding ([#20205](https://github.com/laravel/framework/pull/20205), [56f103c](https://github.com/laravel/framework/commit/56f103c69757cc643120a3de9b601262ed1ff2dd))
+- Added `View::first()` ([#20695](https://github.com/laravel/framework/pull/20695), [f18318b](https://github.com/laravel/framework/commit/f18318b35b246a7f279781fe7403d137fb55be05))
