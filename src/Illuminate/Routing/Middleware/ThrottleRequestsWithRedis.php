@@ -3,18 +3,11 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use RuntimeException;
-use Illuminate\Support\Str;
-use Illuminate\Support\InteractsWithTime;
 use Illuminate\Redis\Limiters\DurationLimiter;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Redis\Factory as Redis;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
-class ThrottleRequestsWithRedis
+class ThrottleRequestsWithRedis extends ThrottleRequests
 {
-    use InteractsWithTime;
-
     /**
      * The Redis factory implementation.
      *
@@ -76,104 +69,24 @@ class ThrottleRequestsWithRedis
     }
 
     /**
-     * Resolve the number of attempts if the user is authenticated or not.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int|string  $maxAttempts
-     * @return int
-     */
-    protected function resolveMaxAttempts($request, $maxAttempts)
-    {
-        if (Str::contains($maxAttempts, '|')) {
-            $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
-        }
-
-        return (int) $maxAttempts;
-    }
-
-    /**
-     * Resolve request signature.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return string
-     * @throws \RuntimeException
-     */
-    protected function resolveRequestSignature($request)
-    {
-        if ($user = $request->user()) {
-            return sha1($user->getAuthIdentifier());
-        }
-
-        if ($route = $request->route()) {
-            return sha1($route->getDomain().'|'.$request->ip());
-        }
-
-        throw new RuntimeException(
-            'Unable to generate the request signature. Route unavailable.'
-        );
-    }
-
-    /**
-     * Create a 'too many attempts' exception.
+     * Determine if the given key has been "accessed" too many times.
      *
      * @param  string  $key
      * @param  int  $maxAttempts
-     * @return \Symfony\Component\HttpKernel\Exception\HttpException
+     * @param  int  $decayMinutes
+     * @return mixed
      */
-    protected function buildException($key, $maxAttempts)
+    protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
     {
-        $retryAfter = $this->decaysAt - $this->currentTime();
-
-        $headers = $this->getHeaders(
-            $maxAttempts,
-            $this->calculateRemainingAttempts($key, $maxAttempts, $retryAfter),
-            $retryAfter
+        $limiter = new DurationLimiter(
+            $this->redis, $key, $maxAttempts, $decayMinutes * 60
         );
 
-        return new HttpException(
-            429, 'Too Many Attempts.', null, $headers
-        );
-    }
-
-    /**
-     * Add the limit header information to the given response.
-     *
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @param  int  $maxAttempts
-     * @param  int  $remainingAttempts
-     * @param  int|null  $retryAfter
-     * @return \Symfony\Component\HttpFoundation\Response
-     */
-    protected function addHeaders(Response $response, $maxAttempts, $remainingAttempts, $retryAfter = null)
-    {
-        $response->headers->add(
-            $this->getHeaders($maxAttempts, $remainingAttempts, $retryAfter)
-        );
-
-        return $response;
-    }
-
-    /**
-     * Get the limit headers information.
-     *
-     * @param  int  $maxAttempts
-     * @param  int  $remainingAttempts
-     * @param  int|null  $retryAfter
-     * @return array
-     */
-    protected function getHeaders($maxAttempts, $remainingAttempts, $retryAfter = null)
-    {
-        $headers = [
-            'X-RateLimit-Limit' => $maxAttempts,
-            'X-RateLimit-Remaining' => $remainingAttempts,
-        ];
-
-        if (! is_null($retryAfter)) {
-            $headers['Retry-After'] = $retryAfter;
-            $headers['X-RateLimit-Reset'] = $this->availableAt($retryAfter);
-        }
-
-        return $headers;
+        return tap(! $limiter->acquire(), function () use ($limiter) {
+            list($this->decaysAt, $this->remaining) = [
+                $limiter->decaysAt, $limiter->remaining,
+            ];
+        });
     }
 
     /**
@@ -194,23 +107,13 @@ class ThrottleRequestsWithRedis
     }
 
     /**
-     * Determine if the given key has been "accessed" too many times.
+     * Get the number of seconds until the lock is released.
      *
      * @param  string  $key
-     * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
-     * @return mixed
+     * @return int
      */
-    protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
+    protected function getTimeUntilNextRetry($key)
     {
-        $limiter = (new DurationLimiter($this->redis, $key, $maxAttempts, $decayMinutes * 60));
-
-        $attempt = $limiter->acquire();
-
-        $this->decaysAt = $limiter->decaysAt;
-
-        $this->remaining = $limiter->remaining;
-
-        return ! $attempt;
+        return $this->decaysAt - $this->currentTime();
     }
 }

@@ -37,8 +37,6 @@ abstract class Connection
     public function funnel($name)
     {
         return new ConcurrencyLimiterBuilder($this, $name);
-
-        return (new ConcurrencyLimiter($this, $name, $maxLocks, $seconds))->block($timeout, $callback);
     }
 
     /**
