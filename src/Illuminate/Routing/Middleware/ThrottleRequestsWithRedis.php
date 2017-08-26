@@ -69,14 +69,24 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     }
 
     /**
-     * Get the number of seconds until the next retry.
+     * Determine if the given key has been "accessed" too many times.
      *
      * @param  string  $key
-     * @return int
+     * @param  int  $maxAttempts
+     * @param  int  $decayMinutes
+     * @return mixed
      */
-    protected function getTimeUntilNextRetry($key)
+    protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
     {
-        return $this->decaysAt - $this->currentTime();
+        $limiter = new DurationLimiter(
+            $this->redis, $key, $maxAttempts, $decayMinutes * 60
+        );
+
+        return tap(! $limiter->acquire(), function () use ($limiter) {
+            list($this->decaysAt, $this->remaining) = [
+                $limiter->decaysAt, $limiter->remaining,
+            ];
+        });
     }
 
     /**
@@ -97,23 +107,13 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     }
 
     /**
-     * Determine if the given key has been "accessed" too many times.
+     * Get the number of seconds until the lock is released.
      *
      * @param  string  $key
-     * @param  int  $maxAttempts
-     * @param  int  $decayMinutes
-     * @return mixed
+     * @return int
      */
-    protected function tooManyAttempts($key, $maxAttempts, $decayMinutes)
+    protected function getTimeUntilNextRetry($key)
     {
-        $limiter = (new DurationLimiter($this->redis, $key, $maxAttempts, $decayMinutes * 60));
-
-        $attempt = $limiter->acquire();
-
-        $this->decaysAt = $limiter->decaysAt;
-
-        $this->remaining = $limiter->remaining;
-
-        return ! $attempt;
+        return $this->decaysAt - $this->currentTime();
     }
 }
