@@ -250,9 +250,13 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     protected function whenPivotLoaded($table, $value, $default = null)
     {
+        if (func_num_args() === 2) {
+            $default = new MissingValue;
+        }
+
         return $this->when(
             $this->pivot && ($this->pivot instanceof $table || $this->pivot->getTable() === $table),
-            ...array_filter([$value, $default])
+            ...[$value, $default]
         );
     }
 
