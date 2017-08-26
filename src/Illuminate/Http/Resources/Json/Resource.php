@@ -52,7 +52,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     /**
      * Create a new resource instance.
      *
-     * @param  dynamic  $parameters
+     * @param  mixed  $parameters
      * @return static
      */
     public static function make(...$parameters)
