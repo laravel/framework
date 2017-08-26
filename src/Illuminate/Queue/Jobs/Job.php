@@ -198,6 +198,16 @@ abstract class Job
     }
 
     /**
+     * The timestamp of job expiration.
+     *
+     * @return int|null
+     */
+    public function expiration()
+    {
+        return $this->payload()['expiration'] ?? null;
+    }
+
+    /**
      * The number of seconds the job can run.
      *
      * @return int|null

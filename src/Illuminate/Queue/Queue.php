@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
 
@@ -121,11 +122,30 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'timeout' => $job->timeout ?? null,
+            'expiration' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => get_class($job),
                 'command' => serialize(clone $job),
             ],
         ];
+    }
+
+    /**
+     * Get the expiration time for  an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function getJobExpiration($job)
+    {
+        if (! method_exists($job, 'retryUntil')) {
+            return;
+        }
+
+        $expiration = $job->retryUntil();
+
+        return $expiration instanceof DateTimeInterface
+             ? $expiration->getTimestamp() : $expiration;
     }
 
     /**

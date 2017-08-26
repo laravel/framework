@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Support\Carbon;
 use Mockery;
 use RuntimeException;
 use PHPUnit\Framework\TestCase;
@@ -119,7 +120,36 @@ class QueueWorkerTest extends TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
-        $this->assertEquals($e, $job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
+    }
+
+    public function test_job_is_not_released_if_it_has_expired()
+    {
+        $e = new RuntimeException;
+
+        $job = new WorkerFakeJob(function ($job) use ($e) {
+            // In normal use this would be incremented by being popped off the queue
+            $job->attempts++;
+
+            throw $e;
+        });
+
+        $job->expiration = now()->addSeconds(2)->getTimestamp();
+
+        $job->attempts = 0;
+
+        Carbon::setTestNow(
+            now()->addSeconds(2)
+        );
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
@@ -136,6 +166,32 @@ class QueueWorkerTest extends TestCase
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['maxTries' => 1]));
+
+        $this->assertNull($job->releaseAfter);
+        $this->assertTrue($job->deleted);
+        $this->assertInstanceOf(MaxAttemptsExceededException::class, $job->failedWith);
+        $this->exceptionHandler->shouldHaveReceived('report')->with(Mockery::type(MaxAttemptsExceededException::class));
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
+    }
+
+    public function test_job_is_failed_if_it_has_already_expired()
+    {
+        $job = new WorkerFakeJob(function ($job){
+            $job->attempts++;
+        });
+
+        $job->expiration = now()->addSeconds(2)->getTimestamp();
+
+        $job->attempts = 1;
+
+        Carbon::setTestNow(
+            now()->addSeconds(3)
+        );
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions());
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
@@ -259,6 +315,7 @@ class WorkerFakeJob
     public $releaseAfter;
     public $released = false;
     public $maxTries;
+    public $expiration;
     public $attempts = 0;
     public $failedWith;
     public $failed = false;
@@ -284,6 +341,11 @@ class WorkerFakeJob
     public function maxTries()
     {
         return $this->maxTries;
+    }
+
+    public function expiration()
+    {
+        return $this->expiration;
     }
 
     public function delete()

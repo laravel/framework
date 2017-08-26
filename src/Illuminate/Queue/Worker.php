@@ -380,7 +380,13 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        if ($maxTries === 0 || $job->attempts() <= $maxTries) {
+        $expiration = $job->expiration();
+
+        if ($job->expiration() && $job->expiration() > now()->getTimestamp()) {
+            return;
+        }
+
+        if (! $expiration && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
             return;
         }
 
@@ -403,6 +409,10 @@ class Worker
     protected function markJobAsFailedIfWillExceedMaxAttempts($connectionName, $job, $maxTries, $e)
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
+
+        if ($job->expiration() && $job->expiration() <= now()->getTimestamp()) {
+            $this->failJob($connectionName, $job, $e);
+        }
 
         if ($maxTries > 0 && $job->attempts() >= $maxTries) {
             $this->failJob($connectionName, $job, $e);

@@ -63,6 +63,13 @@ interface Job
     public function maxTries();
 
     /**
+     * The timestamp of job expiration.
+     *
+     * @return int|null
+     */
+    public function expiration();
+
+    /**
      * The number of seconds the job can run.
      *
      * @return int|null
