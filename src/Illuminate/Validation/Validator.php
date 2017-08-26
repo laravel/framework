@@ -171,11 +171,11 @@ class Validator implements ValidatorContract
     ];
 
     /**
-     * The validation rules which depend on other fields as parameters and should have replaced 
+     * The validation rules which depend on other fields as parameters and should have replaced
      * array parameters with real values.
      *
      * @var array
-     */    
+     */
     protected $dependantReplaceParametersRules = [
         'Exists',
     ];
@@ -384,12 +384,12 @@ class Validator implements ValidatorContract
     {
         $replacedParameters = $this->replaceAsterisksInParameters($parameters, $keys);
 
-        if (!$this->shouldReplaceParametersWithValues($rule)) {
+        if (! $this->shouldReplaceParametersWithValues($rule)) {
             return $replacedParameters;
         }
         // For all data arguments try to verify if they are set in input and if they are,
         // immediately use valid value from input otherwise leave it unchanged
-        for ($i=3, $c = count($parameters); $i<$c; $i+=2) {
+        for ($i = 3, $c = count($parameters); $i < $c; $i += 2) {
             $parameters[$i] = Arr::get($this->data, $replacedParameters[$i], $parameters[$i]);
         }
 
@@ -404,7 +404,7 @@ class Validator implements ValidatorContract
      */
     protected function dependsOnOtherFields($rule)
     {
-        return in_array($rule, $this->dependentRules) 
+        return in_array($rule, $this->dependentRules)
             || $this->shouldReplaceParametersWithValues($rule);
     }
 

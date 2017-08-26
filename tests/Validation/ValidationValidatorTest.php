@@ -1623,7 +1623,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidationExistsParametersAreReplacedWhenPossible()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]], 
+        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
             ['tasks.*.user_id' => 'Exists:users,id,company_id,tasks.*.company_id']);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with(null);
@@ -1632,14 +1632,14 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
-            ['tasks.*.user_id' => (new Exists('users', 'id'))->where('company_id','tasks.*.company_id')]);
+            ['tasks.*.user_id' => (new Exists('users', 'id'))->where('company_id', 'tasks.*.company_id')]);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, null, ['company_id' => 1])->andReturn(true);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]], 
+        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
             ['tasks.*.user_id' => 'Exists:users,id,company_id,tasks.*.not_existing_key']);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with(null);
@@ -1648,7 +1648,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
-            ['tasks.*.user_id' => (new Exists('users', 'id'))->where('company_id','tasks.*.not_existing_key')]);
+            ['tasks.*.user_id' => (new Exists('users', 'id'))->where('company_id', 'tasks.*.not_existing_key')]);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, null, ['company_id' => 'tasks.*.not_existing_key'])->andReturn(true);
@@ -1662,17 +1662,17 @@ class ValidationValidatorTest extends TestCase
         $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, null, ['company_id' => 1])->andReturn(true);
         $mock->shouldReceive('getCount')->once()->with('types', 'type', 'user', null, null, ['user_id' => 2])->andReturn(true);
         $mock->shouldReceive('getCount')->once()->with('users', 'id', '4', null, null, ['company_id' => 3])->andReturn(true);
-        $mock->shouldReceive('getCount')->once()->with('types', 'type', 'admin', null, null, ['user_id' => 4])->andReturn(true);        
+        $mock->shouldReceive('getCount')->once()->with('types', 'type', 'admin', null, null, ['user_id' => 4])->andReturn(true);
         $v->setPresenceVerifier($mock);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['tasks' => [['company_id' => [1, 2, 3], 'user_id' => 2]]],
-            ['tasks.*.user_id' => (new Exists('users', 'id'))->where('company_id','tasks.*.company_id')]);
+            ['tasks.*.user_id' => (new Exists('users', 'id'))->where('company_id', 'tasks.*.company_id')]);
         $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
         $mock->shouldReceive('setConnection')->once()->with(null);
         $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, null, ['company_id' => [1, 2, 3]])->andReturn(true);
         $v->setPresenceVerifier($mock);
-        $this->assertTrue($v->passes());        
+        $this->assertTrue($v->passes());
     }
 
     public function testValidateIp()
