@@ -291,6 +291,8 @@
 - ⚠️ Added `errors()` method to `Validator` interface ([#20337](https://github.com/laravel/framework/pull/20337))
 - Extend `Exists` and `Unique` rule from `DatabaseRule` class ([#20563](https://github.com/laravel/framework/pull/20563))
 - Added `date_equals` rule ([#20646](https://github.com/laravel/framework/pull/20646))
+- Added `whereIn` and `whereNotIn` constraints to `Exists` and `Unique` rules ([#20691](https://github.com/laravel/framework/pull/20691))
+- Allow to pass array value to `where` and `whereNot` constraints in `Exists` and `Unique` rules ([#20739](https://github.com/laravel/framework/pull/20739))
 
 ### Views
 - ⚠️ Camel case variables names passed to views ([#18083](https://github.com/laravel/framework/pull/18083))
