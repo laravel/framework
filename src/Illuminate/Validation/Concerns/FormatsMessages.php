@@ -68,7 +68,7 @@ trait FormatsMessages
      *
      * @param  string  $attribute
      * @param  string  $lowerRule
-     * @param  array   $source
+     * @param  array|null  $source
      * @return string|null
      */
     protected function getFromLocalArray($attribute, $lowerRule, $source = null)
