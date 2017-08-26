@@ -244,11 +244,11 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * Execute a callback if the given pivot table has been loaded.
      *
      * @param  string  $table
-     * @param  callable  $value
+     * @param  mixed  $value
      * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function whenPivotLoaded($table, callable $value, $default = null)
+    protected function whenPivotLoaded($table, $value, $default = null)
     {
         return $this->when(
             $this->pivot && ($this->pivot instanceof $table || $this->pivot->getTable() === $table),
