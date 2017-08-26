@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Support\Carbon;
 use Mockery;
 use RuntimeException;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;
