@@ -4,9 +4,7 @@ namespace Illuminate\Routing\Middleware;
 
 use Closure;
 use Illuminate\Redis\Limiters\DurationLimiter;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Contracts\Redis\Factory as Redis;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class ThrottleRequestsWithRedis extends ThrottleRequests
 {
