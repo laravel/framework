@@ -250,7 +250,7 @@
 - ⚠️ Moved route model binding resolution logic to model ([#20521](https://github.com/laravel/framework/pull/20521), [370e626](https://github.com/laravel/framework/commit/370e626e5cf7d5763bbb0e58aa2a2cd3c01e2b61), [#20542](https://github.com/laravel/framework/pull/20542), [#20618](https://github.com/laravel/framework/pull/20618), [d911fa8](https://github.com/laravel/framework/commit/d911fa8f5db0100a861a3c1696d426624ec27b4e))
 - Accept string on `parameters()` and `names()` methods ([#20531](https://github.com/laravel/framework/pull/20531), [#20529](https://github.com/laravel/framework/pull/20529))
 - Handle `HEAD` requests in `Router::view()` ([#20672](https://github.com/laravel/framework/pull/20672))
-- Added `ThrottleRequestsWithRedis` middleware ([#20761](https://github.com/laravel/framework/pull/20761))
+- Added `ThrottleRequestsWithRedis` middleware ([#20761](https://github.com/laravel/framework/pull/20761), [0a10f9a](https://github.com/laravel/framework/commit/0a10f9a9dab928c9e4d75c66620e35aa73f329c2))
 
 ### Responses
 - ⚠️ Ensure `Arrayable` and `Jsonable` return a `JsonResponse` ([#17875](https://github.com/laravel/framework/pull/17875))
@@ -304,10 +304,9 @@
 - Validate against `DateTimeInterface` instead of `DateTime` ([#20110](https://github.com/laravel/framework/pull/20110))
 - ⚠️ Made several method in `ValidatesAttributes` public  ([#20200](https://github.com/laravel/framework/pull/20200))
 - ⚠️ Added `errors()` method to `Validator` interface ([#20337](https://github.com/laravel/framework/pull/20337))
-- Extend `Exists` and `Unique` rule from `DatabaseRule` class ([#20563](https://github.com/laravel/framework/pull/20563), [#20691](https://github.com/laravel/framework/pull/20691))
+- Extend `Exists` and `Unique` rule from `DatabaseRule` class ([#20563](https://github.com/laravel/framework/pull/20563))
+- Added `whereIn()` and `whereNotIn()` constraints to `DatabaseRule` ([#20691](https://github.com/laravel/framework/pull/20691), [#20739](https://github.com/laravel/framework/pull/20739), [52d28e3](https://github.com/laravel/framework/commit/52d28e3190833457d4efe811d1e993c1a4bba393))
 - Added `date_equals` rule ([#20646](https://github.com/laravel/framework/pull/20646))
-- Added `whereIn` and `whereNotIn` constraints to `Exists` and `Unique` rules ([#20691](https://github.com/laravel/framework/pull/20691))
-- Allow to pass array value to `where` and `whereNot` constraints in `Exists` and `Unique` rules ([#20739](https://github.com/laravel/framework/pull/20739))
 
 ### Views
 - ⚠️ Camel case variables names passed to views ([#18083](https://github.com/laravel/framework/pull/18083))
