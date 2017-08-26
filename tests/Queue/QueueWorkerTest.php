@@ -180,7 +180,7 @@ class QueueWorkerTest extends TestCase
 
     public function test_job_is_failed_if_it_has_already_expired()
     {
-        $job = new WorkerFakeJob(function ($job){
+        $job = new WorkerFakeJob(function ($job) {
             $job->attempts++;
         });
 
