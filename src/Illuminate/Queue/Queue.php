@@ -138,11 +138,11 @@ abstract class Queue
      */
     public function getJobExpiration($job)
     {
-        if (! method_exists($job, 'retryUntil')) {
+        if (! method_exists($job, 'retryUntil') && ! $job->expiration) {
             return;
         }
 
-        $expiration = $job->retryUntil();
+        $expiration = $job->expiration ?? $job->retryUntil();
 
         return $expiration instanceof DateTimeInterface
              ? $expiration->getTimestamp() : $expiration;
