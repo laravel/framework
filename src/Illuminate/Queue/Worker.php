@@ -382,7 +382,7 @@ class Worker
 
         $expiration = $job->expiration();
 
-        if ($job->expiration() && $job->expiration() > now()->getTimestamp()) {
+        if ($expiration && now()->getTimestamp() <= $expiration) {
             return;
         }
 

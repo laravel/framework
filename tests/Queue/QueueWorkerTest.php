@@ -120,6 +120,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
+        $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
@@ -137,12 +138,12 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->expiration = now()->addSeconds(2)->getTimestamp();
+        $job->expiration = now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 
         Carbon::setTestNow(
-            now()->addSeconds(2)
+            now()->addSeconds(1)
         );
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
@@ -150,6 +151,7 @@ class QueueWorkerTest extends TestCase
 
         $this->assertNull($job->releaseAfter);
         $this->assertTrue($job->deleted);
+        $this->assertEquals($e, $job->failedWith);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobFailed::class))->once();
