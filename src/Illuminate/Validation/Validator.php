@@ -421,21 +421,21 @@ class Validator implements ValidatorContract
         $arrayParameter = false;
 
         // if it's array parameter with array notation ex. [users.*.id] we cut off brackets
-        if (Str::startsWith($parameter,'[') && Str::endsWith($parameter,']')) {
+        if (Str::startsWith($parameter, '[') && Str::endsWith($parameter, ']')) {
             $arrayParameter = true;
             $parameter = mb_substr($parameter, 1, -1);
             $replacedParameter = mb_substr($replacedParameter, 1, -1);
         }
 
         $value = Arr::get($this->data, $replacedParameter, $parameter);
-        
+
         // if value is array but [users.*.id] notation is used this is not what we expect so return
-        // parameter without any modification 
+        // parameter without any modification
         if (is_array($value) && $arrayParameter) {
             return $value;
         }
 
-        return $arrayParameter ? '['.$value .']' : $value;
+        return $arrayParameter ? '['.$value.']' : $value;
     }
 
     /**

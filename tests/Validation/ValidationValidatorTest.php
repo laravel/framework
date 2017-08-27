@@ -1576,7 +1576,7 @@ class ValidationValidatorTest extends TestCase
         $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, 'id', ['company_id' => [1, 2, 3]])->andReturn(1);
         $v->setPresenceVerifier($mock);
         $this->assertFalse($v->passes());
-    }    
+    }
 
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
