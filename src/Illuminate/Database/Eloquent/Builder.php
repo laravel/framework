@@ -347,6 +347,17 @@ class Builder
     }
 
     /**
+     * Execute the query and get the first result or return fresh model instance.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function firstOrDefault($attributes = [])
+    {
+        return $this->firstOrNew($attributes);
+    }
+
+    /**
      * Get the first record matching the attributes or create it.
      *
      * @param  array  $attributes
