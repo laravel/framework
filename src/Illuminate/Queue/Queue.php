@@ -122,7 +122,7 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'timeout' => $job->timeout ?? null,
-            'expiration' => $this->getJobExpiration($job),
+            'timeoutAt' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => get_class($job),
                 'command' => serialize(clone $job),
