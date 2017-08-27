@@ -380,18 +380,18 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        $expiration = $job->expiration();
+        $timeoutAt = $job->timeoutAt();
 
-        if ($expiration && now()->getTimestamp() <= $expiration) {
+        if ($timeoutAt && now()->getTimestamp() <= $timeoutAt) {
             return;
         }
 
-        if (! $expiration && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
+        if (! $timeoutAt && ($maxTries === 0 || $job->attempts() <= $maxTries)) {
             return;
         }
 
         $this->failJob($connectionName, $job, $e = new MaxAttemptsExceededException(
-            'A queued job has been attempted too many times. The job may have previously timed out.'
+            'A queued job has been attempted too many times or run too long. The job may have previously timed out.'
         ));
 
         throw $e;
@@ -410,7 +410,7 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        if ($job->expiration() && $job->expiration() <= now()->getTimestamp()) {
+        if ($job->timeoutAt() && $job->timeoutAt() <= now()->getTimestamp()) {
             $this->failJob($connectionName, $job, $e);
         }
 

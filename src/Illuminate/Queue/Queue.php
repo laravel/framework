@@ -131,24 +131,6 @@ abstract class Queue
     }
 
     /**
-     * Get the expiration time for  an object-based queue handler.
-     *
-     * @param  mixed  $job
-     * @return mixed
-     */
-    public function getJobExpiration($job)
-    {
-        if (! method_exists($job, 'retryUntil') && ! $job->expiration) {
-            return;
-        }
-
-        $expiration = $job->expiration ?? $job->retryUntil();
-
-        return $expiration instanceof DateTimeInterface
-             ? $expiration->getTimestamp() : $expiration;
-    }
-
-    /**
      * Get the display name for the given job.
      *
      * @param  mixed  $job
@@ -158,6 +140,24 @@ abstract class Queue
     {
         return method_exists($job, 'displayName')
                         ? $job->displayName() : get_class($job);
+    }
+
+    /**
+     * Get the expiration timestamp for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function getJobExpiration($job)
+    {
+        if (! method_exists($job, 'retryUntil') && ! isset($job->timeoutAt)) {
+            return;
+        }
+
+        $expiration = $job->timeoutAt ?? $job->retryUntil();
+
+        return $expiration instanceof DateTimeInterface
+                        ? $expiration->getTimestamp() : $expiration;
     }
 
     /**

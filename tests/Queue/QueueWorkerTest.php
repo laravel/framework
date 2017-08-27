@@ -138,7 +138,7 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $job->expiration = now()->addSeconds(1)->getTimestamp();
+        $job->timeoutAt = now()->addSeconds(1)->getTimestamp();
 
         $job->attempts = 0;
 
@@ -184,7 +184,7 @@ class QueueWorkerTest extends TestCase
             $job->attempts++;
         });
 
-        $job->expiration = now()->addSeconds(2)->getTimestamp();
+        $job->timeoutAt = now()->addSeconds(2)->getTimestamp();
 
         $job->attempts = 1;
 
@@ -317,7 +317,7 @@ class WorkerFakeJob
     public $releaseAfter;
     public $released = false;
     public $maxTries;
-    public $expiration;
+    public $timeoutAt;
     public $attempts = 0;
     public $failedWith;
     public $failed = false;
@@ -345,9 +345,9 @@ class WorkerFakeJob
         return $this->maxTries;
     }
 
-    public function expiration()
+    public function timeoutAt()
     {
-        return $this->expiration;
+        return $this->timeoutAt;
     }
 
     public function delete()

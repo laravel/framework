@@ -188,7 +188,7 @@ abstract class Job
     }
 
     /**
-     * The number of times to attempt a job.
+     * Get the number of times to attempt a job.
      *
      * @return int|null
      */
@@ -198,23 +198,23 @@ abstract class Job
     }
 
     /**
-     * The timestamp of job expiration.
-     *
-     * @return int|null
-     */
-    public function expiration()
-    {
-        return $this->payload()['expiration'] ?? null;
-    }
-
-    /**
-     * The number of seconds the job can run.
+     * Get the number of seconds the job can run.
      *
      * @return int|null
      */
     public function timeout()
     {
         return $this->payload()['timeout'] ?? null;
+    }
+
+    /**
+     * Get the timestamp indicating when the job should timeout.
+     *
+     * @return int|null
+     */
+    public function timeoutAt()
+    {
+        return $this->payload()['timeoutAt'] ?? null;
     }
 
     /**
