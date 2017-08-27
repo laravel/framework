@@ -40,6 +40,13 @@ class CallQueuedListener implements ShouldQueue
     public $tries;
 
     /**
+     * The timestamp of job expiration.
+     *
+     * @var int
+     */
+    public $expiration;
+
+    /**
      * The number of seconds the job can run before timing out.
      *
      * @var int
