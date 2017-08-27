@@ -778,6 +778,15 @@ class SupportHelpersTest extends TestCase
             return 10;
         }));
     }
+
+    public function testNullIf()
+    {
+        $date = '2017-08-27';
+        $this->assertNotNull(null_if($date, '0000-00-00'));
+
+        $date = '0000-00-00';
+        $this->assertNull(null_if($date, '0000-00-00'));
+    }
 }
 
 trait SupportTestTraitOne
