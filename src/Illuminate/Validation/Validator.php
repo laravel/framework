@@ -166,8 +166,8 @@ class Validator implements ValidatorContract
      */
     protected $dependentRules = [
         'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual',
+        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Before', 'After',
+        'BeforeOrEqual', 'AfterOrEqual',
     ];
 
     /**
@@ -177,7 +177,7 @@ class Validator implements ValidatorContract
      * @var array
      */
     protected $dependantReplaceParametersRules = [
-        'Exists',
+        'Exists', 'Unique',
     ];
 
     /**
@@ -387,13 +387,55 @@ class Validator implements ValidatorContract
         if (! $this->shouldReplaceParametersWithValues($rule)) {
             return $replacedParameters;
         }
-        // For all data arguments try to verify if they are set in input and if they are,
-        // immediately use valid value from input otherwise leave it unchanged
-        for ($i = 3, $c = count($parameters); $i < $c; $i += 2) {
-            $parameters[$i] = Arr::get($this->data, $replacedParameters[$i], $parameters[$i]);
+
+        return $this->replaceParametersWithValues($parameters, $replacedParameters);
+    }
+
+    /**
+     * Replace parameters with values when possible.
+     *
+     * @param array $parameters
+     * @param array $replacedParameters
+     *
+     * @return array
+     */
+    protected function replaceParametersWithValues(array $parameters, array $replacedParameters)
+    {
+        for ($i = 2, $c = count($parameters); $i < $c; ++$i) {
+            $parameters[$i] = $this->replaceParameterWithValue($parameters[$i], $replacedParameters[$i]);
         }
 
         return $parameters;
+    }
+
+    /**
+     * Replace parameter with value when possible.
+     *
+     * @param string $parameter
+     * @param string $replacedParameter
+     *
+     * @return string|array
+     */
+    protected function replaceParameterWithValue($parameter, $replacedParameter)
+    {
+        $arrayParameter = false;
+
+        // if it's array parameter with array notation ex. [users.*.id] we cut off brackets
+        if (Str::startsWith($parameter,'[') && Str::endsWith($parameter,']')) {
+            $arrayParameter = true;
+            $parameter = mb_substr($parameter, 1, -1);
+            $replacedParameter = mb_substr($replacedParameter, 1, -1);
+        }
+
+        $value = Arr::get($this->data, $replacedParameter, $parameter);
+        
+        // if value is array but [users.*.id] notation is used this is not what we expect so return
+        // parameter without any modification 
+        if (is_array($value) && $arrayParameter) {
+            return $value;
+        }
+
+        return $arrayParameter ? '['.$value .']' : $value;
     }
 
     /**

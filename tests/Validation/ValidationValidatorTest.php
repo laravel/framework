@@ -1534,6 +1534,50 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidationUniqueParametersAreReplacedWhenPossible()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
+            ['tasks.*.user_id' => 'Unique:users,id,NULL,foo,company_id,tasks.*.company_id']);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, 'foo', ['company_id' => 1])->andReturn(0);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
+            ['tasks.*.user_id' => (new Unique('users', 'id'))->where('company_id', 'tasks.*.company_id')]);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, 'id', ['company_id' => 1])->andReturn(0);
+        $v->setPresenceVerifier($mock);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
+            ['tasks.*.user_id' => 'Unique:users,id,NULL,id,company_id,tasks.*.not_existing_key']);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, 'id', ['company_id' => 'tasks.*.not_existing_key'])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['tasks' => [['company_id' => 1, 'user_id' => 2]]],
+            ['tasks.*.user_id' => (new Unique('users', 'id'))->where('company_id', 'tasks.*.not_existing_key')]);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, 'id', ['company_id' => 'tasks.*.not_existing_key'])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['tasks' => [['company_id' => [1, 2, 3], 'user_id' => 2]]],
+            ['tasks.*.user_id' => (new Unique('users', 'id'))->where('company_id', 'tasks.*.company_id')]);
+        $mock = m::mock('Illuminate\Validation\PresenceVerifierInterface');
+        $mock->shouldReceive('setConnection')->once()->with(null);
+        $mock->shouldReceive('getCount')->once()->with('users', 'id', '2', null, 'id', ['company_id' => [1, 2, 3]])->andReturn(1);
+        $v->setPresenceVerifier($mock);
+        $this->assertFalse($v->passes());
+    }    
+
     public function testValidateUniqueAndExistsSendsCorrectFieldNameToDBWithArrays()
     {
         $trans = $this->getIlluminateArrayTranslator();

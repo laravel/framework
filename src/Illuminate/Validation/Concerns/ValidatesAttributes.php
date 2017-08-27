@@ -661,7 +661,7 @@ trait ValidatesAttributes
     protected function prepareUniqueId($id)
     {
         if (preg_match('/\[(.*)\]/', $id, $matches)) {
-            $id = $this->getValue($matches[1]);
+            $id = $matches[1];
         }
 
         if (strtolower($id) == 'null') {
