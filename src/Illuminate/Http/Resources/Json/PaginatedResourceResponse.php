@@ -19,7 +19,8 @@ class PaginatedResourceResponse extends ResourceResponse
                 $this->resource->resolve($request),
                 array_merge_recursive(
                     $this->paginationInformation($request),
-                    $this->resource->with($request)
+                    $this->resource->with($request),
+                    $this->resource->additional
                 )
             ),
             $this->calculateStatus()

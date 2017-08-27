@@ -37,7 +37,8 @@ class ResourceResponse implements Responsable
         return tap(response()->json(
             $this->wrap(
                 $this->resource->resolve($request),
-                $this->resource->with($request)
+                $this->resource->with($request),
+                $this->resource->additional
             ),
             $this->calculateStatus()
         ), function ($response) use ($request) {
@@ -50,9 +51,10 @@ class ResourceResponse implements Responsable
      *
      * @param  array  $data
      * @param  array  $with
+     * @param  array  $additional
      * @return array
      */
-    protected function wrap($data, $with = [])
+    protected function wrap($data, $with = [], $additional = [])
     {
         if ($data instanceof Collection) {
             $data = $data->all();
@@ -60,11 +62,11 @@ class ResourceResponse implements Responsable
 
         if ($this->haveDefaultWrapperAndDataIsUnwrapped($data)) {
             $data = [$this->wrapper() => $data];
-        } elseif ($this->haveAdditionalInformationAndDataIsUnwrapped($data, $with)) {
+        } elseif ($this->haveAdditionalInformationAndDataIsUnwrapped($data, $with, $additional)) {
             $data = [($this->wrapper() ?? 'data') => $data];
         }
 
-        return array_merge_recursive($data, $with);
+        return array_merge_recursive($data, $with, $additional);
     }
 
     /**
@@ -83,13 +85,14 @@ class ResourceResponse implements Responsable
      *
      * @param  array  $data
      * @param  array  $with
+     * @param  array  $additional
      * @return bool
      */
-    protected function haveAdditionalInformationAndDataIsUnwrapped($data, $with)
+    protected function haveAdditionalInformationAndDataIsUnwrapped($data, $with, $additional)
     {
-        return ! empty($with) &&
-              (! $this->wrapper() ||
-               ! array_key_exists($this->wrapper(), $data));
+        return (! empty($with) || ! empty($additional)) &&
+               (! $this->wrapper() ||
+                ! array_key_exists($this->wrapper(), $data));
     }
 
     /**

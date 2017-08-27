@@ -214,6 +214,29 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resources_may_customize_extra_data_when_building_response()
+    {
+        Route::get('/', function () {
+            return (new PostResourceWithExtraData(new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ])))->additional(['baz' => 'qux']);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertJson([
+            'data' => [
+                'id' => 5,
+                'title' => 'Test Title',
+            ],
+            'foo' => 'bar',
+            'baz' => 'qux',
+        ]);
+    }
+
     public function test_custom_headers_may_be_set_on_responses()
     {
         Route::get('/', function () {

@@ -32,6 +32,15 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public $with = [];
 
     /**
+     * The additional meta data that should be added to the resource response.
+     *
+     * Added during response constuction by the developer.
+     *
+     * @var array
+     */
+    public $additional = [];
+
+    /**
      * The "data" wrapper that should be applied.
      *
      * @var string
@@ -183,6 +192,19 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public function with($request)
     {
         return $this->with;
+    }
+
+    /**
+     * Add additional meta data to the resource response.
+     *
+     * @param  array  $data
+     * @return $this
+     */
+    public function additional(array $data)
+    {
+        $this->additional = $data;
+
+        return $this;
     }
 
     /**
