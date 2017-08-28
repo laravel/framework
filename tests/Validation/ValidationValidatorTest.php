@@ -3607,6 +3607,58 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($rule->called);
     }
 
+    public function testValidateWhenWithSimpleRule()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), [
+            'first' => 'match',
+            'second' => 123,
+        ], [
+            'first' => 'required|string',
+            'second' => 'when:first,match,numeric',
+        ]);
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWhenDoesNotRunIfTheConditionIsNotSatisfied()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), [
+            'first' => 'no match',
+            'second' => 'not a number',
+        ], [
+            'first' => 'required|string',
+            'second' => 'when:first,match,number',
+        ]);
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateWhenCanApplyParameterizedRules()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), [
+            'first' => 'match',
+            'second' => 123,
+        ], [
+            'first' => 'required|string',
+            'second' => 'numeric|when:first,match,min:120',
+        ]);
+
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateCorrectlyFailsWhenConditionalRuleFails()
+    {
+        $v = new Validator($this->getIlluminateArrayTranslator(), [
+            'first' => 'match',
+            'second' => 123,
+        ], [
+            'first' => 'required|string',
+            'second' => 'numeric|when:first,match,max:120',
+        ]);
+
+        $this->assertFalse($v->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');

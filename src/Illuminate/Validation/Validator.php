@@ -312,9 +312,9 @@ class Validator implements ValidatorContract
      *
      * @param  string  $attribute
      * @param  string  $rule
-     * @return void
+     * @return bool
      */
-    protected function validateAttribute($attribute, $rule)
+    public function validateAttribute($attribute, $rule)
     {
         $this->currentRule = $rule;
 
@@ -340,7 +340,9 @@ class Validator implements ValidatorContract
         if ($value instanceof UploadedFile && ! $value->isValid() &&
             $this->hasRule($attribute, array_merge($this->fileRules, $this->implicitRules))
         ) {
-            return $this->addFailure($attribute, 'uploaded', []);
+            $this->addFailure($attribute, 'uploaded', []);
+
+            return false;
         }
 
         // If we have made it this far we will make sure the attribute is validatable and if it is
@@ -350,15 +352,19 @@ class Validator implements ValidatorContract
 
         if ($rule instanceof RuleContract) {
             return $validatable
-                    ? $this->validateUsingCustomRule($attribute, $value, $rule)
-                    : null;
+                ? $this->validateUsingCustomRule($attribute, $value, $rule)
+                : true;
         }
 
         $method = "validate{$rule}";
 
         if ($validatable && ! $this->$method($attribute, $value, $parameters, $this)) {
             $this->addFailure($attribute, $rule, $parameters);
+
+            return false;
         }
+
+        return true;
     }
 
     /**
@@ -537,6 +543,8 @@ class Validator implements ValidatorContract
                 $rule->message(), $attribute, get_class($rule), []
             ));
         }
+
+        return $rule->passes($attribute, $value);
     }
 
     /**
