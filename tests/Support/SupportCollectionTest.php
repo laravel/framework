@@ -2140,7 +2140,7 @@ class SupportCollectionTest extends TestCase
 
     public function testPartitionCallbackWithKey()
     {
-        $collection = new Collection(['zero', 'one','two', 'three']);
+        $collection = new Collection(['zero', 'one', 'two', 'three']);
 
         list($even, $odd) = $collection->partition(function ($item, $index) {
             return $index % 2 === 0;
