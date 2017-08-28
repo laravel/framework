@@ -91,7 +91,7 @@ class SlackWebhookChannel
                 'title' => $attachment->title,
                 'title_link' => $attachment->url,
                 'ts' => $attachment->timestamp,
-                'action' => $attachment->action,
+                'actions' => $attachment->actions,
             ]);
         })->all();
     }
