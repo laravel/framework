@@ -2138,6 +2138,19 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([6, 7, 8, 9, 10], $secondPartition->values()->toArray());
     }
 
+    public function testPartitionCallbackWithKey()
+    {
+        $collection = new Collection(['zero', 'one','two', 'three']);
+
+        list($even, $odd) = $collection->partition(function ($item, $index) {
+            return $index % 2 === 0;
+        });
+
+        $this->assertEquals(['zero', 'two'], $even->values()->toArray());
+
+        $this->assertEquals(['one', 'three'], $odd->values()->toArray());
+    }
+
     public function testPartitionByKey()
     {
         $courses = new Collection([
