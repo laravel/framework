@@ -84,6 +84,12 @@ class SlackAttachment
     public $timestamp;
 
     /**
+     * The attachment's actions.
+     *
+     * @var array
+     */
+    public $actions;
+    /**
      * Set the title of the attachment.
      *
      * @param  string  $title
@@ -235,6 +241,17 @@ class SlackAttachment
     public function timestamp(Carbon $timestamp)
     {
         $this->timestamp = $timestamp->getTimestamp();
+
+        return $this;
+    }
+    
+    /**
+     * @param array $action
+     * @return $this
+     */
+    public function actions(array $actions)
+    {
+        $this->actions = $actions;
 
         return $this;
     }
