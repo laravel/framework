@@ -58,7 +58,7 @@ class CallbackEvent extends Event
         }
 
         parent::callBeforeCallbacks($container);
-        
+
         try {
             $response = $container->call($this->callback, $this->parameters);
         } finally {
