@@ -11,7 +11,8 @@ use Illuminate\Contracts\Cache\Repository as CacheContract;
 
 class Worker
 {
-    use \Illuminate\Database\DetectsLostConnections, \Illuminate\Queue\DetectsLostConnections {
+    use \Illuminate\Database\DetectsLostConnections, DetectsLostConnections {
+        \Illuminate\Database\DetectsLostConnections::causedByLostConnection insteadof DetectsLostConnections;
         \Illuminate\Database\DetectsLostConnections::causedByLostConnection as causedByLostDbConnection;
         DetectsLostConnections::causedByLostConnection as causedByLostQueueConnection;
     }
