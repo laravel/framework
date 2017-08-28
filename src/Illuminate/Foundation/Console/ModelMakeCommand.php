@@ -138,7 +138,7 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['controller', 'c', InputOption::VALUE_NONE, 'Create a new controller for the model'],
 
-            ['factory', 'fa', InputOption::VALUE_NONE, 'Create a new factory for the model'],
+            ['factory', 's', InputOption::VALUE_NONE, 'Create a new factory for the model'],
 
             ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
 
