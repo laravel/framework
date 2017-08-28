@@ -57,6 +57,8 @@ class CallbackEvent extends Event
             touch($this->mutexPath());
         }
 
+        parent::callBeforeCallbacks($container);
+
         try {
             $response = $container->call($this->callback, $this->parameters);
         } finally {
