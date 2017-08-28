@@ -1,5 +1,17 @@
 # Release Notes for 5.4.x
 
+## [Unreleased]
+
+### Added
+- Added MP3 to `Testing/MimeType::$mimes` ([#20745](https://github.com/laravel/framework/pull/20745))
+
+### Changed
+- Mailables that defined a `$delay` property will honor it ([#20717](https://github.com/laravel/framework/pull/20717))
+
+### Fixed
+- Fixed route URLs building from artisan commands ([#20788](https://github.com/laravel/framework/pull/20788))
+
+
 ## v5.4.35 (2017-08-24)
 
 ### Fixed
