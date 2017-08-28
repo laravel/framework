@@ -21,7 +21,7 @@
 - Made `Carbon` macroable and serializeable ([#19771](https://github.com/laravel/framework/pull/19771), [#20568](https://github.com/laravel/framework/pull/20568), [6a18209](https://github.com/laravel/framework/commit/6a18209863a934446d21ad8bc82c83d4b7dee5e7))
 - ⚠️ Moved `InteractsWithTime` to `Illuminate\Support` ([#20119](https://github.com/laravel/framework/pull/20119), [#20206](https://github.com/laravel/framework/pull/20206))
 - ⚠️ Fixed minimum value of paginator `last_page` field ([#20335](https://github.com/laravel/framework/pull/20335))
-- Added API resources ([#20710](https://github.com/laravel/framework/pull/20710), [2d8b803](https://github.com/laravel/framework/commit/2d8b803e93455db7ce70aed822f62b8d8ad2f4eb), [80a8ca9](https://github.com/laravel/framework/commit/80a8ca9be1b2f86849c07f4705c6660172e54177), [f8db604](https://github.com/laravel/framework/commit/f8db60430d4b811f8ab771d25ec23b1c70edd302), [a07d028](https://github.com/laravel/framework/commit/a07d028d732780249539dc6c33396dafc3bfa173), [88d5f21](https://github.com/laravel/framework/commit/88d5f21fb73b52578be3057b4f373f204955b1c8), [814043e](https://github.com/laravel/framework/commit/814043e30fcf6bf37aa442c09edadd74568ec997), [d64cf19](https://github.com/laravel/framework/commit/d64cf191354ef3a0467c2cd839dfd9feb79b374e), [ec87d74](https://github.com/laravel/framework/commit/ec87d74c7715ac5f32a4d06126b0e226fee3babe))
+- Added API resources ([#20710](https://github.com/laravel/framework/pull/20710), [2d8b803](https://github.com/laravel/framework/commit/2d8b803e93455db7ce70aed822f62b8d8ad2f4eb), [80a8ca9](https://github.com/laravel/framework/commit/80a8ca9be1b2f86849c07f4705c6660172e54177), [f8db604](https://github.com/laravel/framework/commit/f8db60430d4b811f8ab771d25ec23b1c70edd302), [a07d028](https://github.com/laravel/framework/commit/a07d028d732780249539dc6c33396dafc3bfa173), [88d5f21](https://github.com/laravel/framework/commit/88d5f21fb73b52578be3057b4f373f204955b1c8), [814043e](https://github.com/laravel/framework/commit/814043e30fcf6bf37aa442c09edadd74568ec997), [d64cf19](https://github.com/laravel/framework/commit/d64cf191354ef3a0467c2cd839dfd9feb79b374e), [ec87d74](https://github.com/laravel/framework/commit/ec87d74c7715ac5f32a4d06126b0e226fee3babe), [73de18e](https://github.com/laravel/framework/commit/73de18e32a7d04ed61c1a37b724732a23aad259c))
 
 ### Artisan Console
 - Added interactive prompt to `vendor:publish` ([#18230](https://github.com/laravel/framework/pull/18230))
@@ -84,7 +84,7 @@
 - Added `Collection::dd()` method ([f5fafad](https://github.com/laravel/framework/commit/f5fafad80dbb08353824483f5b849031693cc477))
 - Added `Collection::dump()` method ([#19755](https://github.com/laravel/framework/pull/19755))
 - Added `wrap()` and `unwrap()` methods ([#20055](https://github.com/laravel/framework/pull/20055), [#20068](https://github.com/laravel/framework/pull/20068))
-- Added keys to `eachSpread()` and `mapSpread` callback ([#20723](https://github.com/laravel/framework/pull/20723))
+- Added keys to `partition()`, `eachSpread()` and `mapSpread` callback ([#20783](https://github.com/laravel/framework/pull/20783), [#20723](https://github.com/laravel/framework/pull/20723))
 
 ### Configuration
 - Added `Config::getMany()` method ([#19770](https://github.com/laravel/framework/pull/19770))
@@ -194,7 +194,6 @@
 - ⚠️ Made `Markdown` a dependency of `MailChannel` ([#19349](https://github.com/laravel/framework/pull/19349))
 - ⚠️ Upgraded to SwiftMailer 6 ([#19356](https://github.com/laravel/framework/pull/19356))
 - ⚠️ Added `to()` and `bcc()` to `Mailer` contract ([#19955](https://github.com/laravel/framework/pull/19955))
-- ⚠️ Honor `$delay` property on `Mailable::queue()` ([#20717](https://github.com/laravel/framework/pull/20717))
 
 ### Notifications
 - Added methods for Slack's `thumb_url` and `unfurl_*` options ([#19150](https://github.com/laravel/framework/pull/19150), [#19200](https://github.com/laravel/framework/pull/19200))
@@ -213,6 +212,7 @@
 - Accept `DatetimeInterface` and `DateInterval` in queue ([#20102](https://github.com/laravel/framework/pull/20102), [92e2aff](https://github.com/laravel/framework/commit/92e2aff2fd9569fedf3164ef9a1a834e553a6881))
 - ⚠️ Use `dispatch()` instead of `fire()` ([#20446](https://github.com/laravel/framework/pull/20446))
 - Removed `reserved_at` index from jobs table stub ([#20702](https://github.com/laravel/framework/pull/20702))
+- Support job expiration ([#20776](https://github.com/laravel/framework/pull/20776), [1592b9b](https://github.com/laravel/framework/commit/1592b9b27b9ba25bf8bbb313900c5ffc635b0f10))
 
 ### Redis
 - ⚠️ Several improvements on `PhpRedisConnection` ([#20269](https://github.com/laravel/framework/pull/20269), [#20316](https://github.com/laravel/framework/pull/20316))
