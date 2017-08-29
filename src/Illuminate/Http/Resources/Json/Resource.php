@@ -255,7 +255,9 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     protected function attributes($attributes)
     {
-        return new MergeValue($this->resource->only($attributes));
+        return new MergeValue(
+            array_only($this->resource->toArray(), $attributes)
+        );
     }
 
     /**
