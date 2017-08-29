@@ -2,10 +2,7 @@
 
 namespace Illuminate\Routing;
 
-use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Support\Arr;
 
 class RouteGroup implements Arrayable
 {
@@ -40,14 +37,14 @@ class RouteGroup implements Arrayable
         return $this->attributes;
     }
 
-
     /**
      * Add a route to the group's RouteCollection.
      *
      * @param \Illuminate\Routing\Route $route
      * @return \Illuminate\Routing\RouteGroup
      */
-    public function addRoute(Route $route) {
+    public function addRoute(Route $route)
+    {
         $this->routes->add($route);
 
         return $this;
