@@ -248,6 +248,19 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Merge the given attributes.
+     *
+     * @param  array  $attributes
+     * @return mixed
+     */
+    protected function attributes($attributes)
+    {
+        return new MergeValue(value(function () use ($attributes) {
+            return $this->resource->only($attributes);
+        }));
+    }
+
+    /**
      * Retrieve a relationship if it has been loaded.
      *
      * @param  string  $relationship
