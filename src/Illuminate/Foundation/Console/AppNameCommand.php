@@ -89,14 +89,25 @@ class AppNameCommand extends Command
      */
     protected function setAppDirectoryNamespace()
     {
-        $files = Finder::create()
-                            ->in($this->laravel['path'])
-                            ->contains($this->currentRoot)
-                            ->name('*.php');
+        $files = $this->getFilesIn($this->laravel['path']);
 
         foreach ($files as $file) {
             $this->replaceNamespace($file->getRealPath());
         }
+    }
+
+    /**
+     * Get source files containing the current root namespace in a given path.
+     *
+     * @param  string $path
+     * @return  \Symfony\Component\Finder\Finder
+     */
+    protected function getFilesIn($path)
+    {
+        return Finder::create()
+            ->in($path)
+            ->contains($this->currentRoot)
+            ->name('*.php');
     }
 
     /**
@@ -223,10 +234,7 @@ class AppNameCommand extends Command
      */
     protected function setDatabaseFactoryNamespaces()
     {
-        $files = Finder::create()
-                            ->in($this->laravel->databasePath().'/factories')
-                            ->contains($this->currentRoot)
-                            ->name('*.php');
+        $files = $this->getFilesIn($this->laravel->databasePath().'/factories');
 
         foreach ($files as $file) {
             $this->replaceIn(
