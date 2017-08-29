@@ -38,9 +38,9 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      */
     public function __construct(ConnectionResolverInterface $resolver, $database, $table)
     {
-        $this->table = $table;
         $this->resolver = $resolver;
         $this->database = $database;
+        $this->table = $table;
     }
 
     /**
