@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
@@ -546,11 +547,11 @@ if (! function_exists('mix')) {
     {
         static $manifests = [];
 
-        if (! starts_with($path, '/')) {
+        if (! Str::startsWith($path, '/')) {
             $path = "/{$path}";
         }
 
-        if ($manifestDirectory && ! starts_with($manifestDirectory, '/')) {
+        if ($manifestDirectory && ! Str::startsWith($manifestDirectory, '/')) {
             $manifestDirectory = "/{$manifestDirectory}";
         }
 
