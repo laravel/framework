@@ -1119,6 +1119,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'auth.password.broker' => [\Illuminate\Auth\Passwords\PasswordBroker::class, \Illuminate\Contracts\Auth\PasswordBroker::class],
             'queue'                => [\Illuminate\Queue\QueueManager::class, \Illuminate\Contracts\Queue\Factory::class, \Illuminate\Contracts\Queue\Monitor::class],
             'queue.connection'     => [\Illuminate\Contracts\Queue\Queue::class],
+            'queue.failer.manager' => [\Illuminate\Queue\Failed\Manager::class],
             'queue.failer'         => [\Illuminate\Queue\Failed\FailedJobProviderInterface::class],
             'redirect'             => [\Illuminate\Routing\Redirector::class],
             'redis'                => [\Illuminate\Redis\RedisManager::class, \Illuminate\Contracts\Redis\Factory::class],
