@@ -2305,9 +2305,6 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['x' => '2000-01-01'], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:Y-m-d H:i:s']);
-        $this->assertTrue($v->passes());
-
         $v = new Validator($trans, ['x' => '01/01/2001'], ['x' => 'date_format:Y-m-d']);
         $this->assertTrue($v->fails());
 
@@ -2334,6 +2331,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '2000-01-01T00:00:00+00:30'], ['x' => 'date_format:Y-m-d\TH:i:sP']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:Y-m-d H:i:s']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2000-01-01 17:43:59'], ['x' => 'date_format:H:i:s']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'date_format:H:i:s']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'date_format:H:i']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:43'], ['x' => 'date_format:H:i']);
         $this->assertTrue($v->passes());
     }
 
@@ -2391,6 +2403,30 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['start' => 'today', 'ends' => 'tomorrow'], ['start' => 'Before:ends', 'ends' => 'After:start']);
         $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:43:59'], ['x' => 'Before:2012-01-01 17:44|After:2012-01-01 17:43:58']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:01'], ['x' => 'Before:2012-01-01 17:44:02|After:2012-01-01 17:44']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44'], ['x' => 'Before:2012-01-01 17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44'], ['x' => 'After:2012-01-01 17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:43:59'], ['x' => 'Before:17:44|After:17:43:58']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:44:01'], ['x' => 'Before:17:44:02|After:17:44']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'Before:17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'After:17:44:00']);
+        $this->assertTrue($v->fails());
     }
 
     public function testBeforeAndAfterWithFormat()
@@ -2459,6 +2495,33 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['x' => date('Y-m-d')], ['x' => 'before:today']);
         $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:00'], ['x' => 'date_format:Y-m-d H:i:s|before:2012-01-01 17:44:01|after:2012-01-01 17:43:59']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:00'], ['x' => 'date_format:Y-m-d H:i:s|before:2012-01-01 17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:00'], ['x' => 'date_format:Y-m-d H:i:s|after:2012-01-01 17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44:00'], ['x' => 'date_format:H:i:s|before:17:44:01|after:17:43:59']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:44:00'], ['x' => 'date_format:H:i:s|before:17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44:00'], ['x' => 'date_format:H:i:s|after:17:44:00']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|before:17:45|after:17:43']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|before:17:44']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|after:17:44']);
+        $this->assertTrue($v->fails());
     }
 
     public function testWeakBeforeAndAfter()
@@ -2511,6 +2574,33 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => date('d/m/Y')], ['x' => 'date_format:d/m/Y|after_or_equal:tomorrow']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:00'], ['x' => 'date_format:Y-m-d H:i:s|before_or_equal:2012-01-01 17:44:00|after_or_equal:2012-01-01 17:44:00']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:00'], ['x' => 'date_format:Y-m-d H:i:s|before_or_equal:2012-01-01 17:43:59']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '2012-01-01 17:44:00'], ['x' => 'date_format:Y-m-d H:i:s|after_or_equal:2012-01-01 17:44:01']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44:00'], ['x' => 'date_format:H:i:s|before_or_equal:17:44:00|after_or_equal:17:44:00']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:44:00'], ['x' => 'date_format:H:i:s|before_or_equal:17:43:59']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44:00'], ['x' => 'date_format:H:i:s|after_or_equal:17:44:01']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|before_or_equal:17:44|after_or_equal:17:44']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|before_or_equal:17:43']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '17:44'], ['x' => 'date_format:H:i|after_or_equal:17:45']);
         $this->assertTrue($v->fails());
     }
 
