@@ -251,7 +251,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * Merge the given attributes.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Http\Resources\MissingValue
+     * @return \Illuminate\Http\Resources\MergeValue
      */
     protected function attributes($attributes)
     {
