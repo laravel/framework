@@ -248,6 +248,17 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     }
 
     /**
+     * Merge the given attributes.
+     *
+     * @param  array  $attributes
+     * @return \Illuminate\Http\Resources\MissingValue
+     */
+    protected function attributes($attributes)
+    {
+        return new MergeValue($this->resource->only($attributes));
+    }
+
+    /**
      * Retrieve a relationship if it has been loaded.
      *
      * @param  string  $relationship
