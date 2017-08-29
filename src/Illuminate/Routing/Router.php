@@ -332,6 +332,12 @@ class Router implements RegistrarContract, BindingRegistrar
         array_pop($this->groupStack);
     }
 
+    /**
+     * Add a group to the global registry and the local groupStack.
+     *
+     * @param \Illuminate\Routing\RouteGroup $group
+     * @return void
+     */
     public function registerGroup(RouteGroup $group)
     {
         $this->groups[] = $group;
@@ -341,7 +347,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Update the group stack with the given attributes.
      *
-     * @param  array  $attributes
+     * @param \Illuminate\Routing\RouteGroup $group
      * @return void
      */
     protected function updateGroupStack(RouteGroup $group)
@@ -349,6 +355,11 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->groupStack[] = $group;
     }
 
+    /**
+     * Merge down all attributes in the groupStack to one array.
+     *
+     * @return array
+     */
     protected function flattenGroupStackAttributes()
     {
         $flatStack = [];
@@ -370,22 +381,16 @@ class Router implements RegistrarContract, BindingRegistrar
         return RouteGroupAttributes::merge($new, $this->flattenGroupStackAttributes());
     }
 
+    /**
+     * Register a route with all the groups in the stack.
+     * 
+     * @return 
+     */
     public function saveRouteToGroups($route)
     {
         foreach ($this->groupStack as $group) {
             $group->addRoute($route);
         }
-    }
-
-    /**
-     * Merge the given array with the last group stack.
-     *
-     * @param  array  $new
-     * @return array
-     */
-    public function mergeWithLastGroup($new)
-    {
-        return RouteGroup::merge($new, end($this->groupStack));
     }
 
     /**
@@ -773,6 +778,11 @@ class Router implements RegistrarContract, BindingRegistrar
         return $this->middleware;
     }
 
+    /**
+     * Get all of the defined RouteGroup objects.
+     *
+     * @return array
+     */
     public function getGroups()
     {
         return $this->groups;

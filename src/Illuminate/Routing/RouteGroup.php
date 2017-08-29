@@ -30,11 +30,23 @@ class RouteGroup implements Arrayable
         }, $this->attributes);
     }
 
+    /**
+     * Get the attributes.
+     *
+     * @return array
+     */
     public function getAttributes()
     {
         return $this->attributes;
     }
 
+
+    /**
+     * Add a route to the group's RouteCollection.
+     *
+     * @param \Illuminate\Routing\Route $route
+     * @return \Illuminate\Routing\RouteGroup
+     */
     public function addRoute(Route $route) {
         $this->routes->add($route);
 
