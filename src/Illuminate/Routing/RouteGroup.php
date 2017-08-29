@@ -2,94 +2,42 @@
 
 namespace Illuminate\Routing;
 
+use ArrayAccess;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Routing\RouteCollection;
 use Illuminate\Support\Arr;
 
-class RouteGroup
+class RouteGroup implements Arrayable
 {
+    protected $attributes = [];
+    protected $routes;
+
+    public function __construct(array $attributes = [])
+    {
+        $this->attributes = $attributes;
+        $this->routes = new RouteCollection;
+    }
+
     /**
-     * Merge route groups into a new array.
+     * Get the attributes as a plain array.
      *
-     * @param  array  $new
-     * @param  array  $old
      * @return array
      */
-    public static function merge($new, $old)
+    public function toArray()
     {
-        if (isset($new['domain'])) {
-            unset($old['domain']);
-        }
-
-        $new = array_merge(static::formatAs($new, $old), [
-            'namespace' => static::formatNamespace($new, $old),
-            'prefix' => static::formatPrefix($new, $old),
-            'where' => static::formatWhere($new, $old),
-        ]);
-
-        return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
-        ), $new);
+        return array_map(function ($value) {
+            return $value instanceof Arrayable ? $value->toArray() : $value;
+        }, $this->attributes);
     }
 
-    /**
-     * Format the namespace for the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return string|null
-     */
-    protected static function formatNamespace($new, $old)
+    public function getAttributes()
     {
-        if (isset($new['namespace'])) {
-            return isset($old['namespace'])
-                    ? trim($old['namespace'], '\\').'\\'.trim($new['namespace'], '\\')
-                    : trim($new['namespace'], '\\');
-        }
-
-        return $old['namespace'] ?? null;
+        return $this->attributes;
     }
 
-    /**
-     * Format the prefix for the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return string|null
-     */
-    protected static function formatPrefix($new, $old)
-    {
-        $old = $old['prefix'] ?? null;
+    public function addRoute(Route $route) {
+        $this->routes->add($route);
 
-        return isset($new['prefix']) ? trim($old, '/').'/'.trim($new['prefix'], '/') : $old;
-    }
-
-    /**
-     * Format the "wheres" for the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return array
-     */
-    protected static function formatWhere($new, $old)
-    {
-        return array_merge(
-            $old['where'] ?? [],
-            $new['where'] ?? []
-        );
-    }
-
-    /**
-     * Format the "as" clause of the new group attributes.
-     *
-     * @param  array  $new
-     * @param  array  $old
-     * @return array
-     */
-    protected static function formatAs($new, $old)
-    {
-        if (isset($old['as'])) {
-            $new['as'] = $old['as'].($new['as'] ?? '');
-        }
-
-        return $new;
+        return $this;
     }
 }

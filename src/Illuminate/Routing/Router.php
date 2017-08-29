@@ -2,23 +2,24 @@
 
 namespace Illuminate\Routing;
 
-use Closure;
 use ArrayObject;
-use JsonSerializable;
-use Illuminate\Support\Str;
+use Closure;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Routing\RouteGroupAttributes;
 use Illuminate\Support\Collection;
-use Illuminate\Container\Container;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Routing\BindingRegistrar;
+use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -76,6 +77,13 @@ class Router implements RegistrarContract, BindingRegistrar
      * @var array
      */
     protected $middlewareGroups = [];
+
+    /**
+     * All of the route groups.
+     *
+     * @var array
+     */
+    protected $groups = [];
 
     /**
      * The priority-sorted list of middleware.
@@ -313,7 +321,8 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function group(array $attributes, $routes)
     {
-        $this->updateGroupStack($attributes);
+        $group = new RouteGroup($attributes);
+        $this->registerGroup($group);
 
         // Once we have updated the group stack, we'll load the provided routes and
         // merge in the group's attributes when the routes are created. After we
@@ -323,19 +332,49 @@ class Router implements RegistrarContract, BindingRegistrar
         array_pop($this->groupStack);
     }
 
+    public function registerGroup(RouteGroup $group)
+    {
+        $this->groups[] = $group;
+        $this->updateGroupStack($group);
+    }
+
     /**
      * Update the group stack with the given attributes.
      *
      * @param  array  $attributes
      * @return void
      */
-    protected function updateGroupStack(array $attributes)
+    protected function updateGroupStack(RouteGroup $group)
     {
-        if (! empty($this->groupStack)) {
-            $attributes = RouteGroup::merge($attributes, end($this->groupStack));
+        $this->groupStack[] = $group;
+    }
+
+    protected function flattenGroupStackAttributes()
+    {
+        $flatStack = [];
+        foreach ($this->groupStack as $group) {
+            $flatStack = RouteGroupAttributes::merge($group->getAttributes(), $flatStack);
         }
 
-        $this->groupStack[] = $attributes;
+        return $flatStack;
+    }
+
+    /**
+     * Merge the given array with the last group stack.
+     *
+     * @param  array  $new
+     * @return array
+     */
+    public function mergeWithFlatStack($new)
+    {
+        return RouteGroupAttributes::merge($new, $this->flattenGroupStackAttributes());
+    }
+
+    public function saveRouteToGroups($route)
+    {
+        foreach ($this->groupStack as $group) {
+            $group->addRoute($route);
+        }
     }
 
     /**
@@ -374,7 +413,7 @@ class Router implements RegistrarContract, BindingRegistrar
     public function getLastGroupPrefix()
     {
         if (! empty($this->groupStack)) {
-            $last = end($this->groupStack);
+            $last = $this->flattenGroupStackAttributes();
 
             return $last['prefix'] ?? '';
         }
@@ -420,6 +459,7 @@ class Router implements RegistrarContract, BindingRegistrar
         // route has already been created and is ready to go. After we're done with
         // the merge we will be ready to return the route back out to the caller.
         if ($this->hasGroupStack()) {
+            $this->saveRouteToGroups($route);
             $this->mergeGroupAttributesIntoRoute($route);
         }
 
@@ -478,7 +518,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function prependGroupNamespace($class)
     {
-        $group = end($this->groupStack);
+        $group = $this->flattenGroupStackAttributes();
 
         return isset($group['namespace']) && strpos($class, '\\') !== 0
                 ? $group['namespace'].'\\'.$class : $class;
@@ -533,7 +573,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function mergeGroupAttributesIntoRoute($route)
     {
-        $route->setAction($this->mergeWithLastGroup($route->getAction()));
+        $route->setAction($this->mergeWithFlatStack($route->getAction()));
     }
 
     /**
@@ -733,6 +773,11 @@ class Router implements RegistrarContract, BindingRegistrar
         return $this->middleware;
     }
 
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
     /**
      * Register a short-hand name for a middleware.
      *
@@ -917,6 +962,16 @@ class Router implements RegistrarContract, BindingRegistrar
     public function getGroupStack()
     {
         return $this->groupStack;
+    }
+
+    /**
+     * Get the current group stack for the router.
+     *
+     * @return array
+     */
+    public function getGroupStackAttributes()
+    {
+        return $this->flattenGroupStackAttributes();
     }
 
     /**
