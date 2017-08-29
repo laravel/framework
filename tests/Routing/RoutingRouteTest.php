@@ -846,7 +846,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    public function testGroupMerging()
+    public function testRouteGroupAttributeMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
         $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []], RouteGroupAttributes::merge(['prefix' => 'baz'], $old));
