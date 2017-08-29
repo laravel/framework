@@ -914,6 +914,45 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testWhereKeyNotMethodWithInt()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 1;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', $int);
+
+        $builder->whereKeyNot($int);
+    }
+
+    public function testWhereKeyNotMethodWithArray()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $array = [1, 2, 3];
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $array);
+
+        $builder->whereKeyNot($array);
+    }
+
+    public function testWhereKeyNotMethodWithCollection()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([1, 2, 3]);
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $collection);
+
+        $builder->whereKeyNot($collection);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
