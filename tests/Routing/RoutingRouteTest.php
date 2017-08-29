@@ -3,24 +3,24 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Routing\ResourceRegistrar;
-use Illuminate\Routing\Route;
-use Illuminate\Routing\RouteGroup;
-use Illuminate\Routing\RouteGroupAttributes;
-use Illuminate\Routing\Router;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\HttpFoundation\Response;
 use stdClass;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Routing\Controller;
+use Illuminate\Routing\RouteGroup;
+use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Routing\ResourceRegistrar;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Routing\RouteGroupAttributes;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
 {
