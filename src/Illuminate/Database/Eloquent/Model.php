@@ -644,7 +644,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function getKeyForSaveQuery()
     {
         return $this->original[$this->getKeyName()]
-                        ?? $this->getAttribute($this->getKeyName());
+                        ?? $this->getKey();
     }
 
     /**
