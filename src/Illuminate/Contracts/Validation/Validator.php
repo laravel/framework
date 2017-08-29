@@ -44,4 +44,13 @@ interface Validator extends MessageProvider
      * @return array
      */
     public function errors();
+
+    /**
+     * Validate a given attribute against a rule.
+     *
+     * @param  $attribute
+     * @param  $rule
+     * @return void
+     */
+    public function validateAttribute($attribute, $rule);
 }

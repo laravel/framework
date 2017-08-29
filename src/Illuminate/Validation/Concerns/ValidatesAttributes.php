@@ -14,6 +14,7 @@ use InvalidArgumentException;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
+use Illuminate\Contracts\Validation\Validator;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -1369,6 +1370,24 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Conditionally apply another validation rule.
+     *
+     * @param $attribute
+     * @param $value
+     * @param $parameters
+     * @param \Illuminate\Contracts\Validation\Validator $validator
+     * @return bool
+     */
+    public function validateWhen($attribute, $value, $parameters, Validator $validator)
+    {
+        if (Arr::get($this->attributes(), $parameters[0]) === $parameters[1]) {
+            return $validator->validateAttribute($attribute, $parameters[2]);
+        }
+
+        return true;
     }
 
     /**
