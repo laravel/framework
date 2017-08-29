@@ -166,8 +166,18 @@ class Validator implements ValidatorContract
      */
     protected $dependentRules = [
         'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
-        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual',
+        'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Before', 'After',
+        'BeforeOrEqual', 'AfterOrEqual',
+    ];
+
+    /**
+     * The validation rules which depend on other fields as parameters and should have replaced
+     * array parameters with real values.
+     *
+     * @var array
+     */
+    protected $dependantReplaceParametersRules = [
+        'Exists', 'Unique',
     ];
 
     /**
@@ -329,7 +339,7 @@ class Validator implements ValidatorContract
         // If so, we will replace any asterisks found in the parameters with the correct keys.
         if (($keys = $this->getExplicitKeys($attribute)) &&
             $this->dependsOnOtherFields($rule)) {
-            $parameters = $this->replaceAsterisksInParameters($parameters, $keys);
+            $parameters = $this->getReplacedParameters($parameters, $keys, $rule);
         }
 
         $value = $this->getValue($attribute);
@@ -362,6 +372,73 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get replaced parameters.
+     *
+     * @param array  $parameters
+     * @param array  $keys
+     * @param string  $rule
+     *
+     * @return array
+     */
+    protected function getReplacedParameters(array $parameters, array $keys, $rule)
+    {
+        $replacedParameters = $this->replaceAsterisksInParameters($parameters, $keys);
+
+        if (! $this->shouldReplaceParametersWithValues($rule)) {
+            return $replacedParameters;
+        }
+
+        return $this->replaceParametersWithValues($parameters, $replacedParameters);
+    }
+
+    /**
+     * Replace parameters with values when possible.
+     *
+     * @param array $parameters
+     * @param array $replacedParameters
+     *
+     * @return array
+     */
+    protected function replaceParametersWithValues(array $parameters, array $replacedParameters)
+    {
+        for ($i = 2, $c = count($parameters); $i < $c; ++$i) {
+            $parameters[$i] = $this->replaceParameterWithValue($parameters[$i], $replacedParameters[$i]);
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Replace parameter with value when possible.
+     *
+     * @param string $parameter
+     * @param string $replacedParameter
+     *
+     * @return string|array
+     */
+    protected function replaceParameterWithValue($parameter, $replacedParameter)
+    {
+        $arrayParameter = false;
+
+        // if it's array parameter with array notation ex. [users.*.id] we cut off brackets
+        if (Str::startsWith($parameter, '[') && Str::endsWith($parameter, ']')) {
+            $arrayParameter = true;
+            $parameter = mb_substr($parameter, 1, -1);
+            $replacedParameter = mb_substr($replacedParameter, 1, -1);
+        }
+
+        $value = Arr::get($this->data, $replacedParameter, $parameter);
+
+        // if value is array but [users.*.id] notation is used this is not what we expect so return
+        // parameter without any modification
+        if (is_array($value) && $arrayParameter) {
+            return $value;
+        }
+
+        return $arrayParameter ? '['.$value.']' : $value;
+    }
+
+    /**
      * Determine if the given rule depends on other fields.
      *
      * @param  string  $rule
@@ -369,7 +446,19 @@ class Validator implements ValidatorContract
      */
     protected function dependsOnOtherFields($rule)
     {
-        return in_array($rule, $this->dependentRules);
+        return in_array($rule, $this->dependentRules)
+            || $this->shouldReplaceParametersWithValues($rule);
+    }
+
+    /**
+     * Determine if the given rule should have replaced asterisk parameters.
+     *
+     * @param  string  $rule
+     * @return bool
+     */
+    protected function shouldReplaceParametersWithValues($rule)
+    {
+        return in_array($rule, $this->dependantReplaceParametersRules);
     }
 
     /**
