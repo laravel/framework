@@ -126,38 +126,6 @@ abstract class MorphOneOrMany extends HasOneOrMany
     }
 
     /**
-     * Get the first related record matching the attributes or create it.
-     *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function firstOrCreate(array $attributes, array $values = [])
-    {
-        if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create($attributes + $values);
-        }
-
-        return $instance;
-    }
-
-    /**
-     * Create or update a related record matching the attributes, and fill it with values.
-     *
-     * @param  array  $attributes
-     * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function updateOrCreate(array $attributes, array $values = [])
-    {
-        return tap($this->firstOrNew($attributes), function ($instance) use ($values) {
-            $instance->fill($values);
-
-            $instance->save();
-        });
-    }
-
-    /**
      * Attach a model instance to the parent model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
