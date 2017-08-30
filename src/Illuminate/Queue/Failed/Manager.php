@@ -45,7 +45,7 @@ class Manager
         $config = $this->app['config']['queue.failed'];
 
         // Resolve provider with legacy configuration
-        if(! isset($config['provider'])) {
+        if (! isset($config['provider'])) {
             return $this->legacyProvider($config);
         }
 
@@ -78,8 +78,8 @@ class Manager
     {
         $this->addProvider('database', function ($app, $config) {
             return new DatabaseFailedJobProvider(
-                $app['db'], 
-                $config['connection'] ?? $config['database'], 
+                $app['db'],
+                $config['connection'] ?? $config['database'],
                 $config['table']
             );
         });
@@ -101,7 +101,7 @@ class Manager
      * Resolve failed provider keeping backwards compatibility
      * with older configuration.
      *
-     * @param array 
+     * @param array
      * @return \Illuminate\Queue\Failed\FailedJobProviderInterface
      */
     private function legacyProvider($config)

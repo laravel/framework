@@ -51,7 +51,7 @@ class QueueFailedManagerTest extends TestCase
 
         $this->assertInstanceOf(DatabaseFailedJobProvider::class, $manager->provider());
     }
-    
+
     public function testKeepBackwardsCompatibilityWithOldConfig()
     {
         $app = [
@@ -59,7 +59,7 @@ class QueueFailedManagerTest extends TestCase
                 'queue.failed' => [
                     'database' => 'sqlite',
                     'table' => 'failed_jobs',
-                ]
+                ],
             ],
             'db' => m::mock(ConnectionResolverInterface::class),
         ];
@@ -76,7 +76,7 @@ class QueueFailedManagerTest extends TestCase
                 'queue.failed' => [
                     'database' => 'sqlite',
                     'table' => null,
-                ]
+                ],
             ],
         ];
 
