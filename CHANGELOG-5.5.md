@@ -1,27 +1,14 @@
 # Release Notes for 5.5.x
 
-## 5.5.0 (2017-08-30)
+## v5.5.0 (2017-08-30)
 
 ### General
 - ⚠️ Require PHP 7+ ([06907a0](https://github.com/laravel/framework/pull/17048/commits/06907a055e3d28c219f6b6ab97902f0be3e8a4ef), [39809ce](https://github.com/laravel/framework/pull/17048/commits/39809cea81a5564d196c16a87cbc25de88dd3d1c))
 - ⚠️ Removed deprecated `ServiceProvider::compile()` method ([10da428](https://github.com/laravel/framework/pull/17048/commits/10da428eb344191608474f1c12ee7edb0290e80a))
 - ⚠️ Removed deprecated `Str::quickRandom()` method ([2ef257a](https://github.com/laravel/framework/pull/17048/commits/2ef257a4197b7e6efeb0d6ac4a3958f82b7fed39))
 - Removed `build` scripts ([7c16b15](https://github.com/laravel/framework/pull/17048/commits/7c16b154ede10ff9a37756e32d7dddf317524634))
-- Support callable/invokable objects in `Pipeline` ([#18264](https://github.com/laravel/framework/pull/18264))
-- Support for `Responsable` objects ([c0c89fd](https://github.com/laravel/framework/commit/c0c89fd73cebf9ed56e6c5e69ad35106df03d9db), [1229b7f](https://github.com/laravel/framework/commit/1229b7f45d3f574d7e0262cc2d5aec80ccbb1626), [#19614](https://github.com/laravel/framework/pull/19614), [ef0e37d](https://github.com/laravel/framework/commit/ef0e37d44182ac5043b5459bb25b1861e8e036df))
-- ⚠️ Prevent access to protected properties using array access on `Model` and `Fluent` ([#18403](https://github.com/laravel/framework/pull/18403))
-- ⚠️ Extend `MessageBag` interface from `Arrayable` and add `getMessages()` method ([#19768](https://github.com/laravel/framework/pull/19768), [#20334](https://github.com/laravel/framework/pull/20334))
-- Handle `Arrayable` items in `MessageBag` ([6f1f4d8](https://github.com/laravel/framework/commit/6f1f4d834a2f985a06d956305fc73b5329363071))
-- Added `isNotEmpty()` method to message bags and paginators ([#19944](https://github.com/laravel/framework/pull/19944))
-- Return the collection iterator from `AbstractPaginator::getIterator()` ([#20098](https://github.com/laravel/framework/pull/20098))
-- Throw `RuntimeException` when app key is missing ([#19145](https://github.com/laravel/framework/pull/19145), [8adbaa7](https://github.com/laravel/framework/commit/8adbaa714d37bb7214f29b12c52354900a1c6dc5))
-- Autoload package providers ([#19420](https://github.com/laravel/framework/pull/19420), [a5a0f3e](https://github.com/laravel/framework/commit/a5a0f3e7b82a1a4dc00037c5463a31d42c94903a), [2954091](https://github.com/laravel/framework/commit/295409189af589c6389d01e9d55f5568741149ee), [#19455](https://github.com/laravel/framework/pull/19455), [#19561](https://github.com/laravel/framework/pull/19561), [#19646](https://github.com/laravel/framework/pull/19646))
 - Upgraded to Symfony 3.3 components ([4db7031](https://github.com/laravel/framework/commit/4db70311b1b3813359b250d3f5a58743fa436453), [67a5367](https://github.com/laravel/framework/commit/67a536758d1636935ab5502bb6faedd73b30810f))
-- Support registering macros using classes ([#19782](https://github.com/laravel/framework/pull/19782), [353adbd](https://github.com/laravel/framework/commit/353adbd696e36764227e39980272d38147899d14))
-- Made `Carbon` macroable and serializeable ([#19771](https://github.com/laravel/framework/pull/19771), [#20568](https://github.com/laravel/framework/pull/20568), [6a18209](https://github.com/laravel/framework/commit/6a18209863a934446d21ad8bc82c83d4b7dee5e7))
-- ⚠️ Moved `InteractsWithTime` to `Illuminate\Support` ([#20119](https://github.com/laravel/framework/pull/20119), [#20206](https://github.com/laravel/framework/pull/20206))
-- ⚠️ Fixed minimum value of paginator `last_page` field ([#20335](https://github.com/laravel/framework/pull/20335))
-- Added API resources ([#20710](https://github.com/laravel/framework/pull/20710), [2d8b803](https://github.com/laravel/framework/commit/2d8b803e93455db7ce70aed822f62b8d8ad2f4eb), [80a8ca9](https://github.com/laravel/framework/commit/80a8ca9be1b2f86849c07f4705c6660172e54177), [f8db604](https://github.com/laravel/framework/commit/f8db60430d4b811f8ab771d25ec23b1c70edd302), [a07d028](https://github.com/laravel/framework/commit/a07d028d732780249539dc6c33396dafc3bfa173), [88d5f21](https://github.com/laravel/framework/commit/88d5f21fb73b52578be3057b4f373f204955b1c8), [814043e](https://github.com/laravel/framework/commit/814043e30fcf6bf37aa442c09edadd74568ec997), [d64cf19](https://github.com/laravel/framework/commit/d64cf191354ef3a0467c2cd839dfd9feb79b374e), [ec87d74](https://github.com/laravel/framework/commit/ec87d74c7715ac5f32a4d06126b0e226fee3babe), [73de18e](https://github.com/laravel/framework/commit/73de18e32a7d04ed61c1a37b724732a23aad259c))
+- Throw `RuntimeException` when app key is missing ([#19145](https://github.com/laravel/framework/pull/19145), [8adbaa7](https://github.com/laravel/framework/commit/8adbaa714d37bb7214f29b12c52354900a1c6dc5))
 
 ### Artisan Console
 - Added interactive prompt to `vendor:publish` ([#18230](https://github.com/laravel/framework/pull/18230))
@@ -34,7 +21,6 @@
 - ⚠️ Always return array from `RetryCommand::getJobIds()` ([#19232](https://github.com/laravel/framework/pull/19232))
 - Support passing absolute paths to `make::listener` ([#19660](https://github.com/laravel/framework/pull/19660))
 - ⚠️ Use `handle()` method instead of `fire()` ([#19827](https://github.com/laravel/framework/pull/19827), [#19839](https://github.com/laravel/framework/pull/19839), [#20024](https://github.com/laravel/framework/pull/20024))
-- Removed deprecated `--daemon` option from `queue:work` command ([#19914](https://github.com/laravel/framework/pull/19914))
 - Try to guess the `--create` option when generation migrations ([#20032](https://github.com/laravel/framework/pull/20032))
 - Generate `make:policy` with real user model namespace ([#20047](https://github.com/laravel/framework/pull/20047))
 - Added `Kernel::load()` to auto register a directory of commands ([2e7ddca](https://github.com/laravel/framework/commit/2e7ddca682214ea5ffd21aadc93d33b7a2805e94), [d607b9c](https://github.com/laravel/framework/commit/d607b9c670d9c7f7c749cda0a12a1dc6f55da6e4))
@@ -43,9 +29,10 @@
 - Added `CommandStarting` and `CommandFinished` events ([#20298](https://github.com/laravel/framework/pull/20298))
 - Show error message if a reverted migration is not found ([#20499](https://github.com/laravel/framework/pull/20499), [a895b1e](https://github.com/laravel/framework/commit/a895b1eb0e50683c4583c24bb17b3f8d9e8127ab))
 - Set correct namespace in model factories when using the `app:name` command ([#20766](https://github.com/laravel/framework/pull/20766))
+- ⚠️ Switched the `-f` shortcut from `--force` to `--factory` on `make:model` command ([#20800](https://github.com/laravel/framework/pull/20800))
 
 ### Assets
-- Added frontend preset commands (_too many commits, sorry_)
+- Added frontend preset commands ([463b769](https://github.com/laravel/framework/commit/463b769270d462468e1b1dcc51a7a1144e003157), _too many follow-up commits_)
 
 ### Authentication
 - ⚠️ Support default user providers and pass user provider to `RequestGuard` ([#18856](https://github.com/laravel/framework/pull/18856))
@@ -105,6 +92,7 @@
 - ⚠️ Support sticky database connections ([#20746](https://github.com/laravel/framework/pull/20746))
 
 ### Eloquent ORM
+- Added API resources ([#20710](https://github.com/laravel/framework/pull/20710), _too many follow-up commits_)
 - ⚠️ Indicate soft deleted models as existing ([#17613](https://github.com/laravel/framework/pull/17613))
 - ⚠️ Added `$localKey` parameter to `HasRelationships::belongsToMany()` and `BelongsToMany` ([#17903](https://github.com/laravel/framework/pull/17903), [7c7c3bc](https://github.com/laravel/framework/commit/7c7c3bc4be3052afe0889fe323230dfd92f81000))
 - ⚠️ Added `$parentKey` parameter to `belongsToMany()`, `BelongsToMany` and `MorphToMany` ([#17915](https://github.com/laravel/framework/pull/17915), [#18380](https://github.com/laravel/framework/pull/18380))
@@ -135,7 +123,7 @@
 - ⚠️ Call `setConnection()` in `Model::save()` ([#20466](https://github.com/laravel/framework/pull/20466))
 - ⚠️ Touch parent timestamp only if the model is dirty ([#20489](https://github.com/laravel/framework/pull/20489))
 - Added `Model::loadMissing()` method ([#20630](https://github.com/laravel/framework/pull/20630), [4166c12](https://github.com/laravel/framework/commit/4166c12492ce7b1112911299caf4cdb17efc9364))
-- Added `whereKeyNot()` method ([#20817](https://github.com/laravel/framework/pull/20817))
+- Added `Model::whereKeyNot()` method ([#20817](https://github.com/laravel/framework/pull/20817))
 
 ### Encryption
 - Use `openssl_cipher_iv_length()` in `Encrypter` ([#18684](https://github.com/laravel/framework/pull/18684))
@@ -156,7 +144,7 @@
 - Changed how exceptions are logged ([#19698](https://github.com/laravel/framework/pull/19698), [f1971c2](https://github.com/laravel/framework/commit/f1971c2242e4882440162fe504126a1475f7f2b4))
 - ⚠️ Return `HttpException` with code `413` from `PostTooLargeException` ([#19773](https://github.com/laravel/framework/pull/19773))
 - Support custom logger channel names ([#20133](https://github.com/laravel/framework/pull/20133))
-- ⚠️ Unify exception formatting ([#20173](https://github.com/laravel/framework/pull/20173), [#20067](https://github.com/laravel/framework/pull/20067), [#20167](https://github.com/laravel/framework/pull/20167), [87485e6](https://github.com/laravel/framework/commit/87485e681ca658978f8a131fd0b783ac8c8bab61), [b7e231b](https://github.com/laravel/framework/commit/b7e231b99aecb95a26ec89e5fe73346d4fad7fdc), [5dfe72d](https://github.com/laravel/framework/commit/5dfe72d790ef68cbacd329a351e4706b30422acd), [#20177](https://github.com/laravel/framework/pull/20177), [b3b3eb1](https://github.com/laravel/framework/commit/b3b3eb1b974dd9f126d0ea7c279092c0b050628a))
+- ⚠️ Unify exception formatting ([#20173](https://github.com/laravel/framework/pull/20173), [#20067](https://github.com/laravel/framework/pull/20067), [#20167](https://github.com/laravel/framework/pull/20167), _too many follow-up commits, sorry_)
 - Added default `Handler::unauthenticated()` method ([11b0de0](https://github.com/laravel/framework/commit/11b0de0485632d5712f7fb59071a4acbc4af2bdc))
 
 ### Events
@@ -176,7 +164,7 @@
 - Added `$language` parameter to `str_slug()` helper ([#19011](https://github.com/laravel/framework/pull/19011))
 - Added `str_before()` helper ([#19940](https://github.com/laravel/framework/pull/19940), [#20049](https://github.com/laravel/framework/pull/20049))
 - Added `now()` and `today()` helpers ([3c888b6](https://github.com/laravel/framework/commit/3c888b6c7b89c3d3f90e9024ffbebed3ee80bd23), [#20716](https://github.com/laravel/framework/pull/20716))
-- Added `blank()`, `optional()`, `present()` and `transform()` helpers ([06de9b2](https://github.com/laravel/framework/commit/06de9b2beb9e3c13758d93cee86a1657545cb435))
+- Added `blank()`, `filled()`, `optional()` and `transform()` helpers ([06de9b2](https://github.com/laravel/framework/commit/06de9b2beb9e3c13758d93cee86a1657545cb435), [31308e3](https://github.com/laravel/framework/commit/31308e396ecbfeb5a6e505c50a6b1a6b721b094d))
 - Handle lower case words better in as `Str::snake()` ([#18764](https://github.com/laravel/framework/pull/18764))
 - Removed usages of the `with()` helper ([#17888](https://github.com/laravel/framework/pull/17888))
 - Support multiple patterns in `Str::is()` ([#20108](https://github.com/laravel/framework/pull/20108))
@@ -202,7 +190,7 @@
 - Accept other types on `SlackAttachment::timestamp()` ([#20671](https://github.com/laravel/framework/pull/20671))
 
 ### Queues
-- Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), [94c01b1](https://github.com/laravel/framework/commit/94c01b1f37bfbb8e0d5f133b7dd34040b2bdc065), [91f5357](https://github.com/laravel/framework/commit/91f535704d4f6cff5e8393825dbdf46965234fa3), [434245f](https://github.com/laravel/framework/commit/434245f73e694f90476437da8554b58d54ced25c), [b880ad1](https://github.com/laravel/framework/commit/b880ad19282db768718cfd1629ebbc41054daadc), [6af6c8d](https://github.com/laravel/framework/commit/6af6c8d386424b9064ecc1b1bde7a6a9a1bf81b3))
+- Added support for chainable jobs ([81bcb03](https://github.com/laravel/framework/commit/81bcb03b303707cdc94420983b9d72ed558a2b3d), _too many follow-up commits, sorry_)
 - ⚠️ Removed redundant `$queue` parameter from `Queue::createPayload()` ([#17948](https://github.com/laravel/framework/pull/17948))
 - Made all `getQueue()` methods `public` ([#18501](https://github.com/laravel/framework/pull/18501))
 - Pass connection and queue to `Looping` event ([#19081](https://github.com/laravel/framework/pull/19081))
@@ -271,6 +259,20 @@
 - ⚠️ Default value to `true` in `Store::flash()` ([#18136](https://github.com/laravel/framework/pull/18136))
 - ⚠️ Store the user password hash when logging in ([#19843](https://github.com/laravel/framework/pull/19843))
 - ⚠️ Throw `UnauthorizedHttpException` from `failedBasicResponse` ([#20673](https://github.com/laravel/framework/pull/20673))
+
+### Support
+- Autoload package providers ([#19420](https://github.com/laravel/framework/pull/19420), [a5a0f3e](https://github.com/laravel/framework/commit/a5a0f3e7b82a1a4dc00037c5463a31d42c94903a), [2954091](https://github.com/laravel/framework/commit/295409189af589c6389d01e9d55f5568741149ee), [#19455](https://github.com/laravel/framework/pull/19455), [#19561](https://github.com/laravel/framework/pull/19561), [#19646](https://github.com/laravel/framework/pull/19646))
+- Added support for `Responsable` objects ([c0c89fd](https://github.com/laravel/framework/commit/c0c89fd73cebf9ed56e6c5e69ad35106df03d9db), [1229b7f](https://github.com/laravel/framework/commit/1229b7f45d3f574d7e0262cc2d5aec80ccbb1626), [#19614](https://github.com/laravel/framework/pull/19614), [ef0e37d](https://github.com/laravel/framework/commit/ef0e37d44182ac5043b5459bb25b1861e8e036df))
+- Made `Carbon` macroable and serializeable ([#19771](https://github.com/laravel/framework/pull/19771), [#20568](https://github.com/laravel/framework/pull/20568), [6a18209](https://github.com/laravel/framework/commit/6a18209863a934446d21ad8bc82c83d4b7dee5e7))
+- Support registering macros using classes ([#19782](https://github.com/laravel/framework/pull/19782), [353adbd](https://github.com/laravel/framework/commit/353adbd696e36764227e39980272d38147899d14))
+- ⚠️ Moved `InteractsWithTime` to `Illuminate\Support` ([#20119](https://github.com/laravel/framework/pull/20119), [#20206](https://github.com/laravel/framework/pull/20206))
+- Support callable/invokable objects in `Pipeline` ([#18264](https://github.com/laravel/framework/pull/18264))
+- ⚠️ Prevent access to protected properties using array access on `Model` and `Fluent` ([#18403](https://github.com/laravel/framework/pull/18403))
+- ⚠️ Extend `MessageBag` interface from `Arrayable` and add `getMessages()` method ([#19768](https://github.com/laravel/framework/pull/19768), [#20334](https://github.com/laravel/framework/pull/20334))
+- Handle `Arrayable` items in `MessageBag` ([6f1f4d8](https://github.com/laravel/framework/commit/6f1f4d834a2f985a06d956305fc73b5329363071))
+- Added `isNotEmpty()` method to message bags and paginators ([#19944](https://github.com/laravel/framework/pull/19944))
+- Return the collection iterator from `AbstractPaginator::getIterator()` ([#20098](https://github.com/laravel/framework/pull/20098))
+- ⚠️ Fixed minimum value of paginator `last_page` field ([#20335](https://github.com/laravel/framework/pull/20335))
 
 ### Task Scheduling
 - Fire before callbacks on closure-based scheduling events ([#18861](https://github.com/laravel/framework/pull/18861))
