@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": ">=7.0",
-        "illuminate/bus": "5.5.*",
-        "illuminate/contracts": "5.5.*",
-        "illuminate/queue": "5.5.*",
-        "illuminate/support": "5.5.*"
+        "illuminate/bus": "5.6.*",
+        "illuminate/contracts": "5.6.*",
+        "illuminate/queue": "5.6.*",
+        "illuminate/support": "5.6.*"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.5-dev"
+            "dev-master": "5.6-dev"
         }
     },
     "suggest": {
