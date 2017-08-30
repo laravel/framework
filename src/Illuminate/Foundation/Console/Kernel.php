@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
+use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
@@ -224,7 +225,9 @@ class Kernel implements KernelContract
                     try {
                         $artisan->resolve($command);
                     } catch (ContainerExceptionInterface $e) {
-                        $this->reportException($e);
+                        if ((new ReflectionClass($command))->isInstantiable()) {
+                            $this->reportException($e);
+                        }
                     }
                 });
             }
