@@ -270,14 +270,14 @@ class MailFake implements Mailer
     /**
      * Send a new message using a view.
      *
-     * @param  string|array  $view
+     * @param  string|array|MailableContract  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
      * @return void
      */
     public function send($view, array $data = [], $callback = null)
     {
-        if (! $view instanceof Mailable) {
+        if (! $view instanceof Mailable || !is_array($view)) {
             return;
         }
 
