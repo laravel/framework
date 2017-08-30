@@ -9,6 +9,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Optional;
 
 class SupportHelpersTest extends TestCase
 {
@@ -766,6 +767,31 @@ class SupportHelpersTest extends TestCase
                 return 10;
             }
         })->something());
+    }
+
+    public function testOptionalIsMacroable()
+    {
+        Optional::macro('present', function () {
+            if (is_object($this->value)) {
+                return $this->value->present();
+            }
+
+            return new Optional(null);
+        });
+
+        $this->assertNull(optional(null)->present()->something());
+
+        $this->assertEquals('$10.00', optional(new class {
+            public function present()
+            {
+                return new class {
+                    public function something()
+                    {
+                        return '$10.00';
+                    }
+                };
+            }
+        })->present()->something());
     }
 
     public function testTransform()
