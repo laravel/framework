@@ -64,4 +64,16 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a required_if constraint builder instance.
+     *
+     * @param  string  $field
+     * @param  string  $value
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($field, $value)
+    {
+        return new Rules\RequiredIf($field, $value);
+    }
 }
