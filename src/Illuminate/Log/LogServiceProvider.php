@@ -122,11 +122,7 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function handler()
     {
-        if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log', 'single');
-        }
-
-        return 'single';
+        return $this->configValue('app.log', 'single');
     }
 
     /**
@@ -136,11 +132,7 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function logLevel()
     {
-        if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log_level', 'debug');
-        }
-
-        return 'debug';
+        return $this->configValue('app.log_level', 'debug');
     }
 
     /**
@@ -150,10 +142,24 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function maxFiles()
     {
+        return $this->configValue('app.log_max_files', 5, 0);
+    }
+
+    /**
+     * Get value from config or use one of default value provided.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @param mixed|null $defaultNotBound
+     *
+     * @return mixed
+     */
+    protected function configValue($key, $default, $defaultNotBound = null)
+    {
         if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log_max_files', 5);
+            return $this->app->make('config')->get($key, $default);
         }
 
-        return 0;
+        return is_null($defaultNotBound) ? $default : $defaultNotBound;
     }
 }
