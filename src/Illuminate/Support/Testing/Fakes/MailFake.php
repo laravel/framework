@@ -277,7 +277,7 @@ class MailFake implements Mailer
      */
     public function send($view, array $data = [], $callback = null)
     {
-        if (! $view instanceof Mailable || !is_array($view)) {
+        if (! $view instanceof Mailable || ! is_array($view)) {
             return;
         }
 
