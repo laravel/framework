@@ -75,7 +75,7 @@
         "aws/aws-sdk-php": "~3.0",
         "doctrine/dbal": "~2.5",
         "filp/whoops": "^2.1.4",
-        "mockery/mockery": "~0.9.4",
+        "mockery/mockery": "~1.0",
         "orchestra/testbench-core": "3.5.*",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~6.0",
