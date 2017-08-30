@@ -275,6 +275,17 @@ trait HasEvents
     }
 
     /**
+     * Register a retrieved model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function retrieved($callback)
+    {
+        static::registerModelEvent('retrieved', $callback);
+    }
+
+    /**
      * Remove all of the event listeners for the model.
      *
      * @return void
