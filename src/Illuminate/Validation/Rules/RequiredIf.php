@@ -10,23 +10,24 @@ class RequiredIf
     protected $rule = 'required_if';
 
     /**
-     * The constraint field..
+     * The constraint field.
      *
      * @var string
      */
     protected $field;
 
     /**
-     * The constraint value
+     * The constraint value.
      *
      * @var string
      */
     protected $value;
 
     /**
-     * Create a new in rule instance.
+     * Create a new required_if rule instance.
      *
-     * @param  array  $values
+     * @param  string  $field
+     * @param  string  $value
      * @return void
      */
     public function __construct(string $field, string $value)
