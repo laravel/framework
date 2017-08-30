@@ -21,8 +21,10 @@ class QueueFailedManagerTest extends TestCase
     {
         $app = [
             'config' => [
-                'queue.failed.provider' => 'null',
-                'queue.failed.database' => ['connection' => 'sqlite', 'table' => 'failed_jobs'],
+                'queue.failed' => [
+                    'provider' => 'database',
+                    'database' => ['connection' => 'sqlite', 'table' => 'failed_jobs'],
+                ],
             ],
             'db' => m::mock(ConnectionResolverInterface::class),
         ];
@@ -37,8 +39,27 @@ class QueueFailedManagerTest extends TestCase
     {
         $app = [
             'config' => [
-                'queue.failed.provider' => 'database',
-                'queue.failed.database' => ['connection' => 'sqlite', 'table' => 'failed_jobs'],
+                'queue.failed' => [
+                    'provider' => 'database',
+                    'database' => ['connection' => 'sqlite', 'table' => 'failed_jobs'],
+                ],
+            ],
+            'db' => m::mock(ConnectionResolverInterface::class),
+        ];
+
+        $manager = new Manager($app);
+
+        $this->assertInstanceOf(DatabaseFailedJobProvider::class, $manager->provider());
+    }
+    
+    public function testKeepBackwardsCompatibilityWithOldConfig()
+    {
+        $app = [
+            'config' => [
+                'queue.failed' => [
+                    'database' => 'sqlite',
+                    'table' => 'failed_jobs',
+                ]
             ],
             'db' => m::mock(ConnectionResolverInterface::class),
         ];
@@ -48,10 +69,15 @@ class QueueFailedManagerTest extends TestCase
         $this->assertInstanceOf(DatabaseFailedJobProvider::class, $manager->provider());
     }
 
-    public function testFallbackToNullProviderIfNotConfiguredProperly()
+    public function testFallbackToNullProviderIfTableConfigIsNull()
     {
         $app = [
-            'config' => [],
+            'config' => [
+                'queue.failed' => [
+                    'database' => 'sqlite',
+                    'table' => null,
+                ]
+            ],
         ];
 
         $manager = new Manager($app);
@@ -63,7 +89,9 @@ class QueueFailedManagerTest extends TestCase
     {
         $app = [
             'config' => [
-                'queue.failed.provider' => 'custom',
+                'queue.failed' => [
+                    'provider' => 'custom',
+                ],
             ],
         ];
 
@@ -78,11 +106,13 @@ class QueueFailedManagerTest extends TestCase
         $this->assertSame($customProvider, $manager->provider());
     }
 
-    public function testReturnNullProviderIfCustomIsNotAdded()
+    public function testReturnNullProviderIfCustomProviderIsNotAdded()
     {
         $app = [
             'config' => [
-                'queue.failed.provider' => 'custom',
+                'queue.failed' => [
+                    'provider' => 'custom',
+                ],
             ],
         ];
 

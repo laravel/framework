@@ -42,8 +42,15 @@ class Manager
      */
     public function provider($provider = null)
     {
-        $provider = $provider ?? $this->app['config']['queue.failed.provider'] ?? 'null';
-        $config = $this->app['config']["queue.failed.{$provider}"] ?? [];
+        $config = $this->app['config']['queue.failed'];
+
+        // Resolve provider with legacy configuration
+        if(! isset($config['provider'])) {
+            return $this->legacyProvider($config);
+        }
+
+        $provider = $provider ?? $config['provider'];
+        $config = $config[$provider] ?? [];
 
         return isset($this->providers[$provider])
             ? $this->providers[$provider]($this->app, $config)
@@ -71,7 +78,9 @@ class Manager
     {
         $this->addProvider('database', function ($app, $config) {
             return new DatabaseFailedJobProvider(
-                $app['db'], $config['connection'], $config['table']
+                $app['db'], 
+                $config['connection'] ?? $config['database'], 
+                $config['table']
             );
         });
     }
@@ -86,5 +95,19 @@ class Manager
         $this->addProvider('null', function () {
             return new NullFailedJobProvider();
         });
+    }
+
+    /**
+     * Resolve failed provider keeping backwards compatibility
+     * with older configuration.
+     *
+     * @param array 
+     * @return \Illuminate\Queue\Failed\FailedJobProviderInterface
+     */
+    private function legacyProvider($config)
+    {
+        return isset($config['table'])
+            ? $this->providers['database']($this->app, $config)
+            : $this->providers['null']();
     }
 }
