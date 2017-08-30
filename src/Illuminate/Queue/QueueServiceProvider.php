@@ -9,9 +9,8 @@ use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Queue\Connectors\DatabaseConnector;
-use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
-use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Illuminate\Queue\Failed\Manager as FailedManager;
 
 class QueueServiceProvider extends ServiceProvider
 {
@@ -193,26 +192,13 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerFailedJobServices()
     {
-        $this->app->singleton('queue.failer', function () {
-            $config = $this->app['config']['queue.failed'];
-
-            return isset($config['table'])
-                        ? $this->databaseFailedJobProvider($config)
-                        : new NullFailedJobProvider;
+        $this->app->singleton('queue.failer.manager', function ($app) {
+            return new FailedManager($app);
         });
-    }
 
-    /**
-     * Create a new database failed job provider.
-     *
-     * @param  array  $config
-     * @return \Illuminate\Queue\Failed\DatabaseFailedJobProvider
-     */
-    protected function databaseFailedJobProvider($config)
-    {
-        return new DatabaseFailedJobProvider(
-            $this->app['db'], $config['database'], $config['table']
-        );
+        $this->app->bind('queue.failer', function () {
+            return $this->app['queue.failer.manager']->provider();
+        });
     }
 
     /**
@@ -224,7 +210,8 @@ class QueueServiceProvider extends ServiceProvider
     {
         return [
             'queue', 'queue.worker', 'queue.listener',
-            'queue.failer', 'queue.connection',
+            'queue.failed.manager', 'queue.failer',
+            'queue.connection',
         ];
     }
 }
