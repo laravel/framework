@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support;
 
-class Optional
+class HigherOrderOptionalProxy
 {
     use Traits\Macroable;
 
