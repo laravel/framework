@@ -788,6 +788,28 @@ class MimeType
     {
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
 
+        return self::getMimeTypeFromExtension($extension);
+    }
+
+    /**
+     * Get the MIME type for a given extension or return all mimes.
+     *
+     * @param  string  $extension
+     * @return string|array
+     */
+    public static function get($extension = null)
+    {
+        return $extension ? self::getMimeTypeFromExtension($extension) : self::$mimes;
+    }
+
+    /**
+     * Get the MIME type for a given extension.
+     *
+     * @param  string  $extension
+     * @return string
+     */
+    protected static function getMimeTypeFromExtension($extension)
+    {
         return self::$mimes[$extension] ?? 'application/octet-stream';
     }
 }
