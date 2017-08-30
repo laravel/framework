@@ -758,14 +758,25 @@ class SupportHelpersTest extends TestCase
 
     public function testOptional()
     {
-        $this->assertNull(optional(null)->something());
+        $null = optional(null);
+        $this->assertTrue($null->empty());
+        $this->assertNull($null->something()->value());
 
-        $this->assertEquals(10, optional(new class {
+        $withValue = optional(new class {
+            public function chain()
+            {
+                return $this;
+            }
+
             public function something()
             {
                 return 10;
             }
-        })->something());
+        });
+
+        $this->assertTrue($withValue->hasValue());
+        $this->assertEquals(10, $withValue->something()->value());
+        $this->assertEquals(10, $withValue->chain()->something()->value());
     }
 
     public function testTransform()

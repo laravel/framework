@@ -25,6 +25,34 @@ class Optional
     }
 
     /**
+     * Check if Optional has a value.
+     *
+     * @return bool
+     */
+    public function hasValue()
+    {
+        return is_object($this->value);
+    }
+
+    /**
+     * Check if Optional is empty.
+     *
+     * @return bool
+     */
+    public function empty()
+    {
+        return ! $this->hasValue();
+    }
+
+    /**
+     * Get underlying value.
+     */
+    public function value()
+    {
+        return $this->value;
+    }
+
+    /**
      * Dynamically access a property on the underlying object.
      *
      * @param  string  $key
@@ -32,8 +60,24 @@ class Optional
      */
     public function __get($key)
     {
-        if (is_object($this->value)) {
-            return $this->value->{$key};
+        if ($this->hasValue()) {
+            return new self($this->value->{$key});
+        }
+
+        return $this;
+    }
+
+    /**
+     * Dynamically set a property on the underlying object.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return mixed
+     */
+    public function __set($key, $value)
+    {
+        if ($this->hasValue()) {
+            $this->value->{$key} = $value;
         }
     }
 
@@ -46,8 +90,10 @@ class Optional
      */
     public function __call($method, $parameters)
     {
-        if (is_object($this->value)) {
-            return $this->value->{$method}(...$parameters);
+        if ($this->hasValue()) {
+            return new self($this->value->{$method}(...$parameters));
         }
+
+        return $this;
     }
 }
