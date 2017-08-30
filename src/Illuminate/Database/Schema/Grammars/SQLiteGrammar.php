@@ -62,6 +62,24 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a create table if not exists command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('%s table if not exists %s (%s%s%s)',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint)),
+            (string) $this->addForeignKeys($blueprint),
+            (string) $this->addPrimaryKeys($blueprint)
+        );
+    }
+
+    /**
      * Get the foreign key syntax for a table creation statement.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
