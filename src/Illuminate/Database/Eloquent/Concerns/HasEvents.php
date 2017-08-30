@@ -57,7 +57,7 @@ trait HasEvents
             [
                 'creating', 'created', 'updating', 'updated',
                 'deleting', 'deleted', 'saving', 'saved',
-                'restoring', 'restored',
+                'restoring', 'restored', 'retrieved',
             ],
             $this->observables
         );
