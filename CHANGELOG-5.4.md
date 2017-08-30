@@ -1,6 +1,6 @@
 # Release Notes for 5.4.x
 
-## [Unreleased]
+## v5.4.36 (2017-08-30)
 
 ### Added
 - Added MP3 to `Testing/MimeType::$mimes` ([#20745](https://github.com/laravel/framework/pull/20745))
