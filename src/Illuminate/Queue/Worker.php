@@ -18,7 +18,7 @@ class Worker
     }
 
     /**
-     * The queue manager instance.W
+     * The queue manager instance.
      *
      * @var \Illuminate\Queue\QueueManager
      */
