@@ -404,7 +404,7 @@ abstract class HasOneOrMany extends Relation
     {
         $segments = explode('.', $this->getQualifiedForeignKeyName());
 
-        return $segments[count($segments) - 1];
+        return end($segments);
     }
 
     /**
