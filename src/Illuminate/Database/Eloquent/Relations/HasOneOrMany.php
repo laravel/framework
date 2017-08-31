@@ -55,8 +55,19 @@ abstract class HasOneOrMany extends Relation
     public function make(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
         });
+    }
+
+    /**
+     * Set the foreign key name and key for creating a related model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    protected function setForeignAttributesForCreate(Model $model)
+    {
+        $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
     }
 
     /**
@@ -188,7 +199,7 @@ abstract class HasOneOrMany extends Relation
         if (is_null($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();
 
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
         }
 
         return $instance;
@@ -206,7 +217,7 @@ abstract class HasOneOrMany extends Relation
         if (is_null($instance = $this->where($attributes)->first())) {
             $instance = $this->related->newInstance($attributes + $values);
 
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
         }
 
         return $instance;
@@ -252,7 +263,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function save(Model $model)
     {
-        $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+        $this->setForeignAttributesForCreate($model);
 
         return $model->save() ? $model : false;
     }
@@ -281,7 +292,7 @@ abstract class HasOneOrMany extends Relation
     public function create(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
 
             $instance->save();
         });
