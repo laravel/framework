@@ -43,16 +43,16 @@ class MySqlBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $result = $this->getAllTables();
-
-        if (empty($result)) {
-            return;
-        }
-
         $tables = [];
 
-        foreach ($result as $row) {
-            $tables[] = get_object_vars($row)[key($row)];
+        foreach ($this->getAllTables() as $row) {
+            $row = (array) $row;
+
+            $tables[] = reset($row);
+        }
+
+        if (empty($tables)) {
+            return;
         }
 
         $this->disableForeignKeyConstraints();
