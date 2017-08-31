@@ -116,12 +116,6 @@ class Kernel implements KernelContract
         try {
             $this->bootstrap();
 
-            if (! $this->commandsLoaded) {
-                $this->commands();
-
-                $this->commandsLoaded = true;
-            }
-
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
             $this->reportException($e);
@@ -249,12 +243,6 @@ class Kernel implements KernelContract
     {
         $this->bootstrap();
 
-        if (! $this->commandsLoaded) {
-            $this->commands();
-
-            $this->commandsLoaded = true;
-        }
-
         return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
 
@@ -303,6 +291,12 @@ class Kernel implements KernelContract
     {
         if (! $this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
+        }
+
+        if (! $this->commandsLoaded) {
+            $this->commands();
+
+            $this->commandsLoaded = true;
         }
 
         // If we are calling an arbitrary command from within the application, we'll load
