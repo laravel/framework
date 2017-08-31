@@ -55,6 +55,7 @@ trait InteractsWithExceptionHandling
     /**
      * Disable exception handling for the test.
      *
+     * @param  array  $except
      * @return $this
      */
     protected function withoutExceptionHandling(array $except = [])
@@ -95,6 +96,8 @@ trait InteractsWithExceptionHandling
              * @param  \Illuminate\Http\Request  $request
              * @param  \Exception  $e
              * @return mixed
+             *
+             * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException|\Exception
              */
             public function render($request, Exception $e)
             {
