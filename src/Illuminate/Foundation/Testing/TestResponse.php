@@ -390,9 +390,9 @@ class TestResponse
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
                 throw $this->exception;
-            } else {
-                PHPUnit::fail('Invalid JSON was returned from the route.');
             }
+
+            PHPUnit::fail('Invalid JSON was returned from the route.');
         }
 
         return $decodedResponse;
