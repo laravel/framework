@@ -34,8 +34,8 @@ class PostgresBuilder extends Builder
     {
         $tables = [];
 
-        foreach ($this->getAllTables() as $table) {
-            $tables[] = get_object_vars($table)[key($table)];
+        foreach ($this->getAllTables() as $row) {
+            $tables[] = get_object_vars($row)[key($row)];
         }
 
         if (empty($tables)) {
