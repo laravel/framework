@@ -7,6 +7,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Model;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
@@ -45,10 +46,10 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock('stdClass'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with()->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertInstanceOf(stdClass::class, $relation->findOrNew('foo'));
+        $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
     }
 
     public function testFirstOrNewMethodFindsFirstModel()
@@ -153,12 +154,12 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
         $relation->getQuery()->shouldReceive('first')->once()->with()->andReturn(null);
-        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock('stdClass'));
+        $relation->getRelated()->shouldReceive('newInstance')->once()->with(['foo'])->andReturn($model = m::mock(Model::class));
         $model->shouldReceive('save')->once()->andReturn(true);
         $model->shouldReceive('fill')->once()->with(['bar']);
         $model->shouldReceive('setAttribute')->once()->with('foreign_key', 1);
 
-        $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
+        $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
     public function testUpdateMethodUpdatesModelsWithTimestamps()
