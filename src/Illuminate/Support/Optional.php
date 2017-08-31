@@ -48,12 +48,12 @@ class Optional
      */
     public function __call($method, $parameters)
     {
-        if (is_object($this->value)) {
-            return $this->value->{$method}(...$parameters);
-        }
-
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if (is_object($this->value)) {
+            return $this->value->{$method}(...$parameters);
         }
     }
 }
