@@ -209,14 +209,12 @@ class Kernel implements KernelContract
             return;
         }
 
-        $namespace = $this->app->getNamespace();
-
         foreach ((new Finder)->in($paths)->files() as $command) {
-            $command = $namespace.str_replace(
+            $command = ucfirst(str_replace(
                 ['/', '.php'],
                 ['\\', ''],
-                Str::after($command->getPathname(), app_path().DIRECTORY_SEPARATOR)
-            );
+                Str::after($command->getPathname(), base_path().DIRECTORY_SEPARATOR)
+            ));
 
             if (is_subclass_of($command, Command::class)) {
                 Artisan::starting(function ($artisan) use ($command) {
