@@ -5,7 +5,6 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use ReflectionFunction;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
