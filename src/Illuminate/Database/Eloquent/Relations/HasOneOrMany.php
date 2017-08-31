@@ -60,7 +60,7 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Set the foreign key name and key for creating a related model.
+     * Set the foreign ID for creating a related model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return void
