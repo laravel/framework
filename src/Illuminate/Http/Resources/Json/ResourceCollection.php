@@ -41,7 +41,7 @@ class ResourceCollection extends Resource implements IteratorAggregate
     /**
      * Transform the resource into a JSON array.
      *
-     * @param  \Illuminate\Http\Request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
@@ -53,7 +53,7 @@ class ResourceCollection extends Resource implements IteratorAggregate
      * Create an HTTP response that represents the object.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function toResponse($request)
     {
