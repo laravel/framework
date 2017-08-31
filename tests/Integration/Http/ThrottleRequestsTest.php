@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Throwable;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
@@ -20,8 +21,13 @@ class ThrottleRequestsTest extends TestCase
     public function setup()
     {
         parent::setup();
-
         resolve('redis')->flushall();
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+        Carbon::setTestNow(null);
     }
 
     public function test_lock_opens_immediately_after_decay()
@@ -47,8 +53,8 @@ class ThrottleRequestsTest extends TestCase
         );
 
         try {
-            $response = $this->withoutExceptionHandling()->get('/');
-        } catch (\Throwable $e) {
+            $this->withoutExceptionHandling()->get('/');
+        } catch (Throwable $e) {
             $this->assertEquals(429, $e->getStatusCode());
             $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
             $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
