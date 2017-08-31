@@ -143,7 +143,7 @@ class QueueWorkerTest extends TestCase
         $job->attempts = 0;
 
         Carbon::setTestNow(
-            now()->addSeconds(1)
+            Carbon::now()->addSeconds(1)
         );
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);
@@ -184,12 +184,12 @@ class QueueWorkerTest extends TestCase
             $job->attempts++;
         });
 
-        $job->timeoutAt = now()->addSeconds(2)->getTimestamp();
+        $job->timeoutAt = Carbon::now()->addSeconds(2)->getTimestamp();
 
         $job->attempts = 1;
 
         Carbon::setTestNow(
-            now()->addSeconds(3)
+            Carbon::now()->addSeconds(3)
         );
 
         $worker = $this->getWorker('default', ['queue' => [$job]]);

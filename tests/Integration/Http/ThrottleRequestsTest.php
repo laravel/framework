@@ -53,7 +53,7 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
             $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
             $this->assertEquals(2, $e->getHeaders()['Retry-After']);
-            $this->assertEquals(now()->timestamp + 2, $e->getHeaders()['X-RateLimit-Reset']);
+            $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
     }
 }

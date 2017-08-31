@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Throwable;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;
@@ -382,7 +383,7 @@ class Worker
 
         $timeoutAt = $job->timeoutAt();
 
-        if ($timeoutAt && now()->getTimestamp() <= $timeoutAt) {
+        if ($timeoutAt && Carbon::now()->getTimestamp() <= $timeoutAt) {
             return;
         }
 
@@ -410,7 +411,7 @@ class Worker
     {
         $maxTries = ! is_null($job->maxTries()) ? $job->maxTries() : $maxTries;
 
-        if ($job->timeoutAt() && $job->timeoutAt() <= now()->getTimestamp()) {
+        if ($job->timeoutAt() && $job->timeoutAt() <= Carbon::now()->getTimestamp()) {
             $this->failJob($connectionName, $job, $e);
         }
 
