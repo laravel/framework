@@ -35,7 +35,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     /**
      * The additional meta data that should be added to the resource response.
      *
-     * Added during response constuction by the developer.
+     * Added during response construction by the developer.
      *
      * @var array
      */
@@ -79,6 +79,11 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public static function collection($resource)
     {
         return new class($resource, get_called_class()) extends ResourceCollection {
+            /**
+             * @var string
+             */
+            protected $collects;
+
             /**
              * Create a new anonymous resource collection.
              *
@@ -166,17 +171,17 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
                 array_merge(array_slice($data, 0, $index, true), $merge),
                 $this->filter(array_slice($data, $index + 1, null, true))
             );
-        } else {
-            return array_slice($data, 0, $index, true) +
-                    $merge +
-                    $this->filter(array_slice($data, $index + 1, null, true));
         }
+
+        return array_slice($data, 0, $index, true) +
+                $merge +
+                $this->filter(array_slice($data, $index + 1, null, true));
     }
 
     /**
      * Transform the resource into an array.
      *
-     * @param  \Illuminate\Http\Request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     public function toArray($request)
@@ -212,7 +217,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * Customize the response for a request.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
+     * @param  \Illuminate\Http\JsonResponse  $response
      * @return void
      */
     public function withResponse($request, $response)
@@ -225,6 +230,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      *
      * @param  bool  $condition
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function when($condition, $value, $default = null)
@@ -325,7 +331,6 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     /**
      * Disable wrapping of the outer-most resource array.
      *
-     * @param  string  $value
      * @return void
      */
     public static function withoutWrapping()
@@ -337,7 +342,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * Transform the resource into an HTTP response.
      *
      * @param  \Illuminate\Http\Request|null  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function response($request = null)
     {
@@ -350,7 +355,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * Create an HTTP response that represents the object.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function toResponse($request)
     {

@@ -30,7 +30,8 @@ trait DelegatesToResource
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
-     * @return static
+     * @return void
+     * @throws \Exception
      */
     public function resolveRouteBinding($value)
     {
