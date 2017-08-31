@@ -1019,7 +1019,7 @@ trait HasAttributes
     {
         $dirty = [];
 
-        foreach ($this->getAttributes() as $key => $value) {
+        foreach ($this->attributes as $key => $value) {
             if (! $this->originalIsEquivalent($key, $value)) {
                 $dirty[$key] = $value;
             }
