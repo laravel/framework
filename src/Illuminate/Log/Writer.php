@@ -54,7 +54,7 @@ class Writer implements LogContract, PsrLoggerInterface
      * Create a new log writer instance.
      *
      * @param  \Monolog\Logger  $monolog
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
     public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
