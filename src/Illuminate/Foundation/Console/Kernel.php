@@ -299,9 +299,6 @@ class Kernel implements KernelContract
             $this->commandsLoaded = true;
         }
 
-        // If we are calling an arbitrary command from within the application, we'll load
-        // all of the available deferred providers which will make all of the commands
-        // available to an application. Otherwise the command will not be available.
         $this->app->loadDeferredProviders();
     }
 
