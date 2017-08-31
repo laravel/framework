@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Composer;
 use Symfony\Component\Console\Input\InputOption;
 
 class OptimizeCommand extends Command

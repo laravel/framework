@@ -3,7 +3,6 @@
 namespace Illuminate\Http\Resources\Json;
 
 use IteratorAggregate;
-use Illuminate\Support\Collection;
 use Illuminate\Pagination\AbstractPaginator;
 use Illuminate\Http\Resources\CollectsResources;
 
