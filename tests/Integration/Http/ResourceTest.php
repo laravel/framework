@@ -2,13 +2,21 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use JsonSerializable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Tests\Integration\Http\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
+use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 
 /**
  * @group integration
@@ -144,7 +152,7 @@ class ResourceTest extends TestCase
             'title' => 'Test Title',
         ]));
 
-        $route = Route::get('/post/{id}', function () use ($post) {
+        Route::get('/post/{id}', function () use ($post) {
             return route('post.show', $post);
         })->name('post.show');
 
@@ -403,141 +411,5 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
             ],
         ]);
-    }
-}
-
-class Post extends Model
-{
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
-    protected $guarded = [];
-}
-
-class PostResource extends Resource
-{
-    public function toArray($request)
-    {
-        return ['id' => $this->id, 'title' => $this->title, 'custom' => true];
-    }
-
-    public function withResponse($request, $response)
-    {
-        $response->header('X-Resource', 'True');
-    }
-}
-
-class PostResourceWithoutWrap extends PostResource
-{
-    public static $wrap = null;
-}
-
-class PostResourceWithOptionalData extends Resource
-{
-    public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'first' => $this->when(false, 'value'),
-            'second' => $this->when(true, 'value'),
-            'third' => $this->when(true, function () {
-                return 'value';
-            }),
-        ];
-    }
-}
-
-class PostResourceWithOptionalRelationship extends PostResource
-{
-    public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'comments' => new CommentCollection($this->whenLoaded('comments')),
-        ];
-    }
-}
-
-class PostResourceWithOptionalPivotRelationship extends PostResource
-{
-    public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'subscription' => $this->whenPivotLoaded(Subscription::class, function () {
-                return [
-                    'foo' => 'bar',
-                ];
-            }),
-        ];
-    }
-}
-
-class Subscription
-{
-}
-
-class CommentCollection extends ResourceCollection
-{
-    //
-}
-
-class PostResourceWithExtraData extends PostResource
-{
-    public function with($request)
-    {
-        return ['foo' => 'bar'];
-    }
-}
-
-class SerializablePostResource extends Resource
-{
-    public function toArray($request)
-    {
-        return new JsonSerializableResource($this);
-    }
-}
-
-class PostCollectionResource extends ResourceCollection
-{
-    public $collects = PostResource::class;
-
-    public function toArray($request)
-    {
-        return ['data' => $this->collection];
-    }
-}
-
-class EmptyPostCollectionResource extends ResourceCollection
-{
-    public $collects = PostResource::class;
-}
-
-class EmptyPostResource extends PostResource
-{
-    //
-}
-
-class ReallyEmptyPostResource extends Resource
-{
-    //
-}
-
-class JsonSerializableResource implements JsonSerializable
-{
-    public $resource;
-
-    public function __construct($resource)
-    {
-        $this->resource = $resource;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->resource->id,
-        ];
     }
 }
