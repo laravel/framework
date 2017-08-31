@@ -3,6 +3,7 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Contracts\Redis\Factory as Redis;
 
@@ -32,11 +33,13 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
     /**
      * Create a new request throttler.
      *
+     * @param  \Illuminate\Cache\RateLimiter  $limiter
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @return void
      */
-    public function __construct(Redis $redis)
+    public function __construct(RateLimiter $limiter, Redis $redis)
     {
+        parent::__construct($limiter);
         $this->redis = $redis;
     }
 
