@@ -40,6 +40,7 @@ use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
+use Illuminate\Foundation\Console\ResponseMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
@@ -147,6 +148,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueTable' => 'command.queue.table',
         'RequestMake' => 'command.request.make',
         'ResourceMake' => 'command.resource.make',
+        'ResponseMake' => 'command.response.make',
         'RuleMake' => 'command.rule.make',
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
@@ -738,6 +740,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.resource.make', function ($app) {
             return new ResourceMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerResponseMakeCommand()
+    {
+        $this->app->singleton('command.response.make', function ($app) {
+            return new ResponseMakeCommand($app['files']);
         });
     }
 
