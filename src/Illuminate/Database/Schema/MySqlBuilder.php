@@ -46,7 +46,9 @@ class MySqlBuilder extends Builder
         $tables = [];
 
         foreach ($this->getAllTables() as $row) {
-            $tables[] = get_object_vars($row)[key($row)];
+            $row = (array) $row;
+
+            $tables[] = reset($row);
         }
 
         if (empty($tables)) {
