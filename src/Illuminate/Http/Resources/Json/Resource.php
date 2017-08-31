@@ -4,6 +4,7 @@ namespace Illuminate\Http\Resources\Json;
 
 use ArrayAccess;
 use JsonSerializable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Http\Resources\MergeValue;
@@ -256,7 +257,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     protected function attributes($attributes)
     {
         return new MergeValue(
-            array_only($this->resource->toArray(), $attributes)
+            Arr::only($this->resource->toArray(), $attributes)
         );
     }
 

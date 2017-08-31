@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth\Access;
 
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Auth\Access\Gate;
 
 trait AuthorizesRequests
@@ -81,7 +82,7 @@ trait AuthorizesRequests
      */
     public function authorizeResource($model, $parameter = null, array $options = [], $request = null)
     {
-        $parameter = $parameter ?: snake_case(lcfirst(class_basename($model)));
+        $parameter = $parameter ?: Str::snake(lcfirst(class_basename($model)));
 
         $middleware = [];
 
