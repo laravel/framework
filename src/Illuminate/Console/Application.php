@@ -6,9 +6,11 @@ use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -73,7 +75,15 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        $commandName = $this->getCommandName($input);
+        if ($input === null) {
+            $input = new ArgvInput();
+        }
+
+        if ($output === null) {
+            $output = new ConsoleOutput();
+        }
+        
+        $commandName = $this->getCommandName($input ?: new ArgvInput);
 
         $this->events->fire(
             new Events\CommandStarting($commandName, $input, $output)
