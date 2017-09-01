@@ -332,9 +332,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return $this->getAwsUrl($adapter, $path);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
-        } else {
-            throw new RuntimeException('This driver does not support retrieving URLs.');
         }
+
+        throw new RuntimeException('This driver does not support retrieving URLs.');
     }
 
     /**
@@ -375,9 +375,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         // are really supposed to use. We will remove the public from this path here.
         if (Str::contains($path, '/storage/public/')) {
             return Str::replaceFirst('/public/', '/', $path);
-        } else {
-            return $path;
         }
+
+        return $path;
     }
 
     /**
