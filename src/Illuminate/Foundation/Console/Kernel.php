@@ -293,13 +293,13 @@ class Kernel implements KernelContract
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
+        $this->app->loadDeferredProviders();
+
         if (! $this->commandsLoaded) {
             $this->commands();
 
             $this->commandsLoaded = true;
         }
-
-        $this->app->loadDeferredProviders();
     }
 
     /**
