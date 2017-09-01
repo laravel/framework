@@ -250,4 +250,15 @@ class Factory implements ArrayAccess
     {
         unset($this->definitions[$offset]);
     }
+    
+    /**
+     * Set the faker unique options
+     *
+     * @param bool $reset
+     * @param int $maxRetries
+     */
+    public function setFakerUnique($reset = false, $maxRetries = 10000){
+        $this->faker->unique($reset,$maxRetries);
+    }
+
 }
