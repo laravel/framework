@@ -126,6 +126,6 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
 
     public function first()
     {
-        return null;
+        //
     }
 }
