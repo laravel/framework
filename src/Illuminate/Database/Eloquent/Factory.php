@@ -261,5 +261,4 @@ class Factory implements ArrayAccess
     {
         $this->faker->unique($reset, $maxRetries);
     }
-
 }
