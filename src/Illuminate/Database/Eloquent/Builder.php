@@ -292,7 +292,7 @@ class Builder
     /**
      * Find multiple models by their primary keys.
      *
-     * @param  array  $ids
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
