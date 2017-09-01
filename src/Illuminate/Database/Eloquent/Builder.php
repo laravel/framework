@@ -747,7 +747,7 @@ class Builder
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
-    public function create(array $attributes = [])
+    public function create($attributes = [])
     {
         return tap($this->newModelInstance($attributes), function ($instance) {
             $instance->save();
