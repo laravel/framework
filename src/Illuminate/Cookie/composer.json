@@ -15,8 +15,8 @@
     ],
     "require": {
         "php": ">=7.0",
-        "illuminate/contracts": "5.5.*",
-        "illuminate/support": "5.5.*",
+        "illuminate/contracts": "5.6.*",
+        "illuminate/support": "5.6.*",
         "symfony/http-foundation": "~3.3",
         "symfony/http-kernel": "~3.3"
     },
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.5-dev"
+            "dev-master": "5.6-dev"
         }
     },
     "config": {
