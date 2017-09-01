@@ -83,7 +83,7 @@ class Application extends SymfonyApplication implements ApplicationContract
             $output = new ConsoleOutput();
         }
         
-        $commandName = $this->getCommandName($input ?: new ArgvInput);
+        $commandName = $this->getCommandName($input);
 
         $this->events->fire(
             new Events\CommandStarting($commandName, $input, $output)
