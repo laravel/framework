@@ -384,6 +384,19 @@ class SupportCollectionTest extends TestCase
             [['v' => 4]],
             $c->where('v', '>', 3)->values()->all()
         );
+
+        $object = (object) ['foo' => 'bar'];
+
+        $this->assertEquals(
+            [],
+            $c->where('v', $object)->values()->all()
+        );
+
+        $c = new Collection([['v' => 1], ['v' => $object]]);
+        $this->assertEquals(
+            [['v' => $object]],
+            $c->where('v', $object)->values()->all()
+        );
     }
 
     public function testWhereStrict()
