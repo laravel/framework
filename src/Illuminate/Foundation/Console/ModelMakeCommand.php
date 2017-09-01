@@ -80,7 +80,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table = Str::snake(Str::plural(class_basename($this->argument('name'))));
 
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
