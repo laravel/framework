@@ -82,7 +82,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
             /**
              * @var string
              */
-            protected $collects;
+            public $collects;
 
             /**
              * Create a new anonymous resource collection.
