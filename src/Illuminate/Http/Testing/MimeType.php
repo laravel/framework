@@ -804,6 +804,17 @@ class MimeType
     }
 
     /**
+     * Search for the extension of a given MIME type.
+     *
+     * @param  string  $mimeType
+     * @return string|null
+     */
+    public static function search($mimeType)
+    {
+        return array_search($mimeType, self::$mimes) ?: null;
+    }
+
+    /**
      * Get the MIME type for a given extension.
      *
      * @param  string  $extension

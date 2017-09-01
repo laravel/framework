@@ -32,4 +32,10 @@ class HttpMimeTypeTest extends TestCase
         $this->assertInternalType('array', MimeType::get());
         $this->assertArraySubset(['jpg' => 'image/jpeg'], MimeType::get());
     }
+
+    public function testSearchExtensionFromMimeType()
+    {
+        $this->assertSame('mov', MimeType::search('video/quicktime'));
+        $this->assertSame(null, MimeType::search('foo/bar'));
+    }
 }
