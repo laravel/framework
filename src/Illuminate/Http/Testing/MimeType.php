@@ -747,6 +747,7 @@ class MimeType
         'mp4' => 'video/mp4',
         'mpeg' => 'video/mpeg',
         'ogv' => 'video/ogg',
+        'mov' => 'video/quicktime',
         'qt' => 'video/quicktime',
         'uvh' => 'video/vnd.dece.hd',
         'uvm' => 'video/vnd.dece.mobile',
