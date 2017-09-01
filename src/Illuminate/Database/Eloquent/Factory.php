@@ -252,12 +252,13 @@ class Factory implements ArrayAccess
     }
     
     /**
-     * Set the faker unique options
+     * Set the faker unique options.
      *
      * @param bool $reset
      * @param int $maxRetries
      */
-    public function setFakerUnique($reset = false, $maxRetries = 10000){
+    public function setFakerUnique($reset = false, $maxRetries = 10000)
+    {
         $this->faker->unique($reset,$maxRetries);
     }
 
