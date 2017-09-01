@@ -53,13 +53,13 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $internalDontReport = [
-        \Illuminate\Auth\AuthenticationException::class,
-        \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
+        AuthenticationException::class,
+        AuthorizationException::class,
+        HttpException::class,
         HttpResponseException::class,
-        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-        \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
+        ModelNotFoundException::class,
+        TokenMismatchException::class,
+        ValidationException::class,
     ];
 
     /**
