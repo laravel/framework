@@ -250,7 +250,7 @@ class Factory implements ArrayAccess
     {
         unset($this->definitions[$offset]);
     }
-    
+
     /**
      * Set the faker unique options.
      *
@@ -259,7 +259,7 @@ class Factory implements ArrayAccess
      */
     public function setFakerUnique($reset = false, $maxRetries = 10000)
     {
-        $this->faker->unique($reset,$maxRetries);
+        $this->faker->unique($reset, $maxRetries);
     }
 
 }
