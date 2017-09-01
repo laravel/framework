@@ -11,6 +11,7 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
@@ -163,6 +164,14 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $_SERVER['__eloquent.saved'] = false;
         $model = EloquentModelSaveStub::create(['name' => 'taylor']);
+        $this->assertTrue($_SERVER['__eloquent.saved']);
+        $this->assertEquals('taylor', $model->name);
+    }
+
+    public function testCreateMethodWithCollectionSavesNewModel()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = EloquentModelSaveStub::create(new Collection(['name' => 'taylor']));
         $this->assertTrue($_SERVER['__eloquent.saved']);
         $this->assertEquals('taylor', $model->name);
     }
