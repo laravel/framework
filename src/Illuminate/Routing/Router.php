@@ -243,6 +243,17 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register a new route responding to all URIs.
+     *
+     * @param  \Closure|array|string|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function fallback($action = null)
+    {
+        return $this->addRoute(['GET', 'HEAD'], '{any}', $action)->where('any', '.*');
+    }
+
+    /**
      * Register a new route with the given verbs.
      *
      * @param  array|string  $methods
