@@ -28,6 +28,13 @@ class File extends UploadedFile
     public $sizeToReport;
 
     /**
+     * The upload status of the file.
+     *
+     * @var bool|null
+     */
+    public $isValid = null;
+
+    /**
      * Create a new file instance.
      *
      * @param  string  $name
@@ -111,5 +118,26 @@ class File extends UploadedFile
     protected function tempFilePath()
     {
         return stream_get_meta_data($this->tempFile)['uri'];
+    }
+
+    /**
+     * Set the upload status for the file.
+     *
+     * @param  bool  $status
+     * @return $this
+     */
+    public function setIsValid($status)
+    {
+        $this->isValid = (bool) $status;
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isValid()
+    {
+        return is_null($this->isValid) ? parent::isValid() : $this->isValid;
     }
 }
