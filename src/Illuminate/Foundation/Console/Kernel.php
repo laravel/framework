@@ -98,7 +98,7 @@ class Kernel implements KernelContract
     protected function defineConsoleSchedule()
     {
         $this->app->singleton(Schedule::class, function ($app) {
-            return new Schedule();
+            return new Schedule;
         });
 
         $schedule = $this->app->make(Schedule::class);
