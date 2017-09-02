@@ -11,7 +11,10 @@
         "providers": "foo",
         "aliases": {
           "Foo": "Foo\\Facade"
-        }
+        },
+        "dont-discover": [
+            "vendor_a/package_d"
+        ]
       }
     }
   },
@@ -29,5 +32,15 @@
   {
     "name": "vendor_a/package_c",
     "type": "library"
+  },
+  {
+    "name": "vendor_a/package_d",
+    "extra": {
+      "laravel": {
+        "providers": [
+          "bazinga"
+        ]
+      }
+    }
   }
 ]
