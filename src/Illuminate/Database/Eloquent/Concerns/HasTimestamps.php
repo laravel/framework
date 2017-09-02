@@ -38,7 +38,7 @@ trait HasTimestamps
     {
         $time = $this->freshTimestamp();
 
-        if (! $this->isDirty(static::UPDATED_AT)) {
+        if (! $this->isDirty(static::UPDATED_AT) && $this->isModelHasUpdatedAt()) {
             $this->setUpdatedAt($time);
         }
 
@@ -121,5 +121,15 @@ trait HasTimestamps
     public function getUpdatedAtColumn()
     {
         return static::UPDATED_AT;
+    }
+
+    /**
+     * Determine if model requires "updated at" column updates.
+     *
+     * @return bool
+     */
+    public function isModelHasUpdatedAt()
+    {
+        return ! isset($this->withoutUpdatedAt) || ! $this->withoutUpdatedAt;
     }
 }
