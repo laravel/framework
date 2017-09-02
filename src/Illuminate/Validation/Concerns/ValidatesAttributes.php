@@ -375,7 +375,7 @@ trait ValidatesAttributes
      */
     public function validateDateEquals($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'equals');
+        $this->requireParameterCount(1, $parameters, 'date_equals');
 
         return $this->compareDates($attribute, $value, $parameters, '=');
     }
@@ -1432,7 +1432,7 @@ trait ValidatesAttributes
             case '>=':
                 return $first >= $second;
             case '=':
-                return $first === $second;
+                return $first == $second;
             default:
                 throw new InvalidArgumentException;
         }
