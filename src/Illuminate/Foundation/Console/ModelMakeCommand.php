@@ -78,7 +78,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Create a model factory for the model.
+     * Create an API resource for the model.
      *
      * @return void
      */
