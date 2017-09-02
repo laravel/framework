@@ -117,12 +117,23 @@ class Mailable implements MailableContract, Renderable
         Container::getInstance()->call([$this, 'build']);
 
         $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
-            $this->buildFrom($message)
-                 ->buildRecipients($message)
-                 ->buildSubject($message)
-                 ->buildAttachments($message)
-                 ->runCallbacks($message);
+            $this->prepareMessage($message);
         });
+    }
+
+    /**
+     * Prepare the message details before sending.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @return $this
+     */
+    public function prepareMessage($message)
+    {
+        $this->buildFrom($message)
+             ->buildRecipients($message)
+             ->buildSubject($message)
+             ->buildAttachments($message)
+             ->runCallbacks($message);
     }
 
     /**
@@ -183,7 +194,7 @@ class Mailable implements MailableContract, Renderable
      *
      * @return array|string
      */
-    protected function buildView()
+    public function buildView()
     {
         if (isset($this->markdown)) {
             return $this->buildMarkdownView();
