@@ -59,6 +59,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a create table if not exists command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command)
+    {
+        $columns = implode(', ', $this->getColumns($blueprint));
+
+        return "if not exists (select * from sys.tables where name='{$blueprint->getTable()}') create table ".$this->wrapTable($blueprint)." ($columns) go";
+    }
+
+    /**
      * Compile a column addition table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

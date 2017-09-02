@@ -75,6 +75,35 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a create table if not exists command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command, Connection $connection)
+    {
+        $sql = $this->compileCreateTableIfNotExists(
+            $blueprint, $command, $connection
+        );
+
+        // Once we have the primary SQL, we can add the encoding option to the SQL for
+        // the table.  Then, we can check if a storage engine has been supplied for
+        // the table. If so, we will add the engine declaration to the SQL query.
+        $sql = $this->compileCreateEncoding(
+            $sql, $connection, $blueprint
+        );
+
+        // Finally, we will append the engine configuration onto this SQL statement as
+        // the final thing we do before returning this finished SQL. Once this gets
+        // added the query will be ready to execute against the real connections.
+        return $this->compileCreateEngine(
+            $sql, $connection, $blueprint
+        );
+    }
+
+    /**
      * Create the main create table clause.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -85,6 +114,23 @@ class MySqlGrammar extends Grammar
     protected function compileCreateTable($blueprint, $command, $connection)
     {
         return sprintf('%s table %s (%s)',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint))
+        );
+    }
+
+    /**
+     * Create the main create table if not exists clause.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @param  \Illuminate\Database\Connection  $connection
+     * @return string
+     */
+    protected function compileCreateTableIfNotExists($blueprint, $command, $connection)
+    {
+        return sprintf('%s table if not exists %s (%s)',
             $blueprint->temporary ? 'create temporary' : 'create',
             $this->wrapTable($blueprint),
             implode(', ', $this->getColumns($blueprint))

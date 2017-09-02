@@ -166,6 +166,22 @@ class Builder
     }
 
     /**
+     * Create a new table on the schema if it doesn't exists.
+     *
+     * @param  string    $table
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function createIfNotExists($table, Closure $callback)
+    {
+        $this->build(tap($this->createBlueprint($table), function ($blueprint) use ($callback) {
+            $blueprint->createIfNotExists();
+
+            $callback($blueprint);
+        }));
+    }
+
+    /**
      * Drop a table from the schema.
      *
      * @param  string  $table

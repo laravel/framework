@@ -65,6 +65,22 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a create table if not exists command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileCreateIfNotExists(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('%s table if not exists %s (%s)',
+            $blueprint->temporary ? 'create temporary' : 'create',
+            $this->wrapTable($blueprint),
+            implode(', ', $this->getColumns($blueprint))
+        );
+    }
+
+    /**
      * Compile a column addition command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
