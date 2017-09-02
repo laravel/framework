@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
+use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
@@ -209,7 +210,9 @@ class Kernel implements KernelContract
                 Str::after($command->getPathname(), app_path().DIRECTORY_SEPARATOR)
             );
 
-            if (is_subclass_of($command, Command::class)) {
+            $reflector = new ReflectionClass($command);
+
+            if (! $reflector->isAbstract() && $reflector->isSubclassOf(Command::class)) {
                 Artisan::starting(function ($artisan) use ($command) {
                     $artisan->resolve($command);
                 });
