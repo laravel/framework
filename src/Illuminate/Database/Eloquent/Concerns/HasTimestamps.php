@@ -130,6 +130,6 @@ trait HasTimestamps
      */
     public function isModelHasUpdatedAt()
     {
-        return !isset($this->withoutUpdatedAt) || !$this->withoutUpdatedAt;
+        return ! isset($this->withoutUpdatedAt) || ! $this->withoutUpdatedAt;
     }
 }
