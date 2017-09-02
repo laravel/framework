@@ -75,18 +75,14 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
-        if ($input === null) {
-            $input = new ArgvInput();
-        }
-
-        if ($output === null) {
-            $output = new ConsoleOutput();
-        }
-
-        $commandName = $this->getCommandName($input);
+        $commandName = $this->getCommandName(
+            $input = $input ?: new ArgvInput
+        );
 
         $this->events->fire(
-            new Events\CommandStarting($commandName, $input, $output)
+            new Events\CommandStarting(
+                $commandName, $input, $output = $output ?: new ConsoleOutput
+            )
         );
 
         $exitCode = parent::run($input, $output);
