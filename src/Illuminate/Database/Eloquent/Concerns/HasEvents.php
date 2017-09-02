@@ -57,7 +57,7 @@ trait HasEvents
             [
                 'creating', 'created', 'updating', 'updated',
                 'deleting', 'deleted', 'saving', 'saved',
-                'restoring', 'restored',
+                'restoring', 'restored', 'retrieved',
             ],
             $this->observables
         );
@@ -272,6 +272,17 @@ trait HasEvents
     public static function deleted($callback)
     {
         static::registerModelEvent('deleted', $callback);
+    }
+
+    /**
+     * Register a retrieved model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function retrieved($callback)
+    {
+        static::registerModelEvent('retrieved', $callback);
     }
 
     /**
