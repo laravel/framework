@@ -107,5 +107,4 @@ class ScheduleOverviewCommand extends Command
 
         return implode(' ', $parts);
     }
-
 }
