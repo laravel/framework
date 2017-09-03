@@ -288,8 +288,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function parseBindMethod($method)
     {
-        if(is_array($method)) {
-            return $method[0] . '@' . $method[1];
+        if (is_array($method)) {
+            return $method[0].'@'.$method[1];
         }
 
         return $method;
