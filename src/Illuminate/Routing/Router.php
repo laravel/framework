@@ -248,7 +248,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    public function fallback($action = null)
+    public function default($action = null)
     {
         return $this->addRoute(['GET', 'HEAD'], '{any}', $action)->where('any', '.*');
     }
