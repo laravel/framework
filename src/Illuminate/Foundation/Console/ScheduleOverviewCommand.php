@@ -93,7 +93,7 @@ class ScheduleOverviewCommand extends Command
     }
 
     /**
-     * Delete command partials ("php artisan")
+     * Delete command partials ("php artisan").
      *
      * @param $command
      * @return string
@@ -105,8 +105,7 @@ class ScheduleOverviewCommand extends Command
             array_shift($parts);
             array_shift($parts);
         }
-
         return implode(' ', $parts);
-        
     }
+
 }
