@@ -1649,6 +1649,27 @@ class Builder
     }
 
     /**
+     * Get the SQL representation of the query with respected binding.
+     *
+     * @return string
+     */
+    public function toSqlWithBinding()
+    {
+        $query = $this->toSql();
+        $bindings = $this->getBindings();
+        foreach ($bindings as $key => $binding) {
+            if(!is_numeric($binding)) {
+                $binding = "'".$binding."'";
+            }
+            $regex = is_numeric($key)
+            ? "/\?(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/"
+            : "/:{$key}(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/";
+            $query = preg_replace($regex, $binding, $query, 1);
+        }
+        return $query;
+    }
+    
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int    $id
