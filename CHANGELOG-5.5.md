@@ -1,5 +1,29 @@
 # Release Notes for 5.5.x
 
+## v5.5.1 (2017-09-01)
+
+### Added
+- Added getter methods on `MimeType` ([#20826](https://github.com/laravel/framework/pull/20826))
+- Added `retrieved` model event ([#20852](https://github.com/laravel/framework/pull/20852))
+- Added `HasOneOrMany::setForeignAttributesForCreate()` method ([#20871](https://github.com/laravel/framework/pull/20871))
+
+### Changed
+- Moved console commands auto discovery to `Kernel::bootstrap()` ([#20863](https://github.com/laravel/framework/pull/20863))
+- Use classes instead of helper functions ([#20879](https://github.com/laravel/framework/pull/20879), [#20880](https://github.com/laravel/framework/pull/20880))
+- Changed `Resource::$collects` visibility to `public` ([#20885](https://github.com/laravel/framework/pull/20885))
+
+### Fixed
+- Fixed `choice()` on non-tty terminals ([#20840](https://github.com/laravel/framework/pull/20840))
+- Fixed Macroable calls on `Optional` ([#20845](https://github.com/laravel/framework/pull/20845), [#20898](https://github.com/laravel/framework/pull/20898))
+- Fixed `dropAllTables()` when using `PDO::FETCH_ASSOC` mode ([#20859](https://github.com/laravel/framework/pull/20859))
+- Pass model name to `ModelNotFoundException::setModel()` ([#20896](https://github.com/laravel/framework/pull/20896))
+- Fixed `Basic` authentication ([#20905](https://github.com/laravel/framework/pull/20905))
+- Fixed `DelegatesToResource::offsetExists()` ([#20887](https://github.com/laravel/framework/pull/20887))
+
+### Removed
+- Removed redundant methods from `MorphOneOrMany` ([#20837](https://github.com/laravel/framework/pull/20837), [891f90e](https://github.com/laravel/framework/commit/891f90ea48056979add7319c5642501c8678bc9c))
+
+
 ## v5.5.0 (2017-08-30)
 
 ### General
