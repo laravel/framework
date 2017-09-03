@@ -434,10 +434,6 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
-            return false;
-        }
-
         return function () use ($user, $ability, $arguments, $policy) {
             // This callback will be responsible for calling the policy's before method and
             // running this policy method if necessary. This is used to when objects are
