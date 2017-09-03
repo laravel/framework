@@ -57,7 +57,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         try {
             $creator->create('migration_creator_fake_migration', 'foo');
         } catch (\Exception $e) {
-            $this->assertEquals($e->getMessage(), 'A MigrationCreatorFakeMigration migration already exists.');
+            $this->assertEquals($e->getMessage(), 'A MigrationCreatorFakeMigration class already exists.');
 
             return;
         }
