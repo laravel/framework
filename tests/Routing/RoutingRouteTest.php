@@ -1420,6 +1420,44 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(302, $response->getStatusCode());
     }
 
+    public function testRouteDefault()
+    {
+        $router = $this->getRouter();
+        $router->default(function () {
+            return 'SPA view';
+        });
+
+        $response = $router->dispatch(Request::create('any-uri-here', 'GET'));
+
+        $this->assertSame('SPA view', $response->getContent());
+
+        $response = $router->dispatch(Request::create('uri/with/segments/also/work', 'GET'));
+
+        $this->assertSame('SPA view', $response->getContent());
+    }
+
+    public function testRouteDefaultWithOtherRoutes()
+    {
+        $router = $this->getRouter();
+        $router->get('/', function () {
+            return 'Should not reach here';
+        });
+        $router->post('{post}', function () {
+            return 'Should not reach here';
+        })->where('any', '.*');
+        $router->default(function () {
+            return 'SPA view';
+        });
+
+        $response = $router->dispatch(Request::create('any-uri-here', 'GET'));
+
+        $this->assertSame('SPA view', $response->getContent());
+
+        $response = $router->dispatch(Request::create('uri/with/segments/also/work', 'GET'));
+
+        $this->assertSame('SPA view', $response->getContent());
+    }
+
     protected function getRouter()
     {
         $container = new Container;
