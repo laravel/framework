@@ -60,17 +60,6 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Set the foreign ID for creating a related model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return void
-     */
-    protected function setForeignAttributesForCreate(Model $model)
-    {
-        $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
-    }
-
-    /**
      * Set the base constraints on the relation query.
      *
      * @return void
@@ -313,6 +302,17 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $instances;
+    }
+
+    /**
+     * Set the foreign ID for creating a related model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    protected function setForeignAttributesForCreate(Model $model)
+    {
+        $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
     }
 
     /**
