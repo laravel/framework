@@ -143,7 +143,7 @@ class Str
     /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string  $pattern
+     * @param  string|array  $pattern
      * @param  string  $value
      * @return bool
      */
