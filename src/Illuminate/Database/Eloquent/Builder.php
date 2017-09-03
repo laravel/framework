@@ -67,7 +67,7 @@ class Builder
      * @var array
      */
     protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql',
+        'insert', 'insertGetId', 'getBindings', 'toSql','toSqlWithBinding',
         'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
     ];
 
