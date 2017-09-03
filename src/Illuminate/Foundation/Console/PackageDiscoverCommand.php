@@ -12,7 +12,7 @@ class PackageDiscoverCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'package:discover';
+    protected $signature = 'package:discover {--details}';
 
     /**
      * The console command description.
@@ -31,8 +31,27 @@ class PackageDiscoverCommand extends Command
     {
         $manifest->build();
 
-        foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("<info>Discovered Package:</info> {$package}");
+        if($this->option('details')) {
+            foreach ($manifest->manifest as $package => $details) {
+                $this->line("<info>Discovered Package:</info> {$package}");
+                if(isset($details['providers']) && count($details['providers'])) {
+                    $this->line("<info>   Providers:</info>");
+                    foreach($details['providers'] as $provider) {
+                        $this->line("<info>     </info> {$provider}");
+                    }
+                }
+                if(isset($details['aliases']) && count($details['aliases'])) {
+                    $this->line("<info>   Aliases:</info>");
+                    foreach($details['aliases'] as $alias) {
+                        $this->line("<info>     </info> {$alias}");
+                    }
+                }
+            }
+        } else {
+            foreach (array_keys($manifest->manifest) as $package) {
+
+                $this->line("<info>Discovered Package:</info> {$package}");
+            }
         }
 
         $this->info('Package manifest generated successfully.');
