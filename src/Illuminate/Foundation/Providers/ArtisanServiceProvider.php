@@ -864,7 +864,7 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerScheduleRunCommand()
+    protected function registerScheduleOverviewCommand()
     {
         $this->app->singleton(ScheduleOverviewCommand::class);
     }
