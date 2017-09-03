@@ -34,7 +34,7 @@
 - Fixed `choice()` on non-tty terminals ([#20840](https://github.com/laravel/framework/pull/20840))
 - Fixed Macroable calls on `Optional` ([#20845](https://github.com/laravel/framework/pull/20845), [#20898](https://github.com/laravel/framework/pull/20898))
 - Fixed `dropAllTables()` when using `PDO::FETCH_ASSOC` mode ([#20859](https://github.com/laravel/framework/pull/20859))
-- Pass model name to `ModelNotFoundException::setModel()` ([#20896](https://github.com/laravel/framework/pull/20896))
+- Pass model name to `ModelNotFoundException::setModel()` ([#20896](https://github.com/laravel/framework/pull/20896), [891f90e](https://github.com/laravel/framework/commit/891f90ea48056979add7319c5642501c8678bc9c))
 - Fixed `Basic` authentication ([#20905](https://github.com/laravel/framework/pull/20905))
 - Fixed `DelegatesToResource::offsetExists()` ([#20887](https://github.com/laravel/framework/pull/20887))
 
