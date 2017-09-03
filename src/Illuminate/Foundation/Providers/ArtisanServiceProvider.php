@@ -962,4 +962,5 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         return array_merge(array_values($this->commands), array_values($this->devCommands));
     }
+
 }
