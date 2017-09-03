@@ -103,9 +103,8 @@ class ScheduleOverviewCommand extends Command
         if (count($parts) > 2 && $parts[1] === "'artisan'") {
             array_shift($parts);
             array_shift($parts);
-
         }
+
         return implode(' ', $parts);
     }
-
 }
