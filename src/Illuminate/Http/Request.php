@@ -620,4 +620,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         return $this->route($key);
     }
+
+    /**
+     * Check if the request came from an api route.
+     *
+     * @param  int    $index
+     * @param  string $prefix
+     * @return bool
+     */
+    public function isFromApi($index = 1, $prefix = 'api')
+    {
+        return $this->segment($index) == $prefix;
+    }
 }
