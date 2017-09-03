@@ -39,7 +39,7 @@
 - Fixed `DelegatesToResource::offsetExists()` ([#20887](https://github.com/laravel/framework/pull/20887))
 
 ### Removed
-- Removed redundant methods from `MorphOneOrMany` ([#20837](https://github.com/laravel/framework/pull/20837), [891f90e](https://github.com/laravel/framework/commit/891f90ea48056979add7319c5642501c8678bc9c))
+- Removed redundant methods from `MorphOneOrMany` ([#20837](https://github.com/laravel/framework/pull/20837))
 
 
 ## v5.5.0 (2017-08-30)
