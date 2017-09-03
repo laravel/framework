@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Cron\CronExpression;
 use Illuminate\Console\Command;
 use Illuminate\Console\Scheduling\Schedule;
-use Cron\CronExpression;
 
 class ScheduleOverviewCommand extends Command
 {
@@ -22,7 +22,7 @@ class ScheduleOverviewCommand extends Command
      */
     protected $description = 'Show the schedule overview';
 
-     /**
+    /**
      * @var Schedule
      */
     protected $schedule;
@@ -51,9 +51,7 @@ class ScheduleOverviewCommand extends Command
 
         // Map the cron events
         $events = array_map(function ($event) use ($detailedView) {
-
             $cron = CronExpression::factory($event->expression);
-
             // "Default" events
             $cronEvents = [
                 'cron' => $event->expression,
@@ -81,7 +79,7 @@ class ScheduleOverviewCommand extends Command
 
         // Setup table
         $table = [
-            'Cron', 'Artisan command', 'Previous run', 'Next run', 'Timezone', 'Without overlapping?'
+            'Cron', 'Artisan command', 'Previous run', 'Next run', 'Timezone', 'Without overlapping?',
         ];
 
         // If detailed view, add the missing columns
@@ -94,7 +92,7 @@ class ScheduleOverviewCommand extends Command
         $this->table($table, $events);
     }
 
-   /**
+    /**
      * Delete command partials ("php artisan")
      *
      * @param $command
@@ -109,5 +107,6 @@ class ScheduleOverviewCommand extends Command
         }
 
         return implode(' ', $parts);
+        
     }
 }

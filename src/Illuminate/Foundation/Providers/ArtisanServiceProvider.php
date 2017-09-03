@@ -44,9 +44,9 @@ use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
-use Illuminate\Console\Scheduling\ScheduleOverviewCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
+use Illuminate\Console\Scheduling\ScheduleOverviewCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
@@ -962,4 +962,5 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         return array_merge(array_values($this->commands), array_values($this->devCommands));
     }
+
 }
