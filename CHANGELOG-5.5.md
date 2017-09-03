@@ -1,11 +1,29 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added `mov` extension and `MimeType::search()` method ([#20917](https://github.com/laravel/framework/pull/20917))
+- Added support for `dont-discover` in packages ([#20921](https://github.com/laravel/framework/pull/20921), [4a6f1f2](https://github.com/laravel/framework/commit/4a6f1f2613f2ca5a1ef3792b019a769d6a269cda))
+- Added `retrieved` model event ([#20852](https://github.com/laravel/framework/pull/20852), [84291a6](https://github.com/laravel/framework/commit/84291a63d86bd97339f9d3970913c20035b733b9))
+- Added `HasOneOrMany::setForeignAttributesForCreate()` method ([#20871](https://github.com/laravel/framework/pull/20871))
+
+### Changed
+- Load deferred providers before commands ([366c50e](https://github.com/laravel/framework/commit/366c50ec161f296df99961ecc71229b5b097ad49))
+- Don't pass cache instance to Schedule anymore ([#20916](https://github.com/laravel/framework/pull/20916), [#20933](https://github.com/laravel/framework/pull/20933))
+- Simplified `mix` require ([#20929](https://github.com/laravel/framework/pull/20929))
+
+### Fixed
+- Prevent `ErrorException` in `Collection::operatorForWhere()` method ([#20913](https://github.com/laravel/framework/pull/20913))
+- Create default console input/output in `Application::run()` ([#20922](https://github.com/laravel/framework/pull/20922), [7647399](https://github.com/laravel/framework/commit/7647399b54c42b12cd66b76da046e73d15bcbff1))
+- Ignore abstract classes in `Kernel::load()` ([#20931](https://github.com/laravel/framework/pull/20931))
+- Fixed `listener-queued-duck.stub` filename ([#20937](https://github.com/laravel/framework/pull/20937))
+
+
 ## v5.5.1 (2017-09-01)
 
 ### Added
 - Added getter methods on `MimeType` ([#20826](https://github.com/laravel/framework/pull/20826))
-- Added `retrieved` model event ([#20852](https://github.com/laravel/framework/pull/20852))
-- Added `HasOneOrMany::setForeignAttributesForCreate()` method ([#20871](https://github.com/laravel/framework/pull/20871))
 
 ### Changed
 - Moved console commands auto discovery to `Kernel::bootstrap()` ([#20863](https://github.com/laravel/framework/pull/20863))
