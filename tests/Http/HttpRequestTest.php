@@ -855,4 +855,23 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
+
+    public function testIsFromApiMethod()
+    {
+        // Test a default api route
+        $request = Request::create('/api/users', 'GET', []);
+        $this->assertEquals(true, $request->isFromApi());
+
+        // Test that default web route don't match
+        $request = Request::create('/users', 'GET', []);
+        $this->assertEquals(false, $request->isFromApi());
+
+        // Test a custom api route
+        $request = Request::create('my-api/users', 'GET', []);
+        $this->assertEquals(true, $request->isFromApi(1,'my-api'));
+
+        // Test a custom api route in different segment
+        $request = Request::create('/resources/my-api/users', 'GET', []);
+        $this->assertEquals(true, $request->isFromApi(2,'my-api'));
+    }
 }
