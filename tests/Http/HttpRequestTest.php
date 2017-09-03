@@ -858,7 +858,7 @@ class HttpRequestTest extends TestCase
 
     public function testIsFromApiMethod()
     {
-        // Test a default api route
+        // Test a default api route match
         $request = Request::create('/api/users', 'GET', []);
         $this->assertEquals(true, $request->isFromApi());
 
@@ -868,10 +868,10 @@ class HttpRequestTest extends TestCase
 
         // Test a custom api route
         $request = Request::create('my-api/users', 'GET', []);
-        $this->assertEquals(true, $request->isFromApi(1,'my-api'));
+        $this->assertEquals(true, $request->isFromApi(1, 'my-api'));
 
         // Test a custom api route in different segment
         $request = Request::create('/resources/my-api/users', 'GET', []);
-        $this->assertEquals(true, $request->isFromApi(2,'my-api'));
+        $this->assertEquals(true, $request->isFromApi(2, 'my-api'));
     }
 }
