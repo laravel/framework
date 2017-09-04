@@ -2301,6 +2301,57 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testSliceConsecutive()
+    {
+        $data = new Collection([1, 2, 3, 4, 5]);
+        $data = $data->sliceConsecutive(3);
+
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertInstanceOf(Collection::class, $data[0]);
+        $this->assertCount(3, $data);
+        $this->assertEquals([1, 2, 3], $data[0]->toArray());
+        $this->assertEquals([2, 3, 4], $data[1]->toArray());
+        $this->assertEquals([3, 4, 5], $data[2]->toArray());
+    }
+
+    public function testSliceConsecutiveWithSizeEqualCount()
+    {
+        $data = new Collection([1, 2, 3, 4, 5]);
+        $data = $data->sliceConsecutive(5);
+
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertCount(5, $data);
+        $this->assertEquals([1, 2, 3, 4, 5], $data->toArray());
+    }
+
+    public function testSliceConsecutiveWithSizeLargerThanCount()
+    {
+        $data = new Collection([1, 2, 3, 4, 5]);
+        $data = $data->sliceConsecutive(10);
+
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertCount(5, $data);
+        $this->assertEquals([1, 2, 3, 4, 5], $data->toArray());
+    }
+
+    public function testSliceConsecutiveWithNegativeSize()
+    {
+        $data = new Collection([1, 2, 3, 4, 5]);
+        $data = $data->sliceConsecutive(-1);
+
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertCount(0, $data);
+    }
+
+    public function testSliceConsecutiveWithZeroSize()
+    {
+        $data = new Collection([1, 2, 3, 4, 5]);
+        $data = $data->sliceConsecutive(0);
+
+        $this->assertInstanceOf(Collection::class, $data);
+        $this->assertCount(0, $data);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
