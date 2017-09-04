@@ -19,7 +19,7 @@ use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherCon
 
 class Route
 {
-    use RouteDependencyResolverTrait, Macroable;
+    use Macroable, RouteDependencyResolverTrait;
 
     /**
      * The URI pattern the route responds to.
