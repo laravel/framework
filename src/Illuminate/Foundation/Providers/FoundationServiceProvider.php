@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\AggregateServiceProvider;
 
@@ -41,7 +40,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
 
 
             return $this->only(collect($rules)->keys()->map(function($rule){
-                return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
+                return str_contains($rule, '.') ? explode('.', $rule)[0] : $rule;
             })->unique()->toArray());
         });
     }
