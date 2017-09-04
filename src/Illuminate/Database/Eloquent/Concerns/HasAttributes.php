@@ -7,9 +7,11 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
@@ -532,6 +534,19 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
+        // If the "attribute" exists as a method on the model, we'll assume a 
+        // relationship if the value is also a model. We'll transform both
+        // the "attribute" and the given model to set the relationship.
+        elseif (method_exists($this, $key) && $value instanceof Model) {
+
+            $relation = $this->$key();
+
+            if ($relation instanceof BelongsTo) {
+                $key = $relation->getForeignKey();
+                $value = $value->getAttributeFromArray($relation->getOwnerKey());
+            }
+        }
+
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
@@ -542,6 +557,7 @@ trait HasAttributes
         if (Str::contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
         }
+
 
         $this->attributes[$key] = $value;
 
