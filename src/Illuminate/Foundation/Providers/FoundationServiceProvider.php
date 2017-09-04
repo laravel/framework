@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Providers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\AggregateServiceProvider;
+use Illuminate\Support\Str;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
@@ -38,7 +39,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
         Request::macro('validate', function (array $rules, ...$params) {
             validator()->validate($this->all(), $rules, ...$params);
 
-            return $this->only(array_keys($rules));
+
+            return $this->only(collect($rules)->keys()->map(function($rule){
+                return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
+            })->unique()->toArray());
         });
     }
 }
