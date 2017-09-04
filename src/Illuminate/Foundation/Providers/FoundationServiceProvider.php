@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\AggregateServiceProvider;
-use Illuminate\Support\Str;
 
 class FoundationServiceProvider extends AggregateServiceProvider
 {
