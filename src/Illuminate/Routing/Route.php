@@ -700,7 +700,7 @@ class Route
     /**
      * Get an action or action array for the route.
      *
-     * @param  string  $action
+     * @param  string|null  $action
      * @return mixed
      */
     public function getAction($action = null)
