@@ -80,6 +80,8 @@ abstract class GeneratorCommand extends Command
      */
     protected function qualifyClass($name)
     {
+        $name = ltrim($name, '\\/');
+        
         $rootNamespace = $this->rootNamespace();
 
         if (Str::startsWith($name, $rootNamespace)) {
