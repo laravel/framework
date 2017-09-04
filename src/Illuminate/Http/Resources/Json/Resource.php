@@ -151,6 +151,10 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
                 $value->resource instanceof MissingValue)) {
                 unset($data[$key]);
             }
+
+            if ($value instanceof self && is_null($value->resource)) {
+                $data[$key] = null;
+            }
         }
 
         return $data;
