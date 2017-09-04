@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.2 (2017-09-04)
 
 ### Added
 - Added `mov` extension and `MimeType::search()` method ([#20917](https://github.com/laravel/framework/pull/20917))
@@ -12,12 +12,17 @@
 - Load deferred providers before commands ([366c50e](https://github.com/laravel/framework/commit/366c50ec161f296df99961ecc71229b5b097ad49))
 - Don't pass cache instance to Schedule anymore ([#20916](https://github.com/laravel/framework/pull/20916), [#20933](https://github.com/laravel/framework/pull/20933))
 - Simplified `mix` require ([#20929](https://github.com/laravel/framework/pull/20929))
+- Made `Route` macroable ([#20970](https://github.com/laravel/framework/pull/20970))
+- Return `null` if resource attribute contains relation with null value ([#20969](https://github.com/laravel/framework/pull/20969))
 
 ### Fixed
 - Prevent `ErrorException` in `Collection::operatorForWhere()` method ([#20913](https://github.com/laravel/framework/pull/20913))
 - Create default console input/output in `Application::run()` ([#20922](https://github.com/laravel/framework/pull/20922), [7647399](https://github.com/laravel/framework/commit/7647399b54c42b12cd66b76da046e73d15bcbff1))
 - Ignore abstract classes in `Kernel::load()` ([#20931](https://github.com/laravel/framework/pull/20931))
 - Fixed `listener-queued-duck.stub` filename ([#20937](https://github.com/laravel/framework/pull/20937))
+- Fixed faking notification sending while using AnonymousNotifiable ([#20965](https://github.com/laravel/framework/pull/20965))
+- Fix eachSpread mapSpread with nested collections ([#20962](https://github.com/laravel/framework/pull/20962))
+- Fix generating classes with names beginning with slash ([#20961](https://github.com/laravel/framework/pull/20961))
 
 
 ## v5.5.1 (2017-09-01)
