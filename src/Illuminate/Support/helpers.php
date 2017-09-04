@@ -1154,13 +1154,14 @@ if (! function_exists('windows_os')) {
 
 if (! function_exists('with')) {
     /**
-     * Return the given object. Useful for chaining.
+     * Return the given object, optionally passed through a callback.
      *
      * @param  mixed  $object
+     * @param  callable|null  $callback
      * @return mixed
      */
-    function with($object)
+    function with($object, $callback = null)
     {
-        return $object;
+        return $callback ? $callback($object) : $object;
     }
 }

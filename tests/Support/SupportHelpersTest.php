@@ -804,6 +804,18 @@ class SupportHelpersTest extends TestCase
             return 10;
         }));
     }
+
+    public function testWith()
+    {
+        $this->assertEquals('foo', with('foo'));
+    }
+
+    public function testWithWithCallback()
+    {
+        $this->assertEquals('FOO', with('foo', 'strtoupper'));
+
+        $this->assertEquals(2, with(1, function ($n) { return $n + 1; }));
+    }
 }
 
 trait SupportTestTraitOne
