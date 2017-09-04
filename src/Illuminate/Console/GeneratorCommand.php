@@ -80,7 +80,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function qualifyClass($name)
     {
-        $name = ltrim(ltrim($name, '\\'), '/');
+        $name = ltrim($name, '\\/');
         
         $rootNamespace = $this->rootNamespace();
 
