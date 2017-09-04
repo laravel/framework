@@ -606,6 +606,13 @@ class SupportCollectionTest extends TestCase
             $result[] = [$number, $character, $key];
         });
         $this->assertEquals([[1, 'a', 0], [2, 'b', 1]], $result);
+
+        $c = new Collection([new Collection([1, 'a']), new Collection([2, 'b'])]);
+        $result = [];
+        $c->eachSpread(function ($number, $character, $key) use (&$result) {
+            $result[] = [$number, $character, $key];
+        });
+        $this->assertEquals([[1, 'a', 0], [2, 'b', 1]], $result);
     }
 
     public function testIntersectNull()
@@ -1221,6 +1228,12 @@ class SupportCollectionTest extends TestCase
         });
         $this->assertEquals(['1-a', '2-b'], $result->all());
 
+        $result = $c->mapSpread(function ($number, $character, $key) use (&$result) {
+            return "{$number}-{$character}-{$key}";
+        });
+        $this->assertEquals(['1-a-0', '2-b-1'], $result->all());
+
+        $c = new Collection([new Collection([1, 'a']), new Collection([2, 'b'])]);
         $result = $c->mapSpread(function ($number, $character, $key) use (&$result) {
             return "{$number}-{$character}-{$key}";
         });
