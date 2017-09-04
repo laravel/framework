@@ -76,7 +76,7 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
-        if (count($value) == 1) {
+        if (is_array($value) && count($value) == 1) {
             $value = $value[0];
         }
 
