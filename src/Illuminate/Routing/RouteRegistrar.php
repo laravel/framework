@@ -76,6 +76,10 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
+        if (count($value) == 1) {
+            $value = $value[0];
+        }
+
         $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
 
         return $this;
@@ -168,7 +172,7 @@ class RouteRegistrar
         }
 
         if (in_array($method, $this->allowedAttributes)) {
-            return $this->attribute($method, $parameters[0]);
+            return $this->attribute($method, $parameters);
         }
 
         throw new BadMethodCallException("Method [{$method}] does not exist.");

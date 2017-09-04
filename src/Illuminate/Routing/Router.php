@@ -1148,6 +1148,6 @@ class Router implements RegistrarContract, BindingRegistrar
             return $this->macroCall($method, $parameters);
         }
 
-        return (new RouteRegistrar($this))->attribute($method, $parameters[0]);
+        return (new RouteRegistrar($this))->attribute($method, $parameters);
     }
 }
