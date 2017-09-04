@@ -43,6 +43,13 @@ trait HasAttributes
     protected $casts = [];
 
     /**
+     * The attribute conversion to json when the parameter.
+     *
+     * @var integer
+     */
+    protected $toJsonOption;
+
+    /**
      * The attributes that should be mutated to dates.
      *
      * @var array
@@ -644,7 +651,7 @@ trait HasAttributes
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        return json_encode($value, $this->toJsonOption ? $this->toJsonOption : 0);
     }
 
     /**
