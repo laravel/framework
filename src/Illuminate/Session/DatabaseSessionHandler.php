@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
-use Illuminate\Support\Arr;
 use SessionHandlerInterface;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\QueryException;
