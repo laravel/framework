@@ -542,6 +542,8 @@ trait HasAttributes
             $relation = $this->$key();
 
             if ($relation instanceof BelongsTo) {
+                $this->setRelation($key, $value);
+
                 $key = $relation->getForeignKey();
                 $value = $value->getAttributeFromArray($relation->getOwnerKey());
             }
