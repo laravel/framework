@@ -568,10 +568,13 @@ class SupportCollectionTest extends TestCase
         $c = new Collection($original = [1, 2, 'foo' => 'bar', 'bam' => 'baz']);
 
         $result = [];
-        $c->each(function ($item, $key) use (&$result) {
+        $iterations = [];
+        $c->each(function ($item, $key, $iteration) use (&$result, &$iterations) {
             $result[$key] = $item;
+            $iterations[$key] = $iteration;
         });
         $this->assertEquals($original, $result);
+        $this->assertEquals(array_combine(array_keys($original), range(1, count($original))), $iterations);
 
         $result = [];
         $c->each(function ($item, $key) use (&$result) {
