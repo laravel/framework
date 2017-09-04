@@ -560,7 +560,6 @@ trait HasAttributes
             return $this->fillJsonAttribute($key, $value);
         }
 
-
         $this->attributes[$key] = $value;
 
         return $this;
