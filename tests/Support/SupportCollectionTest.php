@@ -2321,8 +2321,8 @@ class SupportCollectionTest extends TestCase
         $data = $data->sliceConsecutive(5);
 
         $this->assertInstanceOf(Collection::class, $data);
-        $this->assertCount(5, $data);
-        $this->assertEquals([1, 2, 3, 4, 5], $data->toArray());
+        $this->assertCount(1, $data);
+        $this->assertEquals([1, 2, 3, 4, 5], $data[0]->toArray());
     }
 
     public function testSliceConsecutiveWithSizeLargerThanCount()
@@ -2331,8 +2331,8 @@ class SupportCollectionTest extends TestCase
         $data = $data->sliceConsecutive(10);
 
         $this->assertInstanceOf(Collection::class, $data);
-        $this->assertCount(5, $data);
-        $this->assertEquals([1, 2, 3, 4, 5], $data->toArray());
+        $this->assertCount(1, $data);
+        $this->assertEquals([1, 2, 3, 4, 5], $data[0]->toArray());
     }
 
     public function testSliceConsecutiveWithNegativeSize()

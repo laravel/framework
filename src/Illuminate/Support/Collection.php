@@ -1288,7 +1288,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         if ($size >= $this->count()) {
-            return $this;
+            return new static([$this]);
         }
 
         $chunks = [];
