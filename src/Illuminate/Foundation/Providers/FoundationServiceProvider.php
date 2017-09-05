@@ -38,7 +38,10 @@ class FoundationServiceProvider extends AggregateServiceProvider
         Request::macro('validate', function (array $rules, ...$params) {
             validator()->validate($this->all(), $rules, ...$params);
 
-            return $this->only(array_keys($rules));
+
+            return $this->only(collect($rules)->keys()->map(function($rule){
+                return str_contains($rule, '.') ? explode('.', $rule)[0] : $rule;
+            })->unique()->toArray());
         });
     }
 }
