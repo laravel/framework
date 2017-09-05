@@ -1,5 +1,21 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added `$action` parameter to `Route::getAction()` for simpler access ([#20975](https://github.com/laravel/framework/pull/20975))
+- Added `@json` blade directive ([#21004](https://github.com/laravel/framework/pull/21004))
+
+### Changed
+- Fixed migrations not being run in batch order ([#20986](https://github.com/laravel/framework/pull/20986))
+
+### Fixed
+- Make `Request::validate()` return the value of parent key ([#20974](https://github.com/laravel/framework/pull/20974))
+- Fixed date comparison validators failing when a format is specified ([#20940](https://github.com/laravel/framework/pull/20940))
+- Fixed login throttling failing when `decayMinutes` is more than `1` ([#20997](https://github.com/laravel/framework/pull/20997))
+- Only use reflection on classes in `Kernel::load()` ([#20998](https://github.com/laravel/framework/pull/20998))
+
+
 ## v5.5.2 (2017-09-04)
 
 ### Added
@@ -7,12 +23,12 @@
 - Added support for `dont-discover` in packages ([#20921](https://github.com/laravel/framework/pull/20921), [4a6f1f2](https://github.com/laravel/framework/commit/4a6f1f2613f2ca5a1ef3792b019a769d6a269cda))
 - Added `retrieved` model event ([#20852](https://github.com/laravel/framework/pull/20852), [84291a6](https://github.com/laravel/framework/commit/84291a63d86bd97339f9d3970913c20035b733b9))
 - Added `HasOneOrMany::setForeignAttributesForCreate()` method ([#20871](https://github.com/laravel/framework/pull/20871))
+- Made `Route` macroable ([#20970](https://github.com/laravel/framework/pull/20970))
 
 ### Changed
 - Load deferred providers before commands ([366c50e](https://github.com/laravel/framework/commit/366c50ec161f296df99961ecc71229b5b097ad49))
 - Don't pass cache instance to Schedule anymore ([#20916](https://github.com/laravel/framework/pull/20916), [#20933](https://github.com/laravel/framework/pull/20933))
 - Simplified `mix` require ([#20929](https://github.com/laravel/framework/pull/20929))
-- Made `Route` macroable ([#20970](https://github.com/laravel/framework/pull/20970))
 - Return `null` if resource attribute contains relation with a null value ([#20969](https://github.com/laravel/framework/pull/20969))
 
 ### Fixed
