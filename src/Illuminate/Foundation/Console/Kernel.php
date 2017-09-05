@@ -12,6 +12,7 @@ use Symfony\Component\Finder\Finder;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
+use Psr\Container\ContainerExceptionInterface;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
@@ -217,7 +218,13 @@ class Kernel implements KernelContract
             if (is_subclass_of($command, Command::class) &&
                 ! (new ReflectionClass($command))->isAbstract()) {
                 Artisan::starting(function ($artisan) use ($command) {
-                    $artisan->resolve($command);
+                    try {
+                        $artisan->resolve($command);
+                    } catch (ContainerExceptionInterface $e) {
+                        if ((new ReflectionClass($command))->isInstantiable()) {
+                            $this->reportException($e);
+                        }
+                    }
                 });
             }
         }
