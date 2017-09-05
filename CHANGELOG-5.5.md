@@ -13,7 +13,7 @@
 - Don't pass cache instance to Schedule anymore ([#20916](https://github.com/laravel/framework/pull/20916), [#20933](https://github.com/laravel/framework/pull/20933))
 - Simplified `mix` require ([#20929](https://github.com/laravel/framework/pull/20929))
 - Made `Route` macroable ([#20970](https://github.com/laravel/framework/pull/20970))
-- Return `null` if resource attribute contains relation with null value ([#20969](https://github.com/laravel/framework/pull/20969))
+- Return `null` if resource attribute contains relation with a null value ([#20969](https://github.com/laravel/framework/pull/20969))
 
 ### Fixed
 - Prevent `ErrorException` in `Collection::operatorForWhere()` method ([#20913](https://github.com/laravel/framework/pull/20913))
@@ -21,8 +21,8 @@
 - Ignore abstract classes in `Kernel::load()` ([#20931](https://github.com/laravel/framework/pull/20931))
 - Fixed `listener-queued-duck.stub` filename ([#20937](https://github.com/laravel/framework/pull/20937))
 - Fixed faking notification sending while using AnonymousNotifiable ([#20965](https://github.com/laravel/framework/pull/20965))
-- Fix eachSpread mapSpread with nested collections ([#20962](https://github.com/laravel/framework/pull/20962))
-- Fix generating classes with names beginning with slash ([#20961](https://github.com/laravel/framework/pull/20961))
+- Fixed `eachSpread()` and `mapSpread()` with nested collections ([#20962](https://github.com/laravel/framework/pull/20962))
+- Fixed generating names for classes beginning with slash ([#20961](https://github.com/laravel/framework/pull/20961))
 
 
 ## v5.5.1 (2017-09-01)
