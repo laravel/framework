@@ -5,11 +5,11 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesJson
 {
     /**
-     * Compile the json statement into valid PHP.
+     * Compile the JSON statement into valid PHP.
      *
-     * @param string $expression
-     * @param int $options
-     * @param int $depth
+     * @param  string  $expression
+     * @param  int  $options
+     * @param  int  $depth
      * @return string
      */
     protected function compileJson($expression, $options = 0, $depth = 512)
