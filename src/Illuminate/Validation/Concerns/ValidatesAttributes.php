@@ -210,7 +210,7 @@ trait ValidatesAttributes
      */
     protected function getDateTimeWithOptionalFormat($format, $value)
     {
-        if ($date = DateTime::createFromFormat($format, $value)) {
+        if ($date = DateTime::createFromFormat('!'.$format, $value)) {
             return $date;
         }
 
@@ -358,11 +358,11 @@ trait ValidatesAttributes
             return false;
         }
 
-        $format = $parameters[0] == 'Y-m' ? '!Y-m' : $parameters[0];
+        $format = $parameters[0];
 
-        $date = DateTime::createFromFormat($format, $value);
+        $date = DateTime::createFromFormat('!'.$format, $value);
 
-        return $date && $date->format($parameters[0]) == $value;
+        return $date && $date->format($format) == $value;
     }
 
     /**
@@ -375,7 +375,7 @@ trait ValidatesAttributes
      */
     public function validateDateEquals($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'equals');
+        $this->requireParameterCount(1, $parameters, 'date_equals');
 
         return $this->compareDates($attribute, $value, $parameters, '=');
     }
@@ -1432,7 +1432,7 @@ trait ValidatesAttributes
             case '>=':
                 return $first >= $second;
             case '=':
-                return $first === $second;
+                return $first == $second;
             default:
                 throw new InvalidArgumentException;
         }
