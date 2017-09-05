@@ -1276,6 +1276,31 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Returns collection of every consecutive slice of certain size.
+     *
+     * @param  int  $size
+     * @return static
+     */
+    public function sliceConsecutive($size)
+    {
+        if ($size <= 0) {
+            return new static;
+        }
+
+        if ($size >= $this->count()) {
+            return new static([$this]);
+        }
+
+        $chunks = [];
+
+        for ($i = 0; $i <= $this->count() - $size; $i++) {
+            $chunks [] = $this->slice($i, $size)->values();
+        }
+
+        return new static($chunks);
+    }
+
+    /**
      * Split a collection into a certain number of groups.
      *
      * @param  int  $numberOfGroups
