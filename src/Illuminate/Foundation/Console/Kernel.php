@@ -214,9 +214,8 @@ class Kernel implements KernelContract
                 Str::after($command->getPathname(), app_path().DIRECTORY_SEPARATOR)
             );
 
-            $reflector = new ReflectionClass($command);
-
-            if (! $reflector->isAbstract() && $reflector->isSubclassOf(Command::class)) {
+            if (is_subclass_of($command, Command::class) &&
+                ! (new ReflectionClass($command))->isAbstract()) {
                 Artisan::starting(function ($artisan) use ($command) {
                     $artisan->resolve($command);
                 });
