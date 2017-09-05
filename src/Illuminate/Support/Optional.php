@@ -27,6 +27,22 @@ class Optional
     }
 
     /**
+     * Dynamically access a property on the underlying object or return default value.
+     *
+     * @param  string  $key
+     * @param  mixes   $default
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        if (is_object($this->value)) {
+            return $this->value->{$key} ?? $default;
+        }
+
+        return $default;
+    }
+
+    /**
      * Dynamically access a property on the underlying object.
      *
      * @param  string  $key
@@ -34,9 +50,7 @@ class Optional
      */
     public function __get($key)
     {
-        if (is_object($this->value)) {
-            return $this->value->{$key};
-        }
+        return $this->get($key);
     }
 
     /**
