@@ -43,4 +43,20 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testInlinePhpStatementsWithPhpBlocks()
+    {
+        $string = '@if (isset($team)) @php ($some = true) '
+               .'@else @php($some = false) @endif '
+               .'@php $somethingElse = true; @endphp';
+
+        $expected = '<?php if(isset($team)): ?> '
+                .'<?php ($some = true); ?> '
+                .'<?php else: ?> '
+                .'<?php ($some = false); ?> '
+                .'<?php endif; ?> '
+                .'<?php $somethingElse = true; ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
