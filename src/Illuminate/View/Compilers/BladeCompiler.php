@@ -213,7 +213,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storePhpBlocks($value)
     {
-        return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
+        return preg_replace_callback('/(?<!@)@php(?![ \t]*\()(.*?)@endphp/s', function ($matches) {
             $this->rawBlocks[] = "<?php{$matches[1]}?>";
 
             return $this->rawPlaceholder;
