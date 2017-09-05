@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
@@ -133,7 +133,7 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
-                'author' => ['name' => 'jrrmartin']
+                'author' => ['name' => 'jrrmartin'],
             ],
         ]);
     }
@@ -160,7 +160,7 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
-                'author' => null
+                'author' => null,
             ],
         ]);
     }
