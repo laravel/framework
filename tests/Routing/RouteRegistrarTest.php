@@ -119,6 +119,17 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+    public function testCanRegisterGroupWithMultipleMiddlewares()
+    {
+        $this->router->middleware('group-middleware1', 'group-middleware2')->group(function ($router) {
+            $router->get('users', function () {
+                return 'all-users';
+            });
+        });
+
+        $this->seeMiddlewares('group-middleware1', 'group-middleware2');
+    }
+
     public function testCanRegisterGroupWithNamespace()
     {
         $this->router->namespace('App\Http\Controllers')->group(function ($router) {
@@ -304,6 +315,17 @@ class RouteRegistrarTest extends TestCase
     protected function seeMiddleware($middleware)
     {
         $this->assertEquals($middleware, $this->getRoute()->middleware()[0]);
+    }
+
+    /**
+     * Assert that a route has the given middlewares.
+     *
+     * @param  string  $middleware
+     * @return void
+     */
+    protected function seeMiddlewares(...$middlewares)
+    {
+        $this->assertEquals($middlewares, $this->getRoute()->middleware());
     }
 
     /**
