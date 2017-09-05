@@ -498,7 +498,7 @@ if (! function_exists('info')) {
      */
     function info($message, $context = [])
     {
-        return app('log')->info($message, $context);
+        app('log')->info($message, $context);
     }
 }
 
@@ -662,7 +662,7 @@ if (! function_exists('report')) {
     /**
      * Report an exception.
      *
-     * @param  \Exception  $e
+     * @param  \Exception  $exception
      * @return void
      */
     function report($exception)

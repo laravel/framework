@@ -1111,7 +1111,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Push all of the given items onto the collection.
      *
      * @param  \Traversable  $source
-     * @return self
+     * @return $this
      */
     public function concat($source)
     {
