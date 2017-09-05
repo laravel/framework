@@ -309,6 +309,25 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('OK', $router->dispatch(Request::create('webhook', 'POST'))->getContent());
     }
 
+    public function testRouteMacro()
+    {
+        $router = $this->getRouter();
+
+        Route::macro('breadcrumb', function ($breadcrumb) {
+            $this->action['breadcrumb'] = $breadcrumb;
+
+            return $this;
+        });
+
+        $router->get('foo', function () {
+            return 'bar';
+        })->breadcrumb('fooBreadcrumb')->name('foo');
+
+        $router->getRoutes()->refreshNameLookups();
+
+        $this->assertEquals('fooBreadcrumb', $router->getRoutes()->getByName('foo')->getAction()['breadcrumb']);
+    }
+
     public function testClassesCanBeInjectedIntoRoutes()
     {
         unset($_SERVER['__test.route_inject']);

@@ -1,5 +1,52 @@
 # Release Notes for 5.5.x
 
+## v5.5.2 (2017-09-04)
+
+### Added
+- Added `mov` extension and `MimeType::search()` method ([#20917](https://github.com/laravel/framework/pull/20917))
+- Added support for `dont-discover` in packages ([#20921](https://github.com/laravel/framework/pull/20921), [4a6f1f2](https://github.com/laravel/framework/commit/4a6f1f2613f2ca5a1ef3792b019a769d6a269cda))
+- Added `retrieved` model event ([#20852](https://github.com/laravel/framework/pull/20852), [84291a6](https://github.com/laravel/framework/commit/84291a63d86bd97339f9d3970913c20035b733b9))
+- Added `HasOneOrMany::setForeignAttributesForCreate()` method ([#20871](https://github.com/laravel/framework/pull/20871))
+
+### Changed
+- Load deferred providers before commands ([366c50e](https://github.com/laravel/framework/commit/366c50ec161f296df99961ecc71229b5b097ad49))
+- Don't pass cache instance to Schedule anymore ([#20916](https://github.com/laravel/framework/pull/20916), [#20933](https://github.com/laravel/framework/pull/20933))
+- Simplified `mix` require ([#20929](https://github.com/laravel/framework/pull/20929))
+- Made `Route` macroable ([#20970](https://github.com/laravel/framework/pull/20970))
+- Return `null` if resource attribute contains relation with null value ([#20969](https://github.com/laravel/framework/pull/20969))
+
+### Fixed
+- Prevent `ErrorException` in `Collection::operatorForWhere()` method ([#20913](https://github.com/laravel/framework/pull/20913))
+- Create default console input/output in `Application::run()` ([#20922](https://github.com/laravel/framework/pull/20922), [7647399](https://github.com/laravel/framework/commit/7647399b54c42b12cd66b76da046e73d15bcbff1))
+- Ignore abstract classes in `Kernel::load()` ([#20931](https://github.com/laravel/framework/pull/20931))
+- Fixed `listener-queued-duck.stub` filename ([#20937](https://github.com/laravel/framework/pull/20937))
+- Fixed faking notification sending while using AnonymousNotifiable ([#20965](https://github.com/laravel/framework/pull/20965))
+- Fix eachSpread mapSpread with nested collections ([#20962](https://github.com/laravel/framework/pull/20962))
+- Fix generating classes with names beginning with slash ([#20961](https://github.com/laravel/framework/pull/20961))
+
+
+## v5.5.1 (2017-09-01)
+
+### Added
+- Added getter methods on `MimeType` ([#20826](https://github.com/laravel/framework/pull/20826))
+
+### Changed
+- Moved console commands auto discovery to `Kernel::bootstrap()` ([#20863](https://github.com/laravel/framework/pull/20863))
+- Use classes instead of helper functions ([#20879](https://github.com/laravel/framework/pull/20879), [#20880](https://github.com/laravel/framework/pull/20880))
+- Changed `Resource::$collects` visibility to `public` ([#20885](https://github.com/laravel/framework/pull/20885))
+
+### Fixed
+- Fixed `choice()` on non-tty terminals ([#20840](https://github.com/laravel/framework/pull/20840))
+- Fixed Macroable calls on `Optional` ([#20845](https://github.com/laravel/framework/pull/20845), [#20898](https://github.com/laravel/framework/pull/20898))
+- Fixed `dropAllTables()` when using `PDO::FETCH_ASSOC` mode ([#20859](https://github.com/laravel/framework/pull/20859))
+- Pass model name to `ModelNotFoundException::setModel()` ([#20896](https://github.com/laravel/framework/pull/20896), [891f90e](https://github.com/laravel/framework/commit/891f90ea48056979add7319c5642501c8678bc9c))
+- Fixed `Basic` authentication ([#20905](https://github.com/laravel/framework/pull/20905))
+- Fixed `DelegatesToResource::offsetExists()` ([#20887](https://github.com/laravel/framework/pull/20887))
+
+### Removed
+- Removed redundant methods from `MorphOneOrMany` ([#20837](https://github.com/laravel/framework/pull/20837))
+
+
 ## v5.5.0 (2017-08-30)
 
 ### General

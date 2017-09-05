@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Container\Container;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
@@ -18,7 +19,7 @@ use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherCon
 
 class Route
 {
-    use RouteDependencyResolverTrait;
+    use Macroable, RouteDependencyResolverTrait;
 
     /**
      * The URI pattern the route responds to.
@@ -697,13 +698,16 @@ class Route
     }
 
     /**
-     * Get the action array for the route.
+     * Get an action or action array for the route.
      *
-     * @return array
+     * @param  string|null  $action
+     * @return mixed
      */
-    public function getAction()
+    public function getAction($action = null)
     {
-        return $this->action;
+        return array_key_exists($action, $this->action)
+            ? $this->action[$action]
+            : $this->action;
     }
 
     /**

@@ -6,6 +6,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
@@ -106,6 +107,60 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
+            ],
+        ]);
+    }
+
+    public function test_resources_may_load_optional_relationships()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            $post->setRelation('author', new Author(['name' => 'jrrmartin']));
+
+            return new PostResourceWithOptionalRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'author' => ['name' => 'jrrmartin'],
+            ],
+        ]);
+    }
+
+    public function test_resources_may_shows_null_for_loaded_relationship_with_value_null()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            $post->setRelation('author', null);
+
+            return new PostResourceWithOptionalRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'author' => null,
             ],
         ]);
     }
