@@ -112,7 +112,11 @@ class ResourceResponse implements Responsable
      */
     protected function calculateStatus()
     {
-        return $this->resource->resource instanceof Model &&
-               $this->resource->resource->wasRecentlyCreated ? 201 : 200;
+        if (is_null($this->resource->httpStatus)) {
+            return $this->resource->resource instanceof Model &&
+                   $this->resource->resource->wasRecentlyCreated ? 201 : 200;
+        }
+
+        return $this->resource->httpStatus;
     }
 }
