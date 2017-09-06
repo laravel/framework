@@ -3,6 +3,10 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Auth\AuthManager;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Facades\Auth;
 use Mockery as m;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
@@ -57,6 +61,26 @@ class FoundationExceptionsHandlerTest extends TestCase
         $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')]);
 
         $this->handler->report(new \RuntimeException('Exception message'));
+    }
+
+	public function testUserDetailsAreProvidedInContextWhenLoggedIn()
+	{
+		$auth = m::mock(AuthManager::class);
+		$guard = m::mock(Guard::class);
+
+		$auth->shouldReceive('guard')->andReturn($guard);
+
+		$guard->shouldReceive('id')->andReturn(1);
+		$guard->shouldReceive('user')->andReturn(new TestUser());
+
+		Auth::setFacadeApplication($this->container);
+		$this->container->instance('auth', $guard);
+
+		$logger = m::mock(LoggerInterface::class);
+		$this->container->instance(LoggerInterface::class, $logger);
+		$logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')]);
+
+		$this->handler->report(new \RuntimeException('Exception message'));
     }
 
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
@@ -132,4 +156,11 @@ class CustomException extends Exception implements Responsable
     {
         return response()->json(['response' => 'My custom exception response']);
     }
+}
+
+class TestUser implements Authenticatable {
+
+	protected $email = 'john@example.com';
+
+	use \Illuminate\Auth\Authenticatable;
 }
