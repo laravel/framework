@@ -742,6 +742,21 @@ if (! function_exists('preg_replace_array')) {
     }
 }
 
+if (! function_exists('rescue')) {
+    function rescue(callable $rescuee, $rescuer)
+    {
+        try {
+            return $rescuee();
+        } catch (Exception $e) {
+            if (is_callable($rescuer)) {
+                return $rescuer();
+            }
+
+            return $rescuer;
+        }
+    }
+}
+
 if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.

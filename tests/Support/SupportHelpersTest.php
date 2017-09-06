@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
+use Exception;
 use ArrayAccess;
 use Mockery as m;
 use RuntimeException;
@@ -792,6 +793,23 @@ class SupportHelpersTest extends TestCase
                 };
             }
         })->present()->something());
+    }
+
+    public function testRescue()
+    {
+        $this->assertEquals(rescue(function () {
+            throw new Exception;
+        }, 'rescued!'), 'rescued!');
+
+        $this->assertEquals(rescue(function () {
+            throw new Exception;
+        }, function () {
+            return 'rescued!';
+        }), 'rescued!');
+
+        $this->assertEquals(rescue(function () {
+            return 'no need to rescue';
+        }, 'rescued!'), 'no need to rescue');
     }
 
     public function testTransform()
