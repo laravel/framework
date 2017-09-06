@@ -117,4 +117,11 @@ interface Gate
      * @return array
      */
     public function abilities();
+
+    /**
+     * Get all of the defined policies.
+     *
+     * @return array
+     */
+    public function policies();
 }
