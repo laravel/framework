@@ -122,7 +122,7 @@ class RedisManager implements Factory
      *
      * @return array
      */
-    public function getConnections()
+    public function connections()
     {
         return $this->connections;
     }
