@@ -623,7 +623,7 @@ class PostgresGrammar extends Grammar
             return ' primary key';
         }
     }
-    
+
     /**
      * Compile a foreign key command.
      *
@@ -632,16 +632,16 @@ class PostgresGrammar extends Grammar
      * @return string
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
-    {   
+    {
         // The \Illuminate\Database\Schema\Grammars\Grammar method compiles the classical statement
         $sql = parent::compileForeign($blueprint, $command);
-        
+
         // Here we add the Postgres specific "deferrable" part
-        if(! is_null($command->deferrable)) {
+        if (! is_null($command->deferrable)) {
             $sql .= " {$command->deferrable}";
         }
-        
+
         return $sql;
     }
-    
+
 }
