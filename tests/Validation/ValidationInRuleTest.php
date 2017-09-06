@@ -18,6 +18,10 @@ class ValidationInRuleTest extends TestCase
 
         $this->assertEquals('in:"Life, the Universe and Everything","this is a ""quote"""', (string) $rule);
 
+        $rule = new In(["a,b\nc,d"]);
+
+        $this->assertEquals("in:\"a,b\nc,d\"", (string) $rule);
+
         $rule = Rule::in([1, 2, 3, 4]);
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
