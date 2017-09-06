@@ -709,7 +709,7 @@ if (! function_exists('rescue')) {
      * @param  mixed  $rescue
      * @return mixed
      */
-    function rescue(callable $callback, $rescue)
+    function rescue(callable $callback, $rescue = null)
     {
         try {
             return $callback();
