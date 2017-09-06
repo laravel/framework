@@ -524,7 +524,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Determine if we are running in the console.
+     * Determine if the application is running in the console.
      *
      * @return bool
      */
@@ -534,7 +534,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
-     * Determine if we are running unit tests.
+     * Determine if the application is running unit tests.
      *
      * @return bool
      */
