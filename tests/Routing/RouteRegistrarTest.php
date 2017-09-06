@@ -119,6 +119,31 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('group-middleware');
     }
 
+    public function testCanRegisterGroupWithMultipleMiddlewares()
+    {
+        $this->router->middleware('group-middleware1', 'group-middleware2')->group(function ($router) {
+            $router->get('users1', function () {
+                return 'all-users';
+            });
+        });
+
+        $this->seeMiddlewares('group-middleware1', 'group-middleware2');
+
+        $this->router->middleware(['group-middleware3', 'group-middleware4'])->group(function ($router) {
+            $router->get('users2', function () {
+                return 'all-users2';
+            });
+        });
+
+        $this->seeMiddlewares('group-middleware3', 'group-middleware4');
+
+        $this->router->middleware('group-middleware5', 'group-middleware6', 'group-middleware7')->group(__DIR__.'/fixtures/routes.php');
+
+        $this->seeMiddlewares('group-middleware5', 'group-middleware6', 'group-middleware7');
+        $this->seeMiddleware('group-middleware5');
+        $this->seeLastMiddleware('group-middleware7');
+    }
+
     public function testCanRegisterGroupWithNamespace()
     {
         $this->router->namespace('App\Http\Controllers')->group(function ($router) {
@@ -296,7 +321,7 @@ class RouteRegistrarTest extends TestCase
     }
 
     /**
-     * Assert that the last route has the given middleware.
+     * Assert that the last route has the first given middleware.
      *
      * @param  string  $middleware
      * @return void
@@ -304,6 +329,28 @@ class RouteRegistrarTest extends TestCase
     protected function seeMiddleware($middleware)
     {
         $this->assertEquals($middleware, $this->getRoute()->middleware()[0]);
+    }
+
+    /**
+     * Assert that the last route has the last given middleware.
+     *
+     * @param  string  $middleware
+     * @return void
+     */
+    protected function seeLastMiddleware($middleware)
+    {
+        $this->assertEquals($middleware, last($this->getRoute()->middleware()));
+    }
+
+    /**
+     * Assert that a route has the given middlewares.
+     *
+     * @param  string  $middleware
+     * @return void
+     */
+    protected function seeMiddlewares(...$middlewares)
+    {
+        $this->assertEquals($middlewares, $this->getRoute()->middleware());
     }
 
     /**
