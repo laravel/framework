@@ -754,7 +754,7 @@ if (! function_exists('rescue')) {
     {
         try {
             return $rescuee();
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return is_callable($rescuer) ? $rescuer() : $rescuer;
         }
     }

@@ -810,6 +810,16 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(rescue(function () {
             return 'no need to rescue';
         }, 'rescued!'), 'no need to rescue');
+
+        $testClass = new class {
+            public function test(int $a) {
+                return $a;
+            }
+        };
+
+        $this->assertEquals(rescue(function () use ($testClass) {
+            $testClass->test([]);
+        }, 'rescued!'), 'rescued!');
     }
 
     public function testTransform()
