@@ -31,9 +31,18 @@ class In
      * Convert the rule to a validation string.
      *
      * @return string
+     *
+     * @see \Illuminate\Validation\ValidationRuleParser::parseParameters
      */
     public function __toString()
     {
-        return $this->rule.':'.implode(',', $this->values);
+        // Encapsulate strings with double quotes
+        // and escape double quotes inside to enable
+        // strings containing commas
+        $values = array_map(function ($value) {
+            return '"'.str_replace('"', '""', $value).'"';
+        }, $this->values);
+
+        return $this->rule.':'.implode(',', $values);
     }
 }
