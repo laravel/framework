@@ -1427,6 +1427,15 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => ['foo', 'qux']], ['name' => 'Array|In:foo,baz,qux']);
         $this->assertTrue($v->passes());
 
+        $v = new Validator($trans, ['name' => ['foo,bar', 'qux']], ['name' => 'Array|In:"foo,bar",baz,qux']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => 'f"o"o'], ['name' => 'In:"f""o""o",baz,qux']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['name' => "a,b\nc,d"], ['name' => "in:\"a,b\nc,d\""]);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['name' => ['foo', 'bar']], ['name' => 'Alpha|In:foo,bar']);
         $this->assertFalse($v->passes());
 
