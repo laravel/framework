@@ -63,7 +63,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new \RuntimeException('Exception message'));
     }
 
-	public function testUserDetailsAreProvidedInContextWhenLoggedIn()
+	public function testExceptionsCanBeReportedWhenLoggedInWithoutAccessibleEmail()
 	{
 		$auth = m::mock(AuthManager::class);
 		$guard = m::mock(Guard::class);
