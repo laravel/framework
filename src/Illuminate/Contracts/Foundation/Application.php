@@ -33,8 +33,8 @@ interface Application extends Container
      * @return bool
      */
     public function runningInConsole();
-    
-     /**
+
+    /**
      * Determine if we are running unit tests.
      *
      * @return bool
