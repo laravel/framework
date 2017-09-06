@@ -817,7 +817,7 @@ class SupportHelpersTest extends TestCase
             }
         };
 
-        $this->assertEquals(rescue(function () use ($testClass){
+        $this->assertEquals(rescue(function () use ($testClass) {
             $testClass->test([]);
         }, 'rescued!'), 'rescued!');
     }
