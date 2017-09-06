@@ -743,16 +743,19 @@ if (! function_exists('preg_replace_array')) {
 }
 
 if (! function_exists('rescue')) {
+    /**
+     * Catch a potential exception and return a default.
+     *
+     * @param  callable  $rescuee
+     * @param  mixed     $rescuer
+     * @return mixed
+     */
     function rescue(callable $rescuee, $rescuer)
     {
         try {
             return $rescuee();
         } catch (Exception $e) {
-            if (is_callable($rescuer)) {
-                return $rescuer();
-            }
-
-            return $rescuer;
+            return is_callable($rescuer) ? $rescuer() : $rescuer;
         }
     }
 }
