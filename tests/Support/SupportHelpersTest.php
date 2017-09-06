@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
-use Exception;
 use ArrayAccess;
 use Mockery as m;
 use RuntimeException;
@@ -812,12 +811,13 @@ class SupportHelpersTest extends TestCase
         }, 'rescued!'), 'no need to rescue');
 
         $testClass = new class {
-            public function test(int $a) {
+            public function test(int $a)
+            {
                 return $a;
             }
         };
 
-        $this->assertEquals(rescue(function () use ($testClass) {
+        $this->assertEquals(rescue(function () use ($testClass){
             $testClass->test([]);
         }, 'rescued!'), 'rescued!');
     }
