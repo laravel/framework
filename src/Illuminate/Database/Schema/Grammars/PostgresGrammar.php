@@ -643,5 +643,4 @@ class PostgresGrammar extends Grammar
 
         return $sql;
     }
-
 }
