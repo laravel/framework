@@ -742,24 +742,6 @@ if (! function_exists('preg_replace_array')) {
     }
 }
 
-if (! function_exists('rescue')) {
-    /**
-     * Catch a potential exception and return a default.
-     *
-     * @param  callable  $rescuee
-     * @param  mixed     $rescuer
-     * @return mixed
-     */
-    function rescue(callable $rescuee, $rescuer)
-    {
-        try {
-            return $rescuee();
-        } catch (Throwable $e) {
-            return is_callable($rescuer) ? $rescuer() : $rescuer;
-        }
-    }
-}
-
 if (! function_exists('retry')) {
     /**
      * Retry an operation a given number of times.
