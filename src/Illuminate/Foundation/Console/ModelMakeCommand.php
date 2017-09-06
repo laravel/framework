@@ -58,6 +58,10 @@ class ModelMakeCommand extends GeneratorCommand
         if ($this->option('controller') || $this->option('resource')) {
             $this->createController();
         }
+
+        if ($this->option('apiresource')) {
+            $this->createApiResource();
+        }
     }
 
     /**
@@ -70,6 +74,18 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:factory', [
             'name' => $this->argument('name').'Factory',
             '--model' => $this->argument('name'),
+        ]);
+    }
+
+    /**
+     * Create an API resource for the model.
+     *
+     * @return void
+     */
+    protected function createApiResource()
+    {
+        $this->call('make:resource', [
+            'name' => $this->argument('name').'',
         ]);
     }
 
@@ -145,6 +161,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
+
+            ['apiresource', 'p', InputOption::VALUE_NONE, 'Create a new API resource file for the model.'],
         ];
     }
 }
