@@ -1145,17 +1145,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         parent::flush();
 
-        $this->loadedProviders = [];
-        $this->bootingCallbacks = [];
-        $this->bootedCallbacks = [];
+        $this->buildStack = [];
         $this->middlewares = [];
-        $this->serviceProviders = [];
+        $this->loadedProviders = [];
+        $this->bootedCallbacks = [];
+        $this->bootingCallbacks = [];
         $this->deferredServices = [];
         $this->reboundCallbacks = [];
+        $this->serviceProviders = [];
         $this->resolvingCallbacks = [];
         $this->afterResolvingCallbacks = [];
         $this->globalResolvingCallbacks = [];
-        $this->buildStack = [];
     }
 
     /**
