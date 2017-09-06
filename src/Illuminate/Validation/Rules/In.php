@@ -36,9 +36,6 @@ class In
      */
     public function __toString()
     {
-        // Encapsulate strings with double quotes
-        // and escape double quotes inside to enable
-        // strings containing commas
         $values = array_map(function ($value) {
             return '"'.str_replace('"', '""', $value).'"';
         }, $this->values);
