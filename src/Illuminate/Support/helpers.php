@@ -352,6 +352,10 @@ if (! function_exists('blank')) {
             return false;
         }
 
+        if (is_array($value) || is_object($value)) {
+            return empty(array_filter((array) $value));
+        }
+
         if ($value instanceof Countable) {
             return count($value) === 0;
         }
