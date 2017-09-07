@@ -638,7 +638,10 @@ class PostgresGrammar extends Grammar
 
         // Here we add the Postgres specific "deferrable" part
         if (! is_null($command->deferrable)) {
-            $sql .= " {$command->deferrable}";
+            $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
+        }
+        if ($command->deferrable && !is_null($command->initiallyImmediate)) {
+            $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
         return $sql;
