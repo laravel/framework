@@ -134,27 +134,17 @@ class FileViewFinder implements ViewFinderInterface
             }
         }
         
-        $hasValidViewExtension = in_array( @end(explode('.', $name)), $this->extensions);
+        $hasValidViewExtension = in_array(@end(explode('.', $name)), $this->extensions);
 
-        // The simplest mistake made, is to include the file extensions in the view names.
-        if( $hasValidViewExtension ){
-
-            $msg = '"' . $name . '", You should not specify a file extension as part of a view name';
-
-        // Another mistake is to try and specify .html, .htm files as views
-        // Would be a good idea to include a more exhaustive list of common file types.
-        } else if( !$hasValidViewExtension && in_array( @end(explode('.', $name)), ['html', 'htm', 'xhtml']) ){
-
-            $msg = '".'. @end(explode('.', $name)) . '", is not a valid view extension';
-
-        // Something is wrong, with the path specified, the view name or both, let's give lots of details.
+        if($hasValidViewExtension){
+            $msg = '"'.$name.'", You should not specify a file extension as part of a view name';
+        } elseif (!$hasValidViewExtension && in_array(@end(explode('.', $name)),['html', 'htm', 'xhtml'])){
+            $msg = '".'.@end(explode('.', $name)).'", is not a valid view extension';
         } else {
-
-            $msg =  "View [$name] not found. " . 
-                    "View paths searched: [ " . join(", ", $paths) . " ] ".
-                    "Possible view extensions where: [ " . join(", ", $this->extensions ) . " ]";
+            $msg = "View [$name] not found. ". 
+                   "View paths searched: [ ".join(", ",$paths)." ] ".
+                   "Possible view extensions where: [ ".join(", ",$this->extensions )." ]";
         }
-
         throw new InvalidArgumentException($msg);
     }
 
