@@ -6,8 +6,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\Events\MigrationExecuted;
-use Illuminate\Database\Events\MigrationRolledBack;
+use Illuminate\Database\Events\MigrationsExecuted;
+use Illuminate\Database\Events\MigrationsRolledBack;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -109,7 +109,7 @@ class Migrator
 
         if (count($migrations) > 0 && isset($this->events)) {
             // Dispatch event after migration run
-            $this->events->dispatch(new MigrationExecuted($this));
+            $this->events->dispatch(new MigrationsExecuted($this));
         }
 
         return $migrations;
@@ -278,7 +278,7 @@ class Migrator
 
         if (! empty($rolledBack) && isset($this->events)) {
             // Dispatch event after migration rolled back
-            $this->events->dispatch(new MigrationRolledBack($this));
+            $this->events->dispatch(new MigrationsRolledBack($this));
         }
 
         return $rolledBack;

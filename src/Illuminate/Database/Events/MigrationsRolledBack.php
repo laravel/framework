@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Events;
 
-class MigrationExecuted extends MigrationEvent
+class MigrationsRolledBack extends MigrationEvent
 {
     //
 }
