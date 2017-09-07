@@ -98,7 +98,7 @@ trait BuildsQueries
 
     /**
      * Apply the basic where if the given "condition" is true.
-     * 
+     *
      * @param  mixed $condition
      * @param  string $column
      * @param  string $operator
