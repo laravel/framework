@@ -2,12 +2,12 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Database\Events\MigrationExecuted;
-use Illuminate\Database\Events\MigrationRolledBack;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Events\MigrationExecuted;
+use Illuminate\Database\Events\MigrationRolledBack;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
