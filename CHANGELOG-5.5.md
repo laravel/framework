@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.3 (2017-09-07)
 
 ### Added
 - Added `$action` parameter to `Route::getAction()` for simpler access ([#20975](https://github.com/laravel/framework/pull/20975))
