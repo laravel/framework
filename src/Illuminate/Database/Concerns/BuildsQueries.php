@@ -99,11 +99,11 @@ trait BuildsQueries
     /**
      * Apply the basic where if the given "condition" is true.
      *
-     * @param  mixed $condition
-     * @param  string $column
-     * @param  string $operator
-     * @param  mixed $value
-     * @param  string $boolean
+     * @param  mixed  $condition
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
      * @return mixed
      */
     public function if($condition, $column, $operator = null, $value = null, $boolean = 'and')
