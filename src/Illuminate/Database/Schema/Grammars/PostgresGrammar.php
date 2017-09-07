@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Exception;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -613,7 +614,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeGeometry(Fluent $column)
     {
-        throw new \Exception('Geometry data type not supported for current database engine.');
+        throw new Exception('Geometry data type not supported for current database engine.');
     }
 
     /**
