@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
+use Throwable;
 use Whoops\Run as Whoops;
 use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
@@ -151,7 +152,7 @@ class Handler implements ExceptionHandlerContract
                 'userId' => Auth::id(),
                 'email' => Auth::user() ? Auth::user()->email : null,
             ]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
@@ -445,6 +446,7 @@ class Handler implements ExceptionHandlerContract
     {
         return config('app.debug') ? [
             'message' => $e->getMessage(),
+            'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => $e->getTrace(),
