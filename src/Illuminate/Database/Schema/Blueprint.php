@@ -142,7 +142,7 @@ class Blueprint
     protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
-            foreach (['primary', 'unique', 'index'] as $index) {
+            foreach (['primary', 'unique', 'index', 'spatialIndex'] as $index) {
                 // If the index has been specified on the given column, but is simply equal
                 // to "true" (boolean), no name has been specified for this index so the
                 // index method can be called without a name and it will generate one.
@@ -383,6 +383,18 @@ class Blueprint
     public function index($columns, $name = null, $algorithm = null)
     {
         return $this->indexCommand('index', $columns, $name, $algorithm);
+    }
+
+    /**
+     * Specify a spatial index for the table.
+     *
+     * @param  string|array  $columns
+     * @param  string        $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function spatialIndex($columns, $name = null)
+    {
+        return $this->indexCommand('spatialIndex', $columns, $name);
     }
 
     /**
