@@ -315,7 +315,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
-    public function testBlank() 
+    public function testBlank()
     {
         $null = null;
         $this->assertTrue(blank($null));
@@ -325,18 +325,17 @@ class SupportHelpersTest extends TestCase
 
         $int = 1;
         $float = 1.111;
-        $strNumber = "1.1111";
+        $strNumber = '1.1111';
         $boolean = true;
         $this->assertFalse(blank($int));
         $this->assertFalse(blank($float));
         $this->assertFalse(blank($strNumber));
         $this->assertFalse(blank($boolean));
 
-        $emptyArray = ["", ""];
+        $emptyArray = ['', ''];
         $emptyObject = new stdClass;
-        $emptyObject->e1 = "";
-        $emptyObject->e2 = "";
-
+        $emptyObject->e1 = '';
+        $emptyObject->e2 = '';
         $this->assertTrue(blank($emptyArray));
         $this->assertTrue(blank($emptyObject));
     }
