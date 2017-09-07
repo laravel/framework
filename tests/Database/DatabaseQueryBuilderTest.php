@@ -147,6 +147,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" where "email" = ?', $builder->toSql());
     }
 
+    public function testEloquentIf()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->if(true, 'email', 'test@test.com');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->if(true, 'email', '=', 'test@test.com', 'or');
+        $this->assertEquals('select * from "users" where "id" = ? or "email" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->if(false, 'email', 'test@test.com');
+        $this->assertEquals('select * from "users" where "id" = ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->if(true, 'email', 'like', 'test%');
+        $this->assertEquals('select * from "users" where "id" = ? and "email" like ?', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->if(true, 'id', '>', '1');
+        $this->assertEquals('select * from "users" where "id" > ?', $builder->toSql());
+    }
+
     public function testWhenCallbackWithReturn()
     {
         $callback = function ($query, $condition) {

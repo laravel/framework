@@ -99,14 +99,14 @@ trait BuildsQueries
     /**
      * Apply the basic where if the given "condition" is true.
      * 
-     * @param  mixed $coniditon
+     * @param  mixed $condition
      * @param  string $column
      * @param  string $operator
      * @param  mixed $value
      * @param  string $boolean
      * @return mixed
      */
-    public function if($coniditon, $column, $operator = null, $value = null, $boolean)
+    public function if($condition, $column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($condition) {
             if (func_num_args() === 3) {
