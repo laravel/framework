@@ -315,6 +315,31 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
+    public function testBlank()
+    {
+        $null = null;
+        $this->assertTrue(blank($null));
+
+        $blankStr = ' ';
+        $this->assertTrue(blank($blankStr));
+
+        $int = 1;
+        $float = 1.111;
+        $strNumber = '1.1111';
+        $boolean = true;
+        $this->assertFalse(blank($int));
+        $this->assertFalse(blank($float));
+        $this->assertFalse(blank($strNumber));
+        $this->assertFalse(blank($boolean));
+
+        $emptyArray = ['', ''];
+        $emptyObject = new stdClass;
+        $emptyObject->e1 = '';
+        $emptyObject->e2 = '';
+        $this->assertTrue(blank($emptyArray));
+        $this->assertTrue(blank($emptyObject));
+    }
+
     public function testCamelCase()
     {
         $this->assertEquals('fooBar', Str::camel('FooBar'));
