@@ -97,6 +97,31 @@ trait BuildsQueries
     }
 
     /**
+     * Apply the basic where if the given "condition" is true.
+     * 
+     * @param  mixed $coniditon
+     * @param  string $column
+     * @param  string $operator
+     * @param  mixed $value
+     * @param  string $boolean
+     * @return mixed
+     */
+    public function if($coniditon, $column, $operator = null, $value = null, $boolean)
+    {
+        if ($condition) {
+            if (func_num_args() === 3) {
+                list($value, $operator) = [$operator, '='];
+            } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+                throw new InvalidArgumentException('Illegal operator and value combination.');
+            }
+
+            return $this->where($column, $operator, $value, $boolean);
+        }
+
+        return $this;
+    }
+
+    /**
      * Pass the query to a given callback.
      *
      * @param  \Closure  $callback
