@@ -7,8 +7,10 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Events\MigrationsExecuted;
+use Illuminate\Database\Events\MigrationFailed;
 use Illuminate\Database\Events\MigrationsRolledBack;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\QueryException;
 
 class Migrator
 {
@@ -383,9 +385,14 @@ class Migrator
             }
         };
 
-        $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
-                    ? $connection->transaction($callback)
-                    : $callback();
+        try {
+            $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
+                ? $connection->transaction($callback)
+                : $callback();
+        }catch (QueryException $e) {
+            $this->events->dispatch(new MigrationFailed($this));
+            throw $e;
+        }
     }
 
     /**
