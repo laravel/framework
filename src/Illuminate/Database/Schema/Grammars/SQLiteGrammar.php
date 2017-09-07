@@ -208,6 +208,16 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all tables.
+     *
+     * @return string
+     */
+    public function compileDropAllTables()
+    {
+        return "delete from sqlite_master where type in ('table', 'index', 'trigger')";
+    }
+
+    /**
      * Compile a drop column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -290,6 +300,26 @@ class SQLiteGrammar extends Grammar
     public function compileDisableForeignKeyConstraints()
     {
         return 'PRAGMA foreign_keys = OFF;';
+    }
+
+    /**
+     * Compile the SQL needed to enable a writable schema.
+     *
+     * @return string
+     */
+    public function compileEnableWriteableSchema()
+    {
+        return 'PRAGMA writable_schema = 1;';
+    }
+
+    /**
+     * Compile the SQL needed to disable a writable schema.
+     *
+     * @return string
+     */
+    public function compileDisableWriteableSchema()
+    {
+        return 'PRAGMA writable_schema = 0;';
     }
 
     /**
@@ -609,6 +639,94 @@ class SQLiteGrammar extends Grammar
     protected function typeMacAddress(Fluent $column)
     {
         return 'varchar';
+    }
+
+    /**
+     * Create the column definition for a geometry type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeGeometry(Fluent $column)
+    {
+        return 'geometry';
+    }
+
+    /**
+     * Create the column definition for a point type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typePoint(Fluent $column)
+    {
+        return 'point';
+    }
+
+    /**
+     * Create the column definition for a linestring type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeLinestring(Fluent $column)
+    {
+        return 'linestring';
+    }
+
+    /**
+     * Create the column definition for a polygon type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typePolygon(Fluent $column)
+    {
+        return 'polygon';
+    }
+
+    /**
+     * Create the column definition for a geometrycollection type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeGeometrycollection(Fluent $column)
+    {
+        return 'geometrycollection';
+    }
+
+    /**
+     * Create the column definition for a multipoint type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeMultipoint(Fluent $column)
+    {
+        return 'multipoint';
+    }
+
+    /**
+     * Create the column definition for a multilinestring type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeMultilinestring(Fluent $column)
+    {
+        return 'multilinestring';
+    }
+
+    /**
+     * Create the column definition for a multipolygon type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeMultipolygon(Fluent $column)
+    {
+        return 'multipolygon';
     }
 
     /**

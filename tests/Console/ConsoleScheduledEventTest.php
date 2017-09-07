@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Console;
 
 use Mockery as m;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;
 
@@ -54,6 +54,10 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertFalse($event->when(function () {
             return false;
         })->filtersPass($app));
+
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
+        $this->assertEquals('* * * * * *', $event->getExpression());
+        $this->assertFalse($event->when(false)->filtersPass($app));
 
         // chained rules should be commutative
         $eventA = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');

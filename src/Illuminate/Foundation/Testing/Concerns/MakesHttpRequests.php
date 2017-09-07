@@ -12,11 +12,57 @@ use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 trait MakesHttpRequests
 {
     /**
+     * Additional headers for the request.
+     *
+     * @var array
+     */
+    protected $defaultHeaders = [];
+
+    /**
      * Additional server variables for the request.
      *
      * @var array
      */
     protected $serverVariables = [];
+
+    /**
+     * Define additional headers to be sent with the request.
+     *
+     * @param  array $headers
+     * @return $this
+     */
+    public function withHeaders(array $headers)
+    {
+        $this->defaultHeaders = array_merge($this->defaultHeaders, $headers);
+
+        return $this;
+    }
+
+    /**
+     * Add a header to be sent with the request.
+     *
+     * @param  string $name
+     * @param  string $value
+     * @return $this
+     */
+    public function withHeader(string $name, string $value)
+    {
+        $this->defaultHeaders[$name] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Flush all the configured headers.
+     *
+     * @return $this
+     */
+    public function flushHeaders()
+    {
+        $this->defaultHeaders = [];
+
+        return $this;
+    }
 
     /**
      * Define a set of server variables to be sent with the requests.
@@ -34,11 +80,25 @@ trait MakesHttpRequests
     /**
      * Disable middleware for the test.
      *
+     * @param  string|array  $middleware
      * @return $this
      */
-    public function withoutMiddleware()
+    public function withoutMiddleware($middleware = null)
     {
-        $this->app->instance('middleware.disable', true);
+        if (is_null($middleware)) {
+            $this->app->instance('middleware.disable', true);
+
+            return $this;
+        }
+
+        foreach ((array) $middleware as $abstract) {
+            $this->app->instance($abstract, new class {
+                public function handle($request, $next)
+                {
+                    return $next($request);
+                }
+            });
+        }
 
         return $this;
     }
@@ -266,7 +326,7 @@ trait MakesHttpRequests
      */
     protected function transformHeadersToServerVars(array $headers)
     {
-        return collect($headers)->mapWithKeys(function ($value, $name) {
+        return collect(array_merge($this->defaultHeaders, $headers))->mapWithKeys(function ($value, $name) {
             $name = strtr(strtoupper($name), '-', '_');
 
             return [$this->formatServerHeaderKey($name) => $value];
@@ -281,7 +341,7 @@ trait MakesHttpRequests
      */
     protected function formatServerHeaderKey($name)
     {
-        if (! Str::startsWith($name, 'HTTP_') && $name != 'CONTENT_TYPE') {
+        if (! Str::startsWith($name, 'HTTP_') && $name !== 'CONTENT_TYPE') {
             return 'HTTP_'.$name;
         }
 

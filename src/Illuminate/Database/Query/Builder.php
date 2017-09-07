@@ -27,7 +27,7 @@ class Builder
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \Illuminate\Database\ConnectionInterface
      */
     public $connection;
 
@@ -334,8 +334,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @param  string  $type
      * @param  bool    $where
      * @return $this
@@ -389,8 +389,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
@@ -417,8 +417,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
@@ -444,9 +444,9 @@ class Builder
      * Add a "cross join" clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
@@ -480,7 +480,7 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
+     * @param  string|null  $operator
      * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
@@ -526,7 +526,7 @@ class Builder
         // where null clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
         if (is_null($value)) {
-            return $this->whereNull($column, $boolean, $operator != '=');
+            return $this->whereNull($column, $boolean, $operator !== '=');
         }
 
         // If the column is making a JSON reference we'll check to see if the value
@@ -625,7 +625,7 @@ class Builder
      * Add an "or where" clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
+     * @param  string|null  $operator
      * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1259,7 +1259,7 @@ class Builder
             // If the segment is not a boolean connector, we can assume it is a column's name
             // and we will add it to the query as a new constraint as a where clause, then
             // we can keep iterating through the dynamic method string's segments again.
-            if ($segment != 'And' && $segment != 'Or') {
+            if ($segment !== 'And' && $segment !== 'Or') {
                 $this->addDynamic($segment, $connector, $parameters, $index);
 
                 $index++;
@@ -1306,7 +1306,7 @@ class Builder
         foreach ($groups as $group) {
             $this->groups = array_merge(
                 (array) $this->groups,
-                array_wrap($group)
+                Arr::wrap($group)
             );
         }
 
@@ -1317,8 +1317,8 @@ class Builder
      * Add a "having" clause to the query.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param  string|null  $operator
+     * @param  string|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -1353,8 +1353,8 @@ class Builder
      * Add a "or having" clause to the query.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param  string|null  $operator
+     * @param  string|null  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orHaving($column, $operator = null, $value = null)
@@ -1857,6 +1857,8 @@ class Builder
             }
 
             $lastId = $results->last()->{$alias};
+
+            unset($results);
         } while ($countResults == $count);
 
         return true;
@@ -1950,7 +1952,7 @@ class Builder
      */
     public function count($columns = '*')
     {
-        return (int) $this->aggregate(__FUNCTION__, array_wrap($columns));
+        return (int) $this->aggregate(__FUNCTION__, Arr::wrap($columns));
     }
 
     /**
@@ -2121,7 +2123,7 @@ class Builder
      * Insert a new record and get the value of the primary key.
      *
      * @param  array   $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return int
      */
     public function insertGetId(array $values, $sequence = null)

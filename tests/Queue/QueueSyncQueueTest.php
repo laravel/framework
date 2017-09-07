@@ -35,7 +35,7 @@ class QueueSyncQueueTest extends TestCase
         $container = new \Illuminate\Container\Container;
         Container::setInstance($container);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('fire')->times(3);
+        $events->shouldReceive('dispatch')->times(3);
         $container->instance('events', $events);
         $container->instance('Illuminate\Contracts\Events\Dispatcher', $events);
         $sync->setContainer($container);
@@ -56,6 +56,11 @@ class SyncQueueTestEntity implements \Illuminate\Contracts\Queue\QueueableEntity
     {
         return 1;
     }
+
+    public function getQueueableConnection()
+    {
+        //
+    }
 }
 
 class SyncQueueTestHandler
@@ -70,7 +75,7 @@ class FailingSyncQueueTestHandler
 {
     public function fire($job, $data)
     {
-        throw new Exception();
+        throw new Exception;
     }
 
     public function failed()

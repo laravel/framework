@@ -50,19 +50,15 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', 'baz', true);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage A MigrationCreatorFakeMigration class already exists.
+     */
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {
         $creator = $this->getCreator();
 
-        try {
-            $creator->create('migration_creator_fake_migration', 'foo');
-        } catch (\Exception $e) {
-            $this->assertEquals($e->getMessage(), 'A MigrationCreatorFakeMigration migration already exists.');
-
-            return;
-        }
-
-        $this->fail();
+        $creator->create('migration_creator_fake_migration', 'foo');
     }
 
     protected function getCreator()

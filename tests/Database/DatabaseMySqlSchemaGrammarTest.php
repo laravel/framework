@@ -27,7 +27,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
 
         $blueprint = new Blueprint('users');
@@ -39,7 +39,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
     }
 
@@ -57,7 +57,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
 
         $blueprint = new Blueprint('users');
@@ -72,7 +72,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
     }
 
@@ -90,7 +90,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate utf8mb4_unicode_ci', $statements[0]);
 
         $blueprint = new Blueprint('users');
@@ -105,7 +105,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
     }
 
@@ -123,7 +123,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $statements = $blueprint->toSql($conn, $grammar);
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
     }
 
@@ -133,7 +133,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->drop();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('drop table `users`', $statements[0]);
     }
 
@@ -143,7 +143,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropIfExists();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('drop table if exists `users`', $statements[0]);
     }
 
@@ -153,21 +153,21 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropColumn('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop `foo`', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn(['foo', 'bar']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop `foo`, drop `bar`', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop `foo`, drop `bar`', $statements[0]);
     }
 
@@ -177,7 +177,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropPrimary();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop primary key', $statements[0]);
     }
 
@@ -187,7 +187,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropUnique('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop index `foo`', $statements[0]);
     }
 
@@ -197,7 +197,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropIndex('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop index `foo`', $statements[0]);
     }
 
@@ -207,7 +207,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropForeign('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop foreign key `foo`', $statements[0]);
     }
 
@@ -217,7 +217,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropTimestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
     }
 
@@ -227,7 +227,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropTimestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
     }
 
@@ -237,7 +237,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->rename('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('rename table `users` to `foo`', $statements[0]);
     }
 
@@ -247,7 +247,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->primary('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add primary key `bar`(`foo`)', $statements[0]);
     }
 
@@ -257,7 +257,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->primary('foo', 'bar', 'hash');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add primary key `bar` using hash(`foo`)', $statements[0]);
     }
 
@@ -267,7 +267,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->unique('foo', 'bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add unique `bar`(`foo`)', $statements[0]);
     }
 
@@ -277,7 +277,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->index(['foo', 'bar'], 'baz');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add index `baz`(`foo`, `bar`)', $statements[0]);
     }
 
@@ -287,7 +287,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->index(['foo', 'bar'], 'baz', 'hash');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
     }
 
@@ -297,7 +297,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->foreign('foo_id')->references('id')->on('orders');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add constraint `users_foo_id_foreign` foreign key (`foo_id`) references `orders` (`id`)', $statements[0]);
     }
 
@@ -307,7 +307,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->increments('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key', $statements[0]);
     }
 
@@ -317,7 +317,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->smallIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `id` smallint unsigned not null auto_increment primary key', $statements[0]);
     }
 
@@ -327,7 +327,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->bigIncrements('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
     }
 
@@ -337,7 +337,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->string('name')->first();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `name` varchar(255) not null first', $statements[0]);
     }
 
@@ -347,7 +347,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->string('name')->after('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `name` varchar(255) not null after `foo`', $statements[0]);
     }
 
@@ -359,7 +359,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->integer('discounted_stored')->storedAs('price - 5');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `products` add `price` int not null, add `discounted_virtual` int as (price - 5), add `discounted_stored` int as (price - 5) stored', $statements[0]);
     }
 
@@ -369,28 +369,28 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->string('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(255) not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->string('foo', 100);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(100) not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->string('foo', 100)->nullable()->default('bar');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(100) null default \'bar\'', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->string('foo', 100)->nullable()->default(new \Illuminate\Database\Query\Expression('CURRENT TIMESTAMP'));
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(100) null default CURRENT TIMESTAMP', $statements[0]);
     }
 
@@ -400,7 +400,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->text('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` text not null', $statements[0]);
     }
 
@@ -410,14 +410,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->bigInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` bigint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->bigInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` bigint not null auto_increment primary key', $statements[0]);
     }
 
@@ -427,14 +427,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->integer('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` int not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` int not null auto_increment primary key', $statements[0]);
     }
 
@@ -444,14 +444,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->mediumInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` mediumint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->mediumInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` mediumint not null auto_increment primary key', $statements[0]);
     }
 
@@ -461,14 +461,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->smallInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` smallint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->smallInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` smallint not null auto_increment primary key', $statements[0]);
     }
 
@@ -478,14 +478,14 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->tinyInteger('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` tinyint not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->tinyInteger('foo', true);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` tinyint not null auto_increment primary key', $statements[0]);
     }
 
@@ -495,7 +495,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->float('foo', 5, 2);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` double(5, 2) not null', $statements[0]);
     }
 
@@ -505,7 +505,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->double('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` double not null', $statements[0]);
     }
 
@@ -515,7 +515,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->double('foo', 15, 8);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` double(15, 8) not null', $statements[0]);
     }
 
@@ -525,7 +525,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->decimal('foo', 5, 2);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` decimal(5, 2) not null', $statements[0]);
     }
 
@@ -535,7 +535,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->boolean('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` tinyint(1) not null', $statements[0]);
     }
 
@@ -545,7 +545,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->enum('foo', ['bar', 'baz']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` enum(\'bar\', \'baz\') not null', $statements[0]);
     }
 
@@ -555,7 +555,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->json('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` json not null', $statements[0]);
     }
 
@@ -565,7 +565,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->jsonb('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` json not null', $statements[0]);
     }
 
@@ -575,7 +575,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->date('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` date not null', $statements[0]);
     }
 
@@ -584,18 +584,28 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->dateTime('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('foo', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` datetime(1) not null', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->dateTimeTz('foo', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` datetime(1) not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->dateTimeTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
     }
 
@@ -604,8 +614,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->time('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` time not null', $statements[0]);
     }
 
@@ -615,67 +624,97 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timeTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` time not null', $statements[0]);
     }
 
     public function testAddingTimeStamp()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->timestamp('foo', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->timestamp('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` timestamp not null', $statements[0]);
     }
 
     public function testAddingTimeStampWithDefault()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->timestamp('foo', 1)->default('2015-07-22 11:43:17');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null default \'2015-07-22 11:43:17\'', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->timestamp('foo')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
     }
 
     public function testAddingTimeStampTz()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('foo', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->timestampTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` timestamp not null', $statements[0]);
     }
 
     public function testAddingTimeStampTzWithDefault()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('foo', 1)->default('2015-07-22 11:43:17');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null default \'2015-07-22 11:43:17\'', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->timestampTz('foo')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
     }
 
     public function testAddingTimeStamps()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->timestamps(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) null, add `updated_at` timestamp(1) null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
     }
 
     public function testAddingTimeStampsTz()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) null, add `updated_at` timestamp(1) null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
     }
 
@@ -685,7 +724,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->rememberToken();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `remember_token` varchar(100) null', $statements[0]);
     }
 
@@ -695,7 +734,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->binary('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` blob not null', $statements[0]);
     }
 
@@ -705,7 +744,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->uuid('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` char(36) not null', $statements[0]);
     }
 
@@ -715,7 +754,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->ipAddress('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(45) not null', $statements[0]);
     }
 
@@ -725,8 +764,88 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->macAddress('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(17) not null', $statements[0]);
+    }
+
+    public function testAddingGeometry()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->geometry('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` geometry not null', $statements[0]);
+    }
+
+    public function testAddingPoint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->point('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` point not null', $statements[0]);
+    }
+
+    public function testAddingLinestring()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->linestring('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` linestring not null', $statements[0]);
+    }
+
+    public function testAddingPolygon()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->polygon('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` polygon not null', $statements[0]);
+    }
+
+    public function testAddingGeometryCollection()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->geometrycollection('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` geometrycollection not null', $statements[0]);
+    }
+
+    public function testAddingMultipoint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->multipoint('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` multipoint not null', $statements[0]);
+    }
+
+    public function testAddingMultiLinestring()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->multilinestring('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` multilinestring not null', $statements[0]);
+    }
+
+    public function testAddingMultiPolygon()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->multipolygon('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` multipolygon not null', $statements[0]);
     }
 
     public function testAddingComment()
@@ -737,6 +856,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
+    }
+
+    public function testDropAllTables()
+    {
+        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop table `alpha`,`beta`,`gamma`', $statement);
     }
 
     protected function getConnection()

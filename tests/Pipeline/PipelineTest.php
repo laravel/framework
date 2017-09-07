@@ -45,6 +45,63 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
+    public function testPipelineUsageWithInvokableObjects()
+    {
+        $result = (new Pipeline(new \Illuminate\Container\Container))
+            ->send('foo')
+            ->through([new PipelineTestPipeTwo])
+            ->then(
+                function ($piped) {
+                    return $piped;
+                }
+            );
+
+        $this->assertEquals('foo', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineUsageWithCallable()
+    {
+        $function = function ($piped, $next) {
+            $_SERVER['__test.pipe.one'] = 'foo';
+
+            return $next($piped);
+        };
+
+        $result = (new Pipeline(new \Illuminate\Container\Container))
+            ->send('foo')
+            ->through([$function])
+            ->then(
+                function ($piped) {
+                    return $piped;
+                }
+            );
+
+        $this->assertEquals('foo', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineUsageWithInvokableClass()
+    {
+        $result = (new Pipeline(new \Illuminate\Container\Container))
+            ->send('foo')
+            ->through([PipelineTestPipeTwo::class])
+            ->then(
+                function ($piped) {
+                    return $piped;
+                }
+            );
+
+        $this->assertEquals('foo', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
+
+        unset($_SERVER['__test.pipe.one']);
+    }
+
     public function testPipelineUsageWithParameters()
     {
         $parameters = ['one', 'two'];
@@ -76,6 +133,7 @@ class PipelineTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
+     * @expectedExceptionMessage A container instance has not been passed to the Pipeline.
      */
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
     {
@@ -98,6 +156,16 @@ class PipelineTestPipeOne
 
     public function differentMethod($piped, $next)
     {
+        return $next($piped);
+    }
+}
+
+class PipelineTestPipeTwo
+{
+    public function __invoke($piped, $next)
+    {
+        $_SERVER['__test.pipe.one'] = $piped;
+
         return $next($piped);
     }
 }

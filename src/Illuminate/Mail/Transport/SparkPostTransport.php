@@ -2,7 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Swift_Mime_Message;
+use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
 
 class SparkPostTransport extends Transport
@@ -46,7 +46,7 @@ class SparkPostTransport extends Transport
     /**
      * {@inheritdoc}
      */
-    public function send(Swift_Mime_Message $message, &$failedRecipients = null)
+    public function send(Swift_Mime_SimpleMessage $message, &$failedRecipients = null)
     {
         $this->beforeSendPerformed($message);
 
@@ -80,10 +80,10 @@ class SparkPostTransport extends Transport
      *
      * Note that SparkPost still respects CC, BCC headers in raw message itself.
      *
-     * @param  \Swift_Mime_Message $message
+     * @param  \Swift_Mime_SimpleMessage $message
      * @return array
      */
-    protected function getRecipients(Swift_Mime_Message $message)
+    protected function getRecipients(Swift_Mime_SimpleMessage $message)
     {
         $recipients = [];
 
@@ -139,7 +139,7 @@ class SparkPostTransport extends Transport
     /**
      * Get the transmission options being used by the transport.
      *
-     * @return string
+     * @return array
      */
     public function getOptions()
     {

@@ -747,6 +747,7 @@ class MimeType
         'mp4' => 'video/mp4',
         'mpeg' => 'video/mpeg',
         'ogv' => 'video/ogg',
+        'mov' => 'video/quicktime',
         'qt' => 'video/quicktime',
         'uvh' => 'video/vnd.dece.hd',
         'uvm' => 'video/vnd.dece.mobile',
@@ -788,6 +789,39 @@ class MimeType
     {
         $extension = pathinfo($filename, PATHINFO_EXTENSION);
 
-        return collect(self::$mimes)->get($extension, 'application/octet-stream');
+        return self::getMimeTypeFromExtension($extension);
+    }
+
+    /**
+     * Get the MIME type for a given extension or return all mimes.
+     *
+     * @param  string  $extension
+     * @return string|array
+     */
+    public static function get($extension = null)
+    {
+        return $extension ? self::getMimeTypeFromExtension($extension) : self::$mimes;
+    }
+
+    /**
+     * Search for the extension of a given MIME type.
+     *
+     * @param  string  $mimeType
+     * @return string|null
+     */
+    public static function search($mimeType)
+    {
+        return array_search($mimeType, self::$mimes) ?: null;
+    }
+
+    /**
+     * Get the MIME type for a given extension.
+     *
+     * @param  string  $extension
+     * @return string
+     */
+    protected static function getMimeTypeFromExtension($extension)
+    {
+        return self::$mimes[$extension] ?? 'application/octet-stream';
     }
 }

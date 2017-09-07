@@ -17,15 +17,16 @@ class PaginatorTest extends TestCase
         $this->assertEquals(['item3', 'item4'], $p->items());
 
         $pageInfo = [
-                    'per_page' => 2,
-                    'current_page' => 2,
-                    'next_page_url' => '/?page=3',
-                    'prev_page_url' => '/?page=1',
-                    'from' => 3,
-                    'to' => 4,
-                    'data' => ['item3', 'item4'],
-                    'path' => '/',
-                    ];
+            'per_page' => 2,
+            'current_page' => 2,
+            'first_page_url' => '/?page=1',
+            'next_page_url' => '/?page=3',
+            'prev_page_url' => '/?page=1',
+            'from' => 3,
+            'to' => 4,
+            'data' => ['item3', 'item4'],
+            'path' => '/',
+        ];
 
         $this->assertEquals($pageInfo, $p->toArray());
     }

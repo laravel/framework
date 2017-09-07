@@ -156,6 +156,14 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
+     *  {@inheritdoc}
+     */
+    public function has($id)
+    {
+        return $this->bound($id);
+    }
+
+    /**
      * Determine if the given abstract type has been resolved.
      *
      * @param  string  $abstract
@@ -245,7 +253,7 @@ class Container implements ArrayAccess, ContainerContract
                 return $container->build($concrete);
             }
 
-            return $container->makeWith($concrete, $parameters);
+            return $container->make($concrete, $parameters);
         };
     }
 
@@ -355,7 +363,7 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  string  $abstract
      * @param  mixed   $instance
-     * @return void
+     * @return mixed
      */
     public function instance($abstract, $instance)
     {
@@ -373,6 +381,8 @@ class Container implements ArrayAccess, ContainerContract
         if ($isBound) {
             $this->rebound($abstract);
         }
+
+        return $instance;
     }
 
     /**
@@ -553,26 +563,39 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Resolve the given type with the given parameter overrides.
+     * An alias function name for make().
      *
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
      */
-    public function makeWith($abstract, array $parameters)
+    public function makeWith($abstract, array $parameters = [])
     {
-        return $this->resolve($abstract, $parameters);
+        return $this->make($abstract, $parameters);
     }
 
     /**
      * Resolve the given type from the container.
      *
      * @param  string  $abstract
+     * @param  array  $parameters
      * @return mixed
      */
-    public function make($abstract)
+    public function make($abstract, array $parameters = [])
     {
-        return $this->resolve($abstract);
+        return $this->resolve($abstract, $parameters);
+    }
+
+    /**
+     *  {@inheritdoc}
+     */
+    public function get($id)
+    {
+        if ($this->has($id)) {
+            return $this->resolve($id);
+        }
+
+        throw new EntryNotFoundException;
     }
 
     /**
@@ -785,7 +808,7 @@ class Container implements ArrayAccess, ContainerContract
             // If the class is null, it means the dependency is a string or some other
             // primitive type which we can not resolve since it is not a class and
             // we will just bomb out with an error since we have no-where to go.
-            $results[] = is_null($class = $dependency->getClass())
+            $results[] = is_null($dependency->getClass())
                             ? $this->resolvePrimitive($dependency)
                             : $this->resolveClass($dependency);
         }
@@ -794,7 +817,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Determine if the given dependency has a parameter override from makeWith.
+     * Determine if the given dependency has a parameter override.
      *
      * @param  \ReflectionParameter  $dependency
      * @return bool

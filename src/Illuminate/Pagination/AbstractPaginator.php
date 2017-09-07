@@ -3,7 +3,6 @@
 namespace Illuminate\Pagination;
 
 use Closure;
-use ArrayIterator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
@@ -455,7 +454,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function getIterator()
     {
-        return new ArrayIterator($this->items->all());
+        return $this->items->getIterator();
     }
 
     /**
@@ -466,6 +465,16 @@ abstract class AbstractPaginator implements Htmlable
     public function isEmpty()
     {
         return $this->items->isEmpty();
+    }
+
+    /**
+     * Determine if the list of items is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty()
+    {
+        return $this->items->isNotEmpty();
     }
 
     /**

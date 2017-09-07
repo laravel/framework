@@ -77,7 +77,7 @@ class EncryptCookiesTestController extends Controller
 {
     public function setCookies()
     {
-        $response = new Response();
+        $response = new Response;
         $response->headers->setCookie(new Cookie('encrypted_cookie', 'value'));
         $response->headers->setCookie(new Cookie('unencrypted_cookie', 'value'));
 
@@ -86,7 +86,7 @@ class EncryptCookiesTestController extends Controller
 
     public function queueCookies()
     {
-        return new Response();
+        return new Response;
     }
 }
 

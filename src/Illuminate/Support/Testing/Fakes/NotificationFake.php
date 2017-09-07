@@ -34,9 +34,29 @@ class NotificationFake implements NotificationFactory
             return;
         }
 
+        if (is_numeric($callback)) {
+            return $this->assertSentToTimes($notifiable, $notification, $callback);
+        }
+
         PHPUnit::assertTrue(
             $this->sent($notifiable, $notification, $callback)->count() > 0,
             "The expected [{$notification}] notification was not sent."
+        );
+    }
+
+    /**
+     * Assert if a notification was sent a number of times.
+     *
+     * @param  mixed  $notifiable
+     * @param  string  $notification
+     * @param  int  $times
+     * @return void
+     */
+    public function assertSentToTimes($notifiable, $notification, $times = 1)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->sent($notifiable, $notification)->count()) === $times,
+            "The expected [{$notification}] notification was sent {$count} times instead of {$times} times."
         );
     }
 
@@ -62,6 +82,16 @@ class NotificationFake implements NotificationFactory
             $this->sent($notifiable, $notification, $callback)->count() === 0,
             "The unexpected [{$notification}] notification was sent."
         );
+    }
+
+    /**
+     * Assert that no notifications were sent.
+     *
+     * @return void
+     */
+    public function assertNothingSent()
+    {
+        PHPUnit::assertEmpty($this->notifications, 'Notifications were sent unexpectedly.');
     }
 
     /**

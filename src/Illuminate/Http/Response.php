@@ -5,6 +5,7 @@ namespace Illuminate\Http;
 use ArrayObject;
 use JsonSerializable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
@@ -38,7 +39,9 @@ class Response extends BaseResponse
             $content = $content->render();
         }
 
-        return parent::setContent($content);
+        parent::setContent($content);
+
+        return $this;
     }
 
     /**
@@ -49,7 +52,8 @@ class Response extends BaseResponse
      */
     protected function shouldBeJson($content)
     {
-        return $content instanceof Jsonable ||
+        return $content instanceof Arrayable ||
+               $content instanceof Jsonable ||
                $content instanceof ArrayObject ||
                $content instanceof JsonSerializable ||
                is_array($content);
@@ -65,6 +69,8 @@ class Response extends BaseResponse
     {
         if ($content instanceof Jsonable) {
             return $content->toJson();
+        } elseif ($content instanceof Arrayable) {
+            return json_encode($content->toArray());
         }
 
         return json_encode($content);

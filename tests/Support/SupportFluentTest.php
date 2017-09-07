@@ -22,7 +22,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->getAttributes());
     }
 
-    public function testAttributesAreSetByConstructorGivenStdClass()
+    public function testAttributesAreSetByConstructorGivenstdClass()
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent((object) $array);
@@ -56,6 +56,18 @@ class SupportFluentTest extends TestCase
         $this->assertEquals('Default', $fluent->get('foo', 'Default'));
         $this->assertEquals('Taylor', $fluent->name);
         $this->assertNull($fluent->foo);
+    }
+
+    public function testArrayAccessToAttributes()
+    {
+        $fluent = new Fluent(['attributes' => '1']);
+
+        $this->assertTrue(isset($fluent['attributes']));
+        $this->assertEquals($fluent['attributes'], 1);
+
+        $fluent->attributes();
+
+        $this->assertTrue($fluent['attributes']);
     }
 
     public function testMagicMethodsCanBeUsedToSetAttributes()

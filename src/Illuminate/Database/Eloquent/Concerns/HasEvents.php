@@ -13,7 +13,7 @@ trait HasEvents
      *
      * @var array
      */
-    protected $events = [];
+    protected $dispatchesEvents = [];
 
     /**
      * User exposed observable events.
@@ -55,9 +55,9 @@ trait HasEvents
     {
         return array_merge(
             [
-                'creating', 'created', 'updating', 'updated',
-                'deleting', 'deleted', 'saving', 'saved',
-                'restoring', 'restored',
+                'retrieved', 'creating', 'created', 'updating',
+                'updated', 'deleting', 'deleted', 'saving',
+                'saved', 'restoring', 'restored',
             ],
             $this->observables
         );
@@ -158,11 +158,11 @@ trait HasEvents
      */
     protected function fireCustomModelEvent($event, $method)
     {
-        if (! isset($this->events[$event])) {
+        if (! isset($this->dispatchesEvents[$event])) {
             return;
         }
 
-        $result = static::$dispatcher->$method(new $this->events[$event]($this));
+        $result = static::$dispatcher->$method(new $this->dispatchesEvents[$event]($this));
 
         if (! is_null($result)) {
             return $result;
@@ -184,6 +184,17 @@ trait HasEvents
         }
 
         return $result;
+    }
+
+    /**
+     * Register a retrieved model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function retrieved($callback)
+    {
+        static::registerModelEvent('retrieved', $callback);
     }
 
     /**

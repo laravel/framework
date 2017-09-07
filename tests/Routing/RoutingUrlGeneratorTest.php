@@ -373,11 +373,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     public function testRoutesWithDomainsThroughProxy()
     {
-        if (defined(SymfonyRequest::class.'::HEADER_X_FORWARDED_ALL')) {
-            Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
-        } else {
-            Request::setTrustedProxies(['10.0.0.1']);
-        }
+        Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
 
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -468,6 +464,11 @@ class RoutableInterfaceStub implements UrlRoutable
     public function getRouteKeyName()
     {
         return 'key';
+    }
+
+    public function resolveRouteBinding($routeKey)
+    {
+        //
     }
 }
 

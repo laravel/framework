@@ -55,7 +55,7 @@ class ListenCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set

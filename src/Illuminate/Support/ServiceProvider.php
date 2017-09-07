@@ -25,19 +25,19 @@ abstract class ServiceProvider
      *
      * @var array
      */
-    protected static $publishes = [];
+    public static $publishes = [];
 
     /**
      * The paths that should be published by group.
      *
      * @var array
      */
-    protected static $publishGroups = [];
+    public static $publishGroups = [];
 
     /**
      * Create a new service provider instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application $app
+     * @param  \Illuminate\Contracts\Foundation\Application  $app
      * @return void
      */
     public function __construct($app)
@@ -98,6 +98,17 @@ abstract class ServiceProvider
     protected function loadTranslationsFrom($path, $namespace)
     {
         $this->app['translator']->addNamespace($namespace, $path);
+    }
+
+    /**
+     * Register a JSON translation file path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadJsonTranslationsFrom($path)
+    {
+        $this->app['translator']->addJsonPath($path);
     }
 
     /**
@@ -219,6 +230,26 @@ abstract class ServiceProvider
     }
 
     /**
+     * Get the service providers available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableProviders()
+    {
+        return array_keys(static::$publishes);
+    }
+
+    /**
+     * Get the groups available for publishing.
+     *
+     * @return array
+     */
+    public static function publishableGroups()
+    {
+        return array_keys(static::$publishGroups);
+    }
+
+    /**
      * Register the package's custom Artisan commands.
      *
      * @param  array|mixed  $commands
@@ -261,17 +292,5 @@ abstract class ServiceProvider
     public function isDeferred()
     {
         return $this->defer;
-    }
-
-    /**
-     * Get a list of files that should be compiled for the package.
-     *
-     * @deprecated
-     *
-     * @return array
-     */
-    public static function compiles()
-    {
-        return [];
     }
 }

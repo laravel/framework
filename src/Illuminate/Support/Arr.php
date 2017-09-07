@@ -285,6 +285,10 @@ class Arr
             return $array[$key];
         }
 
+        if (strpos($key, '.') === false) {
+            return $array[$key] ?? value($default);
+        }
+
         foreach (explode('.', $key) as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];

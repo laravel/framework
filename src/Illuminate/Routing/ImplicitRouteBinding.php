@@ -2,7 +2,9 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class ImplicitRouteBinding
 {
@@ -17,22 +19,24 @@ class ImplicitRouteBinding
     {
         $parameters = $route->parameters();
 
-        foreach ($route->signatureParameters(Model::class) as $parameter) {
+        foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
             if (! $parameterName = static::getParameterName($parameter->name, $parameters)) {
                 continue;
             }
 
             $parameterValue = $parameters[$parameterName];
 
-            if ($parameterValue instanceof Model) {
+            if ($parameterValue instanceof UrlRoutable) {
                 continue;
             }
 
-            $model = $container->make($parameter->getClass()->name);
+            $instance = $container->make($parameter->getClass()->name);
 
-            $route->setParameter($parameterName, $model->where(
-                $model->getRouteKeyName(), $parameterValue
-            )->firstOrFail());
+            if (! $model = $instance->resolveRouteBinding($parameterValue)) {
+                throw (new ModelNotFoundException)->setModel(get_class($instance));
+            }
+
+            $route->setParameter($parameterName, $model);
         }
     }
 
@@ -49,9 +53,7 @@ class ImplicitRouteBinding
             return $name;
         }
 
-        $snakedName = snake_case($name);
-
-        if (array_key_exists($snakedName, $parameters)) {
+        if (array_key_exists($snakedName = Str::snake($name), $parameters)) {
             return $snakedName;
         }
     }

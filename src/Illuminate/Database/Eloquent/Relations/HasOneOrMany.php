@@ -55,7 +55,7 @@ abstract class HasOneOrMany extends Relation
     public function make(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
         });
     }
 
@@ -188,7 +188,7 @@ abstract class HasOneOrMany extends Relation
         if (is_null($instance = $this->find($id, $columns))) {
             $instance = $this->related->newInstance();
 
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
         }
 
         return $instance;
@@ -198,14 +198,15 @@ abstract class HasOneOrMany extends Relation
      * Get the first related model record matching the attributes or instantiate it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrNew(array $attributes)
+    public function firstOrNew(array $attributes, array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance($attributes);
+            $instance = $this->related->newInstance($attributes + $values);
 
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
         }
 
         return $instance;
@@ -215,12 +216,13 @@ abstract class HasOneOrMany extends Relation
      * Get the first related record matching the attributes or create it.
      *
      * @param  array  $attributes
+     * @param  array  $values
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function firstOrCreate(array $attributes)
+    public function firstOrCreate(array $attributes, array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create($attributes);
+            $instance = $this->create($attributes + $values);
         }
 
         return $instance;
@@ -250,7 +252,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function save(Model $model)
     {
-        $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+        $this->setForeignAttributesForCreate($model);
 
         return $model->save() ? $model : false;
     }
@@ -276,10 +278,10 @@ abstract class HasOneOrMany extends Relation
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function create(array $attributes)
+    public function create(array $attributes = [])
     {
         return tap($this->related->newInstance($attributes), function ($instance) {
-            $instance->setAttribute($this->getForeignKeyName(), $this->getParentKey());
+            $this->setForeignAttributesForCreate($instance);
 
             $instance->save();
         });
@@ -300,6 +302,17 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $instances;
+    }
+
+    /**
+     * Set the foreign ID for creating a related model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return void
+     */
+    protected function setForeignAttributesForCreate(Model $model)
+    {
+        $model->setAttribute($this->getForeignKeyName(), $this->getParentKey());
     }
 
     /**
@@ -402,7 +415,7 @@ abstract class HasOneOrMany extends Relation
     {
         $segments = explode('.', $this->getQualifiedForeignKeyName());
 
-        return $segments[count($segments) - 1];
+        return end($segments);
     }
 
     /**

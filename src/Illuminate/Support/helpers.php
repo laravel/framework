@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Optional;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Contracts\Support\Htmlable;
@@ -330,6 +331,35 @@ if (! function_exists('array_wrap')) {
     }
 }
 
+if (! function_exists('blank')) {
+    /**
+     * Determine if the given value is "blank".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function blank($value)
+    {
+        if (is_null($value)) {
+            return true;
+        }
+
+        if (is_string($value)) {
+            return trim($value) === '';
+        }
+
+        if (is_numeric($value) || is_bool($value)) {
+            return false;
+        }
+
+        if ($value instanceof Countable) {
+            return count($value) === 0;
+        }
+
+        return empty($value);
+    }
+}
+
 if (! function_exists('camel_case')) {
     /**
      * Convert a value to camel case.
@@ -601,6 +631,19 @@ if (! function_exists('env')) {
     }
 }
 
+if (! function_exists('filled')) {
+    /**
+     * Determine if a value is "filled".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function filled($value)
+    {
+        return ! blank($value);
+    }
+}
+
 if (! function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
@@ -664,6 +707,19 @@ if (! function_exists('object_get')) {
         }
 
         return $object;
+    }
+}
+
+if (! function_exists('optional')) {
+    /**
+     * Provide access to optional objects.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    function optional($value)
+    {
+        return new Optional($value);
     }
 }
 
@@ -759,6 +815,20 @@ if (! function_exists('str_after')) {
     function str_after($subject, $search)
     {
         return Str::after($subject, $search);
+    }
+}
+
+if (! function_exists('str_before')) {
+    /**
+     * Get the portion of a string before a given value.
+     *
+     * @param  string  $subject
+     * @param  string  $search
+     * @return string
+     */
+    function str_before($subject, $search)
+    {
+        return Str::before($subject, $search);
     }
 }
 
@@ -912,11 +982,12 @@ if (! function_exists('str_slug')) {
      *
      * @param  string  $title
      * @param  string  $separator
+     * @param  string  $language
      * @return string
      */
-    function str_slug($title, $separator = '-')
+    function str_slug($title, $separator = '-', $language = 'en')
     {
-        return Str::slug($title, $separator);
+        return Str::slug($title, $separator, $language);
     }
 }
 
@@ -967,6 +1038,40 @@ if (! function_exists('tap')) {
     }
 }
 
+if (! function_exists('throw_if')) {
+    /**
+     * Throw the given exception if the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return void
+     */
+    function throw_if($boolean, $exception, ...$parameters)
+    {
+        if ($boolean) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+    }
+}
+
+if (! function_exists('throw_unless')) {
+    /**
+     * Throw the given exception unless the given boolean is true.
+     *
+     * @param  bool  $boolean
+     * @param  \Throwable|string  $exception
+     * @param  array  ...$parameters
+     * @return void
+     */
+    function throw_unless($boolean, $exception, ...$parameters)
+    {
+        if (! $boolean) {
+            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+        }
+    }
+}
+
 if (! function_exists('title_case')) {
     /**
      * Convert a value to title case.
@@ -996,6 +1101,29 @@ if (! function_exists('trait_uses_recursive')) {
         }
 
         return $traits;
+    }
+}
+
+if (! function_exists('transform')) {
+    /**
+     * Transform the given value if it is present.
+     *
+     * @param  mixed  $value
+     * @param  callable  $callback
+     * @param  mixed  $default
+     * @return mixed|null
+     */
+    function transform($value, callable $callback, $default = null)
+    {
+        if (filled($value)) {
+            return $callback($value);
+        }
+
+        if (is_callable($default)) {
+            return $default($value);
+        }
+
+        return $default;
     }
 }
 

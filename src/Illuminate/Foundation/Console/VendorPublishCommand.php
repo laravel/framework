@@ -19,11 +19,26 @@ class VendorPublishCommand extends Command
     protected $files;
 
     /**
+     * The provider to publish.
+     *
+     * @var string
+     */
+    protected $provider = null;
+
+    /**
+     * The tags to publish.
+     *
+     * @var array
+     */
+    protected $tags = [];
+
+    /**
      * The console command signature.
      *
      * @var string
      */
     protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
+                    {--all : Publish assets for all service providers without prompt.}
                     {--provider= : The service provider that has assets you want to publish.}
                     {--tag=* : One or many tags that have assets you want to publish.}';
 
@@ -52,12 +67,84 @@ class VendorPublishCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
-        $tags = $this->option('tag') ?: [null];
+        $this->determineWhatShouldBePublished();
 
-        foreach ((array) $tags as $tag) {
+        foreach ($this->tags ?: [null] as $tag) {
             $this->publishTag($tag);
+        }
+
+        $this->info('Publishing complete.');
+    }
+
+    /**
+     * Determine the provider or tag(s) to publish.
+     *
+     * @return void
+     */
+    protected function determineWhatShouldBePublished()
+    {
+        if ($this->option('all')) {
+            return;
+        }
+
+        list($this->provider, $this->tags) = [
+            $this->option('provider'), (array) $this->option('tag'),
+        ];
+
+        if (! $this->provider && ! $this->tags) {
+            $this->promptForProviderOrTag();
+        }
+    }
+
+    /**
+     * Prompt for which provider or tag to publish.
+     *
+     * @return void
+     */
+    protected function promptForProviderOrTag()
+    {
+        $choice = $this->choice(
+            "Which provider or tag's files would you like to publish?",
+            $choices = $this->publishableChoices()
+        );
+
+        if ($choice == $choices[0] || is_null($choice)) {
+            return;
+        }
+
+        $this->parseChoice($choice);
+    }
+
+    /**
+     * The choices available via the prompt.
+     *
+     * @return array
+     */
+    protected function publishableChoices()
+    {
+        return array_merge(
+            ['<comment>Publish files from all providers and tags listed below</comment>'],
+            preg_filter('/^/', '<comment>Provider: </comment>', ServiceProvider::publishableProviders()),
+            preg_filter('/^/', '<comment>Tag: </comment>', ServiceProvider::publishableGroups())
+        );
+    }
+
+    /**
+     * Parse the answer that was given via the prompt.
+     *
+     * @param string $choice
+     * @return void
+     */
+    protected function parseChoice($choice)
+    {
+        list($type, $value) = explode(': ', strip_tags($choice));
+
+        if ($type == 'Provider') {
+            $this->provider = $value;
+        } elseif ($type == 'Tag') {
+            $this->tags = [$value];
         }
     }
 
@@ -72,8 +159,6 @@ class VendorPublishCommand extends Command
         foreach ($this->pathsToPublish($tag) as $from => $to) {
             $this->publishItem($from, $to);
         }
-
-        $this->info('Publishing complete.');
     }
 
     /**
@@ -85,7 +170,7 @@ class VendorPublishCommand extends Command
     protected function pathsToPublish($tag)
     {
         return ServiceProvider::pathsToPublish(
-            $this->option('provider'), $tag
+            $this->provider, $tag
         );
     }
 

@@ -3,16 +3,17 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Tests\Redis\InteractsWithRedis;
 
 class RedisQueueIntegrationTest extends TestCase
 {
-    use InteractsWithRedis;
+    use InteractsWithRedis, InteractsWithTime;
 
     /**
      * @var RedisQueue
@@ -78,10 +79,10 @@ class RedisQueueIntegrationTest extends TestCase
         $this->queue->push($job);
 
         // Pop and check it is popped correctly
-        $before = Carbon::now()->getTimestamp();
+        $before = $this->currentTime();
         /** @var RedisJob $redisJob */
         $redisJob = $this->queue->pop();
-        $after = Carbon::now()->getTimestamp();
+        $after = $this->currentTime();
 
         $this->assertEquals($job, unserialize(json_decode($redisJob->getRawBody())->data->command));
         $this->assertEquals(1, $redisJob->attempts());
@@ -112,9 +113,9 @@ class RedisQueueIntegrationTest extends TestCase
         $this->queue->later(-10, $job);
 
         // Pop and check it is popped correctly
-        $before = Carbon::now()->getTimestamp();
+        $before = $this->currentTime();
         $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $after = Carbon::now()->getTimestamp();
+        $after = $this->currentTime();
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
@@ -141,9 +142,9 @@ class RedisQueueIntegrationTest extends TestCase
         $this->queue->later(-10, $job);
 
         // Pop and check it is popped correctly
-        $before = Carbon::now()->getTimestamp();
+        $before = $this->currentTime();
         $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $after = Carbon::now()->getTimestamp();
+        $after = $this->currentTime();
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
@@ -168,18 +169,18 @@ class RedisQueueIntegrationTest extends TestCase
         // Make an expired reserved job
         $failed = new RedisQueueIntegrationTestJob(-20);
         $this->queue->push($failed);
-        $beforeFailPop = Carbon::now()->getTimestamp();
+        $beforeFailPop = $this->currentTime();
         $this->queue->pop();
-        $afterFailPop = Carbon::now()->getTimestamp();
+        $afterFailPop = $this->currentTime();
 
         // Push an item into queue
         $job = new RedisQueueIntegrationTestJob(10);
         $this->queue->push($job);
 
         // Pop and check it is popped correctly
-        $before = Carbon::now()->getTimestamp();
+        $before = $this->currentTime();
         $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $after = Carbon::now()->getTimestamp();
+        $after = $this->currentTime();
 
         // Check reserved queue
         $this->assertEquals(2, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
@@ -214,9 +215,9 @@ class RedisQueueIntegrationTest extends TestCase
         $this->queue->push($job);
 
         // Pop and check it is popped correctly
-        $before = Carbon::now()->getTimestamp();
+        $before = $this->currentTime();
         $this->assertEquals($job, unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
-        $after = Carbon::now()->getTimestamp();
+        $after = $this->currentTime();
 
         // Check reserved queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:reserved'));
@@ -244,9 +245,9 @@ class RedisQueueIntegrationTest extends TestCase
         //pop and release the job
         /** @var \Illuminate\Queue\Jobs\RedisJob $redisJob */
         $redisJob = $this->queue->pop();
-        $before = Carbon::now()->getTimestamp();
+        $before = $this->currentTime();
         $redisJob->release(1000);
-        $after = Carbon::now()->getTimestamp();
+        $after = $this->currentTime();
 
         //check the content of delayed queue
         $this->assertEquals(1, $this->redis[$driver]->connection()->zcard('queues:default:delayed'));

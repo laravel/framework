@@ -36,7 +36,7 @@ class QueueListenerTest extends TestCase
     public function testMakeProcessCorrectlyFormatsCommandLine()
     {
         $listener = new \Illuminate\Queue\Listener(__DIR__);
-        $options = new \Illuminate\Queue\ListenerOptions();
+        $options = new \Illuminate\Queue\ListenerOptions;
         $options->delay = 1;
         $options->memory = 2;
         $options->timeout = 3;
@@ -46,6 +46,6 @@ class QueueListenerTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\Process\Process', $process);
         $this->assertEquals(__DIR__, $process->getWorkingDirectory());
         $this->assertEquals(3, $process->getTimeout());
-        $this->assertEquals($escape.PHP_BINARY.$escape." artisan queue:work {$escape}connection{$escape} --once --queue={$escape}queue{$escape} --delay=1 --memory=2 --sleep=3 --tries=0", $process->getCommandLine());
+        $this->assertEquals($escape.PHP_BINARY.$escape." {$escape}artisan{$escape} queue:work {$escape}connection{$escape} --once --queue={$escape}queue{$escape} --delay=1 --memory=2 --sleep=3 --tries=0", $process->getCommandLine());
     }
 }

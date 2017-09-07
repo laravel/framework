@@ -3,6 +3,7 @@
 namespace Illuminate\Http;
 
 use Exception;
+use Symfony\Component\HttpFoundation\HeaderBag;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
 trait ResponseTrait
@@ -48,7 +49,9 @@ trait ResponseTrait
      */
     public function getOriginalContent()
     {
-        return $this->original;
+        $original = $this->original;
+
+        return $original instanceof self ? $original->{__FUNCTION__}() : $original;
     }
 
     /**
@@ -69,11 +72,15 @@ trait ResponseTrait
     /**
      * Add an array of headers to the response.
      *
-     * @param  array  $headers
+     * @param  \Symfony\Component\HttpFoundation\HeaderBag|array  $headers
      * @return $this
      */
-    public function withHeaders(array $headers)
+    public function withHeaders($headers)
     {
+        if ($headers instanceof HeaderBag) {
+            $headers = $headers->all();
+        }
+
         foreach ($headers as $key => $value) {
             $this->headers->set($key, $value);
         }

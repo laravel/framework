@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
@@ -56,8 +57,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue($this->db->schema()->hasTable('users'));
         $this->assertTrue($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($ran[0], 'users'));
-        $this->assertTrue(str_contains($ran[1], 'password_resets'));
+        $this->assertTrue(Str::contains($ran[0], 'users'));
+        $this->assertTrue(Str::contains($ran[1], 'password_resets'));
     }
 
     public function testMigrationsCanBeRolledBack()
@@ -69,8 +70,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertTrue(Str::contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(Str::contains($rolledBack[1], 'users'));
     }
 
     public function testMigrationsCanBeReset()
@@ -82,8 +83,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
 
-        $this->assertTrue(str_contains($rolledBack[0], 'password_resets'));
-        $this->assertTrue(str_contains($rolledBack[1], 'users'));
+        $this->assertTrue(Str::contains($rolledBack[0], 'password_resets'));
+        $this->assertTrue(Str::contains($rolledBack[1], 'users'));
     }
 
     public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()
