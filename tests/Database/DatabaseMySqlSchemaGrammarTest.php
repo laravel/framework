@@ -291,6 +291,26 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
     }
 
+    public function testAddingSpatialIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->spatialIndex('foo', 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add spatial index `baz`(`foo`)', $statements[0]);
+    }
+
+    public function testAddingFluentSpatialIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->point('foo')->spatialIndex('baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `users` add spatial index `baz`(`foo`)', $statements[1]);
+    }
+
     public function testAddingForeignKey()
     {
         $blueprint = new Blueprint('users');
