@@ -133,8 +133,19 @@ class FileViewFinder implements ViewFinderInterface
                 }
             }
         }
+        
+        $hasValidViewExtension = in_array(@end(explode('.', $name)), $this->extensions);
 
-        throw new InvalidArgumentException("View [$name] not found.");
+        if($hasValidViewExtension){
+            $msg = '"'.$name.'", You should not specify a file extension as part of a view name';
+        } elseif (!$hasValidViewExtension && in_array(@end(explode('.', $name)),['html', 'htm', 'xhtml'])){
+            $msg = '".'.@end(explode('.', $name)).'", is not a valid view extension';
+        } else {
+            $msg = "View [$name] not found. ". 
+                   "View paths searched: [ ".join(", ",$paths)." ] ".
+                   "Possible view extensions where: [ ".join(", ",$this->extensions )." ]";
+        }
+        throw new InvalidArgumentException($msg);
     }
 
     /**
