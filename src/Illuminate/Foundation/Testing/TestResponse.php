@@ -383,9 +383,9 @@ class TestResponse
      *
      * @return array
      */
-    public function decodeResponseJson()
+    public function decodeResponseJson($assoc = true)
     {
-        $decodedResponse = json_decode($this->getContent(), true);
+        $decodedResponse = json_decode($this->getContent(), $assoc);
 
         if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
@@ -403,9 +403,9 @@ class TestResponse
      *
      * @return array
      */
-    public function json()
+    public function json($assoc = true)
     {
-        return $this->decodeResponseJson();
+        return $this->decodeResponseJson($assoc);
     }
 
     /**
