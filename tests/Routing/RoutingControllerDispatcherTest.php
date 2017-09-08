@@ -16,8 +16,6 @@ class RoutingControllerDispatcherTest extends TestCase {
     public function testCanResolveParametersThatInheritFromPreviousParameter()
     {
         $container = new Container();
-        $container->instance(Foo::class, new Foo());
-
         $dispatcher = new ControllerDispatcher($container);
 
         $this->assertCount(3, $dispatcher->resolveMethodDependencies(['id' => 1], new ReflectionMethod(TestController::class, 'example')));
