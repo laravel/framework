@@ -56,4 +56,37 @@ class Optional
             return $this->value->{$method}(...$parameters);
         }
     }
+
+    /**
+     * Create a new instance with a nullable value.
+     * @param mixed $value
+     * @return self
+     */
+    public static function of($value)
+    {
+        return new self($value);
+    }
+
+    /**
+     * Create a new instance with some value.
+     * @param mixed $value
+     * @return self
+     */
+    public static function some($value)
+    {
+        if (is_null($value)) {
+            throw new \InvalidArgumentException('Null value passed to some() method. Use none() instead.');
+        }
+
+        return new self($value);
+    }
+
+    /**
+     * Create a new instance with no value.
+     * @return self
+     */
+    public static function none()
+    {
+        return new self(null);
+    }
 }
