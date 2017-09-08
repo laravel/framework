@@ -19,7 +19,7 @@ class ValidatorServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function bootRules()
+    public function registerRules()
     {
         foreach ($this->rules as $rule => $class) {
             $instance = $this->app->make($class);
@@ -33,6 +33,6 @@ class ValidatorServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->bootRules();
+        $this->registerRules();
     }
 }
