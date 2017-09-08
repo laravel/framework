@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Foundation\Testing\Concerns\ComposesTemplateMethods;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Testing\Concerns\ComposesTemplateMethods;
 
 class FoundationComposesTemplateMethodsTest extends TestCase
 {
