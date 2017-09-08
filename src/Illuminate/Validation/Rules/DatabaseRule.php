@@ -50,8 +50,8 @@ trait DatabaseRule
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array|string  $value
+     * @param  string|\Closure  $column
+     * @param  array|string|null  $value
      * @return $this
      */
     public function where($column, $value = null)
@@ -138,7 +138,7 @@ trait DatabaseRule
     /**
      * Register a custom query callback.
      *
-     * @param  \Closure $callback
+     * @param  \Closure  $callback
      * @return $this
      */
     public function using(Closure $callback)
