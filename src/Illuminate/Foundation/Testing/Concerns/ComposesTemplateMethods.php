@@ -22,7 +22,6 @@ trait ComposesTemplateMethods
         $class = static::class;
 
         if (! isset(static::$traitTemplateMethods[$class])) {
-
             $templateMethods = ['setUp', 'tearDown'];
             static::$traitTemplateMethods[$class] = array_fill_keys($templateMethods, []);
 
