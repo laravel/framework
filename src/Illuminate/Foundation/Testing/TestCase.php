@@ -69,7 +69,7 @@ abstract class TestCase extends BaseTestCase
             $this->refreshApplication();
         }
 
-        $this->setUpTraits();
+        $this->callTraitTemplateMethods('setUp');
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             call_user_func($callback);
@@ -90,18 +90,6 @@ abstract class TestCase extends BaseTestCase
     protected function refreshApplication()
     {
         $this->app = $this->createApplication();
-    }
-
-    /**
-     * Boot the testing helper traits.
-     *
-     * @return array
-     */
-    protected function setUpTraits()
-    {
-        $this->callTraitTemplateMethods('setUp');
-
-        return array_flip(class_uses_recursive(static::class));
     }
 
     /**
