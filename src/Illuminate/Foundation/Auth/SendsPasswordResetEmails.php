@@ -72,7 +72,7 @@ trait SendsPasswordResetEmails
     {
         return back()->withErrors(
             ['email' => trans($response)]
-        );
+        )->withInput();
     }
 
     /**
