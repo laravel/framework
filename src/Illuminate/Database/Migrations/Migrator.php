@@ -6,7 +6,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\QueryException;
 use Illuminate\Database\Events\MigrationFailed;
 use Illuminate\Database\Events\MigrationsExecuted;
 use Illuminate\Database\Events\MigrationsRolledBack;
@@ -389,7 +388,7 @@ class Migrator
             $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
                 ? $connection->transaction($callback)
                 : $callback();
-        } catch (QueryException $e) {
+        } catch (\Exception $e) {
             $this->events->dispatch(new MigrationFailed($this));
             throw $e;
         }
