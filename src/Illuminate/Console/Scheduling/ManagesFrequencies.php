@@ -346,7 +346,7 @@ trait ManagesFrequencies
     {
         return $this->spliceIntoPosition(1, '*/10');
     }
-    
+
     /**
      * Schedule the event to run every fifteen minutes.
      *
