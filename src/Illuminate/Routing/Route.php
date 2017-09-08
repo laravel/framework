@@ -698,7 +698,7 @@ class Route
     }
 
     /**
-     * Get the action array or one of its property for the route.
+     * Get the action array or one of its properties for the route.
      *
      * @param  string|null  $key
      * @return mixed
