@@ -11,7 +11,7 @@ trait DatabaseMigrations
      *
      * @return void
      */
-    public function runDatabaseMigrations()
+    public function setUpDatabaseMigrations()
     {
         $this->artisan('migrate:fresh');
 
@@ -20,5 +20,17 @@ trait DatabaseMigrations
         $this->beforeApplicationDestroyed(function () {
             $this->artisan('migrate:rollback');
         });
+    }
+
+    /**
+     * Define hooks to migrate the database before and after each test.
+     *
+     * @deprecated
+     *
+     * @return void
+     */
+    public function runDatabaseMigrations()
+    {
+        $this->setUpDatabaseMigrations();
     }
 }
