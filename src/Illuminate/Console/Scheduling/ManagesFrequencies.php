@@ -346,6 +346,16 @@ trait ManagesFrequencies
     {
         return $this->spliceIntoPosition(1, '*/10');
     }
+	
+    /**
+     * Schedule the event to run every fifteen minutes.
+     *
+     * @return $this
+     */
+    public function everyFifteenMinutes()
+    {
+        return $this->spliceIntoPosition(1, '*/15');
+    }
 
     /**
      * Schedule the event to run every thirty minutes.
