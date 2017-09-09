@@ -384,6 +384,19 @@ if (! function_exists('dispatch')) {
     }
 }
 
+if (! function_exists('dispatch_chain')) {
+    /**
+     * Dispatch a chain of jobs to its appropriate handlers.
+     *
+     * @param  array  $jobs
+     * @return \Illuminate\Foundation\Bus\PendingDispatch
+     */
+    function dispatch_chain(array $jobs)
+    {
+        return dispatch(array_shift($jobs))->chain($jobs);
+    }
+}
+
 if (! function_exists('dispatch_now')) {
     /**
      * Dispatch a command to its appropriate handler in the current process.
