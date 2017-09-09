@@ -367,7 +367,6 @@ trait ManagesFrequencies
                     ->spliceIntoPosition(4, 1);
     }
 
-
     /**
      * Set the days of the week the command should run on.
      *
