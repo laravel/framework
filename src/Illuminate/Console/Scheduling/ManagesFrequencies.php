@@ -60,7 +60,7 @@ trait ManagesFrequencies
             );
         };
     }
-    
+
     /**
      * Schedule the event to run every minute.
      *
