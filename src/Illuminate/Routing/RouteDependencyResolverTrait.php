@@ -90,7 +90,12 @@ trait RouteDependencyResolverTrait
     protected function alreadyInParameters($class, array $parameters)
     {
         return ! is_null(Arr::first($parameters, function ($value) use ($class) {
-            return $value instanceof $class;
+
+            if(is_object($value)) {
+                $value = get_class($value);
+            }
+
+            return $value === $class;
         }));
     }
 
