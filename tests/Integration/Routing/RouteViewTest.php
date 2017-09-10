@@ -24,7 +24,7 @@ class RouteViewTest extends TestCase
     {
         Route::view('route/{param}/{param2?}', 'view', ['foo' => 'bar']);
 
-        View::addLocation(__DIR__ . '/Fixtures');
+        View::addLocation(__DIR__.'/Fixtures');
 
         $this->assertContains('Test bar', $this->get('/route/value1/value2')->getContent());
         $this->assertContains('Test bar', $this->get('/route/value1')->getContent());
