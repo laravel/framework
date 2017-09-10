@@ -1040,6 +1040,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Determine if current model is owned by authenticated user.
+     *
+     * @param string $column
+     * @return bool
+     */
+    public function isMine($column = 'user_id')
+    {
+        return $this->$column == auth()->id();
+    }
+
+    /**
      * Get the database connection for the model.
      *
      * @return \Illuminate\Database\Connection
