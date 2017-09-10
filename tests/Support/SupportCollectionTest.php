@@ -2301,6 +2301,24 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testFilterKeysWithMatching()
+    {
+        $collection = new Collection(['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
+
+        $filteredCollection = $collection->filterKeys(['a', 'c']);
+
+        $this->assertSame(['a' => 'foo', 'c' => 'baz'], $filteredCollection->toArray());
+    }
+
+    public function testFilterKeysWithoutMatching()
+    {
+        $collection = new Collection(['a' => 'foo', 'b' => 'bar', 'c' => 'baz']);
+
+        $filteredCollection = $collection->filterKeys(['y', 'z']);
+
+        $this->assertEquals([], $filteredCollection->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem

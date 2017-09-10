@@ -418,6 +418,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Return new filtered Collection that matches given keys.
+     */
+    public function filterKeys($keys)
+    {
+        return new static(array_intersect_key($this->items, array_flip($keys)));
+    }
+
+    /**
      * Apply the callback if the value is truthy.
      *
      * @param  bool  $value
