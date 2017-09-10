@@ -651,7 +651,7 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Static version of prepareResponse
+     * Static version of prepareResponse.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
      * @param  mixed  $response
