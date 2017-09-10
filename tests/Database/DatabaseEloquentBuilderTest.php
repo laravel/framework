@@ -817,6 +817,23 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($nestedSql, $dotSql);
     }
 
+    public function testWhereHasRelatedModel()
+    {
+        $model = new EloquentBuilderTestHavingRelatedModels;
+        $related = new EloquentBuilderTestModelFarRelatedStub(['model_id' => 5552]);
+
+        foreach (['foo', 'foos', 'bar', 'bars'] as $relation) {
+            $builder = $model->whereHas($relation, $related);
+
+            $result = $model->whereHas($relation, function ($q) use ($related) {
+                $q->whereKey($related->model_id);
+            });
+
+            $this->assertEquals($builder->toSql(), $result->toSql());
+            $this->assertEquals($builder->getBindings(), $result->getBindings());
+        }
+    }
+
     public function testSelfHasNestedUsesAlias()
     {
         $model = new EloquentBuilderTestModelSelfRelatedStub;
@@ -1071,6 +1088,35 @@ class EloquentBuilderTestModelCloseRelatedStub extends \Illuminate\Database\Eloq
 
 class EloquentBuilderTestModelFarRelatedStub extends \Illuminate\Database\Eloquent\Model
 {
+    protected $fillable = ['model_id'];
+
+    public function getKeyName()
+    {
+        return 'model_id';
+    }
+}
+
+class EloquentBuilderTestHavingRelatedModels extends \Illuminate\Database\Eloquent\Model
+{
+    public function foo()
+    {
+        return $this->hasOne('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub');
+    }
+
+    public function foos()
+    {
+        return $this->hasMany('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub');
+    }
+
+    public function bar()
+    {
+        return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub');
+    }
+
+    public function bars()
+    {
+        return $this->belongsToMany('Illuminate\Tests\Database\EloquentBuilderTestModelFarRelatedStub');
+    }
 }
 
 class EloquentBuilderTestModelSelfRelatedStub extends \Illuminate\Database\Eloquent\Model
