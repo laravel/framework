@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Support\Str;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -18,11 +19,15 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int     $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  \Illuminate\Database\Eloquent\Model|\Closure|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
     {
+        if ($callback instanceof Model) {
+            $callback = $this->createHasRelatedCallback($callback);
+        }
+
         if (strpos($relation, '.') !== false) {
             return $this->hasNested($relation, $operator, $count, $boolean, $callback);
         }
@@ -121,12 +126,12 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
+     * @param  \Illuminate\Database\Eloquent\Model|\Closure|null  $callback
      * @param  string  $operator
      * @param  int     $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function whereHas($relation, $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'and', $callback);
     }
@@ -306,5 +311,18 @@ trait QueriesRelationships
     protected function canUseExistsForExistenceCheck($operator, $count)
     {
         return ($operator === '>=' || $operator === '<') && $count === 1;
+    }
+
+    /**
+     * Create a relationship callback that scopes the results to only the given model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Closure
+     */
+    protected function createHasRelatedCallback(Model $model)
+    {
+        return function (Builder $query) use ($model) {
+            $query->whereKey($model->getKey());
+        };
     }
 }
