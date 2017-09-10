@@ -3,10 +3,44 @@
 namespace Illuminate\Log;
 
 use Monolog\Logger as Monolog;
+use Monolog\Formatter\JsonFormatter;
+use Monolog\Formatter\LineFormatter;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Log\Middleware\CheckLogLevel;
 
 class LogServiceProvider extends ServiceProvider
 {
+    /**
+     * The available default log types.
+     *
+     * @var array
+     */
+    protected $types = [
+        'single' => SingleChannel::class,
+        'daily' => DailyChannel::class,
+        'syslog' => SyslogChannel::class,
+        'errorlog' => ErrorLogChannel::class,
+    ];
+
+    /**
+     * The available log formats.
+     *
+     * @var array
+     */
+    protected $formats = [
+        'line' => LineFormatter::class,
+        'json' => JsonFormatter::class,
+    ];
+
+    /**
+     * The named middleware registered with the logger.
+     *
+     * @var array
+     */
+    protected $pipes = [
+        'level' => CheckLogLevel::class,
+    ];
+
     /**
      * Register the service provider.
      *
@@ -22,19 +56,29 @@ class LogServiceProvider extends ServiceProvider
     /**
      * Create the logger.
      *
-     * @return \Illuminate\Log\Writer
+     * @return \Illuminate\Log\LogManager
      */
     public function createLogger()
     {
-        $log = new Writer(
-            new Monolog($this->channel()), $this->app['events']
-        );
+        $log = new LogManager($this->app['events']);
 
-        if ($this->app->hasMonologConfigurator()) {
-            call_user_func($this->app->getMonologConfigurator(), $log->getMonolog());
-        } else {
-            $this->configureHandler($log);
+        $channels = collect($this->app['config']->get('logging.channels'))
+            ->map(function ($channelConfig) {
+                $channel = $this->createChannel($channelConfig['type']);
+                $channel->prepare($channelConfig);
+                $channel->through($this->parsePipes(
+                    $this->formatPipes($channelConfig['pipes'] ?? [])
+                ));
+                $channel->setFormatter(new $this->formats[$channelConfig['format'] ?? 'line']);
+
+                return $channel;
+            });
+
+        foreach ($channels as $name => $channel) {
+            $log->registerChannel($name, $channel);
         }
+
+        $log->setDefaultChannels((array) $this->app['config']->get('logging.default'));
 
         return $log;
     }
@@ -55,105 +99,68 @@ class LogServiceProvider extends ServiceProvider
     }
 
     /**
-     * Configure the Monolog handlers for the application.
+     * Parse the middleware into MiddlewareClass:arg1,arg2 format.
      *
-     * @param  \Illuminate\Log\Writer  $log
-     * @return void
+     * @param  array  $pipes
+     * @return array
      */
-    protected function configureHandler(Writer $log)
+    protected function parsePipes(array $pipes)
     {
-        $this->{'configure'.ucfirst($this->handler()).'Handler'}($log);
+        return collect($pipes)->map(function ($pipe) {
+            list($name, $arguments) = explode(':', $pipe);
+
+            return $this->resolvePipe($name).':'.$arguments;
+        })->all();
     }
 
     /**
-     * Configure the Monolog handlers for the application.
+     * Format the list of middleware into an array.
      *
-     * @param  \Illuminate\Log\Writer  $log
-     * @return void
+     * @param  string|array  $pipes
+     * @return array
      */
-    protected function configureSingleHandler(Writer $log)
+    private function formatPipes($pipes)
     {
-        $log->useFiles(
-            $this->app->storagePath().'/logs/laravel.log',
-            $this->logLevel()
-        );
+        if (is_array($pipes)) {
+            return $pipes;
+        }
+
+        return explode('|', $pipes);
     }
 
     /**
-     * Configure the Monolog handlers for the application.
+     * Resolve a middleware to its FQCN.
      *
-     * @param  \Illuminate\Log\Writer  $log
-     * @return void
-     */
-    protected function configureDailyHandler(Writer $log)
-    {
-        $log->useDailyFiles(
-            $this->app->storagePath().'/logs/laravel.log', $this->maxFiles(),
-            $this->logLevel()
-        );
-    }
-
-    /**
-     * Configure the Monolog handlers for the application.
-     *
-     * @param  \Illuminate\Log\Writer  $log
-     * @return void
-     */
-    protected function configureSyslogHandler(Writer $log)
-    {
-        $log->useSyslog('laravel', $this->logLevel());
-    }
-
-    /**
-     * Configure the Monolog handlers for the application.
-     *
-     * @param  \Illuminate\Log\Writer  $log
-     * @return void
-     */
-    protected function configureErrorlogHandler(Writer $log)
-    {
-        $log->useErrorLog($this->logLevel());
-    }
-
-    /**
-     * Get the default log handler.
-     *
+     * @param  string  $name
      * @return string
      */
-    protected function handler()
+    protected function resolvePipe($name)
     {
-        if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log', 'single');
+        if (class_exists($name)) {
+            return $name;
         }
 
-        return 'single';
+        return $this->pipes[$name];
     }
 
     /**
-     * Get the log level for the application.
+     * Create an instance of a channel.
      *
-     * @return string
+     * @param  string  $driver
+     * @return \Illuminate\Log\Channel
+     *
+     * @throws \Exception
      */
-    protected function logLevel()
+    protected function createChannel($driver)
     {
-        if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log_level', 'debug');
+        if (class_exists($driver)) {
+            return new $driver($this->app, new Monolog($this->channel()));
         }
 
-        return 'debug';
-    }
-
-    /**
-     * Get the maximum number of log files for the application.
-     *
-     * @return int
-     */
-    protected function maxFiles()
-    {
-        if ($this->app->bound('config')) {
-            return $this->app->make('config')->get('app.log_max_files', 5);
+        if (! array_key_exists($driver, $this->types)) {
+            throw new ChannelUndefinedException("There is no $driver log channel type configured");
         }
 
-        return 0;
+        return new $this->types[$driver]($this->app, new Monolog($this->channel()));
     }
 }
