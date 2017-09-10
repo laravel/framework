@@ -1444,6 +1444,17 @@ class Builder
     }
 
     /**
+     * Add a "where" clause to limit the result only for the authenticated user.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function mine($column = 'user_id')
+    {
+        return $this->where($column, auth()->id());
+    }
+
+    /**
      * Put the query's results in random order.
      *
      * @param  string  $seed
