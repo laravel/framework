@@ -1164,3 +1164,17 @@ if (! function_exists('with')) {
         return $object;
     }
 }
+
+if (! function_exists('null_if')) {
+    /**
+     * Return null if condition is true, otherwise return a value.
+     *
+     * @param  mixed $value
+     * @param  mixed $against
+     * @return mixed
+     */
+    function null_if($value, $against)
+    {
+        return $value === $against ? null : $value;
+    }
+}
