@@ -89,7 +89,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Get the translation for a given key.
+     * Get the translation for a given key using the typical translation files.
      *
      * @param  string  $key
      * @param  array   $replace
@@ -102,7 +102,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Get the translation for the given key.
+     * Get the translation for the given key using the typical translation files.
      *
      * @param  string  $key
      * @param  array   $replace
@@ -139,7 +139,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Get the translation for a given key from the JSON translation files.
+     * Get the translation for a given key.
      *
      * @param  string  $key
      * @param  array  $replace
@@ -153,9 +153,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // For JSON translations, there is only one file per locale, so we will simply load
         // that file and then we will be ready to check the array for the key. These are
         // only one level deep so we do not need to do any fancy searching through it.
-        $this->load('*', '*', $locale);
-
-        $line = $this->loaded['*']['*'][$locale][$key] ?? null;
+        $line = $this->fromJson($key, $locale);
 
         // If we can't find a translation for the JSON key, we will attempt to translate it
         // using the typical translation file. This way developers can always just use a
@@ -285,6 +283,20 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         return (new Collection($replace))->sortBy(function ($value, $key) {
             return mb_strlen($key) * -1;
         })->all();
+    }
+
+    /**
+     * Get the translation for a given key from the JSON translation files.
+     *
+     * @param  string  $key
+     * @param  string  $locale
+     * @return string
+     */
+    protected function fromJson($key, $locale)
+    {
+        $this->load('*', '*', $locale);
+
+        return $this->loaded['*']['*'][$locale][$key] ?? null;
     }
 
     /**
