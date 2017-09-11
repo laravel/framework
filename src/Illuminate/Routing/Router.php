@@ -647,7 +647,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function prepareResponse($request, $response)
     {
-        return static::prepareResponseObject($request, $response);
+        return static::toResponse($request, $response);
     }
 
     /**
@@ -657,7 +657,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $response
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public static function prepareResponseObject($request, $response)
+    public static function toResponse($request, $response)
     {
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
