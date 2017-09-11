@@ -120,6 +120,10 @@ abstract class TestCase extends BaseTestCase
             $this->disableEventsForAllTests();
         }
 
+        if (isset($uses[TemporaryStorage::class])) {
+            $this->setTemporaryStorage();
+        }
+
         return $uses;
     }
 
