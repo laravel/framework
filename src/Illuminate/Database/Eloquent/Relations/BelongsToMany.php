@@ -922,6 +922,16 @@ class BelongsToMany extends Relation
     {
         return $this->table.'.'.$this->relatedPivotKey;
     }
+    
+    /**
+     * Get the fully qualified parent key name for the relation.
+     *
+     * @return string
+     */
+    public function getQualifiedParentKeyName()
+    {
+        return $this->table.'.'.$this->parentKey;
+    }
 
     /**
      * Get the intermediate table for the relationship.
