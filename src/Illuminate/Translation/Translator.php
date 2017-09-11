@@ -164,6 +164,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             if ($fallback !== $key) {
                 return $fallback;
             }
+
+            // If we still can't find a translation using the typical translation file for the
+            // current language and the fallback language, we will try in a last attempt to
+            // find the given key in the JSON translation file for the fallback language.
+            $line = $this->fromJson($key, $this->fallback);
         }
 
         return $this->makeReplacements($line ?: $key, $replace);
