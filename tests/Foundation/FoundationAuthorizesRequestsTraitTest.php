@@ -31,6 +31,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage This action is unauthorized.
      */
     public function test_exception_is_thrown_if_gate_check_fails()
     {
@@ -71,9 +72,6 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    /**
-     * @group something
-     */
     public function test_policy_method_may_be_guessed_passing_class_name()
     {
         unset($_SERVER['_test.authorizes.trait.policy']);

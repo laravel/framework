@@ -40,14 +40,15 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $files = new Filesystem;
         $files->chmod($this->tempDir.'/file.txt', 0755);
-        $filePermisson = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), -4);
-        $this->assertEquals('0755', $filePermisson);
+        $filePermission = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), -4);
+        $this->assertEquals('0755', $filePermission);
     }
 
     public function testGetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         chmod($this->tempDir.'/file.txt', 0755);
+
         $files = new Filesystem;
         $filePermisson = $files->chmod($this->tempDir.'/file.txt');
         $this->assertEquals('0755', $filePermisson);
@@ -254,14 +255,14 @@ class FilesystemTest extends TestCase
         $this->assertEquals($this->tempDir, $files->dirname($this->tempDir.'/foo.txt'));
     }
 
-    public function testTypeIndentifiesFile()
+    public function testTypeIdentifiesFile()
     {
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $files = new Filesystem;
         $this->assertEquals('file', $files->type($this->tempDir.'/foo.txt'));
     }
 
-    public function testTypeIndentifiesDirectory()
+    public function testTypeIdentifiesDirectory()
     {
         mkdir($this->tempDir.'/foo');
         $files = new Filesystem;

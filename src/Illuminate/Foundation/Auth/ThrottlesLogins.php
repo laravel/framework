@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
+use Illuminate\Validation\ValidationException;
 
 trait ThrottlesLogins
 {
@@ -19,7 +20,7 @@ trait ThrottlesLogins
     protected function hasTooManyLoginAttempts(Request $request)
     {
         return $this->limiter()->tooManyAttempts(
-            $this->throttleKey($request), 5, 1
+            $this->throttleKey($request), $this->maxAttempts(), $this->decayMinutes()
         );
     }
 
@@ -31,14 +32,17 @@ trait ThrottlesLogins
      */
     protected function incrementLoginAttempts(Request $request)
     {
-        $this->limiter()->hit($this->throttleKey($request));
+        $this->limiter()->hit(
+            $this->throttleKey($request), $this->decayMinutes()
+        );
     }
 
     /**
      * Redirect the user after determining they are locked out.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendLockoutResponse(Request $request)
     {
@@ -46,17 +50,9 @@ trait ThrottlesLogins
             $this->throttleKey($request)
         );
 
-        $message = Lang::get('auth.throttle', ['seconds' => $seconds]);
-
-        $errors = [$this->username() => $message];
-
-        if ($request->expectsJson()) {
-            return response()->json($errors, 423);
-        }
-
-        return redirect()->back()
-            ->withInput($request->only($this->username(), 'remember'))
-            ->withErrors($errors);
+        throw ValidationException::withMessages([
+            $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
+        ])->status(423);
     }
 
     /**
@@ -100,5 +96,25 @@ trait ThrottlesLogins
     protected function limiter()
     {
         return app(RateLimiter::class);
+    }
+
+    /**
+     * Get the maximum number of attempts to allow.
+     *
+     * @return int
+     */
+    public function maxAttempts()
+    {
+        return property_exists($this, 'maxAttempts') ? $this->maxAttempts : 5;
+    }
+
+    /**
+     * Get the number of minutes to throttle for.
+     *
+     * @return int
+     */
+    public function decayMinutes()
+    {
+        return property_exists($this, 'decayMinutes') ? $this->decayMinutes : 1;
     }
 }

@@ -21,7 +21,7 @@ class MailChannel
     /**
      * The markdown implementation.
      *
-     * @var \Illuminate\Contracts\Mail\Mailer
+     * @var \Illuminate\Mail\Markdown
      */
     protected $markdown;
 
@@ -135,6 +135,14 @@ class MailChannel
         $this->addSender($mailMessage, $message);
 
         $mailMessage->to($this->getRecipients($notifiable, $message));
+
+        if ($message->cc) {
+            $mailMessage->cc($message->cc[0], Arr::get($message->cc, 1));
+        }
+
+        if ($message->bcc) {
+            $mailMessage->bcc($message->bcc[0], Arr::get($message->bcc, 1));
+        }
     }
 
     /**

@@ -39,17 +39,14 @@ class HttpResponseTest extends TestCase
         $response = new \Illuminate\Http\Response(new JsonSerializableStub);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
-    }
 
-    public function testResponseHeaderTypeIsReset()
-    {
         $response = new \Illuminate\Http\Response(new ArrayableStub);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
 
-        $response->setContent('foo');
-        $this->assertEquals('foo', $response->getContent());
-        $this->assertNotEquals('application/json', $response->headers->get('Content-Type'));
+        $response->setContent('{"foo": "bar"}');
+        $this->assertEquals('{"foo": "bar"}', $response->getContent());
+        $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
 
     public function testRenderablesAreRendered()
@@ -89,6 +86,14 @@ class HttpResponseTest extends TestCase
         $response = new \Illuminate\Http\Response;
         $response->setContent($arr);
         $this->assertSame($arr, $response->getOriginalContent());
+    }
+
+    public function testGetOriginalContentRetrievesTheFirstOriginalContent()
+    {
+        $previousResponse = new \Illuminate\Http\Response(['foo' => 'bar']);
+        $response = new \Illuminate\Http\Response($previousResponse);
+
+        $this->assertSame(['foo' => 'bar'], $response->getOriginalContent());
     }
 
     public function testSetAndRetrieveStatusCode()
@@ -184,6 +189,7 @@ class HttpResponseTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method [doesNotExist] does not exist on Redirect.
      */
     public function testMagicCallException()
     {

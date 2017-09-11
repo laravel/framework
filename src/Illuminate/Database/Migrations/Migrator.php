@@ -135,9 +135,9 @@ class Migrator
         // each migration's execution. We will also extract a few of the options.
         $batch = $this->repository->getNextBatchNumber();
 
-        $pretend = Arr::get($options, 'pretend', false);
+        $pretend = $options['pretend'] ?? false;
 
-        $step = Arr::get($options, 'step', false);
+        $step = $options['step'] ?? false;
 
         // Once we have the array of migrations, we will spin through them and run the
         // migrations "up" so the changes are made to the databases. We'll then log
@@ -217,7 +217,7 @@ class Migrator
      */
     protected function getMigrationsForRollback(array $options)
     {
-        if (($steps = Arr::get($options, 'step', 0)) > 0) {
+        if (($steps = $options['step'] ?? 0) > 0) {
             return $this->repository->getMigrations($steps);
         } else {
             return $this->repository->getLast();
@@ -244,11 +244,17 @@ class Migrator
         foreach ($migrations as $migration) {
             $migration = (object) $migration;
 
-            $rolledBack[] = $files[$migration->migration];
+            if (! $file = Arr::get($files, $migration->migration)) {
+                $this->note("<fg=red>Migration not found:</> {$migration->migration}");
+
+                continue;
+            }
+
+            $rolledBack[] = $file;
 
             $this->runDown(
-                $files[$migration->migration],
-                $migration, Arr::get($options, 'pretend', false)
+                $file, $migration,
+                $options['pretend'] ?? false
             );
         }
 
@@ -388,7 +394,7 @@ class Migrator
         // queries against the database returning the array of raw SQL statements
         // that would get fired against the database system for this migration.
         $db = $this->resolveConnection(
-            $connection = $migration->getConnection()
+            $migration->getConnection()
         );
 
         return $db->pretend(function () use ($migration, $method) {

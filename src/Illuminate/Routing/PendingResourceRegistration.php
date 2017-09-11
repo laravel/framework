@@ -78,10 +78,10 @@ class PendingResourceRegistration
     /**
      * Set the route names for controller actions.
      *
-     * @param  array  $names
+     * @param  array|string  $names
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function names(array $names)
+    public function names($names)
     {
         $this->options['names'] = $names;
 
@@ -105,10 +105,10 @@ class PendingResourceRegistration
     /**
      * Override the route parameter names.
      *
-     * @param  array  $parameters
+     * @param  array|string  $parameters
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
-    public function parameters(array $parameters)
+    public function parameters($parameters)
     {
         $this->options['parameters'] = $parameters;
 

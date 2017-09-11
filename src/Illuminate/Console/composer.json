@@ -15,9 +15,8 @@
     ],
     "require": {
         "php": ">=7.0",
-        "illuminate/contracts": "5.5.*",
-        "illuminate/support": "5.5.*",
-        "nesbot/carbon": "~1.20",
+        "illuminate/contracts": "5.6.*",
+        "illuminate/support": "5.6.*",
         "symfony/console": "~3.3"
     },
     "autoload": {
@@ -27,7 +26,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.5-dev"
+            "dev-master": "5.6-dev"
         }
     },
     "suggest": {

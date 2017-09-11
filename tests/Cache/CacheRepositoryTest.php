@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Cache;
 
+use DateTime;
+use DateInterval;
 use Mockery as m;
-use Carbon\Carbon;
+use DateTimeImmutable;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
@@ -110,6 +113,14 @@ class CacheRepositoryTest extends TestCase
         $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
     }
 
+    public function testSettingMultipleItemsInCache()
+    {
+        // Alias of PuttingMultiple
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
+        $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
+    }
+
     public function testPutWithDatetimeInPastOrZeroSecondsDoesntSaveItem()
     {
         $repo = $this->getRepository();
@@ -136,6 +147,32 @@ class CacheRepositoryTest extends TestCase
         $this->assertTrue($repository->add('k', 'v', 60));
     }
 
+    public function dataProviderTestGetMinutes()
+    {
+        return [
+            [Carbon::now()->addMinutes(5)],
+            [(new DateTime('2030-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [(new DateTimeImmutable('2030-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [new DateInterval('PT5M')],
+            [5],
+        ];
+    }
+
+    /**
+     * @dataProvider dataProviderTestGetMinutes
+     * @param mixed $duration
+     */
+    public function testGetMinutes($duration)
+    {
+        Carbon::setTestNow(Carbon::parse('2030-07-25 12:13:14 UTC'));
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 5);
+        $repo->put($key, $value, $duration);
+
+        Carbon::setTestNow();
+    }
+
     public function testRegisterMacroWithNonStaticCall()
     {
         $repo = $this->getRepository();
@@ -143,6 +180,53 @@ class CacheRepositoryTest extends TestCase
             return 'Taylor';
         });
         $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
+    }
+
+    public function testForgettingCacheKey()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->forget('a-key');
+    }
+
+    public function testRemovingCacheKey()
+    {
+        // Alias of Forget
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->delete('a-key');
+    }
+
+    public function testSettingCache()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1);
+        $repo->set($key, $value, 1);
+    }
+
+    public function testClearingWholeCache()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('flush')->andReturn(true);
+        $repo->clear();
+    }
+
+    public function testGettingMultipleValuesFromCache()
+    {
+        $keys = ['key1', 'key2', 'key3'];
+        $default = ['key2' => 5];
+
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('many')->once()->with(['key2', 'key1', 'key3'])->andReturn(['key1' => 1, 'key2' => null, 'key3' => null]);
+        $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => null], $repo->getMultiple($keys, $default));
+    }
+
+    public function testRemovingMultipleKeys()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
+        $repo->getStore()->shouldReceive('forget')->once()->with('a-second-key')->andReturn(true);
+        $repo->deleteMultiple(['a-key', 'a-second-key']);
     }
 
     protected function getRepository()

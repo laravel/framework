@@ -2,8 +2,11 @@
 
 namespace Illuminate\Queue;
 
+use Exception;
+use ReflectionClass;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class CallQueuedHandler
 {
@@ -34,15 +37,17 @@ class CallQueuedHandler
      */
     public function call(Job $job, array $data)
     {
-        $command = $this->setJobInstanceIfNecessary(
-            $job, unserialize($data['command'])
-        );
-
-        if (! $job->isDeleted() && ! $job->hasFailed()) {
-            $this->dispatcher->dispatchNow(
-                $command, $handler = $this->resolveHandler($job, $command)
+        try {
+            $command = $this->setJobInstanceIfNecessary(
+                $job, unserialize($data['command'])
             );
+        } catch (ModelNotFoundException $e) {
+            return $this->handleModelNotFound($job, $e);
         }
+
+        $this->dispatcher->dispatchNow(
+            $command, $this->resolveHandler($job, $command)
+        );
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
             $this->ensureNextJobInChainIsDispatched($command);
@@ -98,6 +103,33 @@ class CallQueuedHandler
         if (method_exists($command, 'dispatchNextJobInChain')) {
             $command->dispatchNextJobInChain();
         }
+    }
+
+    /**
+     * Handle a model not found exception.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  \Exception  $e
+     * @return void
+     */
+    protected function handleModelNotFound(Job $job, $e)
+    {
+        $class = $job->resolveName();
+
+        try {
+            $shouldDelete = (new ReflectionClass($class))
+                    ->getDefaultProperties()['deleteWhenMissingModels'] ?? false;
+        } catch (Exception $e) {
+            $shouldDelete = false;
+        }
+
+        if ($shouldDelete) {
+            return $job->delete();
+        }
+
+        return FailingJob::handle(
+            $job->getConnectionName(), $job, $e
+        );
     }
 
     /**

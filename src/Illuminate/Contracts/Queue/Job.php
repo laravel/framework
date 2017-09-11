@@ -56,18 +56,25 @@ interface Job
     public function failed($e);
 
     /**
-     * The number of times to attempt a job.
+     * Get the number of times to attempt a job.
      *
      * @return int|null
      */
     public function maxTries();
 
     /**
-     * The number of seconds the job can run.
+     * Get the number of seconds the job can run.
      *
      * @return int|null
      */
     public function timeout();
+
+    /**
+     * Get the timestamp indicating when the job should timeout.
+     *
+     * @return int|null
+     */
+    public function timeoutAt();
 
     /**
      * Get the name of the queued job class.
@@ -99,10 +106,10 @@ interface Job
      */
     public function getQueue();
 
-     /**
-      * Get the raw body string for the job.
-      *
-      * @return string
-      */
-     public function getRawBody();
+    /**
+     * Get the raw body string for the job.
+     *
+     * @return string
+     */
+    public function getRawBody();
 }

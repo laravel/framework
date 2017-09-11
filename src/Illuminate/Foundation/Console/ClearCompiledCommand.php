@@ -25,7 +25,7 @@ class ClearCompiledCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (file_exists($servicesPath = $this->laravel->getCachedServicesPath())) {
             @unlink($servicesPath);

@@ -34,9 +34,9 @@ class ModelMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
-        if (parent::fire() === false) {
+        if (parent::handle() === false && ! $this->option('force')) {
             return;
         }
 
@@ -68,7 +68,8 @@ class ModelMakeCommand extends GeneratorCommand
     protected function createFactory()
     {
         $this->call('make:factory', [
-            'name' => $this->argument('name'),
+            'name' => $this->argument('name').'Factory',
+            '--model' => $this->argument('name'),
         ]);
     }
 
@@ -139,9 +140,11 @@ class ModelMakeCommand extends GeneratorCommand
 
             ['factory', 'f', InputOption::VALUE_NONE, 'Create a new factory for the model'],
 
-            ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model'],
+            ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
 
-            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+            ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
+
+            ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
         ];
     }
 }

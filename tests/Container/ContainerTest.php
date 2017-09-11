@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Container;
 
 use stdClass;
-use ReflectionException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 
@@ -493,7 +492,8 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException ReflectionException
+     * @expectedException \ReflectionException
+     * @expectedExceptionMessage Function ContainerTestCallStub() does not exist
      */
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
@@ -557,6 +557,23 @@ class ContainerTest extends TestCase
 
         $container = new Container;
         $container->bindMethod('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable', function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
+        $this->assertEquals(['foo', 'bar'], $result);
+    }
+
+    public function testBindMethodAcceptsAnArray()
+    {
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable');
+        $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
@@ -968,6 +985,30 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
         $this->assertInstanceOf(ContainerDependentStub::class, $container->build(ContainerDependentStub::class));
+    }
+
+    public function testContainerKnowsEntry()
+    {
+        $container = new Container;
+        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $this->assertTrue($container->has('Illuminate\Tests\Container\IContainerContractStub'));
+    }
+
+    public function testContainerCanBindAnyWord()
+    {
+        $container = new Container;
+        $container->bind('Taylor', stdClass::class);
+        $this->assertInstanceOf(stdClass::class, $container->get('Taylor'));
+    }
+
+    /**
+     * @expectedException \Illuminate\Container\EntryNotFoundException
+     * @expectedExceptionMessage
+     */
+    public function testUnknownEntryThrowsException()
+    {
+        $container = new Container;
+        $container->get('Taylor');
     }
 }
 

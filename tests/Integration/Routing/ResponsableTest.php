@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Routing;
+
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Support\Responsable;
@@ -25,7 +27,7 @@ class ResponsableTest extends TestCase
 
 class TestResponsableResponse implements Responsable
 {
-    public function toResponse()
+    public function toResponse($request)
     {
         return response('hello world', 201, ['X-Test-Header' => 'Taylor']);
     }

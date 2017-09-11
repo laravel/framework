@@ -3,8 +3,8 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
-use Carbon\Carbon;
 use Cron\CronExpression;
+use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -63,6 +63,13 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
+
+    /**
+     * The amount of time the mutex should be valid.
+     *
+     * @var int
+     */
+    public $expiresAt = 1440;
 
     /**
      * Indicates if the command should run in background.
@@ -363,7 +370,7 @@ class Event
     {
         $this->ensureOutputIsBeingCapturedForEmail();
 
-        $addresses = is_array($addresses) ? $addresses : func_get_args();
+        $addresses = is_array($addresses) ? $addresses : [$addresses];
 
         return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
             $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
@@ -509,11 +516,14 @@ class Event
     /**
      * Do not allow the event to overlap each other.
      *
+     * @param  int  $expiresAt
      * @return $this
      */
-    public function withoutOverlapping()
+    public function withoutOverlapping($expiresAt = 1440)
     {
         $this->withoutOverlapping = true;
+
+        $this->expiresAt = $expiresAt;
 
         return $this->then(function () {
             $this->mutex->forget($this);
@@ -525,12 +535,14 @@ class Event
     /**
      * Register a callback to further filter the schedule.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|bool  $callback
      * @return $this
      */
-    public function when(Closure $callback)
+    public function when($callback)
     {
-        $this->filters[] = $callback;
+        $this->filters[] = is_callable($callback) ? $callback : function () use ($callback) {
+            return $callback;
+        };
 
         return $this;
     }
@@ -538,12 +550,14 @@ class Event
     /**
      * Register a callback to further filter the schedule.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|bool  $callback
      * @return $this
      */
-    public function skip(Closure $callback)
+    public function skip($callback)
     {
-        $this->rejects[] = $callback;
+        $this->rejects[] = is_callable($callback) ? $callback : function () use ($callback) {
+            return $callback;
+        };
 
         return $this;
     }
@@ -629,11 +643,11 @@ class Event
      * @param  \DateTime|string  $currentTime
      * @param  int  $nth
      * @param  bool  $allowCurrentDate
-     * @return \Carbon\Carbon
+     * @return \Illuminate\Support\Carbon
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
-        return Carbon::instance($nextDue = CronExpression::factory(
+        return Carbon::instance(CronExpression::factory(
             $this->getExpression()
         )->getNextRunDate($currentTime, $nth, $allowCurrentDate));
     }

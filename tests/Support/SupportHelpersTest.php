@@ -9,6 +9,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Optional;
 
 class SupportHelpersTest extends TestCase
 {
@@ -220,6 +221,18 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Str::is('foo.ar', 'foobar'));
         $this->assertFalse(Str::is('foo?bar', 'foobar'));
         $this->assertFalse(Str::is('foo?bar', 'fobar'));
+
+        $this->assertTrue(Str::is([
+            '*.dev',
+            '*oc*',
+        ], 'localhost.dev'));
+
+        $this->assertFalse(Str::is([
+            '/',
+            'a*',
+        ], 'localhost.dev'));
+
+        $this->assertFalse(Str::is([], 'localhost.dev'));
     }
 
     public function testStrRandom()
@@ -275,6 +288,13 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('test/string/', Str::finish('test/string', '/'));
         $this->assertEquals('test/string/', Str::finish('test/string/', '/'));
         $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
+    }
+
+    public function testStrStart()
+    {
+        $this->assertEquals('/test/string', Str::start('test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
     }
 
     public function testSnakeCase()
@@ -721,7 +741,7 @@ class SupportHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      */
     public function testThrow()
     {
@@ -729,12 +749,60 @@ class SupportHelpersTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage Test Message
      */
     public function testThrowWithString()
     {
         throw_if(true, RuntimeException::class, 'Test Message');
+    }
+
+    public function testOptional()
+    {
+        $this->assertNull(optional(null)->something());
+
+        $this->assertEquals(10, optional(new class {
+            public function something()
+            {
+                return 10;
+            }
+        })->something());
+    }
+
+    public function testOptionalIsMacroable()
+    {
+        Optional::macro('present', function () {
+            if (is_object($this->value)) {
+                return $this->value->present();
+            }
+
+            return new Optional(null);
+        });
+
+        $this->assertNull(optional(null)->present()->something());
+
+        $this->assertEquals('$10.00', optional(new class {
+            public function present()
+            {
+                return new class {
+                    public function something()
+                    {
+                        return '$10.00';
+                    }
+                };
+            }
+        })->present()->something());
+    }
+
+    public function testTransform()
+    {
+        $this->assertEquals(10, transform(5, function ($value) {
+            return $value * 2;
+        }));
+
+        $this->assertNull(transform(null, function () {
+            return 10;
+        }));
     }
 }
 

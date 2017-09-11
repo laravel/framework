@@ -60,6 +60,17 @@ class Encrypter implements EncrypterContract
     }
 
     /**
+     * Create a new encryption key for the given cipher.
+     *
+     * @param  string  $cipher
+     * @return string
+     */
+    public static function generateKey($cipher)
+    {
+        return random_bytes($cipher == 'AES-128-CBC' ? 16 : 32);
+    }
+
+    /**
      * Encrypt the given value.
      *
      * @param  mixed  $value
@@ -84,14 +95,14 @@ class Encrypter implements EncrypterContract
             throw new EncryptException('Could not encrypt the data.');
         }
 
-        // Once we have the encrypted value we will go ahead base64_encode the input
-        // vector and create the MAC for the encrypted value so we can verify its
-        // authenticity. Then, we'll JSON encode the data in a "payload" array.
+        // Once we get the encrypted value we'll go ahead and base64_encode the input
+        // vector and create the MAC for the encrypted value so we can then verify
+        // its authenticity. Then, we'll JSON the data into the "payload" array.
         $mac = $this->hash($iv = base64_encode($iv), $value);
 
         $json = json_encode(compact('iv', 'value', 'mac'));
 
-        if (! is_string($json)) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new EncryptException('Could not encrypt the data.');
         }
 

@@ -37,11 +37,32 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = parent::buildClass($name);
+        $stub = $this->replaceUserNamespace(
+            parent::buildClass($name)
+        );
 
         $model = $this->option('model');
 
         return $model ? $this->replaceModel($stub, $model) : $stub;
+    }
+
+    /**
+     * Replace the User model namespace.
+     *
+     * @param  string  $stub
+     * @return string
+     */
+    protected function replaceUserNamespace($stub)
+    {
+        if (! config('auth.providers.users.model')) {
+            return $stub;
+        }
+
+        return str_replace(
+            $this->rootNamespace().'User',
+            config('auth.providers.users.model'),
+            $stub
+        );
     }
 
     /**
@@ -55,11 +76,17 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         $model = str_replace('/', '\\', $model);
 
+        $namespaceModel = $this->laravel->getNamespace().$model;
+
         if (Str::startsWith($model, '\\')) {
             $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
         } else {
-            $stub = str_replace('NamespacedDummyModel', $this->laravel->getNamespace().$model, $stub);
+            $stub = str_replace('NamespacedDummyModel', $namespaceModel, $stub);
         }
+
+        $stub = str_replace(
+            "use {$namespaceModel};\nuse {$namespaceModel};", "use {$namespaceModel};", $stub
+        );
 
         $model = class_basename(trim($model, '\\'));
 

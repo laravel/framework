@@ -177,9 +177,7 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $method = method_exists($this, 'handle') ? 'handle' : 'fire';
-
-        return $this->laravel->call([$this, $method]);
+        return $this->laravel->call([$this, 'handle']);
     }
 
     /**
@@ -228,7 +226,7 @@ class Command extends SymfonyCommand
     /**
      * Get the value of a command argument.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @return string|array
      */
     public function argument($key = null)
@@ -383,7 +381,7 @@ class Command extends SymfonyCommand
      * @param  string  $style
      * @return void
      */
-    public function table(array $headers, $rows, $style = 'default')
+    public function table($headers, $rows, $style = 'default')
     {
         $table = new Table($this->output);
 
@@ -391,7 +389,7 @@ class Command extends SymfonyCommand
             $rows = $rows->toArray();
         }
 
-        $table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
+        $table->setHeaders((array) $headers)->setRows($rows)->setStyle($style)->render();
     }
 
     /**

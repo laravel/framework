@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Traits\Macroable;
@@ -242,7 +241,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Send the given mailable.
      *
-     * @param  MailableContract  $mailable
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     protected function sendMailable(MailableContract $mailable)
@@ -277,9 +276,9 @@ class Mailer implements MailerContract, MailQueueContract
         // named keys instead, allowing the developers to use one or the other.
         if (is_array($view)) {
             return [
-                Arr::get($view, 'html'),
-                Arr::get($view, 'text'),
-                Arr::get($view, 'raw'),
+                $view['html'] ?? null,
+                $view['text'] ?? null,
+                $view['raw'] ?? null,
             ];
         }
 
@@ -387,7 +386,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Queue a new e-mail message for sending after (n) seconds.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array|MailableContract  $view
      * @param  string|null  $queue
      * @return mixed
@@ -405,7 +404,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Queue a new e-mail message for sending after (n) seconds on the given queue.
      *
      * @param  string  $queue
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array  $view
      * @return mixed
      */

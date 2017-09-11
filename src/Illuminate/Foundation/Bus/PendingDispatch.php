@@ -7,6 +7,13 @@ use Illuminate\Contracts\Bus\Dispatcher;
 class PendingDispatch
 {
     /**
+     * The job.
+     *
+     * @var mixed
+     */
+    protected $job;
+
+    /**
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job

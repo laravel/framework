@@ -38,7 +38,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
 
         $this->perPage = $perPage;
         $this->currentPage = $this->setCurrentPage($currentPage);
-        $this->path = $this->path != '/' ? rtrim($this->path, '/') : $this->path;
+        $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
 
         $this->setItems($items);
     }
@@ -100,7 +100,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return \Illuminate\Support\HtmlString
+     * @return string
      */
     public function render($view = null, $data = [])
     {
@@ -144,6 +144,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         return [
             'current_page' => $this->currentPage(),
             'data' => $this->items->toArray(),
+            'first_page_url' => $this->url(1),
             'from' => $this->firstItem(),
             'next_page_url' => $this->nextPageUrl(),
             'path' => $this->path,

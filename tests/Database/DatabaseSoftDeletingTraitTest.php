@@ -25,7 +25,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         ]);
         $model->delete();
 
-        $this->assertInstanceOf('Carbon\Carbon', $model->deleted_at);
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
     }
 
     public function testRestore()
@@ -91,7 +91,7 @@ class DatabaseSoftDeletingTraitStub
 
     public function freshTimestamp()
     {
-        return \Carbon\Carbon::now();
+        return \Illuminate\Support\Carbon::now();
     }
 
     public function fromDateTime()

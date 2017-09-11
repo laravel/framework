@@ -27,14 +27,14 @@ class Connection implements ConnectionInterface
     /**
      * The active PDO connection.
      *
-     * @var PDO
+     * @var \PDO|\Closure
      */
     protected $pdo;
 
     /**
      * The active PDO connection used for reads.
      *
-     * @var PDO
+     * @var \PDO|\Closure
      */
     protected $readPdo;
 
@@ -107,6 +107,13 @@ class Connection implements ConnectionInterface
      * @var int
      */
     protected $transactions = 0;
+
+    /**
+     * Indicates if changes have been made to the database.
+     *
+     * @var int
+     */
+    protected $recordsModified = false;
 
     /**
      * All of the queries run against the connection.
@@ -446,6 +453,8 @@ class Connection implements ConnectionInterface
 
             $this->bindValues($statement, $this->prepareBindings($bindings));
 
+            $this->recordsHaveBeenModified();
+
             return $statement->execute();
         });
     }
@@ -473,7 +482,11 @@ class Connection implements ConnectionInterface
 
             $statement->execute();
 
-            return $statement->rowCount();
+            $this->recordsHaveBeenModified(
+                ($count = $statement->rowCount()) > 0
+            );
+
+            return $count;
         });
     }
 
@@ -490,7 +503,11 @@ class Connection implements ConnectionInterface
                 return true;
             }
 
-            return $this->getPdo()->exec($query) === false ? false : true;
+            $this->recordsHaveBeenModified(
+                $change = ($this->getPdo()->exec($query) === false ? false : true)
+            );
+
+            return $change;
         });
     }
 
@@ -778,7 +795,7 @@ class Connection implements ConnectionInterface
      * Fire an event for this connection.
      *
      * @param  string  $event
-     * @return void
+     * @return array|null
      */
     protected function fireConnectionEvent($event)
     {
@@ -818,6 +835,19 @@ class Connection implements ConnectionInterface
     public function raw($value)
     {
         return new Expression($value);
+    }
+
+    /**
+     * Indicate if any records have been modified.
+     *
+     * @param  bool  $value
+     * @return void
+     */
+    public function recordsHaveBeenModified($value = true)
+    {
+        if (! $this->recordsModified) {
+            $this->recordsModified = $value;
+        }
     }
 
     /**
@@ -893,7 +923,11 @@ class Connection implements ConnectionInterface
      */
     public function getReadPdo()
     {
-        if ($this->transactions >= 1) {
+        if ($this->transactions > 0) {
+            return $this->getPdo();
+        }
+
+        if ($this->getConfig('sticky') && $this->recordsModified) {
             return $this->getPdo();
         }
 
@@ -907,7 +941,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO|\Closure|null  $pdo
      * @return $this
      */
     public function setPdo($pdo)
@@ -922,7 +956,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection used for reading.
      *
-     * @param  \PDO|null  $pdo
+     * @param  \PDO||\Closure|null  $pdo
      * @return $this
      */
     public function setReadPdo($pdo)
@@ -1197,7 +1231,6 @@ class Connection implements ConnectionInterface
      */
     public static function getResolver($driver)
     {
-        return isset(static::$resolvers[$driver]) ?
-                     static::$resolvers[$driver] : null;
+        return static::$resolvers[$driver] ?? null;
     }
 }

@@ -34,6 +34,17 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $this->p->items());
     }
 
+    public function testLengthAwarePaginatorSetCorrectInformationWithNoItems()
+    {
+        $paginator = new LengthAwarePaginator([], 0, 2, 1);
+
+        $this->assertEquals(1, $paginator->lastPage());
+        $this->assertEquals(1, $paginator->currentPage());
+        $this->assertFalse($paginator->hasPages());
+        $this->assertFalse($paginator->hasMorePages());
+        $this->assertEmpty($paginator->items());
+    }
+
     public function testLengthAwarePaginatorCanGenerateUrls()
     {
         $this->p->setPath('http://website.com');

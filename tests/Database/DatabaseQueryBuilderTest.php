@@ -1045,6 +1045,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([48, 'baz', null], $builder->getBindings());
     }
 
+    public function testJoinWhereInSubquery()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
+            $q = $this->getBuilder();
+            $q->select('name')->from('contacts')->where('name', 'baz');
+            $j->on('users.id', '=', 'contacts.id')->whereIn('contacts.name', $q);
+        });
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."name" in (select "name" from "contacts" where "name" = ?)', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
+            $q = $this->getBuilder();
+            $q->select('name')->from('contacts')->where('name', 'baz');
+            $j->on('users.id', '=', 'contacts.id')->orWhereIn('contacts.name', $q);
+        });
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."name" in (select "name" from "contacts" where "name" = ?)', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+    }
+
     public function testJoinWhereNotIn()
     {
         $builder = $this->getBuilder();
@@ -1554,6 +1575,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete [users] from [users] inner join [contacts] on [users].[id] = [contacts].[id] where [users].[id] = ?', [1])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->delete(1);
         $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" USING "contacts" where "users"."email" = ? and "users"."id" = "contacts"."id"', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" as "a" USING "users" as "b" where "email" = ? and "a"."id" = "b"."user_id"', ['foo'])->andReturn(1);
+        $result = $builder->from('users AS a')->join('users AS b', 'a.id', '=', 'b.user_id')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" USING "contacts" where "users"."id" = ? and "users"."id" = "contacts"."id"', [1])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->orderBy('id')->take(1)->delete(1);
+        $this->assertEquals(1, $result);
     }
 
     public function testTruncateMethod()
@@ -1789,11 +1825,13 @@ class DatabaseQueryBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException BadMethodCallException
+     * @expectedException \BadMethodCallException
      */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
         $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);
 
         $builder->noValidMethodHere();
     }

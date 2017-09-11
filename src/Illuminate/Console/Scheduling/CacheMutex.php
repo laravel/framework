@@ -32,7 +32,9 @@ class CacheMutex implements Mutex
      */
     public function create(Event $event)
     {
-        return $this->cache->add($event->mutexName(), true, 1440);
+        return $this->cache->add(
+            $event->mutexName(), true, $event->expiresAt
+        );
     }
 
     /**

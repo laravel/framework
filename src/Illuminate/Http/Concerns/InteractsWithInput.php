@@ -143,6 +143,16 @@ trait InteractsWithInput
     }
 
     /**
+     * Get the keys for all of the input and files.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_merge(array_keys($this->input()), $this->files->keys());
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @param  array|mixed  $keys
@@ -234,6 +244,19 @@ trait InteractsWithInput
     }
 
     /**
+     * Retrieve a request payload item from the request.
+     *
+     * @param  string  $key
+     * @param  string|array|null  $default
+     *
+     * @return string|array
+     */
+    public function post($key = null, $default = null)
+    {
+        return $this->retrieveItem('request', $key, $default);
+    }
+
+    /**
      * Determine if a cookie is set on the request.
      *
      * @param  string  $key
@@ -318,7 +341,7 @@ trait InteractsWithInput
      */
     protected function isValidFile($file)
     {
-        return $file instanceof SplFileInfo && $file->getPath() != '';
+        return $file instanceof SplFileInfo && $file->getPath() !== '';
     }
 
     /**

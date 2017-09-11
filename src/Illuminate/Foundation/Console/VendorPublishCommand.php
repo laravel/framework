@@ -67,7 +67,7 @@ class VendorPublishCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->determineWhatShouldBePublished();
 
@@ -110,7 +110,7 @@ class VendorPublishCommand extends Command
             $choices = $this->publishableChoices()
         );
 
-        if ($choice == $choices[0]) {
+        if ($choice == $choices[0] || is_null($choice)) {
             return;
         }
 

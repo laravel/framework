@@ -3,10 +3,9 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use ReflectionFunction;
-use ReflectionParameter;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\BindingRegistrar;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Illuminate\Contracts\Broadcasting\Broadcaster as BroadcasterContract;
@@ -150,11 +149,13 @@ abstract class Broadcaster implements BroadcasterContract
                 continue;
             }
 
-            $model = $parameter->getClass()->newInstance();
+            $instance = $parameter->getClass()->newInstance();
 
-            return $model->where($model->getRouteKeyName(), $value)->firstOr(function () {
+            if (! $model = $instance->resolveRouteBinding($value)) {
                 throw new AccessDeniedHttpException;
-            });
+            }
+
+            return $model;
         }
 
         return $value;
@@ -164,13 +165,13 @@ abstract class Broadcaster implements BroadcasterContract
      * Determine if a given key and parameter is implicitly bindable.
      *
      * @param  string  $key
-     * @param  ReflectionParameter  $parameter
+     * @param  \ReflectionParameter  $parameter
      * @return bool
      */
     protected function isImplicitlyBindable($key, $parameter)
     {
         return $parameter->name === $key && $parameter->getClass() &&
-                $parameter->getClass()->isSubclassOf(Model::class);
+                        $parameter->getClass()->isSubclassOf(UrlRoutable::class);
     }
 
     /**
@@ -189,7 +190,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Get the model binding registrar instance.
      *
-     * @return BindingRegistrar
+     * @return \Illuminate\Contracts\Routing\BindingRegistrar
      */
     protected function binder()
     {

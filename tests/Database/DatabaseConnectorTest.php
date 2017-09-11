@@ -96,13 +96,13 @@ class DatabaseConnectorTest extends TestCase
     public function testPostgresApplicationNameIsSet()
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
-        $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Larvel App'];
+        $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Laravel App'];
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\PostgresConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('stdClass');
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
         $connection->shouldReceive('prepare')->once()->with('set names \'utf8\'')->andReturn($connection);
-        $connection->shouldReceive('prepare')->once()->with('set application_name to \'Larvel App\'')->andReturn($connection);
+        $connection->shouldReceive('prepare')->once()->with('set application_name to \'Laravel App\'')->andReturn($connection);
         $connection->shouldReceive('execute')->twice();
         $result = $connector->connect($config);
 

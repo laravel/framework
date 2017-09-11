@@ -15,7 +15,7 @@ class ListenCommand extends Command
      */
     protected $signature = 'queue:listen
                             {connection? : The name of connection}
-                            {--delay=0 : Amount of time to delay failed jobs}
+                            {--delay=0 : The number of seconds to delay failed jobs}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--queue= : The queue to listen on}
@@ -55,7 +55,7 @@ class ListenCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set

@@ -2,7 +2,9 @@
 
 namespace Illuminate\Translation;
 
-class ArrayLoader implements LoaderInterface
+use Illuminate\Contracts\Translation\Loader;
+
+class ArrayLoader implements Loader
 {
     /**
      * All of the translation messages.
@@ -38,6 +40,17 @@ class ArrayLoader implements LoaderInterface
      * @return void
      */
     public function addNamespace($namespace, $hint)
+    {
+        //
+    }
+
+    /**
+     * Add a new JSON path to the loader.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    public function addJsonPath($path)
     {
         //
     }

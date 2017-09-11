@@ -208,6 +208,15 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->secure());
     }
 
+    public function testUserAgentMethod()
+    {
+        $request = Request::create('/', 'GET', [], [], [], [
+            'HTTP_USER_AGENT' => 'Laravel',
+        ]);
+
+        $this->assertEquals('Laravel', $request->userAgent());
+    }
+
     public function testHasMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
@@ -299,6 +308,27 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['developer' => ['name' => 'Taylor', 'age' => null]], $request->all());
     }
 
+    public function testKeysMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
+        $this->assertEquals(['name', 'age'], $request->keys());
+
+        $files = [
+            'foo' => [
+                'size' => 500,
+                'name' => 'foo.jpg',
+                'tmp_name' => __FILE__,
+                'type' => 'blah',
+                'error' => null,
+            ],
+        ];
+        $request = Request::create('/', 'GET', [], [], $files);
+        $this->assertEquals(['foo'], $request->keys());
+
+        $request = Request::create('/', 'GET', ['name' => 'Taylor'], [], $files);
+        $this->assertEquals(['name', 'foo'], $request->keys());
+    }
+
     public function testOnlyMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
@@ -323,6 +353,15 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Taylor', $request->query('name'));
         $this->assertEquals('Bob', $request->query('foo', 'Bob'));
         $all = $request->query(null);
+        $this->assertEquals('Taylor', $all['name']);
+    }
+
+    public function testPostMethod()
+    {
+        $request = Request::create('/', 'POST', ['name' => 'Taylor']);
+        $this->assertEquals('Taylor', $request->post('name'));
+        $this->assertEquals('Bob', $request->post('foo', 'Bob'));
+        $all = $request->post(null);
         $this->assertEquals('Taylor', $all['name']);
     }
 
@@ -656,7 +695,8 @@ class HttpRequestTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Session store not set on request.
      */
     public function testSessionMethod()
     {
@@ -687,7 +727,8 @@ class HttpRequestTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Unable to generate fingerprint. Route unavailable.
      */
     public function testFingerprintWithoutRoute()
     {

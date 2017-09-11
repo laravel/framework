@@ -45,7 +45,7 @@ class EncrypterTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testDoNoAllowLongerKey()
@@ -54,7 +54,7 @@ class EncrypterTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testWithBadKeyLength()
@@ -63,7 +63,7 @@ class EncrypterTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testWithBadKeyLengthAlternativeCipher()
@@ -72,7 +72,7 @@ class EncrypterTest extends TestCase
     }
 
     /**
-     * @expectedException RuntimeException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
      */
     public function testWithUnsupportedCipher()
@@ -81,7 +81,7 @@ class EncrypterTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Contracts\Encryption\DecryptException
+     * @expectedException \Illuminate\Contracts\Encryption\DecryptException
      * @expectedExceptionMessage The payload is invalid.
      */
     public function testExceptionThrownWhenPayloadIsInvalid()
@@ -93,7 +93,7 @@ class EncrypterTest extends TestCase
     }
 
     /**
-     * @expectedException Illuminate\Contracts\Encryption\DecryptException
+     * @expectedException \Illuminate\Contracts\Encryption\DecryptException
      * @expectedExceptionMessage The MAC is invalid.
      */
     public function testExceptionThrownWithDifferentKey()

@@ -9,8 +9,6 @@ class SupportStrTest extends TestCase
 {
     /**
      * Test the Str::words method.
-     *
-     * @group laravel
      */
     public function testStringCanBeLimitedByWords()
     {
@@ -88,6 +86,18 @@ class SupportStrTest extends TestCase
         $this->assertFalse(Str::endsWith(0.27, '8'));
     }
 
+    public function testStrBefore()
+    {
+        $this->assertEquals('han', Str::before('hannah', 'nah'));
+        $this->assertEquals('ha', Str::before('hannah', 'n'));
+        $this->assertEquals('ééé ', Str::before('ééé hannah', 'han'));
+        $this->assertEquals('hannah', Str::before('hannah', 'xxxx'));
+        $this->assertEquals('hannah', Str::before('hannah', ''));
+        $this->assertEquals('han', Str::before('han0nah', '0'));
+        $this->assertEquals('han', Str::before('han0nah', 0));
+        $this->assertEquals('han', Str::before('han2nah', 2));
+    }
+
     public function testStrAfter()
     {
         $this->assertEquals('nah', Str::after('hannah', 'han'));
@@ -95,6 +105,9 @@ class SupportStrTest extends TestCase
         $this->assertEquals('nah', Str::after('ééé hannah', 'han'));
         $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
         $this->assertEquals('hannah', Str::after('hannah', ''));
+        $this->assertEquals('nah', Str::after('han0nah', '0'));
+        $this->assertEquals('nah', Str::after('han0nah', 0));
+        $this->assertEquals('nah', Str::after('han2nah', 2));
     }
 
     public function testStrContains()

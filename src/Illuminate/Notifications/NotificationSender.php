@@ -154,7 +154,7 @@ class NotificationSender
                 $notification->id = $notificationId;
 
                 $this->bus->dispatch(
-                    (new SendQueuedNotifications($this->formatNotifiables($notifiable), $notification, [$channel]))
+                    (new SendQueuedNotifications($notifiable, $notification, [$channel]))
                             ->onConnection($notification->connection)
                             ->onQueue($notification->queue)
                             ->delay($notification->delay)
@@ -167,7 +167,7 @@ class NotificationSender
      * Format the notifiables into a Collection / array if necessary.
      *
      * @param  mixed  $notifiables
-     * @return ModelCollection|array
+     * @return \Illuminate\Database\Eloquent\Collection|array
      */
     protected function formatNotifiables($notifiables)
     {

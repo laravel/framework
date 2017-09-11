@@ -170,6 +170,7 @@ class RouteRegistrarTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method [missing] does not exist.
      */
     public function testRegisteringNonApprovedAttributesThrows()
     {
@@ -222,6 +223,9 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanNameRoutesOnRegisteredResource()
     {
+        $this->router->resource('comments', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->only('create', 'store')->names('reply');
+
         $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
                      ->only('create', 'store')->names([
                          'create' => 'user.build',
@@ -233,6 +237,8 @@ class RouteRegistrarTest extends TestCase
                     ->name('create', 'posts.make')
                     ->name('destroy', 'posts.remove');
 
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('reply.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('reply.store'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.build'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.save'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('posts.make'));

@@ -23,7 +23,7 @@ class Schedule
     protected $mutex;
 
     /**
-     * Create a new event instance.
+     * Create a new schedule instance.
      *
      * @return void
      */
@@ -41,7 +41,7 @@ class Schedule
      *
      * @param  string|callable  $callback
      * @param  array   $parameters
-     * @return \Illuminate\Console\Scheduling\Event
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function call($callback, array $parameters = [])
     {
@@ -74,7 +74,7 @@ class Schedule
      * Add a new job callback event to the schedule.
      *
      * @param  object|string  $job
-     * @return \Illuminate\Console\Scheduling\Event
+     * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
     public function job($job)
     {
@@ -126,7 +126,7 @@ class Schedule
      * Get all of the events on the schedule that are due.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return array
+     * @return \Illuminate\Support\Collection
      */
     public function dueEvents($app)
     {

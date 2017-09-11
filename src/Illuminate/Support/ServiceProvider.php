@@ -101,6 +101,17 @@ abstract class ServiceProvider
     }
 
     /**
+     * Register a JSON translation file path.
+     *
+     * @param  string  $path
+     * @return void
+     */
+    protected function loadJsonTranslationsFrom($path)
+    {
+        $this->app['translator']->addJsonPath($path);
+    }
+
+    /**
      * Register a database migration path.
      *
      * @param  array|string  $paths
@@ -203,7 +214,7 @@ abstract class ServiceProvider
     }
 
     /**
-     * Get the paths for the provdider and group.
+     * Get the paths for the provider and group.
      *
      * @param  string  $provider
      * @param  string  $group

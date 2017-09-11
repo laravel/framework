@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Queue;
+
 use Illuminate\Bus\Queueable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Queue;
@@ -24,6 +26,16 @@ class JobChainingTest extends TestCase
         JobChainingTestFirstJob::dispatch()->chain([
             new JobChainingTestSecondJob,
         ]);
+
+        $this->assertTrue(JobChainingTestFirstJob::$ran);
+        $this->assertTrue(JobChainingTestSecondJob::$ran);
+    }
+
+    public function test_jobs_can_be_chained_on_success_using_pending_chain()
+    {
+        JobChainingTestFirstJob::withChain([
+            new JobChainingTestSecondJob,
+        ])->dispatch();
 
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertTrue(JobChainingTestSecondJob::$ran);

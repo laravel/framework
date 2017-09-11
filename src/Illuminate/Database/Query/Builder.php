@@ -16,6 +16,7 @@ use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class Builder
 {
@@ -26,7 +27,7 @@ class Builder
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \Illuminate\Database\ConnectionInterface
      */
     public $connection;
 
@@ -98,7 +99,7 @@ class Builder
      *
      * @var array
      */
-    public $wheres;
+    public $wheres = [];
 
     /**
      * The groupings for the query.
@@ -333,8 +334,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @param  string  $type
      * @param  bool    $where
      * @return $this
@@ -388,8 +389,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
@@ -416,8 +417,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
@@ -443,9 +444,9 @@ class Builder
      * Add a "cross join" clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
@@ -460,17 +461,6 @@ class Builder
     }
 
     /**
-     * Pass the query to a given callback.
-     *
-     * @param  \Closure  $callback
-     * @return \Illuminate\Database\Query\Builder
-     */
-    public function tap($callback)
-    {
-        return $this->when(true, $callback);
-    }
-
-    /**
      * Merge an array of where clauses and bindings.
      *
      * @param  array  $wheres
@@ -479,7 +469,7 @@ class Builder
      */
     public function mergeWheres($wheres, $bindings)
     {
-        $this->wheres = array_merge((array) $this->wheres, (array) $wheres);
+        $this->wheres = array_merge($this->wheres, (array) $wheres);
 
         $this->bindings['where'] = array_values(
             array_merge($this->bindings['where'], (array) $bindings)
@@ -490,7 +480,7 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
+     * @param  string|null  $operator
      * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
@@ -536,7 +526,7 @@ class Builder
         // where null clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
         if (is_null($value)) {
-            return $this->whereNull($column, $boolean, $operator != '=');
+            return $this->whereNull($column, $boolean, $operator !== '=');
         }
 
         // If the column is making a JSON reference we'll check to see if the value
@@ -572,12 +562,12 @@ class Builder
      */
     protected function addArrayOfWheres($column, $boolean, $method = 'where')
     {
-        return $this->whereNested(function ($query) use ($column, $method) {
+        return $this->whereNested(function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
                 if (is_numeric($key) && is_array($value)) {
                     $query->{$method}(...array_values($value));
                 } else {
-                    $query->$method($key, '=', $value);
+                    $query->$method($key, '=', $value, $boolean);
                 }
             }
         }, $boolean);
@@ -634,8 +624,8 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|string  $column
-     * @param  string  $operator
+     * @param  string|array|\Closure  $column
+     * @param  string|null  $operator
      * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -715,10 +705,10 @@ class Builder
      * Add a raw or where clause to the query.
      *
      * @param  string  $sql
-     * @param  array   $bindings
+     * @param  mixed   $bindings
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereRaw($sql, array $bindings = [])
+    public function orWhereRaw($sql, $bindings = [])
     {
         return $this->whereRaw($sql, $bindings, 'or');
     }
@@ -736,10 +726,14 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
+        if ($values instanceof EloquentBuilder) {
+            $values = $values->getQuery();
+        }
+
         // If the value is a query builder instance we will assume the developer wants to
         // look for any values that exists within this given query. So we will add the
         // query accordingly so that this query is properly executed when it is run.
-        if ($values instanceof static) {
+        if ($values instanceof self) {
             return $this->whereInExistingQuery(
                 $column, $values, $boolean, $not
             );
@@ -1265,7 +1259,7 @@ class Builder
             // If the segment is not a boolean connector, we can assume it is a column's name
             // and we will add it to the query as a new constraint as a where clause, then
             // we can keep iterating through the dynamic method string's segments again.
-            if ($segment != 'And' && $segment != 'Or') {
+            if ($segment !== 'And' && $segment !== 'Or') {
                 $this->addDynamic($segment, $connector, $parameters, $index);
 
                 $index++;
@@ -1323,8 +1317,8 @@ class Builder
      * Add a "having" clause to the query.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param  string|null  $operator
+     * @param  string|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -1359,8 +1353,8 @@ class Builder
      * Add a "or having" clause to the query.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param  string|null  $operator
+     * @param  string|null  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orHaving($column, $operator = null, $value = null)
@@ -1562,7 +1556,7 @@ class Builder
     }
 
     /**
-     * Get an array orders with all orders for an given column removed.
+     * Get an array with all orders with a given column removed.
      *
      * @param  string  $column
      * @return array
@@ -1571,7 +1565,8 @@ class Builder
     {
         return Collection::make($this->orders)
                     ->reject(function ($order) use ($column) {
-                        return $order['column'] === $column;
+                        return isset($order['column'])
+                               ? $order['column'] === $column : false;
                     })->values()->all();
     }
 
@@ -2128,7 +2123,7 @@ class Builder
      * Insert a new record and get the value of the primary key.
      *
      * @param  array   $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return int
      */
     public function insertGetId(array $values, $sequence = null)

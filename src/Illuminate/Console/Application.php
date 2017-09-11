@@ -6,10 +6,14 @@ use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
+use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\ConsoleOutput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Illuminate\Contracts\Console\Application as ApplicationContract;
@@ -38,6 +42,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected static $bootstrappers = [];
 
     /**
+     * The Event Dispatcher.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
+    /**
      * Create a new Artisan console application.
      *
      * @param  \Illuminate\Contracts\Container\Container  $laravel
@@ -50,12 +61,37 @@ class Application extends SymfonyApplication implements ApplicationContract
         parent::__construct('Laravel Framework', $version);
 
         $this->laravel = $laravel;
+        $this->events = $events;
         $this->setAutoExit(false);
         $this->setCatchExceptions(false);
 
-        $events->dispatch(new Events\ArtisanStarting($this));
+        $this->events->dispatch(new Events\ArtisanStarting($this));
 
         $this->bootstrap();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function run(InputInterface $input = null, OutputInterface $output = null)
+    {
+        $commandName = $this->getCommandName(
+            $input = $input ?: new ArgvInput
+        );
+
+        $this->events->fire(
+            new Events\CommandStarting(
+                $commandName, $input, $output = $output ?: new ConsoleOutput
+            )
+        );
+
+        $exitCode = parent::run($input, $output);
+
+        $this->events->fire(
+            new Events\CommandFinished($commandName, $input, $output, $exitCode)
+        );
+
+        return $exitCode;
     }
 
     /**
@@ -112,7 +148,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         }
     }
 
-    /*
+    /**
      * Clear the console application bootstrappers.
      *
      * @return void
