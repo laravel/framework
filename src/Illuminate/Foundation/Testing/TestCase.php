@@ -18,7 +18,8 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithDatabase,
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
-        Concerns\MocksApplicationServices;
+        Concerns\MocksApplicationServices,
+        Concerns\ComposesTemplateMethods;
 
     /**
      * The Illuminate application instance.
@@ -68,7 +69,7 @@ abstract class TestCase extends BaseTestCase
             $this->refreshApplication();
         }
 
-        $this->setUpTraits();
+        $this->callTraitTemplateMethods('setUp');
 
         foreach ($this->afterApplicationCreatedCallbacks as $callback) {
             call_user_func($callback);
@@ -92,44 +93,14 @@ abstract class TestCase extends BaseTestCase
     }
 
     /**
-     * Boot the testing helper traits.
-     *
-     * @return array
-     */
-    protected function setUpTraits()
-    {
-        $uses = array_flip(class_uses_recursive(static::class));
-
-        if (isset($uses[RefreshDatabase::class])) {
-            $this->refreshDatabase();
-        }
-
-        if (isset($uses[DatabaseMigrations::class])) {
-            $this->runDatabaseMigrations();
-        }
-
-        if (isset($uses[DatabaseTransactions::class])) {
-            $this->beginDatabaseTransaction();
-        }
-
-        if (isset($uses[WithoutMiddleware::class])) {
-            $this->disableMiddlewareForAllTests();
-        }
-
-        if (isset($uses[WithoutEvents::class])) {
-            $this->disableEventsForAllTests();
-        }
-
-        return $uses;
-    }
-
-    /**
      * Clean up the testing environment before the next test.
      *
      * @return void
      */
     protected function tearDown()
     {
+        $this->callTraitTemplateMethods('tearDown');
+
         if ($this->app) {
             foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
                 call_user_func($callback);
