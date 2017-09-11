@@ -99,7 +99,7 @@ class JoinClause extends Builder
     }
 
     /**
-     * Create a new query instance for sub-query where condition.
+     * Create a new query instance for sub-query.
      *
      * @return \Illuminate\Database\Query\Builder
      */

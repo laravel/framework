@@ -830,16 +830,6 @@ class Builder
     }
 
     /**
-     * Create a new query instance for sub-query where condition.
-     *
-     * @return \Illuminate\Database\Query\Builder
-     */
-    protected function forSubQuery()
-    {
-        return $this->newQuery();
-    }
-
-    /**
      * Add an external sub-select to the query.
      *
      * @param  string   $column
@@ -2258,6 +2248,16 @@ class Builder
     public function newQuery()
     {
         return new static($this->connection, $this->grammar, $this->processor);
+    }
+
+    /**
+     * Create a new query instance for a sub-query.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function forSubQuery()
+    {
+        return $this->newQuery();
     }
 
     /**
