@@ -922,7 +922,7 @@ class BelongsToMany extends Relation
     {
         return $this->table.'.'.$this->relatedPivotKey;
     }
-    
+
     /**
      * Get the fully qualified parent key name for the relation.
      *
