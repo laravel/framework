@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -17,6 +16,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 
