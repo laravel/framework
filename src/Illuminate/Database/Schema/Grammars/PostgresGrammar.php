@@ -742,4 +742,27 @@ class PostgresGrammar extends Grammar
             return ' primary key';
         }
     }
+
+    /**
+     * Compile a foreign key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileForeign(Blueprint $blueprint, Fluent $command)
+    {
+        // The \Illuminate\Database\Schema\Grammars\Grammar method compiles the classical statement
+        $sql = parent::compileForeign($blueprint, $command);
+
+        // Here we add the Postgres specific "deferrable" part
+        if (! is_null($command->deferrable)) {
+            $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
+        }
+        if ($command->deferrable && ! is_null($command->initiallyImmediate)) {
+            $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
+        }
+
+        return $sql;
+    }
 }
