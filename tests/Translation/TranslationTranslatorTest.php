@@ -146,6 +146,7 @@ class TranslationTranslatorTest extends TestCase
         $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'Foo that bar', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with($t->getFallback(), '*', '*')->andReturn([]);
         $this->assertEquals('Foo that bar', $t->getFromJson('Foo that bar'));
     }
 
@@ -154,6 +155,7 @@ class TranslationTranslatorTest extends TestCase
         $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with($t->getFallback(), '*', '*')->andReturn([]);
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
