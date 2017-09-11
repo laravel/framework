@@ -645,7 +645,19 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $response
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public static function prepareResponse($request, $response)
+    public function prepareResponse($request, $response)
+    {
+        return static::prepareResponseObject($request, $response);
+    }
+
+    /**
+     * Static version of prepareResponse.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  mixed  $response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public static function prepareResponseObject($request, $response)
     {
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
