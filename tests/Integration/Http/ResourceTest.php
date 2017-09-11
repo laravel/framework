@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Pagination\LengthAwarePaginator;
@@ -85,6 +86,28 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'second' => 'value',
                 'third' => 'value',
+            ],
+        ]);
+    }
+
+    public function test_resources_may_have_optional_Merges()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalMerging(new Post([
+                'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'second' => 'value',
             ],
         ]);
     }
