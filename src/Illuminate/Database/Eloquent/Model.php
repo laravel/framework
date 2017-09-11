@@ -1020,7 +1020,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  \Illuminate\Database\Eloquent\Model|null  $model
      * @return bool
      */
-    public function is($model)
+    public function is(Model $model = null)
     {
         return ! is_null($model) &&
                $this->getKey() === $model->getKey() &&
@@ -1031,10 +1031,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Determine if two models are not the same.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
      * @return bool
      */
-    public function isNot(Model $model)
+    public function isNot(Model $model = null)
     {
         return ! $this->is($model);
     }
