@@ -159,6 +159,17 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
     }
 
+    public function testGetJsonForNonExistingJsonKeyReturnsTheJsonKeyOfTheFallbackLanguage()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->setFallback('it');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('it', 'foo', '*')->andReturn([]);
+        $t->getLoader()->shouldReceive('load')->once()->with('it', '*', '*')->andReturn(['foo' => 'one']);
+        $this->assertEquals('one', $t->getFromJson('foo'));
+    }
+
     protected function getLoader()
     {
         return m::mock(\Illuminate\Contracts\Translation\Loader::class);
