@@ -19,18 +19,6 @@ trait RefreshDatabase
     }
 
     /**
-     * Define hooks to migrate the database before and after each test.
-     *
-     * @deprecated
-     *
-     * @return void
-     */
-    public function refreshDatabase()
-    {
-        $this->setUpRefreshDatabase();
-    }
-
-    /**
      * Determine if an in-memory database is being used.
      *
      * @return bool

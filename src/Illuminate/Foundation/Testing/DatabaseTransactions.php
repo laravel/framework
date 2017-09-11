@@ -28,18 +28,6 @@ trait DatabaseTransactions
     }
 
     /**
-     * Handle database transactions on the specified connections.
-     *
-     * @deprecated
-     *
-     * @return void
-     */
-    public function beginDatabaseTransaction()
-    {
-        $this->setUpDatabaseTransactions();
-    }
-
-    /**
      * The database connections that should have transactions.
      *
      * @return array

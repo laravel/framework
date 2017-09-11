@@ -21,16 +21,4 @@ trait DatabaseMigrations
             $this->artisan('migrate:rollback');
         });
     }
-
-    /**
-     * Define hooks to migrate the database before and after each test.
-     *
-     * @deprecated
-     *
-     * @return void
-     */
-    public function runDatabaseMigrations()
-    {
-        $this->setUpDatabaseMigrations();
-    }
 }

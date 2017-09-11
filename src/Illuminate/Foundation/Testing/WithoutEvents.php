@@ -19,16 +19,4 @@ trait WithoutEvents
             throw new Exception('Unable to disable events. ApplicationTrait not used.');
         }
     }
-
-    /**
-     * Prevent all event handles from being executed.
-     *
-     * @deprecated
-     *
-     * @throws \Exception
-     */
-    public function disableEventsForAllTests()
-    {
-        $this->setUpWithoutEvents();
-    }
 }
