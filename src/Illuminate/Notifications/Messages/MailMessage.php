@@ -217,4 +217,16 @@ class MailMessage extends SimpleMessage
     {
         return array_merge($this->toArray(), $this->viewData);
     }
+
+    /**
+     * Sets the markdown template to render.
+     *
+     * @param string $template
+     */
+    public function template($template)
+    {
+        $this->markdown = $template;
+
+        return $this;
+    }
 }
