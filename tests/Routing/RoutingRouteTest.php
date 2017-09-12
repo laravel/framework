@@ -327,6 +327,7 @@ class RoutingRouteTest extends TestCase
             ],
             $router->getGroups()
         );
+    }
 
     public function testRouteGetAction()
     {
