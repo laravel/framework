@@ -2406,13 +2406,13 @@ class Builder
     /**
      * Clone the query without the given properties.
      *
-     * @param  array  $except
+     * @param  array  $properties
      * @return static
      */
-    public function cloneWithout(array $except)
+    public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($except) {
-            foreach ($except as $property) {
+        return tap(clone $this, function ($clone) use ($properties) {
+            foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
         });
