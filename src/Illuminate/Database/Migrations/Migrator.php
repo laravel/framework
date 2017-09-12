@@ -6,6 +6,9 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Events\MigrationFailed;
+use Illuminate\Database\Events\MigrationsExecuted;
+use Illuminate\Database\Events\MigrationsRolledBack;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -53,6 +56,13 @@ class Migrator
     protected $paths = [];
 
     /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -67,6 +77,10 @@ class Migrator
         $this->files = $files;
         $this->resolver = $resolver;
         $this->repository = $repository;
+
+        if (app()->bound('events')) {
+            $this->events = app()['events'];
+        }
     }
 
     /**
@@ -93,6 +107,11 @@ class Migrator
         // we will go ahead and run them "up". This will execute each migration as
         // an operation against a database. Then we'll return this list of them.
         $this->runPending($migrations, $options);
+
+        if (count($migrations) > 0 && isset($this->events)) {
+            // Dispatch event after migration run
+            $this->events->dispatch(new MigrationsExecuted($this));
+        }
 
         return $migrations;
     }
@@ -258,6 +277,11 @@ class Migrator
             );
         }
 
+        if (! empty($rolledBack) && isset($this->events)) {
+            // Dispatch event after migration rolled back
+            $this->events->dispatch(new MigrationsRolledBack($this));
+        }
+
         return $rolledBack;
     }
 
@@ -360,9 +384,14 @@ class Migrator
             }
         };
 
-        $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
-                    ? $connection->transaction($callback)
-                    : $callback();
+        try {
+            $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
+                ? $connection->transaction($callback)
+                : $callback();
+        } catch (\Exception $e) {
+            $this->events->dispatch(new MigrationFailed($this));
+            throw $e;
+        }
     }
 
     /**
