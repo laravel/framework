@@ -47,7 +47,7 @@ class DurationLimiterBuilder
     /**
      * Create a new builder instance.
      *
-     * @param  \Illuminate\Redis\Connetions\Connection  $connection
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
      * @param  string  $name
      * @return void
      */
@@ -100,8 +100,10 @@ class DurationLimiterBuilder
      * Execute the given callback if a lock is obtained, otherise call the failure callback.
      *
      * @param  callable  $callback
-     * @param  callable  $failure
+     * @param  callable|null  $failure
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
      */
     public function then(callable $callback, callable $failure = null)
     {

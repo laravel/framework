@@ -2,13 +2,23 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use JsonSerializable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Http\Resources\Json\Resource;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Resources\Json\ResourceCollection;
+use Illuminate\Tests\Integration\Http\Fixtures\Post;
+use Illuminate\Tests\Integration\Http\Fixtures\Author;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
+use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 
 /**
  * @group integration
@@ -80,6 +90,28 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resources_may_have_optional_Merges()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalMerging(new Post([
+                'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'second' => 'value',
+            ],
+        ]);
+    }
+
     public function test_resources_may_have_optional_relationships()
     {
         Route::get('/', function () {
@@ -98,6 +130,60 @@ class ResourceTest extends TestCase
         $response->assertExactJson([
             'data' => [
                 'id' => 5,
+            ],
+        ]);
+    }
+
+    public function test_resources_may_load_optional_relationships()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            $post->setRelation('author', new Author(['name' => 'jrrmartin']));
+
+            return new PostResourceWithOptionalRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'author' => ['name' => 'jrrmartin'],
+            ],
+        ]);
+    }
+
+    public function test_resources_may_shows_null_for_loaded_relationship_with_value_null()
+    {
+        Route::get('/', function () {
+            $post = new Post([
+                'id' => 5,
+                'title' => 'Test Title',
+            ]);
+
+            $post->setRelation('author', null);
+
+            return new PostResourceWithOptionalRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'author' => null,
             ],
         ]);
     }
@@ -144,7 +230,7 @@ class ResourceTest extends TestCase
             'title' => 'Test Title',
         ]));
 
-        $route = Route::get('/post/{id}', function () use ($post) {
+        Route::get('/post/{id}', function () use ($post) {
             return route('post.show', $post);
         })->name('post.show');
 
@@ -403,141 +489,5 @@ class ResourceTest extends TestCase
                 'title' => 'Test Title',
             ],
         ]);
-    }
-}
-
-class Post extends Model
-{
-    /**
-     * The attributes that aren't mass assignable.
-     *
-     * @var array
-     */
-    protected $guarded = [];
-}
-
-class PostResource extends Resource
-{
-    public function toArray($request)
-    {
-        return ['id' => $this->id, 'title' => $this->title, 'custom' => true];
-    }
-
-    public function withResponse($request, $response)
-    {
-        $response->header('X-Resource', 'True');
-    }
-}
-
-class PostResourceWithoutWrap extends PostResource
-{
-    public static $wrap = null;
-}
-
-class PostResourceWithOptionalData extends Resource
-{
-    public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'first' => $this->when(false, 'value'),
-            'second' => $this->when(true, 'value'),
-            'third' => $this->when(true, function () {
-                return 'value';
-            }),
-        ];
-    }
-}
-
-class PostResourceWithOptionalRelationship extends PostResource
-{
-    public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'comments' => new CommentCollection($this->whenLoaded('comments')),
-        ];
-    }
-}
-
-class PostResourceWithOptionalPivotRelationship extends PostResource
-{
-    public function toArray($request)
-    {
-        return [
-            'id' => $this->id,
-            'subscription' => $this->whenPivotLoaded(Subscription::class, function () {
-                return [
-                    'foo' => 'bar',
-                ];
-            }),
-        ];
-    }
-}
-
-class Subscription
-{
-}
-
-class CommentCollection extends ResourceCollection
-{
-    //
-}
-
-class PostResourceWithExtraData extends PostResource
-{
-    public function with($request)
-    {
-        return ['foo' => 'bar'];
-    }
-}
-
-class SerializablePostResource extends Resource
-{
-    public function toArray($request)
-    {
-        return new JsonSerializableResource($this);
-    }
-}
-
-class PostCollectionResource extends ResourceCollection
-{
-    public $collects = PostResource::class;
-
-    public function toArray($request)
-    {
-        return ['data' => $this->collection];
-    }
-}
-
-class EmptyPostCollectionResource extends ResourceCollection
-{
-    public $collects = PostResource::class;
-}
-
-class EmptyPostResource extends PostResource
-{
-    //
-}
-
-class ReallyEmptyPostResource extends Resource
-{
-    //
-}
-
-class JsonSerializableResource implements JsonSerializable
-{
-    public $resource;
-
-    public function __construct($resource)
-    {
-        $this->resource = $resource;
-    }
-
-    public function jsonSerialize()
-    {
-        return [
-            'id' => $this->resource->id,
-        ];
     }
 }

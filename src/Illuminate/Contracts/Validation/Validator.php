@@ -41,7 +41,7 @@ interface Validator extends MessageProvider
     /**
      * Get all of the validation error messages.
      *
-     * @return array
+     * @return \Illuminate\Support\MessageBag
      */
     public function errors();
 }

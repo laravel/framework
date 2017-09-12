@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Exceptions;
 
 use Exception;
+use Throwable;
 use Whoops\Run as Whoops;
 use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
@@ -53,13 +54,13 @@ class Handler implements ExceptionHandlerContract
      * @var array
      */
     protected $internalDontReport = [
-        \Illuminate\Auth\AuthenticationException::class,
-        \Illuminate\Auth\Access\AuthorizationException::class,
-        \Symfony\Component\HttpKernel\Exception\HttpException::class,
+        AuthenticationException::class,
+        AuthorizationException::class,
+        HttpException::class,
         HttpResponseException::class,
-        \Illuminate\Database\Eloquent\ModelNotFoundException::class,
-        \Illuminate\Session\TokenMismatchException::class,
-        \Illuminate\Validation\ValidationException::class,
+        ModelNotFoundException::class,
+        TokenMismatchException::class,
+        ValidationException::class,
     ];
 
     /**
@@ -151,7 +152,7 @@ class Handler implements ExceptionHandlerContract
                 'userId' => Auth::id(),
                 'email' => Auth::user() ? Auth::user()->email : null,
             ]);
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
             return [];
         }
     }
@@ -166,7 +167,7 @@ class Handler implements ExceptionHandlerContract
     public function render($request, Exception $e)
     {
         if (method_exists($e, 'render') && $response = $e->render($request)) {
-            return Router::prepareResponse($request, $response);
+            return Router::toResponse($request, $response);
         } elseif ($e instanceof Responsable) {
             return $e->toResponse($request);
         }
@@ -445,6 +446,7 @@ class Handler implements ExceptionHandlerContract
     {
         return config('app.debug') ? [
             'message' => $e->getMessage(),
+            'exception' => get_class($e),
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => $e->getTrace(),

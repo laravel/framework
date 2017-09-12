@@ -398,7 +398,7 @@ class Gate implements GateContract
         }
 
         if (! is_string($class)) {
-            return null;
+            return;
         }
 
         if (isset($this->policies[$class])) {
@@ -531,5 +531,15 @@ class Gate implements GateContract
     public function abilities()
     {
         return $this->abilities;
+    }
+
+    /**
+     * Get all of the defined policies.
+     *
+     * @return array
+     */
+    public function policies()
+    {
+        return $this->policies;
     }
 }

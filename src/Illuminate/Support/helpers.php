@@ -335,8 +335,6 @@ if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".
      *
-     * @author Derek MacDonald (https://github.com/derekmd)
-     *
      * @param  mixed  $value
      * @return bool
      */
@@ -633,6 +631,19 @@ if (! function_exists('env')) {
     }
 }
 
+if (! function_exists('filled')) {
+    /**
+     * Determine if a value is "filled".
+     *
+     * @param  mixed  $value
+     * @return bool
+     */
+    function filled($value)
+    {
+        return ! blank($value);
+    }
+}
+
 if (! function_exists('head')) {
     /**
      * Get the first element of an array. Useful for method chaining.
@@ -728,21 +739,6 @@ if (! function_exists('preg_replace_array')) {
                 return array_shift($replacements);
             }
         }, $subject);
-    }
-}
-
-if (! function_exists('present')) {
-    /**
-     * Determine if a value is "present".
-     *
-     * @author Derek MacDonald (https://github.com/derekmd)
-     *
-     * @param  mixed  $value
-     * @return bool
-     */
-    function present($value)
-    {
-        return ! blank($value);
     }
 }
 
@@ -1112,8 +1108,6 @@ if (! function_exists('transform')) {
     /**
      * Transform the given value if it is present.
      *
-     * @author Derek MacDonald (https://github.com/derekmd)
-     *
      * @param  mixed  $value
      * @param  callable  $callback
      * @param  mixed  $default
@@ -1121,7 +1115,7 @@ if (! function_exists('transform')) {
      */
     function transform($value, callable $callback, $default = null)
     {
-        if (present($value)) {
+        if (filled($value)) {
             return $callback($value);
         }
 

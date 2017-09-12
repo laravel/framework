@@ -314,7 +314,7 @@ trait HasAttributes
         }
 
         // Here we will determine if the model base class itself contains this given key
-        // since we do not want to treat any of those methods are relationships since
+        // since we don't want to treat any of those methods as relationships because
         // they are all intended as helper methods and none of these are relations.
         if (method_exists(self::class, $key)) {
             return;

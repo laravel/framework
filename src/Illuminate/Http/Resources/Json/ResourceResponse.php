@@ -16,7 +16,7 @@ class ResourceResponse implements Responsable
     public $resource;
 
     /**
-     * Create a new resource repsonse.
+     * Create a new resource response.
      *
      * @param  mixed  $resource
      * @return void
@@ -30,7 +30,7 @@ class ResourceResponse implements Responsable
      * Create an HTTP response that represents the object.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\JsonResponse
      */
     public function toResponse($request)
     {

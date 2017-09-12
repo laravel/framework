@@ -191,6 +191,23 @@ class Builder
     }
 
     /**
+     * Add a where clause on the primary key to the query.
+     *
+     * @param  mixed  $id
+     * @return $this
+     */
+    public function whereKeyNot($id)
+    {
+        if (is_array($id) || $id instanceof Arrayable) {
+            $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
+
+            return $this;
+        }
+
+        return $this->where($this->model->getQualifiedKeyName(), '!=', $id);
+    }
+
+    /**
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
@@ -275,7 +292,7 @@ class Builder
     /**
      * Find multiple models by their primary keys.
      *
-     * @param  array  $ids
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Collection
      */
@@ -865,7 +882,7 @@ class Builder
             }
 
             // Next we'll pass the scope callback to the callScope method which will take
-            // care of groping the "wheres" correctly so the logical order doesn't get
+            // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callScope(
                 [$this->model, 'scope'.ucfirst($scope)],

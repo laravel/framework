@@ -29,7 +29,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.5-dev';
+    const VERSION = '5.5.3';
 
     /**
      * The base path for the Laravel installation.
@@ -1145,7 +1145,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         parent::flush();
 
+        $this->buildStack = [];
         $this->loadedProviders = [];
+        $this->bootedCallbacks = [];
+        $this->bootingCallbacks = [];
+        $this->deferredServices = [];
+        $this->reboundCallbacks = [];
+        $this->serviceProviders = [];
+        $this->resolvingCallbacks = [];
+        $this->afterResolvingCallbacks = [];
+        $this->globalResolvingCallbacks = [];
     }
 
     /**

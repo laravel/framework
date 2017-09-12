@@ -4,7 +4,9 @@ namespace Illuminate\Support;
 
 class Optional
 {
-    use Traits\Macroable;
+    use Traits\Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The underlying object.
@@ -46,6 +48,10 @@ class Optional
      */
     public function __call($method, $parameters)
     {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }

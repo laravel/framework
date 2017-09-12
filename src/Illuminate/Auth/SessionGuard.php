@@ -336,7 +336,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      */
     protected function failedBasicResponse()
     {
-        throw new UnauthorizedHttpException('Invalid credentials.');
+        throw new UnauthorizedHttpException('Basic', 'Invalid credentials.');
     }
 
     /**
@@ -696,7 +696,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     /**
      * Get the session store used by the guard.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Contracts\Session\Session.
      */
     public function getSession()
     {

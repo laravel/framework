@@ -352,7 +352,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function eachSpread(callable $callback)
     {
         return $this->each(function ($chunk, $key) use ($callback) {
-            array_push($chunk, $key);
+            $chunk[] = $key;
 
             return $callback(...$chunk);
         });
@@ -481,18 +481,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            switch ($operator) {
-                default:
-                case '=':
-                case '==':  return $retrieved == $value;
-                case '!=':
-                case '<>':  return $retrieved != $value;
-                case '<':   return $retrieved < $value;
-                case '>':   return $retrieved > $value;
-                case '<=':  return $retrieved <= $value;
-                case '>=':  return $retrieved >= $value;
-                case '===': return $retrieved === $value;
-                case '!==': return $retrieved !== $value;
+            try {
+                switch ($operator) {
+                    default:
+                    case '=':
+                    case '==':  return $retrieved == $value;
+                    case '!=':
+                    case '<>':  return $retrieved != $value;
+                    case '<':   return $retrieved < $value;
+                    case '>':   return $retrieved > $value;
+                    case '<=':  return $retrieved <= $value;
+                    case '>=':  return $retrieved >= $value;
+                    case '===': return $retrieved === $value;
+                    case '!==': return $retrieved !== $value;
+                }
+            } catch (Exception $e) {
+                return false;
             }
         };
     }
@@ -840,7 +844,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function mapSpread(callable $callback)
     {
         return $this->map(function ($chunk, $key) use ($callback) {
-            array_push($chunk, $key);
+            $chunk[] = $key;
 
             return $callback(...$chunk);
         });
@@ -1107,7 +1111,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Push all of the given items onto the collection.
      *
      * @param  \Traversable  $source
-     * @return self
+     * @return $this
      */
     public function concat($source)
     {

@@ -142,7 +142,7 @@ class Blueprint
     protected function addFluentIndexes()
     {
         foreach ($this->columns as $column) {
-            foreach (['primary', 'unique', 'index'] as $index) {
+            foreach (['primary', 'unique', 'index', 'spatialIndex'] as $index) {
                 // If the index has been specified on the given column, but is simply equal
                 // to "true" (boolean), no name has been specified for this index so the
                 // index method can be called without a name and it will generate one.
@@ -224,7 +224,7 @@ class Blueprint
      */
     public function dropColumn($columns)
     {
-        $columns = is_array($columns) ? $columns : (array) func_get_args();
+        $columns = is_array($columns) ? $columns : func_get_args();
 
         return $this->addCommand('dropColumn', compact('columns'));
     }
@@ -383,6 +383,18 @@ class Blueprint
     public function index($columns, $name = null, $algorithm = null)
     {
         return $this->indexCommand('index', $columns, $name, $algorithm);
+    }
+
+    /**
+     * Specify a spatial index for the table.
+     *
+     * @param  string|array  $columns
+     * @param  string        $name
+     * @return \Illuminate\Support\Fluent
+     */
+    public function spatialIndex($columns, $name = null)
+    {
+        return $this->indexCommand('spatialIndex', $columns, $name);
     }
 
     /**
@@ -922,6 +934,94 @@ class Blueprint
     public function macAddress($column)
     {
         return $this->addColumn('macAddress', $column);
+    }
+
+    /**
+     * Create a new geometry column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function geometry($column)
+    {
+        return $this->addColumn('geometry', $column);
+    }
+
+    /**
+     * Create a new point column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function point($column)
+    {
+        return $this->addColumn('point', $column);
+    }
+
+    /**
+     * Create a new linestring column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function lineString($column)
+    {
+        return $this->addColumn('linestring', $column);
+    }
+
+    /**
+     * Create a new polygon column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function polygon($column)
+    {
+        return $this->addColumn('polygon', $column);
+    }
+
+    /**
+     * Create a new geometrycollection column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function geometryCollection($column)
+    {
+        return $this->addColumn('geometrycollection', $column);
+    }
+
+    /**
+     * Create a new multipoint column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function multiPoint($column)
+    {
+        return $this->addColumn('multipoint', $column);
+    }
+
+    /**
+     * Create a new multilinestring column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function multiLineString($column)
+    {
+        return $this->addColumn('multilinestring', $column);
+    }
+
+    /**
+     * Create a new multipolygon column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function multiPolygon($column)
+    {
+        return $this->addColumn('multipolygon', $column);
     }
 
     /**

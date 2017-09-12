@@ -40,11 +40,9 @@ class RateLimiter
         if ($this->attempts($key) >= $maxAttempts) {
             if ($this->cache->has($key.':timer')) {
                 return true;
-            } else {
-                $this->resetAttempts($key);
-
-                return false;
             }
+
+            $this->resetAttempts($key);
         }
 
         return false;

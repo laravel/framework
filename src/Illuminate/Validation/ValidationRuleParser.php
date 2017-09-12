@@ -111,7 +111,7 @@ class ValidationRuleParser
             return $rule;
         }
 
-        return strval($rule);
+        return (string) $rule;
     }
 
     /**

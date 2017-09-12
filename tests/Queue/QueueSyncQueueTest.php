@@ -59,7 +59,7 @@ class SyncQueueTestEntity implements \Illuminate\Contracts\Queue\QueueableEntity
 
     public function getQueueableConnection()
     {
-        return null;
+        //
     }
 }
 

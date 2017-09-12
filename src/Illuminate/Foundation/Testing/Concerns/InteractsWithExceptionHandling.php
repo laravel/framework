@@ -11,11 +11,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 trait InteractsWithExceptionHandling
 {
     /**
-     * The previous exception handler.
+     * The original exception handler.
      *
      * @var ExceptionHandler|null
      */
-    protected $previousExceptionHandler;
+    protected $originalExceptionHandler;
 
     /**
      * Restore exception handling.
@@ -24,8 +24,8 @@ trait InteractsWithExceptionHandling
      */
     protected function withExceptionHandling()
     {
-        if ($this->previousExceptionHandler) {
-            $this->app->instance(ExceptionHandler::class, $this->previousExceptionHandler);
+        if ($this->originalExceptionHandler) {
+            $this->app->instance(ExceptionHandler::class, $this->originalExceptionHandler);
         }
 
         return $this;
@@ -55,15 +55,18 @@ trait InteractsWithExceptionHandling
     /**
      * Disable exception handling for the test.
      *
+     * @param  array  $except
      * @return $this
      */
     protected function withoutExceptionHandling(array $except = [])
     {
-        $this->previousExceptionHandler = app(ExceptionHandler::class);
+        if ($this->originalExceptionHandler == null) {
+            $this->originalExceptionHandler = app(ExceptionHandler::class);
+        }
 
-        $this->app->instance(ExceptionHandler::class, new class($this->previousExceptionHandler, $except) implements ExceptionHandler {
+        $this->app->instance(ExceptionHandler::class, new class($this->originalExceptionHandler, $except) implements ExceptionHandler {
             protected $except;
-            protected $previousHandler;
+            protected $originalHandler;
 
             /**
              * Create a new class instance.
@@ -72,10 +75,10 @@ trait InteractsWithExceptionHandling
              * @param  array  $except
              * @return void
              */
-            public function __construct($previousHandler, $except = [])
+            public function __construct($originalHandler, $except = [])
             {
                 $this->except = $except;
-                $this->previousHandler = $previousHandler;
+                $this->originalHandler = $originalHandler;
             }
 
             /**
@@ -95,6 +98,8 @@ trait InteractsWithExceptionHandling
              * @param  \Illuminate\Http\Request  $request
              * @param  \Exception  $e
              * @return mixed
+             *
+             * @throws \Symfony\Component\HttpKernel\Exception\NotFoundHttpException|\Exception
              */
             public function render($request, Exception $e)
             {
@@ -106,7 +111,7 @@ trait InteractsWithExceptionHandling
 
                 foreach ($this->except as $class) {
                     if ($e instanceof $class) {
-                        return $this->previousHandler->render($request, $e);
+                        return $this->originalHandler->render($request, $e);
                     }
                 }
 
