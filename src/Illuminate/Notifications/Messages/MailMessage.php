@@ -219,9 +219,10 @@ class MailMessage extends SimpleMessage
     }
 
     /**
-     * Sets the markdown template to render.
+     * Set the markdown template to render.
      *
      * @param string $template
+     * @return $this
      */
     public function template($template)
     {

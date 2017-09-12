@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Illuminate\Notifications\Messages\MailMessage;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Notifications\Messages\MailMessage;
 
 class NotificationsMailMessageTest extends TestCase
 {
@@ -20,4 +20,5 @@ class NotificationsMailMessageTest extends TestCase
 
         $this->assertEquals('notifications::foo', $this->message->markdown);
     }
+
 }
