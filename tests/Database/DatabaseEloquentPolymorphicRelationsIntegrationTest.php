@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 {
@@ -104,6 +104,35 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $this->assertEquals($post->id, $tag->posts->first()->id);
     }
 
+    public function testWhereHasAndWithCountAutomatically()
+    {
+        $post = EloquentManyToManyPolymorphicTestPostWithCount::create();
+        $tag = EloquentManyToManyPolymorphicTestTagForWithCount::create();
+        $post->tags()->attach($tag->id);
+
+        $firstTagHavingPosts = EloquentManyToManyPolymorphicTestTagForWithCount::whereHas('posts', function ($q) use ($post) {
+            $q->where("eloquent_many_to_many_polymorphic_test_tag_id", $post->id);
+        })->firstOrFail();
+
+        $this->assertTrue($tag->is($firstTagHavingPosts));
+    }
+
+    public function testWhereHasAndWithCountOnDemand()
+    {
+        $post = EloquentManyToManyPolymorphicTestPostWithCountMethod::create();
+        $tag = EloquentManyToManyPolymorphicTestTagWithCountMethod::create();
+        $post->tags()->attach($tag->id);
+
+        $firstPostWithCount = EloquentManyToManyPolymorphicTestPostWithCountMethod
+                ::methodicWithCount()->firstOrFail();
+        $firstTagHavingPosts = EloquentManyToManyPolymorphicTestTagWithCountMethod::whereHas('posts', function ($q) use ($firstPostWithCount) {
+            $q->where("eloquent_many_to_many_polymorphic_test_tag_id",
+            $firstPostWithCount->id );
+        })->firstOrFail();
+
+        $this->assertTrue($tag->is($firstTagHavingPosts));
+    }
+
     /**
      * Helpers...
      */
@@ -143,6 +172,34 @@ class EloquentManyToManyPolymorphicTestPost extends Eloquent
     }
 }
 
+class EloquentManyToManyPolymorphicTestPostWithCount extends Eloquent
+{
+    protected $table = 'posts';
+    protected $guarded = [];
+    protected $withCount = ["tags as tags_count"];
+
+    public function tags()
+    {
+        return $this->morphToMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestTagForWithCount', 'taggable', 'taggables', null, 'eloquent_many_to_many_polymorphic_test_tag_id', '');
+    }
+}
+
+class EloquentManyToManyPolymorphicTestPostWithCountMethod extends Eloquent
+{
+    protected $table = 'posts';
+    protected $guarded = [];
+
+    public function tags()
+    {
+        return $this->morphToMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestTagForWithCount', 'taggable', 'taggables', null, 'eloquent_many_to_many_polymorphic_test_tag_id', '');
+    }
+
+    public static function methodicWithCount()
+    {
+        return static::withCount("tags AS tags_count");
+    }
+}
+
 class EloquentManyToManyPolymorphicTestImage extends Eloquent
 {
     protected $table = 'images';
@@ -169,3 +226,26 @@ class EloquentManyToManyPolymorphicTestTag extends Eloquent
         return $this->morphedByMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestImage', 'taggable');
     }
 }
+
+class EloquentManyToManyPolymorphicTestTagForWithCount extends Eloquent
+{
+    protected $table = 'tags';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->morphedByMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestPostWithCount', 'taggable', 'taggables', 'eloquent_many_to_many_polymorphic_test_tag_id');
+    }
+}
+
+class EloquentManyToManyPolymorphicTestTagWithCountMethod extends Eloquent
+{
+    protected $table = 'tags';
+    protected $guarded = [];
+
+    public function posts()
+    {
+        return $this->morphedByMany('Illuminate\Tests\Database\EloquentManyToManyPolymorphicTestPostWithCountMethod', 'taggable', 'taggables', 'eloquent_many_to_many_polymorphic_test_tag_id');
+    }
+}
+
