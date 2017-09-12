@@ -450,7 +450,7 @@ class Handler implements ExceptionHandlerContract
             'file' => $e->getFile(),
             'line' => $e->getLine(),
             'trace' => collect($e->getTrace())->map(function ($trace) {
-                return array_except($trace, ['args']);
+                return Arr::except($trace, ['args']);
             })->all(),
         ] : [
             'message' => $this->isHttpException($e) ? $e->getMessage() : 'Server Error',
