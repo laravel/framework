@@ -190,7 +190,9 @@ trait FormatsMessages
             $message, $this->getDisplayableAttribute($attribute)
         );
 
-        $message = str_replace(':actual_value', $this->getValue($attribute), $message);
+        if (is_string($this->getValue($attribute)) || is_numeric($this->getValue($attribute))) {
+            $message = str_replace(':actual_value', $this->getValue($attribute), $message);
+        }
 
         if (isset($this->replacers[Str::snake($rule)])) {
             return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
