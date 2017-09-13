@@ -190,7 +190,7 @@ trait FormatsMessages
             $message, $this->getDisplayableAttribute($attribute)
         );
 
-        $message = $this->replaceActualValuePlaceholder($message, $attribute);
+        $message = $this->replaceInputPlaceholder($message, $attribute);
 
         if (isset($this->replacers[Str::snake($rule)])) {
             return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
@@ -274,12 +274,12 @@ trait FormatsMessages
      * @param  string  $value
      * @return string
      */
-    protected function replaceActualValuePlaceholder($message, $attribute)
+    protected function replaceInputPlaceholder($message, $attribute)
     {
         $actualValue = $this->getValue($attribute);
 
         if (is_scalar($actualValue) || is_null($actualValue)) {
-            $message = str_replace(':actual_value', $actualValue, $message);
+            $message = str_replace(':input', $actualValue, $message);
         }
 
         return $message;
