@@ -409,10 +409,48 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif (! $adapter instanceof AwsS3Adapter) {
+        } elseif ($adapter instanceof AwsS3Adapter) {
+            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
+        } elseif ($adapter instanceof RackspaceAdapter) {
+            return $this->getRackspaceTemporaryUrl($adapter, $path, $expiration, $options);
+        } else {
             throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
+    }
 
+    /**
+     * Get a temporary URL for the file at the given path.
+     * 
+     * @param  \League\Flysystem\Rackspace\RackspaceAdapter $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  $options
+     * @return string
+     */
+
+    public function getRackspaceTemporaryUrl($adapter, $path, $expiration, $options)
+    {
+        $seconds = \Carbon\Carbon::now()->diffInSeconds($expiration);
+        return $adapter
+            ->getContainer()
+            ->getObject($path)
+            ->getTemporaryUrl(
+                $seconds,
+                isset($options['method'])?$options['method']:'GET',
+                isset($options['forcePublicUrl'])?$options['forcePublicUrl']:false);
+    }
+
+    /**
+     * Get a temporary URL for the file at the given path.
+     * 
+     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
+    {
         $client = $adapter->getClient();
 
         $command = $client->getCommand('GetObject', array_merge([
