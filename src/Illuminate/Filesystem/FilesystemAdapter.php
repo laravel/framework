@@ -349,7 +349,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     protected function getRackspaceUrl($adapter, $path)
     {
-        return (string) $adapter->getContainer()->getObject($path)->getUrl();
+        return (string) $adapter->getContainer()->getObject($path)->getPublicUrl();
     }
 
     /**
@@ -437,7 +437,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             ->getTemporaryUrl(
                 $seconds,
                 isset($options['method']) ? $options['method'] : 'GET',
-                isset($options['forcePublicUrl']) ? $options['forcePublicUrl'] : false);
+                isset($options['forcePublicUrl']) ? $options['forcePublicUrl'] : true);
     }
 
     /**
