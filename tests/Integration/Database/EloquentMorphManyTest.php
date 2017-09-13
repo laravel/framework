@@ -72,7 +72,6 @@ class Post extends Model
     }
 }
 
-
 class Comment extends Model
 {
     public $table = 'comments';
