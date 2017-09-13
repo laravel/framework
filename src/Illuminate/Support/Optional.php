@@ -14,6 +14,7 @@ class Optional
      * @var mixed
      */
     protected $value;
+    protected $default;
 
     /**
      * Create a new optional instance.
@@ -21,9 +22,10 @@ class Optional
      * @param  mixed  $value
      * @return void
      */
-    public function __construct($value)
+    public function __construct($value, $default = null)
     {
         $this->value = $value;
+        $this->default = $default;
     }
 
     /**
@@ -37,6 +39,8 @@ class Optional
         if (is_object($this->value)) {
             return $this->value->{$key};
         }
+
+        return $this->default;
     }
 
     /**
@@ -55,5 +59,7 @@ class Optional
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
+
+        return $this->default;
     }
 }
