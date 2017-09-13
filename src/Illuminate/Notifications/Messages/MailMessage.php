@@ -109,6 +109,19 @@ class MailMessage extends SimpleMessage
     }
 
     /**
+     * Set the default markdown template.
+     *
+     * @param  string  $template
+     * @return $this
+     */
+    public function template($template)
+    {
+        $this->markdown = $template;
+
+        return $this;
+    }
+
+    /**
      * Set the from address for the mail message.
      *
      * @param  string  $address
@@ -216,18 +229,5 @@ class MailMessage extends SimpleMessage
     public function data()
     {
         return array_merge($this->toArray(), $this->viewData);
-    }
-
-    /**
-     * Set the markdown template to render.
-     *
-     * @param string $template
-     * @return $this
-     */
-    public function template($template)
-    {
-        $this->markdown = $template;
-
-        return $this;
     }
 }
