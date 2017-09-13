@@ -20,5 +20,4 @@ class NotificationsMailMessageTest extends TestCase
 
         $this->assertEquals('notifications::foo', $this->message->markdown);
     }
-
 }
