@@ -602,6 +602,10 @@ if (! function_exists('env')) {
      */
     function env($key, $default = null)
     {
+        if (app()->configurationIsCached()) {
+            app('log')->debug(sprintf("The env('%s') method has been called but the config is cached.", $key));
+        }
+
         $value = getenv($key);
 
         if ($value === false) {
