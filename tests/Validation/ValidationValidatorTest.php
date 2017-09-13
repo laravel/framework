@@ -376,7 +376,6 @@ class ValidationValidatorTest extends TestCase
 
     public function testActualValuesAreReplaced()
     {
-        //required_if:foo,bar
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.email' => ':actual_value is not a valid email'], 'en');
         $v = new Validator($trans, ['email' => 'a@s'], ['email' => 'email']);
