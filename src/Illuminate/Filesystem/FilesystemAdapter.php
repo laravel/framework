@@ -13,6 +13,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
@@ -332,9 +333,23 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return $this->getAwsUrl($adapter, $path);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
+        } elseif ($adapter instanceof RackspaceAdapter) {
+            return $this->getRackspaceUrl($adapter, $path);
         } else {
             throw new RuntimeException('This driver does not support retrieving URLs.');
         }
+    }
+
+    /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  \League\Flysystem\Rackspace\RackspaceAdapter $adapter
+     * @param  string $path
+     * @return string
+     */
+    protected function getRackspaceUrl($adapter, $path)
+    {
+        return (string) $adapter->getContainer()->getObject($path)->getUrl();
     }
 
     /**
