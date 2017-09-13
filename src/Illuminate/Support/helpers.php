@@ -717,9 +717,9 @@ if (! function_exists('optional')) {
      * @param  mixed  $value
      * @return mixed
      */
-    function optional($value)
+    function optional($value, $default = null)
     {
-        return new Optional($value);
+        return new Optional($value, $default);
     }
 }
 
