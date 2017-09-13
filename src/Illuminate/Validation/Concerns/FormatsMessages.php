@@ -190,6 +190,8 @@ trait FormatsMessages
             $message, $this->getDisplayableAttribute($attribute)
         );
 
+        $message = str_replace(':actual_value', $this->getValue($attribute), $message);
+
         if (isset($this->replacers[Str::snake($rule)])) {
             return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
         } elseif (method_exists($this, $replacer = "replace{$rule}")) {

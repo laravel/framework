@@ -374,7 +374,18 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('First name is required!', $v->messages()->first('names.0'));
     }
 
-    public function testDisplayableValuesAreReplaced()
+    public function testActualValuesAreReplaced()
+    {
+        //required_if:foo,bar
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->addLines(['validation.email' => ':actual_value is not a valid email'], 'en');
+        $v = new Validator($trans, ['email' => 'a@s'], ['email' => 'email']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('a@s is not a valid email', $v->messages()->first('email'));
+    }
+
+        public function testDisplayableValuesAreReplaced()
     {
         //required_if:foo,bar
         $trans = $this->getIlluminateArrayTranslator();
