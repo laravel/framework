@@ -420,7 +420,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
     /**
      * Get a temporary URL for the file at the given path.
-     * 
+     *
      * @param  \League\Flysystem\Rackspace\RackspaceAdapter $adapter
      * @param  string $path
      * @param  \DateTimeInterface $expiration
@@ -436,13 +436,13 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             ->getObject($path)
             ->getTemporaryUrl(
                 $seconds,
-                isset($options['method'])?$options['method']:'GET',
-                isset($options['forcePublicUrl'])?$options['forcePublicUrl']:false);
+                isset($options['method']) ? $options['method'] : 'GET',
+                isset($options['forcePublicUrl']) ? $options['forcePublicUrl'] : false);
     }
 
     /**
      * Get a temporary URL for the file at the given path.
-     * 
+     *
      * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
      * @param  string $path
      * @param  \DateTimeInterface $expiration
