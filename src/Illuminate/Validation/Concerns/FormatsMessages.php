@@ -190,9 +190,7 @@ trait FormatsMessages
             $message, $this->getDisplayableAttribute($attribute)
         );
 
-        if (is_string($this->getValue($attribute)) || is_numeric($this->getValue($attribute))) {
-            $message = str_replace(':actual_value', $this->getValue($attribute), $message);
-        }
+        $message = $this->replaceActualValuePlaceholder($message, $attribute);
 
         if (isset($this->replacers[Str::snake($rule)])) {
             return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
@@ -267,6 +265,24 @@ trait FormatsMessages
             [$value, Str::upper($value), Str::ucfirst($value)],
             $message
         );
+    }
+
+    /**
+     * Replace the :attribute placeholder in the given message.
+     *
+     * @param  string  $message
+     * @param  string  $value
+     * @return string
+     */
+    protected function replaceActualValuePlaceholder($message, $attribute)
+    {
+        $actualValue = $this->getValue($attribute);
+
+        if (is_scalar($actualValue) || is_null($actualValue)) {
+            $message = str_replace(':actual_value', $actualValue, $message);
+        }
+
+        return $message;
     }
 
     /**
