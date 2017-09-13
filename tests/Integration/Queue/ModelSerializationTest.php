@@ -43,6 +43,21 @@ class ModelSerializationTest extends TestCase
             $table->increments('id');
             $table->string('email');
         });
+
+        Schema::create('orders', function ($table) {
+            $table->increments('id');
+        });
+
+        Schema::create('lines', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('order_id');
+            $table->unsignedInteger('product_id');
+        });
+
+        Schema::create('products', function ($table) {
+            $table->increments('id');
+
+        });
     }
 
     /**
@@ -126,11 +141,83 @@ class ModelSerializationTest extends TestCase
 
         unserialize($serialized);
     }
+
+    /**
+     * @test
+     */
+    public function it_reloads_relationships()
+    {
+        $order = Order::create();
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+
+        $order->load('lines');
+
+        $serialized = serialize(new ModelRelationSerializationTestClass($order));
+        $unSerialized = unserialize($serialized);
+
+        $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
+    }
+
+    /**
+     * @test
+     */
+    public function it_reloads_nested_relationships()
+    {
+        $order = Order::create();
+
+        $product1 = Product::create();
+        $product2 = Product::create();
+
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
+        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
+
+        $order->load('lines', 'lines.product');
+
+        $nestedSerialized = serialize(new ModelRelationSerializationTestClass($order));
+        $nestedUnSerialized = unserialize($nestedSerialized);
+
+        $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
+    }
 }
 
 class ModelSerializationTestUser extends Model
 {
     public $table = 'users';
+    public $guarded = ['id'];
+    public $timestamps = false;
+}
+
+class Order extends Model
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function lines()
+    {
+        return $this->hasMany(Line::class);
+    }
+}
+
+class Line extends Model
+{
+    public $guarded = ['id'];
+    public $timestamps = false;
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+}
+
+class Product extends Model
+{
     public $guarded = ['id'];
     public $timestamps = false;
 }
@@ -144,5 +231,17 @@ class ModelSerializationTestClass
     public function __construct($user)
     {
         $this->user = $user;
+    }
+}
+
+class ModelRelationSerializationTestClass
+{
+    use \Illuminate\Queue\SerializesModels;
+
+    public $order;
+
+    public function __construct($order)
+    {
+        $this->order = $order;
     }
 }

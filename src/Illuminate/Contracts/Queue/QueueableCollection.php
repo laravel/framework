@@ -24,4 +24,11 @@ interface QueueableCollection
      * @return string|null
      */
     public function getQueueableConnection();
+
+    /**
+     * Get the relationships of the entities being queued.
+     *
+     * @return array
+     */
+    public function getQueueableRelations();
 }
