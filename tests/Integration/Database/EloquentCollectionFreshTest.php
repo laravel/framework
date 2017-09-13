@@ -32,8 +32,6 @@ class EloquentCollectionFreshTest extends TestCase
             $table->increments('id');
             $table->string('email');
         });
-
-
     }
 
     public function test_eloquent_collection_fresh()
@@ -47,7 +45,7 @@ class EloquentCollectionFreshTest extends TestCase
 
         User::whereKey($collection->pluck('id')->toArray())->delete();
 
-        $this->assertEquals($collection->fresh()->toArray(), [null, null]);
+        $this->assertEmpty($collection->fresh()->filter());
     }
 }
 
