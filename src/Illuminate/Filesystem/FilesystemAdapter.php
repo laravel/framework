@@ -430,7 +430,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function getRackspaceTemporaryUrl($adapter, $path, $expiration, $options)
     {
         $seconds = \Carbon\Carbon::now()->diffInSeconds($expiration);
-        
+
         return $adapter
             ->getContainer()
             ->getObject($path)
