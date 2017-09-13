@@ -1457,4 +1457,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $this->bootIfNotBooted();
     }
+
+    /**
+     * Get attributes for debugging functions like var_dump/dd/dump.
+     *
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return $this->toArray();
+    }
 }
