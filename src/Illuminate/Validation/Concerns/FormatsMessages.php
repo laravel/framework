@@ -268,7 +268,7 @@ trait FormatsMessages
     }
 
     /**
-     * Replace the :attribute placeholder in the given message.
+     * Replace the :actual_value placeholder in the given message.
      *
      * @param  string  $message
      * @param  string  $value
