@@ -194,7 +194,7 @@ class BelongsToMany extends Relation
      */
     public function addEagerConstraints(array $models)
     {
-        $this->query->whereIn($this->getQualifiedForeignPivotKeyName(), $this->getKeys($models));
+        $this->query->whereIn($this->getQualifiedForeignPivotKeyName(), $this->getKeys($models, $this->parentKey));
     }
 
     /**
@@ -229,7 +229,7 @@ class BelongsToMany extends Relation
         // children back to their parent using the dictionary and the keys on the
         // the parent models. Then we will return the hydrated models back out.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getKey()])) {
+            if (isset($dictionary[$key = $model->{$this->parentKey}])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );
@@ -921,6 +921,16 @@ class BelongsToMany extends Relation
     public function getQualifiedRelatedPivotKeyName()
     {
         return $this->table.'.'.$this->relatedPivotKey;
+    }
+
+    /**
+     * Get the fully qualified parent key name for the relation.
+     *
+     * @return string
+     */
+    public function getQualifiedParentKeyName()
+    {
+        return $this->parent->getTable().'.'.$this->parentKey;
     }
 
     /**

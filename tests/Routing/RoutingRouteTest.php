@@ -296,6 +296,20 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo.bar', $router->currentRouteName());
     }
 
+    public function testRouteGetAction()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo', function () {
+            return 'foo';
+        })->name('foo');
+
+        $this->assertTrue(is_array($route->getAction()));
+        $this->assertArrayHasKey('as', $route->getAction());
+        $this->assertEquals('foo', $route->getAction('as'));
+        $this->assertNull($route->getAction('unknown_property'));
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
