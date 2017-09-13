@@ -32,8 +32,6 @@ class EloquentCollectionFreshTest extends TestCase
             $table->increments('id');
             $table->string('email');
         });
-
-
     }
 
     public function test_eloquent_collection_fresh()
