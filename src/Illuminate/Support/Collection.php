@@ -1734,4 +1734,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         return new HigherOrderCollectionProxy($this, $key);
     }
+
+    /**
+     * Get attributes for debugging functions like var_dump/dd/dump.
+     *
+     * @return array
+     */
+    public function __debugInfo()
+    {
+        return $this->all();
+    }
 }
