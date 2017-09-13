@@ -266,7 +266,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         // If the given view is an array with numeric keys, we will just assume that
         // both a "pretty" and "plain" view were provided, so we will return this
-        // array as is, since it should contain both views with numeric keys.
+        // array as is, since it should contain both views with numerical keys.
         if (is_array($view) && isset($view[0])) {
             return [$view[0], $view[1], null];
         }
@@ -424,14 +424,14 @@ class Mailer implements MailerContract, MailQueueContract
 
         // If a global from address has been specified we will set it on every message
         // instance so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push the address.
+        // they create a new message. We'll just go ahead and push this address.
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
 
         // When a global reply address was specified we will set this on every message
         // instance so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push the address.
+        // they create a new message. We will just go ahead and push this address.
         if (! empty($this->replyTo['address'])) {
             $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }
