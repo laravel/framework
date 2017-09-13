@@ -57,7 +57,7 @@ trait CompilesIncludes
     /**
      * Compile the include-first statements into valid PHP.
      *
-     * @param string $expression
+     * @param  string  $expression
      * @return string
      */
     protected function compileIncludeFirst($expression)
