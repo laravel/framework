@@ -391,7 +391,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(' is not a valid email', $v->messages()->first('email'));
     }
 
-        public function testDisplayableValuesAreReplaced()
+    public function testDisplayableValuesAreReplaced()
     {
         //required_if:foo,bar
         $trans = $this->getIlluminateArrayTranslator();
