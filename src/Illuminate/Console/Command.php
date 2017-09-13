@@ -382,22 +382,22 @@ class Command extends SymfonyCommand
      * @param  array   $columnStyles
      * @return void
      */
-     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
-     {
-         $table = new Table($this->output);
+    public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
+    {
+        $table = new Table($this->output);
  
-         if ($rows instanceof Arrayable) {
-             $rows = $rows->toArray();
-         }
+        if ($rows instanceof Arrayable) {
+            $rows = $rows->toArray();
+        }
  
-         $table->setHeaders((array) $headers)->setRows($rows)->setStyle($tableStyle);
+        $table->setHeaders((array) $headers)->setRows($rows)->setStyle($tableStyle);
          
-         foreach ($columnStyles as $columnIndex => $columnStyle) {
-             $table->setColumnStyle($columnIndex, $columnStyle);
-         }
+        foreach ($columnStyles as $columnIndex => $columnStyle) {
+            $table->setColumnStyle($columnIndex, $columnStyle);
+        }
  
-         $table->render();
-     }
+        $table->render();
+    }
 
     /**
      * Write a string as information output.
