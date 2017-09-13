@@ -159,7 +159,8 @@ class Collection extends BaseCollection implements QueueableCollection
             ->getDictionary();
 
         return $this->map(function ($model) use ($freshModels) {
-            return $model->exists && isset($freshModels[$model->getKey()]) ? $freshModels[$model->getKey()] : null;
+            return $model->exists && isset($freshModels[$model->getKey()])
+                    ? $freshModels[$model->getKey()] : null;
         });
     }
 
