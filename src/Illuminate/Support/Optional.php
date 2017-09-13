@@ -58,7 +58,7 @@ class Optional
     }
 
     /**
-     * Convert the object to its string
+     * Convert the object to its string.
      *
      * @return string
      */
