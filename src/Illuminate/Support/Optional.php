@@ -56,4 +56,14 @@ class Optional
             return $this->value->{$method}(...$parameters);
         }
     }
+
+    /**
+     * Convert the object to its string
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return is_string($this->value) ? $this->value : '';
+    }
 }
