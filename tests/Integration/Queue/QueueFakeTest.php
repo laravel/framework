@@ -14,44 +14,44 @@ class QueueFakeTest extends TestCase
     public function setUp()
     {
         (new BusServiceProvider(app()))->register();
-        CallQueuedHandlerTestJob::$handled = false;
+        CallQueuedHandlerTestJobUnderQueueFake::$handled = false;
     }
 
     public function test_job_through_helper_is_not_fired()
     {
         QueueFacade::fake();
 
-        dispatch(new CallQueuedHandlerTestJob);
+        dispatch(new CallQueuedHandlerTestJobUnderQueueFake);
 
         // job should be puzshed to the QueueFake and not actually handled
-        QueueFacade::assertPushed(CallQueuedHandlerTestJob::class);
-        $this->assertFalse(CallQueuedHandlerTestJob::$handled);
+        QueueFacade::assertPushed(CallQueuedHandlerTestJobUnderQueueFake::class);
+        $this->assertFalse(CallQueuedHandlerTestJobUnderQueueFake::$handled);
     }
 
     public function test_job_through_facade_is_not_fired()
     {
         QueueFacade::fake();
 
-        QueueFacade::push(new CallQueuedHandlerTestJob);
+        QueueFacade::push(new CallQueuedHandlerTestJobUnderQueueFake);
 
         // job should be puzshed to the QueueFake and not actually handled
-        QueueFacade::assertPushed(CallQueuedHandlerTestJob::class);
-        $this->assertFalse(CallQueuedHandlerTestJob::$handled);
+        QueueFacade::assertPushed(CallQueuedHandlerTestJobUnderQueueFake::class);
+        $this->assertFalse(CallQueuedHandlerTestJobUnderQueueFake::$handled);
     }
 
     public function test_job_through_static_is_not_fired()
     {
         QueueFacade::fake();
 
-        CallQueuedHandlerTestJob::dispatch();
+        CallQueuedHandlerTestJobUnderQueueFake::dispatch();
 
         // job should be puzshed to the QueueFake and not actually handled
-        QueueFacade::assertPushed(CallQueuedHandlerTestJob::class);
-        $this->assertFalse(CallQueuedHandlerTestJob::$handled);
+        QueueFacade::assertPushed(CallQueuedHandlerTestJobUnderQueueFake::class);
+        $this->assertFalse(CallQueuedHandlerTestJobUnderQueueFake::$handled);
     }
 }
 
-class CallQueuedHandlerTestJob
+class CallQueuedHandlerTestJobUnderQueueFake
 {
     use \Illuminate\Queue\InteractsWithQueue, \Illuminate\Foundation\Bus\Dispatchable;
 
