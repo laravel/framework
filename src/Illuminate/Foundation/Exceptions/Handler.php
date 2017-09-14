@@ -383,10 +383,13 @@ class Handler implements ExceptionHandlerContract
     {
         $status = $e->getStatusCode();
 
-        view()->replaceNamespace('errors', [
-            resource_path('views/errors'),
-            __DIR__.'/views',
-        ]);
+        view()->replaceNamespace('errors',
+            collect(config('view.paths'))
+                ->map(function ($path) {
+                    return "{$path}/errors";
+                })
+                ->push(__DIR__.'/views')->all()
+        );
 
         if (view()->exists($view = "errors::{$status}")) {
             return response()->view($view, ['exception' => $e], $status, $e->getHeaders());
