@@ -38,10 +38,8 @@ trait HasTimestamps
     {
         $time = $this->freshTimestamp();
 
-        if (static::UPDATED_AT !== null) {
-            if (! $this->isDirty(static::UPDATED_AT)) {
-                $this->setUpdatedAt($time);
-            }
+        if (! is_null(static::UPDATED_AT) && ! $this->isDirty(static::UPDATED_AT)) {
+            $this->setUpdatedAt($time);
         }
 
         if (! $this->exists && ! $this->isDirty(static::CREATED_AT)) {
