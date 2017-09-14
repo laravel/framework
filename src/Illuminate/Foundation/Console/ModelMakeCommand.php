@@ -112,7 +112,9 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__.'/stubs/model.stub';
+        return $this->option('unguard')
+            ? __DIR__.'/stubs/model-unguarded.stub'
+            : __DIR__.'/stubs/model.stub';
     }
 
     /**
@@ -145,6 +147,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
+
+            ['unguard', 'u', InputOption::VALUE_NONE, 'Sets all attributes as mass assignable.'],
         ];
     }
 }
