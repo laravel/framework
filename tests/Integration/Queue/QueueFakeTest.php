@@ -3,15 +3,14 @@
 namespace Illuminate\Tests\Integration\Queue;
 
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Queue as QueueFacade;
 use Illuminate\Bus\BusServiceProvider;
+use Illuminate\Support\Facades\Queue as QueueFacade;
 
 /**
  * @group integration
  */
 class QueueFakeTest extends TestCase
 {
-
     public function setUp()
     {
         (new BusServiceProvider(app()))->register();
@@ -23,7 +22,7 @@ class QueueFakeTest extends TestCase
         QueueFacade::fake();
 
         dispatch(new CallQueuedHandlerTestJob);
-        
+
         // job should be puzshed to the QueueFake and not actually handled
         QueueFacade::assertPushed(CallQueuedHandlerTestJob::class);
         $this->assertFalse(CallQueuedHandlerTestJob::$handled);
@@ -34,12 +33,12 @@ class QueueFakeTest extends TestCase
         QueueFacade::fake();
 
         QueueFacade::push(new CallQueuedHandlerTestJob);
-        
+
         // job should be puzshed to the QueueFake and not actually handled
         QueueFacade::assertPushed(CallQueuedHandlerTestJob::class);
         $this->assertFalse(CallQueuedHandlerTestJob::$handled);
     }
-    
+
     public function test_job_through_static_is_not_fired()
     {
         QueueFacade::fake();
@@ -50,7 +49,6 @@ class QueueFakeTest extends TestCase
         QueueFacade::assertPushed(CallQueuedHandlerTestJob::class);
         $this->assertFalse(CallQueuedHandlerTestJob::$handled);
     }
-
 }
 
 class CallQueuedHandlerTestJob
