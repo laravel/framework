@@ -2,20 +2,20 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use ArrayAccess;
-use BadMethodCallException;
 use Exception;
-use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use ArrayAccess;
+use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use JsonSerializable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
@@ -1265,13 +1265,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
             if ($relation instanceof QueueableCollection) {
                 foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
-                    $relations[] = $key . '.' . $collectionKey;
+                    $relations[] = $key.'.'.$collectionKey;
                 }
             }
 
             if ($relation instanceof QueueableEntity) {
                 foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
-                    $relations[] = $key . '.' . $entityValue;
+                    $relations[] = $key.'.'.$entityValue;
                 }
             }
         }
