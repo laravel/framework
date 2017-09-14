@@ -154,7 +154,6 @@ class ModelSerializationTest extends TestCase
 
         Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
         Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
-        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
 
         $order->load('lines');
 
@@ -176,7 +175,6 @@ class ModelSerializationTest extends TestCase
 
         Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
         Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
-        Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
 
         $order->load('lines', 'lines.product');
 
