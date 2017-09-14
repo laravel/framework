@@ -2,20 +2,20 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Exception;
 use ArrayAccess;
-use JsonSerializable;
 use BadMethodCallException;
+use Exception;
+use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Contracts\Queue\QueueableCollection;
-use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use JsonSerializable;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
@@ -1260,20 +1260,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $relations = [];
 
-        foreach ($this->getRelations() as $key => $relation){
-
+        foreach ($this->getRelations() as $key => $relation) {
             $relations[] = $key;
 
-            if ($relation instanceof QueueableCollection)
-            {
-                foreach($relation->getQueueableRelations() as $collectionKey => $collectionValue){
+            if ($relation instanceof QueueableCollection) {
+                foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
                     $relations[] = $key . '.' . $collectionKey;
                 }
             }
 
-            if ($relation instanceof QueueableEntity)
-            {
-                foreach($relation->getQueueableRelations() as $entityKey => $entityValue){
+            if ($relation instanceof QueueableEntity) {
+                foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
                     $relations[] = $key . '.' . $entityValue;
                 }
             }

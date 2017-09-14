@@ -56,7 +56,6 @@ class ModelSerializationTest extends TestCase
 
         Schema::create('products', function ($table) {
             $table->increments('id');
-
         });
     }
 
