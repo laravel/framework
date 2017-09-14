@@ -105,7 +105,7 @@ class PostgresGrammar extends Grammar
     {
         return sprintf('alter table %s add constraint %s unique (%s)',
             $this->wrapTable($blueprint),
-            $this->wrap($command->index),
+            $this->wrapTable($command->index),
             $this->columnize($command->columns)
         );
     }
@@ -120,7 +120,7 @@ class PostgresGrammar extends Grammar
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
         return sprintf('create index %s on %s%s (%s)',
-            $this->wrap($command->index),
+            $this->wrapTable($command->index),
             $this->wrapTable($blueprint),
             $command->algorithm ? ' using '.$command->algorithm : '',
             $this->columnize($command->columns)
@@ -218,7 +218,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap("{$blueprint->getTable()}_pkey");
+        $index = $this->wrapTable("{$blueprint->getTable()}_pkey");
 
         return 'alter table '.$this->wrapTable($blueprint)." drop constraint {$index}";
     }
@@ -232,7 +232,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
+        $index = $this->wrapTable($command->index);
 
         return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
     }
@@ -246,7 +246,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropIndex(Blueprint $blueprint, Fluent $command)
     {
-        return "drop index {$this->wrap($command->index)}";
+        return "drop index {$this->wrapTable($command->index)}";
     }
 
     /**
@@ -258,7 +258,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
+        $index = $this->wrapTable($command->index);
 
         return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
     }
