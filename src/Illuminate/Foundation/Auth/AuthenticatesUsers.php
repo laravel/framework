@@ -120,8 +120,9 @@ trait AuthenticatesUsers
     /**
      * Get the failed login response instance.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @throws ValidationException
      */
     protected function sendFailedLoginResponse(Request $request)
