@@ -385,17 +385,17 @@ class Command extends SymfonyCommand
     public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
     {
         $table = new Table($this->output);
- 
+
         if ($rows instanceof Arrayable) {
             $rows = $rows->toArray();
         }
- 
+
         $table->setHeaders((array) $headers)->setRows($rows)->setStyle($tableStyle);
-         
+
         foreach ($columnStyles as $columnIndex => $columnStyle) {
             $table->setColumnStyle($columnIndex, $columnStyle);
         }
- 
+
         $table->render();
     }
 
