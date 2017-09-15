@@ -85,8 +85,8 @@ class Command extends SymfonyCommand
     ];
 
     /**
-     * Indicates whether the contructor of the current class
-     * should be called automaticly using reflection.
+     * Indicates whether or not the constructor of the current class
+     * should be called automatically using reflection.
      *
      * @var boolean
      */
@@ -189,8 +189,8 @@ class Command extends SymfonyCommand
     }
 
     /**
-     * Indicates whether the contructor of the current class
-     * should be called automaticly using reflection.
+     * Indicates whether or not the constructor of the current class
+     * should be called automatically using reflection.
      *
      * @return boolean
      */
