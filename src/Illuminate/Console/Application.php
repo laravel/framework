@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Closure;
+use ReflectionObject;
 use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
@@ -225,7 +226,22 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolve($command)
     {
-        return $this->add($this->laravel->make($command));
+        $instance = $this->laravel->make($command);
+
+        // After resolve the command via IOC container, Laravel will try to call the constructor
+        // of the parent class \Illuminate\Console\Command using reflection. We should ask to
+        // the command's instance if the developer have intentionally disabled this action.
+        if ($instance instanceof Command && $instance->shouldAutoConstructed()) {
+            $reflector = new ReflectionObject($instance);
+            while ($reflector->getName() !== Command::class) {
+                $reflector = $reflector->getParentClass();
+            }
+
+            $reflector->getMethod('__construct')
+                ->invoke($instance);
+        }
+
+        return $this->add($instance);
     }
 
     /**

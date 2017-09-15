@@ -85,6 +85,14 @@ class Command extends SymfonyCommand
     ];
 
     /**
+     * Indicates whether or not the constructor of the current class
+     * should be called automatically using reflection.
+     *
+     * @var bool
+     */
+    protected $autoConstruct = true;
+
+    /**
      * Create a new console command instance.
      *
      * @return void
@@ -178,6 +186,17 @@ class Command extends SymfonyCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         return $this->laravel->call([$this, 'handle']);
+    }
+
+    /**
+     * Indicates whether or not the constructor of the current class
+     * should be called automatically using reflection.
+     *
+     * @return bool
+     */
+    public function shouldAutoConstructed()
+    {
+        return $this->autoConstruct;
     }
 
     /**
