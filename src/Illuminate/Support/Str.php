@@ -331,7 +331,7 @@ class Str
         $position = mb_strpos($subject, $search);
 
         if ($position !== false) {
-            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position+mb_strlen($search));
+            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
         }
 
         return $subject;
@@ -350,7 +350,7 @@ class Str
         $position = mb_strrpos($subject, $search);
 
         if ($position !== false) {
-            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position+mb_strlen($search));
+            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
         }
 
         return $subject;
