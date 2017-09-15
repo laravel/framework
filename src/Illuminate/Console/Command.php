@@ -88,7 +88,7 @@ class Command extends SymfonyCommand
      * Indicates whether or not the constructor of the current class
      * should be called automatically using reflection.
      *
-     * @var boolean
+     * @var bool
      */
     protected $autoConstruct = true;
 
@@ -192,7 +192,7 @@ class Command extends SymfonyCommand
      * Indicates whether or not the constructor of the current class
      * should be called automatically using reflection.
      *
-     * @return boolean
+     * @return bool
      */
     public function shouldAutoConstructed()
     {
