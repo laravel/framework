@@ -1,5 +1,20 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added `:input` placeholder in validation error messages ([#21175](https://github.com/laravel/framework/pull/21175))
+- Added `@includeFirst` Blade directive ([#21172](https://github.com/laravel/framework/pull/21172))
+- Allow setting column styles for tables in Artisan commands ([#21169](https://github.com/laravel/framework/pull/21169))
+
+### Changed
+- Support `null` on `Model::UPDATED_AT` ([#21178](https://github.com/laravel/framework/pull/21178))
+- Render views from config while building error views ([#21145](https://github.com/laravel/framework/pull/21145))
+
+### Fixed
+- Ignore `SELECT` bindings in `prepareBindingsForUpdate()` ([#21173](https://github.com/laravel/framework/pull/21173))
+
+
 ## v5.5.4 (2017-09-13)
 
 ### Added
