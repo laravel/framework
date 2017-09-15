@@ -231,7 +231,7 @@ class Application extends SymfonyApplication implements ApplicationContract
         // After resolve the command via IOC container, Laravel will try to call the constructor
         // of the parent class \Illuminate\Console\Command using reflection. We should ask to
         // the command's instance if the developer have intentionally disabled this action.
-        if ($instance instanceof Command::class && $instance->shouldAutoConstructed()) {
+        if ($instance instanceof Command && $instance->shouldAutoConstructed()) {
             $reflector = new ReflectionObject($instance);
             while ($reflector->getName() !== Command::class) {
                 $reflector = $reflector->getParentClass();
