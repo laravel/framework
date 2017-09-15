@@ -41,8 +41,8 @@ class Auth extends Facade
      *
      * @return void
      */
-    public static function routes()
+    public static function routes($register = true, $forgotPassword = true)
     {
-        static::$app->make('router')->auth();
+        static::$app->make('router')->auth($register, $forgotPassword);
     }
 }
