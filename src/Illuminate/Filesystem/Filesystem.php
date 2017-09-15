@@ -74,11 +74,11 @@ class Filesystem
      * Get the returned value of a file.
      *
      * @param  string  $path
-     * @return mixed
+     * @return array
      *
      * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function getRequire($path)
+    public function getRequire($path): array
     {
         if ($this->isFile($path)) {
             return require $path;
