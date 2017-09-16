@@ -259,6 +259,7 @@ class Handler {
 			}
 			catch (\Throwable $e)
 			{
+				$e = new FatalThrowableError($e);
 				$response = $this->formatException($e);
 			}
 

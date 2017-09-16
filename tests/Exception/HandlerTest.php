@@ -41,4 +41,17 @@ class HandlerTest extends PHPUnit_Framework_TestCase
 		$this->assertSame('', $error->getFile(), 'error handler should use correct default path');
 		$this->assertSame(0, $error->getLine(), 'error handler should use correct default line');
 	}
+
+	public function testHandleErrorThrowableThrownDuringCustomHandler()
+	{
+		// Regirster a handler that handles all errors and causes a new PHP 7
+		// Error to be thrown.
+		$this->handler->error(function () {
+			throw new \Error('No cookies for you!');
+		});
+
+		$this->responsePreparer->shouldReceive('prepareResponse')->andReturn('Handled that!');
+		$result = $this->handler->handleException(new \Error('PHP 7 Failure'));
+		$this->assertSame('Handled that!', $result);
+	}
 }
