@@ -817,6 +817,15 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 'dayle', 0 => 'taylor'], $data->all());
     }
 
+    public function testSortByMaintainsOriginalOrderOfItemsWithIdenticalValues()
+    {
+        $data = new Collection([['name' => 'taylor'], ['name' => 'dayle'], ['name' => 'dayle']]);
+        $data = $data->sortBy('name');
+
+        $this->assertEquals([['name' => 'dayle'], ['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+        $this->assertEquals([1, 2, 0], $data->keys()->all());
+    }
+
     public function testReverse()
     {
         $data = new Collection(['zaeed', 'alan']);
