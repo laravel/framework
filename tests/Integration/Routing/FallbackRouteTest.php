@@ -17,7 +17,7 @@ class FallbackRouteTest extends TestCase
             return response('fallback', 404);
         });
 
-        Route::get('one', function(){
+        Route::get('one', function () {
             return 'one';
         });
 
@@ -28,12 +28,12 @@ class FallbackRouteTest extends TestCase
 
     public function test_fallback_with_prefix()
     {
-        Route::group(['prefix' => 'prefix'], function(){
+        Route::group(['prefix' => 'prefix'], function () {
             Route::fallback(function () {
                 return response('fallback', 404);
             });
 
-            Route::get('one', function(){
+            Route::get('one', function () {
                 return 'one';
             });
         });
@@ -49,11 +49,11 @@ class FallbackRouteTest extends TestCase
             return response('fallback', 404);
         });
 
-        Route::get('{any}', function(){
+        Route::get('{any}', function () {
             return 'wildcard';
         })->where('any', '.*');
 
-        Route::get('one', function(){
+        Route::get('one', function () {
             return 'one';
         });
 
