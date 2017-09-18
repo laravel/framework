@@ -398,9 +398,10 @@ class Command extends SymfonyCommand
      *
      * @param  \Illuminate\Database\Eloquent\Model|string $model
      * @param  array|null $attributes
+     * @param  string $style
      * @return void
      */
-    public function tableFromModel($model, $attributes = null)
+    public function tableFromModel($model, $attributes = null, $style = 'default')
     {
         if(!$attributes){
             $attributes = collect($model->first()->getAttributes())->keys()->toArray();
@@ -410,7 +411,7 @@ class Command extends SymfonyCommand
             $model = $model::all($attributes);
         }
 
-        $this->table($attributes, $model);
+        $this->table($attributes, $model, $style);
     }
 
     /**
