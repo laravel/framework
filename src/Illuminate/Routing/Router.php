@@ -213,6 +213,19 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register a new Fallback route with the router.
+     *
+     * @param  \Closure|array|string|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function fallback($action)
+    {
+        $placeholder = 'fallbackPlaceholder';
+
+        return $this->addRoute('GET', "{{$placeholder}}", $action)->where($placeholder, '.*')->fallback();
+    }
+
+    /**
      * Create a redirect from one URI to another.
      *
      * @param string  $uri

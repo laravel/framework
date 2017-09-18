@@ -106,6 +106,13 @@ class Route
     protected $container;
 
     /**
+     * Determine if the route is a fallback one.
+     *
+     * @var bool
+     */
+    public $isFallback = false;
+
+    /**
      * The validators used by the routes.
      *
      * @var array
@@ -483,6 +490,19 @@ class Route
 
         return $this;
     }
+
+    /**
+     * Mark the route as a fallback route.
+     *
+     * @return $this
+     */
+    public function fallback()
+    {
+        $this->isFallback = true;
+
+        return $this;
+    }
+
 
     /**
      * Get the HTTP verbs the route responds to.
