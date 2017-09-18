@@ -404,11 +404,7 @@ class Command extends SymfonyCommand
     public function tableFromModel($model, $attributes = null, $style = 'default')
     {
         if(!$model instanceof Model){
-            if($attributes){
-                $model = $model::all($attributes);
-            } else {
-                $model = $model::all();
-            }
+            $model = $model::all($attributes ?? ['*']);
         }
 
         if(!$attributes){
