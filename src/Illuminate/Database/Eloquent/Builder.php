@@ -355,7 +355,7 @@ class Builder
      */
     public function exists($id = null)
     {
-        if(! is_null($id)) {
+        if (! is_null($id)) {
             $this->whereKey($id);
         }
 
