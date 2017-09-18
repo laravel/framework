@@ -28,17 +28,26 @@ class ModelIdentifier
     public $connection;
 
     /**
+     * The relationships loaded on the model.
+     *
+     * @var array
+     */
+    public $relations;
+
+    /**
      * Create a new model identifier.
      *
      * @param  string  $class
      * @param  mixed  $id
      * @param  mixed  $connection
+     * @param  array  $relations
      * @return void
      */
-    public function __construct($class, $id, $connection)
+    public function __construct($class, $id, $connection, $relations)
     {
         $this->id = $id;
         $this->class = $class;
         $this->connection = $connection;
+        $this->relations = $relations;
     }
 }
