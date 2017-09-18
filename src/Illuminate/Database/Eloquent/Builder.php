@@ -348,13 +348,15 @@ class Builder
     }
 
     /**
-     * Determine if a records exists by its primary key.
+     * Determine if a record exists by its primary key.
      *
      * @param  mixed  $id
      * @return bool
      */
     public function exists($id = null)
     {
+        // if an array of ids is passed, this returns true
+        // when any one of the ids exist.
         if (! is_null($id)) {
             $this->whereKey($id);
         }
