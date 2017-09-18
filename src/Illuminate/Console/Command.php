@@ -397,22 +397,22 @@ class Command extends SymfonyCommand
      * Format input to textual table from model.
      *
      * @param  \Illuminate\Database\Eloquent\Model|string $model
-     * @param  array|null $fields
+     * @param  array|null $attributes
      * @return void
      */
-    public function tableFromModel($model, $fields = null)
+    public function tableFromModel($model, $attributes = null)
     {
         if(!$model instanceof Model){
             $model = $model::all();
         }
 
-        if(!$fields){
-            $fields = collect($model->first()->getAttributes())->keys()->toArray();
+        if(!$attributes){
+            $attributes = collect($model->first()->getAttributes())->keys()->toArray();
         }
 
-        $this->table($fields, $model->map(function($model) use($fields){
+        $this->table($attributes, $model->map(function($model) use($attributes){
             $return = [];
-            foreach($fields as $field){
+            foreach($attributes as $field){
                 $return[] = $model->$field;
             }
             return $return;
