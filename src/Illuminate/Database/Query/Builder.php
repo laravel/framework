@@ -1922,12 +1922,20 @@ class Builder
     }
 
     /**
-     * Determine if any rows exist for the current query.
+     * Determine if any rows exist for the current query and/or by id.
      *
+     * @param  int  $id
      * @return bool
      */
-    public function exists()
+    public function exists($id = null)
     {
+        // If an ID is passed to the method, we will set the where clause to check the
+        // ID to let developers simply and quickly check if a single row exists in
+        // the database without manually specifying the "where" clauses on the query.
+        if (! is_null($id)) {
+            $this->where('id', '=', $id);
+        }
+
         $results = $this->connection->select(
             $this->grammar->compileExists($this), $this->getBindings(), ! $this->useWritePdo
         );
