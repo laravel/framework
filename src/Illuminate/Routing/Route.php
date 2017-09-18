@@ -503,7 +503,6 @@ class Route
         return $this;
     }
 
-
     /**
      * Get the HTTP verbs the route responds to.
      *
