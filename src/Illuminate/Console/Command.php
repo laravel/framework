@@ -402,21 +402,15 @@ class Command extends SymfonyCommand
      */
     public function tableFromModel($model, $attributes = null)
     {
-        if(!$model instanceof Model){
-            $model = $model::all();
-        }
-
         if(!$attributes){
             $attributes = collect($model->first()->getAttributes())->keys()->toArray();
         }
 
-        $this->table($attributes, $model->map(function($model) use($attributes){
-            $return = [];
-            foreach($attributes as $field){
-                $return[] = $model->$field;
-            }
-            return $return;
-        }));
+        if(!$model instanceof Model){
+            $model = $model::all($attributes);
+        }
+
+        $this->table($attributes, $model);
     }
 
     /**
