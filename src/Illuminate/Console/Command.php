@@ -403,12 +403,16 @@ class Command extends SymfonyCommand
      */
     public function tableFromModel($model, $attributes = null, $style = 'default')
     {
-        if(!$attributes){
-            $attributes = collect($model->first()->getAttributes())->keys()->toArray();
+        if(!$model instanceof Model){
+            if($attributes){
+                $model = $model::all($attributes);
+            } else {
+                $model = $model::all();
+            }
         }
 
-        if(!$model instanceof Model){
-            $model = $model::all($attributes);
+        if(!$attributes){
+            $attributes = collect($model->first()->getAttributes())->keys()->toArray();
         }
 
         $this->table($attributes, $model, $style);
