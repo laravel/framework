@@ -27,6 +27,7 @@ class Pluralizer
         'fish',
         'furniture',
         'gold',
+        'hardware',
         'information',
         'jedi',
         'knowledge',
