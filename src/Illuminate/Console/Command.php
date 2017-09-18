@@ -3,6 +3,7 @@
 namespace Illuminate\Console;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Model;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
@@ -397,6 +398,27 @@ class Command extends SymfonyCommand
         }
 
         $table->render();
+    }
+
+    /**
+     * Format input to textual table from model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model|string $model
+     * @param  array|null $attributes
+     * @param  string $style
+     * @return void
+     */
+    public function tableFromModel($model, $attributes = null, $style = 'default')
+    {
+        if(!$model instanceof Model){
+            $model = $model::all($attributes ?? ['*']);
+        }
+
+        if(!$attributes){
+            $attributes = collect($model->first()->getAttributes())->keys()->toArray();
+        }
+
+        $this->table($attributes, $model, $style);
     }
 
     /**
