@@ -468,16 +468,16 @@ trait HasAttributes
         switch ($this->getCastType($key)) {
             case 'int':
             case 'integer':
-                return (int) $value;
+                return intval($value);
             case 'real':
             case 'float':
             case 'double':
-                return (float) $value;
+                return floatval($value);
             case 'string':
-                return (string) $value;
+                return strval($value);
             case 'bool':
             case 'boolean':
-                return (bool) $value;
+                return boolval($value);
             case 'object':
                 return $this->fromJson($value, true);
             case 'array':
