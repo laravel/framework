@@ -68,7 +68,7 @@ class Builder
      */
     protected $passthru = [
         'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
+        'count', 'min', 'max', 'avg', 'sum', 'getConnection',
     ];
 
     /**
@@ -345,6 +345,21 @@ class Builder
         }
 
         return $this->newModelInstance();
+    }
+
+    /**
+     * Determine if a records exists by its primary key.
+     *
+     * @param  mixed  $id
+     * @return bool
+     */
+    public function exists($id = null)
+    {
+        if(! is_null($id)) {
+            $this->whereKey($id);
+        }
+
+        return $this->query->exists();
     }
 
     /**
