@@ -138,6 +138,7 @@ class CacheFileStoreTest extends TestCase
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
         $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue(['foo']));
+        $files->expects($this->once())->method('files')->with($this->equalTo(__DIR__))->will($this->returnValue([]));
         $files->expects($this->once())->method('deleteDirectory')->with($this->equalTo('foo'))->will($this->returnValue(true));
 
         $store = new FileStore($files, __DIR__);
