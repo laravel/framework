@@ -507,6 +507,7 @@ if (! function_exists('dd')) {
      */
     function dd()
     {
+        while (@ob_end_flush());
         array_map(function ($x) {
             (new Dumper)->dump($x);
         }, func_get_args());
