@@ -222,7 +222,9 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $placeholder = 'fallbackPlaceholder';
 
-        return $this->addRoute('GET', "{{$placeholder}}", $action)->where($placeholder, '.*')->fallback();
+        return $this->addRoute(
+            'GET', "{{$placeholder}}", $action
+        )->where($placeholder, '.*')->fallback();
     }
 
     /**

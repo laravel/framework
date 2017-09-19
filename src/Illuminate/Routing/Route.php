@@ -43,6 +43,13 @@ class Route
     public $action;
 
     /**
+     * Indicates whether the route is a fallback route.
+     *
+     * @var bool
+     */
+    public $isFallback = false;
+
+    /**
      * The controller instance.
      *
      * @var mixed
@@ -104,13 +111,6 @@ class Route
      * @var \Illuminate\Container\Container
      */
     protected $container;
-
-    /**
-     * Determine if the route is a fallback one.
-     *
-     * @var bool
-     */
-    public $isFallback = false;
 
     /**
      * The validators used by the routes.
@@ -492,7 +492,7 @@ class Route
     }
 
     /**
-     * Mark the route as a fallback route.
+     * Mark this route as a fallback route.
      *
      * @return $this
      */
