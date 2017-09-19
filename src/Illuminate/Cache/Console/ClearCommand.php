@@ -4,6 +4,7 @@ namespace Illuminate\Cache\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -31,16 +32,25 @@ class ClearCommand extends Command
     protected $cache;
 
     /**
+     * The filesystem instance.
+     *
+     * @var \Illuminate\Filesystem\Filesystem
+     */
+    protected $files;
+
+    /**
      * Create a new cache clear command instance.
      *
      * @param  \Illuminate\Cache\CacheManager  $cache
+     * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(CacheManager $cache)
+    public function __construct(CacheManager $cache, Filesystem $files)
     {
         parent::__construct();
 
         $this->cache = $cache;
+        $this->files = $files;
     }
 
     /**
@@ -53,6 +63,8 @@ class ClearCommand extends Command
         $this->laravel['events']->fire('cache:clearing', [$this->argument('store'), $this->tags()]);
 
         $this->cache()->flush();
+
+        $this->clearRealTimeFacades();
 
         $this->laravel['events']->fire('cache:cleared', [$this->argument('store'), $this->tags()]);
 
@@ -103,5 +115,19 @@ class ClearCommand extends Command
         return [
             ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear.', null],
         ];
+    }
+
+    /**
+     * Clear real-time facades stored in the framework's cache directory.
+     * 
+     * @return void
+     */
+    public function clearRealTimeFacades()
+    {
+        foreach ($this->files->files(storage_path('framework/cache')) as $file) {
+            if (preg_match('/facade-.*\.php$/', $file)) {
+                $this->files->delete($file);
+            }
+        }
     }
 }
