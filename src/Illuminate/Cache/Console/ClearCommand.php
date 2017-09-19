@@ -60,15 +60,33 @@ class ClearCommand extends Command
      */
     public function handle()
     {
-        $this->laravel['events']->fire('cache:clearing', [$this->argument('store'), $this->tags()]);
+        $this->laravel['events']->fire(
+            'cache:clearing', [$this->argument('store'), $this->tags()]
+        );
 
         $this->cache()->flush();
 
-        $this->clearRealTimeFacades();
+        $this->flushFacades();
 
-        $this->laravel['events']->fire('cache:cleared', [$this->argument('store'), $this->tags()]);
+        $this->laravel['events']->fire(
+            'cache:cleared', [$this->argument('store'), $this->tags()]
+        );
 
         $this->info('Cache cleared successfully.');
+    }
+
+    /**
+     * Flush the real-time facades stored in the cache directory.
+     *
+     * @return void
+     */
+    public function flushFacades()
+    {
+        foreach ($this->files->files(storage_path('framework/cache')) as $file) {
+            if (preg_match('/facade-.*\.php$/', $file)) {
+                $this->files->delete($file);
+            }
+        }
     }
 
     /**
@@ -115,19 +133,5 @@ class ClearCommand extends Command
         return [
             ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear.', null],
         ];
-    }
-
-    /**
-     * Clear real-time facades stored in the framework's cache directory.
-     *
-     * @return void
-     */
-    public function clearRealTimeFacades()
-    {
-        foreach ($this->files->files(storage_path('framework/cache')) as $file) {
-            if (preg_match('/facade-.*\.php$/', $file)) {
-                $this->files->delete($file);
-            }
-        }
     }
 }
