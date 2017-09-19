@@ -518,6 +518,25 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['name' => 'Hello']);
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
+    
+    public function testMergeFlatMap()
+    {
+        $c = new Collection([1,2,3]);
+        
+        $result = $c->mergeFlatMap(function($item) {
+            if ($item == 1) {
+                return [4,5];
+            } else if ($item == 2) {
+                return [6,7];
+            } else if ($item == 3) {
+                return [8];
+            }
+
+            return [];
+        });
+
+        $this->assertEquals([1,2,3,4,5,6,7,8], $result->all());
+    }
 
     public function testUnionNull()
     {
