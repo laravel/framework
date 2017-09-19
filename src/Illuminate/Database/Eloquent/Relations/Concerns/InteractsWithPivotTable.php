@@ -184,6 +184,10 @@ trait InteractsWithPivotTable
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
+        $attributes = $this->using
+                ? $this->newPivot()->forceFill($attributes)->getAttributes()
+                : $attributes;
+
         if (in_array($this->updatedAt(), $this->pivotColumns)) {
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
