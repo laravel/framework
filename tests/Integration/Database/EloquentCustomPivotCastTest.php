@@ -76,6 +76,24 @@ class EloquentCustomPivotCastTest extends TestCase
 
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
+
+    public function test_casts_are_respected_on_sync_update()
+    {
+        $user = CustomPivotCastTestUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $project = CustomPivotCastTestProject::forceCreate([
+            'name' => 'Test Project',
+        ]);
+
+        $project->collaborators()->attach($user, ['permissions' => ['foo' => 'bar']]);
+
+        $project->collaborators()->sync([$user->id => ['permissions' => ['foo' => 'baz']]]);
+        $project = $project->fresh();
+
+        $this->assertEquals(['foo' => 'baz'], $project->collaborators[0]->pivot->permissions);
+    }
 }
 
 class CustomPivotCastTestUser extends Model
