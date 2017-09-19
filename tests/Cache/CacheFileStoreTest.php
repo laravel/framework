@@ -167,6 +167,19 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flush should not clean directory');
     }
 
+    public function testFlushCleansRealTimeFacades()
+    {
+        $files = $this->mockFilesystem();
+        $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
+        $files->expects($this->once())->method('directories')->with($this->equalTo(__DIR__))->will($this->returnValue([]));
+        $files->expects($this->once())->method('files')->with($this->equalTo(__DIR__))->will($this->returnValue(['/facade-XXX.php']));
+        $files->expects($this->once())->method('delete')->with($this->equalTo('/facade-XXX.php'))->will($this->returnValue(true));
+
+        $store = new FileStore($files, __DIR__);
+        $result = $store->flush();
+        $this->assertTrue($result, 'Flush failed');
+    }
+
     protected function mockFilesystem()
     {
         return $this->createMock('Illuminate\Filesystem\Filesystem');
