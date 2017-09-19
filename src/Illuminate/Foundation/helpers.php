@@ -107,9 +107,7 @@ if (! function_exists('app')) {
             return Container::getInstance();
         }
 
-        return empty($parameters)
-            ? Container::getInstance()->make($abstract)
-            : Container::getInstance()->makeWith($abstract, $parameters);
+        return Container::getInstance()->make($abstract, $parameters);
     }
 }
 
