@@ -945,6 +945,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         return new static(array_merge($this->items, $this->getArrayableItems($items)));
     }
+    
+    /**
+     * Merge the collection with the result of a flat map.
+     
+     * @param callable $callback
+     * @return static
+     */
+    public function mergeFlatMap($callback)
+    {
+        return $this->merge(
+            $this->flatMap(function ($item) use ($callback) {
+                return $callback($item);  
+            })
+        );
+    }
 
     /**
      * Create a collection by using this collection for keys and another for its values.
