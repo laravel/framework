@@ -151,6 +151,14 @@ class FileStore implements Store
             }
         }
 
+        foreach ($this->files->files($this->directory) as $file) {
+            if (preg_match('/facade-.*\.php$/', $file)) {
+                if (! $this->files->delete($file)) {
+                    return false;
+                }
+            }
+        }
+
         return true;
     }
 
