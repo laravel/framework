@@ -119,7 +119,7 @@ class ClearCommand extends Command
 
     /**
      * Clear real-time facades stored in the framework's cache directory.
-     * 
+     *
      * @return void
      */
     public function clearRealTimeFacades()
