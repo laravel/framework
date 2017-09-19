@@ -1,18 +1,25 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.5 (2017-09-19)
 
 ### Added
 - Added `:input` placeholder in validation error messages ([#21175](https://github.com/laravel/framework/pull/21175))
 - Added `@includeFirst` Blade directive ([#21172](https://github.com/laravel/framework/pull/21172))
 - Allow setting column styles for tables in Artisan commands ([#21169](https://github.com/laravel/framework/pull/21169))
+- Added `ValidatesRequests::extractInputFromRules()` method ([#21192](https://github.com/laravel/framework/pull/21192))
+- Added `-m` shortcut to `make:factory` ([#21219](https://github.com/laravel/framework/pull/21219))
+- Added ability to set a fallback (catch-all) route ([#21234](https://github.com/laravel/framework/pull/21234))
 
 ### Changed
 - Support `null` on `Model::UPDATED_AT` ([#21178](https://github.com/laravel/framework/pull/21178))
 - Render views from config while building error views ([#21145](https://github.com/laravel/framework/pull/21145))
+- Use multibyte functions in some `Str` methods ([#21207](https://github.com/laravel/framework/pull/21207))
+- Perform stable sort in `Collection::sortBy()` ([#21214](https://github.com/laravel/framework/pull/21214))
 
 ### Fixed
 - Ignore `SELECT` bindings in `prepareBindingsForUpdate()` ([#21173](https://github.com/laravel/framework/pull/21173))
+- Fixed `remember` check in `AuthenticatesUsers::attemptLogin()` ([#21221](https://github.com/laravel/framework/pull/21221))
+- Added "hardware" as an uncountable word ([#21236](https://github.com/laravel/framework/pull/21236))
 
 
 ## v5.5.4 (2017-09-13)
