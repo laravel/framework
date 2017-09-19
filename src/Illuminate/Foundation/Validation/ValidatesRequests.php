@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Validation;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\ValidationException;
