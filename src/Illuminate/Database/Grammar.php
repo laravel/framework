@@ -59,7 +59,7 @@ abstract class Grammar
         // the pieces so we can wrap each of the segments of the expression on it
         // own, and then joins them both back together with the "as" connector.
         if (strpos(strtolower($value), ' as ') !== false) {
-            return $this->wrapAliasedValue($value, $prefixAlias);
+            return $this->wrapAliasedValue($value, $prefixAlias, $hasDatabaseName = false);
         }
 
         return $this->wrapSegments(explode('.', $value), $hasDatabaseName);
@@ -70,9 +70,10 @@ abstract class Grammar
      *
      * @param  string  $value
      * @param  bool  $prefixAlias
+     * @param  bool  $hasDatabaseName
      * @return string
      */
-    protected function wrapAliasedValue($value, $prefixAlias = false)
+    protected function wrapAliasedValue($value, $prefixAlias = false, $hasDatabaseName = false)
     {
         $segments = preg_split('/\s+as\s+/i', $value);
 
@@ -84,7 +85,7 @@ abstract class Grammar
         }
 
         return $this->wrap(
-            $segments[0]).' as '.$this->wrapValue($segments[1]
+            $segments[0], $prefixAlias, $hasDatabaseName).' as '.$this->wrapValue($segments[1]
         );
     }
 
