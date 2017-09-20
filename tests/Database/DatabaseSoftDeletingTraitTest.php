@@ -28,20 +28,6 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
     }
 
-    public function testDeleteSetsSoftDeletedWithUpdatedAtColumnIsNull()
-    {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub');
-        $model->shouldDeferMissing();
-        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('stdClass'));
-        $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
-        $query->shouldReceive('update')->once()->with([
-            'deleted_at' => 'date-time',
-        ]);
-        $model->delete();
-
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
-    }
-
     public function testRestore()
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
@@ -58,6 +44,43 @@ class DatabaseSoftDeletingTraitTest extends TestCase
     public function testRestoreCancel()
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model->shouldDeferMissing();
+        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
+        $model->shouldReceive('save')->never();
+
+        $this->assertFalse($model->restore());
+    }
+
+    public function testDeleteSetsSoftDeletedWithUpdatedAtColumnIsNull()
+    {
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub');
+        $model->shouldDeferMissing();
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('stdClass'));
+        $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+        ]);
+        $model->delete();
+
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
+    }
+
+    public function testRestoreWithUpdatedAtIsNull()
+    {
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub');
+        $model->shouldDeferMissing();
+        $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
+        $model->shouldReceive('save')->once();
+        $model->shouldReceive('fireModelEvent')->with('restored', false)->andReturn(true);
+
+        $model->restore();
+
+        $this->assertNull($model->deleted_at);
+    }
+
+    public function testRestoreCancelWithUpdatedAtIsNull()
+    {
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub');
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
