@@ -12,9 +12,11 @@ class Pluralizer
      * @var array
      */
     public static $uncountable = [
+        'aircraft',
         'audio',
         'bison',
         'chassis',
+        'clothes',
         'compensation',
         'coreopsis',
         'data',
@@ -26,6 +28,7 @@ class Pluralizer
         'feedback',
         'fish',
         'furniture',
+        'glasses',
         'gold',
         'hardware',
         'information',
@@ -43,11 +46,16 @@ class Pluralizer
         'police',
         'rain',
         'rice',
+        'salmon',
+        'scissors',
         'series',
         'sheep',
+        'software',
         'species',
         'swine',
         'traffic',
+        'trousers',
+        'trout',
         'wheat',
     ];
 
