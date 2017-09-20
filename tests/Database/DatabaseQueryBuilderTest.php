@@ -130,6 +130,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "public"."users"', $builder->toSql());
     }
 
+    public function testTableWithDatabaseWrapping()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->select('*')->from('public.users');
+        $this->assertEquals('select * from "public"."prefix_users"', $builder->toSql());
+    }
+
+    public function testTableWithDatabaseAsWrapping()
+    {
+        $builder = $this->getBuilder();
+        $builder->getGrammar()->setTablePrefix('prefix_');
+        $builder->select('*')->from('public.users as people');
+        $this->assertEquals('select * from "public"."prefix_users" as "prefix_people"', $builder->toSql());
+    }
+
     public function testWhenCallback()
     {
         $callback = function ($query, $condition) {
