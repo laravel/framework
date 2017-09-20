@@ -1,9 +1,21 @@
 # Release Notes for 5.5.x
 
+## v5.5.9 (2017-09-20)
+
+### Changed
+- Perform stable sort in `Collection::sortBy()` (2nd attempt) ([#21270](https://github.com/laravel/framework/pull/21270))
+- Return empty string if database session key is expired ([#21277](https://github.com/laravel/framework/pull/21277))
+
+### Fixed
+- Fixed setting `Model::UPDATED_AT` in `SoftDeletes` ([#21286](https://github.com/laravel/framework/pull/21286))
+- Apply custom pivot model attribute casting on arrays ([#21275](https://github.com/laravel/framework/pull/21275))
+
+
 ## v5.5.8 (2017-09-20)
 
 ### Fixed
 - Fixed issue with routes sorting ([#21261](https://github.com/laravel/framework/pull/21261))
+
 
 ## v5.5.7 (2017-09-19)
 
