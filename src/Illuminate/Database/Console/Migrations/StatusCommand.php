@@ -57,10 +57,20 @@ class StatusCommand extends BaseCommand
 
         $ran = $this->migrator->getRepository()->getRan();
 
-        if (count($migrations = $this->getStatusFor($ran)) > 0) {
-            $this->table(['Ran?', 'Migration'], $migrations);
-        } else {
+        if (count($migrations = $this->getStatusFor($ran)) === 0) {
             $this->error('No migrations found');
+        } elseif ($this->option('pending')) {
+            if ($pending = count($this->getPendingMigrations($ran))) {
+                $this->info("Pending migrations: <fg=red>$pending</fg=red>");
+
+                return 0;
+            } else {
+                $this->info('Pending migrations: 0');
+
+                return 1;
+            }
+        } else {
+            $this->table(['Ran?', 'Migration'], $migrations);
         }
     }
 
@@ -79,6 +89,22 @@ class StatusCommand extends BaseCommand
                         return in_array($migrationName, $ran)
                                 ? ['<info>Y</info>', $migrationName]
                                 : ['<fg=red>N</fg=red>', $migrationName];
+                    });
+    }
+
+    /**
+     * Get the migrations that have not yet been run.
+     *
+     * @param  array  $ran
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getPendingMigrations(array $ran)
+    {
+        return Collection::make($this->getAllMigrationFiles())
+                    ->filter(function ($migration) use ($ran) {
+                        $migrationName = $this->migrator->getMigrationName($migration);
+
+                        return !in_array($migrationName, $ran);
                     });
     }
 
@@ -103,6 +129,8 @@ class StatusCommand extends BaseCommand
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to use.'],
+
+            ['pending', null, InputOption::VALUE_NONE, 'Return information only for pending migrations.'],
         ];
     }
 }
