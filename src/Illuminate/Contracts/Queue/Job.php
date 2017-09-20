@@ -112,7 +112,7 @@ interface Job
      * @return string
      */
     public function getRawBody();
-    
+
     /**
      * Get the decoded body of the job.
      *
