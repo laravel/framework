@@ -112,4 +112,18 @@ interface Job
      * @return string
      */
     public function getRawBody();
+
+    /**
+     * Get the decoded body of the job.
+     *
+     * @return array
+     */
+    public function payload();
+
+    /**
+     * Get the job identifier.
+     *
+     * @return string
+     */
+    public function getJobId();
 }
