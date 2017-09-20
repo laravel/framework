@@ -46,6 +46,16 @@ class None extends Preset
     }
 
     /**
+     * Update the Webpack configuration.
+     *
+     * @return void
+     */
+    protected static function updateWebpackConfiguration()
+    {
+        copy(__DIR__.'/none-stubs/webpack.mix.js', base_path('webpack.mix.js'));
+    }
+
+    /**
      * Write the stubs for the Sass and JavaScript files.
      *
      * @return void
