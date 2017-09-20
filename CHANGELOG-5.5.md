@@ -1,5 +1,10 @@
 # Release Notes for 5.5.x
 
+## v5.5.8 (2017-09-20)
+
+### Fixed
+- Fixed issue with routes sorting ([#21261](https://github.com/laravel/framework/pull/21261))
+
 ## v5.5.7 (2017-09-19)
 
 ### Fixed
