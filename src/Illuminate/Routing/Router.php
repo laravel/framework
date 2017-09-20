@@ -1018,6 +1018,16 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Get the current route version.
+     *
+     * @return array|null
+     */
+    public function currentRouteVersion()
+    {
+        return $this->current() ? $this->current()->getVersion() : null;
+    }
+
+    /**
      * Alias for the "currentRouteNamed" method.
      *
      * @param  dynamic  $patterns

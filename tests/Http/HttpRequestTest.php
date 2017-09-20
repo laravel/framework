@@ -217,6 +217,14 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Laravel', $request->userAgent());
     }
 
+    public function testVersionMethod()
+    {
+        $request = Request::create('/', 'GET');
+        $this->assertNull($request->version());
+        $request->headers->set('Accept-Version', '2');
+        $this->assertEquals('2', $request->version());
+    }
+
     public function testHasMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);

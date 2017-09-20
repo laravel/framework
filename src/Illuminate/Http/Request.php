@@ -287,6 +287,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the client Accept-Version header.
+     *
+     * @return array|string
+     */
+    public function version()
+    {
+        return $this->headers->get('Accept-Version');
+    }
+
+    /**
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
