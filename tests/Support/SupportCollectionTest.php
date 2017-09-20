@@ -795,7 +795,7 @@ class SupportCollectionTest extends TestCase
     public function testSortByString()
     {
         $data = new Collection([['name' => 'taylor'], ['name' => 'dayle']]);
-        $data = $data->sortBy('name');
+        $data = $data->sortBy('name', SORT_STRING);
 
         $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
 
@@ -803,6 +803,45 @@ class SupportCollectionTest extends TestCase
         $data = $data->sortBy('name', SORT_STRING);
 
         $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+    }
+
+    public function testSortByMaintainsOriginalOrderOfItemsWithIdenticalValues()
+    {
+        $data = new Collection([['name' => 'taylor'], ['name' => 'dayle'], ['name' => 'dayle']]);
+
+        $data = $data->sortBy('name');
+
+        $this->assertEquals([['name' => 'dayle'], ['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+        $this->assertEquals([1, 2, 0], $data->keys()->all());
+    }
+
+    public function testSortByStringMaintainsOriginalOrderOfItemsWithIdenticalValues()
+    {
+        $data = new Collection([['name' => 'taylor'], ['name' => 'dayle'], ['name' => 'dayle']]);
+
+        $data = $data->sortBy('name', SORT_STRING);
+
+        $this->assertEquals([['name' => 'dayle'], ['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
+        $this->assertEquals([1, 2, 0], $data->keys()->all());
+    }
+
+    public function testSortByNumericMaintainsOriginalOrderOfItemsWithIdenticalValues()
+    {
+        $data = new Collection([['name' => '2'], ['name' => '1'], ['name' => '1']]);
+        $data = $data->sortBy('name', SORT_NUMERIC);
+
+        $this->assertEquals([['name' => '1'], ['name' => '1'], ['name' => '2']], array_values($data->all()));
+        $this->assertEquals([1, 2, 0], $data->keys()->all());
+    }
+
+    public function testSortByNaturalMaintainsOriginalOrderOfItemsWithIdenticalValues()
+    {
+        $data = new Collection([['name' => 'img10.png'], ['name' => 'img1.png'], ['name' => 'img1.png']]);
+
+        $data = $data->sortBy('name', SORT_NATURAL);
+
+        $this->assertEquals([['name' => 'img1.png'], ['name' => 'img1.png'], ['name' => 'img10.png']], array_values($data->all()));
+        $this->assertEquals([1, 2, 0], $data->keys()->all());
     }
 
     public function testSortByAlwaysReturnsAssoc()
