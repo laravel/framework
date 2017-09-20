@@ -1020,7 +1020,7 @@ class Builder
 
         $whereGroup->wheres = $whereSlice;
 
-        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => $boolean];
+        return ['type' => 'Nested', 'query' => $whereGroup, 'boolean' => $boolean, 'not' => false];
     }
 
     /**
