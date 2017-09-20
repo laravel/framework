@@ -1340,6 +1340,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
+        $values = [];
         $results = [];
 
         $callback = $this->valueRetriever($callback);
