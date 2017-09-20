@@ -1340,8 +1340,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
-        $values = [];
-        $results = [];
+        list($values, $results) = [[], []];
 
         $callback = $this->valueRetriever($callback);
 
@@ -1353,7 +1352,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $keys = array_keys($this->items);
+
         $order = $descending ? SORT_DESC : SORT_ASC;
+
         array_multisort($values, $order, $options, $keys, $order);
 
         // Once we have sorted all of the keys in the array, we will loop through them
