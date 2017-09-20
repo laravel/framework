@@ -101,6 +101,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
             return base64_decode($session->payload);
         }
+
+        return '';
     }
 
     /**
