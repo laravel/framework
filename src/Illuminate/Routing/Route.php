@@ -14,6 +14,7 @@ use Illuminate\Routing\Matching\UriValidator;
 use Illuminate\Routing\Matching\HostValidator;
 use Illuminate\Routing\Matching\MethodValidator;
 use Illuminate\Routing\Matching\SchemeValidator;
+use Illuminate\Routing\Matching\VersionValidator;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Contracts\ControllerDispatcher as ControllerDispatcherContract;
 
@@ -597,6 +598,33 @@ class Route
     }
 
     /**
+     * Get or set the version for the route.
+     *
+     * @param  string|null $version
+     * @return $this|array
+     */
+    public function version($version = null)
+    {
+        if (is_null($version)) {
+            return $this->getVersion();
+        }
+
+        $this->action['version'] = $version;
+
+        return $this;
+    }
+
+    /**
+     * Get the version defined for the route.
+     *
+     * @return array
+     */
+    public function getVersion()
+    {
+        return isset($this->action['version']) ? Arr::wrap($this->action['version']) : [];
+    }
+
+    /**
      * Get the URI associated with the route.
      *
      * @return string
@@ -828,6 +856,7 @@ class Route
         return static::$validators = [
             new UriValidator, new MethodValidator,
             new SchemeValidator, new HostValidator,
+            new VersionValidator,
         ];
     }
 

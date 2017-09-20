@@ -45,7 +45,7 @@ class RouteListCommand extends Command
      *
      * @var array
      */
-    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Version','Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
 
     /**
      * Create a new route command instance.
@@ -106,6 +106,7 @@ class RouteListCommand extends Command
     protected function getRouteInformation(Route $route)
     {
         return $this->filterRoute([
+            'version'=> implode('|', $route->version()),
             'host'   => $route->domain(),
             'method' => implode('|', $route->methods()),
             'uri'    => $route->uri(),
@@ -163,6 +164,7 @@ class RouteListCommand extends Command
     {
         if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
              $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+             $this->option('ver') && ! Str::contains($route['version'], $this->option('ver')) ||
              $this->option('method') && ! Str::contains($route['method'], $this->option('method'))) {
             return;
         }
@@ -178,6 +180,8 @@ class RouteListCommand extends Command
     protected function getOptions()
     {
         return [
+            ['ver', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by version.'],
+
             ['method', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by method.'],
 
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name.'],

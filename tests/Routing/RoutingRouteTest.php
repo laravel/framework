@@ -559,6 +559,18 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
     }
 
+    public function testMatchesVersionRequests()
+    {
+        $request = Request::create('foo/bar', 'POST');
+        $route = new Route('POST', 'foo/bar', ['version' => ['v1', 'v2'], function () {
+        }]);
+        $this->assertFalse($route->matches($request));
+        $request->headers->set('Accept-Version', 'v2');
+        $this->assertTrue($route->matches($request));
+        $request->headers->set('Accept-Version', 'v3');
+        $this->assertFalse($route->matches($request));
+    }
+
     public function testMatchesMethodAgainstRequests()
     {
         /*
