@@ -273,12 +273,7 @@ class Str
      */
     public static function placeholder($subject, array $replace)
     {
-        foreach ($replace as $key => $value)
-        {
-            $subject = str_replace($key, $value, $subject);
-        }
-
-        return $subject;
+        return str_replace(array_keys($replace), array_values($replace), $subject);
     }
 
     /**
