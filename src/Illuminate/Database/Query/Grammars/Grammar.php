@@ -432,7 +432,9 @@ class Grammar extends BaseGrammar
         // if it is a normal query we need to take the leading "where" of queries.
         $offset = $query instanceof JoinClause ? 3 : 6;
 
-        return '('.substr($this->compileWheres($where['query']), $offset).')';
+        $negation = ($where['not'] ?? false) ? 'not ' : '';
+
+        return  "{$negation}(".substr($this->compileWheres($where['query']), $offset).')';
     }
 
     /**

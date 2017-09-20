@@ -1093,13 +1093,26 @@ class Builder
      *
      * @param  \Closure $callback
      * @param  string   $boolean
+     * @param  bool     $not
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNested(Closure $callback, $boolean = 'and')
+    public function whereNested(Closure $callback, $boolean = 'and', $not = false)
     {
         call_user_func($callback, $query = $this->forNestedWhere());
 
-        return $this->addNestedWhereQuery($query, $boolean);
+        return $this->addNestedWhereQuery($query, $boolean, $not);
+    }
+
+    /**
+     * Add a nested "where not" statement to the query.
+     *
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotNested(Closure $callback, $boolean = 'and')
+    {
+        return $this->whereNested($callback, $boolean, true);
     }
 
     /**
@@ -1117,14 +1130,15 @@ class Builder
      *
      * @param  \Illuminate\Database\Query\Builder|static $query
      * @param  string  $boolean
+     * @param  bool    $not
      * @return $this
      */
-    public function addNestedWhereQuery($query, $boolean = 'and')
+    public function addNestedWhereQuery($query, $boolean = 'and', $not = false)
     {
         if (count($query->wheres)) {
             $type = 'Nested';
 
-            $this->wheres[] = compact('type', 'query', 'boolean');
+            $this->wheres[] = compact('type', 'query', 'boolean', 'not');
 
             $this->addBinding($query->getBindings(), 'where');
         }

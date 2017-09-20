@@ -909,6 +909,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
     }
 
+    public function testWhereNotNested()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotNested(function ($q) {
+            $q->where('email', '=', 'foo')->where('name', '=', 'bar');
+        });
+        $this->assertEquals('select * from "users" where not ("email" = ? and "name" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();
