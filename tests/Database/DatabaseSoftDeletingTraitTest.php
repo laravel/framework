@@ -30,7 +30,6 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testDeleteSetsSoftDeletedWithUpdatedAtColumnIsNull()
     {
-
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub');
         $model->shouldDeferMissing();
         $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('stdClass'));
