@@ -572,7 +572,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function dispatchToRoute(Request $request)
     {
-        return $this->buildResponse($this->findRoute($request), $request);
+        return $this->buildResponse($request, $this->findRoute($request));
     }
 
     /**
@@ -597,7 +597,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  Request  $request
      * @return mixed
      */
-    protected function buildResponse(Route $route, Request $request)
+    protected function buildResponse(Request $request, Route $route)
     {
         $request->setRouteResolver(function () use ($route) {
             return $route;
@@ -1113,13 +1113,12 @@ class Router implements RegistrarContract, BindingRegistrar
      * Return a response out of the given route.
      *
      * @param  string  $name
-     * @param  \Illuminate\Http\Request  $request
      * @return mixed
      */
-    public function respondWith($name, $request){
-        $route = tap($this->routes->getByName($name))->bind($request);
-
-        return $this->buildResponse($route, $request);
+    public function respondWith($name){
+        return $this->buildResponse($this->currentRequest,
+            tap($this->routes->getByName($name))->bind($this->currentRequest)
+        );
     }
 
     /**
