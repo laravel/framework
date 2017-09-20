@@ -260,11 +260,7 @@ trait FormatsMessages
      */
     protected function replaceAttributePlaceholder($message, $value)
     {
-        return str_replace(
-            [':attribute', ':ATTRIBUTE', ':Attribute'],
-            [$value, Str::upper($value), Str::ucfirst($value)],
-            $message
-        );
+        return str_placeholder($message, [':attribute' => $value, ':ATTRIBUTE' => Str::upper($value), ':Attribute' => Str::ucfirst($value)]);
     }
 
     /**
