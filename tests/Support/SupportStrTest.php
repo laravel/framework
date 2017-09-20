@@ -196,6 +196,12 @@ class SupportStrTest extends TestCase
         $this->assertEquals(11, Str::length('foo bar baz'));
     }
 
+    public function testPlaceholder()
+    {
+        $this->assertEquals('Laravel Framework', Str::placeholder(':name Framework', [':name' => 'Laravel']));
+        $this->assertEquals('Taylor Otwell', Str::placeholder(':first_name :last_name', [':first_name' => 'Taylor', ':last_name' => 'Otwell']));
+    }
+
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
