@@ -32,11 +32,13 @@ abstract class Grammar
      */
     public function wrapTable($table)
     {
-        if (! $this->isExpression($table)) {
+        // When the value of $table has database name,such as database.table,we should not
+        // add a tablePrefix to database name.
+        if (strpos($table, '.') == false) {
             return $this->wrap($this->tablePrefix.$table, true);
+        } else {
+            return $this->wrap($table, true, true);
         }
-
-        return $this->getValue($table);
     }
 
     /**
@@ -44,9 +46,10 @@ abstract class Grammar
      *
      * @param  \Illuminate\Database\Query\Expression|string  $value
      * @param  bool    $prefixAlias
+     * @param  bool    $hasDatabaseName
      * @return string
      */
-    public function wrap($value, $prefixAlias = false)
+    public function wrap($value, $prefixAlias = false, $hasDatabaseName = false)
     {
         if ($this->isExpression($value)) {
             return $this->getValue($value);
@@ -56,10 +59,10 @@ abstract class Grammar
         // the pieces so we can wrap each of the segments of the expression on it
         // own, and then joins them both back together with the "as" connector.
         if (strpos(strtolower($value), ' as ') !== false) {
-            return $this->wrapAliasedValue($value, $prefixAlias);
+            return $this->wrapAliasedValue($value, $prefixAlias, $hasDatabaseName);
         }
 
-        return $this->wrapSegments(explode('.', $value));
+        return $this->wrapSegments(explode('.', $value), $hasDatabaseName);
     }
 
     /**
@@ -67,9 +70,10 @@ abstract class Grammar
      *
      * @param  string  $value
      * @param  bool  $prefixAlias
+     * @param  bool  $hasDatabaseName
      * @return string
      */
-    protected function wrapAliasedValue($value, $prefixAlias = false)
+    protected function wrapAliasedValue($value, $prefixAlias = false, $hasDatabaseName = false)
     {
         $segments = preg_split('/\s+as\s+/i', $value);
 
@@ -81,7 +85,7 @@ abstract class Grammar
         }
 
         return $this->wrap(
-            $segments[0]).' as '.$this->wrapValue($segments[1]
+            $segments[0], $prefixAlias, $hasDatabaseName).' as '.$this->wrapValue($segments[1]
         );
     }
 
@@ -89,12 +93,17 @@ abstract class Grammar
      * Wrap the given value segments.
      *
      * @param  array  $segments
+     * @param  bool   $hasDatabaseName
      * @return string
      */
-    protected function wrapSegments($segments)
+    protected function wrapSegments($segments, $hasDatabaseName = false)
     {
-        return collect($segments)->map(function ($segment, $key) use ($segments) {
-            return $key == 0 && count($segments) > 1
+        // The value of $segments has two forms : database.table or table.column,we should
+        // distinguish them.
+        $table_key = $hasDatabaseName ? 1 : 0;
+
+        return collect($segments)->map(function ($segment, $key) use ($segments, $table_key) {
+            return $key == $table_key && count($segments) > 1
                             ? $this->wrapTable($segment)
                             : $this->wrapValue($segment);
         })->implode('.');
