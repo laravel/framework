@@ -1115,7 +1115,8 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $name
      * @return mixed
      */
-    public function respondWith($name){
+    public function respondWith($name)
+    {
         return $this->buildResponse($this->currentRequest,
             tap($this->routes->getByName($name))->bind($this->currentRequest)
         );
