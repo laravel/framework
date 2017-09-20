@@ -188,7 +188,9 @@ trait InteractsWithPivotTable
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
 
-        $updated = $this->newPivotStatementForId($id)->update($attributes);
+        $updated = $this->newPivotStatementForId($id)->update(
+            $this->castAttributes($attributes)
+        );
 
         if ($touch) {
             $this->touchIfTouching();
@@ -258,12 +260,8 @@ trait InteractsWithPivotTable
     {
         list($id, $attributes) = $this->extractAttachIdAndAttributes($key, $value, $attributes);
 
-        $attributes = $this->using
-                ? $this->newPivot()->forceFill($attributes)->getAttributes()
-                : $attributes;
-
         return array_merge(
-            $this->baseAttachRecord($id, $hasTimestamps), $attributes
+            $this->baseAttachRecord($id, $hasTimestamps), $this->castAttributes($attributes)
         );
     }
 
@@ -502,5 +500,18 @@ trait InteractsWithPivotTable
     protected function castKey($key)
     {
         return is_numeric($key) ? (int) $key : (string) $key;
+    }
+
+    /**
+     * Cast the given pivot attributes.
+     *
+     * @param  array $attributes
+     * @return array
+     */
+    protected function castAttributes($attributes)
+    {
+        return $this->using
+                    ? $this->newPivot()->forceFill($attributes)->getAttributes()
+                    : $attributes;
     }
 }
