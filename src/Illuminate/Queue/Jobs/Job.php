@@ -62,6 +62,14 @@ abstract class Job
      */
     abstract public function getRawBody();
 
+
+    /**
+     * Get the job identifier.
+     *
+     * @return string
+     */
+    abstract public function getJobId();
+    
     /**
      * Fire the job.
      *
