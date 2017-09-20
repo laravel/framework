@@ -14,7 +14,6 @@ class VersionValidator implements ValidatorInterface
      * @param  \Illuminate\Http\Request $request
      * @return bool
      */
-
     public function matches(Route $route, Request $request)
     {
         if (empty($route->getVersion()) && ! $request->version()) {
