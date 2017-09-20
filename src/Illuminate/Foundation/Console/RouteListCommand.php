@@ -45,7 +45,7 @@ class RouteListCommand extends Command
      *
      * @var array
      */
-    protected $headers = ['Version','Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Version', 'Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
 
     /**
      * Create a new route command instance.
