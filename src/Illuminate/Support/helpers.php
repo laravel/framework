@@ -723,6 +723,20 @@ if (! function_exists('optional')) {
     }
 }
 
+if (! function_exists('str_placeholder')) {
+    /**
+     * Replace the placeholders in a string.
+     *
+     * @param  string  $value
+     * @param  array   $replace
+     * @return string
+     */
+    function str_placeholder($subject, array $replace)
+    {
+        return Str::placeholder($subject, $replace);
+    }
+}
+
 if (! function_exists('preg_replace_array')) {
     /**
      * Replace a given pattern with each value in the array in sequentially.

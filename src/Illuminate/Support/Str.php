@@ -265,6 +265,23 @@ class Str
     }
 
     /**
+     * Replace the placeholders in a string.
+     *
+     * @param  string  $value
+     * @param  array   $replace
+     * @return string
+     */
+    public static function placeholder($subject, array $replace)
+    {
+        foreach ($replace as $key => $value)
+        {
+            $subject = str_replace($key, $value, $subject);
+        }
+
+        return $subject;
+    }
+
+    /**
      * Get the plural form of an English word.
      *
      * @param  string  $value
