@@ -1,5 +1,20 @@
 # Release Notes for 5.5.x
 
+## v5.5.7 (2017-09-19)
+
+### Fixed
+- Fix `CacheClearCommand` binding ([#21256](https://github.com/laravel/framework/pull/21256))
+
+
+## v5.5.6 (2017-09-19)
+
+### Changed
+- Clear real-time facades when running `cache:clear` ([#21250](https://github.com/laravel/framework/pull/21250), [1856601](https://github.com/laravel/framework/commit/185660178ad213140411ca27550cdaf44c650002))
+
+### Fixed
+- Reverted stable sort support in `Collection::sortBy()` ([#21255](https://github.com/laravel/framework/pull/21255))
+
+
 ## v5.5.5 (2017-09-19)
 
 ### Added

@@ -61,6 +61,30 @@ class EloquentCustomPivotCastTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
+    public function test_casts_are_respected_on_attach_array()
+    {
+        $user = CustomPivotCastTestUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user2 = CustomPivotCastTestUser::forceCreate([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $project = CustomPivotCastTestProject::forceCreate([
+            'name' => 'Test Project',
+        ]);
+
+        $project->collaborators()->attach([
+            $user->id => ['permissions' => ['foo' => 'bar']],
+            $user2->id => ['permissions' => ['baz' => 'bar']],
+        ]);
+        $project = $project->fresh();
+
+        $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+        $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
+    }
+
     public function test_casts_are_respected_on_sync()
     {
         $user = CustomPivotCastTestUser::forceCreate([
@@ -75,6 +99,60 @@ class EloquentCustomPivotCastTest extends TestCase
         $project = $project->fresh();
 
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+    }
+
+    public function test_casts_are_respected_on_sync_array()
+    {
+        $user = CustomPivotCastTestUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user2 = CustomPivotCastTestUser::forceCreate([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $project = CustomPivotCastTestProject::forceCreate([
+            'name' => 'Test Project',
+        ]);
+
+        $project->collaborators()->sync([
+            $user->id => ['permissions' => ['foo' => 'bar']],
+            $user2->id => ['permissions' => ['baz' => 'bar']],
+        ]);
+        $project = $project->fresh();
+
+        $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
+        $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
+    }
+
+    public function test_casts_are_respected_on_sync_array_while_updating_existing()
+    {
+        $user = CustomPivotCastTestUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $user2 = CustomPivotCastTestUser::forceCreate([
+            'email' => 'mohamed@laravel.com',
+        ]);
+
+        $project = CustomPivotCastTestProject::forceCreate([
+            'name' => 'Test Project',
+        ]);
+
+        $project->collaborators()->attach([
+            $user->id => ['permissions' => ['foo' => 'bar']],
+            $user2->id => ['permissions' => ['baz' => 'bar']],
+        ]);
+
+        $project->collaborators()->sync([
+            $user->id => ['permissions' => ['foo1' => 'bar1']],
+            $user2->id => ['permissions' => ['baz2' => 'bar2']],
+        ]);
+
+        $project = $project->fresh();
+
+        $this->assertEquals(['foo1' => 'bar1'], $project->collaborators[0]->pivot->permissions);
+        $this->assertEquals(['baz2' => 'bar2'], $project->collaborators[1]->pivot->permissions);
     }
 }
 

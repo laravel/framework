@@ -49,16 +49,36 @@ class FallbackRouteTest extends TestCase
             return response('fallback', 404);
         });
 
+        Route::get('one', function () {
+            return 'one';
+        });
+
         Route::get('{any}', function () {
             return 'wildcard';
         })->where('any', '.*');
 
+        $this->assertContains('one', $this->get('/one')->getContent());
+        $this->assertContains('wildcard', $this->get('/non-existing')->getContent());
+        $this->assertEquals(200, $this->get('/non-existing')->getStatusCode());
+    }
+
+    public function test_no_routes()
+    {
+        Route::fallback(function () {
+            return response('fallback', 404);
+        });
+
+        $this->assertContains('fallback', $this->get('/non-existing')->getContent());
+        $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
+    }
+
+    public function test_no_fallbacks()
+    {
         Route::get('one', function () {
             return 'one';
         });
 
         $this->assertContains('one', $this->get('/one')->getContent());
-        $this->assertContains('wildcard', $this->get('/non-existing')->getContent());
-        $this->assertEquals(200, $this->get('/non-existing')->getStatusCode());
+        $this->assertEquals(200, $this->get('/one')->getStatusCode());
     }
 }
