@@ -28,6 +28,21 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
     }
 
+    public function testDeleteSetsSoftDeletedWithUpdatedAtColumnIsNull()
+    {
+
+        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub');
+        $model->shouldDeferMissing();
+        $model->shouldReceive('newQueryWithoutScopes')->andReturn($query = m::mock('stdClass'));
+        $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
+        $query->shouldReceive('update')->once()->with([
+            'deleted_at' => 'date-time',
+        ]);
+        $model->delete();
+
+        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
+    }
+
     public function testRestore()
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
@@ -58,6 +73,61 @@ class DatabaseSoftDeletingTraitStub
     public $deleted_at;
     public $updated_at;
     public $timestamps = true;
+
+    public function newQuery()
+    {
+        //
+    }
+
+    public function getKey()
+    {
+        return 1;
+    }
+
+    public function getKeyName()
+    {
+        return 'id';
+    }
+
+    public function save()
+    {
+        //
+    }
+
+    public function delete()
+    {
+        return $this->performDeleteOnModel();
+    }
+
+    public function fireModelEvent()
+    {
+        //
+    }
+
+    public function freshTimestamp()
+    {
+        return \Illuminate\Support\Carbon::now();
+    }
+
+    public function fromDateTime()
+    {
+        return 'date-time';
+    }
+
+    public function getUpdatedAtColumn()
+    {
+        return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
+    }
+}
+
+class DatabaseSoftDeletingWithUpdatedAtIsNullTraitStub
+{
+    use \Illuminate\Database\Eloquent\SoftDeletes;
+    public $deleted_at;
+    public $updated_at;
+    public $timestamps = true;
+
+    const UPDATED_AT = null;
 
     public function newQuery()
     {
