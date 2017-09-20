@@ -948,7 +948,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     
     /**
      * Merge the collection with the result of a flat map.
-     
+     *
      * @param callable $callback
      * @return static
      */
