@@ -59,7 +59,7 @@ abstract class Grammar
         // the pieces so we can wrap each of the segments of the expression on it
         // own, and then joins them both back together with the "as" connector.
         if (strpos(strtolower($value), ' as ') !== false) {
-            return $this->wrapAliasedValue($value, $prefixAlias, $hasDatabaseName = false);
+            return $this->wrapAliasedValue($value, $prefixAlias, $hasDatabaseName);
         }
 
         return $this->wrapSegments(explode('.', $value), $hasDatabaseName);
