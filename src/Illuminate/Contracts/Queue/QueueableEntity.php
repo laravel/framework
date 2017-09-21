@@ -17,4 +17,11 @@ interface QueueableEntity
      * @return string|null
      */
     public function getQueueableConnection();
+
+    /**
+     * Get the relationships for the entity.
+     *
+     * @return array
+     */
+    public function getQueueableRelations();
 }
