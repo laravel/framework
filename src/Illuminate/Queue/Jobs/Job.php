@@ -56,18 +56,18 @@ abstract class Job
     protected $queue;
 
     /**
-     * Get the raw body of the job.
-     *
-     * @return string
-     */
-    abstract public function getRawBody();
-
-    /**
      * Get the job identifier.
      *
      * @return string
      */
     abstract public function getJobId();
+
+    /**
+     * Get the raw body of the job.
+     *
+     * @return string
+     */
+    abstract public function getRawBody();
 
     /**
      * Fire the job.
