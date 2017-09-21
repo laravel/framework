@@ -24,6 +24,7 @@ class Pluralizer
         'equipment',
         'evidence',
         'feedback',
+        'firmware',
         'fish',
         'furniture',
         'gold',
