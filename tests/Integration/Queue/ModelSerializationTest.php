@@ -154,7 +154,7 @@ class ModelSerializationTest extends TestCase
         Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
         Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
 
-        $order->load('lines');
+        $order->load('line', 'lines');
 
         $serialized = serialize(new ModelRelationSerializationTestClass($order));
         $unSerialized = unserialize($serialized);
@@ -175,7 +175,7 @@ class ModelSerializationTest extends TestCase
         Line::create(['order_id' => $order->id, 'product_id' => $product1->id]);
         Line::create(['order_id' => $order->id, 'product_id' => $product2->id]);
 
-        $order->load('lines', 'lines.product');
+        $order->load('line.product', 'lines', 'lines.product');
 
         $nestedSerialized = serialize(new ModelRelationSerializationTestClass($order));
         $nestedUnSerialized = unserialize($nestedSerialized);
@@ -195,6 +195,11 @@ class Order extends Model
 {
     public $guarded = ['id'];
     public $timestamps = false;
+
+    public function line()
+    {
+        return $this->hasOne(Line::class);
+    }
 
     public function lines()
     {

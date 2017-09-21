@@ -21,8 +21,8 @@ trait SerializesAndRestoresModelIdentifiers
             return new ModelIdentifier(
                 $value->getQueueableClass(),
                 $value->getQueueableIds(),
-                $value->getQueueableConnection(),
-                $value->getQueueableRelations()
+                $value->getQueueableRelations(),
+                $value->getQueueableConnection()
             );
         }
 
@@ -30,8 +30,8 @@ trait SerializesAndRestoresModelIdentifiers
             return new ModelIdentifier(
                 get_class($value),
                 $value->getQueueableId(),
-                $value->getQueueableConnection(),
-                $value->getQueueableRelations()
+                $value->getQueueableRelations(),
+                $value->getQueueableConnection()
             );
         }
 
@@ -79,7 +79,8 @@ trait SerializesAndRestoresModelIdentifiers
      */
     public function restoreModel($value)
     {
-        $model = $this->getQueryForModelRestoration((new $value->class)->setConnection($value->connection))
+        $model = $this->getQueryForModelRestoration((new $value->class)
+                      ->setConnection($value->connection))
                       ->useWritePdo()->findOrFail($value->id);
 
         return $model->load($value->relations);

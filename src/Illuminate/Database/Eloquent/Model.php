@@ -1238,16 +1238,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Get the queueable connection for the entity.
-     *
-     * @return mixed
-     */
-    public function getQueueableConnection()
-    {
-        return $this->getConnectionName();
-    }
-
-    /**
      * Get the queueable relationships for the entity.
      *
      * @return array
@@ -1272,7 +1262,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             }
         }
 
-        return $relations;
+        return array_unique($relations);
+    }
+
+    /**
+     * Get the queueable connection for the entity.
+     *
+     * @return mixed
+     */
+    public function getQueueableConnection()
+    {
+        return $this->getConnectionName();
     }
 
     /**
