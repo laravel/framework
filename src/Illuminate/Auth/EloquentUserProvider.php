@@ -61,8 +61,8 @@ class EloquentUserProvider implements UserProvider
     public function retrieveByToken($identifier, $token)
     {
         $model = $this->createModel();
-        
-        $model = $this->createModel()->newQuery()
+
+        $model = $model->newQuery()
             ->where($model->getAuthIdentifierName(), $identifier)
             ->first();
 
