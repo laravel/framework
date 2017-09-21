@@ -1,5 +1,23 @@
 # Release Notes for 5.5.x
 
+## v5.5.10 (2017-09-21)
+
+### Added
+- Added `Route::respondWithRoute($name)` method ([#21299](https://github.com/laravel/framework/pull/21299), [66c5e46](https://github.com/laravel/framework/commit/66c5e462dbdb9d0c9d23114da3a3dc1b6e9fa0a1))
+- Added `$strict` parameter to `TestResponse::assertJson()` ([#21301](https://github.com/laravel/framework/pull/21301))
+
+### Changed
+- Added "firmware" as an uncountable word ([#21306](https://github.com/laravel/framework/pull/21306))
+- Allow `MorphTo::associate()` accept `null` ([#21318](https://github.com/laravel/framework/pull/21318))
+- Changed `__()` signature to match `Translation::trans()` ([10c013c](https://github.com/laravel/framework/commit/10c013c564b7e518640e42e97d9178f9e05ec7d9))
+
+### Fixed
+- Add missing `driver` parameter to doctrine connection ([#21297](https://github.com/laravel/framework/pull/21297))
+
+### Security
+- Perform constant-time token comparison in `DatabaseUserProvider` ([#21320](https://github.com/laravel/framework/pull/21320))
+
+
 ## v5.5.9 (2017-09-20)
 
 ### Changed
