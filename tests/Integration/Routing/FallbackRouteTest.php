@@ -72,6 +72,20 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
+    public function test_respond_with_named_fallback_route()
+    {
+        Route::fallback(function () {
+            return response('fallback', 404);
+        })->name('testFallbackRoute');
+
+        Route::get('one', function () {
+            return Route::respondWith('testFallbackRoute');
+        });
+
+        $this->assertContains('fallback', $this->get('/non-existing')->getContent());
+        $this->assertContains('fallback', $this->get('/one')->getContent());
+    }
+
     public function test_no_fallbacks()
     {
         Route::get('one', function () {
