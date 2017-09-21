@@ -43,6 +43,13 @@ class Route
     public $action;
 
     /**
+     * Indicates whether the route is a fallback route.
+     *
+     * @var bool
+     */
+    public $isFallback = false;
+
+    /**
      * The controller instance.
      *
      * @var mixed
@@ -480,6 +487,18 @@ class Route
         foreach ($wheres as $name => $expression) {
             $this->where($name, $expression);
         }
+
+        return $this;
+    }
+
+    /**
+     * Mark this route as a fallback route.
+     *
+     * @return $this
+     */
+    public function fallback()
+    {
+        $this->isFallback = true;
 
         return $this;
     }

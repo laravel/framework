@@ -1,18 +1,87 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.9 (2017-09-20)
+
+### Changed
+- Perform stable sort in `Collection::sortBy()` (2nd attempt) ([#21270](https://github.com/laravel/framework/pull/21270))
+- Return empty string if database session key is expired ([#21277](https://github.com/laravel/framework/pull/21277))
+
+### Fixed
+- Fixed setting `Model::UPDATED_AT` in `SoftDeletes` ([#21286](https://github.com/laravel/framework/pull/21286))
+- Apply custom pivot model attribute casting on arrays ([#21275](https://github.com/laravel/framework/pull/21275))
+
+
+## v5.5.8 (2017-09-20)
+
+### Fixed
+- Fixed issue with routes sorting ([#21261](https://github.com/laravel/framework/pull/21261))
+
+
+## v5.5.7 (2017-09-19)
+
+### Fixed
+- Fix `CacheClearCommand` binding ([#21256](https://github.com/laravel/framework/pull/21256))
+
+
+## v5.5.6 (2017-09-19)
+
+### Changed
+- Clear real-time facades when running `cache:clear` ([#21250](https://github.com/laravel/framework/pull/21250), [1856601](https://github.com/laravel/framework/commit/185660178ad213140411ca27550cdaf44c650002))
+
+### Fixed
+- Reverted stable sort support in `Collection::sortBy()` ([#21255](https://github.com/laravel/framework/pull/21255))
+
+
+## v5.5.5 (2017-09-19)
+
+### Added
+- Added `:input` placeholder in validation error messages ([#21175](https://github.com/laravel/framework/pull/21175))
+- Added `@includeFirst` Blade directive ([#21172](https://github.com/laravel/framework/pull/21172))
+- Allow setting column styles for tables in Artisan commands ([#21169](https://github.com/laravel/framework/pull/21169))
+- Added `ValidatesRequests::extractInputFromRules()` method ([#21192](https://github.com/laravel/framework/pull/21192))
+- Added `-m` shortcut to `make:factory` ([#21219](https://github.com/laravel/framework/pull/21219))
+- Added ability to set a fallback (catch-all) route ([#21234](https://github.com/laravel/framework/pull/21234))
+
+### Changed
+- Support `null` on `Model::UPDATED_AT` ([#21178](https://github.com/laravel/framework/pull/21178))
+- Render views from config while building error views ([#21145](https://github.com/laravel/framework/pull/21145))
+- Use multibyte functions in some `Str` methods ([#21207](https://github.com/laravel/framework/pull/21207))
+- Perform stable sort in `Collection::sortBy()` ([#21214](https://github.com/laravel/framework/pull/21214))
+
+### Fixed
+- Ignore `SELECT` bindings in `prepareBindingsForUpdate()` ([#21173](https://github.com/laravel/framework/pull/21173))
+- Fixed `remember` check in `AuthenticatesUsers::attemptLogin()` ([#21221](https://github.com/laravel/framework/pull/21221))
+- Added "hardware" as an uncountable word ([#21236](https://github.com/laravel/framework/pull/21236))
+
+
+## v5.5.4 (2017-09-13)
 
 ### Added
 - Added `Blueprint::spatialIndex()` method ([#21070](https://github.com/laravel/framework/pull/21070))
 - Added support for SQL Server's `TransactionIsolation` DSN key ([#21069](https://github.com/laravel/framework/pull/21069))
 - Added `ManagesFrequencies::everyFifteenMinutes()` method ([#21092](https://github.com/laravel/framework/pull/21092))
+- Added `Mailable::hasReplyTo()` method ([#21093](https://github.com/laravel/framework/pull/21093))
+- Added `MailMessage::template()` method ([#21154](https://github.com/laravel/framework/pull/21154))
+- Added support for Rackspace to `Storage::url()` ([#21157](https://github.com/laravel/framework/pull/21157))
+- Added support to use sub-queries as a where condition on a join clause ([#21008](https://github.com/laravel/framework/pull/21008))
 
 ### Changed
 - Return `null` from `Route::getAction()` if `$key` is not found ([#21083](https://github.com/laravel/framework/pull/21083))
+- Restore non-static signature of `Router::prepareResponse()` ([#21114](https://github.com/laravel/framework/pull/21114), [e1a1265](https://github.com/laravel/framework/commit/e1a1265b6cd19c1597faafd4af409b913298c782))
+- Removed `Model` type hint from `Model::isNot()` ([4d8f0a1](https://github.com/laravel/framework/commit/4d8f0a1a72fe9ea915570df2ef58cbafd43ec96a))
+- Prefer `Jsonable` over `Arrayable` in `JsonResponse::setData()` ([#21136](https://github.com/laravel/framework/pull/21136))
+- Reset `cc` and `bcc` in `Mailer::setGlobalTo()` ([#21137](https://github.com/laravel/framework/pull/21137))
+- Avoid trace `args` in JSON exceptions ([#21149](https://github.com/laravel/framework/pull/21149))
 
 ### Fixed
 - Fixed `@json` directive parameter logic ([2a25ee7](https://github.com/laravel/framework/commit/2a25ee7f2f2d5e2cbc1397cc24abbb2838a9b439))
 - Fixed a problem with `withoutExceptionHandling()` when called more than once ([#21086](https://github.com/laravel/framework/pull/21086))
+- Added a `compileForeign()` method to `PostgresGrammar` ([#21038](https://github.com/laravel/framework/pull/21038))
+- Reset the index after a `MissingValue` while resolving resource ([#21127](https://github.com/laravel/framework/pull/21127))
+- Fixed `getQualifiedParentKey()` on `BelongsToMany` relationships ([#21128](https://github.com/laravel/framework/pull/21128))
+- Fixed parameters on `Route::view()` when using `where()` ([#21113](https://github.com/laravel/framework/pull/21113))
+- Show real directory name in the exception message thrown by `PackageManifest` ([#21099](https://github.com/laravel/framework/pull/21099))
+- Fixed undefined offset error when refreshing a database collection ([#21159](https://github.com/laravel/framework/pull/21159))
 
 
 ## v5.5.3 (2017-09-07)

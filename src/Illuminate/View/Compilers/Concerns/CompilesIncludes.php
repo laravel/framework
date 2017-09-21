@@ -53,4 +53,17 @@ trait CompilesIncludes
 
         return "<?php echo \$__env->renderWhen($expression, array_except(get_defined_vars(), array('__data', '__path'))); ?>";
     }
+
+    /**
+     * Compile the include-first statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileIncludeFirst($expression)
+    {
+        $expression = $this->stripParentheses($expression);
+
+        return "<?php echo \$__env->first({$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+    }
 }

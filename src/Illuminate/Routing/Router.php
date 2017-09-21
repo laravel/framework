@@ -213,6 +213,21 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register a new Fallback route with the router.
+     *
+     * @param  \Closure|array|string|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function fallback($action)
+    {
+        $placeholder = 'fallbackPlaceholder';
+
+        return $this->addRoute(
+            'GET', "{{$placeholder}}", $action
+        )->where($placeholder, '.*')->fallback();
+    }
+
+    /**
      * Create a redirect from one URI to another.
      *
      * @param string  $uri
@@ -537,6 +552,19 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Return the response returned by the given route.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function respondWithRoute($name)
+    {
+        $route = tap($this->routes->getByName($name))->bind($this->currentRequest);
+
+        return $this->runRoute($this->currentRequest, $route);
+    }
+
+    /**
      * Dispatch the request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -557,20 +585,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function dispatchToRoute(Request $request)
     {
-        // First we will find a route that matches this request. We will also set the
-        // route resolver on the request so middlewares assigned to the route will
-        // receive access to this route instance for checking of the parameters.
-        $route = $this->findRoute($request);
-
-        $request->setRouteResolver(function () use ($route) {
-            return $route;
-        });
-
-        $this->events->dispatch(new Events\RouteMatched($route, $request));
-
-        $response = $this->runRouteWithinStack($route, $request);
-
-        return $this->prepareResponse($request, $response);
+        return $this->runRoute($request, $this->findRoute($request));
     }
 
     /**
@@ -586,6 +601,26 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->container->instance(Route::class, $route);
 
         return $route;
+    }
+
+    /**
+     * Return the response for the given route.
+     *
+     * @param  Route  $route
+     * @param  Request  $request
+     * @return mixed
+     */
+    protected function runRoute(Request $request, Route $route)
+    {
+        $request->setRouteResolver(function () use ($route) {
+            return $route;
+        });
+
+        $this->events->dispatch(new Events\RouteMatched($route, $request));
+
+        return $this->prepareResponse($request,
+            $this->runRouteWithinStack($route, $request)
+        );
     }
 
     /**
