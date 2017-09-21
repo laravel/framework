@@ -19,6 +19,7 @@
         "ext-mbstring": "*",
         "ext-openssl": "*",
         "doctrine/inflector": "~1.1",
+        "doctrine/instantiator": "~1.0|~1.1",
         "erusev/parsedown": "~1.6",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.12",
