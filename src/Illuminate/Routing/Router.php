@@ -552,6 +552,19 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Return the response returned by the given route.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function respondWithRoute($name)
+    {
+        $route = tap($this->routes->getByName($name))->bind($this->currentRequest);
+
+        return $this->runRoute($this->currentRequest, $route);
+    }
+
+    /**
      * Dispatch the request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -572,7 +585,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function dispatchToRoute(Request $request)
     {
-        return $this->buildResponse($request, $this->findRoute($request));
+        return $this->runRoute($request, $this->findRoute($request));
     }
 
     /**
@@ -597,7 +610,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  Request  $request
      * @return mixed
      */
-    protected function buildResponse(Request $request, Route $route)
+    protected function runRoute(Request $request, Route $route)
     {
         $request->setRouteResolver(function () use ($route) {
             return $route;
@@ -1107,19 +1120,6 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
         $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
         $this->post('password/reset', 'Auth\ResetPasswordController@reset');
-    }
-
-    /**
-     * Return a response out of the given route.
-     *
-     * @param  string  $name
-     * @return mixed
-     */
-    public function respondWith($name)
-    {
-        return $this->buildResponse($this->currentRequest,
-            tap($this->routes->getByName($name))->bind($this->currentRequest)
-        );
     }
 
     /**

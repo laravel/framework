@@ -79,7 +79,7 @@ class FallbackRouteTest extends TestCase
         })->name('testFallbackRoute');
 
         Route::get('one', function () {
-            return Route::respondWith('testFallbackRoute');
+            return Route::respondWithRoute('testFallbackRoute');
         });
 
         $this->assertContains('fallback', $this->get('/non-existing')->getContent());
