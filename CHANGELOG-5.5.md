@@ -1,5 +1,11 @@
 # Release Notes for 5.5.x
 
+## v5.5.11 (2017-09-21)
+
+### Fixed
+- Fixed bug in `EloquentUserProvider` introduced in [#21320](https://github.com/laravel/framework/pull/21320) ([#21323](https://github.com/laravel/framework/pull/21323))
+
+
 ## v5.5.10 (2017-09-21)
 
 ### Added
