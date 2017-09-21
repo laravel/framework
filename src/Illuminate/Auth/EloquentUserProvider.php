@@ -60,12 +60,11 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByToken($identifier, $token)
     {
-        $model = $this->createModel();
-
-        return $model->newQuery()
+        $model = $this->createModel()->newQuery()
             ->where($model->getAuthIdentifierName(), $identifier)
-            ->where($model->getRememberTokenName(), $token)
             ->first();
+
+        return $model && hash_equals($model->getRememberToken(), $token) ? $model : null;
     }
 
     /**
