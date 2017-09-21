@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Validation;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\ValidationException;
@@ -25,9 +26,7 @@ trait ValidatesRequests
 
         $validator->validate();
 
-        return $request->only(collect($validator->getRules())->keys()->map(function ($rule) {
-            return str_contains($rule, '.') ? explode('.', $rule)[0] : $rule;
-        })->unique()->toArray());
+        return $this->extractInputFromRules($request, $validator->getRules());
     }
 
     /**
@@ -46,8 +45,20 @@ trait ValidatesRequests
              ->make($request->all(), $rules, $messages, $customAttributes)
              ->validate();
 
+        return $this->extractInputFromRules($request, $rules);
+    }
+
+    /**
+     * Get the request input based on the given validation rules.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @return array
+     */
+    protected function extractInputFromRules(Request $request, array $rules)
+    {
         return $request->only(collect($rules)->keys()->map(function ($rule) {
-            return str_contains($rule, '.') ? explode('.', $rule)[0] : $rule;
+            return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
         })->unique()->toArray());
     }
 

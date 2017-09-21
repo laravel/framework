@@ -257,7 +257,7 @@ class Builder
         if ($query instanceof Closure) {
             $callback = $query;
 
-            $callback($query = $this->newQuery());
+            $callback($query = $this->forSubQuery());
         }
 
         // Here, we will parse this query into an SQL string and an array of bindings
@@ -820,7 +820,7 @@ class Builder
         // To create the exists sub-select, we will actually create a query and call the
         // provided callback with the query so the developer may set any of the query
         // conditions they want for the in clause, then we'll put it in this array.
-        call_user_func($callback, $query = $this->newQuery());
+        call_user_func($callback, $query = $this->forSubQuery());
 
         $this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
@@ -1148,7 +1148,7 @@ class Builder
         // Once we have the query instance we can simply execute it so it can add all
         // of the sub-select's conditions to itself, and then we can cache it off
         // in the array of where clauses for the "main" parent query instance.
-        call_user_func($callback, $query = $this->newQuery());
+        call_user_func($callback, $query = $this->forSubQuery());
 
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'query', 'boolean'
@@ -1169,7 +1169,7 @@ class Builder
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
-        $query = $this->newQuery();
+        $query = $this->forSubQuery();
 
         // Similar to the sub-select clause, we will create a new query instance so
         // the developer may cleanly specify the entire exists query and we will
@@ -2251,6 +2251,16 @@ class Builder
     }
 
     /**
+     * Create a new query instance for a sub-query.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function forSubQuery()
+    {
+        return $this->newQuery();
+    }
+
+    /**
      * Create a raw database expression.
      *
      * @param  mixed  $value
@@ -2396,13 +2406,13 @@ class Builder
     /**
      * Clone the query without the given properties.
      *
-     * @param  array  $except
+     * @param  array  $properties
      * @return static
      */
-    public function cloneWithout(array $except)
+    public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($except) {
-            foreach ($except as $property) {
+        return tap(clone $this, function ($clone) use ($properties) {
+            foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
         });
