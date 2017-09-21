@@ -72,7 +72,7 @@ class DatabaseUserProvider implements UserProvider
                         ->where('id', $identifier)
                         ->first();
 
-        return hash_equals($user->remember_token, $token) ? $this->getGenericUser($user) : null;
+        return $user && hash_equals($user->remember_token, $token) ? $this->getGenericUser($user) : null;
     }
 
     /**
