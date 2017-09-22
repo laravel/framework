@@ -282,10 +282,10 @@ if (! function_exists('array_sort')) {
      * Sort the array by the given callback or attribute name.
      *
      * @param  array  $array
-     * @param  callable|string  $callback
+     * @param  callable|string|null  $callback
      * @return array
      */
-    function array_sort($array, $callback)
+    function array_sort($array, $callback = null)
     {
         return Arr::sort($array, $callback);
     }
