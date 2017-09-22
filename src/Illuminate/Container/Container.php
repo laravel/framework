@@ -161,6 +161,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function has($id)
     {
+        if ($this->bound($id) || $this->resolved($id)) {
+            return true;
+        }
+
         try {
             $this->resolve($id);
 
