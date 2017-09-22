@@ -993,6 +993,18 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->get('Taylor');
     }
+
+    public function testContainerKnowsAutowiredObjects()
+    {
+        $container = new Container;
+        $this->assertTrue($container->has(ContainerConcreteStub::class));
+    }
+
+    public function testUnknownEntry()
+    {
+        $container = new Container;
+        $this->assertFalse($container->has('Laravel'));
+    }
 }
 
 class ContainerConcreteStub
