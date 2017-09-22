@@ -1,5 +1,13 @@
 # Release Notes for 5.5.x
 
+## v5.5.12 (2017-09-22)
+
+### Added
+- Added "software" as an uncountable word ([#21324](https://github.com/laravel/framework/pull/21324))
+
+### Fixed
+- Fixed null remember token error on EloquentUserProvider ([#21328](https://github.com/laravel/framework/pull/21328))
+
 ## v5.5.11 (2017-09-21)
 
 ### Fixed
