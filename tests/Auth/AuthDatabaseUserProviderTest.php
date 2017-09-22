@@ -52,7 +52,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveByToken(1, 'a');
 
-        $this->assertEquals(new GenericUser((array )$mockUser), $user);
+        $this->assertEquals(new GenericUser((array) $mockUser), $user);
     }
 
     public function testRetrieveByBadTokenReturnsNull()
