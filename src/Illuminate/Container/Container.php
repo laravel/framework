@@ -160,7 +160,35 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function has($id)
     {
-        return $this->bound($id);
+        return $this->bound($id) || $this->isResolvable($id);
+    }
+
+    /**
+     * Determine if a given class exist and can be instantiated.
+     *
+     * @param  string  $concrete
+     * @return bool
+     */
+    protected function isResolvable($concrete)
+    {
+        if (! class_exists($concrete) && ! interface_exists($concrete)) {
+            return false;
+        }
+
+        return $this->isInstantiable($concrete);
+    }
+
+    /**
+     * Determine if the given abstract is instantiable.
+     *
+     * @param  string  $concrete
+     * @return bool
+     */
+    protected function isInstantiable($concrete)
+    {
+        $reflector = new ReflectionClass($concrete);
+
+        return $reflector->isInstantiable();
     }
 
     /**
@@ -749,16 +777,16 @@ class Container implements ArrayAccess, ContainerContract
             return $concrete($this, $this->getLastParameterOverride());
         }
 
-        $reflector = new ReflectionClass($concrete);
-
         // If the type is not instantiable, the developer is attempting to resolve
         // an abstract type such as an Interface of Abstract Class and there is
         // no binding registered for the abstractions so we need to bail out.
-        if (! $reflector->isInstantiable()) {
+        if (! $this->isInstantiable($concrete)) {
             return $this->notInstantiable($concrete);
         }
 
         $this->buildStack[] = $concrete;
+
+        $reflector = new ReflectionClass($concrete);
 
         $constructor = $reflector->getConstructor();
 
