@@ -182,7 +182,7 @@ class Container implements ArrayAccess, ContainerContract
      * Determine if the given abstract is instantiable.
      *
      * @param  string  $concrete
-     * @return bool    
+     * @return bool
      */
     protected function isInstantiable($concrete)
     {
