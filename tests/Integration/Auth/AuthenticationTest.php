@@ -198,7 +198,7 @@ class AuthenticationTest extends TestCase
         $this->assertEquals($user->id, $provider->retrieveByToken($user->id, $token)->id);
 
         $user->update([
-            'remember_token' => null
+            'remember_token' => null,
         ]);
 
         $this->assertNull($provider->retrieveByToken($user->id, $token));
