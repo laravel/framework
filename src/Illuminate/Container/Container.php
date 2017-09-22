@@ -164,14 +164,14 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Determine if a given class exist and can be instantiated
+     * Determine if a given class exist and can be instantiated.
      * 
      * @param  string  $concrete
-     * @return boolean     
+     * @return bool
      */
     protected function isResolvable($concrete)
     {
-        if(! class_exists($concrete) && ! interface_exists($concrete)) {
+        if (! class_exists($concrete) && ! interface_exists($concrete)) {
             return false;
         }
 
@@ -179,7 +179,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Determine if the given abstract is instantiable
+     * Determine if the given abstract is instantiable.
      * 
      * @param  string  $concrete
      * @return bool           
