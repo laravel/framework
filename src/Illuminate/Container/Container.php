@@ -6,6 +6,7 @@ use Closure;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -160,7 +161,17 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function has($id)
     {
-        return $this->bound($id);
+        if ($this->bound($id) || $this->resolved($id)) {
+            return true;
+        }
+
+        try {
+            $this->resolve($id);
+
+            return true;
+        } catch (ReflectionException $e) {
+            return false;
+        }
     }
 
     /**
