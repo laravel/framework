@@ -6,7 +6,8 @@
 - Added "software" as an uncountable word ([#21324](https://github.com/laravel/framework/pull/21324))
 
 ### Fixed
-- Fixed null remember token error on EloquentUserProvider ([#21328](https://github.com/laravel/framework/pull/21328))
+- Don't compare remember token if it's `null` ([#21328](https://github.com/laravel/framework/pull/21328))
+
 
 ## v5.5.11 (2017-09-21)
 
