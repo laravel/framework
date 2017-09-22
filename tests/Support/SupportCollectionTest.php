@@ -1804,13 +1804,13 @@ class SupportCollectionTest extends TestCase
 
     public function testPadPadsArrayWithValue()
     {
-        $c = new Collection([1,2,3]);
+        $c = new Collection([1, 2, 3]);
         $c = $c->pad(4, 0);
-        $this->assertEquals([1,2,3,0], $c->all());
+        $this->assertEquals([1, 2, 3, 0], $c->all());
 
-        $c = new Collection([1,2,3,4,5]);
+        $c = new Collection([1, 2, 3, 4, 5]);
         $c = $c->pad(4, 0);
-        $this->assertEquals([1,2,3,4,5], $c->all());
+        $this->assertEquals([1, 2, 3, 4, 5], $c->all());
     }
 
     public function testGettingMaxItemsFromCollection()
