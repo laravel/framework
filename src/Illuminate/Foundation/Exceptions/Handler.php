@@ -365,6 +365,12 @@ class Handler implements ExceptionHandlerContract
 
             $handler->handleUnconditionally(true);
 
+            foreach (config('whoops.blacklist', []) as $key => $secrets) {
+                foreach ($secrets as $secret) {
+                    $handler->blacklist($key, $secret);
+                }
+            }
+
             $handler->setApplicationPaths(
                 array_flip(Arr::except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]
