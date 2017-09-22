@@ -6,8 +6,8 @@ use Closure;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
-use ReflectionParameter;
 use ReflectionException;
+use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
