@@ -22,6 +22,8 @@ namespace Illuminate\Support\Facades;
  * @method \Illuminate\Support\Facades\Route name(string $value)
  * @method \Illuminate\Support\Facades\Route namespace(string $value)
  * @method \Illuminate\Routing\Route group(string $value)
+ * @method \Illuminate\Support\Facades\Route redirect(string $uri, string $destination, int $status = 301)
+ * @method \Illuminate\Support\Facades\Route view(string $uri, string $view, array $data = [])
  *
  * @see \Illuminate\Routing\Router
  */
