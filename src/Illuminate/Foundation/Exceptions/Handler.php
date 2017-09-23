@@ -365,7 +365,7 @@ class Handler implements ExceptionHandlerContract
 
             $handler->handleUnconditionally(true);
 
-            foreach (config('whoops.blacklist', []) as $key => $secrets) {
+            foreach (config('app.debug_blacklist', []) as $key => $secrets) {
                 foreach ($secrets as $secret) {
                     $handler->blacklist($key, $secret);
                 }
