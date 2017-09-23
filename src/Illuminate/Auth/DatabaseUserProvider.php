@@ -70,7 +70,9 @@ class DatabaseUserProvider implements UserProvider
     {
         $user = $this->conn->table($this->table)->find($identifier);
 
-        return $user && hash_equals($user->remember_token, $token)
+        $rememberToken = $user->remember_token;
+
+        return $user && $rememberToken && hash_equals($rememberToken, $token)
                     ? $this->getGenericUser($user) : null;
     }
 
