@@ -1545,11 +1545,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Pad collection to the specified length with a value.
      *
-     * e.g. new Collection([1, 2, 3])->pad(5,0);
-     *      => [1, 2, 3, 0, 0]
-     *
      * @param  int  $size
-     * @param  mixed $value
+     * @param  mixed  $value
      * @return static
      */
     public function pad($size, $value)
