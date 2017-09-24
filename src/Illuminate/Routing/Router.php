@@ -78,6 +78,11 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected $middlewareGroups = [];
 
+    /**
+     * The current middlewares to be added to the routes.
+     *
+     * @var array
+     */
     protected $currentMiddlewares = [];
 
     /**
@@ -410,9 +415,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function addRoute($methods, $uri, $action)
     {
-        return tap($this->routes->add($this->createRoute($methods, $uri, $action)), function($route) {
-            $route->middleware(Arr::flatten($this->currentMiddlewares));    
-        });
+        return $this->routes->add($this->createRoute($methods, $uri, $action));
     }
 
     /**
@@ -442,6 +445,8 @@ class Router implements RegistrarContract, BindingRegistrar
         if ($this->hasGroupStack()) {
             $this->mergeGroupAttributesIntoRoute($route);
         }
+
+        $this->addCurrentMiddlewaresToRoute($route);
 
         $this->addWhereClausesToRoute($route);
 
@@ -554,6 +559,17 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function mergeGroupAttributesIntoRoute($route)
     {
         $route->setAction($this->mergeWithLastGroup($route->getAction()));
+    }
+
+    /**
+     * Add the current middlewares to the newly created route.
+     *
+     * @param \Illuminate\Routing\Route $route
+     * @return void
+     */
+    protected function addCurrentMiddlewaresToRoute($route)
+    {
+        $route->middleware(Arr::flatten($this->currentMiddlewares));
     }
 
     /**
@@ -775,18 +791,25 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->events->listen(Events\RouteMatched::class, $callback);
     }
 
+    /**
+     * Adds one or many middlewares to be added to the next routes.
+     *
+     * @param  array|string $middleware
+     * @return void
+     */
     public function startMiddleware($middleware)
     {
         $this->currentMiddlewares[] = $middleware;
-
-        return $this;
     }
 
+    /**
+     * Removes the latest added middleware.
+     *
+     * @return void
+     */
     public function stopMiddleware()
     {
         array_pop($this->currentMiddlewares);
-
-        return $this;
     }
 
     /**
