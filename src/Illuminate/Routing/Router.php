@@ -2,23 +2,24 @@
 
 namespace Illuminate\Routing;
 
-use Closure;
 use ArrayObject;
-use JsonSerializable;
-use Illuminate\Support\Str;
+use Closure;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Routing\BindingRegistrar;
+use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Container\Container;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Contracts\Routing\BindingRegistrar;
+use JsonSerializable;
 use Psr\Http\Message\ResponseInterface as PsrResponseInterface;
-use Illuminate\Contracts\Routing\Registrar as RegistrarContract;
 use Symfony\Bridge\PsrHttpMessage\Factory\HttpFoundationFactory;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
@@ -76,6 +77,8 @@ class Router implements RegistrarContract, BindingRegistrar
      * @var array
      */
     protected $middlewareGroups = [];
+
+    protected $currentMiddlewares = [];
 
     /**
      * The priority-sorted list of middleware.
@@ -407,7 +410,11 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function addRoute($methods, $uri, $action)
     {
-        return $this->routes->add($this->createRoute($methods, $uri, $action));
+        return tap($this->routes->add($this->createRoute($methods, $uri, $action)), function($route) {
+            if(! empty($this->currentMiddlewares)) {
+                $route->middleware(Arr::flatten($this->currentMiddlewares));
+            }
+        });
     }
 
     /**
@@ -768,6 +775,20 @@ class Router implements RegistrarContract, BindingRegistrar
     public function matched($callback)
     {
         $this->events->listen(Events\RouteMatched::class, $callback);
+    }
+
+    public function startMiddleware($middleware)
+    {
+        $this->currentMiddlewares[] = $middleware;
+
+        return $this;
+    }
+
+    public function stopMiddleware()
+    {
+        array_pop($this->currentMiddlewares);
+
+        return $this;
     }
 
     /**
