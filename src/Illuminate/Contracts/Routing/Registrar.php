@@ -102,4 +102,24 @@ interface Registrar
      * @return void
      */
     public function substituteImplicitBindings($route);
+    
+    /**
+     * Create a redirect from one URI to another.
+     *
+     * @param string  $uri
+     * @param string  $destination
+     * @param int  $status
+     * @return \Illuminate\Routing\Route
+     */
+    public function redirect($uri, $destination, $status);
+    
+    /**
+     * Register a new route that returns a view.
+     *
+     * @param  string  $uri
+     * @param  string  $view
+     * @param  array  $data
+     * @return \Illuminate\Routing\Route
+     */
+    public function view($uri, $view, $data);
 }
