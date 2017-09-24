@@ -475,6 +475,26 @@ class Str
     }
 
     /**
+     * Returns the string bewtween start and end symbols.
+     *
+     * @param string $value
+     * @param string $start
+     * @param string $end
+     *
+     * @return string
+     */
+    public static function between($value, $start, $end)
+    {
+        $r = explode($start, $value);
+        if (isset($r[1])) {
+            $r = explode($end, $r[1]);
+            return $r[0];
+        }
+        return '';
+    }
+
+
+    /**
      * Convert a value to studly caps case.
      *
      * @param  string  $value
