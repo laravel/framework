@@ -1351,7 +1351,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $values[] = $callback($value, $key);
         }
 
-        $keys = array_keys($this->items);
+        $items = array_values($this->items);
+        $keys = array_keys($items);
+        $resultKeys = array_combine($keys, array_keys($this->items));
 
         $order = $descending ? SORT_DESC : SORT_ASC;
 
@@ -1361,7 +1363,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         // and grab the corresponding model so we can set the underlying items list
         // to the sorted version. Then we'll just return the collection instance.
         foreach ($keys as $key) {
-            $results[$key] = $this->items[$key];
+            $results[$resultKeys[$key]] = $items[$key];
         }
 
         return new static($results);

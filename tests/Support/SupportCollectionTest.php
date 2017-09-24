@@ -805,6 +805,31 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['name' => 'dayle'], ['name' => 'taylor']], array_values($data->all()));
     }
 
+    public function testChainedSortByMaintainsOriginalOrderOfItemsWithIdenticalValues()
+    {
+        $data = new Collection(
+            [
+                ['name' => 'Ann', 'grade' => 'B'],
+                ['name' => 'Boris', 'grade' => 'B'],
+                ['name' => 'Dave', 'grade' => 'A'],
+                ['name' => 'Cathy', 'grade' => 'A'],
+            ]
+        );
+
+        $data = $data->sortBy('name')->sortBy('grade');
+
+        $this->assertEquals(
+            [
+                ['name' => 'Cathy', 'grade' => 'A'],
+                ['name' => 'Dave', 'grade' => 'A'],
+                ['name' => 'Ann', 'grade' => 'B'],
+                ['name' => 'Boris', 'grade' => 'B'],
+            ],
+            array_values($data->all())
+        );
+        $this->assertEquals([3, 2, 0, 1], $data->keys()->all());
+    }
+
     public function testSortByMaintainsOriginalOrderOfItemsWithIdenticalValues()
     {
         $data = new Collection([['name' => 'taylor'], ['name' => 'dayle'], ['name' => 'dayle']]);
