@@ -411,9 +411,7 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function addRoute($methods, $uri, $action)
     {
         return tap($this->routes->add($this->createRoute($methods, $uri, $action)), function($route) {
-            if(! empty($this->currentMiddlewares)) {
-                $route->middleware(Arr::flatten($this->currentMiddlewares));
-            }
+            $route->middleware(Arr::flatten($this->currentMiddlewares));    
         });
     }
 
