@@ -311,6 +311,18 @@ class RouteRegistrarTest extends TestCase
         $this->assertEmpty($this->getRoute()->middleware());
     }
 
+    public function testCanStartAndStopMiddlewaresOnAResource()
+    {
+        $this->router->startMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+        $this->router->stopMiddleware();
+
+        $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+
+        $this->router->resource('foo', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+        $this->assertEmpty($this->getRoute()->middleware());
+    }                   
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
