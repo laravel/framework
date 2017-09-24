@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Closure;
 use ArrayObject;
 use JsonSerializable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -76,6 +77,13 @@ class Router implements RegistrarContract, BindingRegistrar
      * @var array
      */
     protected $middlewareGroups = [];
+
+    /**
+     * The current middlewares to be added to the routes.
+     *
+     * @var array
+     */
+    protected $currentMiddlewares = [];
 
     /**
      * The priority-sorted list of middleware.
@@ -438,6 +446,8 @@ class Router implements RegistrarContract, BindingRegistrar
             $this->mergeGroupAttributesIntoRoute($route);
         }
 
+        $this->addCurrentMiddlewaresToRoute($route);
+
         $this->addWhereClausesToRoute($route);
 
         return $route;
@@ -549,6 +559,17 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function mergeGroupAttributesIntoRoute($route)
     {
         $route->setAction($this->mergeWithLastGroup($route->getAction()));
+    }
+
+    /**
+     * Add the current middlewares to the newly created route.
+     *
+     * @param \Illuminate\Routing\Route $route
+     * @return void
+     */
+    protected function addCurrentMiddlewaresToRoute($route)
+    {
+        $route->middleware(Arr::flatten($this->currentMiddlewares));
     }
 
     /**
@@ -768,6 +789,27 @@ class Router implements RegistrarContract, BindingRegistrar
     public function matched($callback)
     {
         $this->events->listen(Events\RouteMatched::class, $callback);
+    }
+
+    /**
+     * Adds one or many middlewares to be added to the next routes.
+     *
+     * @param  array|string $middleware
+     * @return void
+     */
+    public function startMiddleware($middleware)
+    {
+        $this->currentMiddlewares[] = $middleware;
+    }
+
+    /**
+     * Removes the latest added middleware.
+     *
+     * @return void
+     */
+    public function stopMiddleware()
+    {
+        array_pop($this->currentMiddlewares);
     }
 
     /**

@@ -265,6 +265,64 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
     }
 
+    public function testCanStartAndStopMiddlewares()
+    {
+        $this->router->startMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->router->stopMiddleware();
+
+        $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+
+        $this->router->get('foo', function () {
+            return 'all-users';
+        });
+
+        $this->assertEmpty($this->getRoute()->middleware());
+    }
+
+    public function testCanStartAndStopAnArrayOfMiddlewares()
+    {
+        $this->router->startMiddleware(['Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub', 'foo']);
+        $this->router->startMiddleware(['bar', 'baz']);
+        $this->router->startMiddleware('laravel');
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->router->stopMiddleware();
+        $this->router->stopMiddleware();
+        $this->router->stopMiddleware();
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub', $this->getRoute()->middleware()[0]);
+        $this->assertEquals('foo', $this->getRoute()->middleware()[1]);
+        $this->assertEquals('bar', $this->getRoute()->middleware()[2]);
+        $this->assertEquals('baz', $this->getRoute()->middleware()[3]);
+
+        $this->router->get('foo', function () {
+            return 'all-users';
+        });
+
+        $this->assertEmpty($this->getRoute()->middleware());
+    }
+
+    public function testCanStartAndStopMiddlewaresOnAResource()
+    {
+        $this->router->startMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+        $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+        $this->router->stopMiddleware();
+
+        $this->seeMiddleware('Illuminate\Tests\Routing\RouteRegistrarMiddlewareStub');
+
+        $this->router->resource('foo', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+        $this->assertEmpty($this->getRoute()->middleware());
+    }                   
+
     public function testCanSetRouteName()
     {
         $this->router->as('users.index')->get('users', function () {
