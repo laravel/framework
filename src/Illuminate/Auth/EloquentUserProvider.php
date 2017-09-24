@@ -64,7 +64,7 @@ class EloquentUserProvider implements UserProvider
 
         $model = $model->where($model->getAuthIdentifierName(), $identifier)->first();
 
-        if (!$model) {
+        if (! $model) {
             return null;
         }
 
