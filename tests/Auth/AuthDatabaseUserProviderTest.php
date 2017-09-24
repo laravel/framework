@@ -55,6 +55,18 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertEquals(new GenericUser((array) $mockUser), $user);
     }
 
+    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    {
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn(null);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertNull($user);
+    }
+
     public function testRetrieveByBadTokenReturnsNull()
     {
         $mockUser = new \stdClass();
