@@ -1005,6 +1005,22 @@ if (! function_exists('str_start')) {
     }
 }
 
+if (!function_exists('str_between')) {
+    /**
+     * Returns the string bewtween start and end symbols.
+     *
+     * @param $value
+     * @param $start
+     * @param $end
+     *
+     * @return string
+     */
+    function str_between($value, $start, $end)
+    {
+        return Str::between($value, $start, $end);
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
