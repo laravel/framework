@@ -1,5 +1,20 @@
 # Release Notes for 5.5.x
 
+## v5.5.13 (2017-09-24)
+
+### Added
+- Added optional config option for whoops blacklist ([#21336](https://github.com/laravel/framework/pull/21336), [a83ebc1](https://github.com/laravel/framework/commit/a83ebc15e768fab3955013bf5797fa090ee693d7))
+- Added `Collection::pad()` method ([#21342](https://github.com/laravel/framework/pull/21342))
+
+### Changed
+- Made `$callback` parameter of `Arr::sort()` optional  ([#21337](https://github.com/laravel/framework/pull/21337))
+- Support setting custom `REMOTE_ADDR` in `MakesHttpRequests` ([#21351](https://github.com/laravel/framework/pull/21351))
+- Changed visibility of `$output` to public on console events ([#21356](https://github.com/laravel/framework/pull/21356))
+
+### Fixed
+- Don't compare remember token in user providers if it's `null` (srsly for real this time, pinky promise) ([#21328](https://github.com/laravel/framework/pull/21328), [#21368](https://github.com/laravel/framework/pull/21368))
+
+
 ## v5.5.12 (2017-09-22)
 
 ### Added
