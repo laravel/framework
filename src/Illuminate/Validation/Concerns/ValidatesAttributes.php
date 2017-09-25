@@ -447,7 +447,7 @@ trait ValidatesAttributes
      */
     public function validateDimensions($attribute, $value, $parameters)
     {
-        if ($this->isValidFileInstance($value) && $value->getExtension() == 'svg') {
+        if ($this->isValidFileInstance($value) && $value->getClientMimeType() == 'image/svg+xml') {
             return true;
         }
 
