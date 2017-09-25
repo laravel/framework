@@ -1340,7 +1340,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function sortBy($callback, $options = SORT_REGULAR, $descending = false)
     {
-        list($values, $results) = [[], []];
+        $results = [];
 
         $callback = $this->valueRetriever($callback);
 
@@ -1348,19 +1348,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         // function which we were given. Then, we will sort the returned values and
         // and grab the corresponding values for the sorted keys from this array.
         foreach ($this->items as $key => $value) {
-            $values[] = $callback($value, $key);
+            $results[$key] = $callback($value, $key);
         }
 
-        $keys = array_keys($this->items);
-
-        $order = $descending ? SORT_DESC : SORT_ASC;
-
-        array_multisort($values, $order, $options, $keys, $order);
+        $descending ? arsort($results, $options)
+            : asort($results, $options);
 
         // Once we have sorted all of the keys in the array, we will loop through them
         // and grab the corresponding model so we can set the underlying items list
         // to the sorted version. Then we'll just return the collection instance.
-        foreach ($keys as $key) {
+        foreach (array_keys($results) as $key) {
             $results[$key] = $this->items[$key];
         }
 
