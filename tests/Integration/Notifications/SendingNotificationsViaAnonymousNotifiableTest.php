@@ -34,6 +34,26 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
             'enzo', 'enzo@deepblue.com',
         ], $_SERVER['__notifiable.route']);
     }
+
+    public function test_faking()
+    {
+        NotificationFacade::fake();
+
+        $notifiable = (new AnonymousNotifiable())
+            ->route('testchannel', 'enzo')
+            ->route('anothertestchannel', 'enzo@deepblue.com');
+
+        NotificationFacade::send(
+            $notifiable,
+            new TestMailNotificationForAnonymousNotifiable()
+        );
+
+        NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class,
+            function ($notification, $channels, $notifiable) {
+                return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
+            }
+        );
+    }
 }
 
 class TestMailNotificationForAnonymousNotifiable extends Notification
