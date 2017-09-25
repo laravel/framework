@@ -605,7 +605,7 @@ class Arr
         if (is_array($value)) {
             return $value;
         }
-        
+
         return is_null($key) ? [$value] : [$key => $value];
     }
 }
