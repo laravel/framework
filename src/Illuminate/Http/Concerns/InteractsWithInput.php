@@ -130,6 +130,25 @@ trait InteractsWithInput
     }
 
     /**
+     * Determine if any of the given inputs are not empty.
+     *
+     * @param  string|array  $key
+     * @return bool
+     */
+    public function anyFilled($key)
+    {
+        $keys = is_array($key) ? $key : func_get_args();
+
+        foreach ($keys as $value) {
+            if (! $this->isEmptyString($value)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if the given input key is an empty string for "has".
      *
      * @param  string  $key
