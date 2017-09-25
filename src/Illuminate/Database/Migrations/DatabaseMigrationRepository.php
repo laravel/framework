@@ -54,6 +54,19 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface
     }
 
     /**
+     * Get the ran migrations with batch numbers.
+     *
+     * @return array
+     */
+    public function getMigrationsBatches()
+    {
+        return $this->table()
+            ->orderBy('batch', 'asc')
+            ->orderBy('migration', 'asc')
+            ->pluck('batch', 'migration')->all();
+    }
+
+    /**
      * Get list of migrations.
      *
      * @param  int  $steps
