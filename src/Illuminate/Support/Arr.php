@@ -597,10 +597,15 @@ class Arr
      * If the given value is not an array, wrap it in one.
      *
      * @param  mixed  $value
+     * @param  string|null  $key
      * @return array
      */
-    public static function wrap($value)
+    public static function wrap($value, $key = null)
     {
-        return ! is_array($value) ? [$value] : $value;
+        if (is_array($value)) {
+            return $value;
+        }
+
+        return is_null($key) ? [$value] : [$key => $value];
     }
 }
