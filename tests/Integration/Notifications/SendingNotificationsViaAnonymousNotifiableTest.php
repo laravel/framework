@@ -48,9 +48,11 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
             new TestMailNotificationForAnonymousNotifiable()
         );
 
-        NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class, function($notification, $channels, $notifiable){
-            return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
-        });
+        NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class,
+            function ($notification, $channels, $notifiable) {
+                return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
+            }
+        );
     }
 }
 
