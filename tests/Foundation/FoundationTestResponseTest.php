@@ -54,6 +54,19 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertSeeTextEscapesSpecialChars()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'foo&#039;s b&auml;r',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeText("foo's bär");
+    }
+
     public function testAssertHeader()
     {
         $baseResponse = tap(new Response, function ($response) {
