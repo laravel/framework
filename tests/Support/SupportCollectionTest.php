@@ -1776,10 +1776,12 @@ class SupportCollectionTest extends TestCase
 
     public function testRangeCollection()
     {
-        $this->assertEquals([0,1,2,3,4],Collection::range(0,4)->all());
-        $this->assertEquals([0,2,4,6,8],Collection::range(0,8,2)->all());
-        $this->assertEquals([0,100,200,300,400],Collection::range(0,499,100)->all());
-        $this->assertEquals([-2,-1,0,1,2],Collection::range(-2,2)->all());
+        $this->assertEquals([0, 1, 2, 3, 4], Collection::range(0, 4)->all());
+        $this->assertEquals([0, 2, 4, 6, 8], Collection::range(0, 8, 2)->all());
+        $this->assertEquals([-2, -1, 0, 1, 2], Collection::range(-2, 2)->all());
+        $this->assertEquals([4, 3, 2, 1, 0], Collection::range(4, 0)->all());
+        $this->assertEquals([-1, -.5, 0, .5, 1], Collection::range(-1, 1, .5)->all());
+        $this->assertEquals(['a', 'c', 'e', 'g'], Collection::range('a', 'h', 2)->all());
     }
 
     public function testGettingMaxItemsFromCollection()

@@ -1552,10 +1552,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection with a range of values, with optional step.
+     * Create a new collection with a range of elements, with optional step.
      *
-     * @param  int  $start
-     * @param  int  $end
+     * @param  mixed  $start
+     * @param  mixed  $end
      * @param  float|int  $step    
      * @return static
      */
