@@ -275,7 +275,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // hydration of new objects via the Eloquent query builder instances.
         $model = new static((array) $attributes);
 
-        $model->exists = $exists;
+        // Refactored to preserve model's "exists" property where set and 
+        // not explicitly supplied in this method call.
+        $model->exists = is_null($exists) ? $this->exists : boolval($exists);
 
         $model->setConnection(
             $this->getConnectionName()
