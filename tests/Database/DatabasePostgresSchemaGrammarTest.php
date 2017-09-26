@@ -101,7 +101,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
-        $this->assertEquals('alter table "users" drop constraint "users_'.implode("_", $columns).'_primary"', $statements[1]);
+        $this->assertEquals('alter table "users" drop constraint "users_'.implode('_', $columns).'_primary"', $statements[1]);
     }
 
     public function testDropUnique()
