@@ -89,9 +89,11 @@ class PostgresGrammar extends Grammar
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
     {
-        $columns = $this->columnize($command->columns);
-
-        return 'alter table '.$this->wrapTable($blueprint)." add primary key ({$columns})";
+        return sprintf('alter table %s add constraint %s primary key (%s)',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->index),
+            $this->columnize($command->columns)
+        );
     }
 
     /**
@@ -218,9 +220,7 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap("{$blueprint->getTable()}_pkey");
-
-        return 'alter table '.$this->wrapTable($blueprint)." drop constraint {$index}";
+        return $this->dropConstraint($blueprint, $command->index);
     }
 
     /**
@@ -232,9 +232,22 @@ class PostgresGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
+        return $this->dropConstraint($blueprint, $command->index);
+    }
 
-        return "alter table {$this->wrapTable($blueprint)} drop constraint {$index}";
+    /**
+     * Compile a drop constraint command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  string  $name
+     * @return string
+     */
+    protected function dropConstraint(Blueprint $blueprint, string $name)
+    {
+        return sprintf('alter table %s drop constraint %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($name)
+        );
     }
 
     /**

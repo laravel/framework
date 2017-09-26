@@ -80,11 +80,28 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testDropPrimary()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dropPrimary();
+        $blueprint->dropPrimary('id');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" drop constraint "users_pkey"', $statements[0]);
+        $this->assertEquals('alter table "users" drop constraint "id"', $statements[0]);
+    }
+
+    public function testDropPrimaryWithColumns()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropPrimary(['id']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" drop constraint "users_id_primary"', $statements[0]);
+
+        $columns = ['id', 'code'];
+        $blueprint->dropPrimary($columns);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table "users" drop constraint "users_' . implode("_", $columns) . '_primary"', $statements[1]);
     }
 
     public function testDropUnique()
@@ -154,7 +171,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add primary key ("foo")', $statements[0]);
+        $this->assertEquals('alter table "users" add constraint "users_foo_primary" primary key ("foo")', $statements[0]);
     }
 
     public function testAddingUniqueKey()
