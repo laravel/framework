@@ -511,7 +511,7 @@ trait InteractsWithPivotTable
     protected function castAttributes($attributes)
     {
         return $this->using
-                    ? $this->newPivot()->forceFill($attributes)->getAttributes()
+                    ? $this->newPivot()->fill($attributes)->getAttributes()
                     : $attributes;
     }
 }
