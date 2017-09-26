@@ -197,6 +197,16 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Get the relationship for eager loading.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getEager()
+    {
+        return $this->take(1)->get();
+    }
+
+    /**
      * Update the parent model on the relationship.
      *
      * @param  array  $attributes

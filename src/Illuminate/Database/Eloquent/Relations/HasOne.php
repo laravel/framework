@@ -50,6 +50,16 @@ class HasOne extends HasOneOrMany
     }
 
     /**
+     * Get the relationship for eager loading.
+     *
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getEager()
+    {
+        return $this->take(1)->get();
+    }
+
+    /**
      * Make a new related instance for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
