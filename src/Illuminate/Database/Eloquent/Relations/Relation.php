@@ -117,6 +117,13 @@ abstract class Relation
     abstract public function initRelation(array $models, $relation);
 
     /**
+     * Get the key for comparing against in "has" query.
+     *
+     * @return string
+     */
+    abstract public function getExistenceCompareKey();
+
+    /**
      * Match the eagerly loaded results to their parents.
      *
      * @param  array   $models
