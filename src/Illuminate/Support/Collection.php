@@ -1556,7 +1556,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @param  mixed  $start
      * @param  mixed  $end
-     * @param  float|int  $step    
+     * @param  float|int  $step
      * @return static
      */
     public static function range($start, $end, $step = 1)
