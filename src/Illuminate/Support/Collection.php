@@ -1552,6 +1552,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a new collection with a range of values, with optional step.
+     *
+     * @param  int  $start
+     * @param  int  $end
+     * @param  float|int  $step    
+     * @return static
+     */
+    public static function range($start, $end, $step = 1)
+    {
+        return new static(range($start, $end, $step));
+    }
+
+    /**
      * Get the collection of items as a plain array.
      *
      * @return array
