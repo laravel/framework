@@ -316,7 +316,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
 		$only = ['index', 'show', 'store', 'update', 'destroy'];
         if (isset($options['withSoftDeletes'])) {
-            $only = $only + ['trashed', 'restore'];
+        $only = $only + ['trashed', 'restore'];
             unset($options['withSoftDeletes']);
         }
         return $this->resource($name, $controller, array_merge([

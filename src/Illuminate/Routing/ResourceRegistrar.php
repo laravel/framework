@@ -20,7 +20,7 @@ class ResourceRegistrar
      */
     protected $resourceDefaults = ['index', 'create', 'store', 'show', 'edit', 'update', 'destroy'];
 	
-	/**
+    /**
      * The actions for a resourcefull controller with a model with softDeletes.
      *
      * @var array
@@ -56,7 +56,7 @@ class ResourceRegistrar
     protected static $verbs = [
         'create' => 'create',
         'edit' => 'edit',
-		'trashed' => 'trashed',
+        'trashed' => 'trashed',
         'restore' => 'restore'
     ];
 
@@ -155,7 +155,7 @@ class ResourceRegistrar
      */
     protected function getResourceMethods($defaults, $options)
     {
-		if (isset($options['withSoftDeletes']) && $options['withSoftDeletes'] == true) {
+        if (isset($options['withSoftDeletes']) && $options['withSoftDeletes'] == true) {
             $defaults = $this->resourceSoftDeletes;
             unset($options['withSoftDeletes']);
         }
@@ -186,7 +186,7 @@ class ResourceRegistrar
         return $this->router->get($uri, $action);
     }
 	
-	/**
+    /**
      * Add the trashed method for a resourceful route.
      *
      * @param  string  $name
@@ -312,7 +312,7 @@ class ResourceRegistrar
         return $this->router->delete($uri, $action);
     }
 	
-	/**
+    /**
      * Add the restore method for a resourceful route.
      *
      * @param  string  $name
@@ -327,7 +327,7 @@ class ResourceRegistrar
 
         $action = $this->getResourceAction($name, $controller, 'restore', $options);
 
-		return $$this->router->match(['PUT', 'PATCH'], $uri, $action);
+        return $$this->router->match(['PUT', 'PATCH'], $uri, $action);
     }
 
     /**
