@@ -2356,6 +2356,55 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+	public function testCollectCarbonObject()
+	{
+		$collection = new Collection(new \Illuminate\Support\Carbon());
+		$this->assertEquals(1, $collection->count());
+		$this->assertInstanceOf(\Illuminate\Support\Carbon::class, $collection->first());
+	}
+
+	public function testCollectCarbonObjects()
+	{
+		$collection = new Collection([new \Illuminate\Support\Carbon(), new \Illuminate\Support\Carbon()]);
+		$this->assertEquals(2, $collection->count());
+		$collection->each(function($item) {
+			$this->assertInstanceOf(\Illuminate\Support\Carbon::class, $item);
+		});
+	}
+
+	public function testCollectNativeCarbonObject()
+	{
+		$collection = new Collection(new \Carbon\Carbon());
+		$this->assertEquals(1, $collection->count());
+		$this->assertInstanceOf(\Carbon\Carbon::class, $collection->first());
+	}
+
+	public function testCollectNativeCarbonObjects()
+	{
+		$collection = new Collection([new \Carbon\Carbon(), new \Carbon\Carbon()]);
+		$this->assertEquals(2, $collection->count());
+		$collection->each(function($item) {
+			$this->assertInstanceOf(\Carbon\Carbon::class, $item);
+		});
+	}
+
+	public function testCollectDatetimeObject()
+	{
+		$collection = new Collection(new \Datetime);
+		$this->assertEquals(1, $collection->count());
+		$this->assertInstanceOf(\DateTime::class, $collection->first());
+	}
+
+	public function testCollectDatetimeObjects()
+	{
+		$collection = new Collection([new \Datetime(), new \Datetime()]);
+		$this->assertEquals(2, $collection->count());
+		$collection->each(function($item) {
+			$this->assertInstanceOf(\Datetime::class, $item);
+		});
+	}
+
 }
 
 class TestSupportCollectionHigherOrderItem

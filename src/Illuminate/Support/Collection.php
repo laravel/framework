@@ -1709,7 +1709,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $items;
         } elseif ($items instanceof self) {
             return $items->all();
-        } elseif ($items instanceof Arrayable) {
+        } elseif ($items instanceof \DateTimeInterface) {
+        	return [$items];
+		} elseif ($items instanceof Arrayable) {
             return $items->toArray();
         } elseif ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
