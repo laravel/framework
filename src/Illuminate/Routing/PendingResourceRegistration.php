@@ -141,7 +141,7 @@ class PendingResourceRegistration
 
         return $this;
     }
-	
+
     /**
      * Tell the resource to include softDelete routes.
      *

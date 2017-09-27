@@ -314,11 +314,12 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function apiResource($name, $controller, array $options = [])
     {
-		$only = ['index', 'show', 'store', 'update', 'destroy'];
+        $only = ['index', 'show', 'store', 'update', 'destroy'];
         if (isset($options['withSoftDeletes'])) {
-        $only = $only + ['trashed', 'restore'];
+            $only = $only + ['trashed', 'restore'];
             unset($options['withSoftDeletes']);
         }
+
         return $this->resource($name, $controller, array_merge([
             'only' => $only,
         ], $options));
