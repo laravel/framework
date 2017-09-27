@@ -143,6 +143,18 @@ class PendingResourceRegistration
     }
 
     /**
+     * Tell the resource to include softDelete routes.
+     *
+     * @return \Sjorsvanleeuwen\ExtendedResourceRegistrar\PendingResourceRegistration
+     */
+    public function withSoftDeletes()
+    {
+        $this->options['withSoftDeletes'] = true;
+
+        return $this;
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
