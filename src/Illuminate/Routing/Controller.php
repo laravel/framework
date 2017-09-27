@@ -67,4 +67,28 @@ abstract class Controller
     {
         throw new BadMethodCallException("Method [{$method}] does not exist.");
     }
+    
+    /**
+     * Returns the view in a folder with same structure as namespace, function name as the name
+     *
+     * @param  array   $vars
+     * @return \Illuminate\Contracts\View\View
+     */
+    public function view($vars=[])
+    {
+        $class    = strtolower(debug_backtrace()[1]['class']);
+        $function = strtolower(debug_backtrace()[1]['function']);
+
+        //transform namespace to folder structure
+        $dir = preg_replace('/controller$/', '',
+            str_replace('app.http.controllers.', '',
+                str_replace('\\', '.', $class)
+            )
+        );
+
+        //function becomes filename
+        $defaultView = $dir . '.' . $function;
+
+        return view($defaultView,$vars);
+    }
 }
