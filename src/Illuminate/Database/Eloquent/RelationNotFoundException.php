@@ -48,7 +48,7 @@ class RelationNotFoundException extends RuntimeException
     }
 
     /**
-     * Get the affected Eloquent model IDs.
+     * Get the affected relation.
      *
      * @return int|array
      */
