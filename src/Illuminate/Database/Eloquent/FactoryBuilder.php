@@ -157,6 +157,23 @@ class FactoryBuilder
     }
 
     /**
+     * Create or get a collection of models.
+     *
+     * @param array $attributes
+     * @return mixed
+     */
+    public function firstOrCreate(array $attributes = [])
+    {
+        $query = (new $this->class)->where($attributes);
+
+        if ($this->amount === null) {
+            return $query->first() ?? $this->create($attributes);
+        } else {
+            return $query->exists() ? $query->get() : $this->create($attributes);
+        }
+    }
+
+    /**
      * Set the connection name on the results and store them.
      *
      * @param  \Illuminate\Support\Collection  $results
