@@ -4,6 +4,7 @@ namespace Illuminate\Validation;
 
 use Exception;
 use Illuminate\Support\Facades\Validator as ValidatorFacade;
+use Illuminate\Support\Arr;
 
 class ValidationException extends Exception
 {
