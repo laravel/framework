@@ -1516,6 +1516,16 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
     }
 
+    public function testModelAttributeCustomCasting()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->customAttribute = 'test';
+
+        $arr = $model->toArray();
+
+        $this->assertEquals('test1', $arr['customAttribute']);
+    }
+
     public function testModelAttributeCastingPreservesNull()
     {
         $model = new EloquentModelCastingStub;
@@ -2008,11 +2018,17 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'customAttribute' => 'custom',
     ];
 
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function castCustomValue($value)
+    {
+        return $value.'1';
     }
 }
 

@@ -465,7 +465,16 @@ trait HasAttributes
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
+        $castType = $this->getCastType($key);
+
+        // If the cast type has a cast mutator, we will call that then return what
+        // it returns as the value, which is useful for transforming values on
+        // retrieval from the model to a form that is more useful for usage.
+        if ($this->hasCastMutator($castType)) {
+            return $this->{'cast'.Str::studly($castType).'Value'}($value);
+        }
+
+        switch ($castType) {
             case 'int':
             case 'integer':
                 return (int) $value;
@@ -505,6 +514,17 @@ trait HasAttributes
     protected function getCastType($key)
     {
         return trim(strtolower($this->getCasts()[$key]));
+    }
+
+    /**
+     * Determine if a cast mutator exists for an cast type.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasCastMutator($key)
+    {
+        return method_exists($this, 'cast'.Str::studly($key).'Value');
     }
 
     /**
