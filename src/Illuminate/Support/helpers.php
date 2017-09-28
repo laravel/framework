@@ -1154,7 +1154,7 @@ if (! function_exists('windows_os')) {
 
 if (! function_exists('with')) {
     /**
-     * Return the given value, optionaly passed through the given callback.
+     * Return the given value, optionally passed through the given callback.
      *
      * @param  mixed  $value
      * @param  callable|null  $callback
