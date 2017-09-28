@@ -1563,7 +1563,7 @@ class SupportCollectionTest extends TestCase
         $this->assertFalse($c->contains->b);
 
         $c = new Collection([
-            null, 1, 2
+            null, 1, 2,
         ]);
 
         $this->assertTrue($c->contains(function ($value) {
