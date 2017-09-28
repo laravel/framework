@@ -97,6 +97,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates if the model read data all from writable connection.
+     *
+     * @var bool
+     */
+    public $onWriteConnection = false;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -823,6 +830,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         foreach ($this->getGlobalScopes() as $identifier => $scope) {
             $builder->withGlobalScope($identifier, $scope);
+        }
+
+        if ($this->onWriteConnection) {
+            $builder->useWritePdo();
         }
 
         return $builder;
