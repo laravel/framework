@@ -18,6 +18,6 @@ trait CompilesJson
 
         $depth = $parts[2] ?? 512;
 
-        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
+        return "<?php echo json_encode($parts[0], $options, $depth) . PHP_EOL ?>";
     }
 }
