@@ -78,6 +78,17 @@ trait MakesHttpRequests
     }
 
     /**
+     * Define a url from which the request is being made.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function fromUrl($url)
+    {
+        return $this->withServerVariables(['HTTP_REFERER' => $url]);
+    }
+
+    /**
      * Disable middleware for the test.
      *
      * @param  string|array  $middleware
