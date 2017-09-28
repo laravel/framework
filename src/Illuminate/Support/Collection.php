@@ -217,7 +217,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (func_num_args() == 1) {
             if ($this->useAsCallable($key)) {
-                return ! is_null($this->first($key));
+                return $this->first($key, '__placeholder') != '__placeholder';
             }
 
             return in_array($key, $this->items);
