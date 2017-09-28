@@ -5,6 +5,7 @@ namespace Illuminate\Tests\View;
 use Mockery as m;
 use Illuminate\View\View;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Support\Arrayable;
 
 class ViewTest extends TestCase
 {
@@ -18,7 +19,13 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $view->with('foo', 'bar');
         $view->with(['baz' => 'boom']);
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
+        $view->with(new class implements Arrayable {
+            public function toArray()
+            {
+                return ['spam' => 'eggs'];
+            }
+        });
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'boom', 'spam' => 'eggs'], $view->getData());
 
         $view = $this->getView();
         $view->withFoo('bar')->withBaz('boom');
