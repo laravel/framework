@@ -7,14 +7,14 @@ use RuntimeException;
 class RelationNotFoundException extends RuntimeException
 {
     /**
-     * Name of the affected Eloquent model.
+     * The name of the affected Eloquent model.
      *
      * @var string
      */
     public $model;
 
     /**
-     * Name of the affected relation.
+     * The name of the relation.
      *
      * @var string
      */
