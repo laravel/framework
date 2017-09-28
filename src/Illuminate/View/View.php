@@ -170,12 +170,13 @@ class View implements ArrayAccess, ViewContract
     /**
      * Add a piece of data to the view.
      *
-     * @param  string|array  $key
+     * @param  string|array|Arrayable  $key
      * @param  mixed   $value
      * @return $this
      */
     public function with($key, $value = null)
     {
+        $key = $key instanceof Arrayable ? $key->toArray() : $key;
         if (is_array($key)) {
             $this->data = array_merge($this->data, $key);
         } else {
