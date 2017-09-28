@@ -20,7 +20,8 @@ class ViewTest extends TestCase
         $view->with('foo', 'bar');
         $view->with(['baz' => 'boom']);
         $view->with(new class implements Arrayable {
-            public function toArray(){
+            public function toArray()
+            {
                 return ['spam' => 'eggs'];
             }
         });
