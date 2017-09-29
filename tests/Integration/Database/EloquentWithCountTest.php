@@ -53,7 +53,7 @@ class EloquentWithCountTest extends TestCase
         $three = $two->threes()->Create();
 
         $results = Model1::withCount([
-            'twos' => function($query){
+            'twos' => function ($query) {
                 $query->where('id', '>=', 1);
             }
         ]);
@@ -99,8 +99,7 @@ class Model3 extends Model
     {
         parent::boot();
 
-        static::addGlobalScope('app', function($builder)
-        {
+        static::addGlobalScope('app', function ($builder) {
             $builder->where('idz', '>', 0);
         });
     }
