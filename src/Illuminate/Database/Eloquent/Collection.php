@@ -57,6 +57,21 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Load a set of relationships onto the collection if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadMissing($relations)
+    {
+        $relations = is_string($relations) ? func_get_args() : $relations;
+
+        return $this->load(array_filter($relations, function ($relation) {
+            return ! $this->first()->relationLoaded($relation);
+        }));
+    }
+
+    /**
      * Add an item to the collection.
      *
      * @param  mixed  $item
