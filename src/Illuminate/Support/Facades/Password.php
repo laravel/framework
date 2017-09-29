@@ -3,6 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static \Illuminate\Contracts\Auth\PasswordBroker broker(string $name) Attempt to get the broker from the local cache.
+ * @method static string getDefaultDriver() Get the default password broker name.
+ * @method static void setDefaultDriver(string $name) Set the default password broker name.
+ *
  * @see \Illuminate\Auth\Passwords\PasswordBroker
  */
 class Password extends Facade
