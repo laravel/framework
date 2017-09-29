@@ -139,7 +139,9 @@ trait ConditionallyLoadsAttributes
         }
 
         return $this->when(
-            $this->pivot && ($this->pivot instanceof $table || $this->pivot->getTable() === $table),
+            $this->resource->pivot &&
+            ($this->resource->pivot instanceof $table ||
+             $this->resource->pivot->getTable() === $table),
             ...[$value, $default]
         );
     }
