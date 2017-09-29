@@ -55,11 +55,11 @@ class EloquentWithCountTest extends TestCase
         $results = Model1::withCount([
             'twos' => function ($query) {
                 $query->where('id', '>=', 1);
-            }
+            },
         ]);
 
         $this->assertEquals([
-            ['id' => 1, 'twos_count' => 1]
+            ['id' => 1, 'twos_count' => 1],
         ], $results->get()->toArray());
     }
 }
