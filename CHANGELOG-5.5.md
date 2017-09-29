@@ -1,5 +1,30 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Allow testing anonymous notifiables ([#21379](https://github.com/laravel/framework/pull/21379))
+- Add relation and model attributes on `RelationNotFoundException` ([#21426](https://github.com/laravel/framework/pull/21426))
+- Allow passing a callback to `with()` ([#21445](https://github.com/laravel/framework/pull/21445))
+
+### Changed
+- Reset RefreshDatabaseState after DatabaseMigrations rolls back ([#21325](https://github.com/laravel/framework/pull/21325))
+- Make sure page resolver returns an integer ([#21378](https://github.com/laravel/framework/pull/21378))
+- Allow single error messages in `ValidationException::withMessages()` ([#21400](https://github.com/laravel/framework/pull/21400))
+- Revert `Collection::sortBy()` behaviour to 5.4 ([#21382](https://github.com/laravel/framework/pull/21382))
+- Use fill instead of forceFill while storing pivot attributes ([#21403](https://github.com/laravel/framework/pull/21403))
+- Alphabetize `vendor:publish` options ([#21412](https://github.com/laravel/framework/pull/21412))
+- Extract `AnonymousResourceCollection` into class to allow serialization ([#21456](https://github.com/laravel/framework/pull/21456))
+- Extract some methods from `Resource` into `ConditionallyLoadsAttributes` trait ([28d945e](https://github.com/laravel/framework/commit/28d945e557736598c10c492c2918d5697b70570d))
+
+### Fixed
+- Ensure user is logged in before expecting user instance ([#21377](https://github.com/laravel/framework/pull/21377))
+- Remove leading slash from class while resolving controllers ([#21407](https://github.com/laravel/framework/pull/21407))
+- Make sure SQL for virtual columns is added after the unsigned modifier ([#21441](https://github.com/laravel/framework/pull/21441))
+- Fixed `Collection::contains()` when the found value is `null` ([#21442](https://github.com/laravel/framework/pull/21442))
+- Fixed merge issue in `Relation::morphMap()` ([#21458](https://github.com/laravel/framework/pull/21458))
+
+
 ## v5.5.13 (2017-09-24)
 
 ### Added
