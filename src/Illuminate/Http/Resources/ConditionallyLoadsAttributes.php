@@ -29,9 +29,10 @@ trait ConditionallyLoadsAttributes
                 return $this->merge($data, $index, $this->filter($value->data));
             }
 
-            if ($value instanceof MissingValue ||
+            if (($value instanceof PotentiallyMissing && $value->isMissing()) ||
                 ($value instanceof self &&
-                $value->resource instanceof MissingValue)) {
+                $value->resource instanceof PotentiallyMissing &&
+                $value->isMissing())) {
                 unset($data[$key]);
 
                 $index--;
