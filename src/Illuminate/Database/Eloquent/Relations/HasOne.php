@@ -21,16 +21,6 @@ class HasOne extends HasOneOrMany
     }
 
     /**
-     * Get the relationship for eager loading.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getEager()
-    {
-        return $this->take(1)->get();
-    }
-
-    /**
      * Initialize the relation on a set of models.
      *
      * @param  array   $models

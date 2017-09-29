@@ -82,16 +82,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Get the relationship for eager loading.
-     *
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function getEager()
-    {
-        return $this->take(1)->get();
-    }
-
-    /**
      * Set the base constraints on the relation query.
      *
      * @return void
