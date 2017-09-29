@@ -14,7 +14,7 @@ class MySqlGrammar extends Grammar
      * @var array
      */
     protected $modifiers = [
-        'VirtualAs', 'StoredAs', 'Unsigned', 'Charset', 'Collate', 'Nullable',
+        'Unsigned', 'VirtualAs', 'StoredAs', 'Charset', 'Collate', 'Nullable',
         'Default', 'Increment', 'Comment', 'After', 'First',
     ];
 
