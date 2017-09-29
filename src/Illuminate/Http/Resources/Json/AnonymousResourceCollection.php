@@ -5,6 +5,8 @@ namespace Illuminate\Http\Resources\Json;
 class AnonymousResourceCollection extends ResourceCollection
 {
     /**
+     * The name of the resource being collected.
+     *
      * @var string
      */
     public $collects;
