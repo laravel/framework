@@ -64,6 +64,12 @@ class MigrateMakeCommand extends BaseCommand
         // schema operation. The developer may also specify if this table needs
         // to be freshly created so we can create the appropriate migrations.
         $name = trim($this->input->getArgument('name'));
+        
+        // The name of a migration cannot start with a number because we create a
+        // class of the same name and classes cannot start with numbers.
+        if(is_numeric($name[0])) {
+            $this->error('Migrations cannot start with a number.');
+        }
 
         $table = $this->input->getOption('table');
 
