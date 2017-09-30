@@ -1,0 +1,19 @@
+<?php
+
+namespace DummyNamespace;
+
+use Exception;
+
+class DummyClass extends Exception
+{
+
+    /**
+     * Render an exception into a response.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     */
+    public function render($request)
+    {
+        //
+    }
+}
