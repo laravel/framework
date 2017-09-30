@@ -47,7 +47,7 @@ class Pluralizer
         'information',
         'jedi',
         'knowledge',
-        'logic'
+        'logic',
         'love',
         'metadata',
         'management',
