@@ -74,12 +74,13 @@ class Schedule
      * Add a new job callback event to the schedule.
      *
      * @param  object|string  $job
+     * @param  string|null  $queue
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
-    public function job($job)
+    public function job($job, $queue = null)
     {
-        return $this->call(function () use ($job) {
-            dispatch(is_string($job) ? resolve($job) : $job);
+        return $this->call(function () use ($job, $queue) {
+            dispatch(is_string($job) ? resolve($job) : $job)->onQueue($queue);
         })->name(is_string($job) ? $job : get_class($job));
     }
 
