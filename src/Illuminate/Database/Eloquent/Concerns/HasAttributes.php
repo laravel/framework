@@ -680,9 +680,9 @@ trait HasAttributes
     {
         // Value can be nullable
         if (is_null($value)) {
-            return $value;   
+            return $value;
         }
-        
+
         // If this value is already a Carbon instance, we shall just return it as is.
         // This prevents us having to re-instantiate a Carbon instance when we know
         // it already is one, which wouldn't be fulfilled by the DateTime check.
