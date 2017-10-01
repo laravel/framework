@@ -147,7 +147,7 @@ class ResourceRegistrar
     protected function getResourceMethods($defaults, $options)
     {
         if (isset($options['only'])) {
-            $defaults = array_intersect($defaults, (array)$options['only']);
+            $defaults = array_intersect($defaults, (array) $options['only']);
         }
 
         if (isset($options['except'])) {
