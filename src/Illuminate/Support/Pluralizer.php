@@ -13,7 +13,6 @@ class Pluralizer
      */
     public static $uncountable = [
         'access',
-        'accommodation',
         'audio',
         'bison',
         'carbon',
