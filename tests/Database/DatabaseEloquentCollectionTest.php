@@ -164,6 +164,32 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['results'], $c->all());
     }
 
+    public function testLoadMissingMethodEagerLoadsGivenRelationshipsWhenMissing()
+    {
+        $mockItem = m::mock('stdClass');
+        $mockItem->shouldReceive('relationLoaded')->once()->with('bar')->andReturn(false);
+        $mockItem->shouldReceive('relationLoaded')->once()->with('baz')->andReturn(false);
+
+        $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['load', 'first'])->getMock();
+        $c->expects($this->atLeastOnce())->method('first')->will($this->returnValue($mockItem));
+        $c->expects($this->once())->method('load')->with($this->countOf(2)); // ['bar', 'baz']
+
+        $c->loadMissing('bar', 'baz');
+    }
+
+    public function testLoadMissingMethodDoesntEagerLoadGivenRelationshipsWhenRelationAlreadyLoaded()
+    {
+        $mockItem = m::mock('stdClass');
+        $mockItem->shouldReceive('relationLoaded')->once()->with('bar')->andReturn(true);
+        $mockItem->shouldReceive('relationLoaded')->once()->with('baz')->andReturn(false);
+
+        $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['load', 'first'])->getMock();
+        $c->expects($this->atLeastOnce())->method('first')->will($this->returnValue($mockItem));
+        $c->expects($this->once())->method('load')->with($this->countOf(1)); // ['baz']
+
+        $c->loadMissing('bar', 'baz');
+    }
+
     public function testCollectionDictionaryReturnsModelKeys()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
