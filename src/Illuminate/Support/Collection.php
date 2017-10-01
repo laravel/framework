@@ -12,6 +12,7 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Debug\Dumper;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -673,6 +674,39 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the item that is a specified number away from the searched item.
+     *
+     * @param  mixed  $value
+     * @param  bool   $strict
+     * @param  int    $jump
+     * @return mixed
+     */
+    public function jump($value, $strict = false, $jump = 1)
+    {
+        if ($value instanceof Model) {
+            $key = $this->search(function ($item, $key) use ($value) {
+                return $value->is($item);
+            });
+        } else {
+            $key = $this->search($value, $strict);
+        }
+
+        if ($key === false) {
+            return false;
+        }
+
+        $keys = array_keys($this->items);
+
+        $jumpKey = array_search($key, $keys, true) + $jump;
+
+        if ($jumpKey < 0 || $jumpKey >= count($keys)) {
+            return false;
+        }
+
+        return $this->items[$keys[$jumpKey]];
+    }
+
+    /**
      * Key an associative array by a field or using a callback.
      *
      * @param  callable|string  $keyBy
@@ -991,6 +1025,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the item after the searched item.
+     *
+     * @param  mixed  $value
+     * @param  bool   $strict
+     * @return mixed
+     */
+    public function next($value, $strict = false)
+    {
+        return $this->jump($value, $strict, 1);
+    }
+
+    /**
      * Create a new collection consisting of every n-th element.
      *
      * @param  int  $step
@@ -1095,6 +1141,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $this->items = Arr::prepend($this->items, $value, $key);
 
         return $this;
+    }
+
+    /**
+     * Get the item before the searched item.
+     *
+     * @param  mixed   $value
+     * @param  bool    $strict
+     * @return mixed
+     */
+    public function previous($value, $strict = false)
+    {
+        return $this->jump($value, $strict, -1);
     }
 
     /**

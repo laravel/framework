@@ -9,6 +9,7 @@ use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -2325,6 +2326,76 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testJumpWithNumericalArray()
+    {
+        $collection = new Collection(['taylor', 'mohamed', 'adam', 'matt', 'andy']);
+
+        $this->assertSame('mohamed', $collection->jump('taylor')); //this tests the 0 index
+        $this->assertSame('adam', $collection->jump('mohamed'));
+        $this->assertSame('matt', $collection->jump('mohamed', false, 2));
+        $this->assertSame('andy', $collection->jump('mohamed', false, 3));
+        $this->assertSame('taylor', $collection->jump('mohamed', false, -1));
+    }
+
+    public function testJumpWithAssociateArray()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $this->assertSame('burns', $collection->jump('falls'));
+        $this->assertSame('leeloo', $collection->jump('falls', false, 2));
+        $this->assertSame('korben', $collection->jump('falls', false, 3));
+        $this->assertSame('blows', $collection->jump('falls', false, -1));
+    }
+
+    public function testJumpWithEloquentModels()
+    {
+        $taylor = new User(['id' => 1, 'name' => 'Taylor']);
+        $mohamed = new User(['id' => 2, 'name' => 'Mohamed']);
+        $adam = new User(['id' => 3, 'name' => 'Adam']);
+        $matt = new User(['id' => 4, 'name' => 'Matt']);
+        $andy = new User(['id' => 5, 'name' => 'Andy']);
+
+        $collection = new Collection([$taylor, $mohamed, $adam, $matt, $andy]);
+
+        $this->assertTrue($collection->jump($mohamed)->is($adam));
+        $this->assertTrue($collection->jump($mohamed, false, 2)->is($matt));
+        $this->assertTrue($collection->jump($mohamed, false, 3)->is($andy));
+        $this->assertTrue($collection->jump($mohamed, false, -1)->is($taylor));
+    }
+
+    public function testJumpWithDuplicateLooseKeys()
+    {
+        $collection = new Collection(['01' => 'foo', 1 => 'bar', '02' => 'baz', 2 => 'qux']);
+
+        $this->assertSame('bar', $collection->jump('foo'));
+        $this->assertSame('baz', $collection->jump('bar'));
+    }
+
+    public function testJumpReturnsFalseAtTheBeginningAndEnd()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $this->assertFalse($collection->jump('korben'));
+        $this->assertFalse($collection->jump('blows', false, -1));
+    }
+
+    public function testJumpReturnsFalseWhenValueIsNotFound()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $this->assertFalse($collection->jump('dne'));
+        $this->assertFalse($collection->jump('wind'));
+        $this->assertFalse($collection->jump(''));
+    }
+
+    public function testNextAndPreviousProxyJump()
+    {
+        $collection = new Collection(['wind' => 'blows', 'rain' => 'falls', 'fire' => 'burns', 1 => 'leeloo', 5 => 'korben']);
+
+        $this->assertSame($collection->jump('blows', false, 1), $collection->next('blows'));
+        $this->assertSame($collection->jump('falls', false, -1), $collection->previous('falls'));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
@@ -2440,4 +2511,9 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class User extends Model
+{
+    protected $guarded = [];
 }
