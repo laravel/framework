@@ -688,9 +688,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $key = $this->search(function ($item, $key) use ($value) {
                 return $value->is($item);
             });
-        }
-
-        else {
+        } else {
             $key = $this->search($value, $strict);
         }
 
