@@ -684,7 +684,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function jump($value, $strict = false, $jump = 1)
     {
         if ($value instanceof Model) {
-
             $key = $this->search(function ($item, $key) use ($value) {
                 return $value->is($item);
             });
