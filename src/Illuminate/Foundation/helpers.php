@@ -191,8 +191,12 @@ if (! function_exists('bcrypt')) {
      * @param  array   $options
      * @return string
      */
-    function bcrypt($value, $options = [])
+    function bcrypt($value = null, $options = [])
     {
+        if (is_null($value)) {
+            return app('hash');
+        }
+
         return app('hash')->make($value, $options);
     }
 }
