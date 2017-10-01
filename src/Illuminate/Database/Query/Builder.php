@@ -219,6 +219,8 @@ class Builder
     {
         $this->columns = is_array($columns) ? $columns : func_get_args();
 
+        $this->setBindings([], 'select');
+
         return $this;
     }
 
