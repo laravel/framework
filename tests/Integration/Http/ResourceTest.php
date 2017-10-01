@@ -185,7 +185,7 @@ class ResourceTest extends TestCase
             'data' => [
                 'id' => 5,
                 'author' => null,
-                'author_name' => null
+                'author_name' => null,
             ],
         ]);
     }

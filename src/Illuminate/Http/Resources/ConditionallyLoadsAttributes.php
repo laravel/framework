@@ -126,7 +126,7 @@ trait ConditionallyLoadsAttributes
             $default = new MissingValue;
         }
 
-        if (!$this->resource->relationLoaded($relationship)) {
+        if (! $this->resource->relationLoaded($relationship)) {
             return $default;
         }
 
@@ -134,7 +134,7 @@ trait ConditionallyLoadsAttributes
             return $this->resource->{$relationship};
         }
 
-        if($this->resource->{$relationship} === null) {
+        if ($this->resource->{$relationship} === null) {
             return null;
         }
 
