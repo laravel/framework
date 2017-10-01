@@ -177,7 +177,6 @@ class DatabaseEloquentHasOneTest extends TestCase
         $builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'))->andReturnSelf();
         $relation->getParent()->shouldReceive('getTable')->andReturn('table');
         $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
-        $baseQuery->shouldReceive('setBindings')->once()->with([], 'select');
 
         $relation->getRelationExistenceCountQuery($builder, $builder);
     }
