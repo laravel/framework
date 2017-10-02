@@ -879,7 +879,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapToGroups(callable $callback)
     {
-        $groups = $this->dictionary($callback);
+        $groups = $this->mapToDictionary($callback);
 
         return $groups->map([$this, 'make']);
     }
