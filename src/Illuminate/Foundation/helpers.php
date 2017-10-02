@@ -183,20 +183,6 @@ if (! function_exists('base_path')) {
     }
 }
 
-if (! function_exists('bcrypt')) {
-    /**
-     * Hash the given value.
-     *
-     * @param  string  $value
-     * @param  array   $options
-     * @return string
-     */
-    function bcrypt($value, $options = [])
-    {
-        return app('hash')->make($value, $options);
-    }
-}
-
 if (! function_exists('broadcast')) {
     /**
      * Begin broadcasting an event.
@@ -484,6 +470,24 @@ if (! function_exists('factory')) {
         } else {
             return $factory->of($arguments[0]);
         }
+    }
+}
+
+if (! function_exists('hasher')) {
+    /**
+     * Hash the given value.
+     *
+     * @param  string  $value
+     * @param  array   $options
+     * @return string
+     */
+    function hasher($value = null, $options = [])
+    {
+        if (is_null($value)) {
+            return app('hash');
+        }
+
+        return app('hash')->make($value, $options);
     }
 }
 
