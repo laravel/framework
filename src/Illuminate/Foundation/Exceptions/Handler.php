@@ -6,6 +6,7 @@ use Exception;
 use Throwable;
 use Whoops\Run as Whoops;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
 use Psr\Log\LoggerInterface;
 use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
@@ -164,7 +165,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Exception  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    public function render($request, Exception $e)
+    public function render(Request $request, Exception $e)
     {
         if (method_exists($e, 'render') && $response = $e->render($request)) {
             return Router::toResponse($request, $response);
@@ -213,7 +214,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Auth\AuthenticationException  $exception
      * @return \Illuminate\Http\Response
      */
-    protected function unauthenticated($request, AuthenticationException $exception)
+    protected function unauthenticated(Request $request, AuthenticationException $exception)
     {
         return $request->expectsJson()
                     ? response()->json(['message' => 'Unauthenticated.'], 401)
@@ -227,7 +228,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Http\Request  $request
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function convertValidationExceptionToResponse(ValidationException $e, $request)
+    protected function convertValidationExceptionToResponse(ValidationException $e, Request $request)
     {
         if ($e->response) {
             return $e->response;
@@ -245,7 +246,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Validation\ValidationException  $exception
      * @return \Illuminate\Http\Response
      */
-    protected function invalid($request, ValidationException $exception)
+    protected function invalid(Request $request, ValidationException $exception)
     {
         $url = $exception->redirectTo ?? url()->previous();
 
@@ -264,7 +265,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Illuminate\Validation\ValidationException  $exception
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function invalidJson($request, ValidationException $exception)
+    protected function invalidJson(Request $request, ValidationException $exception)
     {
         return response()->json([
             'message' => $exception->getMessage(),
@@ -279,7 +280,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Exception $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
-    protected function prepareResponse($request, Exception $e)
+    protected function prepareResponse(Request $request, Exception $e)
     {
         if (! $this->isHttpException($e) && config('app.debug')) {
             return $this->toIlluminateResponse(
@@ -431,7 +432,7 @@ class Handler implements ExceptionHandlerContract
      * @param  \Exception $e
      * @return \Illuminate\Http\JsonResponse
      */
-    protected function prepareJsonResponse($request, Exception $e)
+    protected function prepareJsonResponse(Request $request, Exception $e)
     {
         $status = $this->isHttpException($e) ? $e->getStatusCode() : 500;
 
