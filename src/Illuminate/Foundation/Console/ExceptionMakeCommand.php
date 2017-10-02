@@ -39,11 +39,12 @@ class ExceptionMakeCommand extends GeneratorCommand
             return $this->option('report')
                 ? __DIR__.'/stubs/exception-render-report.stub'
                 : __DIR__.'/stubs/exception-render.stub';
-        } else {
-            return $this->option('report')
-                ? __DIR__.'/stubs/exception-report.stub'
-                : __DIR__.'/stubs/exception.stub';
         }
+        
+        return $this->option('report')
+            ? __DIR__.'/stubs/exception-report.stub'
+            : __DIR__.'/stubs/exception.stub';
+
     }
 
     /**
