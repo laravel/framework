@@ -58,6 +58,18 @@ class DatabaseNotification extends Model
     }
 
     /**
+     * Mark the notification as unread.
+     *
+     * @return void
+     */
+    public function markAsUnread()
+    {
+        if (! is_null($this->read_at)) {
+            $this->forceFill(['read_at' => null])->save();
+        }
+    }
+
+    /**
      * Determine if a notification has been read.
      *
      * @return bool
