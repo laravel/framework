@@ -21,7 +21,7 @@ use Illuminate\Filesystem\Filesystem;
  * @method static bool exists(string $path) Determine if a file exists.
  * @method static string path(string $path) Get the full path for the file at the given "short" path.
  * @method static string get(string $path) Get the contents of a file.
- * @method static bool put(string $path, string | resource $contents, mixed $options) Write the contents of a file.
+ * @method static bool put(string $path, string | resource $contents, mixed $options=[]) Write the contents of a file.
  * @method static string|false putFile(string $path, \Illuminate\Http\File | \Illuminate\Http\UploadedFile $file, array $options) Store the uploaded file on the disk.
  * @method static string|false putFileAs(string $path, \Illuminate\Http\File | \Illuminate\Http\UploadedFile $file, string $name, array $options) Store the uploaded file on the disk with a given name.
  * @method static string getVisibility(string $path) Get the visibility for the given path.
@@ -38,10 +38,10 @@ use Illuminate\Filesystem\Filesystem;
  * @method static string temporaryUrl(string $path, \DateTimeInterface $expiration, array $options) Get a temporary URL for the file at the given path.
  * @method static string getAwsTemporaryUrl(\League\Flysystem\AwsS3v3\AwsS3Adapter $adapter, string $path, \DateTimeInterface $expiration, array $options) Get a temporary URL for the file at the given path.
  * @method static void getRackspaceTemporaryUrl() Get a temporary URL for the file at the given path.
- * @method static array files(string | null $directory, bool $recursive) Get an array of all files in a directory.
- * @method static array allFiles(string | null $directory) Get all of the files from the given directory (recursive).
- * @method static array directories(string | null $directory, bool $recursive) Get all of the directories within a given directory.
- * @method static array allDirectories(string | null $directory) Get all (recursive) of the directories within a given directory.
+ * @method static array files(string | null $directory = null, bool $recursive=false) Get an array of all files in a directory.
+ * @method static array allFiles(string | null $directory = null) Get all of the files from the given directory (recursive).
+ * @method static array directories(string | null $directory= null, bool $recursive = false) Get all of the directories within a given directory.
+ * @method static array allDirectories(string | null $directory= null) Get all (recursive) of the directories within a given directory.
  * @method static bool makeDirectory(string $path) Create a directory.
  * @method static bool deleteDirectory(string $directory) Recursively delete a directory.
  * @method static \League\Flysystem\FilesystemInterface getDriver() Get the Flysystem driver.
