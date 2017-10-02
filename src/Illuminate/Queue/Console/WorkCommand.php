@@ -82,7 +82,8 @@ class WorkCommand extends Command
         $queue = $this->getQueue($connection);
 
         $this->runWorker(
-            $connection, $queue
+            $connection,
+            $queue
         );
     }
 
@@ -110,9 +111,12 @@ class WorkCommand extends Command
     protected function gatherWorkerOptions()
     {
         return new WorkerOptions(
-            $this->option('delay'), $this->option('memory'),
-            $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries'), $this->option('force')
+            $this->option('delay'),
+            $this->option('memory'),
+            $this->option('timeout'),
+            $this->option('sleep'),
+            $this->option('tries'),
+            $this->option('force')
         );
     }
 
@@ -170,7 +174,8 @@ class WorkCommand extends Command
         $this->output->writeln(sprintf(
             "<{$type}>[%s] %s</{$type}> %s",
             Carbon::now()->format('Y-m-d H:i:s'),
-            str_pad("{$status}:", 11), $job->resolveName()
+            str_pad("{$status}:", 11),
+            $job->resolveName()
         ));
     }
 
@@ -183,8 +188,10 @@ class WorkCommand extends Command
     protected function logFailedJob(JobFailed $event)
     {
         $this->laravel['queue.failer']->log(
-            $event->connectionName, $event->job->getQueue(),
-            $event->job->getRawBody(), $event->exception
+            $event->connectionName,
+            $event->job->getQueue(),
+            $event->job->getRawBody(),
+            $event->exception
         );
     }
 
@@ -197,7 +204,8 @@ class WorkCommand extends Command
     protected function getQueue($connection)
     {
         return $this->option('queue') ?: $this->laravel['config']->get(
-            "queue.connections.{$connection}.queue", 'default'
+            "queue.connections.{$connection}.queue",
+            'default'
         );
     }
 

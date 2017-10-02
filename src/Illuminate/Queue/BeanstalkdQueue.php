@@ -82,7 +82,10 @@ class BeanstalkdQueue extends Queue implements QueueContract
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->pheanstalk->useTube($this->getQueue($queue))->put(
-            $payload, Pheanstalk::DEFAULT_PRIORITY, Pheanstalk::DEFAULT_DELAY, $this->timeToRun
+            $payload,
+            Pheanstalk::DEFAULT_PRIORITY,
+            Pheanstalk::DEFAULT_DELAY,
+            $this->timeToRun
         );
     }
 
@@ -121,7 +124,11 @@ class BeanstalkdQueue extends Queue implements QueueContract
 
         if ($job instanceof PheanstalkJob) {
             return new BeanstalkdJob(
-                $this->container, $this->pheanstalk, $job, $this->connectionName, $queue
+                $this->container,
+                $this->pheanstalk,
+                $job,
+                $this->connectionName,
+                $queue
             );
         }
     }
