@@ -111,13 +111,11 @@ trait ConditionallyLoadsAttributes
     }
 
     /**
-     * Retrieve a relationship or execute a callback
-     * if the given relationship has been loaded.
+     * Retrieve a relationship if it has been loaded.
      *
      * @param  string  $relationship
      * @param  mixed  $value
      * @param  mixed  $default
-     *
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
     protected function whenLoaded($relationship, $value = null, $default = null)
