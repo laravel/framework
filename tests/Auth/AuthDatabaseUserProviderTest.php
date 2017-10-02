@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Auth\GenericUser;
 use Illuminate\Auth\DatabaseUserProvider;
 
 class AuthDatabaseUserProviderTest extends TestCase
@@ -35,6 +36,48 @@ class AuthDatabaseUserProviderTest extends TestCase
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
         $user = $provider->retrieveById(1);
+
+        $this->assertNull($user);
+    }
+
+    public function testRetrieveByTokenReturnsUser()
+    {
+        $mockUser = new \stdClass();
+        $mockUser->remember_token = 'a';
+
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn($mockUser);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertEquals(new GenericUser((array) $mockUser), $user);
+    }
+
+    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    {
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn(null);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertNull($user);
+    }
+
+    public function testRetrieveByBadTokenReturnsNull()
+    {
+        $mockUser = new \stdClass();
+        $mockUser->remember_token = null;
+
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn($mockUser);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
 
         $this->assertNull($user);
     }

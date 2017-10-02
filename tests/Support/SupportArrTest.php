@@ -510,6 +510,9 @@ class SupportArrTest extends TestCase
             ['name' => 'Desk'],
         ];
 
+        $sorted = array_values(Arr::sort($unsorted));
+        $this->assertEquals($expected, $sorted);
+
         // sort with closure
         $sortedWithClosure = array_values(Arr::sort($unsorted, function ($value) {
             return $value['name'];

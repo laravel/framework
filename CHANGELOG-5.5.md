@@ -1,5 +1,81 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Allow testing anonymous notifiables ([#21379](https://github.com/laravel/framework/pull/21379))
+- Add relation and model attributes on `RelationNotFoundException` ([#21426](https://github.com/laravel/framework/pull/21426))
+- Allow passing a callback to `with()` ([#21445](https://github.com/laravel/framework/pull/21445))
+- Added `PotentiallyMissing` interface to `MissingValue` class ([be7dccc](https://github.com/laravel/framework/commit/be7dccca9f9249c928108d957fe70e78d370d26e))
+- Accept `$queue` name on `Schedule::job()` ([#21473](https://github.com/laravel/framework/pull/21473))
+
+### Changed
+- Reset RefreshDatabaseState after DatabaseMigrations rolls back ([#21325](https://github.com/laravel/framework/pull/21325))
+- Make sure page resolver returns an integer ([#21378](https://github.com/laravel/framework/pull/21378))
+- Allow single error messages in `ValidationException::withMessages()` ([#21400](https://github.com/laravel/framework/pull/21400))
+- Revert `Collection::sortBy()` behaviour to 5.4 ([#21382](https://github.com/laravel/framework/pull/21382))
+- Use fill instead of forceFill while storing pivot attributes ([#21403](https://github.com/laravel/framework/pull/21403))
+- Alphabetize `vendor:publish` options ([#21412](https://github.com/laravel/framework/pull/21412))
+- Extract `AnonymousResourceCollection` into class to allow serialization ([#21456](https://github.com/laravel/framework/pull/21456))
+- Extract some methods from `Resource` into `ConditionallyLoadsAttributes` trait ([28d945e](https://github.com/laravel/framework/commit/28d945e557736598c10c492c2918d5697b70570d), [1f37ccc](https://github.com/laravel/framework/commit/1f37ccc06485410fa0866c012b083a042c4cc73e))
+
+### Fixed
+- Ensure user is logged in before expecting user instance ([#21377](https://github.com/laravel/framework/pull/21377))
+- Remove leading slash from class while resolving controllers ([#21407](https://github.com/laravel/framework/pull/21407))
+- Make sure SQL for virtual columns is added after the unsigned modifier ([#21441](https://github.com/laravel/framework/pull/21441))
+- Fixed `Collection::contains()` when the found value is `null` ([#21442](https://github.com/laravel/framework/pull/21442))
+- Fixed merge issue in `Relation::morphMap()` ([#21458](https://github.com/laravel/framework/pull/21458))
+- Clear count query select bindings in `Relation::getRelationExistenceCountQuery()` ([#21468](https://github.com/laravel/framework/pull/21468))
+
+
+## v5.5.13 (2017-09-24)
+
+### Added
+- Added optional config option for whoops blacklist ([#21336](https://github.com/laravel/framework/pull/21336), [a83ebc1](https://github.com/laravel/framework/commit/a83ebc15e768fab3955013bf5797fa090ee693d7))
+- Added `Collection::pad()` method ([#21342](https://github.com/laravel/framework/pull/21342))
+
+### Changed
+- Made `$callback` parameter of `Arr::sort()` optional  ([#21337](https://github.com/laravel/framework/pull/21337))
+- Support setting custom `REMOTE_ADDR` in `MakesHttpRequests` ([#21351](https://github.com/laravel/framework/pull/21351))
+- Changed visibility of `$output` to public on console events ([#21356](https://github.com/laravel/framework/pull/21356))
+
+### Fixed
+- Don't compare remember token in user providers if it's `null` (srsly for real this time, pinky promise) ([#21328](https://github.com/laravel/framework/pull/21328), [#21368](https://github.com/laravel/framework/pull/21368))
+
+
+## v5.5.12 (2017-09-22)
+
+### Added
+- Added "software" as an uncountable word ([#21324](https://github.com/laravel/framework/pull/21324))
+
+### Fixed
+- Don't compare remember token if it's `null` ([#21328](https://github.com/laravel/framework/pull/21328))
+
+
+## v5.5.11 (2017-09-21)
+
+### Fixed
+- Fixed bug in `EloquentUserProvider` introduced in [#21320](https://github.com/laravel/framework/pull/21320) ([#21323](https://github.com/laravel/framework/pull/21323))
+
+
+## v5.5.10 (2017-09-21)
+
+### Added
+- Added `Route::respondWithRoute($name)` method ([#21299](https://github.com/laravel/framework/pull/21299), [66c5e46](https://github.com/laravel/framework/commit/66c5e462dbdb9d0c9d23114da3a3dc1b6e9fa0a1))
+- Added `$strict` parameter to `TestResponse::assertJson()` ([#21301](https://github.com/laravel/framework/pull/21301))
+
+### Changed
+- Added "firmware" as an uncountable word ([#21306](https://github.com/laravel/framework/pull/21306))
+- Allow `MorphTo::associate()` accept `null` ([#21318](https://github.com/laravel/framework/pull/21318))
+- Changed `__()` signature to match `Translation::trans()` ([10c013c](https://github.com/laravel/framework/commit/10c013c564b7e518640e42e97d9178f9e05ec7d9))
+
+### Fixed
+- Add missing `driver` parameter to doctrine connection ([#21297](https://github.com/laravel/framework/pull/21297))
+
+### Security
+- Perform constant-time token comparison in `DatabaseUserProvider` ([#21320](https://github.com/laravel/framework/pull/21320))
+
+
 ## v5.5.9 (2017-09-20)
 
 ### Changed

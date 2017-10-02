@@ -900,9 +900,9 @@ if (! function_exists('__')) {
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
-     * @return \Illuminate\Contracts\Translation\Translator|string
+     * @return string
      */
-    function __($key = null, $replace = [], $locale = null)
+    function __($key, $replace = [], $locale = null)
     {
         return app('translator')->getFromJson($key, $replace, $locale);
     }

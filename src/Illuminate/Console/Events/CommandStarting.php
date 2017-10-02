@@ -26,7 +26,7 @@ class CommandStarting
      *
      * @var \Symfony\Component\Console\Output\OutputInterface|null
      */
-    protected $output;
+    public $output;
 
     /**
      * Create a new event instance.
