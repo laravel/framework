@@ -315,6 +315,18 @@ class Str
     }
 
     /**
+     * Replace the keys with their corresponding values.
+     *
+     * @param  array   $searchPairs
+     * @param  string  $subject
+     * @return string
+     */
+    public static function replaceAssoc(array $searchPairs, $subject)
+    {
+        return str_replace(array_keys($searchPairs), array_values($searchPairs), $subject);
+    }
+
+    /**
      * Replace the first occurrence of a given value in the string.
      *
      * @param  string  $search
