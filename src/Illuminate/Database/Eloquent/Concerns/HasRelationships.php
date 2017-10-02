@@ -17,26 +17,32 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
+/**
+ * Trait HasRelationships
+ * @package Illuminate\Database\Eloquent\Concerns
+ *
+ * @property Model $this
+ */
 trait HasRelationships
 {
     /**
      * The loaded relationships for the model.
      *
-     * @var array
+     * @var Model[]
      */
     protected $relations = [];
 
     /**
      * The relationships that should be touched on save.
      *
-     * @var array
+     * @var string[]
      */
     protected $touches = [];
 
     /**
      * The many to many relationship methods.
      *
-     * @var array
+     * @var string[]
      */
     public static $manyMethods = [
         'belongsToMany', 'morphToMany', 'morphedByMany',
@@ -59,6 +65,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
+        /** @var Model $this */
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
     }
 
@@ -82,6 +89,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
+        /** @var Model $this */
         return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
 
@@ -117,6 +125,7 @@ trait HasRelationships
         // actually be responsible for retrieving and hydrating every relations.
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
+        /** @var Model $this */
         return new BelongsTo(
             $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
@@ -159,6 +168,7 @@ trait HasRelationships
      */
     protected function morphEagerTo($name, $type, $id)
     {
+        /** @var Model $this */
         return new MorphTo(
             $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
         );
@@ -179,6 +189,7 @@ trait HasRelationships
             static::getActualClassNameForMorph($target)
         );
 
+        /** @var Model $this */
         return new MorphTo(
             $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
         );
@@ -202,9 +213,9 @@ trait HasRelationships
      */
     protected function guessBelongsToRelation()
     {
-        list($one, $two, $caller) = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
+        $calls = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 3);
 
-        return $caller['function'];
+        return $calls[2]['function'];
     }
 
     /**
@@ -223,6 +234,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
+        /** @var Model $this */
         return new HasMany(
             $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
         );
@@ -241,6 +253,8 @@ trait HasRelationships
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
+        /** @var Model $through */
+        /** @var Model $this */
         $through = new $through;
 
         $firstKey = $firstKey ?: $this->getForeignKey();
@@ -268,6 +282,7 @@ trait HasRelationships
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
+        /** @var Model $this */
         $instance = $this->newRelatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
@@ -297,6 +312,7 @@ trait HasRelationships
     public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
                                   $parentKey = null, $relatedKey = null, $relation = null)
     {
+        /** @var Model $this */
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -344,6 +360,7 @@ trait HasRelationships
                                 $relatedPivotKey = null, $parentKey = null,
                                 $relatedKey = null, $inverse = false)
     {
+        /** @var Model $this */
         $caller = $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
@@ -503,7 +520,7 @@ trait HasRelationships
      */
     protected function newRelatedInstance($class)
     {
-        return tap(new $class, function ($instance) {
+        return tap(new $class, function (Model $instance) {
             if (! $instance->getConnectionName()) {
                 $instance->setConnection($this->connection);
             }
@@ -559,7 +576,7 @@ trait HasRelationships
     /**
      * Set the entire relations array on the model.
      *
-     * @param  array  $relations
+     * @param  Model[]  $relations
      * @return $this
      */
     public function setRelations(array $relations)
