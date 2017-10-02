@@ -217,7 +217,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('one two three two three one', Str::replaceAssoc([
             '1' => 'one',
             '2' => 'two',
-            '3' => 'three'
+            '3' => 'three',
         ], '1 2 3 2 3 1'));
 
         $this->assertEquals('oranges are color orange', Str::replaceAssoc([
@@ -227,7 +227,7 @@ class SupportStrTest extends TestCase
 
         $this->assertEquals('Nothing will change in foo', Str::replaceAssoc([
             'foo' => 'bar',
-            'bar' => 'foo'
+            'bar' => 'foo',
         ], 'Nothing will change in foo'));
     }
 
