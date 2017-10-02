@@ -321,7 +321,7 @@ class Str
      * @param  string  $subject
      * @return string
      */
-    public static function replaceAssoc(array $searchPairs,$subject)
+    public static function replaceAssoc(array $searchPairs, $subject)
     {
         return str_replace(array_keys($searchPairs), array_values($searchPairs), $subject);
     }

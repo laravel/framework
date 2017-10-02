@@ -218,17 +218,17 @@ class SupportStrTest extends TestCase
             '1' => 'one',
             '2' => 'two',
             '3' => 'three'
-        ],'1 2 3 2 3 1'));
+        ], '1 2 3 2 3 1'));
 
         $this->assertEquals('oranges are color orange', Str::replaceAssoc([
             'apple' => 'orange',
             'red' => 'orange',
-        ],'apples are color red'));
+        ], 'apples are color red'));
 
         $this->assertEquals('Nothing will change in foo', Str::replaceAssoc([
             'foo' => 'bar',
             'bar' => 'foo'
-        ],'Nothing will change in foo'));
+        ], 'Nothing will change in foo'));
     }
 
     public function testReplaceFirst()

@@ -941,7 +941,7 @@ if (! function_exists('str_replace_assoc')) {
      * @param  string  $subject
      * @return string
      */
-    function str_replace_assoc(array $searchPairs,$subject)
+    function str_replace_assoc(array $searchPairs, $subject)
     {
         return Str::replaceAssoc($searchPairs, $subject);
     }
