@@ -248,7 +248,7 @@ trait FormatsMessages
      */
     protected function getAttributeFromTranslations($name)
     {
-        return $this->translator->trans('validation.attributes.' . $name);
+        return $this->translator->trans('validation.attributes.'.$name);
     }
 
     /**
