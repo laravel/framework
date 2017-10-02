@@ -39,14 +39,16 @@ class CallQueuedHandler
     {
         try {
             $command = $this->setJobInstanceIfNecessary(
-                $job, unserialize($data['command'])
+                $job,
+                unserialize($data['command'])
             );
         } catch (ModelNotFoundException $e) {
             return $this->handleModelNotFound($job, $e);
         }
 
         $this->dispatcher->dispatchNow(
-            $command, $this->resolveHandler($job, $command)
+            $command,
+            $this->resolveHandler($job, $command)
         );
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
@@ -128,7 +130,9 @@ class CallQueuedHandler
         }
 
         return FailingJob::handle(
-            $job->getConnectionName(), $job, $e
+            $job->getConnectionName(),
+            $job,
+            $e
         );
     }
 

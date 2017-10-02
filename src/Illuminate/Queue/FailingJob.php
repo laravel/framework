@@ -33,7 +33,9 @@ class FailingJob
             $job->failed($e);
         } finally {
             static::events()->dispatch(new JobFailed(
-                $connectionName, $job, $e ?: new ManuallyFailedException
+                $connectionName,
+                $job,
+                $e ?: new ManuallyFailedException
             ));
         }
     }

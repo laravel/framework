@@ -59,7 +59,11 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
         $exception = (string) $exception;
 
         return $this->getTable()->insertGetId(compact(
-            'connection', 'queue', 'payload', 'exception', 'failed_at'
+            'connection',
+            'queue',
+            'payload',
+            'exception',
+            'failed_at'
         ));
     }
 

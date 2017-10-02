@@ -65,10 +65,11 @@ class Worker
      * @param  \Illuminate\Contracts\Debug\ExceptionHandler  $exceptions
      * @return void
      */
-    public function __construct(QueueManager $manager,
-                                Dispatcher $events,
-                                ExceptionHandler $exceptions)
-    {
+    public function __construct(
+        QueueManager $manager,
+        Dispatcher $events,
+        ExceptionHandler $exceptions
+    ) {
         $this->events = $events;
         $this->manager = $manager;
         $this->exceptions = $exceptions;
@@ -102,7 +103,8 @@ class Worker
             // register the timeout handler and reset the alarm for this job so it is
             // not stuck in a frozen state forever. Then, we can fire off this job.
             $job = $this->getNextJob(
-                $this->manager->connection($connectionName), $queue
+                $this->manager->connection($connectionName),
+                $queue
             );
 
             $this->registerTimeoutHandler($job, $options);
@@ -217,7 +219,8 @@ class Worker
     public function runNextJob($connectionName, $queue, WorkerOptions $options)
     {
         $job = $this->getNextJob(
-            $this->manager->connection($connectionName), $queue
+            $this->manager->connection($connectionName),
+            $queue
         );
 
         // If we're able to pull a job off of the stack, we will process it and then return
@@ -311,7 +314,9 @@ class Worker
             $this->raiseBeforeJobEvent($connectionName, $job);
 
             $this->markJobAsFailedIfAlreadyExceedsMaxAttempts(
-                $connectionName, $job, (int) $options->maxTries
+                $connectionName,
+                $job,
+                (int) $options->maxTries
             );
 
             // Here we will fire off the job and let it process. We will catch any exceptions so
@@ -324,7 +329,10 @@ class Worker
             $this->handleJobException($connectionName, $job, $options, $e);
         } catch (Throwable $e) {
             $this->handleJobException(
-                $connectionName, $job, $options, new FatalThrowableError($e)
+                $connectionName,
+                $job,
+                $options,
+                new FatalThrowableError($e)
             );
         }
     }
@@ -348,12 +356,17 @@ class Worker
             // go ahead and mark it as failed now so we do not have to release this again.
             if (! $job->hasFailed()) {
                 $this->markJobAsFailedIfWillExceedMaxAttempts(
-                    $connectionName, $job, (int) $options->maxTries, $e
+                    $connectionName,
+                    $job,
+                    (int) $options->maxTries,
+                    $e
                 );
             }
 
             $this->raiseExceptionOccurredJobEvent(
-                $connectionName, $job, $e
+                $connectionName,
+                $job,
+                $e
             );
         } finally {
             // If we catch an exception, we will attempt to release the job back onto the queue
@@ -443,7 +456,8 @@ class Worker
     protected function raiseBeforeJobEvent($connectionName, $job)
     {
         $this->events->dispatch(new Events\JobProcessing(
-            $connectionName, $job
+            $connectionName,
+            $job
         ));
     }
 
@@ -457,7 +471,8 @@ class Worker
     protected function raiseAfterJobEvent($connectionName, $job)
     {
         $this->events->dispatch(new Events\JobProcessed(
-            $connectionName, $job
+            $connectionName,
+            $job
         ));
     }
 
@@ -472,7 +487,9 @@ class Worker
     protected function raiseExceptionOccurredJobEvent($connectionName, $job, $e)
     {
         $this->events->dispatch(new Events\JobExceptionOccurred(
-            $connectionName, $job, $e
+            $connectionName,
+            $job,
+            $e
         ));
     }
 
@@ -487,7 +504,9 @@ class Worker
     protected function raiseFailedJobEvent($connectionName, $job, $e)
     {
         $this->events->dispatch(new Events\JobFailed(
-            $connectionName, $job, $e
+            $connectionName,
+            $job,
+            $e
         ));
     }
 

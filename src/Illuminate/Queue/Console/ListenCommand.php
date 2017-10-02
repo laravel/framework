@@ -65,7 +65,9 @@ class ListenCommand extends Command
         );
 
         $this->listener->listen(
-            $connection, $queue, $this->gatherOptions()
+            $connection,
+            $queue,
+            $this->gatherOptions()
         );
     }
 
@@ -80,7 +82,8 @@ class ListenCommand extends Command
         $connection = $connection ?: $this->laravel['config']['queue.default'];
 
         return $this->input->getOption('queue') ?: $this->laravel['config']->get(
-            "queue.connections.{$connection}.queue", 'default'
+            "queue.connections.{$connection}.queue",
+            'default'
         );
     }
 
@@ -92,9 +95,12 @@ class ListenCommand extends Command
     protected function gatherOptions()
     {
         return new ListenerOptions(
-            $this->option('env'), $this->option('delay'),
-            $this->option('memory'), $this->option('timeout'),
-            $this->option('sleep'), $this->option('tries'),
+            $this->option('env'),
+            $this->option('delay'),
+            $this->option('memory'),
+            $this->option('timeout'),
+            $this->option('sleep'),
+            $this->option('tries'),
             $this->option('force')
         );
     }

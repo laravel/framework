@@ -169,7 +169,9 @@ class QueueServiceProvider extends ServiceProvider
     {
         $this->app->singleton('queue.worker', function () {
             return new Worker(
-                $this->app['queue'], $this->app['events'], $this->app[ExceptionHandler::class]
+                $this->app['queue'],
+                $this->app['events'],
+                $this->app[ExceptionHandler::class]
             );
         });
     }
@@ -211,7 +213,9 @@ class QueueServiceProvider extends ServiceProvider
     protected function databaseFailedJobProvider($config)
     {
         return new DatabaseFailedJobProvider(
-            $this->app['db'], $config['database'], $config['table']
+            $this->app['db'],
+            $config['database'],
+            $config['table']
         );
     }
 

@@ -154,7 +154,10 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {
         return $this->database->table($this->table)->insertGetId($this->buildDatabaseRecord(
-            $this->getQueue($queue), $payload, $this->availableAt($delay), $attempts
+            $this->getQueue($queue),
+            $payload,
+            $this->availableAt($delay),
+            $attempts
         ));
     }
 
@@ -262,7 +265,11 @@ class DatabaseQueue extends Queue implements QueueContract
         $this->database->commit();
 
         return new DatabaseJob(
-            $this->container, $this, $job, $this->connectionName, $queue
+            $this->container,
+            $this,
+            $job,
+            $this->connectionName,
+            $queue
         );
     }
 

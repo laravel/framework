@@ -139,11 +139,18 @@ class Listener
         // options available for the command. This will produce the final command
         // line that we will pass into a Symfony process object for processing.
         $command = $this->formatCommand(
-            $command, $connection, $queue, $options
+            $command,
+            $connection,
+            $queue,
+            $options
         );
 
         return new Process(
-            $command, $this->commandPath, null, null, $options->timeout
+            $command,
+            $this->commandPath,
+            null,
+            null,
+            $options->timeout
         );
     }
 
@@ -174,8 +181,10 @@ class Listener
             $command,
             ProcessUtils::escapeArgument($connection),
             ProcessUtils::escapeArgument($queue),
-            $options->delay, $options->memory,
-            $options->sleep, $options->maxTries
+            $options->delay,
+            $options->memory,
+            $options->sleep,
+            $options->maxTries
         );
     }
 
