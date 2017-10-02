@@ -19,7 +19,7 @@ class DatabaseNotificationCollection extends Collection
     }
 
     /**
-     * Mark all notification as unread.
+     * Mark all notifications as unread.
      *
      * @return void
      */
