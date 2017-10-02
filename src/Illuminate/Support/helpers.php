@@ -933,6 +933,20 @@ if (! function_exists('str_replace_array')) {
     }
 }
 
+if (! function_exists('str_replace_assoc')) {
+    /**
+     * Replace the keys with their corresponding values.
+     *
+     * @param  array   $searchPairs
+     * @param  string  $subject
+     * @return string
+     */
+    function str_replace_assoc(array $searchPairs,$subject)
+    {
+        return Str::replaceAssoc($searchPairs, $subject);
+    }
+}
+
 if (! function_exists('str_replace_first')) {
     /**
      * Replace the first occurrence of a given value in the string.
