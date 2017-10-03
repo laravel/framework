@@ -544,6 +544,21 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is equal to given.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateEquals($attribute, $value, $parameters)
+    {
+	    $this->requireParameterCount(1, $parameters, 'equals');
+
+        return $value == $parameters[0];
+    }
+
+    /**
      * Validate the existence of an attribute value in a database table.
      *
      * @param  string  $attribute
