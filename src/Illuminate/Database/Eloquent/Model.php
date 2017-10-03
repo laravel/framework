@@ -23,7 +23,7 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
  * @mixin \Illuminate\Database\Query\Builder
  *
  * @see \Illuminate\Database\Eloquent\Builder
- * @method static \Illuminate\Database\Eloquent\Model make(array $attributes = []) Create and return an un-saved model instance.
+ * @method static $this make(array $attributes = []) Create and return an un-saved model instance.
  * @method static $this withGlobalScope(string $identifier, \Illuminate\Database\Eloquent\Scope | \Closure $scope) Register a new global scope.
  * @method static $this withoutGlobalScope(\Illuminate\Database\Eloquent\Scope | string $scope) Remove a registered global scope.
  * @method static $this withoutGlobalScopes(array $scopes = null) Remove all or passed registered global scopes.
@@ -34,44 +34,44 @@ use Illuminate\Database\ConnectionResolverInterface as Resolver;
  * @method static \Illuminate\Database\Eloquent\Builder|static orWhere(\Closure | array | string $column, string $operator = null, mixed $value = null) Add an "or where" clause to the query.
  * @method static \Illuminate\Database\Eloquent\Collection hydrate(array $items) Create a collection of models from plain arrays.
  * @method static \Illuminate\Database\Eloquent\Collection fromQuery(string $query, array $bindings = []) Create a collection of models from a raw query.
- * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null find(mixed $id, array $columns = ['*']) Find a model by its primary key.
+ * @method static $this|\Illuminate\Database\Eloquent\Collection|static[]|static|null find(mixed $id, array $columns = ['*']) Find a model by its primary key.
  * @method static \Illuminate\Database\Eloquent\Collection findMany(\Illuminate\Contracts\Support\Arrayable | array $ids, array $columns = ['*']) Find multiple models by their primary keys.
- * @method static \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection findOrFail(mixed $id, array $columns = []) Find a model by its primary key or throw an exception.
- * @method static \Illuminate\Database\Eloquent\Model findOrNew(mixed $id, array $columns = ['*']) Find a model by its primary key or return fresh model instance.
- * @method static \Illuminate\Database\Eloquent\Model firstOrNew(array $attributes, array $values = []) Get the first record matching the attributes or instantiate it.
- * @method static \Illuminate\Database\Eloquent\Model firstOrCreate(array $attributes, array $values = []) Get the first record matching the attributes or create it.
- * @method static \Illuminate\Database\Eloquent\Model updateOrCreate(array $attributes, array $values = []) Create or update a record matching the attributes, and fill it with values.
- * @method static \Illuminate\Database\Eloquent\Model|static firstOrFail(array $columns = ['*']) Execute the query and get the first result or throw an exception.
- * @method static \Illuminate\Database\Eloquent\Model|static|mixed firstOr(\Closure | array $columns=null, \Closure $callback = null) Execute the query and get the first result or call a callback.
+ * @method static $this findOrFail(mixed $id, array $columns = []) Find a model by its primary key or throw an exception.
+ * @method static $this findOrNew(mixed $id, array $columns = ['*']) Find a model by its primary key or return fresh model instance.
+ * @method static $this firstOrNew(array $attributes, array $values = []) Get the first record matching the attributes or instantiate it.
+ * @method static $this firstOrCreate(array $attributes, array $values = []) Get the first record matching the attributes or create it.
+ * @method static $this updateOrCreate(array $attributes, array $values = []) Create or update a record matching the attributes, and fill it with values.
+ * @method static $this|static firstOrFail(array $columns = ['*']) Execute the query and get the first result or throw an exception.
+ * @method static $this|static|mixed firstOr(\Closure | array $columns=null, \Closure $callback = null) Execute the query and get the first result or call a callback.
  * @method static mixed value(string $column) Get a single column's value from the first result of a query.
  * @method static \Illuminate\Database\Eloquent\Collection|static[] get(array $columns = ['*']) Execute the query as a "select" statement.
- * @method static \Illuminate\Database\Eloquent\Model[] getModels(array $columns = ['*']) Get the hydrated models without eager loading.
+ * @method static $this[] getModels(array $columns = ['*']) Get the hydrated models without eager loading.
  * @method static array eagerLoadRelations(array $models) Eager load the relationships for the models.
  * @method static \Generator cursor() Get a generator for the given query.
  * @method static bool chunkById(int $count, callable $callback, string $column = null, string $alias = null) Chunk the results of a query by comparing numeric IDs.
  * @method static \Illuminate\Support\Collection pluck(string $column, string $key = null) Get an array with the values of a given column.
  * @method static \Illuminate\Contracts\Pagination\LengthAwarePaginator paginate(int $perPage = null, array $columns = ['*'], string $pageName = 'page', int $page = null) Paginate the given query.
  * @method static \Illuminate\Contracts\Pagination\Paginator simplePaginate(int $perPage = null, array $columns = ['*'], string $pageName = 'page', int $page = null) Paginate the given query into a simple paginator.
- * @method static \Illuminate\Database\Eloquent\Model|$this create(array $attributes = []) Save a new model and return the instance.
- * @method static \Illuminate\Database\Eloquent\Model|$this forceCreate(array $attributes) Save a new model and return the instance. Allow mass-assignment.
+ * @method static $this|$this create(array $attributes = []) Save a new model and return the instance.
+ * @method static $this|$this forceCreate(array $attributes) Save a new model and return the instance. Allow mass-assignment.
  * @method static void onDelete(\Closure $callback) Register a replacement for the default delete function.
  * @method static mixed scopes(array $scopes) Call the given local model scopes.
  * @method static \Illuminate\Database\Eloquent\Builder|static applyScopes() Apply the scopes to the Eloquent builder instance and return it.
  * @method static $this without(mixed $relations) Prevent the specified relations from being eager loaded.
- * @method static \Illuminate\Database\Eloquent\Model newModelInstance(array $attributes = []) Create a new instance of the model being queried.
+ * @method static $this newModelInstance(array $attributes = []) Create a new instance of the model being queried.
  * @method static \Illuminate\Database\Query\Builder getQuery() Get the underlying query builder instance.
  * @method static $this setQuery(\Illuminate\Database\Query\Builder $query) Set the underlying query builder instance.
  * @method static \Illuminate\Database\Query\Builder toBase() Get a base query builder instance.
  * @method static array getEagerLoads() Get the relationships being eagerly loaded.
  * @method static $this setEagerLoads(array $eagerLoad) Set the relationships being eagerly loaded.
- * @method static \Illuminate\Database\Eloquent\Model getModel() Get the model instance being queried.
- * @method static $this setModel(\Illuminate\Database\Eloquent\Model $model) Set a model instance for the model being queried.
+ * @method static $this getModel() Get the model instance being queried.
+ * @method static $this setModel(Model $model) Set a model instance for the model being queried.
  * @method static \Closure getMacro(string $name) Get the given macro by name.
  *
  * @see \Illuminate\Database\Concerns\BuildsQueries
  * @method static bool chunk(int $count, callable $callback) Chunk the results of the query.
  * @method static bool each(callable $callback, int $count = 1000) Execute a callback over each item while chunking.
- * @method static \Illuminate\Database\Eloquent\Model|static|null first(array $columns = ['*']) Execute the query and get the first result.
+ * @method static $this|static|null first(array $columns = ['*']) Execute the query and get the first result.
  * @method static mixed when(mixed $value, callable $callback, callable $default = null) Apply the callback's query changes if the given "value" is true.
  * @method static \Illuminate\Database\Query\Builder tap(\Closure $callback) Pass the query to a given callback.
  * @method static mixed unless(mixed $value, callable $callback, callable $default = null) Apply the callback's query changes if the given "value" is false.
@@ -1166,7 +1166,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Clone the model into a new, non-existing instance.
      *
      * @param  array|null  $except
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return $this
      */
     public function replicate(array $except = null)
     {
@@ -1447,7 +1447,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @return $this|null
      */
     public function resolveRouteBinding($value)
     {
