@@ -35,7 +35,7 @@ namespace Illuminate\Support\Facades;
  * @method static array directories(string $directory) Get all of the directories within a given directory.
  * @method static bool makeDirectory(string $path, int $mode, bool $recursive, bool $force) Create a directory.
  * @method static bool moveDirectory(string $from, string $to, bool $overwrite) Move a directory.
- * @method static bool copyDirectory(string $directory, string $destination, int $options) Copy a directory from one location to another.
+ * @method static bool copyDirectory(string $directory, string $destination, int $options=null) Copy a directory from one location to another.
  * @method static bool deleteDirectory(string $directory, bool $preserve) Recursively delete a directory.
  * @method static bool cleanDirectory(string $directory) Empty the specified directory of all files and folders.
  * @method static void macro(string $name, object | callable $macro) Register a custom macro.
