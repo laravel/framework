@@ -1069,7 +1069,7 @@ class Builder
     /**
      * Parse a list of relations into individuals.
      *
-     * @param  array  $relations array of strings "relation_name:constraint1,constraint2,..." OR array( array('relation_name','constraint1','constraint2') )
+     * @param  array  $relations
      * @return array
      */
     protected function parseWithRelations(array $relations)
@@ -1104,10 +1104,7 @@ class Builder
     /**
      * Create a constraint to select the given columns for the relation.
      *
-     * @param  string $name
-     * @example $array = $builder->createSelectWithConstraint("relation_name:constraint1,constraint2,...");
-     *      / * $array == ['relation_name','constraint1','constraint2'] * /
-     * /example
+     * @param  string  $name
      * @return array
      */
     protected function createSelectWithConstraint($name)

@@ -39,7 +39,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
     /**
      * Create a new fluent container instance.
      *
-     * @param  array|object $attributes=[]
+     * @param  array|object  $attributes=[]
      */
     public function __construct($attributes = [])
     {
@@ -52,7 +52,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      * Get an attribute from the container.
      *
      * @param  string  $key
-     * @param  mixed   $default=null
+     * @param  mixed   $default
      * @return mixed
      */
     public function get($key, $default = null)
