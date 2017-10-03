@@ -144,7 +144,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Get the current encoded path info for the request.
+     * Get the current decoded path info for the request.
      *
      * @return string
      */
