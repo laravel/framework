@@ -415,7 +415,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function increments($column)
+    public function increments($column = 'id')
     {
         return $this->unsignedInteger($column, true);
     }
@@ -426,7 +426,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function tinyIncrements($column)
+    public function tinyIncrements($column = 'id')
     {
         return $this->unsignedTinyInteger($column, true);
     }
@@ -437,7 +437,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function smallIncrements($column)
+    public function smallIncrements($column = 'id')
     {
         return $this->unsignedSmallInteger($column, true);
     }
@@ -448,7 +448,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function mediumIncrements($column)
+    public function mediumIncrements($column = 'id')
     {
         return $this->unsignedMediumInteger($column, true);
     }
@@ -459,7 +459,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function bigIncrements($column)
+    public function bigIncrements($column = 'id')
     {
         return $this->unsignedBigInteger($column, true);
     }
@@ -909,7 +909,7 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function uuid($column)
+    public function uuid($column = 'uuid')
     {
         return $this->addColumn('uuid', $column);
     }
