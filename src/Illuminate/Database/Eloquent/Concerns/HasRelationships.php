@@ -59,7 +59,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        /** @var Model $this */
+        /* @var Model $this */
         return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
     }
 
@@ -83,7 +83,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        /** @var Model $this */
+        /* @var Model $this */
         return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
 
@@ -119,7 +119,7 @@ trait HasRelationships
         // actually be responsible for retrieving and hydrating every relations.
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
-        /** @var Model $this */
+        /* @var Model $this */
         return new BelongsTo(
             $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
@@ -162,7 +162,7 @@ trait HasRelationships
      */
     protected function morphEagerTo($name, $type, $id)
     {
-        /** @var Model $this */
+        /* @var Model $this */
         return new MorphTo(
             $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
         );
@@ -183,7 +183,7 @@ trait HasRelationships
             static::getActualClassNameForMorph($target)
         );
 
-        /** @var Model $this */
+        /* @var Model $this */
         return new MorphTo(
             $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
         );
@@ -228,7 +228,7 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        /** @var Model $this */
+        /* @var Model $this */
         return new HasMany(
             $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
         );
@@ -247,8 +247,8 @@ trait HasRelationships
      */
     public function hasManyThrough($related, $through, $firstKey = null, $secondKey = null, $localKey = null, $secondLocalKey = null)
     {
-        /** @var Model $through */
-        /** @var Model $this */
+        /* @var Model $through */
+        /* @var Model $this */
         $through = new $through;
 
         $firstKey = $firstKey ?: $this->getForeignKey();
@@ -276,7 +276,7 @@ trait HasRelationships
      */
     public function morphMany($related, $name, $type = null, $id = null, $localKey = null)
     {
-        /** @var Model $this */
+        /* @var Model $this */
         $instance = $this->newRelatedInstance($related);
 
         // Here we will gather up the morph type and ID for the relationship so that we
@@ -306,7 +306,7 @@ trait HasRelationships
     public function belongsToMany($related, $table = null, $foreignPivotKey = null, $relatedPivotKey = null,
                                   $parentKey = null, $relatedKey = null, $relation = null)
     {
-        /** @var Model $this */
+        /* @var Model $this */
         // If no relationship name was passed, we will pull backtraces to get the
         // name of the calling function. We will use that function name as the
         // title of this relation since that is a great convention to apply.
@@ -354,7 +354,7 @@ trait HasRelationships
                                 $relatedPivotKey = null, $parentKey = null,
                                 $relatedKey = null, $inverse = false)
     {
-        /** @var Model $this */
+        /* @var Model $this */
         $caller = $this->guessBelongsToManyRelation();
 
         // First, we will need to determine the foreign key and "other key" for the
