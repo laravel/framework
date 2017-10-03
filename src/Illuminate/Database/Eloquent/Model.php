@@ -78,12 +78,12 @@ use JsonSerializable;
  * @method static mixed unless(mixed $value, callable $callback, callable $default = null) Apply the callback's query changes if the given "value" is false.
  *
  * @see \Illuminate\Database\Concerns\QueriesRelationships
- * @method static \Illuminate\Database\Eloquent\Builder|static has(string $relation, string $operator = '>=', int $count = 1, string $boolean = 'and', Closure $callback = null) Add a relationship count / exists condition to the query.
+ * @method static \Illuminate\Database\Eloquent\Builder|static has(string $relation, string $operator = '>=', int $count = 1, string $boolean = 'and', \Closure $callback = null) Add a relationship count / exists condition to the query.
  * @method static \Illuminate\Database\Eloquent\Builder|static orHas(string $relation, string $operator = '>=', int $count = 1) Add a relationship count / exists condition to the query with an "or".
- * @method static \Illuminate\Database\Eloquent\Builder|static doesntHave(string $relation, string $boolean = 'and', Closure $callback = null) Add a relationship count / exists condition to the query.
+ * @method static \Illuminate\Database\Eloquent\Builder|static doesntHave(string $relation, string $boolean = 'and', \Closure $callback = null) Add a relationship count / exists condition to the query.
  * @method static \Illuminate\Database\Eloquent\Builder|static orDoesntHave(string $relation) Add a relationship count / exists condition to the query with an "or".
- * @method static \Illuminate\Database\Eloquent\Builder|static whereHas(string $relation, Closure $callback = null, string $operator = '>=', int $count = 1) Add a relationship count / exists condition to the query with where clauses.
- * @method static \Illuminate\Database\Eloquent\Builder|static orWhereHas(string $relation, Closure $callback = null, string $operator = '>=', int $count = 1) Add a relationship count / exists condition to the query with where clauses and an "or".
+ * @method static \Illuminate\Database\Eloquent\Builder|static whereHas(string $relation, \Closure $callback = null, string $operator = '>=', int $count = 1) Add a relationship count / exists condition to the query with where clauses.
+ * @method static \Illuminate\Database\Eloquent\Builder|static orWhereHas(string $relation, \Closure $callback = null, string $operator = '>=', int $count = 1) Add a relationship count / exists condition to the query with where clauses and an "or".
  * @method static \Illuminate\Database\Eloquent\Builder|static whereDoesntHave(string $relation, \Closure $callback = null) Add a relationship count / exists condition to the query with where clauses.
  * @method static \Illuminate\Database\Eloquent\Builder|static orWhereDoesntHave(string $relation, \Closure $callback) Add a relationship count / exists condition to the query with where clauses and an "or".
  * @method static $this withCount(mixed $relations) Add subselect queries to count the relations.
