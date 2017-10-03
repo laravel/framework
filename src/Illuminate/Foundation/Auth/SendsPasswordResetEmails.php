@@ -7,6 +7,8 @@ use Illuminate\Support\Facades\Password;
 
 trait SendsPasswordResetEmails
 {
+    use RedirectsUsers;
+
     /**
      * Display the form to request a password reset link.
      *
@@ -58,7 +60,8 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkResponse($response)
     {
-        return back()->with('status', trans($response));
+        return redirect($this->redirectPath())
+                            ->with('status', trans($response));
     }
 
     /**
