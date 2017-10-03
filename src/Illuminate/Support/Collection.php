@@ -1133,13 +1133,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function concat($source)
     {
-        $result = new static($this);
-
         foreach ($source as $item) {
-            $result->push($item);
+            $this->push($item);
         }
 
-        return $result;
+        return $this;
     }
 
     /**
