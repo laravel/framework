@@ -8,6 +8,10 @@
 - Allow passing a callback to `with()` ([#21445](https://github.com/laravel/framework/pull/21445))
 - Added `PotentiallyMissing` interface to `MissingValue` class ([be7dccc](https://github.com/laravel/framework/commit/be7dccca9f9249c928108d957fe70e78d370d26e))
 - Accept `$queue` name on `Schedule::job()` ([#21473](https://github.com/laravel/framework/pull/21473))
+- Added callback and default parameter `whenLoaded()` method ([#21490](https://github.com/laravel/framework/pull/21490))
+- Allow marking notifications as unread ([#21497](https://github.com/laravel/framework/pull/21497))
+- Added `Collection::mapToDictionary()` method ([#21505](https://github.com/laravel/framework/pull/21505))
+- Added `make:exception` command ([#21483](https://github.com/laravel/framework/pull/21483))
 
 ### Changed
 - Reset RefreshDatabaseState after DatabaseMigrations rolls back ([#21325](https://github.com/laravel/framework/pull/21325))
@@ -26,7 +30,7 @@
 - Fixed `Collection::contains()` when the found value is `null` ([#21442](https://github.com/laravel/framework/pull/21442))
 - Fixed merge issue in `Relation::morphMap()` ([#21458](https://github.com/laravel/framework/pull/21458))
 - Clear count query select bindings in `Relation::getRelationExistenceCountQuery()` ([#21468](https://github.com/laravel/framework/pull/21468))
-
+- Fixed user model type hints policy stub ([#21499](https://github.com/laravel/framework/pull/21499))
 
 ## v5.5.13 (2017-09-24)
 
