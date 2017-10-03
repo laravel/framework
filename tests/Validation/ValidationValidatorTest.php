@@ -1678,6 +1678,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateEquals()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'equals:foo']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => 'bar'], ['foo' => 'equals:bar']);
+        $this->assertTrue($v->passes());
+    }
+
     /**
      * @dataProvider validUrls
      */
