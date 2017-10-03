@@ -738,6 +738,7 @@ if (! function_exists('preg_replace_array')) {
             foreach ($replacements as $key => $value) {
                 return array_shift($replacements);
             }
+
             return '';
         }, $subject);
     }
