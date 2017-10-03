@@ -1237,7 +1237,7 @@ class Builder
      * Handles dynamic "where" clauses to the query.
      *
      * @param  string  $method
-     * @param  string  $parameters
+     * @param  array  $parameters
      * @return $this
      */
     public function dynamicWhere($method, $parameters)
@@ -1947,7 +1947,7 @@ class Builder
     /**
      * Retrieve the "count" result of the query.
      *
-     * @param  string  $columns
+     * @param  array|string  $columns
      * @return int
      */
     public function count($columns = '*')
@@ -2029,6 +2029,8 @@ class Builder
         if (! $results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
         }
+
+        return null;
     }
 
     /**

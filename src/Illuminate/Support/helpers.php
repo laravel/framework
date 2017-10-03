@@ -139,7 +139,7 @@ if (! function_exists('array_forget')) {
      */
     function array_forget(&$array, $keys)
     {
-        return Arr::forget($array, $keys);
+        Arr::forget($array, $keys);
     }
 }
 
@@ -620,7 +620,7 @@ if (! function_exists('env')) {
                 return '';
             case 'null':
             case '(null)':
-                return;
+                return null;
         }
 
         if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
@@ -738,6 +738,8 @@ if (! function_exists('preg_replace_array')) {
             foreach ($replacements as $key => $value) {
                 return array_shift($replacements);
             }
+
+            return '';
         }, $subject);
     }
 }
@@ -1045,6 +1047,7 @@ if (! function_exists('throw_if')) {
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
      * @param  array  ...$parameters
+     * @throws \Throwable
      * @return void
      */
     function throw_if($boolean, $exception, ...$parameters)
@@ -1062,6 +1065,7 @@ if (! function_exists('throw_unless')) {
      * @param  bool  $boolean
      * @param  \Throwable|string  $exception
      * @param  array  ...$parameters
+     * @throws \Throwable
      * @return void
      */
     function throw_unless($boolean, $exception, ...$parameters)

@@ -12,6 +12,9 @@ use Illuminate\Contracts\Support\MessageProvider;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 use Symfony\Component\HttpFoundation\RedirectResponse as BaseRedirectResponse;
 
+/**
+ * @method $this withMessage(string $message) Create and return an un-saved model instance.
+ */
 class RedirectResponse extends BaseRedirectResponse
 {
     use ResponseTrait, Macroable {
