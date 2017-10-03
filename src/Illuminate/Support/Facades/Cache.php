@@ -10,7 +10,7 @@ namespace Illuminate\Support\Facades;
  * @method static void setDefaultDriver(string $name) Set the default cache driver name.
  * @method static $this extend(string $driver, \Closure $callback) Register a custom driver creator Closure.
  * @method static bool has(string $key) Determine if an item exists in the cache.
- * @method static mixed get(string $key, mixed $default) Retrieve an item from the cache by key.
+ * @method static mixed get(string $key, mixed $default=null) Retrieve an item from the cache by key.
  * @method static array many(array $keys) Retrieve multiple items from the cache by key.
  * @method static mixed pull(string $key, mixed $default) Retrieve an item from the cache and delete it.
  * @method static void put(string $key, mixed $value, \DateTimeInterface | \DateInterval | float | int $minutes) Store an item in the cache.

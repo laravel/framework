@@ -17,7 +17,7 @@ namespace Illuminate\Support\Facades;
  * @method static void resources(array $resources) Register an array of resource controllers.
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = []) Route a resource to a controller.
  * @method static \Illuminate\Routing\PendingResourceRegistration apiResource(string $name, string $controller, array $options = []) Route an api resource to a controller.
- * @method static void group(array $attributes, \Closure | string $routes) Create a route group with shared attributes.
+ * @method static void group(string $callback) Create a route group with shared attributes.
  * @method static array mergeWithLastGroup(array $new) Merge the given array with the last group stack.
  * @method static string getLastGroupPrefix() Get the prefix from the last group on the stack.
  * @method static \Illuminate\Http\Response|\Illuminate\Http\JsonResponse dispatch(\Illuminate\Http\Request $request) Dispatch the request to the application.
