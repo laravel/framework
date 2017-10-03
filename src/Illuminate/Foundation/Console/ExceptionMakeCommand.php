@@ -40,7 +40,7 @@ class ExceptionMakeCommand extends GeneratorCommand
                 ? __DIR__.'/stubs/exception-render-report.stub'
                 : __DIR__.'/stubs/exception-render.stub';
         }
-        
+
         return $this->option('report')
             ? __DIR__.'/stubs/exception-report.stub'
             : __DIR__.'/stubs/exception.stub';
@@ -78,6 +78,7 @@ class ExceptionMakeCommand extends GeneratorCommand
     {
         return [
             ['render', null, InputOption::VALUE_NONE, 'Create the exception with an empty render method.'],
+
             ['report', null, InputOption::VALUE_NONE, 'Create the exception with an empty report method.'],
         ];
     }

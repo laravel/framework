@@ -6,7 +6,6 @@ use Exception;
 
 class DummyClass extends Exception
 {
-
     /**
      * Report the exception.
      *
