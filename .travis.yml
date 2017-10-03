@@ -22,6 +22,7 @@ sudo: false
 cache:
   directories:
     - $HOME/.composer/cache
+    - $HOME/libsodium
 
 services:
   - memcached
@@ -31,6 +32,11 @@ before_install:
   - phpenv config-rm xdebug.ini || true
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - printf "\n" | pecl install -f redis
+  - sudo apt-get install -y software-properties-common
+  - sudo LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+  - sudo apt-get update
+  - sudo apt-get install -y libsodium-dev
+  - pecl install -f libsodium
   - travis_retry composer self-update
 
 install:
