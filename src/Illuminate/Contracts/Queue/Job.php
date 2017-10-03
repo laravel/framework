@@ -4,6 +4,8 @@ namespace Illuminate\Contracts\Queue;
 
 /**
  * @mixin \Illuminate\Queue\Jobs\Job
+ *
+ * @method int getJobId()
  */
 interface Job
 {
