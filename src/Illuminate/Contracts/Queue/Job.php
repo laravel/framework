@@ -2,6 +2,9 @@
 
 namespace Illuminate\Contracts\Queue;
 
+/**
+ * @mixin \Illuminate\Queue\Jobs\Job
+ */
 interface Job
 {
     /**
