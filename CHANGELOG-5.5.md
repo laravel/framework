@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## 5.5.14 (2017-10-03)
 
 ### Added
 - Allow testing anonymous notifiables ([#21379](https://github.com/laravel/framework/pull/21379))
