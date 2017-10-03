@@ -620,7 +620,7 @@ if (! function_exists('env')) {
                 return '';
             case 'null':
             case '(null)':
-                return NULL;
+                return null;
         }
 
         if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {

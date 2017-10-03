@@ -2,23 +2,22 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use ArrayAccess;
-use BadMethodCallException;
 use Exception;
-use Illuminate\Contracts\Queue\QueueableEntity;
-use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Database\Eloquent\Relations\Pivot;
-use Illuminate\Database\Query\Builder as QueryBuilder;
+use ArrayAccess;
+use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use JsonSerializable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Routing\UrlRoutable;
+use Illuminate\Contracts\Queue\QueueableEntity;
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 /**
  * Class Model
- * @package Illuminate\Database\Eloquent
  *
  * @mixin \Illuminate\Database\Eloquent\Builder
  * @mixin \Illuminate\Database\Query\Builder
@@ -191,7 +190,6 @@ use JsonSerializable;
  * @method static void mixin(object $mixin) Mix another object into the class.
  * @method static bool hasMacro(string $name) Checks if macro is registered.
  * @method static mixed macroCall(string $method, array $parameters) Dynamically handle calls to the class.
- *
  */
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -904,8 +902,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
         // correct set of attributes in case the developers wants to check these.
-        /** @var string $key */
-        /** @var Model $instance */
+        /* @var string $key */
+        /* @var Model $instance */
         $key = ($instance = new static)->getKeyName();
 
         foreach ($instance->whereIn($key, $ids)->get() as $model) {
@@ -934,7 +932,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // immediately and not do anything else. Otherwise, we will continue with a
         // deletion process on the model, firing the proper events, and so forth.
         if (! $this->exists) {
-            return NULL;
+            return null;
         }
 
         if ($this->fireModelEvent('deleting') === false) {
@@ -1084,7 +1082,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null)
     {
-        /** @var $using Pivot */
+        /* @var $using Pivot */
         return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
                       : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
@@ -1137,7 +1135,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function fresh($with = [])
     {
         if (! $this->exists) {
-            return NULL;
+            return null;
         }
 
         return static::newQueryWithoutScopes()

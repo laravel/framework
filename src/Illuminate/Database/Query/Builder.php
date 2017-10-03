@@ -2029,6 +2029,7 @@ class Builder
         if (! $results->isEmpty()) {
             return array_change_key_case((array) $results[0])['aggregate'];
         }
+
         return null;
     }
 

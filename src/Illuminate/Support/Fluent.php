@@ -8,7 +8,7 @@ use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
- * Methods commonly used in migrations
+ * Methods commonly used in migrations.
  *
  * @method Fluent after(string $column) Add the after modifier
  * @method Fluent charset(string $charset) Add the character set modifier
