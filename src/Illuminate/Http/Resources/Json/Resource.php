@@ -92,9 +92,9 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
         );
 
         if ($data instanceof Arrayable) {
-            return $this->filter($data->toArray());
+            $data = $this->filter($data->toArray());
         } elseif ($data instanceof JsonSerializable) {
-            return $this->filter($data->jsonSerialize());
+            $data = $this->filter($data->jsonSerialize());
         }
 
         return $this->filter($data);
