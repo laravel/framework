@@ -91,12 +91,12 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
             $request = $request ?: Container::getInstance()->make('request')
         );
 
-        if (is_array($data)) {
-            $data = $data;
-        } elseif ($data instanceof Arrayable || $data instanceof Collection) {
-            $data = $data->toArray();
-        } elseif ($data instanceof JsonSerializable) {
-            $data = $data->jsonSerialize();
+        if ($data instanceof Arrayable || $data instanceof Collection) {
+            return $this->filter((array) $data->toArray());
+        }
+
+        if ($data instanceof JsonSerializable) {
+            return $this->filter((array) $data->jsonSerialize());
         }
 
         return $this->filter((array) $data);
