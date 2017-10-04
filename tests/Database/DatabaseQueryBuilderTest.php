@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Query\JoinClause;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
@@ -2317,6 +2318,19 @@ class DatabaseQueryBuilderTest extends TestCase
             'path' => $path,
             'pageName' => $pageName,
         ]), $result);
+    }
+
+    public function testQueryHasJoin()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->join("my-table", 'id')
+            ->join("my-table", 'id');
+
+        $joins = collect($builder->joins)->filter(function ($item) {
+            return $item instanceof JoinClause;
+        });
+
+        $this->assertEquals($joins->count(), 1);
     }
 
     protected function getBuilder()
