@@ -527,7 +527,7 @@ trait HasRelationships
      * Get a specified relationship.
      *
      * @param  string  $relation
-     * @return mixed
+     * @return \Illuminate\Support\Collection|Model
      */
     public function getRelation($relation)
     {
