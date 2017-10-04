@@ -168,7 +168,6 @@ class JobChainingTestThirdJob implements ShouldQueue
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
-
     }
 }
 
