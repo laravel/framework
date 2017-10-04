@@ -21,7 +21,14 @@ class HashServiceProvider extends ServiceProvider
     public function register()
     {
         $this->app->singleton('hash', function () {
-            return new BcryptHasher;
+            switch (config('hash.algorithm')) {
+                case 'argon2':
+                case 'argon2i':
+                    return new Argon2Hasher;
+                case 'bcrypt':
+                default:
+                    return new BcryptHasher;
+            }
         });
     }
 
