@@ -96,6 +96,8 @@ trait Queueable
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
                 $next->chained = $this->chained;
+                $next->onConnection($next->connection ?: $this->connection);
+                $next->onQueue($next->queue ?: $this->queue);
             }));
         }
     }
