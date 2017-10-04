@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.14 (2017-10-03)
 
 ### Added
 - Allow testing anonymous notifiables ([#21379](https://github.com/laravel/framework/pull/21379))
@@ -31,6 +31,7 @@
 - Fixed merge issue in `Relation::morphMap()` ([#21458](https://github.com/laravel/framework/pull/21458))
 - Clear count query select bindings in `Relation::getRelationExistenceCountQuery()` ([#21468](https://github.com/laravel/framework/pull/21468))
 - Fixed user model type hints policy stub ([#21499](https://github.com/laravel/framework/pull/21499))
+
 
 ## v5.5.13 (2017-09-24)
 
