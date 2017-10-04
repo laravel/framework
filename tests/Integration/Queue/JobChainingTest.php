@@ -111,6 +111,16 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertFalse(JobChainingTestThirdJob::$ran);
     }
+
+    public function test_chain_jobs_use_same_config()
+    {
+        JobChainingTestFirstJob::dispatch()->onQueue('some_queue')->onConnection('sync')->chain([
+            new JobChainingTestSecondJob,
+        ]);
+
+        $this->assertEquals('some_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertEquals('sync', JobChainingTestSecondJob::$usedConnection);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -118,10 +128,14 @@ class JobChainingTestFirstJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
 
     public function handle()
     {
         static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
     }
 }
 
@@ -130,10 +144,14 @@ class JobChainingTestSecondJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
 
     public function handle()
     {
         static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
     }
 }
 
@@ -142,10 +160,15 @@ class JobChainingTestThirdJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
 
     public function handle()
     {
         static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
+
     }
 }
 
