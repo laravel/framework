@@ -121,6 +121,16 @@ class JobChainingTest extends TestCase
         $this->assertEquals('some_queue', JobChainingTestSecondJob::$usedQueue);
         $this->assertEquals('sync', JobChainingTestSecondJob::$usedConnection);
     }
+
+    public function test_chain_jobs_use_own_config()
+    {
+        JobChainingTestFirstJob::dispatch()->onQueue('some_queue')->onConnection('sync')->chain([
+            (new JobChainingTestSecondJob)->onQueue('another_queue'),
+        ]);
+
+        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertEquals('sync', JobChainingTestSecondJob::$usedConnection);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
