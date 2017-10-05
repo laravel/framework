@@ -1005,6 +1005,21 @@ if (! function_exists('str_start')) {
     }
 }
 
+if (! function_exists('str_words')) {
+    /**
+     * Limit the number of words in a string.
+     *
+     * @param  string  $value
+     * @param  int     $words
+     * @param  string  $end
+     * @return string
+     */
+    function str_words($value, $words = 100, $end = '...')
+    {
+        return Str::words($value, $words, $end);
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
