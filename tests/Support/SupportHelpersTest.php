@@ -315,6 +315,21 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('这是一', Str::limit($nonAsciiString, 6, ''));
     }
 
+    public function testStrWords()
+    {
+        $string = 'Hello world!';
+        $this->assertEquals('Hello...', str_words($string, 1));
+        $this->assertEquals('Hello___', str_words($string, 1, '___'));
+        $this->assertEquals('Hello', str_words($string, 1, ''));
+        $this->assertEquals('Hello world!', str_words($string, 3));
+
+        $unicodeString = 'Привет мир!';
+        $this->assertEquals('Привет...', str_words($unicodeString, 1));
+        $this->assertEquals('Привет___', str_words($unicodeString, 1, '___'));
+        $this->assertEquals('Привет', str_words($unicodeString, 1, ''));
+        $this->assertEquals('Привет мир!', str_words($unicodeString, 3));
+    }
+
     public function testCamelCase()
     {
         $this->assertEquals('fooBar', Str::camel('FooBar'));
