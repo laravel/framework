@@ -969,3 +969,26 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('json')) {
+
+    /**
+     * Return a new JSON response from the application.
+     *
+     * @param  string|array  $data
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  int  $options
+     * @return \Illuminate\Http\JsonResponse
+     */
+     function json($data = [], $status = 200, array $headers = [], $options = 0)
+    {
+        $factory = app(ResponseFactory::class);
+
+        if (func_num_args() === 0) {
+            return $factory;
+        }
+
+        return $factory->json($data, $status, $headers, $options);
+    }
+}
