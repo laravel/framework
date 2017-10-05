@@ -56,7 +56,27 @@ abstract class ServiceProvider
     {
         $config = $this->app['config']->get($key, []);
 
-        $this->app['config']->set($key, array_merge(require $path, $config));
+        $array = $this->array_unique_recursive(array_merge_recursive(require $path, $config));
+
+        $this->app['config']->set($key, $array);
+    }
+
+    /**
+     * Remove duplicates, recursively.
+     * @param array $array
+     * @return array
+     */
+    private function array_unique_recursive($array)
+    {
+        $result = array_map('unserialize', array_unique(array_map('serialize', $array)));
+
+        foreach ($result as $key => $value) {
+            if (is_array($value)) {
+                $result[$key] = $this->array_unique_recursive($value);
+            }
+        }
+
+        return $result;
     }
 
     /**
