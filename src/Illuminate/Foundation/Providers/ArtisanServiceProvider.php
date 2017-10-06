@@ -46,6 +46,7 @@ use Illuminate\Foundation\Console\ExceptionMakeCommand;
 use Illuminate\Foundation\Console\VendorPublishCommand;
 use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Foundation\Console\SubscriberMakeCommand;
 use Illuminate\Foundation\Console\PackageDiscoverCommand;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
@@ -153,6 +154,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
+        'SubscriberMake' => 'command.subscriber.make',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
     ];
@@ -800,6 +802,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.storage.link', function () {
             return new StorageLinkCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerSubscriberMakeCommand()
+    {
+        $this->app->singleton('command.subscriber.make', function ($app) {
+            return new SubscriberMakeCommand($app['files']);
         });
     }
 
