@@ -66,12 +66,41 @@ class PendingDispatch
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array  $chain
+     * @param      $chain
+     * @param null $queue
+     * @param null $connection
+     *
      * @return $this
      */
-    public function chain($chain)
+    public function chain($chain,$queue=null,$connection=null)
     {
-        $this->job->chain($chain);
+        $this->job->chain($chain)->onChainQueue($queue)->onChainConnection($connection);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired default connection for the jobs on the chain.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function onChainConnection($connection)
+    {
+        $this->job->onChainConnection($connection);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired default queue for the jobs on the chain.
+     *
+     * @param  string|null  $queue
+     * @return $this
+     */
+    public function onChainQueue($queue)
+    {
+        $this->job->onChainQueue($queue);
 
         return $this;
     }

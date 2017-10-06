@@ -2,6 +2,9 @@
 
 namespace Illuminate\Contracts\Queue;
 
+/**
+ *
+ */
 interface ShouldQueue
 {
     //
