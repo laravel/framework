@@ -659,7 +659,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
 
             foreach ($groupKeys as $groupKey) {
-                $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
+                $groupKey = is_bool($groupKey) || is_int($groupKey)
+                    ? (int) $groupKey
+                    : (string) $groupKey;
 
                 if (! array_key_exists($groupKey, $results)) {
                     $results[$groupKey] = new static;
