@@ -165,7 +165,7 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Create job to be queued
+     * Create job to be queued.
      *
      * @return SendQueuedMailable
      */
