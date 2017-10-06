@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Storage;
 use Illuminate\Console\Command;
 
 class StorageLinkCommand extends Command
@@ -32,7 +33,7 @@ class StorageLinkCommand extends Command
         }
 
         $this->laravel->make('files')->link(
-            storage_path('app/public'), public_path('storage')
+            rtrim(Storage::disk('public')->path(''), '/'), public_path('storage')
         );
 
         $this->info('The [public/storage] directory has been linked.');
