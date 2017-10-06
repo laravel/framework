@@ -149,7 +149,7 @@ class ModelMakeCommand extends GeneratorCommand
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
 
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model.'],
-            
+
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
         ];
     }
