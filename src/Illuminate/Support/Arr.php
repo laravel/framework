@@ -594,6 +594,25 @@ class Arr
     }
 
     /**
+     * Filter the array using the given callback Recursively.
+     *
+     * @param  array $array
+     * @param  callable $callback
+     * @return array
+     */
+    public static function whereRecursive(array $array, callable $callback = null)
+    {
+        $array = is_callable($callback) ? static::where($array, $callback) : array_filter($array);
+        foreach ($array as &$value) {
+            if (is_array($value)) {
+                $value = call_user_func(__CLASS__ . '::' . __FUNCTION__, $value, $callback);
+            }
+        }
+
+        return $array;
+    }
+
+    /**
      * If the given value is not an array, wrap it in one.
      *
      * @param  mixed  $value
