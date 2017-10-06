@@ -9,14 +9,14 @@ trait Queueable
      *
      * @var string|null
      */
-    public $chain_connection=null;
+    public $chain_connection = null;
 
     /**
      * The name of the queue the chained jobs should be sent to if not set on job.
      *
      * @var string|null
      */
-    public $chain_queue=null;
+    public $chain_queue = null;
 
     /**
      * The name of the connection the job should be sent to.
@@ -88,10 +88,13 @@ trait Queueable
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array  $chain
+     * @param      $chain
+     * @param null $queue
+     * @param null $connection
+     *
      * @return $this
      */
-    public function chain($chain,$queue=null,$connection=null)
+    public function chain($chain,$queue = null ,$connection = null )
     {
         $this->chained = collect($chain)->map(function ($job) {
             return serialize($job);
@@ -135,10 +138,9 @@ trait Queueable
      */
     public function dispatchNextJobInChain()
     {
-        if (! empty($this->chained))
-        {
+        if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
-                if(in_array('Illuminate\Bus\Queueable', class_uses_recursive($next))){
+                if(in_array('Illuminate\Bus\Queueable', class_uses_recursive($next))) {
                     /* @var \Illuminate\Bus\Queueable $next */
                 } else {
                     throw new \Exception('Trying to dispatch an object that is not Queueable');

@@ -67,12 +67,12 @@ class PendingDispatch
      * Set the jobs that should run if this job is successful.
      *
      * @param      $chain
-     * @param null $queue
-     * @param null $connection
+     * @param null|string $queue
+     * @param null|string $connection
      *
      * @return $this
      */
-    public function chain($chain,$queue=null,$connection=null)
+    public function chain($chain,$queue = null,$connection = null)
     {
         $this->job->chain($chain)->onChainQueue($queue)->onChainConnection($connection);
 

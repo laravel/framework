@@ -37,11 +37,11 @@ class PendingChain
      *
      * @param      $class
      * @param      $chain
-     * @param null $chain_queue
-     * @param null $chain_connection
+     * @param null|string $chain_queue
+     * @param null|string $chain_connection
      * @return void
      */
-    public function __construct($class, $chain, $chain_queue=null, $chain_connection=null)
+    public function __construct($class, $chain, $chain_queue = null, $chain_connection = null)
     {
         $this->class = $class;
         $this->chain = $chain;

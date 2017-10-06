@@ -22,7 +22,7 @@ trait Dispatchable
      * @param  null|string  $chain_connection
      * @return \Illuminate\Foundation\Bus\PendingChain
      */
-    public static function withChain(array $chain,string $chain_queue=null,string $chain_connection=null)
+    public static function withChain(array $chain,string $chain_queue = null,string $chain_connection = null)
     {
         return new PendingChain(get_called_class(), $chain, $chain_queue, $chain_connection);
     }
