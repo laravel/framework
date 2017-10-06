@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
+use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
 class SubscriberMakeCommand extends GeneratorCommand
@@ -39,12 +39,12 @@ class SubscriberMakeCommand extends GeneratorCommand
     {
         $event = $this->option('event');
 
-        if (!Str::startsWith($event, [
+        if (! Str::startsWith($event, [
             $this->laravel->getNamespace(),
             'Illuminate',
             '\\',
         ])) {
-            $event = $this->laravel->getNamespace() . 'Events\\' . $event;
+            $event = $this->laravel->getNamespace().'Events\\'.$event;
         }
 
         $stub = str_replace(
@@ -64,8 +64,8 @@ class SubscriberMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         return $this->option('event')
-            ? __DIR__ . '/stubs/subscriber.stub'
-            : __DIR__ . '/stubs/subscriber-duck.stub';
+            ? __DIR__.'/stubs/subscriber.stub'
+            : __DIR__.'/stubs/subscriber-duck.stub';
     }
 
     /**
@@ -87,7 +87,7 @@ class SubscriberMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace . '\Listeners';
+        return $rootNamespace.'\Listeners';
     }
 
     /**
