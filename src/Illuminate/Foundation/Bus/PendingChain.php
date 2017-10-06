@@ -23,14 +23,14 @@ class PendingChain
      *
      * @var string|null
      */
-    public $chain_connection=null;
+    public $chain_connection = null;
 
     /**
      * The name of the queue the chained jobs should be sent to if not set on job.
      *
      * @var string|null
      */
-    public $chain_queue=null;
+    public $chain_queue = null;
 
     /**
      * Create a new PendingChain instance.

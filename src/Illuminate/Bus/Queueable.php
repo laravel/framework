@@ -94,7 +94,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function chain($chain,$queue = null ,$connection = null )
+    public function chain($chain,$queue = null ,$connection = null)
     {
         $this->chained = collect($chain)->map(function ($job) {
             return serialize($job);
@@ -140,7 +140,7 @@ trait Queueable
     {
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
-                if(in_array('Illuminate\Bus\Queueable', class_uses_recursive($next))) {
+                if (in_array('Illuminate\Bus\Queueable', class_uses_recursive($next))) {
                     /* @var \Illuminate\Bus\Queueable $next */
                 } else {
                     throw new \Exception('Trying to dispatch an object that is not Queueable');

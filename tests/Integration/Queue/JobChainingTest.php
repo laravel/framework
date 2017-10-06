@@ -193,7 +193,7 @@ class JobChainingTest extends TestCase
     {
         JobChainingTestFirstJob::withChain([
             new JobChainingTestSecondJob,
-        ],'chain_queue_name', 'sync')->dispatch()->onQueue('first_queue')->onConnection('sync');
+        ], 'chain_queue_name', 'sync')->dispatch()->onQueue('first_queue')->onConnection('sync');
 
         $this->assertEquals('first_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertEquals('sync', JobChainingTestFirstJob::$usedConnection);
@@ -206,7 +206,7 @@ class JobChainingTest extends TestCase
     {
         JobChainingTestFirstJob::withChain([
             (new JobChainingTestSecondJob)->onQueue('another_queue')->onConnection('sync'),
-        ],'chain_queue_name', 'sync')->dispatch()->onQueue('first_queue')->onConnection('sync');
+        ], 'chain_queue_name', 'sync')->dispatch()->onQueue('first_queue')->onConnection('sync');
 
         $this->assertEquals('first_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertEquals('sync', JobChainingTestFirstJob::$usedConnection);
@@ -220,7 +220,7 @@ class JobChainingTest extends TestCase
         JobChainingTestFirstJob::withChain([
             (new JobChainingTestSecondJob)->onChainQueue('override_chain_queue')->onChainConnection('sync'),
             (new JobChainingTestThirdJob),
-        ],'chain_queue_name', 'sync')->dispatch()->onQueue('first_queue')->onConnection('sync');
+        ], 'chain_queue_name', 'sync')->dispatch()->onQueue('first_queue')->onConnection('sync');
 
         $this->assertEquals('first_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertEquals('sync', JobChainingTestFirstJob::$usedConnection);
