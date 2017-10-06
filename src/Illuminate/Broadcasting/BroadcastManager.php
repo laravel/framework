@@ -111,15 +111,9 @@ class BroadcastManager implements FactoryContract
             $connection = $event->connection;
         }
 
-        $queue = null;
-
-        if (method_exists($event, 'broadcastQueue')) {
-            $queue = $event->broadcastQueue();
-        } elseif (isset($event->broadcastQueue)) {
-            $queue = $event->broadcastQueue;
-        } elseif (isset($event->queue)) {
-            $queue = $event->queue;
-        }
+        $queue = (method_exists($event, 'broadcastQueue'))
+            ? $event->broadcastQueue()
+            : $event->broadcastQueue ?? $event->queue ?? null;
 
         $this->app->make('queue')->connection($connection)->pushOn(
             $queue, new BroadcastEvent(clone $event)

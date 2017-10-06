@@ -15,8 +15,8 @@ trait WithoutMiddleware
     {
         if (method_exists($this, 'withoutMiddleware')) {
             $this->withoutMiddleware();
-        } else {
-            throw new Exception('Unable to disable middleware. MakesHttpRequests trait not used.');
         }
+
+        throw new Exception('Unable to disable middleware. MakesHttpRequests trait not used.');
     }
 }

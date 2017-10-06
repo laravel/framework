@@ -101,11 +101,11 @@ class CacheManager implements FactoryContract
         } else {
             $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
+            if (! method_exists($this, $driverMethod)) {
                 throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
             }
+
+            return $this->{$driverMethod}($config);
         }
     }
 
