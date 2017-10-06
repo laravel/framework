@@ -87,9 +87,9 @@ class ValidationRuleParser
             return explode('|', $rule);
         } elseif (is_object($rule)) {
             return [$this->prepareRule($rule)];
-        } else {
-            return array_map([$this, 'prepareRule'], $rule);
         }
+
+        return array_map([$this, 'prepareRule'], $rule);
     }
 
     /**
@@ -195,11 +195,9 @@ class ValidationRuleParser
             return [$rules, []];
         }
 
-        if (is_array($rules)) {
-            $rules = static::parseArrayRule($rules);
-        } else {
-            $rules = static::parseStringRule($rules);
-        }
+        $rules = (is_array($rules))
+            ? static::parseArrayRule($rules)
+            : static::parseStringRule($rules);
 
         $rules[0] = static::normalizeRule($rules[0]);
 
