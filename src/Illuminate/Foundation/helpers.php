@@ -292,12 +292,12 @@ if (! function_exists('cookie')) {
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  int     $minutes
+     * @param  int  $minutes
      * @param  string  $path
      * @param  string  $domain
-     * @param  bool    $secure
-     * @param  bool    $httpOnly
-     * @param  bool         $raw
+     * @param  bool  $secure
+     * @param  bool  $httpOnly
+     * @param  bool  $raw
      * @param  string|null  $sameSite
      * @return \Illuminate\Cookie\CookieJar|\Symfony\Component\HttpFoundation\Cookie
      */
