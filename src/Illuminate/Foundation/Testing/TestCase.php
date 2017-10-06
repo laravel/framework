@@ -130,6 +130,10 @@ abstract class TestCase extends BaseTestCase
      */
     protected function tearDown()
     {
+        if (isset($uses[DatabaseTruncations::class])) {
+            $this->truncateTables();
+        }
+
         if ($this->app) {
             foreach ($this->beforeApplicationDestroyedCallbacks as $callback) {
                 call_user_func($callback);
