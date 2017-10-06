@@ -1,0 +1,25 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyFullEvent;
+
+class DummyClass
+{
+
+
+    public function onDummyEvent(DummyEvent $event)
+    {
+        //
+    }
+
+    /**
+     * Register the listeners for the subscriber.
+     *
+     * @param  \Illuminate\Events\Dispatcher $events
+     */
+    public function subscribe($events)
+    {
+        $events->listen('DummyFullEvent', 'DummyNamespace\DummyClass@onDummyEvent');
+    }
+}

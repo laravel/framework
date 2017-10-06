@@ -38,6 +38,7 @@ use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\SubscriberMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -153,6 +154,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'SeederMake' => 'command.seeder.make',
         'SessionTable' => 'command.session.table',
         'Serve' => 'command.serve',
+        'SubscriberMake' => 'command.subscriber.make',
         'TestMake' => 'command.test.make',
         'VendorPublish' => 'command.vendor.publish',
     ];
@@ -800,6 +802,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.storage.link', function () {
             return new StorageLinkCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerSubscriberMakeCommand()
+    {
+        $this->app->singleton('command.subscriber.make', function ($app) {
+            return new SubscriberMakeCommand($app['files']);
         });
     }
 
