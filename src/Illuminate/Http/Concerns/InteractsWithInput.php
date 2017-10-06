@@ -176,6 +176,20 @@ trait InteractsWithInput
     }
 
     /**
+     * Get all of the input and files for the request without null input.
+     *
+     * @param  array|mixed $keys
+     * @return array
+     */
+    public function allWithoutNull($keys = null)
+    {
+        $inputs = $this->all($keys);
+        return Arr::whereRecursive($inputs, function ($value, $key) {
+            return !(null === $value || $value === '' || $value === []);
+        });
+    }
+
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string  $key

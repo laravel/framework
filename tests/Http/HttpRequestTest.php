@@ -855,4 +855,29 @@ class HttpRequestTest extends TestCase
         $request->setLaravelSession($session);
         $request->flashExcept(['email']);
     }
+
+    public function testAllWithoutNullInputReturnsNestedInputAndFiles()
+    {
+        $file = $this->getMockBuilder('Illuminate\Http\UploadedFile')->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
+        $request = Request::create('/?boom=', 'GET', ['foo' => []], [], ['foo' => ['file' => $file, 'anotherFile' => null]]);
+        $this->assertEquals(['foo' => ['file' => $file]], $request->allWithoutNull());
+    }
+
+    public function testAllWithoutNullInputReturnsInputAfterReplace()
+    {
+        $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']]);
+        $request->replace(['foo' => ['bar' => 'baz'], 'boom' => '']);
+        $this->assertEquals(['foo' => ['bar' => 'baz']], $request->allWithoutNull());
+    }
+
+    public function testAllWithoutNullInputWithNumericKeysReturnsInputAfterReplace()
+    {
+        $request1 = Request::create('/', 'POST', [0 => 'A', 1 => 'B', 2 => 'C']);
+        $request1->replace([0 => '', 1 => 'B', 2 => 'C']);
+        $this->assertEquals([1 => 'B', 2 => 'C'], $request1->allWithoutNull());
+
+        $request2 = Request::create('/', 'POST', [1 => 'A', 2 => 'B', 3 => 'C']);
+        $request2->replace([1 => 'A', 2 => '', 3 => 'C']);
+        $this->assertEquals([1 => 'A', 3 => 'C'], $request2->allWithoutNull());
+    }
 }
