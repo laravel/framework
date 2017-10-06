@@ -72,7 +72,7 @@ class PendingDispatch
      *
      * @return $this
      */
-    public function chain($chain, $queue = null,$connection = null)
+    public function chain($chain, $queue = null, $connection = null)
     {
         $this->job->chain($chain)->onChainQueue($queue)->onChainConnection($connection);
 

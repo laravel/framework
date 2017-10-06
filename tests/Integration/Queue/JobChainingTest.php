@@ -231,7 +231,6 @@ class JobChainingTest extends TestCase
         $this->assertEquals('override_chain_queue', JobChainingTestThirdJob::$usedQueue);
         $this->assertEquals('sync', JobChainingTestThirdJob::$usedConnection);
     }
-
 }
 
 class JobChainingTestFirstJob implements ShouldQueue

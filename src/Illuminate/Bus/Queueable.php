@@ -94,7 +94,7 @@ trait Queueable
      *
      * @return $this
      */
-    public function chain($chain, $queue = null ,$connection = null)
+    public function chain($chain, $queue = null, $connection = null)
     {
         $this->chained = collect($chain)->map(function ($job) {
             return serialize($job);
