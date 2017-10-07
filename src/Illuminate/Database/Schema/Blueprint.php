@@ -831,7 +831,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add nullable creation, update and delete timestamps to the table.
      *
      * @param  int     $precision
      * @return void
@@ -841,6 +841,8 @@ class Blueprint
         $this->timestamp('created_at', $precision)->nullable();
 
         $this->timestamp('updated_at', $precision)->nullable();
+
+        $this->timestamp('deleted_at', $precision)->nullable();
     }
 
     /**
@@ -857,7 +859,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table.
+     * Add creation, update and delete timestampTz columns to the table.
      *
      * @param  int     $precision
      * @return void
@@ -867,6 +869,8 @@ class Blueprint
         $this->timestampTz('created_at', $precision)->nullable();
 
         $this->timestampTz('updated_at', $precision)->nullable();
+
+        $this->timestampTz('deleted_at', $precision)->nullable();
     }
 
     /**
