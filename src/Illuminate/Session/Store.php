@@ -339,6 +339,10 @@ class Store implements Session
      */
     public function flash($key, $value = true)
     {
+        if (!is_string($key)) {
+            throw new \InvalidArgumentException('Flash key expects a string.');
+        }
+
         $this->put($key, $value);
 
         $this->push('_flash.new', $key);
