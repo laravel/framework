@@ -14,9 +14,8 @@ trait CompilesJson
     {
         $parts = explode(',', $this->stripParentheses($expression));
 
-        $options = $parts[1] ?? 0;
-
-        $depth = $parts[2] ?? 512;
+        $options = trim($parts[1] ?? 0);
+        $depth = trim($parts[2] ?? 512);
 
         return "<?php echo json_encode($parts[0], $options, $depth) ?>";
     }
