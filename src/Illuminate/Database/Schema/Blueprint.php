@@ -859,7 +859,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table.
+     * Add creation, update and delete timestampTz columns to the table.
      *
      * @param  int     $precision
      * @return void
@@ -869,6 +869,8 @@ class Blueprint
         $this->timestampTz('created_at', $precision)->nullable();
 
         $this->timestampTz('updated_at', $precision)->nullable();
+
+        $this->timestampTz('deleted_at', $precision)->nullable();
     }
 
     /**
