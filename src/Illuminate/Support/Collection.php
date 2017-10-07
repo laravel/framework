@@ -1219,6 +1219,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function rotate($offset)
     {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
         $count = $this->count();
 
         $offset %= $count;
