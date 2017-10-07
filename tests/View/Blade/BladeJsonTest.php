@@ -4,10 +4,10 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeJsonTest extends AbstractBladeTestCase
 {
-    public function testStatementIsCompiledWithDefaultEncodingOptions()
+    public function testStatementIsCompiledWithSafeDefaultEncodingOptions()
     {
         $string = 'var foo = @json($var);';
-        $expected = 'var foo = <?php echo json_encode($var, 0, 512) ?>;';
+        $expected = 'var foo = <?php echo json_encode($var, 15, 512) ?>;';
 
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
