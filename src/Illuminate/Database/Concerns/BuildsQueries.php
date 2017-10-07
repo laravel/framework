@@ -9,6 +9,16 @@ use Illuminate\Pagination\LengthAwarePaginator;
 trait BuildsQueries
 {
     /**
+     * Execute the query, while selecting all columns.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function all()
+    {
+        return $this->get();
+    }
+
+    /**
      * Chunk the results of the query.
      *
      * @param  int  $count

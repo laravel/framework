@@ -34,7 +34,7 @@ class DatabaseQueryBuilderTest extends TestCase
             $this->assertEquals('select "foo", "bar" from "users"', $sql);
         });
 
-        $builder->from('users')->get();
+        $builder->from('users')->all();
         $this->assertNull($builder->columns);
 
         $builder->from('users')->get(['foo', 'bar']);
