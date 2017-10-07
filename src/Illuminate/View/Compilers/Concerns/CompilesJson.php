@@ -5,14 +5,11 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesJson
 {
     /**
-     * Default encoding options.
-     *
-     * To make JSON safe for embedding into HTML, <, >, ', &, and " characters
-     * should be escaped.
+     * The default JSON encoding options.
      *
      * @var int
      */
-    private $safeEncodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+    private $encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
 
     /**
      * Compile the JSON statement into valid PHP.
@@ -24,7 +21,8 @@ trait CompilesJson
     {
         $parts = explode(',', $this->stripParentheses($expression));
 
-        $options = trim($parts[1] ?? $this->safeEncodingOptions);
+        $options = trim($parts[1] ?? $this->encodingOptions);
+
         $depth = trim($parts[2] ?? 512);
 
         return "<?php echo json_encode($parts[0], $options, $depth) ?>";
