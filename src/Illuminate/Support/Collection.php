@@ -1227,6 +1227,29 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Roate the items in the collection.
+     *
+     * @param  int  $offset
+     * @return static
+     */
+    public function rotate($offset)
+    {
+        if ($this->isEmpty()) {
+            return new static;
+        }
+
+        $count = $this->count();
+
+        $offset %= $count;
+
+        if ($offset < 0) {
+            $offset += $count;
+        }
+
+        return new static($this->slice($offset)->merge($this->take($offset)));
+    }
+
+    /**
      * Search the collection for a given value and return the corresponding key if successful.
      *
      * @param  mixed  $value
