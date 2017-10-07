@@ -17,13 +17,13 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Support\Facades\Route middleware(array|string|null $middleware)
  * @method static \Illuminate\Support\Facades\Route substituteBindings(\Illuminate\Support\Facades\Route $route)
  * @method static void substituteImplicitBindings(\Illuminate\Support\Facades\Route $route)
- * @method \Illuminate\Support\Facades\Route as(string $value)
- * @method \Illuminate\Support\Facades\Route domain(string $value)
- * @method \Illuminate\Support\Facades\Route name(string $value)
- * @method \Illuminate\Support\Facades\Route namespace(string $value)
- * @method \Illuminate\Routing\Route group(array $value)
- * @method \Illuminate\Support\Facades\Route redirect(string $uri, string $destination, int $status = 301)
- * @method \Illuminate\Support\Facades\Route view(string $uri, string $view, array $data = [])
+ * @method static \Illuminate\Support\Facades\Route as(string $value)
+ * @method static \Illuminate\Support\Facades\Route domain(string $value)
+ * @method static \Illuminate\Support\Facades\Route name(string $value)
+ * @method static \Illuminate\Support\Facades\Route namespace(string $value)
+ * @method static \Illuminate\Routing\Route group(\Closure|string|array $value)
+ * @method static \Illuminate\Support\Facades\Route redirect(string $uri, string $destination, int $status = 301)
+ * @method static \Illuminate\Support\Facades\Route view(string $uri, string $view, array $data = [])
  *
  * @see \Illuminate\Routing\Router
  */

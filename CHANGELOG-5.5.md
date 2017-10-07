@@ -1,11 +1,17 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.14 (2017-10-03)
 
 ### Added
 - Allow testing anonymous notifiables ([#21379](https://github.com/laravel/framework/pull/21379))
 - Add relation and model attributes on `RelationNotFoundException` ([#21426](https://github.com/laravel/framework/pull/21426))
 - Allow passing a callback to `with()` ([#21445](https://github.com/laravel/framework/pull/21445))
+- Added `PotentiallyMissing` interface to `MissingValue` class ([be7dccc](https://github.com/laravel/framework/commit/be7dccca9f9249c928108d957fe70e78d370d26e))
+- Accept `$queue` name on `Schedule::job()` ([#21473](https://github.com/laravel/framework/pull/21473))
+- Added callback and default parameter `whenLoaded()` method ([#21490](https://github.com/laravel/framework/pull/21490))
+- Allow marking notifications as unread ([#21497](https://github.com/laravel/framework/pull/21497))
+- Added `Collection::mapToDictionary()` method ([#21505](https://github.com/laravel/framework/pull/21505))
+- Added `make:exception` command ([#21483](https://github.com/laravel/framework/pull/21483))
 
 ### Changed
 - Reset RefreshDatabaseState after DatabaseMigrations rolls back ([#21325](https://github.com/laravel/framework/pull/21325))
@@ -15,7 +21,7 @@
 - Use fill instead of forceFill while storing pivot attributes ([#21403](https://github.com/laravel/framework/pull/21403))
 - Alphabetize `vendor:publish` options ([#21412](https://github.com/laravel/framework/pull/21412))
 - Extract `AnonymousResourceCollection` into class to allow serialization ([#21456](https://github.com/laravel/framework/pull/21456))
-- Extract some methods from `Resource` into `ConditionallyLoadsAttributes` trait ([28d945e](https://github.com/laravel/framework/commit/28d945e557736598c10c492c2918d5697b70570d))
+- Extract some methods from `Resource` into `ConditionallyLoadsAttributes` trait ([28d945e](https://github.com/laravel/framework/commit/28d945e557736598c10c492c2918d5697b70570d), [1f37ccc](https://github.com/laravel/framework/commit/1f37ccc06485410fa0866c012b083a042c4cc73e))
 
 ### Fixed
 - Ensure user is logged in before expecting user instance ([#21377](https://github.com/laravel/framework/pull/21377))
@@ -23,6 +29,8 @@
 - Make sure SQL for virtual columns is added after the unsigned modifier ([#21441](https://github.com/laravel/framework/pull/21441))
 - Fixed `Collection::contains()` when the found value is `null` ([#21442](https://github.com/laravel/framework/pull/21442))
 - Fixed merge issue in `Relation::morphMap()` ([#21458](https://github.com/laravel/framework/pull/21458))
+- Clear count query select bindings in `Relation::getRelationExistenceCountQuery()` ([#21468](https://github.com/laravel/framework/pull/21468))
+- Fixed user model type hints policy stub ([#21499](https://github.com/laravel/framework/pull/21499))
 
 
 ## v5.5.13 (2017-09-24)

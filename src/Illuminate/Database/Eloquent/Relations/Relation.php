@@ -188,7 +188,7 @@ abstract class Relation
     {
         return $this->getRelationExistenceQuery(
             $query, $parentQuery, new Expression('count(*)')
-        );
+        )->setBindings([], 'select');
     }
 
     /**

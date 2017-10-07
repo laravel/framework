@@ -112,6 +112,10 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
+        if ($this->option('pivot')) {
+            return __DIR__.'/stubs/pivot.model.stub';
+        }
+
         return __DIR__.'/stubs/model.stub';
     }
 
@@ -143,6 +147,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['force', null, InputOption::VALUE_NONE, 'Create the class even if the model already exists.'],
 
             ['migration', 'm', InputOption::VALUE_NONE, 'Create a new migration file for the model.'],
+
+            ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
         ];

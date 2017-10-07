@@ -114,15 +114,29 @@ trait ConditionallyLoadsAttributes
      * Retrieve a relationship if it has been loaded.
      *
      * @param  string  $relationship
+     * @param  mixed  $value
+     * @param  mixed  $default
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function whenLoaded($relationship)
+    protected function whenLoaded($relationship, $value = null, $default = null)
     {
-        if ($this->resource->relationLoaded($relationship)) {
+        if (func_num_args() < 3) {
+            $default = new MissingValue;
+        }
+
+        if (! $this->resource->relationLoaded($relationship)) {
+            return $default;
+        }
+
+        if (func_num_args() === 1) {
             return $this->resource->{$relationship};
         }
 
-        return new MissingValue;
+        if ($this->resource->{$relationship} === null) {
+            return null;
+        }
+
+        return value($value);
     }
 
     /**

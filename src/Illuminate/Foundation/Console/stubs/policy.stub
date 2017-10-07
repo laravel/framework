@@ -17,7 +17,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function view(User $user, DummyModel $dummyModel)
+    public function view(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
@@ -28,7 +28,7 @@ class DummyClass
      * @param  \NamespacedDummyUserModel  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(DummyUser $user)
     {
         //
     }
@@ -40,7 +40,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function update(User $user, DummyModel $dummyModel)
+    public function update(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
@@ -52,7 +52,7 @@ class DummyClass
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function delete(User $user, DummyModel $dummyModel)
+    public function delete(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
