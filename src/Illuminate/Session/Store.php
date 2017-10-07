@@ -337,12 +337,8 @@ class Store implements Session
      * @param  mixed   $value
      * @return void
      */
-    public function flash($key, $value = true)
+    public function flash(string $key, $value = true)
     {
-        if (! is_string($key)) {
-            throw new \InvalidArgumentException('Flash key expects a string.');
-        }
-
         $this->put($key, $value);
 
         $this->push('_flash.new', $key);
