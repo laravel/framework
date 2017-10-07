@@ -1212,7 +1212,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Roate the items in the collection
+     * Roate the items in the collection.
      *
      * @param  int  $offset
      * @return static
@@ -1223,7 +1223,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $offset %= $count;
 
-        if($offset < 0) {
+        if ($offset < 0) {
             $offset += $count;
         }
 
