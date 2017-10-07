@@ -27,7 +27,13 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * @var int
      */
     protected $lastPage;
-
+    
+    /**
+    * Number of links to display on each side of pagination
+    *
+    * @var int
+    */
+    public $onEachSide;
     /**
      * Create a new paginator instance.
      *
@@ -73,8 +79,12 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      * @param  array  $data
      * @return \Illuminate\Support\HtmlString
      */
-    public function links($view = null, $data = [])
+    public function links($view = null, $data = [], $onEachSide = 3)
     {
+        if(!$data){
+            $data = [];
+        }
+        $this->onEachSide = $onEachSide;       
         return $this->render($view, $data);
     }
 
