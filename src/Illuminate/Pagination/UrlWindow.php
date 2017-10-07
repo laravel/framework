@@ -28,7 +28,6 @@ class UrlWindow
      * Create a new URL window instance.
      *
      * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
-     * @param  int  $onEachSide
      * @return array
      */
     public static function make(PaginatorContract $paginator)
