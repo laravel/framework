@@ -15,7 +15,7 @@ trait BuildsQueries
      */
     public function all()
     {
-        $this->get();
+        return $this->get();
     }
 
     /**
