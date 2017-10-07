@@ -2325,6 +2325,30 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testRotateOffset()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6]);
+        $this->assertEquals([3, 4, 5, 6, 1, 2], $collection->rotate(2)->toArray());
+    }
+
+    public function testRotateNegativeOffset()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6]);
+        $this->assertEquals([5, 6, 1, 2, 3, 4], $collection->rotate(-2)->toArray());
+    }
+
+    public function testRotateOffsetWithKeys()
+    {
+        $collection = new Collection(['first' => 1, 'second' => 2, 'third' => 3, 'fourth' => 4, 'fifth' => 5]);
+        $this->assertEquals(['fourth' => 4, 'fifth' => 5, 'first' => 1, 'second' => 2, 'third' => 3], $collection->rotate(3)->toArray());
+    }
+
+    public function testRotateNegativeOffsetWithKeys()
+    {
+        $collection = new Collection(['first' => 1, 'second' => 2, 'third' => 3, 'fourth' => 4, 'fifth' => 5]);
+        $this->assertEquals(['third' => 3, 'fourth' => 4, 'fifth' => 5, 'first' => 1, 'second' => 2], $collection->rotate(-3)->toArray());
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
