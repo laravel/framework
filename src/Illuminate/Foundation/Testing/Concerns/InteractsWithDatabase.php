@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
@@ -40,6 +41,21 @@ trait InteractsWithDatabase
         );
 
         $this->assertThat($table, $constraint);
+
+        return $this;
+    }
+
+    /**
+     * Asserts that two models have the same ID and belong to the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model $expected
+     * @param  \Illuminate\Database\Eloquent\Model $actual
+     * @param  string  $message
+     * @return $this
+     */
+    protected function assertModelsSame(Model $expected, Model $actual, $message = '')
+    {
+        $this->assertTrue($expected->is($actual), $message);
 
         return $this;
     }
