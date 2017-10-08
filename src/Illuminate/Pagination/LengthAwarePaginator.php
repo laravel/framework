@@ -29,6 +29,13 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     protected $lastPage;
 
     /**
+     * Number of links to display on each side of pagination
+     *
+     * @var int
+     */
+    public $onEachSide;
+
+    /**
      * Create a new paginator instance.
      *
      * @param  mixed  $items
@@ -50,6 +57,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->onEachSide = 3;
     }
 
     /**
@@ -71,10 +79,17 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      *
      * @param  string|null  $view
      * @param  array  $data
+     * @param  int  $onEachSide
      * @return \Illuminate\Support\HtmlString
      */
-    public function links($view = null, $data = [])
+    public function links($view = null, $data = [], $onEachSide = 3)
     {
+        if (! $data) {
+            $data = [];
+        }
+
+        $this->onEachSide = $onEachSide;
+
         return $this->render($view, $data);
     }
 
