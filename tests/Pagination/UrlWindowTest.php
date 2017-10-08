@@ -49,4 +49,33 @@ class UrlWindowTest extends TestCase
 
         $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
     }
+
+    public function testPresenterCanGetAUrlRangeForAWindowOfLinksWithCustomOnEachSide()
+    {
+        $array = [];
+        for ($i = 1; $i <= 13; $i++) {
+            $array[$i] = 'item'.$i;
+        }
+        $p = new LengthAwarePaginator($array, count($array), 1, 7);
+        $p->onEachSide = 2;
+        $window = new UrlWindow($p);
+        $slider = [];
+        for ($i = 5; $i <= 9; $i++) {
+            $slider[$i] = '/?page='.$i;
+        }
+
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->make($p));
+
+        /*
+         * Test Being Near The End Of The List
+         */
+        $p = new LengthAwarePaginator($array, count($array), 1, 8);
+        $window = new UrlWindow($p);
+        $last = [];
+        for ($i = 5; $i <= 13; $i++) {
+            $last[$i] = '/?page='.$i;
+        }
+
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
+    }
 }
