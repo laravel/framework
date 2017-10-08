@@ -80,7 +80,6 @@ class SendQueuedNotifications implements ShouldQueue
         }
     }
 
-
     /**
      * Prepare the instance for cloning.
      *
