@@ -1311,7 +1311,7 @@ trait ValidatesAttributes
      */
     public function validateString($attribute, $value)
     {
-        return is_string($value);
+        return is_null($value) || is_string($value);
     }
 
     /**
