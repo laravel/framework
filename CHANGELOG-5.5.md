@@ -1,5 +1,19 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added missing PostgreSQL network address operators ([#21518](https://github.com/laravel/framework/pull/21518))
+- Added raw and same-site parameters to `cookie()` helper ([#21551](https://github.com/laravel/framework/pull/21551))
+- Added option to create pivot model to `make:model` command ([#21549](https://github.com/laravel/framework/pull/21549))
+- Added support for a `failed()` method to mailables and notifications ([#21585](https://github.com/laravel/framework/pull/21585))
+
+### Changed
+- Escape HTML characters in `@json` directive ([#21574](https://github.com/laravel/framework/pull/21574))
+- Only accept strings in `Session::flash()` ([#21576](https://github.com/laravel/framework/pull/21576))
+- Use message from `AuthenticationException` in `Handler::unauthenticated()` ([#21575](https://github.com/laravel/framework/pull/21575))
+
+
 ## v5.5.14 (2017-10-03)
 
 ### Added
