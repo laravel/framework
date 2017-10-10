@@ -708,12 +708,8 @@ trait HasAttributes
             return Carbon::createFromFormat('Y-m-d', $value)->startOfDay();
         }
 
-        // Finally, we will just assume this date is in the format used by default on
-        // the database connection and use that format to create the Carbon object
-        // that is returned back out to the developers after we convert it here.
-        return Carbon::createFromFormat(
-            $this->getDateFormat(), $value
-        );
+	    // Finally, we will just parse this date.
+	    return Carbon::parse($value);
     }
 
     /**
