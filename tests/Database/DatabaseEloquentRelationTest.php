@@ -33,6 +33,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder->shouldReceive('getModel')->andReturn($related = m::mock(\stdClass::class));
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
+        $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
