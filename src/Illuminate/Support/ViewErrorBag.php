@@ -117,7 +117,7 @@ class ViewErrorBag implements Countable
     {
         $this->put($key, $value);
     }
-    
+
     /**
      * Convert the default bag to its string representation.
      *
