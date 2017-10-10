@@ -307,6 +307,16 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testHigherOrderKeyBy()
+    {
+        $c = new Collection([
+            ['id' => 'id1', 'name' => 'first'],
+            ['id' => 'id2', 'name' => 'second'],
+        ]);
+
+        $this->assertEquals(['id1' => 'first', 'id2' => 'second'], $c->keyBy->id->map->name->all());
+    }
+
     public function testHigherOrderFilter()
     {
         $c = new Collection([

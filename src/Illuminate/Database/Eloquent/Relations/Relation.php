@@ -174,7 +174,7 @@ abstract class Relation
      */
     public function rawUpdate(array $attributes = [])
     {
-        return $this->query->update($attributes);
+        return $this->query->withoutGlobalScopes()->update($attributes);
     }
 
     /**
