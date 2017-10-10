@@ -46,47 +46,23 @@ class CallbackEvent extends Event
     }
 
     /**
-     * Run the given event.
+     * Run the given event in the foreground.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return mixed
-     *
-     * @throws \Exception
      */
-    public function run(Container $container)
+    public function runForegroundProcess(Container $container)
     {
-        if ($this->description && $this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
-            return;
+        if ($this->outputNotBeingCaptured()) {
+            return $container->call($this->callback, $this->parameters);
         }
 
-        register_shutdown_function(function () {
-            $this->removeMutex();
-        });
+        ob_start();
+        $container->call($this->callback, $this->parameters);
+        $output = $this->storeOutput(ob_get_contents());
+        ob_end_flush();
 
-        parent::callBeforeCallbacks($container);
-
-        try {
-            $response = $container->call($this->callback, $this->parameters);
-        } finally {
-            $this->removeMutex();
-
-            parent::callAfterCallbacks($container);
-        }
-
-        return $response;
-    }
-
-    /**
-     * Clear the mutex for the event.
-     *
-     * @return void
-     */
-    protected function removeMutex()
-    {
-        if ($this->description) {
-            $this->mutex->forget($this);
-        }
+        return $output;
     }
 
     /**
@@ -97,19 +73,13 @@ class CallbackEvent extends Event
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
-        if (! isset($this->description)) {
+        if (! $this->description) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );
         }
 
-        $this->withoutOverlapping = true;
-
-        $this->expiresAt = $expiresAt;
-
-        return $this->skip(function () {
-            return $this->mutex->exists($this);
-        });
+        return parent::withoutOverlapping($expiresAt);
     }
 
     /**
@@ -119,20 +89,37 @@ class CallbackEvent extends Event
      */
     public function mutexName()
     {
-        return 'framework/schedule-'.sha1($this->description);
+        return 'schedule-mutex-'.sha1($this->expression.$this->description);
     }
 
     /**
-     * Get the summary of the event for display.
+     * Do not allow the event to run in background without a name.
      *
-     * @return string
+     * @return $this
+     *
+     * @throws \LogicException
      */
-    public function getSummaryForDisplay()
+    public function runInBackground()
     {
-        if (is_string($this->description)) {
-            return $this->description;
+        if (! $this->description) {
+            throw new LogicException(
+                "A scheduled event name is required to run in the background. Use the 'name' method before 'runInBackground'."
+            );
         }
 
-        return is_string($this->callback) ? $this->callback : 'Closure';
+        return parent::runInBackground();
+    }
+
+    /**
+     * Store any captured output.
+     *
+     * @param  string  $output
+     * @return string
+     */
+    public function storeOutput($output)
+    {
+        file_put_contents($this->output, $output.PHP_EOL, $this->shouldAppendOutput ? FILE_APPEND : null);
+
+        return $output;
     }
 }

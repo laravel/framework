@@ -183,7 +183,7 @@ class Event
      */
     public function mutexName()
     {
-        return 'framework'.DIRECTORY_SEPARATOR.'schedule-'.sha1($this->expression.$this->command);
+        return 'schedule-mutex-'.sha1($this->expression.$this->command);
     }
 
     /**
@@ -192,15 +192,19 @@ class Event
      * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
-    protected function runCommandInForeground(Container $container)
+    public function runCommandInForeground(Container $container)
     {
+        register_shutdown_function(function () {
+            $this->mutex->forget($this);
+        });
+
         $this->callBeforeCallbacks($container);
 
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
-
-        $this->callAfterCallbacks($container);
+        try {
+            $this->runForegroundProcess($container);
+        } finally {
+            $this->callAfterCallbacks($container);
+        }
     }
 
     /**
@@ -211,10 +215,21 @@ class Event
      */
     protected function runCommandInBackground(Container $container)
     {
-        $this->callBeforeCallbacks($container);
-
         (new Process(
-            $this->buildCommand(), base_path(), null, null, null
+            (new CommandBuilder)->buildBackgroundCommand($this), base_path(), null, null, null
+        ))->run();
+    }
+
+    /**
+     * Build the process to run.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return mixed
+     */
+    public function runForegroundProcess(Container $container)
+    {
+        return (new Process(
+            (new CommandBuilder)->buildForegroundCommand($this), base_path(), null, null, null
         ))->run();
     }
 
@@ -242,16 +257,6 @@ class Event
         foreach ($this->afterCallbacks as $callback) {
             $container->call($callback);
         }
-    }
-
-    /**
-     * Build the command string.
-     *
-     * @return string
-     */
-    public function buildCommand()
-    {
-        return (new CommandBuilder)->buildCommand($this);
     }
 
     /**
@@ -397,9 +402,19 @@ class Event
      */
     protected function ensureOutputIsBeingCapturedForEmail()
     {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
+        if ($this->outputNotBeingCaptured()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
         }
+    }
+
+    /**
+     * Check if output is being captured.
+     *
+     * @return bool
+     */
+    protected function outputNotBeingCaptured()
+    {
+        return is_null($this->output) || $this->output == $this->getDefaultOutput();
     }
 
     /**
@@ -525,9 +540,7 @@ class Event
 
         $this->expiresAt = $expiresAt;
 
-        return $this->then(function () {
-            $this->mutex->forget($this);
-        })->skip(function () {
+        return $this->skip(function () {
             return $this->mutex->exists($this);
         });
     }
@@ -630,11 +643,19 @@ class Event
      */
     public function getSummaryForDisplay()
     {
-        if (is_string($this->description)) {
-            return $this->description;
+        if (! is_null($this->command)) {
+            return $this->expression.' : '.$this->command;
         }
 
-        return $this->buildCommand();
+        if (! is_null($this->description)) {
+            return $this->expression.' : '.$this->description;
+        }
+
+        if (isset($this->callback) && is_string($this->callback)) {
+            return $this->expression.' : '.$this->callback;
+        }
+
+        return $this->expression.' : '.$this->mutexName();
     }
 
     /**

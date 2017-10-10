@@ -8,27 +8,12 @@ use Symfony\Component\Process\ProcessUtils;
 class CommandBuilder
 {
     /**
-     * Build the command for the given event.
-     *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @return string
-     */
-    public function buildCommand(Event $event)
-    {
-        if ($event->runInBackground) {
-            return $this->buildBackgroundCommand($event);
-        } else {
-            return $this->buildForegroundCommand($event);
-        }
-    }
-
-    /**
      * Build the command for running the event in the foreground.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return string
      */
-    protected function buildForegroundCommand(Event $event)
+    public function buildForegroundCommand(Event $event)
     {
         $output = ProcessUtils::escapeArgument($event->output);
 
@@ -43,17 +28,14 @@ class CommandBuilder
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return string
      */
-    protected function buildBackgroundCommand(Event $event)
+    public function buildBackgroundCommand(Event $event)
     {
-        $output = ProcessUtils::escapeArgument($event->output);
+        $background = Application::formatCommandString('schedule:background').' "'.$event->mutexName().'"';
 
-        $redirect = $event->shouldAppendOutput ? ' >> ' : ' > ';
+        $output = ProcessUtils::escapeArgument($event->getDefaultOutput());
 
-        $finished = Application::formatCommandString('schedule:finish').' "'.$event->mutexName().'"';
-
-        return $this->ensureCorrectUser($event,
-            '('.$event->command.$redirect.$output.' 2>&1 '.(windows_os() ? '&' : ';').' '.$finished.') > '
-            .ProcessUtils::escapeArgument($event->getDefaultOutput()).' 2>&1 &'
+        return $this->ensureCorrectUser(
+            $event, '('.$background.' > '.$output.' 2>&1) > '.$output.' 2>&1 &'
         );
     }
 

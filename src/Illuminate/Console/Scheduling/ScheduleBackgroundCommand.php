@@ -2,23 +2,24 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
-class ScheduleFinishCommand extends Command
+class ScheduleBackgroundCommand extends Command
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $signature = 'schedule:finish {id}';
+    protected $signature = 'schedule:background {id}';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Handle the completion of a scheduled command';
+    protected $description = 'Handle running a scheduled background command';
 
     /**
      * Indicates whether the command should be shown in the Artisan command list.
@@ -54,8 +55,24 @@ class ScheduleFinishCommand extends Command
      */
     public function handle()
     {
-        collect($this->schedule->events())->filter(function ($value) {
-            return $value->mutexName() == $this->argument('id');
-        })->each->callAfterCallbacks($this->laravel);
+        if (! $event = $this->findEventMutex()) {
+            $this->error('No scheduled event could be found that matches the given id.');
+
+            return;
+        }
+
+        $event->runCommandInForeground($this->laravel);
+    }
+
+    /**
+     * Find the event that matches the id.
+     *
+     * @return \Illuminate\Console\Scheduling\Event|null
+     */
+    protected function findEventMutex()
+    {
+        return Arr::first($this->schedule->events(), (function ($value) {
+            return $value->mutexName() === $this->argument('id');
+        }));
     }
 }
