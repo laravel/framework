@@ -906,6 +906,30 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is latitude.
+     *
+     * @param   string  $attribute
+     * @param   mixed   $value
+     * @return  bool
+     */
+    protected function validateLat($attribute, $value)
+    {
+        return is_numeric($value) && $value >= -90 && $value <= 90;
+    }
+
+    /**
+     * Validate that an attribute is longitude.
+     *
+     * @param   string  $attribute
+     * @param   mixed   $value
+     * @return  bool
+     */
+    protected function validateLng($attribute, $value)
+    {
+        return is_numeric($value) && $value >= -180 && $value <= 180;
+    }
+
+    /**
      * Validate the size of an attribute is less than a maximum value.
      *
      * @param  string  $attribute
