@@ -849,4 +849,47 @@ class Grammar extends BaseGrammar
     {
         return $this->operators;
     }
+
+    /**
+     * Compile an update Batch statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @param  string  $index
+     * @return string
+     */
+    public function compileUpdateBatch(Builder $query, $values, $index)
+    {
+        $table = $this->wrapTable($query->from);
+
+        $final = [];
+        $ids = [];
+
+        if (! count($values)) {
+            return false;
+        }
+        if (! isset($index) and empty($index)) {
+            return false;
+        }
+
+        foreach ($values as $key => $val) {
+            $ids[] = $val[$index];
+            foreach (array_keys($val) as $field) {
+                if ($field !== $index) {
+                    $final[$field][] = 'WHEN '.$this->wrap($index).' = "'.$val[$index].'" THEN "'.$val[$field].'" ';
+                }
+            }
+        }
+
+        $cases = '';
+        foreach ($final as $k => $v) {
+            $cases .= $k.' = (CASE '.$val[$index]['field']."\n"
+                .implode("\n", $v)."\n"
+                .'ELSE '.$k.' END), ';
+        }
+
+        $query = 'UPDATE '.$table.' SET '.substr($cases, 0, -2).' WHERE '.$index.' IN('.implode(',', $ids).')';
+
+        return trim("$query");
+    }
 }

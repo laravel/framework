@@ -1233,6 +1233,26 @@ class Connection implements ConnectionInterface
      */
     public static function getResolver($driver)
     {
-        return static::$resolvers[$driver] ?? null;
+        return static::$resolvers[$driver] ?: null;
+    }
+
+    /**
+     * Run an SQL statement and get the number of rows affected.
+     *
+     * @param  string  $query
+     * @return int
+     */
+    public function updateBatch($query)
+    {
+        return $this->run($query, [], function ($me, $query) {
+            if ($me->pretending()) {
+                return 0;
+            }
+
+            $statement = $me->getPdo()->prepare($query);
+            $statement->execute();
+
+            return $statement->rowCount();
+        });
     }
 }

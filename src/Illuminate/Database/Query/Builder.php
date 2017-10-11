@@ -2456,4 +2456,41 @@ class Builder
 
         throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
     }
+
+    /**
+     * Handle update Batch statement into SQL.
+     *
+     * @param  array    $values
+     * @param  string   $key
+     * @return mixed
+     *
+     * @throws \BadMethodCallException
+     *
+     * in Package : https://github.com/mavinoo/updateBatch
+     *
+     * Example :
+     *
+     * $table = 'users';
+     * $values = [
+     *      [
+     *          'id' => 1,
+     *          'nickname' => 'mohammad',
+     *      ],
+     *      [
+     *          'id' => 2,
+     *          'username' => 'mavinoo',
+     *      ],
+     * ];
+     * DB::table($table)->updateBatch($values, 'id');
+     */
+    public function updateBatch(array $values, $key)
+    {
+        if (count($this->wheres) > 0) {
+            throw new BadMethodCallException('Not Invalid Condition in Query!');
+        }
+
+        $sql = $this->grammar->compileUpdateBatch($this, $values, $key);
+
+        return $this->connection->updateBatch($sql);
+    }
 }
