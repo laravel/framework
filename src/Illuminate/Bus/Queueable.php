@@ -9,14 +9,14 @@ trait Queueable
      *
      * @var string|null
      */
-    public $chain_connection = null;
+    public $chainConnection = null;
 
     /**
      * The name of the queue the chained jobs should be sent to if not set on job.
      *
      * @var string|null
      */
-    public $chain_queue = null;
+    public $chainQueue = null;
 
     /**
      * The name of the connection the job should be sent to.
@@ -113,7 +113,7 @@ trait Queueable
      */
     public function onChainConnection($connection)
     {
-        $this->chain_connection = $connection;
+        $this->chainConnection = $connection;
 
         return $this;
     }
@@ -126,7 +126,7 @@ trait Queueable
      */
     public function onChainQueue($queue)
     {
-        $this->chain_queue = $queue;
+        $this->chainQueue = $queue;
 
         return $this;
     }
@@ -146,13 +146,13 @@ trait Queueable
                     throw new \Exception('Trying to dispatch an object that is not Queueable');
                 }
                 // pass the chain settings on to the next job in the chain, IF this job does not have a new chain settings set...
-                $next->onChainConnection($next->chain_connection ?: $this->chain_connection);
-                $next->onChainQueue($next->chain_queue ?: $this->chain_queue);
+                $next->onChainConnection($next->chainConnection ?: $this->chainConnection);
+                $next->onChainQueue($next->chainQueue ?: $this->chainQueue);
                 // array of remaining jobs...
                 $next->chained = $this->chained;
                 // use the chain setting if this job is not specifically set.
-                $next->onConnection($next->connection ?: $this->chain_connection);
-                $next->onQueue($next->queue ?: $this->chain_queue);
+                $next->onConnection($next->connection ?: $this->chainConnection);
+                $next->onQueue($next->queue ?: $this->chainQueue);
             }));
         }
     }

@@ -248,8 +248,8 @@ class JobChainingTestFirstJob implements ShouldQueue
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
-        static::$usedChainedQueue = $this->chain_queue;
-        static::$usedChainedConnection = $this->chain_connection;
+        static::$usedChainedQueue = $this->chainQueue;
+        static::$usedChainedConnection = $this->chainConnection;
     }
 }
 
@@ -268,8 +268,8 @@ class JobChainingTestSecondJob implements ShouldQueue
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
-        static::$usedChainedQueue = $this->chain_queue;
-        static::$usedChainedConnection = $this->chain_connection;
+        static::$usedChainedQueue = $this->chainQueue;
+        static::$usedChainedConnection = $this->chainConnection;
     }
 }
 
@@ -288,8 +288,8 @@ class JobChainingTestThirdJob implements ShouldQueue
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
-        static::$usedChainedQueue = $this->chain_queue;
-        static::$usedChainedConnection = $this->chain_connection;
+        static::$usedChainedQueue = $this->chainQueue;
+        static::$usedChainedConnection = $this->chainConnection;
     }
 }
 
@@ -308,8 +308,8 @@ class JobChainingTestDeletingJob implements ShouldQueue
         static::$ran = true;
         static::$usedQueue = $this->queue;
         static::$usedConnection = $this->connection;
-        static::$usedChainedQueue = $this->chain_queue;
-        static::$usedChainedConnection = $this->chain_connection;
+        static::$usedChainedQueue = $this->chainQueue;
+        static::$usedChainedConnection = $this->chainConnection;
         $this->delete();
     }
 }
