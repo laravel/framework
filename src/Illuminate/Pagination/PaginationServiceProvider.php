@@ -38,13 +38,9 @@ class PaginationServiceProvider extends ServiceProvider
         });
 
         Paginator::currentPageResolver(function ($pageName = 'page') {
-            $page = $this->app['request']->input($pageName);
+            $page = (int) $this->app['request']->input($pageName);
 
-            if (filter_var($page, FILTER_VALIDATE_INT) !== false && (int) $page >= 1) {
-                return (int) $page;
-            }
-
-            return 1;
+            return ($page >= 1) ? $page : 1;
         });
     }
 }
