@@ -865,10 +865,10 @@ class Grammar extends BaseGrammar
         $final = [];
         $ids = [];
 
-        if(!count($values)) {
+        if (! count($values)) {
             return false;
         }
-        if(!isset($index) AND empty($index)) {
+        if (! isset($index) and empty($index)) {
             return false;
         }
 

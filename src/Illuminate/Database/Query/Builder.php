@@ -2485,8 +2485,8 @@ class Builder
      */
     public function updateBatch(array $values, $key)
     {
-        if(count($this->wheres) > 0) {
-            throw new BadMethodCallException('Not Invalid Condition in Query!') ;
+        if (count($this->wheres) > 0) {
+            throw new BadMethodCallException('Not Invalid Condition in Query!');
         }
 
         $sql = $this->grammar->compileUpdateBatch($this, $values, $key);
