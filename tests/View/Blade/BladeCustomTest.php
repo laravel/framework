@@ -73,4 +73,21 @@ class BladeCustomTest extends AbstractBladeTestCase
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testCustomIfElseConditions()
+    {
+        $this->compiler->if('custom', function ($anything) {
+            return true;
+        });
+
+        $string = '@custom($user)
+@elsecustom($product)
+@else
+@endcustom';
+        $expected = '<?php if (\Illuminate\Support\Facades\Blade::check(\'custom\', $user)): ?>
+<?php elseif (\Illuminate\Support\Facades\Blade::check(\'custom\', $product)): ?>
+<?php else: ?>
+<?php endif; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
