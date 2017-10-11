@@ -6,6 +6,7 @@ use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -711,9 +712,16 @@ trait HasAttributes
         // Finally, we will just assume this date is in the format used by default on
         // the database connection and use that format to create the Carbon object
         // that is returned back out to the developers after we convert it here.
-        return Carbon::createFromFormat(
-            $this->getDateFormat(), $value
-        );
+        try {
+            return Carbon::createFromFormat(
+                $this->getDateFormat(), $value
+            );
+        } catch (InvalidArgumentException $exception) {
+
+            // Fallback to Carbon::parse($value) if date format does not match.
+            // So we can get Carbon instance even if $value is not in standard format.
+            return Carbon::parse($value);
+        }
     }
 
     /**
