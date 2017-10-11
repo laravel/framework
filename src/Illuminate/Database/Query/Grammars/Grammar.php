@@ -865,30 +865,24 @@ class Grammar extends BaseGrammar
         $final  = [];
         $ids    = [];
 
-        if(!count($values))
-        {
+        if(!count($values)) {
             return false;
         }
-        if(!isset($index) AND empty($index))
-        {
+        if(!isset($index) AND empty($index)) {
             return false;
         }
 
-        foreach ($values as $key => $val)
-        {
+        foreach ($values as $key => $val) {
             $ids[] = $val[$index];
-            foreach (array_keys($val) as $field)
-            {
-                if ($field !== $index)
-                {
+            foreach (array_keys($val) as $field) {
+                if ($field !== $index) {
                     $final[$field][] = 'WHEN ' . $this->wrap($index) . ' = "' . $val[$index] . '" THEN "' . $val[$field] . '" ';
                 }
             }
         }
 
         $cases = '';
-        foreach ($final as $k => $v)
-        {
+        foreach ($final as $k => $v) {
             $cases .= $k.' = (CASE '.$val[$index]['field']."\n"
                 .implode("\n", $v)."\n"
                 .'ELSE '.$k.' END), ';

@@ -1245,8 +1245,7 @@ class Connection implements ConnectionInterface
     public function updateBatch($query)
     {
         return $this->run($query, [], function ($me, $query) {
-            if ($me->pretending())
-            {
+            if ($me->pretending()) {
                 return 0;
             }
 
