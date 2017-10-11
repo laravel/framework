@@ -1246,7 +1246,9 @@ class Connection implements ConnectionInterface
     {
         return $this->run($query, [], function ($me, $query) {
             if ($me->pretending())
+            {
                 return 0;
+            }
 
             $statement = $me->getPdo()->prepare($query);
             $statement->execute();
