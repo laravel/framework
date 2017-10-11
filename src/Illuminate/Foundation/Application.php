@@ -1062,6 +1062,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the current application url.
+     *
+     * @return string
+     */
+    public function getUrl()
+    {
+        return $this['config']->get('app.url');
+    }
+
+    /**
      * Set the current application locale.
      *
      * @param  string  $locale
