@@ -28,6 +28,37 @@ class RouteRegistrarTest extends TestCase
         m::close();
     }
 
+    public function testMiddlewareFluentRegistration()
+    {
+        $this->router->middleware(['one', 'two'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
+
+        $this->router->middleware('three', 'four')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['three', 'four'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware('five', 'six');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['five', 'six'], $this->getRoute()->middleware());
+
+        $this->router->middleware('seven')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['seven'], $this->getRoute()->middleware());
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
