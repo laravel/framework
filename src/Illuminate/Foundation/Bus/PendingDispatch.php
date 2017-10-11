@@ -66,7 +66,7 @@ class PendingDispatch
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param      $chain
+     * @param array $chain
      * @param null|string $queue
      * @param null|string $connection
      *
