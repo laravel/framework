@@ -1233,6 +1233,6 @@ class Connection implements ConnectionInterface
      */
     public static function getResolver($driver)
     {
-        return static::$resolvers[$driver] ?? null;
+        return static::$resolvers[$driver] ?: null;
     }
 }
