@@ -251,6 +251,7 @@ class SupportStrTest extends TestCase
 
         // ensure expected behavior for numbers
         $this->assertEquals('laravel_php_framework_v_2', Str::snake('LaravelPhpFrameworkV2'));
+        $this->assertEquals('laravel_php_framework_v_2_more', Str::snake('LaravelPhpFrameworkV2More'));
         $this->assertEquals('laravel_php_framework_v_234', Str::snake('LaravelPhpFrameworkV234'));
         $this->assertEquals('laravel_php_framework_v_234', Str::snake('LaravelPhpFrameworkV2 3 4'));
     }
