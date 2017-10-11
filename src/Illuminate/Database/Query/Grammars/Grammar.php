@@ -860,10 +860,10 @@ class Grammar extends BaseGrammar
      */
     public function compileUpdateBatch(Builder $query, $values, $index)
     {
-        $table      = $this->wrapTable($query->from);
+        $table = $this->wrapTable($query->from);
 
-        $final  = [];
-        $ids    = [];
+        $final = [];
+        $ids = [];
 
         if(!count($values)) {
             return false;
@@ -876,7 +876,7 @@ class Grammar extends BaseGrammar
             $ids[] = $val[$index];
             foreach (array_keys($val) as $field) {
                 if ($field !== $index) {
-                    $final[$field][] = 'WHEN ' . $this->wrap($index) . ' = "' . $val[$index] . '" THEN "' . $val[$field] . '" ';
+                    $final[$field][] = 'WHEN '.$this->wrap($index).' = "'.$val[$index].'" THEN "'.$val[$field].'" ';
                 }
             }
         }

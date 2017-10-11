@@ -2482,7 +2482,6 @@ class Builder
      *      ],
      * ];
      * DB::table($table)->updateBatch($values, 'id');
-     *
      */
     public function updateBatch(array $values, $key)
     {
