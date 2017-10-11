@@ -1516,6 +1516,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
     }
 
+    public function testModelDateAttributeCastingFallbackToParseOnNotStandardDateFormat()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setDateFormat('Y-m-d H:i:s');
+        $model->datetimeAttribute = '2017-10-20 10:15:20';
+
+        $this->assertEquals('2017-10-20 10:15:20', $model->datetimeAttribute->toDateTimeString());
+
+        $model->datetimeAttribute = '20.10.2017 10:15:20';
+        $this->assertEquals('2017-10-20 10:15:20', $model->datetimeAttribute->toDateTimeString());
+
+        $model->datetimeAttribute = '10/20/2017 10:15:20';
+        $this->assertEquals('2017-10-20 10:15:20', $model->datetimeAttribute->toDateTimeString());
+
+        $model->setDateFormat('d/m/Y H:i:s');
+        $model->datetimeAttribute = '20/10/2017 10:15:20';
+        $this->assertEquals('2017-10-20 10:15:20', $model->datetimeAttribute->toDateTimeString());
+
+        $model->datetimeAttribute = '2017-10-20 10:15:20';
+        $this->assertEquals('2017-10-20 10:15:20', $model->datetimeAttribute->toDateTimeString());
+    }
+
     public function testModelAttributeCastingPreservesNull()
     {
         $model = new EloquentModelCastingStub;
