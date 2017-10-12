@@ -214,6 +214,23 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Add a view alias.
+     *
+     * @param string|array $aliases
+     * @param null|string  $name
+     *
+     * @return $this
+     */
+    public function addAlias($aliases, $name = null)
+    {
+        ViewName::addAliases(
+            is_array($aliases) ? $aliases : [$aliases => $name]
+        );
+
+        return $this;
+    }
+
+    /**
      * Normalize a view name.
      *
      * @param  string $name
