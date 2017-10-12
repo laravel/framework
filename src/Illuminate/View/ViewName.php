@@ -5,7 +5,7 @@ namespace Illuminate\View;
 class ViewName
 {
     /**
-     * View name aliases
+     * View name aliases.
      *
      * @var array
      */
@@ -33,7 +33,7 @@ class ViewName
     }
 
     /**
-     * Add a view name alias
+     * Add a view name alias.
      *
      * @param $aliases array
      *
@@ -45,7 +45,7 @@ class ViewName
     }
 
     /**
-     * Resolve view name by alias
+     * Resolve view name by alias.
      *
      * @param $name
      *

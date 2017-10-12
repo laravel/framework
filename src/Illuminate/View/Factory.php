@@ -214,7 +214,7 @@ class Factory implements FactoryContract
     }
 
     /**
-     * Add a view alias
+     * Add a view alias.
      *
      * @param string|array $aliases
      * @param null|string  $name
