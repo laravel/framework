@@ -620,6 +620,23 @@ class ViewFactoryTest extends TestCase
         $this->assertNull($factory->getLoopStack()[0]['last']);
     }
 
+    public function testMakeNormalizesAliases()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->once()->with('path.to.foo')->andReturn('path.php');
+        $factory->getFinder()->shouldReceive('find')->once()->with('path.to.bar')->andReturn('path.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->twice()->with('php')->andReturn($engine = m::mock(\Illuminate\Contracts\View\Engine::class));
+        $factory->setDispatcher(new \Illuminate\Events\Dispatcher);
+
+        $factory->addAlias('foo', 'path.to.foo');
+        $factory->addAlias(['bar' => 'path.to.bar']);
+
+        $foo = $factory->make('foo');
+        $bar = $factory->make('bar');
+        $this->assertSame('path.to.foo', $foo->getName());
+        $this->assertSame('path.to.bar', $bar->getName());
+    }
+
     protected function getFactory()
     {
         return new Factory(
