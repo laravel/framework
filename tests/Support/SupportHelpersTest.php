@@ -769,6 +769,16 @@ class SupportHelpersTest extends TestCase
         })->something());
     }
 
+    public function testOptionalReturnsDefaultForProperty()
+    {
+        $this->assertEquals(10, optional(null, 10)->doesntExist);
+    }
+
+    public function testOptionalReturnsDefaultForMethod()
+    {
+        $this->assertEquals(10, optional(null, 10)->doesntExist());
+    }
+
     public function testOptionalIsMacroable()
     {
         Optional::macro('present', function () {

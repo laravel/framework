@@ -16,14 +16,23 @@ class Optional
     protected $value;
 
     /**
+     * The default value returned if the property is unavailable on the underlying object.
+     *
+     * @var mixed
+     */
+    protected $default;
+
+    /**
      * Create a new optional instance.
      *
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return void
      */
-    public function __construct($value)
+    public function __construct($value, $default = null)
     {
         $this->value = $value;
+        $this->default = $default;
     }
 
     /**
@@ -37,6 +46,8 @@ class Optional
         if (is_object($this->value)) {
             return $this->value->{$key};
         }
+
+        return $this->default;
     }
 
     /**
@@ -55,5 +66,7 @@ class Optional
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
+
+        return $this->default;
     }
 }
