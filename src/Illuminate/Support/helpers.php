@@ -715,11 +715,12 @@ if (! function_exists('optional')) {
      * Provide access to optional objects.
      *
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return mixed
      */
-    function optional($value)
+    function optional($value, $default = null)
     {
-        return new Optional($value);
+        return new Optional($value, $default);
     }
 }
 
