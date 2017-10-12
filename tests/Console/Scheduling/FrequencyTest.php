@@ -23,99 +23,99 @@ class FrequencyTest extends TestCase
 
     public function testEveryMinute()
     {
-        $this->assertEquals('* * * * * *', $this->event->getExpression());
-        $this->assertEquals('* * * * * *', $this->event->everyMinute()->getExpression());
+        $this->assertEquals('* * * * *', $this->event->getExpression());
+        $this->assertEquals('* * * * *', $this->event->everyMinute()->getExpression());
     }
 
     public function testEveryFiveMinutes()
     {
-        $this->assertEquals('*/5 * * * * *', $this->event->everyFiveMinutes()->getExpression());
+        $this->assertEquals('*/5 * * * *', $this->event->everyFiveMinutes()->getExpression());
     }
 
     public function testDaily()
     {
-        $this->assertEquals('0 0 * * * *', $this->event->daily()->getExpression());
+        $this->assertEquals('0 0 * * *', $this->event->daily()->getExpression());
     }
 
     public function testTwiceDaily()
     {
-        $this->assertEquals('0 3,15 * * * *', $this->event->twiceDaily(3, 15)->getExpression());
+        $this->assertEquals('0 3,15 * * *', $this->event->twiceDaily(3, 15)->getExpression());
     }
 
     public function testOverrideWithHourly()
     {
-        $this->assertEquals('0 * * * * *', $this->event->everyFiveMinutes()->hourly()->getExpression());
-        $this->assertEquals('37 * * * * *', $this->event->hourlyAt(37)->getExpression());
+        $this->assertEquals('0 * * * *', $this->event->everyFiveMinutes()->hourly()->getExpression());
+        $this->assertEquals('37 * * * *', $this->event->hourlyAt(37)->getExpression());
     }
 
     public function testMonthlyOn()
     {
-        $this->assertEquals('0 15 4 * * *', $this->event->monthlyOn(4, '15:00')->getExpression());
+        $this->assertEquals('0 15 4 * *', $this->event->monthlyOn(4, '15:00')->getExpression());
     }
 
     public function testTwiceMonthly()
     {
-        $this->assertEquals('0 0 1,16 * * *', $this->event->twiceMonthly(1, 16)->getExpression());
+        $this->assertEquals('0 0 1,16 * *', $this->event->twiceMonthly(1, 16)->getExpression());
     }
 
     public function testMonthlyOnWithMinutes()
     {
-        $this->assertEquals('15 15 4 * * *', $this->event->monthlyOn(4, '15:15')->getExpression());
+        $this->assertEquals('15 15 4 * *', $this->event->monthlyOn(4, '15:15')->getExpression());
     }
 
     public function testWeekdaysDaily()
     {
-        $this->assertEquals('0 0 * * 1-5 *', $this->event->weekdays()->daily()->getExpression());
+        $this->assertEquals('0 0 * * 1-5', $this->event->weekdays()->daily()->getExpression());
     }
 
     public function testWeekdaysHourly()
     {
-        $this->assertEquals('0 * * * 1-5 *', $this->event->weekdays()->hourly()->getExpression());
+        $this->assertEquals('0 * * * 1-5', $this->event->weekdays()->hourly()->getExpression());
     }
 
     public function testWeekdays()
     {
-        $this->assertEquals('* * * * 1-5 *', $this->event->weekdays()->getExpression());
+        $this->assertEquals('* * * * 1-5', $this->event->weekdays()->getExpression());
     }
 
     public function testSundays()
     {
-        $this->assertEquals('* * * * 0 *', $this->event->sundays()->getExpression());
+        $this->assertEquals('* * * * 0', $this->event->sundays()->getExpression());
     }
 
     public function testMondays()
     {
-        $this->assertEquals('* * * * 1 *', $this->event->mondays()->getExpression());
+        $this->assertEquals('* * * * 1', $this->event->mondays()->getExpression());
     }
 
     public function testTuesdays()
     {
-        $this->assertEquals('* * * * 2 *', $this->event->tuesdays()->getExpression());
+        $this->assertEquals('* * * * 2', $this->event->tuesdays()->getExpression());
     }
 
     public function testWednesdays()
     {
-        $this->assertEquals('* * * * 3 *', $this->event->wednesdays()->getExpression());
+        $this->assertEquals('* * * * 3', $this->event->wednesdays()->getExpression());
     }
 
     public function testThursdays()
     {
-        $this->assertEquals('* * * * 4 *', $this->event->thursdays()->getExpression());
+        $this->assertEquals('* * * * 4', $this->event->thursdays()->getExpression());
     }
 
     public function testFridays()
     {
-        $this->assertEquals('* * * * 5 *', $this->event->fridays()->getExpression());
+        $this->assertEquals('* * * * 5', $this->event->fridays()->getExpression());
     }
 
     public function testSaturdays()
     {
-        $this->assertEquals('* * * * 6 *', $this->event->saturdays()->getExpression());
+        $this->assertEquals('* * * * 6', $this->event->saturdays()->getExpression());
     }
 
     public function testQuarterly()
     {
-        $this->assertEquals('0 0 1 1-12/3 * *', $this->event->quarterly()->getExpression());
+        $this->assertEquals('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
     }
 
     public function testFrequencyMacro()
@@ -124,6 +124,6 @@ class FrequencyTest extends TestCase
             return $this->spliceIntoPosition(1, "*/{$x}");
         });
 
-        $this->assertEquals('*/6 * * * * *', $this->event->everyXMinutes(6)->getExpression());
+        $this->assertEquals('*/6 * * * *', $this->event->everyXMinutes(6)->getExpression());
     }
 }
