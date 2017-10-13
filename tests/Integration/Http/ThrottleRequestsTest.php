@@ -13,17 +13,6 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
  */
 class ThrottleRequestsTest extends TestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('cache.default', 'redis');
-    }
-
-    public function setup()
-    {
-        parent::setup();
-        resolve('redis')->flushall();
-    }
-
     public function tearDown()
     {
         parent::tearDown();
