@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
 use RuntimeException;
+use Illuminate\Contracts\Console\Kernel;
 
 trait RefreshDatabase
 {
