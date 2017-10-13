@@ -198,9 +198,9 @@ class Handler implements ExceptionHandlerContract
         if ($e instanceof ModelNotFoundException) {
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
-            $e = new AccessDeniedHttpException($e->getMessage());
+            $e = new AccessDeniedHttpException($e->getMessage(), $e);
         } elseif ($e instanceof TokenMismatchException) {
-            $e = new HttpException(419, $e->getMessage());
+            $e = new HttpException(419, $e->getMessage(), $e);
         }
 
         return $e;
