@@ -249,6 +249,32 @@ if (! function_exists('cache')) {
     }
 }
 
+if (! function_exists('carbon')) {
+    /**
+     * Create a new Carbon instance for the given datetime or return a new instance.
+     *
+     * @param  \DateTime|string|null $datetime
+     * @param  \DateTimeZone|string|null $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function carbon($datetime = null, $tz = null)
+    {
+        if (is_null($datetime)) {
+            return new Carbon(null, $tz);
+        }
+
+        if ($datetime instanceof \DateTime) {
+            if (is_null($tz)) {
+                return Carbon::instance($datetime);
+            }
+
+            return Carbon::instance($datetime)->setTimezone($tz);
+        }
+
+        return new Carbon($datetime, $tz);
+    }
+}
+
 if (! function_exists('config')) {
     /**
      * Get / set the specified configuration value.

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 
@@ -41,6 +42,45 @@ class FoundationHelpersTest extends TestCase
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
     {
         cache(['foo' => 'bar']);
+    }
+
+    public function testCarbon()
+    {
+        // carbon()
+        $this->assertInstanceOf('Illuminate\Support\Carbon', carbon());
+
+        // carbon('string', 'timezone')
+        $this->assertEquals(13, carbon('2017-10-13 22:00:00')->day);
+        $this->assertEquals('2017', carbon('first day of october 2017')->year);
+        $this->assertFalse(carbon('today', 'America/Sao_Paulo')->utc);
+        $this->assertFalse(carbon(null, 'America/Sao_Paulo')->utc);
+
+        // carbon(\DateTime)
+        $this->assertEquals(
+            '22',
+            carbon(\DateTime::createFromFormat('Y-m-d H', '2017-10-13 22'))->hour
+        );
+        $this->assertFalse(
+            carbon(new \DateTime('now', new \DateTimeZone('America/Sao_Paulo')))->utc
+        );
+        $this->assertFalse(
+            carbon(new \DateTime('now'), new \DateTimeZone('America/Sao_Paulo'))->utc
+        );
+
+        // Carbon helpers
+        $this->assertEquals(Carbon::yesterday(), carbon()->yesterday());
+        $this->assertEquals(Carbon::tomorrow(), carbon()->tomorrow());
+
+        // Relative phrases
+        $this->assertEquals(
+            Carbon::now()->addMonth()->month, carbon('next month')->month
+        );
+
+        // Addition and Subtraction
+        $this->assertEquals(
+            Carbon::tomorrow()->addWeek(),
+            carbon()->tomorrow()->addWeek()
+        );
     }
 
     public function testUnversionedElixir()
