@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use RuntimeException;
 use Illuminate\Contracts\Console\Kernel;
 
 trait RefreshDatabase
@@ -49,6 +50,10 @@ trait RefreshDatabase
      */
     protected function refreshTestDatabase()
     {
+        if ($this->app->configurationIsCached()) {
+            throw new RuntimeException('Configuration cache detected. Variables in phpunit.xml did not take effect.');
+        }
+
         if (! RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh');
 
