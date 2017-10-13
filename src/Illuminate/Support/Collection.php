@@ -337,7 +337,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function each(callable $callback)
     {
-        foreach ($this->items as $key => $item) {
+        foreach ($this->items as $key => &$item) {
             if ($callback($item, $key) === false) {
                 break;
             }
