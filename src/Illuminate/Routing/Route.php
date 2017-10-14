@@ -741,6 +741,16 @@ class Route
     }
 
     /**
+     * Get the view for the route.
+     *
+     * @return string
+     */
+    public function getViewName()
+    {
+        return $this->defaults['view'] ?? null;
+    }
+
+    /**
      * Get all middleware, including the ones from the controller.
      *
      * @return array

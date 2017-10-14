@@ -45,7 +45,7 @@ class RouteListCommand extends Command
      *
      * @var array
      */
-    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
+    protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware', 'View'];
 
     /**
      * Create a new route command instance.
@@ -112,6 +112,7 @@ class RouteListCommand extends Command
             'name'   => $route->getName(),
             'action' => $route->getActionName(),
             'middleware' => $this->getMiddleware($route),
+            'view'   => $route->getViewName()
         ]);
     }
 
