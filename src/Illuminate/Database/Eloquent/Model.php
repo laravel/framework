@@ -254,7 +254,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Fill the model with fillable attributes present in a Request object.
      *
-     * @param  Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @return $this
      */
     public function fillWithRequest(Request $request)
