@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Http\Request;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -249,7 +250,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->fill($attributes);
         });
     }
-
+    
+    /**
+     * Fill the model with fillable attributes present in a Request object.
+     *
+     * @param  Illuminate\Http\Request  $request
+     * @return $this
+     */
+    public function fillWithRequest(Request $request)
+    {
+        return $this->fill($request->only($this->getFillable()));
+    }
+    
     /**
      * Remove the table name from a given key.
      *
