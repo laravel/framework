@@ -8,6 +8,7 @@ use JsonSerializable;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -248,6 +249,17 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return static::unguarded(function () use ($attributes) {
             return $this->fill($attributes);
         });
+    }
+
+    /**
+     * Fill the model with fillable attributes present in a Request object.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return $this
+     */
+    public function fillWithRequest(Request $request)
+    {
+        return $this->fill($request->only($this->getFillable()));
     }
 
     /**
