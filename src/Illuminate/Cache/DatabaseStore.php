@@ -157,7 +157,7 @@ class DatabaseStore implements Store
 
             $cache = is_array($cache) ? (object) $cache : $cache;
 
-            $current = unserialize($cache->value);
+            $current = unserialize(base64_decode($cache->value));
 
             // Here we'll call this callback function that was given to the function which
             // is used to either increment or decrement the function. We use a callback
@@ -172,7 +172,7 @@ class DatabaseStore implements Store
             // since database cache values are encrypted by default with secure storage
             // that can't be easily read. We will return the new value after storing.
             $this->table()->where('key', $prefixed)->update([
-                'value' => serialize($new),
+                'value' => base64_encode(serialize($new)),
             ]);
 
             return $new;
