@@ -250,7 +250,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->fill($attributes);
         });
     }
-    
+
     /**
      * Fill the model with fillable attributes present in a Request object.
      *
