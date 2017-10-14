@@ -3803,4 +3803,75 @@ class ValidationValidatorTest extends TestCase
             new \Illuminate\Translation\ArrayLoader, 'en'
         );
     }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage UUID version is unsupported.
+     */
+    public function testValidateUuidThrowOnInvalidArgument()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => 'cd940696-643c-42ca-815d-a5ea0ed7bd3e'], ['x' => 'uuid:6']);
+        $v->validate();
+    }
+
+    public function testValidateUuid()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['x' => ''], ['x' => 'required|uuid']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, [], ['x' => 'uuid']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => null], ['x' => 'uuid']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => 'string does not contains UUID'], ['x' => 'uuid']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '1fa4a050-b0de-11e7-abc4-cec278b6b50a'], ['x' => 'uuid']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '1fa4a050-b0de-11e7-FAIL-cec278b6b50a'], ['x' => 'uuid']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '00000000-0000-0000-0000-000000000000'], ['x' => 'uuid']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '00000000-0000-0000-0000-000000000000'], ['x' => 'uuid:0']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '00000000-0000-0000-0000-000000000000'], ['x' => 'uuid:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-1243-885e-0761b9e7bddd'], ['x' => 'uuid:1']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-2243-885e-0761b9e7bddd'], ['x' => 'uuid:1']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-2243-885e-0761b9e7bddd'], ['x' => 'uuid:2']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-3243-885e-0761b9e7bddd'], ['x' => 'uuid:2']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-3243-885e-0761b9e7bddd'], ['x' => 'uuid:3']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-4243-885e-0761b9e7bddd'], ['x' => 'uuid:3']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-4243-885e-0761b9e7bddd'], ['x' => 'uuid:4']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-5243-885e-0761b9e7bddd'], ['x' => 'uuid:4']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['x' => '54ffc0fa-27c3-5243-885e-0761b9e7bddd'], ['x' => 'uuid:5']);
+        $this->assertTrue($v->passes());
+    }
 }
