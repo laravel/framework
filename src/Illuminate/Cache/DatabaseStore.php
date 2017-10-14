@@ -78,7 +78,7 @@ class DatabaseStore implements Store
             return;
         }
 
-        return unserialize($cache->value);
+        return unserialize(base64_decode($cache->value));
     }
 
     /**
@@ -93,7 +93,7 @@ class DatabaseStore implements Store
     {
         $key = $this->prefix.$key;
 
-        $value = serialize($value);
+        $value = base64_encode(serialize($value));
 
         $expiration = $this->getTime() + (int) ($minutes * 60);
 
