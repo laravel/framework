@@ -1471,4 +1471,38 @@ trait ValidatesAttributes
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
         }
     }
+
+    /**
+     * Validate that an attribute is valid UUID as explained in "UUID 4122 RFC".
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function validateUuid($attribute, $value, $parameters)
+    {
+        $pattern = '/^[0-9A-F]{8}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{4}-[0-9A-F]{12}$/i';
+
+        $patterns = [
+            0 => '/^[0]{8}-[0]{4}-[0]{4}-[0]{4}-[0]{12}$/i',
+            1 => '/^[0-9A-F]{8}-[0-9A-F]{4}-[1][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i',
+            2 => '/^[0-9A-F]{8}-[0-9A-F]{4}-[2][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i',
+            3 => '/^[0-9A-F]{8}-[0-9A-F]{4}-[3][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i',
+            4 => '/^[0-9A-F]{8}-[0-9A-F]{4}-[4][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i',
+            5 => '/^[0-9A-F]{8}-[0-9A-F]{4}-[5][0-9A-F]{3}-[89AB][0-9A-F]{3}-[0-9A-F]{12}$/i',
+        ];
+
+        if (count($parameters)) {
+            if (! Arr::has($patterns, $parameters[0])) {
+                throw new \InvalidArgumentException('UUID version is unsupported.');
+            }
+
+            $pattern = Arr::get($patterns, $parameters[0]);
+        }
+
+        return is_string($value) && preg_match($pattern, $value);
+    }
 }
