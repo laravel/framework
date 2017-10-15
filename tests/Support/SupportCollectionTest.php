@@ -1942,6 +1942,35 @@ class SupportCollectionTest extends TestCase
         $this->assertSame($expected, $actual);
     }
 
+    public function testKeyWithArray()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6,
+        ];
+
+        $c = new Collection(array_values($expected));
+        $actual = $c->keyWith(array_keys($expected))->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
+    public function testKeyWithCollection()
+    {
+        $expected = [
+            1 => 4,
+            2 => 5,
+            3 => 6,
+        ];
+
+        $keysCollection = new Collection(array_keys($expected));
+        $valueCollection = new Collection(array_values($expected));
+        $actual = $valueCollection->keyWith($keysCollection)->toArray();
+
+        $this->assertSame($expected, $actual);
+    }
+
     public function testConcatWithArray()
     {
         $expected = [
