@@ -976,6 +976,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a collection by using this collection for values and another for its keys.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function keyWith($keys)
+    {
+        return new static(array_combine($this->getArrayableItems($keys), $this->all()));
+    }
+
+    /**
      * Union the collection with the given items.
      *
      * @param  mixed  $items
