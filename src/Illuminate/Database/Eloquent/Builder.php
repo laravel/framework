@@ -7,11 +7,11 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -247,7 +247,7 @@ class Builder
 
     /**
      * Exclude one or many columns from being in the result colelction.
-     * 
+     *
      * @param  array $columns
      * @return $this
      */
