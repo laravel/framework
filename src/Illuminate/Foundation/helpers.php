@@ -902,7 +902,7 @@ if (! function_exists('__')) {
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
-     * @return string
+     * @return string|array|null
      */
     function __($key, $replace = [], $locale = null)
     {
