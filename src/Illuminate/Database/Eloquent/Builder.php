@@ -11,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -242,6 +243,22 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Exclude one or many columns from being in the result colelction.
+     * 
+     * @param  array $columns
+     * @return $this
+     */
+    public function exclude($columns)
+    {
+        $wantedColumns = array_diff(
+                Schema::getColumnListing($this->getModel()['table']),
+                (array) $columns
+            );
+
+        return $this->select($wantedColumns);
     }
 
     /**
