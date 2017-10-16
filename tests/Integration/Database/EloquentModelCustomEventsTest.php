@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelCustomEventsTest;
 
-use Illuminate\Support\Facades\Event;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 
