@@ -81,11 +81,13 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        foreach ($this->app->config['view']['paths'] as $viewPath) {
-            if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
-                $this->app['view']->addNamespace($namespace, $appPath);
-            }
-        }
+        collect($this->app->config['view']['paths'] ?? [])
+            ->filter(function ($path) use ($namespace) {
+                return is_dir("{$path}/vendor/{$namespace}");
+            })
+            ->each(function ($path) use ($namespace) {
+                $this->app['view']->addNamespace($namespace, "{$path}/vendor/{$namespace}");
+            });
 
         $this->app['view']->addNamespace($namespace, $path);
     }
