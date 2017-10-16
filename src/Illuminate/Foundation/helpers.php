@@ -929,6 +929,23 @@ if (! function_exists('url')) {
     }
 }
 
+if (! function_exists('user')) {
+    /**
+     * Get the authenticated user.
+     *
+     * @param  string|null  $guard
+     * @return \Illuminate\Auth\Authenticatable
+     */
+    function user($guard = null)
+    {
+        if (is_null($guard)) {
+            return app(AuthFactory::class)->user();
+        } else {
+            return app(AuthFactory::class)->guard($guard)->user();
+        }
+    }
+}
+
 if (! function_exists('validator')) {
     /**
      * Create a new Validator instance.
