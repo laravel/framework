@@ -241,12 +241,13 @@ class TestResponse
      * Assert that the response is a superset of the given JSON.
      *
      * @param  array  $data
+     * @param  bool  $strict
      * @return $this
      */
-    public function assertJson(array $data)
+    public function assertJson(array $data, $strict = false)
     {
         PHPUnit::assertArraySubset(
-            $data, $this->decodeResponseJson(), false, $this->assertJsonMessage($data)
+            $data, $this->decodeResponseJson(), $strict, $this->assertJsonMessage($data)
         );
 
         return $this;

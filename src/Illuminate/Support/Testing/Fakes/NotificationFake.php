@@ -178,6 +178,7 @@ class NotificationFake implements NotificationFactory
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,
                 'channels' => $notification->via($notifiable),
+                'notifiable' => $notifiable,
             ];
         }
     }

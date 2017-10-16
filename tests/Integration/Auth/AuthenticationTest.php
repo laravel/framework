@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Auth;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -34,7 +35,7 @@ class AuthenticationTest extends TestCase
             $table->string('email');
             $table->string('username');
             $table->string('password');
-            $table->string('remember_token')->default('');
+            $table->string('remember_token')->default(null)->nullable();
             $table->tinyInteger('is_active')->default(0);
         });
 
@@ -156,6 +157,51 @@ class AuthenticationTest extends TestCase
         $this->app['auth']->logout();
         $this->assertNull($this->app['auth']->user());
         Event::assertDispatched(\Illuminate\Auth\Events\Logout::class);
+    }
+
+    /**
+     * @test
+     */
+    public function logging_in_out_via_attempt_remembering()
+    {
+        $this->assertTrue(
+            $this->app['auth']->attempt(['email' => 'email', 'password' => 'password'], true)
+        );
+        $this->assertInstanceOf(AuthenticationTestUser::class, $this->app['auth']->user());
+        $this->assertTrue($this->app['auth']->check());
+        $this->assertNotNull($this->app['auth']->user()->getRememberToken());
+
+        $oldToken = $this->app['auth']->user()->getRememberToken();
+        $user = $this->app['auth']->user();
+
+        $this->app['auth']->logout();
+
+        $this->assertNotNull($user->getRememberToken());
+        $this->assertNotEquals($oldToken, $user->getRememberToken());
+    }
+
+    /**
+     * @test
+     */
+    public function auth_via_attempt_remembering()
+    {
+        $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
+
+        $user = AuthenticationTestUser::create([
+            'username' => 'username2',
+            'email' => 'email2',
+            'password' => bcrypt('password'),
+            'remember_token' => $token = str_random(),
+            'is_active' => false,
+        ]);
+
+        $this->assertEquals($user->id, $provider->retrieveByToken($user->id, $token)->id);
+
+        $user->update([
+            'remember_token' => null,
+        ]);
+
+        $this->assertNull($provider->retrieveByToken($user->id, $token));
     }
 }
 

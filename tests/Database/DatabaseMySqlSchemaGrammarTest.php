@@ -291,6 +291,26 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
     }
 
+    public function testAddingSpatialIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->spatialIndex('foo', 'baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add spatial index `baz`(`foo`)', $statements[0]);
+    }
+
+    public function testAddingFluentSpatialIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->point('foo')->spatialIndex('baz');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `users` add spatial index `baz`(`foo`)', $statements[1]);
+    }
+
     public function testAddingForeignKey()
     {
         $blueprint = new Blueprint('users');
@@ -766,6 +786,86 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `foo` varchar(17) not null', $statements[0]);
+    }
+
+    public function testAddingGeometry()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->geometry('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` geometry not null', $statements[0]);
+    }
+
+    public function testAddingPoint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->point('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` point not null', $statements[0]);
+    }
+
+    public function testAddingLinestring()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->linestring('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` linestring not null', $statements[0]);
+    }
+
+    public function testAddingPolygon()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->polygon('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` polygon not null', $statements[0]);
+    }
+
+    public function testAddingGeometryCollection()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->geometrycollection('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` geometrycollection not null', $statements[0]);
+    }
+
+    public function testAddingMultipoint()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->multipoint('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` multipoint not null', $statements[0]);
+    }
+
+    public function testAddingMultiLinestring()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->multilinestring('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` multilinestring not null', $statements[0]);
+    }
+
+    public function testAddingMultiPolygon()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->multipolygon('foo');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` multipolygon not null', $statements[0]);
     }
 
     public function testAddingComment()

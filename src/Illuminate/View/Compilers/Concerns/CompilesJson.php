@@ -5,15 +5,26 @@ namespace Illuminate\View\Compilers\Concerns;
 trait CompilesJson
 {
     /**
+     * The default JSON encoding options.
+     *
+     * @var int
+     */
+    private $encodingOptions = JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT;
+
+    /**
      * Compile the JSON statement into valid PHP.
      *
      * @param  string  $expression
-     * @param  int  $options
-     * @param  int  $depth
      * @return string
      */
-    protected function compileJson($expression, $options = 0, $depth = 512)
+    protected function compileJson($expression)
     {
-        return "<?php echo json_encode($expression, $options, $depth) ?>";
+        $parts = explode(',', $this->stripParentheses($expression));
+
+        $options = trim($parts[1] ?? $this->encodingOptions);
+
+        $depth = trim($parts[2] ?? 512);
+
+        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
     }
 }

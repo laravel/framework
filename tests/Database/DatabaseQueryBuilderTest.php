@@ -1122,6 +1122,51 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['admin'], $builder->getBindings());
     }
 
+    public function testJoinsWithSubqueryCondition()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->whereIn('contact_type_id', function ($q) {
+                $q->select('id')->from('contact_types')
+                    ->where('category_id', '1')
+                    ->whereNull('deleted_at');
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and "contact_type_id" in (select "id" from "contact_types" where "category_id" = ? and "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals(['1'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->whereExists(function ($q) {
+                $q->selectRaw('1')->from('contact_types')
+                    ->whereRaw('contact_types.id = contacts.contact_type_id')
+                    ->where('category_id', '1')
+                    ->whereNull('deleted_at');
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and exists (select 1 from "contact_types" where contact_types.id = contacts.contact_type_id and "category_id" = ? and "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals(['1'], $builder->getBindings());
+    }
+
+    public function testJoinsWithAdvancedSubqueryCondition()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->whereExists(function ($q) {
+                $q->selectRaw('1')->from('contact_types')
+                    ->whereRaw('contact_types.id = contacts.contact_type_id')
+                    ->where('category_id', '1')
+                    ->whereNull('deleted_at')
+                    ->whereIn('level_id', function ($q) {
+                        $q->select('id')->from('levels')
+                            ->where('is_active', true);
+                    });
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and exists (select 1 from "contact_types" where contact_types.id = contacts.contact_type_id and "category_id" = ? and "deleted_at" is null and "level_id" in (select "id" from "levels" where "is_active" = ?))', $builder->toSql());
+        $this->assertEquals(['1', true], $builder->getBindings());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();

@@ -182,6 +182,7 @@ img {
 .table th {
     border-bottom: 1px solid #EDEFF2;
     padding-bottom: 8px;
+    margin: 0;
 }
 
 .table td {
@@ -189,6 +190,7 @@ img {
     font-size: 15px;
     line-height: 18px;
     padding: 10px 0;
+    margin: 0;
 }
 
 .content-cell {

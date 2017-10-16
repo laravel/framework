@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use stdClass;
 use Countable;
 use Exception;
 use ArrayAccess;
@@ -33,7 +34,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected static $proxies = [
         'average', 'avg', 'contains', 'each', 'every', 'filter', 'first', 'flatMap',
-        'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
+        'keyBy', 'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
     ];
 
     /**
@@ -217,7 +218,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (func_num_args() == 1) {
             if ($this->useAsCallable($key)) {
-                return ! is_null($this->first($key));
+                $placeholder = new stdClass;
+
+                return $this->first($key, $placeholder) !== $placeholder;
             }
 
             return in_array($key, $this->items);
@@ -851,6 +854,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Run a dictionary map over the items.
+     *
+     * The callback should return an associative array with a single key/value pair.
+     *
+     * @param  callable  $callback
+     * @return static
+     */
+    public function mapToDictionary(callable $callback)
+    {
+        $dictionary = $this->map($callback)->reduce(function ($groups, $pair) {
+            $groups[key($pair)][] = reset($pair);
+
+            return $groups;
+        }, []);
+
+        return new static($dictionary);
+    }
+
+    /**
      * Run a grouping map over the items.
      *
      * The callback should return an associative array with a single key/value pair.
@@ -860,13 +882,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapToGroups(callable $callback)
     {
-        $groups = $this->map($callback)->reduce(function ($groups, $pair) {
-            $groups[key($pair)][] = reset($pair);
+        $groups = $this->mapToDictionary($callback);
 
-            return $groups;
-        }, []);
-
-        return (new static($groups))->map([$this, 'make']);
+        return $groups->map([$this, 'make']);
     }
 
     /**
@@ -1037,7 +1055,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function forPage($page, $perPage)
     {
-        return $this->slice(($page - 1) * $perPage, $perPage);
+        $offset = max(0, ($page - 1) * $perPage);
+
+        return $this->slice($offset, $perPage);
     }
 
     /**
@@ -1352,7 +1372,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         $descending ? arsort($results, $options)
-                    : asort($results, $options);
+            : asort($results, $options);
 
         // Once we have sorted all of the keys in the array, we will loop through them
         // and grab the corresponding model so we can set the underlying items list
@@ -1537,6 +1557,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }, $this->items], $arrayableItems);
 
         return new static(call_user_func_array('array_map', $params));
+    }
+
+    /**
+     * Pad collection to the specified length with a value.
+     *
+     * @param  int  $size
+     * @param  mixed  $value
+     * @return static
+     */
+    public function pad($size, $value)
+    {
+        return new static(array_pad($this->items, $size, $value));
     }
 
     /**

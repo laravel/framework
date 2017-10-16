@@ -461,6 +461,18 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasReplyTo($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'replyTo');
+    }
+
+    /**
      * Set the recipients of the message.
      *
      * All recipients are stored internally as [['name' => ?, 'address' => ?]]

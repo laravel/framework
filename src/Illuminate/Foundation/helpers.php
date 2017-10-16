@@ -107,9 +107,7 @@ if (! function_exists('app')) {
             return Container::getInstance();
         }
 
-        return empty($parameters)
-            ? Container::getInstance()->make($abstract)
-            : Container::getInstance()->makeWith($abstract, $parameters);
+        return Container::getInstance()->make($abstract, $parameters);
     }
 }
 
@@ -204,7 +202,7 @@ if (! function_exists('broadcast')) {
      * Begin broadcasting an event.
      *
      * @param  mixed|null  $event
-     * @return \Illuminate\Broadcasting\PendingBroadcast|void
+     * @return \Illuminate\Broadcasting\PendingBroadcast
      */
     function broadcast($event = null)
     {
@@ -219,7 +217,7 @@ if (! function_exists('cache')) {
      * If an array is passed, we'll assume you want to put to the cache.
      *
      * @param  dynamic  key|key,default|data,expiration|null
-     * @return mixed
+     * @return mixed|\Illuminate\Cache\CacheManager
      *
      * @throws \Exception
      */
@@ -259,7 +257,7 @@ if (! function_exists('config')) {
      *
      * @param  array|string  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return mixed|\Illuminate\Config\Repository
      */
     function config($key = null, $default = null)
     {
@@ -294,14 +292,16 @@ if (! function_exists('cookie')) {
      *
      * @param  string  $name
      * @param  string  $value
-     * @param  int     $minutes
+     * @param  int  $minutes
      * @param  string  $path
      * @param  string  $domain
-     * @param  bool    $secure
-     * @param  bool    $httpOnly
-     * @return \Symfony\Component\HttpFoundation\Cookie
+     * @param  bool  $secure
+     * @param  bool  $httpOnly
+     * @param  bool  $raw
+     * @param  string|null  $sameSite
+     * @return \Illuminate\Cookie\CookieJar|\Symfony\Component\HttpFoundation\Cookie
      */
-    function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true)
+    function cookie($name = null, $value = null, $minutes = 0, $path = null, $domain = null, $secure = false, $httpOnly = true, $raw = false, $sameSite = null)
     {
         $cookie = app(CookieFactory::class);
 
@@ -309,7 +309,7 @@ if (! function_exists('cookie')) {
             return $cookie;
         }
 
-        return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly);
+        return $cookie->make($name, $value, $minutes, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
 }
 
@@ -818,7 +818,7 @@ if (! function_exists('session')) {
      *
      * @param  array|string  $key
      * @param  mixed  $default
-     * @return mixed
+     * @return mixed|\Illuminate\Session\Store|\Illuminate\Session\SessionManager
      */
     function session($key = null, $default = null)
     {
@@ -902,9 +902,9 @@ if (! function_exists('__')) {
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
-     * @return \Illuminate\Contracts\Translation\Translator|string
+     * @return string|array|null
      */
-    function __($key = null, $replace = [], $locale = null)
+    function __($key, $replace = [], $locale = null)
     {
         return app('translator')->getFromJson($key, $replace, $locale);
     }

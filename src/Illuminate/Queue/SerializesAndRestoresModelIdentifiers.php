@@ -21,6 +21,7 @@ trait SerializesAndRestoresModelIdentifiers
             return new ModelIdentifier(
                 $value->getQueueableClass(),
                 $value->getQueueableIds(),
+                $value->getQueueableRelations(),
                 $value->getQueueableConnection()
             );
         }
@@ -29,6 +30,7 @@ trait SerializesAndRestoresModelIdentifiers
             return new ModelIdentifier(
                 get_class($value),
                 $value->getQueueableId(),
+                $value->getQueueableRelations(),
                 $value->getQueueableConnection()
             );
         }
@@ -50,8 +52,7 @@ trait SerializesAndRestoresModelIdentifiers
 
         return is_array($value->id)
                 ? $this->restoreCollection($value)
-                : $this->getQueryForModelRestoration((new $value->class)->setConnection($value->connection))
-                    ->useWritePdo()->findOrFail($value->id);
+                : $this->restoreModel($value);
     }
 
     /**
@@ -70,6 +71,19 @@ trait SerializesAndRestoresModelIdentifiers
 
         return $this->getQueryForModelRestoration($model)->useWritePdo()
                     ->whereIn($model->getQualifiedKeyName(), $value->id)->get();
+    }
+
+    /**
+     * @param  \Illuminate\Contracts\Database\ModelIdentifier  $value
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function restoreModel($value)
+    {
+        $model = $this->getQueryForModelRestoration((new $value->class)
+                      ->setConnection($value->connection))
+                      ->useWritePdo()->findOrFail($value->id);
+
+        return $model->load($value->relations);
     }
 
     /**

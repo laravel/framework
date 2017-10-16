@@ -341,7 +341,7 @@ trait MakesHttpRequests
      */
     protected function formatServerHeaderKey($name)
     {
-        if (! Str::startsWith($name, 'HTTP_') && $name !== 'CONTENT_TYPE') {
+        if (! Str::startsWith($name, 'HTTP_') && $name != 'CONTENT_TYPE' && $name != 'REMOTE_ADDR') {
             return 'HTTP_'.$name;
         }
 

@@ -82,6 +82,8 @@ trait InteractsWithAuthentication
     {
         $expected = $this->app->make('auth')->guard($guard)->user();
 
+        $this->assertNotNull($expected, 'The current user is not authenticated.');
+
         $this->assertInstanceOf(
             get_class($expected), $user,
             'The currently authenticated user is not who was expected'

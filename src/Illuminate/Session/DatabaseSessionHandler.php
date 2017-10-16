@@ -93,7 +93,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         if ($this->expired($session)) {
             $this->exists = true;
 
-            return;
+            return '';
         }
 
         if (isset($session->payload)) {
@@ -101,6 +101,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
 
             return base64_decode($session->payload);
         }
+
+        return '';
     }
 
     /**

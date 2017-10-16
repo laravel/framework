@@ -1106,7 +1106,6 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         parent::flush();
 
         $this->buildStack = [];
-        $this->middlewares = [];
         $this->loadedProviders = [];
         $this->bootedCallbacks = [];
         $this->bootingCallbacks = [];

@@ -43,6 +43,13 @@ class Route
     public $action;
 
     /**
+     * Indicates whether the route is a fallback route.
+     *
+     * @var bool
+     */
+    public $isFallback = false;
+
+    /**
      * The controller instance.
      *
      * @var mixed
@@ -216,7 +223,7 @@ class Route
         if (! $this->controller) {
             $class = $this->parseControllerCallback()[0];
 
-            $this->controller = $this->container->make($class);
+            $this->controller = $this->container->make(ltrim($class, '\\'));
         }
 
         return $this->controller;
@@ -485,6 +492,18 @@ class Route
     }
 
     /**
+     * Mark this route as a fallback route.
+     *
+     * @return $this
+     */
+    public function fallback()
+    {
+        $this->isFallback = true;
+
+        return $this;
+    }
+
+    /**
      * Get the HTTP verbs the route responds to.
      *
      * @return array
@@ -698,16 +717,14 @@ class Route
     }
 
     /**
-     * Get an action or action array for the route.
+     * Get the action array or one of its properties for the route.
      *
-     * @param  string|null  $action
+     * @param  string|null  $key
      * @return mixed
      */
-    public function getAction($action = null)
+    public function getAction($key = null)
     {
-        return array_key_exists($action, $this->action)
-            ? $this->action[$action]
-            : $this->action;
+        return Arr::get($this->action, $key);
     }
 
     /**

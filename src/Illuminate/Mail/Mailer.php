@@ -226,7 +226,7 @@ class Mailer implements MailerContract, MailQueueContract
             $this->setGlobalTo($message);
         }
 
-        // Next we will determine if the message should be send. We give the developer
+        // Next we will determine if the message should be sent. We give the developer
         // one final chance to stop this message and then we will send it to all of
         // its recipients. We will then fire the sent event for the sent message.
         $swiftMessage = $message->getSwiftMessage();
@@ -266,7 +266,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         // If the given view is an array with numeric keys, we will just assume that
         // both a "pretty" and "plain" view were provided, so we will return this
-        // array as is, since must should contain both views with numeric keys.
+        // array as is, since it should contain both views with numerical keys.
         if (is_array($view) && isset($view[0])) {
             return [$view[0], $view[1], null];
         }
@@ -337,8 +337,8 @@ class Mailer implements MailerContract, MailQueueContract
     protected function setGlobalTo($message)
     {
         $message->to($this->to['address'], $this->to['name'], true);
-        $message->cc($this->to['address'], $this->to['name'], true);
-        $message->bcc($this->to['address'], $this->to['name'], true);
+        $message->cc(null, null, true);
+        $message->bcc(null, null, true);
     }
 
     /**
@@ -423,15 +423,15 @@ class Mailer implements MailerContract, MailQueueContract
         $message = new Message($this->swift->createMessage('message'));
 
         // If a global from address has been specified we will set it on every message
-        // instances so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push the address.
+        // instance so the developer does not have to repeat themselves every time
+        // they create a new message. We'll just go ahead and push this address.
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
 
         // When a global reply address was specified we will set this on every message
-        // instances so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push the address.
+        // instance so the developer does not have to repeat themselves every time
+        // they create a new message. We will just go ahead and push this address.
         if (! empty($this->replyTo['address'])) {
             $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }

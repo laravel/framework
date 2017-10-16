@@ -122,7 +122,7 @@ class Arr
     }
 
     /**
-     * Get all of the given array except for a specified array of items.
+     * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
      * @param  array|string  $keys
@@ -550,10 +550,10 @@ class Arr
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable|string  $callback
+     * @param  callable|string|null  $callback
      * @return array
      */
-    public static function sort($array, $callback)
+    public static function sort($array, $callback = null)
     {
         return Collection::make($array)->sortBy($callback)->all();
     }

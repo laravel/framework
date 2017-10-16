@@ -13,13 +13,10 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- * @mixin \Illuminate\Database\Query\Builder
- */
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
@@ -1031,10 +1028,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Determine if two models are not the same.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model|null  $model
      * @return bool
      */
-    public function isNot(Model $model)
+    public function isNot($model)
     {
         return ! $this->is($model);
     }
@@ -1238,6 +1235,34 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function getQueueableId()
     {
         return $this->getKey();
+    }
+
+    /**
+     * Get the queueable relationships for the entity.
+     *
+     * @return array
+     */
+    public function getQueueableRelations()
+    {
+        $relations = [];
+
+        foreach ($this->getRelations() as $key => $relation) {
+            $relations[] = $key;
+
+            if ($relation instanceof QueueableCollection) {
+                foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
+                    $relations[] = $key.'.'.$collectionKey;
+                }
+            }
+
+            if ($relation instanceof QueueableEntity) {
+                foreach ($relation->getQueueableRelations() as $entityKey => $entityValue) {
+                    $relations[] = $key.'.'.$entityValue;
+                }
+            }
+        }
+
+        return array_unique($relations);
     }
 
     /**

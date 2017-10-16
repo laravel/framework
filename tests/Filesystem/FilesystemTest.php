@@ -122,7 +122,9 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/2.txt', '2');
         mkdir($this->tempDir.'/foo/bar');
         $files = new Filesystem;
-        $this->assertEquals([$this->tempDir.'/foo/1.txt', $this->tempDir.'/foo/2.txt'], $files->files($this->tempDir.'/foo'));
+        $results = $files->files($this->tempDir.'/foo');
+        $this->assertInstanceOf('SplFileInfo', $results[0]);
+        $this->assertInstanceOf('SplFileInfo', $results[1]);
         unset($files);
     }
 

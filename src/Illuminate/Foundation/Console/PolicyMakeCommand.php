@@ -90,11 +90,17 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $model = class_basename(trim($model, '\\'));
 
+        $dummyUser = class_basename(config('auth.providers.users.model'));
+
+        $dummyModel = Str::camel($model) === 'user' ? 'model' : Str::camel($model);
+
         $stub = str_replace('DummyModel', $model, $stub);
 
-        $stub = str_replace('dummyModel', Str::camel($model), $stub);
+        $stub = str_replace('dummyModel', $dummyModel, $stub);
 
-        return str_replace('dummyPluralModel', Str::plural(Str::camel($model)), $stub);
+        $stub = str_replace('DummyUser', $dummyUser, $stub);
+
+        return str_replace('dummyPluralModel', Str::plural($dummyModel), $stub);
     }
 
     /**

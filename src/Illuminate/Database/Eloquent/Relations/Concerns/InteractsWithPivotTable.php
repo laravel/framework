@@ -64,7 +64,7 @@ trait InteractsWithPivotTable
     /**
      * Sync the intermediate tables with a list of IDs without detaching.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection|array  $ids
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array  $ids
      * @return array
      */
     public function syncWithoutDetaching($ids)
@@ -188,7 +188,9 @@ trait InteractsWithPivotTable
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
 
-        $updated = $this->newPivotStatementForId($id)->update($attributes);
+        $updated = $this->newPivotStatementForId($id)->update(
+            $this->castAttributes($attributes)
+        );
 
         if ($touch) {
             $this->touchIfTouching();
@@ -236,10 +238,6 @@ trait InteractsWithPivotTable
         // To create the attachment records, we will simply spin through the IDs given
         // and create a new record to insert for each ID. Each ID may actually be a
         // key in the array, with extra attributes to be placed in other columns.
-        $attributes = $this->using
-                ? $this->newPivot()->forceFill($attributes)->getAttributes()
-                : $attributes;
-
         foreach ($ids as $key => $value) {
             $records[] = $this->formatAttachRecord(
                 $key, $value, $attributes, $hasTimestamps
@@ -263,7 +261,7 @@ trait InteractsWithPivotTable
         list($id, $attributes) = $this->extractAttachIdAndAttributes($key, $value, $attributes);
 
         return array_merge(
-            $this->baseAttachRecord($id, $hasTimestamps), $attributes
+            $this->baseAttachRecord($id, $hasTimestamps), $this->castAttributes($attributes)
         );
     }
 
@@ -293,7 +291,7 @@ trait InteractsWithPivotTable
     {
         $record[$this->relatedPivotKey] = $id;
 
-        $record[$this->foreignPivotKey] = $this->parent->getKey();
+        $record[$this->foreignPivotKey] = $this->parent->{$this->parentKey};
 
         // If the record needs to have creation and update timestamps, we will make
         // them by calling the parent model's "freshTimestamp" method which will
@@ -439,7 +437,7 @@ trait InteractsWithPivotTable
             call_user_func_array([$query, 'whereIn'], $arguments);
         }
 
-        return $query->where($this->foreignPivotKey, $this->parent->getKey());
+        return $query->where($this->foreignPivotKey, $this->parent->{$this->parentKey});
     }
 
     /**
@@ -502,5 +500,18 @@ trait InteractsWithPivotTable
     protected function castKey($key)
     {
         return is_numeric($key) ? (int) $key : (string) $key;
+    }
+
+    /**
+     * Cast the given pivot attributes.
+     *
+     * @param  array $attributes
+     * @return array
+     */
+    protected function castAttributes($attributes)
+    {
+        return $this->using
+                    ? $this->newPivot()->fill($attributes)->getAttributes()
+                    : $attributes;
     }
 }
