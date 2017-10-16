@@ -144,7 +144,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  array  $replace
      * @param  string  $locale
-     * @return string
+     * @return string|array|null
      */
     public function getFromJson($key, array $replace = [], $locale = null)
     {
