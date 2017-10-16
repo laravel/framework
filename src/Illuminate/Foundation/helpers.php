@@ -934,7 +934,7 @@ if (! function_exists('user')) {
      * Get the authenticated user.
      *
      * @param  string|null  $guard
-     * @return mixed
+     * @return \Illuminate\Auth\Authenticatable
      */
     function user($guard = null)
     {
