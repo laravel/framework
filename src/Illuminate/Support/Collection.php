@@ -114,6 +114,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get a single item for a given index from the collection
+     *
+     * @param $index
+     * @return mixed
+     */
+    public function at($index)
+    {
+        return $this->slice($index,1)->first();
+    }
+
+    /**
      * Get the average value of a given key.
      *
      * @param  callable|string|null  $callback
