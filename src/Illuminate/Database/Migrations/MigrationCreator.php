@@ -52,7 +52,7 @@ class MigrationCreator
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($prefix, $table, $create);
+        $stub = $this->getStub($table, $create);
 
         $this->files->put(
             $path = $this->getPath($prefix, $name, $path),
@@ -90,7 +90,7 @@ class MigrationCreator
      * @param  bool    $create
      * @return string
      */
-    protected function getStub($prefix, $table, $create)
+    protected function getStub($table, $create)
     {
         if (is_null($table)) {
             return $this->files->get($this->stubPath().'/blank.stub');
