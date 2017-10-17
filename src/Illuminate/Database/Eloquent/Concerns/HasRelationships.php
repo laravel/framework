@@ -57,9 +57,11 @@ trait HasRelationships
 
         $foreignKey = $foreignKey ?: $this->getForeignKey();
 
+        $foreignKey = Str::contains($foreignKey, '.') ? $foreignKey : $instance->getTable().'.'.$foreignKey;
+        
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        return new HasOne($instance->newQuery(), $this, $foreignKey, $localKey);
     }
 
     /**
