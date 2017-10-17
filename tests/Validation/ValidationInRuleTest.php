@@ -25,5 +25,9 @@ class ValidationInRuleTest extends TestCase
         $rule = Rule::in([1, 2, 3, 4]);
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::in('1', '2', '3', '4');
+
+        $this->assertEquals('in:"1","2","3","4"', (string) $rule);
     }
 }
