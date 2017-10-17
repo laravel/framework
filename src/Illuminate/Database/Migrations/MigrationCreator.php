@@ -148,12 +148,9 @@ class MigrationCreator
      */
     protected function getPath($prefix, $name, $path)
     {
-        if($prefix)
-        {
+        if($prefix) {
             return $path.'/'.$prefix.'_'.$name.'.php';
-        }
-        else
-        {
+        } else {
             return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
         }
     }
