@@ -104,6 +104,7 @@ class MigrateMakeCommand extends BaseCommand
      * Write the migration file to disk.
      *
      * @param  string  $name
+     * @param  string  $prefix
      * @param  string  $table
      * @param  bool    $create
      * @return string
