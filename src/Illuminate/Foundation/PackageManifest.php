@@ -153,10 +153,7 @@ class PackageManifest
 
             $composer = json_decode(file_get_contents($file), true);
 
-            if (array_key_exists('extra', $composer) &&
-                array_key_exists('laravel', $composer['extra']) &&
-                array_key_exists('dont-discover', $composer['extra']['laravel'])
-            ) {
+            if (isset($composer['extra']['laravel']['dont-discover'])) {
                 $ignore[] = $composer['extra']['laravel']['dont-discover'];
             }
         }
