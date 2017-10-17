@@ -39,22 +39,23 @@ class MigrationCreator
      *
      * @param  string  $name
      * @param  string  $path
+     * @param  string  $prefix
      * @param  string  $table
      * @param  bool    $create
      * @return string
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $prefix = false, $table = null, $create = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        $stub = $this->getStub($prefix, $table, $create);
 
         $this->files->put(
-            $path = $this->getPath($name, $path),
+            $path = $this->getPath($prefix, $name, $path),
             $this->populateStub($name, $stub, $table)
         );
 
@@ -88,7 +89,7 @@ class MigrationCreator
      * @param  bool    $create
      * @return string
      */
-    protected function getStub($table, $create)
+    protected function getStub($prefix, $table, $create)
     {
         if (is_null($table)) {
             return $this->files->get($this->stubPath().'/blank.stub');
@@ -140,13 +141,18 @@ class MigrationCreator
     /**
      * Get the full path to the migration.
      *
+     * @param  string  $prefix
      * @param  string  $name
      * @param  string  $path
      * @return string
      */
-    protected function getPath($name, $path)
+    protected function getPath($prefix, $name, $path)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        if ($prefix) {
+            return $path.'/'.$prefix.'_'.$name.'.php';
+        } else {
+            return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        }
     }
 
     /**

@@ -13,6 +13,7 @@ class MigrateMakeCommand extends BaseCommand
      * @var string
      */
     protected $signature = 'make:migration {name : The name of the migration.}
+        {--prefix= : Use custom prefix on migration file instead of default DateTime.}
         {--create= : The table to be created.}
         {--table= : The table to migrate.}
         {--path= : The location where the migration file should be created.}';
@@ -65,6 +66,8 @@ class MigrateMakeCommand extends BaseCommand
         // to be freshly created so we can create the appropriate migrations.
         $name = trim($this->input->getArgument('name'));
 
+        $prefix = $this->input->getOption('prefix');
+
         $table = $this->input->getOption('table');
 
         $create = $this->input->getOption('create') ?: false;
@@ -92,7 +95,7 @@ class MigrateMakeCommand extends BaseCommand
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create);
+        $this->writeMigration($name, $prefix, $table, $create);
 
         $this->composer->dumpAutoloads();
     }
@@ -105,7 +108,7 @@ class MigrateMakeCommand extends BaseCommand
      * @param  bool    $create
      * @return string
      */
-    protected function writeMigration($name, $table, $create)
+    protected function writeMigration($name, $prefix, $table, $create)
     {
         $file = pathinfo($this->creator->create(
             $name, $this->getMigrationPath(), $table, $create
