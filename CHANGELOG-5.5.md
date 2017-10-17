@@ -1,5 +1,23 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Make `Redirector` macroable ([#21714](https://github.com/laravel/framework/pull/21714))
+
+### Changed
+- Prevent reloading default relationships while lazy eager-loading ([#21710](https://github.com/laravel/framework/pull/21710))
+- Don't reload pivot relationship on refresh ([#21713](https://github.com/laravel/framework/pull/21713))
+- Unify vue preset ([#21711](https://github.com/laravel/framework/pull/21711))
+
+
+## v5.5.17 (2017-10-17)
+
+### Fixed
+- Allow `@json` options to be `0` ([#21692](https://github.com/laravel/framework/pull/21692))
+- Fixed "invalid argument" error in `ServiceProvider::loadViewsFrom()` ([#21705](https://github.com/laravel/framework/pull/21705))
+
+
 ## v5.5.16 (2017-10-16)
 
 _No changes._
