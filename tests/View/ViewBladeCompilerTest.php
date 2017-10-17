@@ -92,6 +92,16 @@ class ViewBladeCompilerTest extends TestCase
         }}'));
     }
 
+    public function testCommentedBladeTag()
+    {
+        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
+        $compiler->setEchoFormat('%s');
+
+        $str = '{{-- @php $foo = $bar; @endphp --}} @php $foo = 100; @endphp';
+
+        $this->assertSame(' <?php $foo = 100; ?>', $compiler->compileString($str));
+    }
+
     protected function getFiles()
     {
         return m::mock('Illuminate\Filesystem\Filesystem');

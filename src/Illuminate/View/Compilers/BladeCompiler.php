@@ -101,7 +101,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
      *
      * @var string
      */
-    protected $rawPlaceholder = '@__raw-block__@';
+    protected $rawPlaceholder = '@__raw-block-INDEX__@';
+
+    /**
+     * The current placeholder index.
+     *
+     * @var int
+     */
+    protected $rawIndex = 0;
 
     /**
      * Array to temporary store the raw blocks found in the template.
@@ -200,9 +207,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storeVerbatimBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            $this->rawBlocks[] = $matches[1];
+            $i = $this->rawIndex++;
+            $this->rawBlocks[$i] = $matches[1];
 
-            return $this->rawPlaceholder;
+            return str_replace('INDEX', $i, $this->rawPlaceholder);
         }, $value);
     }
 
@@ -215,9 +223,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storePhpBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
-            $this->rawBlocks[] = "<?php{$matches[1]}?>";
+            $i = $this->rawIndex++;
+            $this->rawBlocks[$i] = "<?php{$matches[1]}?>";
 
-            return $this->rawPlaceholder;
+            return str_replace('INDEX', $i, $this->rawPlaceholder);
         }, $value);
     }
 
@@ -229,11 +238,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.preg_quote($this->rawPlaceholder).'/', function () {
-            return array_shift($this->rawBlocks);
+        $regex = '/'.str_replace('INDEX', '(.*?)', preg_quote($this->rawPlaceholder, '/')).'/';
+
+        $result = preg_replace_callback($regex, function ($matches) {
+            return $this->rawBlocks[$matches[1]];
         }, $result);
 
         $this->rawBlocks = [];
+        $this->rawIndex = 0;
 
         return $result;
     }
