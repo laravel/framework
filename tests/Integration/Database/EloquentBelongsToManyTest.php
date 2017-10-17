@@ -99,6 +99,37 @@ class EloquentBelongsToManyTest extends TestCase
     /**
      * @test
      */
+    public function refresh_on_other_model_works()
+    {
+        $post = Post::create(['title' => str_random()]);
+        $tag = Tag::create(['name' => $tagName = str_random()]);
+
+        $post->tags()->sync([
+            $tag->id,
+        ]);
+
+        $post->load('tags');
+
+        $loadedTag = $post->tags()->first();
+
+        $tag->update(['name' => 'newName']);
+
+        $this->assertEquals($tagName, $loadedTag->name);
+
+        $this->assertEquals($tagName, $post->tags[0]->name);
+
+        $loadedTag->refresh();
+
+        $this->assertEquals('newName', $loadedTag->name);
+
+        $post->refresh();
+
+        $this->assertEquals('newName', $post->tags[0]->name);
+    }
+
+    /**
+     * @test
+     */
     public function custom_pivot_class()
     {
         Carbon::setTestNow(
