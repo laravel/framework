@@ -39,12 +39,13 @@ class MigrationCreator
      *
      * @param  string  $name
      * @param  string  $path
+     * @param  string  $prefix
      * @param  string  $table
      * @param  bool    $create
      * @return string
      * @throws \Exception
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $prefix = false, $table = null, $create = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
@@ -54,7 +55,7 @@ class MigrationCreator
         $stub = $this->getStub($table, $create);
 
         $this->files->put(
-            $path = $this->getPath($name, $path),
+            $path = $this->getPath($prefix, $name, $path),
             $this->populateStub($name, $stub, $table)
         );
 
@@ -84,6 +85,7 @@ class MigrationCreator
     /**
      * Get the migration stub file.
      *
+     * @param  string  $prefix
      * @param  string  $table
      * @param  bool    $create
      * @return string
@@ -140,13 +142,18 @@ class MigrationCreator
     /**
      * Get the full path to the migration.
      *
+     * @param  string  $prefix
      * @param  string  $name
      * @param  string  $path
      * @return string
      */
-    protected function getPath($name, $path)
+    protected function getPath($prefix, $name, $path)
     {
-        return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        if ($prefix) {
+            return $path.'/'.$prefix.'_'.$name.'.php';
+        } else {
+            return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+        }
     }
 
     /**
