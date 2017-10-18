@@ -8,7 +8,11 @@
 ### Changed
 - Prevent reloading default relationships while lazy eager-loading ([#21710](https://github.com/laravel/framework/pull/21710))
 - Don't reload pivot relationship on refresh ([#21713](https://github.com/laravel/framework/pull/21713))
-- Unify vue preset ([#21711](https://github.com/laravel/framework/pull/21711))
+- Unify Vue.js preset ([#21711](https://github.com/laravel/framework/pull/21711), [#21724](https://github.com/laravel/framework/pull/21724))
+- Revert multibyte functions in `Str` ([#21722](https://github.com/laravel/framework/pull/21722))
+
+### Fixed
+- Don't recreate the SQLite database file in `refreshDatabaseFile()` ([#21720](https://github.com/laravel/framework/pull/21720))
 
 
 ## v5.5.17 (2017-10-17)
