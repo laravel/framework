@@ -143,13 +143,22 @@ class PackageManifest
      */
     protected function packagesToIgnore()
     {
-        if (! file_exists($this->basePath.'/composer.json')) {
-            return [];
+        if (file_exists($this->basePath . '/composer.json')) {
+            $ignore[] = json_decode(file_get_contents(
+                    $this->basePath . '/composer.json'
+                ), true)['extra']['laravel']['dont-discover'] ?? [];
         }
 
-        return json_decode(file_get_contents(
-            $this->basePath.'/composer.json'
-        ), true)['extra']['laravel']['dont-discover'] ?? [];
+        foreach (glob($this->basePath . '/vendor/*/*/composer.json') as $file) {
+
+            $composer = json_decode(file_get_contents($file), true);
+
+            if (isset($composer['extra']['laravel']['dont-discover'])) {
+                $ignore[] = $composer['extra']['laravel']['dont-discover'];
+            }
+        }
+
+        return collect($ignore ?? [])->collapse()->unique()->toArray();
     }
 
     /**
