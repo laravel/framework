@@ -1,11 +1,3 @@
-## --- this is a copy with extra docblocks ---
-
-GOTO: <a href="https://github.com/laravel/framework">Laravel/Framework</a> for the official up to date repository
-
-I will attempt to keep the doc blocks up to date, specifically for PhpStorm.
-
-------
-
 <p align="center"><a href="https://laravel.com" target="_blank"><img src="https://laravel.com/assets/img/components/logo-laravel.svg"></a></p>
 
 <p align="center">
