@@ -6,9 +6,10 @@ use GuzzleHttp\Client as HttpClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
+use Illuminate\Notifications\NotificationChannelInterface;
 use Illuminate\Notifications\Messages\SlackAttachmentField;
 
-class SlackWebhookChannel
+class SlackWebhookChannel implements NotificationChannelInterface
 {
     /**
      * The HTTP client instance.
