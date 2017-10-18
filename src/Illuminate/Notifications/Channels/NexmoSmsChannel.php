@@ -5,8 +5,9 @@ namespace Illuminate\Notifications\Channels;
 use Nexmo\Client as NexmoClient;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\NexmoMessage;
+use Illuminate\Notifications\NotificationChannelInterface;
 
-class NexmoSmsChannel
+class NexmoSmsChannel implements NotificationChannelInterface
 {
     /**
      * The Nexmo client instance.
