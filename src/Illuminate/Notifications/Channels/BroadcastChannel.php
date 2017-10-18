@@ -6,8 +6,8 @@ use RuntimeException;
 use Illuminate\Notifications\Notification;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Messages\BroadcastMessage;
-use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 use Illuminate\Notifications\NotificationChannelInterface;
+use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 
 class BroadcastChannel implements NotificationChannelInterface
 {

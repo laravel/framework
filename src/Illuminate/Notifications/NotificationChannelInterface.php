@@ -1,7 +1,6 @@
 <?php
-namespace Illuminate\Notifications;
 
-use Illuminate\Notifications\Notification;
+namespace Illuminate\Notifications;
 
 interface NotificationChannelInterface
 {
