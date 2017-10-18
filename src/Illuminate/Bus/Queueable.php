@@ -140,16 +140,12 @@ trait Queueable
     {
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
-                /* @var \Illuminate\Bus\Queueable $next */
                 if (! in_array('Illuminate\Bus\Queueable', class_uses_recursive($next))) {
                     throw new \Exception('Trying to dispatch an object that is not Queueable');
                 }
-                // pass the chain settings on to the next job in the chain, IF this job does not have a new chain settings set...
                 $next->onChainConnection($next->chainConnection ?: $this->chainConnection);
                 $next->onChainQueue($next->chainQueue ?: $this->chainQueue);
-                // array of remaining jobs...
                 $next->chained = $this->chained;
-                // use the chain setting if this job is not specifically set.
                 $next->onConnection($next->connection ?: $this->chainConnection);
                 $next->onQueue($next->queue ?: $this->chainQueue);
             }));
