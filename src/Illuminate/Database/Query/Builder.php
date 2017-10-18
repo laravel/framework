@@ -2024,6 +2024,7 @@ class Builder
         $results = $this->cloneWithout(['columns'])
                         ->cloneWithoutBindings(['select'])
                         ->setAggregate($function, $columns)
+                        ->offset(0)
                         ->get($columns);
 
         if (! $results->isEmpty()) {
