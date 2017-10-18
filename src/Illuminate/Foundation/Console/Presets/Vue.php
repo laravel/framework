@@ -59,8 +59,8 @@ class Vue extends Preset
         );
 
         copy(
-            __DIR__.'/vue-stubs/Example.vue',
-            resource_path('assets/js/components/Example.vue')
+            __DIR__.'/vue-stubs/ExampleComponent.vue',
+            resource_path('assets/js/components/ExampleComponent.vue')
         );
     }
 
