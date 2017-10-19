@@ -594,7 +594,7 @@ class Arr
     }
 
     /**
-     * If the given value is not an array, wrap it in one.
+     * If the given value is not an array and not null, wrap it in one. Return an empty array if the value is null.
      *
      * @param  mixed  $value
      * @return array
