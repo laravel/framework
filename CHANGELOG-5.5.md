@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.17 (2017-10-19)
 
 ### Added
 - Make `Redirector` macroable ([#21714](https://github.com/laravel/framework/pull/21714))
@@ -10,6 +10,7 @@
 - Don't reload pivot relationship on refresh ([#21713](https://github.com/laravel/framework/pull/21713))
 - Unify Vue.js preset ([#21711](https://github.com/laravel/framework/pull/21711), [#21724](https://github.com/laravel/framework/pull/21724))
 - Revert multibyte functions in `Str` ([#21722](https://github.com/laravel/framework/pull/21722))
+- Remove hardcoded fields in DatabaseUserProvider `Str` ([#21749](https://github.com/laravel/framework/pull/21749))
 
 ### Fixed
 - Don't recreate the SQLite database file in `refreshDatabaseFile()` ([#21720](https://github.com/laravel/framework/pull/21720))
