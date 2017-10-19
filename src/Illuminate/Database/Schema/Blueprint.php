@@ -22,14 +22,14 @@ class Blueprint
     /**
      * The columns that should be added to the table.
      *
-     * @var array
+     * @var \Illuminate\Support\Fluent[]
      */
     protected $columns = [];
 
     /**
      * The commands that should be run for the table.
      *
-     * @var array
+     * @var \Illuminate\Support\Fluent[]
      */
     protected $commands = [];
 
@@ -1196,7 +1196,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint.
      *
-     * @return array
+     * @return \Illuminate\Support\Fluent[]
      */
     public function getColumns()
     {
@@ -1206,7 +1206,7 @@ class Blueprint
     /**
      * Get the commands on the blueprint.
      *
-     * @return array
+     * @return \Illuminate\Support\Fluent[]
      */
     public function getCommands()
     {
@@ -1216,7 +1216,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be added.
      *
-     * @return array
+     * @return \Illuminate\Support\Fluent[]
      */
     public function getAddedColumns()
     {
@@ -1228,7 +1228,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be changed.
      *
-     * @return array
+     * @return \Illuminate\Support\Fluent[]
      */
     public function getChangedColumns()
     {
