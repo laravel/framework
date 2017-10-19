@@ -3,7 +3,7 @@
 ## v5.5.18 (2017-10-19)
 
 ### Added
-- Make `Redirector` macroable ([#21714](https://github.com/laravel/framework/pull/21714))
+- Made `Redirector` macroable ([#21714](https://github.com/laravel/framework/pull/21714))
 
 ### Changed
 - Prevent reloading default relationships while lazy eager-loading ([#21710](https://github.com/laravel/framework/pull/21710))
