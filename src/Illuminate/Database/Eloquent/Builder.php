@@ -245,6 +245,22 @@ class Builder
     }
 
     /**
+     * Exclude one or many columns from being in the result collection.
+     *
+     * @param  array $columns
+     * @return $this
+     */
+    public function exclude($columns)
+    {
+        $wantedColumns = array_diff(
+                $this->query->columns,
+                (array) $columns
+            );
+
+        return $this->select($wantedColumns);
+    }
+
+    /**
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
