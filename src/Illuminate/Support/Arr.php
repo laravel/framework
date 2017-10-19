@@ -594,14 +594,14 @@ class Arr
     }
 
     /**
-     * If the given value is not an array and not null, wrap it in one. Return an empty array if the value is null.
+     * If the given value is not an array and not null, wrap it in one.
      *
      * @param  mixed  $value
      * @return array
      */
     public static function wrap($value)
     {
-        if ($value === null) {
+        if (is_null($value)) {
             return [];
         }
 
