@@ -245,7 +245,7 @@ class Builder
     }
 
     /**
-     * Exclude one or many columns from being in the result colelction.
+     * Exclude one or many columns from being in the result collection.
      *
      * @param  array $columns
      * @return $this
