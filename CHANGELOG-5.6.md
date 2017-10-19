@@ -7,7 +7,7 @@
 - ⚠️ Upgraded `cron-expression` to `2.x` ([#21637](https://github.com/laravel/framework/pull/21637))
 
 ### Arrays
-- ⚠️ Arr::wrap(null) will now return an empty array instead of wraping the null value ([#21745](https://github.com/laravel/framework/pull/21745))
+- ⚠️ Arr::wrap(null) will now return an empty array instead of wrapping the null value ([#21745](https://github.com/laravel/framework/pull/21745))
 
 ### Artisan Console
 - ⚠️ Removed deprecated `optimize` command ([#20851](https://github.com/laravel/framework/pull/20851))
