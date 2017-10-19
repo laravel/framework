@@ -662,5 +662,6 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['a'], Arr::wrap($string));
         $this->assertEquals($array, Arr::wrap($array));
         $this->assertEquals([$object], Arr::wrap($object));
+        $this->assertEquals([], Arr::wrap(null));
     }
 }

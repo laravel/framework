@@ -601,6 +601,10 @@ class Arr
      */
     public static function wrap($value)
     {
+        if ($value === null) {
+            return [];
+        }
+
         return ! is_array($value) ? [$value] : $value;
     }
 }
