@@ -19,16 +19,34 @@ class PendingChain
     public $chain;
 
     /**
+     * The name of the connection the jobs should be sent to if not set on job.
+     *
+     * @var string|null
+     */
+    public $chainConnection;
+
+    /**
+     * The name of the queue the chained jobs should be sent to if not set on job.
+     *
+     * @var string|null
+     */
+    public $chain_queue;
+
+    /**
      * Create a new PendingChain instance.
      *
-     * @param  string  $class
-     * @param  array  $chain
+     * @param      $class
+     * @param      $chain
+     * @param null|string $chainQueue
+     * @param null|string $chainConnection
      * @return void
      */
-    public function __construct($class, $chain)
+    public function __construct($class, $chain, $chainQueue = null, $chainConnection = null)
     {
         $this->class = $class;
         $this->chain = $chain;
+        $this->chainQueue = $chainQueue;
+        $this->chainConnection = $chainConnection;
     }
 
     /**
@@ -40,6 +58,6 @@ class PendingChain
     {
         return (new PendingDispatch(
             new $this->class(...func_get_args())
-        ))->chain($this->chain);
+        ))->chain($this->chain, $this->chainQueue, $this->chainConnection);
     }
 }

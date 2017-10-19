@@ -5,6 +5,20 @@ namespace Illuminate\Bus;
 trait Queueable
 {
     /**
+     * The name of the connection the jobs should be sent to if not set on job.
+     *
+     * @var string|null
+     */
+    public $chainConnection;
+
+    /**
+     * The name of the queue the chained jobs should be sent to if not set on job.
+     *
+     * @var string|null
+     */
+    public $chainQueue;
+
+    /**
      * The name of the connection the job should be sent to.
      *
      * @var string|null
@@ -74,14 +88,45 @@ trait Queueable
     /**
      * Set the jobs that should run if this job is successful.
      *
-     * @param  array  $chain
+     * @param array $chain
+     * @param null|string $queue
+     * @param null|string $connection
+     *
      * @return $this
      */
-    public function chain($chain)
+    public function chain($chain, $queue = null, $connection = null)
     {
         $this->chained = collect($chain)->map(function ($job) {
             return serialize($job);
         })->all();
+        $this->onChainConnection($connection);
+        $this->onChainQueue($queue);
+
+        return $this;
+    }
+
+    /**
+     * Set the desired default connection for the jobs on the chain.
+     *
+     * @param  string|null  $connection
+     * @return $this
+     */
+    public function onChainConnection($connection)
+    {
+        $this->chainConnection = $connection;
+
+        return $this;
+    }
+
+    /**
+     * Set the desired default queue for the jobs on the chain.
+     *
+     * @param  string|null  $queue
+     * @return $this
+     */
+    public function onChainQueue($queue)
+    {
+        $this->chainQueue = $queue;
 
         return $this;
     }
@@ -95,7 +140,14 @@ trait Queueable
     {
         if (! empty($this->chained)) {
             dispatch(tap(unserialize(array_shift($this->chained)), function ($next) {
+                if (! in_array('Illuminate\Bus\Queueable', class_uses_recursive($next))) {
+                    throw new \Exception('Trying to dispatch an object that is not Queueable');
+                }
+                $next->onChainConnection($next->chainConnection ?: $this->chainConnection);
+                $next->onChainQueue($next->chainQueue ?: $this->chainQueue);
                 $next->chained = $this->chained;
+                $next->onConnection($next->connection ?: $this->chainConnection);
+                $next->onQueue($next->queue ?: $this->chainQueue);
             }));
         }
     }

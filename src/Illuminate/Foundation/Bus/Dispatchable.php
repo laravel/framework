@@ -18,10 +18,12 @@ trait Dispatchable
      * Set the jobs that should run if this job is successful.
      *
      * @param  array  $chain
+     * @param  null|string  $chainQueue
+     * @param  null|string  $chainConnection
      * @return \Illuminate\Foundation\Bus\PendingChain
      */
-    public static function withChain($chain)
+    public static function withChain(array $chain, $chainQueue = null, $chainConnection = null)
     {
-        return new PendingChain(get_called_class(), $chain);
+        return new PendingChain(get_called_class(), $chain, $chainQueue, $chainConnection);
     }
 }
