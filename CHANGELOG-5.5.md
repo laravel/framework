@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## v5.5.17 (2017-10-19)
+## v5.5.18 (2017-10-19)
 
 ### Added
 - Make `Redirector` macroable ([#21714](https://github.com/laravel/framework/pull/21714))
