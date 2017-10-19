@@ -22,6 +22,13 @@ class ThrottleRequests
     protected $limiter;
 
     /**
+     * All of the guards that were checked.
+     *
+     * @var array
+     */
+    protected $guards = [];
+
+    /**
      * Create a new request throttler.
      *
      * @param  \Illuminate\Cache\RateLimiter  $limiter
@@ -39,11 +46,14 @@ class ThrottleRequests
      * @param  \Closure  $next
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
+     * @param  string[]  ...$guards
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
+    public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1, ...$guards)
     {
+        $this->guards = $guards;
+
         $key = $this->resolveRequestSignature($request);
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
@@ -72,7 +82,7 @@ class ThrottleRequests
     protected function resolveMaxAttempts($request, $maxAttempts)
     {
         if (Str::contains($maxAttempts, '|')) {
-            $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
+            $maxAttempts = explode('|', $maxAttempts, 2)[$this->getUserFromRequest($request) ? 1 : 0];
         }
 
         return (int) $maxAttempts;
@@ -87,8 +97,10 @@ class ThrottleRequests
      */
     protected function resolveRequestSignature($request)
     {
-        if ($user = $request->user()) {
-            return sha1($user->getAuthIdentifier());
+        if ($user = $this->getUserFromRequest($request)) {
+            if (method_exists($user, 'getAuthIdentifier')) {
+                return sha1($user->getAuthIdentifier());
+            }
         }
 
         if ($route = $request->route()) {
@@ -189,5 +201,22 @@ class ThrottleRequests
         }
 
         return 0;
+    }
+
+    /**
+     * Load user from request according to $guards.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return mixed
+     */
+    protected function getUserFromRequest($request)
+    {
+        foreach ($this->guards as $guard) {
+            if ($user = $request->user($guard)) {
+                return $user;
+            }
+        }
+
+        return $request->user();
     }
 }
