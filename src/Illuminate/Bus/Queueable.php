@@ -9,14 +9,14 @@ trait Queueable
      *
      * @var string|null
      */
-    public $chainConnection = null;
+    public $chainConnection;
 
     /**
      * The name of the queue the chained jobs should be sent to if not set on job.
      *
      * @var string|null
      */
-    public $chainQueue = null;
+    public $chainQueue;
 
     /**
      * The name of the connection the job should be sent to.
