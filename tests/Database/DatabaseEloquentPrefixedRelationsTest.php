@@ -9,24 +9,64 @@
 namespace Illuminate\Tests\Database;
 use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
-
-
+use Mockery as m;
+use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseEloquentPrefixedRelationsTest extends TestCase
 {
-    public function testPrefixedRelation()
+    public function setUp()
     {
-        $model = new SampleModel();
-        $relation = $model->samplePrefixedRelation();
-        assertEquals($model->foreignTableKey, $relation->getQualifiedForeignKeyName());
+        $db = new DB;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+        ]);
+
+        $db->bootEloquent();
+        $db->setAsGlobal();
     }
 
-    public function testNonPrefixedRelation()
+    public function testPrefixedHasOne()
     {
         $model = new SampleModel();
-        $model2 = new SampleModel2;
-        $relation = $model->sampleNonPrefixedRelation();
-        assertEquals($model2->getDefaultRelation(), $relation->getQualifiedForeignKeyName());
+        $relation = $model->samplePrefixedHasOne();
+        $this->assertEquals($model->foreignTableKey, $relation->getQualifiedForeignKeyName());
+    }
+
+    public function testNonPrefixedHasOne()
+    {
+        $model = new SampleModel();
+        $relation = $model->sampleNonPrefixedHasOne();
+        $this->assertEquals('test2.sample_model_id', $relation->getQualifiedForeignKeyName());
+    }
+
+    public function testNonPrefixedHasOneWithKey()
+    {
+        $model = new SampleModel();
+        $relation = $model->sampleNonPrexifedHasOneWithForeignKey();
+        $this->assertEquals('test2.sample_model_id', $relation->getQualifiedForeignKeyName());
+    }
+
+    public function testPrefixedHasMany()
+    {
+        $model = new SampleModel();
+        $relation = $model->samplePrefixedHasMany();
+        $this->assertEquals($model->foreignTableKey, $relation->getQualifiedForeignKeyName());
+    }
+
+    public function testNonPrefixedHasMany()
+    {
+        $model = new SampleModel();
+        $relation = $model->sampleNonPrefixedHasMany();
+        $this->assertEquals('test2.sample_model_id', $relation->getQualifiedForeignKeyName());
+    }
+
+    public function testNonPrefixedHasManyWithKey()
+    {
+        $model = new SampleModel();
+        $relation = $model->sampleNonPrexifedHasManyWithForeignKey();
+        $this->assertEquals('test2.sample_model_id', $relation->getQualifiedForeignKeyName());
     }
 
 
@@ -35,32 +75,40 @@ class DatabaseEloquentPrefixedRelationsTest extends TestCase
 class SampleModel2 extends Model
 {
     protected $table = 'test2';
-    protected $primaryKey = 'id2';
-
-    public function getDefaultRelation()
-    {
-        return $this->table .'.'. $this->primaryKey;
-    }
 }
 
 class SampleModel extends Model
 {
     public $foreignTableKey = 'foreigntable.key';
     public $table = 'test';
-    public $primaryKey = 'id';
 
-    public function samplePrefixedRelation()
+    public function samplePrefixedHasOne()
     {
            return $this->hasOne('Illuminate\Tests\Database\SampleModel2', $this->foreignTableKey,'id');
     }
 
-    public function sampleNonPrefixedRelation()
+    public function sampleNonPrefixedHasOne()
     {
         return $this->hasOne('Illuminate\Tests\Database\SampleModel2');
     }
 
-    public function getDefaultRelation()
+    public function sampleNonPrexifedHasOneWithForeignKey()
     {
+        return $this->hasOne('Illuminate\Tests\Database\SampleModel2', 'sample_model_id','id');
+    }
 
+    public function samplePrefixedHasMany()
+    {
+        return $this->hasOne('Illuminate\Tests\Database\SampleModel2', $this->foreignTableKey,'id');
+    }
+
+    public function sampleNonPrefixedHasMany()
+    {
+        return $this->hasMany('Illuminate\Tests\Database\SampleModel2');
+    }
+
+    public function sampleNonPrexifedHasManyWithForeignKey()
+    {
+        return $this->hasOne('Illuminate\Tests\Database\SampleModel2', 'sample_model_id','id');
     }
 }
