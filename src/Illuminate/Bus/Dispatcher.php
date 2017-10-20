@@ -3,6 +3,7 @@
 namespace Illuminate\Bus;
 
 use Closure;
+use Illuminate\Events\Dispatcher as EventDispatcher;
 use RuntimeException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Queue\Queue;
@@ -172,7 +173,7 @@ class Dispatcher implements QueueingDispatcher
     {
         $queueId = $this->pushCommandToQueueWithOptions($queue, $command);
 
-        event(new JobQueued($queue, $command, $queueId));
+        app(EventDispatcher::class)->dispatch(new JobQueued($queue, $command, $queueId));
 
         return $queueId;
     }
