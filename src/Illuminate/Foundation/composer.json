@@ -1,0 +1,36 @@
+{
+    "name": "illuminate/foundation",
+    "description": "The Illuminate Foundation package.",
+    "license": "MIT",
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "require": {
+        "php": ">=7.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Foundation\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.6-dev"
+        }
+    },
+    "suggest": {
+
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}
