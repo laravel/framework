@@ -9,28 +9,28 @@ class JobQueued
     /**
      * The connection name.
      *
-     * @var string $connectionName
+     * @var string
      */
     public $connectionName;
 
     /**
-     * The job class to dispatch
+     * The job class to dispatch.
      *
-     * @var $job
+     * @var
      */
     public $job;
 
     /**
-     * The optional queue name that is wanted depending on queue driver
+     * The optional queue name that is wanted depending on queue driver.
      *
-     * @var null|string $queueName
+     * @var null|string
      */
     public $queueName;
 
     /**
-     * Depending on queue driver, this could be the reference to the concrete job
+     * Depending on queue driver, this could be the reference to the concrete job.
      *
-     * @var mixed $queueReference
+     * @var mixed
      */
     public $queueReference;
 

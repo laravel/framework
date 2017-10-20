@@ -6,10 +6,10 @@ use Closure;
 use RuntimeException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
-use Illuminate\Queue\Events\JobQueued;
 
 class Dispatcher implements QueueingDispatcher
 {
@@ -178,7 +178,7 @@ class Dispatcher implements QueueingDispatcher
     }
 
     /**
-     * Push the command onto the given queue instance respecting the options set in job
+     * Push the command onto the given queue instance respecting the options set in job.
      *
      * @param $queue
      * @param $command
