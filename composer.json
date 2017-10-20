@@ -1,6 +1,6 @@
 {
-    "name": "laravel/framework",
-    "description": "The Laravel Framework.",
+    "name": "illuminate/foundation-test",
+    "description": "Illuminate Foundation.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
     "homepage": "https://laravel.com",
@@ -37,39 +37,37 @@
         "symfony/routing": "~3.3",
         "symfony/var-dumper": "~3.3",
         "tijsverkoyen/css-to-inline-styles": "~2.2",
-        "vlucas/phpdotenv": "~2.2"
-    },
-    "replace": {
-        "illuminate/auth": "self.version",
-        "illuminate/broadcasting": "self.version",
-        "illuminate/bus": "self.version",
-        "illuminate/cache": "self.version",
-        "illuminate/config": "self.version",
-        "illuminate/console": "self.version",
-        "illuminate/container": "self.version",
-        "illuminate/contracts": "self.version",
-        "illuminate/cookie": "self.version",
-        "illuminate/database": "self.version",
-        "illuminate/encryption": "self.version",
-        "illuminate/events": "self.version",
-        "illuminate/exception": "self.version",
-        "illuminate/filesystem": "self.version",
-        "illuminate/hashing": "self.version",
-        "illuminate/http": "self.version",
-        "illuminate/log": "self.version",
-        "illuminate/mail": "self.version",
-        "illuminate/notifications": "self.version",
-        "illuminate/pagination": "self.version",
-        "illuminate/pipeline": "self.version",
-        "illuminate/queue": "self.version",
-        "illuminate/redis": "self.version",
-        "illuminate/routing": "self.version",
-        "illuminate/session": "self.version",
-        "illuminate/support": "self.version",
-        "illuminate/translation": "self.version",
-        "illuminate/validation": "self.version",
-        "illuminate/view": "self.version",
-        "tightenco/collect": "self.version"
+        "vlucas/phpdotenv": "~2.2",
+        "illuminate/auth": "^5.5",
+        "illuminate/broadcasting": "^5.5",
+        "illuminate/bus": "^5.5",
+        "illuminate/cache": "^5.5",
+        "illuminate/config": "^5.5",
+        "illuminate/console": "^5.5",
+        "illuminate/container": "^5.5",
+        "illuminate/contracts": "^5.5",
+        "illuminate/cookie": "^5.5",
+        "illuminate/database": "^5.5",
+        "illuminate/encryption": "^5.5",
+        "illuminate/events": "^5.5",
+        "illuminate/filesystem": "^5.5",
+        "illuminate/hashing": "^5.5",
+        "illuminate/http": "^5.5",
+        "illuminate/log": "^5.5",
+        "illuminate/mail": "^5.5",
+        "illuminate/notifications": "^5.5",
+        "illuminate/pagination": "^5.5",
+        "illuminate/pipeline": "^5.5",
+        "illuminate/queue": "^5.5",
+        "illuminate/redis": "^5.5",
+        "illuminate/routing": "^5.5",
+        "illuminate/session": "^5.5",
+        "illuminate/support": "^5.5",
+        "illuminate/translation": "^5.5",
+        "illuminate/validation": "^5.5",
+        "illuminate/view": "^5.5",
+        "tightenco/collect": "^5.5"
+
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
@@ -85,11 +83,10 @@
     },
     "autoload": {
         "files": [
-            "src/Illuminate/Foundation/helpers.php",
-            "src/Illuminate/Support/helpers.php"
+            "src/helpers.php"
         ],
         "psr-4": {
-            "Illuminate\\": "src/Illuminate/"
+            "Illuminate\\Foundation\\": "src/"
         }
     },
     "autoload-dev": {
