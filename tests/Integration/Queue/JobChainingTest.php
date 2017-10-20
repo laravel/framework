@@ -14,6 +14,21 @@ use Illuminate\Foundation\Bus\Dispatchable;
  */
 class JobChainingTest extends TestCase
 {
+    protected function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('app.debug', 'true');
+
+        $app['config']->set('database.default', 'testbench');
+
+        $app['config']->set('queue.connections.sync1', [
+            'driver' => 'sync',
+        ]);
+
+        $app['config']->set('queue.connections.sync2', [
+            'driver' => 'sync',
+        ]);
+    }
+
     public function tearDown()
     {
         JobChainingTestFirstJob::$ran = false;
@@ -111,6 +126,47 @@ class JobChainingTest extends TestCase
         $this->assertTrue(JobChainingTestFirstJob::$ran);
         $this->assertFalse(JobChainingTestThirdJob::$ran);
     }
+
+    public function test_chain_jobs_use_same_config()
+    {
+        JobChainingTestFirstJob::dispatch()->allOnQueue('some_queue')->allOnConnection('sync1')->chain([
+            new JobChainingTestSecondJob,
+            new JobChainingTestThirdJob,
+        ]);
+
+        $this->assertEquals('some_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
+        $this->assertEquals('sync1', JobChainingTestSecondJob::$usedConnection);
+        $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
+    }
+
+    public function test_chain_jobs_use_own_config()
+    {
+        JobChainingTestFirstJob::dispatch()->allOnQueue('some_queue')->allOnConnection('sync1')->chain([
+            (new JobChainingTestSecondJob)->onQueue('another_queue')->onConnection('sync2'),
+            new JobChainingTestThirdJob,
+        ]);
+
+        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
+        $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+        $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
+    }
+
+    public function test_chain_jobs_use_default_config()
+    {
+        JobChainingTestFirstJob::dispatch()->onQueue('some_queue')->onConnection('sync1')->chain([
+            (new JobChainingTestSecondJob)->onQueue('another_queue')->onConnection('sync2'),
+            new JobChainingTestThirdJob,
+        ]);
+
+        $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
+        $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+        $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
+        $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+        $this->assertEquals(null, JobChainingTestThirdJob::$usedQueue);
+        $this->assertEquals(null, JobChainingTestThirdJob::$usedConnection);
+    }
 }
 
 class JobChainingTestFirstJob implements ShouldQueue
@@ -118,10 +174,14 @@ class JobChainingTestFirstJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
 
     public function handle()
     {
         static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
     }
 }
 
@@ -130,10 +190,14 @@ class JobChainingTestSecondJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
 
     public function handle()
     {
         static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
     }
 }
 
@@ -142,10 +206,14 @@ class JobChainingTestThirdJob implements ShouldQueue
     use Dispatchable, Queueable;
 
     public static $ran = false;
+    public static $usedQueue = null;
+    public static $usedConnection = null;
 
     public function handle()
     {
         static::$ran = true;
+        static::$usedQueue = $this->queue;
+        static::$usedConnection = $this->connection;
     }
 }
 
