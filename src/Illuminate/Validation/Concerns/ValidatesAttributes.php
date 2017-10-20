@@ -1031,11 +1031,18 @@ trait ValidatesAttributes
      *
      * @param  string  $attribute
      * @param  mixed   $value
+     * @param  array  $parameters
      * @return bool
      */
-    public function validateNumeric($attribute, $value)
+    public function validateNumeric($attribute, $value, $parameters)
     {
-        return is_numeric($value);
+        $isNumeric = is_numeric($value);
+
+        if ($isNumeric && !empty($parameters) && $parameters[0] === 'strict') {
+            return !is_nan($value) && !is_infinite($value);
+        }
+
+        return $isNumeric;
     }
 
     /**
