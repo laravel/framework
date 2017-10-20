@@ -6,9 +6,11 @@ use Closure;
 use RuntimeException;
 use Illuminate\Pipeline\Pipeline;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\Events\JobQueued;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Bus\QueueingDispatcher;
+use Illuminate\Events\Dispatcher as EventDispatcher;
 
 class Dispatcher implements QueueingDispatcher
 {
@@ -165,9 +167,26 @@ class Dispatcher implements QueueingDispatcher
      *
      * @param  \Illuminate\Contracts\Queue\Queue  $queue
      * @param  mixed  $command
-     * @return mixed
+     * @return mixed  Optional reference to queued job
      */
-    protected function pushCommandToQueue($queue, $command)
+    public function pushCommandToQueue($queue, $command)
+    {
+        $queueId = $this->pushCommandToQueueWithOptions($queue, $command);
+
+        app(EventDispatcher::class)->dispatch(new JobQueued($queue, $command, $queueId));
+
+        return $queueId;
+    }
+
+    /**
+     * Push the command onto the given queue instance respecting the options set in job.
+     *
+     * @param $queue
+     * @param $command
+     *
+     * @return mixed Optional reference to queued job
+     */
+    protected function pushCommandToQueueWithOptions($queue, $command)
     {
         if (isset($command->queue, $command->delay)) {
             return $queue->laterOn($command->queue, $command->delay, $command);
