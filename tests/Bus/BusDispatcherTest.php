@@ -20,6 +20,7 @@ class BusDispatcherTest extends TestCase
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock->shouldReceive('getConnectionName');
             $mock->shouldReceive('push')->once();
 
             return $mock;
@@ -46,6 +47,7 @@ class BusDispatcherTest extends TestCase
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+            $mock->shouldReceive('getConnectionName');
             $mock->shouldReceive('laterOn')->once()->with('foo', 10, m::type('Illuminate\Tests\Bus\BusDispatcherTestSpecificQueueAndDelayCommand'));
 
             return $mock;
@@ -97,6 +99,8 @@ class BusDispatcherTest extends TestCase
 
         $dispatcher = new Dispatcher($container, function () {
             $mock = m::mock('Illuminate\Contracts\Queue\Queue');
+
+            $mock->shouldReceive('getConnectionName');
             $mock->shouldReceive('push')->once();
 
             return $mock;
