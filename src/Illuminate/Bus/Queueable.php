@@ -81,6 +81,7 @@ trait Queueable
     public function allOnConnection($connection)
     {
         $this->chainConnection = $connection;
+        $this->connection = $connection;
 
         return $this;
     }
@@ -94,6 +95,7 @@ trait Queueable
     public function allOnQueue($queue)
     {
         $this->chainQueue = $queue;
+        $this->queue = $queue;
 
         return $this;
     }
