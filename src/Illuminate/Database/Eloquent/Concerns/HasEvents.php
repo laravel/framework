@@ -113,8 +113,13 @@ trait HasEvents
     {
         if (isset(static::$dispatcher)) {
             $name = static::class;
+            $eventName = "eloquent.{$event}: {$name}";
 
-            static::$dispatcher->listen("eloquent.{$event}: {$name}", $callback);
+            if (in_array($callback, static::$dispatcher->getListeners($eventName))) {
+                return;
+            }
+
+            static::$dispatcher->listen($eventName, $callback);
         }
     }
 
