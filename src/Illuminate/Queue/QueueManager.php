@@ -45,6 +45,17 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Register an event listener for the queued job event.
+     *
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function queued($callback)
+    {
+        $this->app['events']->listen(Events\JobQueued::class, $callback);
+    }
+
+    /**
      * Register an event listener for the before job event.
      *
      * @param  mixed  $callback
