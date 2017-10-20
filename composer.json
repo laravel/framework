@@ -86,7 +86,7 @@
             "src/helpers.php"
         ],
         "psr-4": {
-            "Illuminate\\Foundation": "src/"
+            "Illuminate\\Foundation\\": "src/"
         }
     },
     "autoload-dev": {
