@@ -432,7 +432,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($value) {
             return $callback($this);
-        } elseif ($default) {
+        }
+
+        if ($default) {
             return $default($this);
         }
 
