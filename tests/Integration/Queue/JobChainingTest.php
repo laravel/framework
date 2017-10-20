@@ -136,9 +136,11 @@ class JobChainingTest extends TestCase
 
         $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+
         $this->assertEquals('some_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
         $this->assertEquals('sync1', JobChainingTestSecondJob::$usedConnection);
+
+        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
         $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
     }
 
@@ -151,9 +153,11 @@ class JobChainingTest extends TestCase
 
         $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+
         $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
-        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
         $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+
+        $this->assertEquals('some_queue', JobChainingTestThirdJob::$usedQueue);
         $this->assertEquals('sync1', JobChainingTestThirdJob::$usedConnection);
     }
 
@@ -166,8 +170,10 @@ class JobChainingTest extends TestCase
 
         $this->assertEquals('some_queue', JobChainingTestFirstJob::$usedQueue);
         $this->assertEquals('sync1', JobChainingTestFirstJob::$usedConnection);
+
         $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
         $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
+
         $this->assertEquals(null, JobChainingTestThirdJob::$usedQueue);
         $this->assertEquals(null, JobChainingTestThirdJob::$usedConnection);
     }
