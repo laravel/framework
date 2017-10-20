@@ -59,7 +59,7 @@
         "illuminate/notifications": "^5.5",
         "illuminate/pagination": "^5.5",
         "illuminate/pipeline": "^5.5",
-        "illuminate/queue": "^5.5",^
+        "illuminate/queue": "^5.5",
         "illuminate/redis": "^5.5",
         "illuminate/routing": "^5.5",
         "illuminate/session": "^5.5",
