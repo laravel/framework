@@ -50,7 +50,6 @@
         "illuminate/database": "^5.5",
         "illuminate/encryption": "^5.5",
         "illuminate/events": "^5.5",
-        "illuminate/exception": "^5.5",
         "illuminate/filesystem": "^5.5",
         "illuminate/hashing": "^5.5",
         "illuminate/http": "^5.5",
