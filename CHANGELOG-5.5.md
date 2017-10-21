@@ -1,17 +1,38 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.16 (2017-10-16)
+
+_No changes._
+
+
+## v5.5.15 (2017-10-16)
 
 ### Added
 - Added missing PostgreSQL network address operators ([#21518](https://github.com/laravel/framework/pull/21518))
 - Added raw and same-site parameters to `cookie()` helper ([#21551](https://github.com/laravel/framework/pull/21551))
 - Added option to create pivot model to `make:model` command ([#21549](https://github.com/laravel/framework/pull/21549))
 - Added support for a `failed()` method to mailables and notifications ([#21585](https://github.com/laravel/framework/pull/21585))
+- Added `__toString` on `ViewErrorBag` ([#21605](https://github.com/laravel/framework/pull/21605))
+- Support higher order call of `keyBy()` ([#21606](https://github.com/laravel/framework/pull/21606))
+- Generate `@else*` directives for `Blade::if()` ([#21611](https://github.com/laravel/framework/pull/21611))
+- Made `Response` and `JsonResponse` macroable ([#21669](https://github.com/laravel/framework/pull/21669))
 
 ### Changed
 - Escape HTML characters in `@json` directive ([#21574](https://github.com/laravel/framework/pull/21574))
 - Only accept strings in `Session::flash()` ([#21576](https://github.com/laravel/framework/pull/21576))
 - Use message from `AuthenticationException` in `Handler::unauthenticated()` ([#21575](https://github.com/laravel/framework/pull/21575))
+- Don't use global scope while touching parent timestamp ([#21604](https://github.com/laravel/framework/pull/21604))
+- Accept multiple middleware when defining middleware fluently ([#21621](https://github.com/laravel/framework/pull/21621))
+- Bind `true` as `1` while preparing an SQL statement ([#21623](https://github.com/laravel/framework/pull/21623))
+- Ensure config load order across multiple installations ([#21634](https://github.com/laravel/framework/pull/21634))
+- Pass previous exception to `AccessDeniedHttpException` and `HttpException` ([#21645](https://github.com/laravel/framework/pull/21645))
+- Unify Bootstrap preset ([#21686](https://github.com/laravel/framework/pull/21686), [#21685](https://github.com/laravel/framework/pull/21685))
+
+### Fixed
+- Reset table cell margins in mail theme ([#21647](https://github.com/laravel/framework/pull/21647))
+- Check for vendor views for each paths given in `config/view.php` ([#21636](https://github.com/laravel/framework/pull/21636))
+- Prevent negative offsets when paginating collection ([#21658](https://github.com/laravel/framework/pull/21658))
+- Flush all listeners of custom Eloquent events ([#21688](https://github.com/laravel/framework/pull/21688))
 
 
 ## v5.5.14 (2017-10-03)
