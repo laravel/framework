@@ -1033,11 +1033,11 @@ class Blueprint
      */
     public function morphs($name, $indexName = null)
     {
-        $this->unsignedInteger("{$name}_id");
-
         $this->string("{$name}_type");
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->unsignedInteger("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**
@@ -1049,11 +1049,11 @@ class Blueprint
      */
     public function nullableMorphs($name, $indexName = null)
     {
-        $this->unsignedInteger("{$name}_id")->nullable();
-
         $this->string("{$name}_type")->nullable();
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->unsignedInteger("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**
