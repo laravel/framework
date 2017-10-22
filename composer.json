@@ -52,7 +52,6 @@
         "illuminate/database": "self.version",
         "illuminate/encryption": "self.version",
         "illuminate/events": "self.version",
-        "illuminate/exception": "self.version",
         "illuminate/filesystem": "self.version",
         "illuminate/hashing": "self.version",
         "illuminate/http": "self.version",
