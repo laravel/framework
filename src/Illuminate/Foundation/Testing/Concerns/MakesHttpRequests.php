@@ -410,6 +410,8 @@ trait MakesHttpRequests
             $response = $this->get($response->headers->get('Location'));
         }
 
+        $this->followRedirects = false;
+
         return $response;
     }
 
