@@ -39,7 +39,7 @@ class PostgresBuilder extends Builder
             $row = (array) $row;
             $table = reset($row);
 
-            if (!in_array($table, $excludedTables)) {
+            if (! in_array($table, $excludedTables)) {
                 $tables[] = $table;
             }
         }
