@@ -33,10 +33,12 @@ class PostgresBuilder extends Builder
     public function dropAllTables()
     {
         $tables = [];
+
         $excludedTables = ['spatial_ref_sys'];
 
         foreach ($this->getAllTables() as $row) {
             $row = (array) $row;
+
             $table = reset($row);
 
             if (! in_array($table, $excludedTables)) {
