@@ -26,7 +26,7 @@ trait MakesHttpRequests
     protected $serverVariables = [];
 
     /**
-     * Whether redirects should be followed.
+     * Indicates whether redirects should be followed.
      *
      * @var bool
      */
