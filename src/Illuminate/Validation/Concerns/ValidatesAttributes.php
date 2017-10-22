@@ -1038,8 +1038,8 @@ trait ValidatesAttributes
     {
         $isNumeric = is_numeric($value);
 
-        if ($isNumeric && !empty($parameters) && $parameters[0] === 'strict') {
-            return !is_nan($value) && !is_infinite($value);
+        if ($isNumeric && ! empty($parameters) && $parameters[0] === 'strict') {
+            return ! is_nan($value) && ! is_infinite($value);
         }
 
         return $isNumeric;
