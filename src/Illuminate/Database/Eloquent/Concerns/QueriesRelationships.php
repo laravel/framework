@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -50,6 +51,21 @@ trait QueriesRelationships
         return $this->addHasWhere(
             $hasQuery, $relation, $operator, $count, $boolean
         );
+    }
+
+    /**
+     * Add a relationship count / exists condition to the query.
+     *
+     * @param  string  $relation
+     * @param  string  $operator
+     * @param  string|int $count
+     * @param  string  $boolean
+     * @param  \Closure|null  $callback
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function hasRaw($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+    {
+        return $this->has($relation, $operator, DB::raw($count), $boolean, $callback);
     }
 
     /**
