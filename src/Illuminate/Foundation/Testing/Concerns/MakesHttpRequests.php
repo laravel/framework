@@ -123,6 +123,17 @@ trait MakesHttpRequests
     }
 
     /**
+     * Set the referer header to simulate a previous request.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function from(string $url)
+    {
+        return $this->withHeader('referer', $url);
+    }
+
+    /**
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
