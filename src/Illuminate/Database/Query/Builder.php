@@ -1649,6 +1649,18 @@ class Builder
     }
 
     /**
+     * Get the SQL representation of the query with the bindings substituted.
+     *
+     * @return string
+     */
+    public function toRaw()
+    {
+        $statement = str_replace(' ?', ' "%s"', $this->toSql());
+        $bindings = array_map('addslashes', $this->getBindings());
+        return sprintf($statement, ...$bindings);
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int    $id
