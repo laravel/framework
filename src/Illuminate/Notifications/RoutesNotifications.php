@@ -19,6 +19,18 @@ trait RoutesNotifications
     }
 
     /**
+     * Send the given notification immediately.
+     *
+     * @param  mixed  $instance
+     * @param  array|null  $channels
+     * @return void
+     */
+    public function notifyNow($instance, array $channels = null)
+    {
+        app(Dispatcher::class)->sendNow($this, $instance, $channels);
+    }
+
+    /**
      * Get the notification routing information for the given driver.
      *
      * @param  string  $driver
