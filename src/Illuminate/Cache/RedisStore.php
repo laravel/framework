@@ -55,6 +55,31 @@ class RedisStore extends TaggableStore implements Store
 
         return ! is_null($value) ? $this->unserialize($value) : null;
     }
+    
+    /**
+     * Retrieve all keys from cache.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        $keys = $this->connection()->keys("*".$this->prefix."*");
+
+        return $keys;
+    }
+    
+    /**
+     * Retrieve all keys from cache by key.
+     *
+     * @param  string  $key
+     * @return array
+     */
+    public function key($key)
+    {
+        $keys = $this->connection()->keys("*".$key."*");
+
+        return $keys;
+    }
 
     /**
      * Retrieve multiple items from the cache by key.
