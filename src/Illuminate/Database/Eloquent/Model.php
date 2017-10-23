@@ -1512,7 +1512,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function toggle($attributes)
     {
-        foreach ((array)$attributes as $attribute) {
+        foreach ((array) $attributes as $attribute) {
             $this->setAttribute($attribute, ! $this->getAttribute($attribute));
         }
 
