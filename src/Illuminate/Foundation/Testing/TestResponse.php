@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -165,6 +166,29 @@ class TestResponse
         PHPUnit::assertEquals(
             $value, $actual,
             "Cookie [{$cookieName}] was found, but value [{$actual}] does not match [{$value}]."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the response contains the given cookie and is expired.
+     *
+     * @param  string  $cookieName
+     * @return $this
+     */
+    public function assertCookieExpired($cookieName)
+    {
+        PHPUnit::assertNotNull(
+            $cookie = $this->getCookie($cookieName),
+            "Cookie [{$cookieName}] not present on response."
+        );
+
+        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+
+        PHPUnit::assertTrue(
+            $expiresAt->lessThan(Carbon::now()),
+            "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
         );
 
         return $this;
