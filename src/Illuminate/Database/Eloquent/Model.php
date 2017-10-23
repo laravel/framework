@@ -1507,12 +1507,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Invert the value of each given attribute.
      *
-     * @param  array  $attributes
+     * @param  string|array  $attributes
      * @return bool
      */
-    public function toggle(...$attributes)
+    public function toggle($attributes)
     {
-        foreach ($attributes as $attribute) {
+        foreach ((array)$attributes as $attribute) {
             $this->setAttribute($attribute, ! $this->getAttribute($attribute));
         }
 
