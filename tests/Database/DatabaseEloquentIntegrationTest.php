@@ -101,6 +101,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->timestamps();
                 $table->softDeletes();
             });
+
+            $this->schema($connection)->create('payments', function ($table) {
+                $table->increments('id');
+                $table->float('amount');
+                $table->boolean('received');
+                $table->timestamps();
+            });
         }
 
         $this->schema($connection)->create('non_incrementing_users', function ($table) {
@@ -1138,6 +1145,17 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 
+    public function testToggleMethodOnModel()
+    {
+        $payment = EloquentTestPayment::create(['amount' => 500, 'received' => 0]);
+
+        $this->assertFalse($payment->received);
+
+        $payment->toggle('received');
+
+        $this->assertTrue($payment->refresh()->received);
+    }
+
     /**
      * Helpers...
      */
@@ -1367,4 +1385,13 @@ class EloquentTestFriendPivot extends Pivot
     {
         return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
     }
+}
+
+class EloquentTestPayment extends Eloquent
+{
+    protected $table = 'payments';
+    protected $guarded = [];
+    protected $casts = [
+        'received' => 'boolean',
+    ];
 }
