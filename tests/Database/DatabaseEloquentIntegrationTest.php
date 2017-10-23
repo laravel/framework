@@ -1144,7 +1144,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $users = new Collection();
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
-    
+
     public function testToggleMethodOnModel()
     {
         $payment = EloquentTestPayment::create(['amount' => 500, 'received' => 0]);
