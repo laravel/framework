@@ -195,6 +195,22 @@ class TestResponse
     }
 
     /**
+     * Asserts that the response does not contains the given cookie.
+     *
+     * @param  string  $cookieName
+     * @return $this
+     */
+    public function assertCookieMissing($cookieName)
+    {
+        PHPUnit::assertNull(
+            $this->getCookie($cookieName),
+            "Cookie [{$cookieName}] is present on response."
+        );
+
+        return $this;
+    }
+
+    /**
      * Get the given cookie from the response.
      *
      * @param  string  $cookieName
