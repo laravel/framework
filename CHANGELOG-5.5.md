@@ -1,5 +1,17 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added `MakesHttpRequests::followingRedirects()` method ([#21771](https://github.com/laravel/framework/pull/21771))
+- Added `MakesHttpRequests::from()` method ([#21788](https://github.com/laravel/framework/pull/21788))
+- Added `notifyNow()` method to notifiables ([#21795](https://github.com/laravel/framework/pull/21795))
+- Added `TestResponse::assertCookieExpired()` method ([#21793](https://github.com/laravel/framework/pull/21793))
+
+### Fixed
+- Excluding `spatial_ref_sys` table from `migrate:fresh` ([#21778](https://github.com/laravel/framework/pull/21778))
+
+
 ## v5.5.18 (2017-10-19)
 
 ### Added
