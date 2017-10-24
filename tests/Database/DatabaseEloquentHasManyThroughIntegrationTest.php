@@ -56,6 +56,13 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             $table->string('shortname');
             $table->timestamps();
         });
+
+        $this->schema()->create('orders', function ($table) {
+            $table->increments('id');
+            $table->integer('user_id');
+            $table->integer('referrer_id')->nullable();
+            $table->timestamps();
+        });
     }
 
     /**
@@ -68,6 +75,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('countries');
+        $this->schema()->drop('orders');
     }
 
     public function testItLoadsAHasManyThroughRelationWithCustomKeys()
@@ -183,6 +191,26 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertCount(2, $country->posts);
     }
 
+    public function testSelfReferencingRelation()
+    {
+        HasManyThroughTestUser::insert([
+            ['id' => 1, 'email' => 'taylor@laravel.com', 'country_id' => 1, 'country_short' => 'UK'],
+            ['id' => 2, 'email' => 'mohammed@laravel.com', 'country_id' => 1, 'country_short' => 'UK'],
+            ['id' => 3, 'email' => 'mark@laravel.com', 'country_id' => 1, 'country_short' => 'UK'],
+        ]);
+
+        HasManyThroughTestOrder::insert([
+            ['id' => 1, 'user_id' => 1, 'referrer_id' => 2],
+            ['id' => 2, 'user_id' => 1, 'referrer_id' => null],
+            ['id' => 3, 'user_id' => 2, 'referrer_id' => 3],
+        ]);
+
+        $users = HasManyThroughTestUser::has('referrals')->get();
+
+        $this->assertCount(2, $users);
+        $this->assertEquals([2, 3], $users->pluck('id')->toArray());
+    }
+
     /**
      * Helpers...
      */
@@ -278,6 +306,11 @@ class HasManyThroughTestUser extends Eloquent
     public function posts()
     {
         return $this->hasMany(HasManyThroughTestPost::class, 'user_id');
+    }
+
+    public function referrals()
+    {
+        return $this->hasManyThrough(self::class, HasManyThroughTestOrder::class, 'referrer_id', 'id');
     }
 }
 
@@ -412,4 +445,13 @@ class HasManyThroughSoftDeletesTestCountry extends Eloquent
     {
         return $this->hasMany(HasManyThroughSoftDeletesTestUser::class, 'country_id');
     }
+}
+
+/**
+ * Eloquent Models...
+ */
+class HasManyThroughTestOrder extends Eloquent
+{
+    protected $table = 'orders';
+    protected $guarded = [];
 }
