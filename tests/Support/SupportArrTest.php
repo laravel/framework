@@ -101,6 +101,9 @@ class SupportArrTest extends TestCase
 
         $array = Arr::dot(['foo' => ['bar' => []]]);
         $this->assertEquals(['foo.bar' => []], $array);
+
+        $array = Arr::dot([5 => [], 6 => [7 => []]]);
+        $this->assertEquals(['5' => [], '6.7' => []], $array);
     }
 
     public function testExcept()
