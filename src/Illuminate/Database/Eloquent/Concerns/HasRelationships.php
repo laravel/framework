@@ -44,6 +44,16 @@ trait HasRelationships
     ];
 
     /**
+     * Define a void relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasNone
+     */
+    protected function hasNone()
+    {
+        return new HasNone($this->newQuery(), $this);
+    }
+
+    /**
      * Define a one-to-one relationship.
      *
      * @param  string  $related
