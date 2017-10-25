@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
 
-use Illuminate\Database\Eloquent\SoftDeletes;
-use Illuminate\Database\Schema\Blueprint;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 /**
  * @group integration
