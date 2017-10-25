@@ -4,6 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Symfony\Component\Process\ProcessUtils;
 
 class Schedule
@@ -80,7 +81,13 @@ class Schedule
     public function job($job, $queue = null)
     {
         return $this->call(function () use ($job, $queue) {
-            dispatch(is_string($job) ? resolve($job) : $job)->onQueue($queue);
+            $job = is_string($job) ? resolve($job) : $job;
+
+            if ($job instanceof ShouldQueue) {
+                dispatch($job)->onQueue($queue);
+            } else {
+                dispatch_now($job);
+            }
         })->name(is_string($job) ? $job : get_class($job));
     }
 

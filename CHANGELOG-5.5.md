@@ -1,5 +1,24 @@
 # Release Notes for 5.5.x
 
+## v5.5.19 (2017-10-25)
+
+### Added
+- Added `MakesHttpRequests::followingRedirects()` method ([#21771](https://github.com/laravel/framework/pull/21771))
+- Added `MakesHttpRequests::from()` method ([#21788](https://github.com/laravel/framework/pull/21788))
+- Added `notifyNow()` method to notifiables ([#21795](https://github.com/laravel/framework/pull/21795))
+- Added `TestResponse::assertCookieExpired()` method ([#21793](https://github.com/laravel/framework/pull/21793))
+- Added `TestResponse::assertCookieMissing()` method ([#21803](https://github.com/laravel/framework/pull/21803))
+
+### Changed
+- Allow the distinct validation rule to optionally ignore case ([#21757](https://github.com/laravel/framework/pull/21757))
+
+### Fixed
+- Excluding `spatial_ref_sys` table from `migrate:fresh` ([#21778](https://github.com/laravel/framework/pull/21778))
+- Fixed issue with `SessionGuard` setting the logged in user after firing the `Authenticated` event ([#21790](https://github.com/laravel/framework/pull/21790))
+- Fixed issue with `Model::refresh()` when model has a global scope ([#21815](https://github.com/laravel/framework/pull/21815))
+- Fixed scheduling a non-queuable job ([#21820](https://github.com/laravel/framework/pull/21820))
+
+
 ## v5.5.18 (2017-10-19)
 
 ### Added
