@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.19 (2017-10-25)
 
 ### Added
 - Added `MakesHttpRequests::followingRedirects()` method ([#21771](https://github.com/laravel/framework/pull/21771))
