@@ -91,7 +91,7 @@ class Str
     }
 
     /**
-     * Convert array keys to camel case
+     * Convert array keys to camel case.
      *
      * @param array $data
      * @param bool $recursive
@@ -103,7 +103,7 @@ class Str
     }
 
     /**
-     * Convert array keys based on the given callable
+     * Convert array keys based on the given callable.
      *
      * @param callable $method
      * @param array $data
@@ -113,14 +113,14 @@ class Str
     public static function convertArrayKeys(callable $method, array $data, $recursive = true)
     {
         $newKeys = array_map($method, array_keys($data));
-        $data    = array_combine($newKeys, array_values($data));
+        $data = array_combine($newKeys, array_values($data));
 
         // If we are running recursively we'll map over each
         // sub array and run it through this function.
         if ($recursive === true) {
             $data = array_map(
                 function ($data) use ($method) {
-                    return !is_array($data) ? $data : static::convertArrayKeys($method, $data, true);
+                    return ! is_array($data) ? $data : static::convertArrayKeys($method, $data, true);
                 },
                 $data
             );
@@ -496,7 +496,7 @@ class Str
     }
 
     /**
-     * Convert array keys to snake case
+     * Convert array keys to snake case.
      *
      * @param array $data
      * @param bool $recursive

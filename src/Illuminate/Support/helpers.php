@@ -375,7 +375,7 @@ if (! function_exists('camel_case')) {
 
 if (! function_exists('camel_array_keys')) {
     /**
-     * Convert array keys to camel case
+     * Convert array keys to camel case.
      *
      * @param array $data
      * @param bool $recursive
@@ -806,7 +806,7 @@ if (! function_exists('snake_case')) {
 
 if (! function_exists('snake_array_keys')) {
     /**
-     * Convert array keys to snake case
+     * Convert array keys to snake case.
      *
      * @param array $data
      * @param bool $recursive

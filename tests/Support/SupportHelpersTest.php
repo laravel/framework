@@ -309,7 +309,7 @@ class SupportHelpersTest extends TestCase
             'myFirstKey' => 1,
             'mySecondKey' => [
                 'firstKey' => 1,
-                'secondKey' => 2
+                'secondKey' => 2,
             ],
         ];
 
@@ -318,7 +318,7 @@ class SupportHelpersTest extends TestCase
             'my_first_key' => 1,
             'my_second_key' => [
                 'first_key' => 1,
-                'second_key' => 2
+                'second_key' => 2,
             ],
         ], Str::snakeArrayKeys($data));
 
@@ -327,7 +327,7 @@ class SupportHelpersTest extends TestCase
             'my_first_key' => 1,
             'my_second_key' => [
                 'firstKey' => 1,
-                'secondKey' => 2
+                'secondKey' => 2,
             ],
         ], Str::snakeArrayKeys($data, false));
     }
@@ -371,7 +371,7 @@ class SupportHelpersTest extends TestCase
                 'testOne' => 1,
                 'testTwo' => 2,
             ],
-            'myThirdKey' => 3
+            'myThirdKey' => 3,
         ], Str::camelArrayKeys($data));
 
         // non-recursive
@@ -381,7 +381,7 @@ class SupportHelpersTest extends TestCase
                 'test_one' => 1,
                 'test_two' => 2,
             ],
-            'myThirdKey' => 3
+            'myThirdKey' => 3,
         ], Str::camelArrayKeys($data, false));
     }
 
