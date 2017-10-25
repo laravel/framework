@@ -373,6 +373,20 @@ if (! function_exists('camel_case')) {
     }
 }
 
+if (! function_exists('camel_array_keys')) {
+    /**
+     * Convert array keys to camel case
+     *
+     * @param array $data
+     * @param bool $recursive
+     * @return array
+     */
+    function camel_array_keys(array $data, $recursive = true)
+    {
+        return Str::camelArrayKeys($data, $recursive);
+    }
+}
+
 if (! function_exists('class_basename')) {
     /**
      * Get the class "basename" of the given object / class.
@@ -787,6 +801,20 @@ if (! function_exists('snake_case')) {
     function snake_case($value, $delimiter = '_')
     {
         return Str::snake($value, $delimiter);
+    }
+}
+
+if (! function_exists('snake_array_keys')) {
+    /**
+     * Convert array keys to snake case
+     *
+     * @param array $data
+     * @param bool $recursive
+     * @return array
+     */
+    function snake_array_keys(array $data, $recursive = true)
+    {
+        return Str::snakeArrayKeys($data, $recursive);
     }
 }
 

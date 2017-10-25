@@ -303,6 +303,35 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('foo_bar', Str::snake('fooBar')); // test cache
     }
 
+    public function testSnakeArrayKeys()
+    {
+        $data = [
+            'myFirstKey' => 1,
+            'mySecondKey' => [
+                'firstKey' => 1,
+                'secondKey' => 2
+            ],
+        ];
+
+        // recursive
+        $this->assertSame([
+            'my_first_key' => 1,
+            'my_second_key' => [
+                'first_key' => 1,
+                'second_key' => 2
+            ],
+        ], Str::snakeArrayKeys($data));
+
+        // non-recursive
+        $this->assertSame([
+            'my_first_key' => 1,
+            'my_second_key' => [
+                'firstKey' => 1,
+                'secondKey' => 2
+            ],
+        ], Str::snakeArrayKeys($data, false));
+    }
+
     public function testStrLimit()
     {
         $string = 'The PHP framework for web artisans.';
@@ -322,6 +351,38 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('fooBar', Str::camel('foo_bar')); // test cache
         $this->assertEquals('fooBarBaz', Str::camel('Foo-barBaz'));
         $this->assertEquals('fooBarBaz', Str::camel('foo-bar_baz'));
+    }
+
+    public function testCamelArrayKeys()
+    {
+        $data = [
+            'my_first_key' => 1,
+            'my_second_key' => [
+                'test_one' => 1,
+                'test_two' => 2,
+            ],
+            'myThirdKey' => 3,
+        ];
+
+        // recursive
+        $this->assertSame([
+            'myFirstKey' => 1,
+            'mySecondKey' => [
+                'testOne' => 1,
+                'testTwo' => 2,
+            ],
+            'myThirdKey' => 3
+        ], Str::camelArrayKeys($data));
+
+        // non-recursive
+        $this->assertSame([
+            'myFirstKey' => 1,
+            'mySecondKey' => [
+                'test_one' => 1,
+                'test_two' => 2,
+            ],
+            'myThirdKey' => 3
+        ], Str::camelArrayKeys($data, false));
     }
 
     public function testStudlyCase()

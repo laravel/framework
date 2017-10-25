@@ -91,6 +91,45 @@ class Str
     }
 
     /**
+     * Convert array keys to camel case
+     *
+     * @param array $data
+     * @param bool $recursive
+     * @return array
+     */
+    public static function camelArrayKeys(array $data, $recursive = true)
+    {
+        return static::convertArrayKeys(static::class.'::camel', $data, $recursive);
+    }
+
+    /**
+     * Convert array keys based on the given callable
+     *
+     * @param callable $method
+     * @param array $data
+     * @param bool $recursive
+     * @return array
+     */
+    public static function convertArrayKeys(callable $method, array $data, $recursive = true)
+    {
+        $newKeys = array_map($method, array_keys($data));
+        $data    = array_combine($newKeys, array_values($data));
+
+        // If we are running recursively we'll map over each
+        // sub array and run it through this function.
+        if ($recursive === true) {
+            $data = array_map(
+                function ($data) use ($method) {
+                    return !is_array($data) ? $data : static::convertArrayKeys($method, $data, true);
+                },
+                $data
+            );
+        }
+
+        return $data;
+    }
+
+    /**
      * Determine if a given string contains a given substring.
      *
      * @param  string  $haystack
@@ -454,6 +493,18 @@ class Str
         }
 
         return static::$snakeCache[$key][$delimiter] = $value;
+    }
+
+    /**
+     * Convert array keys to snake case
+     *
+     * @param array $data
+     * @param bool $recursive
+     * @return array
+     */
+    public static function snakeArrayKeys(array $data, $recursive = true)
+    {
+        return static::convertArrayKeys(static::class.'::snake', $data, $recursive);
     }
 
     /**
