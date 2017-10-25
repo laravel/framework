@@ -4,7 +4,6 @@ namespace Illuminate\Mail\Events;
 
 class MessageSent
 {
-
     /**
      * The Swift message instance.
      *
