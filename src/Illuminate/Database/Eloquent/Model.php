@@ -999,7 +999,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this;
         }
 
-        $this->setRawAttributes(static::findOrFail($this->getKey())->attributes);
+        $this->setRawAttributes(
+            static::newQueryWithoutScopes()->findOrFail($this->getKey())->attributes
+        );
 
         $this->load(collect($this->relations)->except('pivot')->keys()->toArray());
 
