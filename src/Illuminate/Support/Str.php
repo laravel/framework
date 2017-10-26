@@ -234,7 +234,7 @@ class Str
     }
 
     /**
-     * Prevent widow in a string
+     * Prevent widow in a string.
      *
      * @param  string  $value
      * @return string
