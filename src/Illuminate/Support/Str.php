@@ -234,6 +234,17 @@ class Str
     }
 
     /**
+     * Prevent widow in a string
+     *
+     * @param  string  $value
+     * @return string
+     */
+    public static function no_widow($value)
+    {
+        return preg_replace('|([^\s])\s+([^\s]+)\s*$|', '$1&nbsp;$2', $value);
+    }
+
+    /**
      * Limit the number of words in a string.
      *
      * @param  string  $value
