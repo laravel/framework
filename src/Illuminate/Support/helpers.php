@@ -683,6 +683,19 @@ if (! function_exists('last')) {
     }
 }
 
+if (! function_exists('no_widow')) {
+    /**
+     * Prevent widow in a string.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function no_widow($value)
+    {
+        return Str::no_widow($value);
+    }
+}
+
 if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.
