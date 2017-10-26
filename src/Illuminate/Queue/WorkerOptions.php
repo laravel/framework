@@ -19,7 +19,7 @@ class WorkerOptions
     public $memory;
 
     /**
-     * The maximum number of seconds a child worker may run.
+     * The maximum number of seconds a child worker may processing job.
      *
      * @var int
      */
