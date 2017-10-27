@@ -64,6 +64,21 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('test.ability2'));
     }
 
+    public function test_before_callbacks_works_with_resource_gates_abilities()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithBefore::class);
+
+        $abilities = [
+            'bar' => 'update',
+        ];
+
+        $gate->resource('foo', AccessGateTestPolicyWithBefore::class, $abilities);
+
+        $this->assertTrue($gate->check('foo.bar', new AccessGateTestDummy));
+    }
+
     public function test_before_callbacks_can_override_result_if_necessary()
     {
         $gate = $this->getBasicGate();
