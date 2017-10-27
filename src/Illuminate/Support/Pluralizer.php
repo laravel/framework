@@ -31,6 +31,7 @@ class Pluralizer
         'hardware',
         'information',
         'jedi',
+        'kin',
         'knowledge',
         'love',
         'metadata',
