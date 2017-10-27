@@ -315,15 +315,19 @@ class TestResponse
      * Assert that the response has the exact given JSON.
      *
      * @param  array  $data
+     * @param  bool   $pretty
      * @return $this
      */
-    public function assertExactJson(array $data)
+    public function assertExactJson(array $data, $pretty = false)
     {
-        $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
-        ));
+        $options = 0;
+        if ($pretty === true) {
+            $options = JSON_PRETTY_PRINT;
+        }
 
-        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
+        $actual = json_encode(Arr::sortRecursive((array) $this->decodeResponseJson()), $options);
+
+        PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data), $options), $actual);
 
         return $this;
     }
