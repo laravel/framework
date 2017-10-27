@@ -52,7 +52,25 @@ class TestMakeCommand extends GeneratorCommand
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
+        $name = Str::finish($name, 'Test');
+
         return $this->laravel->basePath().'/tests'.str_replace('\\', '/', $name).'.php';
+    }
+
+    /**
+     * Replace the class name for the given stub.
+     *
+     * @param  string  $stub
+     * @param  string  $name
+     * @return string
+     */
+    protected function replaceClass($stub, $name)
+    {
+        $class = str_replace($this->getNamespace($name).'\\', '', $name);
+
+        $class = Str::finish($class, 'Test');
+
+        return str_replace('DummyClass', $class, $stub);
     }
 
     /**
