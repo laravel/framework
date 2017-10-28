@@ -435,7 +435,7 @@ class Gate implements GateContract
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
         // Checks if ability is defined using resource method
-        $callback = strpos($ability, '.')
+        $callback = strpos($ability, '.') !== false
             ? $this->abilities[$ability]
             : [$policy, $this->formatAbilityToMethod($ability)];
 
