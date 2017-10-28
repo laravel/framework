@@ -23,6 +23,13 @@ class PostgresGrammar extends Grammar
     protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
     /**
+     * Enable other commands to be executed outside of create or alter command (like indexes)
+     *
+     * @var array
+     */
+    protected $fluentCommands = ['Comment'];
+
+    /**
      * The columns available as serials.
      *
      * @var array
@@ -296,6 +303,23 @@ class PostgresGrammar extends Grammar
     {
         return 'SET CONSTRAINTS ALL DEFERRED;';
     }
+
+    /**
+     * Compile a plain index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileComment(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('comment on column %s.%s is %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->column->name),
+            "'".addslashes($command->value)."'"
+        );
+    }
+
 
     /**
      * Create the column definition for a char type.

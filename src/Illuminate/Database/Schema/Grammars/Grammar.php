@@ -20,6 +20,13 @@ abstract class Grammar extends BaseGrammar
     protected $transactions = false;
 
     /**
+     * Enable other commands to be executed outside of create or alter command (like indexes)
+     *
+     * @var array
+     */
+    protected $fluentCommands = [];
+
+    /**
      * Compile a rename column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
@@ -118,6 +125,14 @@ abstract class Grammar extends BaseGrammar
     protected function getType(Fluent $column)
     {
         return $this->{'type'.ucfirst($column->type)}($column);
+    }
+
+    /**
+     * @return array
+     */
+    public function getFluentCommands()
+    {
+        return $this->fluentCommands;
     }
 
     /**
