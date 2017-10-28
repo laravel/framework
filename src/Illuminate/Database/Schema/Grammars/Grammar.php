@@ -20,7 +20,7 @@ abstract class Grammar extends BaseGrammar
     protected $transactions = false;
 
     /**
-     * Enable other commands to be executed outside of create or alter command (like indexes)
+     * Enable other commands to be executed outside of create or alter command (like indexes).
      *
      * @var array
      */

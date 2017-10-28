@@ -38,7 +38,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint = new Blueprint('users');
         $blueprint->create();
         $blueprint->increments('id');
-        $blueprint->string('email')->comment("my first comment");
+        $blueprint->string('email')->comment('my first comment');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);

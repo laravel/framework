@@ -23,7 +23,7 @@ class PostgresGrammar extends Grammar
     protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
     /**
-     * Enable other commands to be executed outside of create or alter command (like indexes)
+     * Enable other commands to be executed outside of create or alter command (like indexes).
      *
      * @var array
      */
@@ -319,7 +319,6 @@ class PostgresGrammar extends Grammar
             "'".addslashes($command->value)."'"
         );
     }
-
 
     /**
      * Create the column definition for a char type.

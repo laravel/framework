@@ -172,8 +172,9 @@ class Blueprint
             foreach ($grammar->getFluentCommands() as $commandName) {
                 $attributeName = lcfirst($commandName);
 
-                if (!isset($column->{$attributeName}))
+                if (! isset($column->{$attributeName})) {
                     continue;
+                }
 
                 $value = $column->{$attributeName};
 
