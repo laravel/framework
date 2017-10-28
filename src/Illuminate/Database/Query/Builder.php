@@ -118,7 +118,7 @@ class Builder
     /**
      * The orderings for the query.
      *
-     * @var array
+     * @var array|null
      */
     public $orders;
 
