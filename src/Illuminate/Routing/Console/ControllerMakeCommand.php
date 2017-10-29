@@ -41,6 +41,8 @@ class ControllerMakeCommand extends GeneratorCommand
             return __DIR__.'/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             return __DIR__.'/stubs/controller.model.stub';
+        } elseif ($this->option('apiResource')) {
+            return __DIR__.'/stubs/controller.api.stub';
         } elseif ($this->option('resource')) {
             return __DIR__.'/stubs/controller.stub';
         }
@@ -163,6 +165,8 @@ class ControllerMakeCommand extends GeneratorCommand
     {
         return [
             ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
+
+            ['apiResource', 'a', InputOption::VALUE_NONE, 'Generate an api resource controller class.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
 
