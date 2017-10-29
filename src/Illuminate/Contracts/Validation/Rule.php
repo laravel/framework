@@ -1,6 +1,7 @@
 <?php
 
 namespace Illuminate\Contracts\Validation;
+
 use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 interface Rule
