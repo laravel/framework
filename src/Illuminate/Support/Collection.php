@@ -1482,10 +1482,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unique($key = null, $strict = false)
     {
-        if (is_null($key)) {
-            return new static(array_unique($this->items, SORT_REGULAR));
-        }
-
         $callback = $this->valueRetriever($key);
 
         $exists = [];
