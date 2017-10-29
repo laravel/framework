@@ -656,6 +656,9 @@ class SupportCollectionTest extends TestCase
 
         $c = new Collection([[1, 2], [1, 2], [2, 3], [3, 4], [2, 3]]);
         $this->assertEquals([[1, 2], [2, 3], [3, 4]], $c->unique()->values()->all());
+
+        $c = new Collection([10, '10']);
+        $this->assertEquals([10], $c->unique()->values()->all());
     }
 
     public function testUniqueWithCallback()
@@ -717,6 +720,9 @@ class SupportCollectionTest extends TestCase
                 'name' => 'double zero',
             ],
         ], $c->uniqueStrict('id')->all());
+
+        $c = new Collection([10, '10']);
+        $this->assertEquals([10, '10'], $c->uniqueStrict()->values()->all());
     }
 
     public function testCollapse()
