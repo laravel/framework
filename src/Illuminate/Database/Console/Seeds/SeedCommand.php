@@ -96,11 +96,11 @@ class SeedCommand extends Command
     protected function getOptions()
     {
         return [
-            ['class', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'],
+            ['class', 'c', InputOption::VALUE_OPTIONAL, 'The class name of the root seeder', 'DatabaseSeeder'],
 
-            ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
+            ['database', 'd', InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
 
-            ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
         ];
     }
 }
