@@ -127,13 +127,13 @@ trait ManagesComponents
         if (preg_match('/\[(.*)\]$/', $name, $matches)) {
             $slot = &$this->slots[$this->currentComponent()][substr($name, 0, -strlen($matches[0]))];
 
-            if (!is_array($slot)) {
-                $slot = array();
+            if (! is_array($slot)) {
+                $slot = [];
             }
             
             if ($matches[1] != '') {
                 $slot[$matches[1]] = $content;
-            } else if ($content != null) {
+            } elseif ($content != null) {
                 $slot[] = $content;
             }
         } else {
