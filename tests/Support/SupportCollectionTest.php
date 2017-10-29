@@ -845,6 +845,38 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
     }
 
+    public function testReverseWithPreserveKeys()
+    {
+        $data = new Collection(['zaeed', 'alan']);
+        $reversed = $data->reverse(true);
+
+        $this->assertSame([1 => 'alan', 0 => 'zaeed'], $reversed->all());
+
+        $data = new Collection(['zaeed', 'alan']);
+        $reversed = $data->reverse(false);
+
+        $this->assertSame([0 => 'alan', 1 => 'zaeed'], $reversed->all());
+    }
+
+    public function testReverseWithPreserveKeysWithStringKeys()
+    {
+        // Flag has no effect on string keys:
+        $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $reversed = $data->reverse(true);
+
+        $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
+
+        $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
+        $reversed = $data->reverse(false);
+
+        $this->assertSame(['framework' => 'laravel', 'name' => 'taylor'], $reversed->all());
+
+        $data = new Collection([0 => 'taylor', 1 => 'mixed', 'framework' => 'laravel']);
+        $reversed = $data->reverse(false);
+
+        $this->assertSame(['framework' => 'laravel', 0 => 'mixed', 1 => 'taylor'], $reversed->all());
+    }
+
     public function testFlip()
     {
         $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
