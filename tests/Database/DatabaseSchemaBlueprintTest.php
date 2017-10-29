@@ -87,4 +87,26 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Blueprint::drop() does not take any arguments. Did you mean dropColumn()?
+     */
+    public function testDropThrowsWithArgs()
+    {
+        new Blueprint('users', function ($table) {
+            $table->drop('money');
+        });
+    }
+
+    public function testDropDoesNotThrowWithoutArgs()
+    {
+        try {
+            new Blueprint('users', function ($table) {
+                $table->drop();
+            });
+        } catch (\BadMethodCallException $ex) {
+            $this->fail('Blueprint::drop() threw even without arguments: ' . $ex->getMessage());
+        }
+    }
 }
