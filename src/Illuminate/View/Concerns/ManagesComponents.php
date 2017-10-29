@@ -89,10 +89,10 @@ trait ManagesComponents
     public function slot($name, $content = null)
     {
         if (count(func_get_args()) == 2) {
-            $this->slots[$this->currentComponent()][$name] = $content;
+            $this->assignSlot($name, $content);
         } else {
             if (ob_start()) {
-                $this->slots[$this->currentComponent()][$name] = '';
+                $this->assignSlot($name, '');
 
                 $this->slotStack[$this->currentComponent()][] = $name;
             }
@@ -112,8 +112,33 @@ trait ManagesComponents
             $this->slotStack[$this->currentComponent()]
         );
 
-        $this->slots[$this->currentComponent()]
-                    [$currentSlot] = new HtmlString(trim(ob_get_clean()));
+        $this->assignSlot($currentSlot, new HtmlString(trim(ob_get_clean())));
+    }
+
+    /**
+     * Assign the slot content.
+     *
+     * @param  string  $name
+     * @param  string|null  $content
+     * @return void
+     */
+    protected function assignSlot($name, $content = null)
+    {
+        if (preg_match('/\[(.*)\]$/', $name, $matches)) {
+            $slot = &$this->slots[$this->currentComponent()][substr($name, 0, -strlen($matches[0]))];
+
+            if (! is_array($slot)) {
+                $slot = [];
+            }
+
+            if ($matches[1] != '') {
+                $slot[$matches[1]] = $content;
+            } elseif ($content != null) {
+                $slot[] = $content;
+            }
+        } else {
+            $this->slots[$this->currentComponent()][$name] = $content;
+        }
     }
 
     /**
