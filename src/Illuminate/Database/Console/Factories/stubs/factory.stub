@@ -2,8 +2,6 @@
 
 use Faker\Generator as Faker;
 
-/* @var Illuminate\Database\Eloquent\Factory $factory */
-
 $factory->define(DummyModel::class, function (Faker $faker) {
     return [
         //
