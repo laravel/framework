@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema;
 
+use BadMethodCallException;
 use Closure;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
@@ -203,6 +204,9 @@ class Blueprint
      */
     public function drop()
     {
+        if (func_num_args() > 0) {
+            throw new BadMethodCallException("Blueprint::drop() does not take any arguments. Did you mean dropColumn()?");
+        }
         return $this->addCommand('drop');
     }
 
