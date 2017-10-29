@@ -3,6 +3,7 @@
 namespace DummyNamespace;
 
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Contracts\Validation\Validator as ValidatorContract;
 
 class DummyClass implements Rule
 {
@@ -21,9 +22,10 @@ class DummyClass implements Rule
      *
      * @param  string  $attribute
      * @param  mixed  $value
+     * @param  ValidatorContract  $validator
      * @return bool
      */
-    public function passes($attribute, $value)
+    public function passes($attribute, $value, ValidatorContract $validator)
     {
         //
     }
