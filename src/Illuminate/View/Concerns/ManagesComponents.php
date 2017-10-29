@@ -130,7 +130,7 @@ trait ManagesComponents
             if (! is_array($slot)) {
                 $slot = [];
             }
-            
+
             if ($matches[1] != '') {
                 $slot[$matches[1]] = $content;
             } elseif ($content != null) {
