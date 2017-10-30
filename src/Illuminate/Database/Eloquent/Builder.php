@@ -327,7 +327,8 @@ class Builder
         }
 
         throw (new ModelNotFoundException)->setModel(
-            get_class($this->model), $id
+            get_class($this->model),
+            $id
         );
     }
 
@@ -524,7 +525,8 @@ class Builder
         // of models which have been eagerly hydrated and are readied for return.
         return $relation->match(
             $relation->initRelation($models, $name),
-            $relation->getEager(), $name
+            $relation->getEager(),
+            $name
         );
     }
 
@@ -705,7 +707,7 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
-        $results = ($total = $this->toBase()->getCountForPagination())
+        $results = ($total = $this->toBase()->getCountForPagination($columns))
                                     ? $this->forPage($page, $perPage)->get($columns)
                                     : $this->model->newCollection();
 
@@ -789,7 +791,9 @@ class Builder
     public function increment($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->increment(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+            $column,
+            $amount,
+            $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -804,7 +808,9 @@ class Builder
     public function decrement($column, $amount = 1, array $extra = [])
     {
         return $this->toBase()->decrement(
-            $column, $amount, $this->addUpdatedAtColumn($extra)
+            $column,
+            $amount,
+            $this->addUpdatedAtColumn($extra)
         );
     }
 
@@ -821,7 +827,8 @@ class Builder
         }
 
         return Arr::add(
-            $values, $this->model->getUpdatedAtColumn(),
+            $values,
+            $this->model->getUpdatedAtColumn(),
             $this->model->freshTimestampString()
         );
     }
@@ -976,11 +983,13 @@ class Builder
         $query->wheres = [];
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, 0, $originalWhereCount)
+            $query,
+            array_slice($allWheres, 0, $originalWhereCount)
         );
 
         $this->groupWhereSliceForScope(
-            $query, array_slice($allWheres, $originalWhereCount)
+            $query,
+            array_slice($allWheres, $originalWhereCount)
         );
     }
 
@@ -1000,7 +1009,8 @@ class Builder
         // we don't add any unnecessary nesting thus keeping the query clean.
         if ($whereBooleans->contains('or')) {
             $query->wheres[] = $this->createNestedWhere(
-                $whereSlice, $whereBooleans->first()
+                $whereSlice,
+                $whereBooleans->first()
             );
         } else {
             $query->wheres = array_merge($query->wheres, $whereSlice);
