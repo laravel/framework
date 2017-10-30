@@ -1046,7 +1046,7 @@ if (! function_exists('throw_if')) {
      * @param  \Throwable|string  $exception
      * @param  array  ...$parameters
      * @return void
-     * @throws Throwable
+     * @throws \Throwable
      */
     function throw_if($boolean, $exception, ...$parameters)
     {
