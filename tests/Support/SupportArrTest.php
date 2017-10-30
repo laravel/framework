@@ -213,7 +213,7 @@ class SupportArrTest extends TestCase
         $array = ['key_foo' => '#foo', 'key_bar' => '#bar', 'key_baz' => '#baz'];
         $this->assertEquals($array, Arr::flatten_keeping_keys($array));
 
-        // Nested arrays are flattened but the keys remain with dots to separate.
+        // Nested arrays are flattened but the keys remain with dots to separate
         $array = ['level_1' => [ 'key_foo' => '#foo', 'key_bar' => '#bar'], 'key_baz' => '#baz'];
         $this->assertEquals(['level_1.key_foo' => '#foo', 'level_1.key_bar' => '#bar', 'key_baz' => '#baz'], Arr::flatten_keeping_keys($array));
 
