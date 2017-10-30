@@ -157,7 +157,7 @@ class SupportArrTest extends TestCase
     {
         // Flat arrays are unaffected
         $array = ['#foo', '#bar', '#baz'];
-        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten(['#foo', '#bar', '#baz']));
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
         // Nested arrays are flattened with existing flat items
         $array = [['#foo', '#bar'], '#baz'];
@@ -204,6 +204,30 @@ class SupportArrTest extends TestCase
 
         $array = [['#foo', ['#bar', ['#baz']]], '#zap'];
         $this->assertEquals(['#foo', '#bar', ['#baz'], '#zap'], Arr::flatten($array, 2));
+    }
+
+
+    public function testFlattenKeepingKeys()
+    {
+        // One Level returns same results
+        $array = ['key_foo' => '#foo', 'key_bar' => '#bar', 'key_baz' => '#baz'];
+        $this->assertEquals($array, Arr::flatten_keeping_keys($array));
+
+        // Nested arrays are flattened but the keys remain with dots to separate
+        $array = ['level_1' => [ 'key_foo' => '#foo', 'key_bar' => '#bar'], 'key_baz' => '#baz'];
+        $this->assertEquals(['level_1.key_foo' => '#foo', 'level_1.key_bar' => '#bar', 'key_baz' => '#baz'], Arr::flatten_keeping_keys($array));
+
+        // Sets of nested arrays are flattened
+        $array = ['level_1_foo' => [ 'key_foo' => '#foo', 'key_bar' => '#bar'], 'level_1_baz' => ['key_baz' => '#baz']];
+        $this->assertEquals(['level_1_foo.key_foo' => '#foo', 'level_1_foo.key_bar' => '#bar', 'level_1_baz.key_baz' => '#baz'], Arr::flatten_keeping_keys($array));
+
+        // Deeply nested arrays are flattened
+        $array = ['level_1_foo' => [ 'key_foo' => '#foo', 'key_bar' => '#bar'], 'level_1_baz' => ['level_2_baz' => ['key_baz' => '#baz']]];
+        $this->assertEquals(['level_1_foo.key_foo' => '#foo', 'level_1_foo.key_bar' => '#bar', 'level_1_baz.level_2_baz.key_baz' => '#baz'], Arr::flatten_keeping_keys($array));
+
+        // If a Collection is used
+        $array = new Collection(['level_1_foo' => [ 'key_foo' => '#foo', 'key_bar' => '#bar'], 'level_1_baz' => ['level_2_baz' => ['key_baz' => '#baz']]]);
+        $this->assertEquals(['level_1_foo.key_foo' => '#foo', 'level_1_foo.key_bar' => '#bar', 'level_1_baz.level_2_baz.key_baz' => '#baz'], Arr::flatten_keeping_keys($array));
     }
 
     public function testGet()

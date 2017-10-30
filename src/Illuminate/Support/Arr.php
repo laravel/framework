@@ -220,6 +220,30 @@ class Arr
     }
 
     /**
+     * Flatten a multi-dimensional array into a single level
+     * keeping the keys formatted into dot notation.
+     *
+     * @param  array $array
+     * @param string $prefix
+     * @return array
+     * @internal param int $depth
+     */
+    public static function flatten_keeping_keys($array, $prefix = '')
+    {
+        $array = $array instanceof Collection ? $array->all() : $array;
+        $result = array();
+        foreach($array as $key=>$value) {
+            if(is_array($value)) {
+                $result = $result + array_flatten_keeping_keys($value, $prefix . $key . '.');
+            }
+            else {
+                $result[$prefix . $key] = $value;
+            }
+        }
+        return $result;
+    }
+
+    /**
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array

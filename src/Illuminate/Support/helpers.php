@@ -129,6 +129,19 @@ if (! function_exists('array_flatten')) {
     }
 }
 
+if(! function_exists("array_flatten_keeping_keys")) {
+    /**
+     * @param $array
+     * @param string $prefix
+     * @return array
+     * Thanks
+     * https://stackoverflow.com/questions/9546181/flatten-multidimensional-array-concatenating-keys/9546215#9546215
+     */
+    function array_flatten_keeping_keys($array, $prefix = '') {
+        return Arr::flatten_keeping_keys($array, $prefix);
+    }
+}
+
 if (! function_exists('array_forget')) {
     /**
      * Remove one or many array items from a given array using "dot" notation.
