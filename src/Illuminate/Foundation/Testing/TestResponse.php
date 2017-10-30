@@ -399,7 +399,7 @@ class TestResponse
             (array) $this->decodeResponseJson()
         ));
 
-        foreach(Arr::sortRecursive($data) as $key => $value) {
+        foreach (Arr::sortRecursive($data) as $key => $value) {
             $unexpected = substr(json_encode([$key => $value]), 1, -1);
 
             if (! Str::contains($actual, $unexpected)) {
