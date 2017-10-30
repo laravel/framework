@@ -24,6 +24,8 @@ class AuthenticationTest extends TestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
     public function setUp()
