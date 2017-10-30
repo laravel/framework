@@ -55,11 +55,9 @@ class EloquentHasManyThroughTest extends TestCase
 
         $notMember = User::create(['name' => str_random()]);
 
-
         $this->assertEquals([$member1->id, $member2->id], $user->members->pluck('id')->toArray());
     }
 }
-
 
 class User extends Model
 {
