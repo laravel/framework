@@ -16,6 +16,8 @@ class MySqlConnector extends Connector implements ConnectorInterface
     {
         $dsn = $this->getDsn($config);
 
+        $config = $this->formatSslOptions($config);
+
         $options = $this->getOptions($config);
 
         // We need to grab the PDO options that should be used while making the brand
@@ -176,5 +178,28 @@ class MySqlConnector extends Connector implements ConnectorInterface
     protected function strictMode()
     {
         return "set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'";
+    }
+
+    /**
+     * Format the SSL options for the config.
+     *
+     * @param  array  $config
+     * @return array
+     */
+    protected function formatSslOptions(array $config)
+    {
+        collect([
+            'sslkey' => PDO::MYSQL_ATTR_SSL_KEY,
+            'sslcert' => PDO::MYSQL_ATTR_SSL_CERT,
+            'sslrootcert' => PDO::MYSQL_ATTR_SSL_CA,
+        ])
+        ->each(function ($attr, $option) use (&$config) {
+            if (isset($config[$option]) && ! empty($config[$option])) {
+                $config['options'][$attr] = $config[$option];
+                unset($config[$option]);
+            }
+        });
+
+        return $config;
     }
 }
