@@ -53,6 +53,13 @@ class HasManyThrough extends Relation
     protected $secondLocalKey;
 
     /**
+     * The count of self joins.
+     *
+     * @var int
+     */
+    protected static $selfJoinCount = 0;
+
+    /**
      * Create a new has many through relationship instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
@@ -427,9 +434,44 @@ class HasManyThrough extends Relation
     {
         $this->performJoin($query);
 
+        if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
+            return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
+        }
+
         return $query->select($columns)->whereColumn(
             $this->getExistenceCompareKey(), '=', $this->getQualifiedFirstKeyName()
         );
+    }
+
+    /**
+     * Add the constraints for a relationship query on the same table.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param  array|mixed  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
+    {
+        $parentQuery->select($columns)->from(
+            $query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash()
+        );
+
+        $parentQuery->getModel()->setTable($hash);
+
+        return $query->whereColumn(
+            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedFirstKeyName()
+        );
+    }
+
+    /**
+     * Get a relationship join table hash.
+     *
+     * @return string
+     */
+    public function getRelationCountHash()
+    {
+        return 'laravel_reserved_'.static::$selfJoinCount++;
     }
 
     /**
