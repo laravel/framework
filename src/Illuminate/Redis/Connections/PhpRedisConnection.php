@@ -386,6 +386,7 @@ class PhpRedisConnection extends Connection
      * Apply prefix to the given key if necessary.
      *
      * @param $key
+     * @return string
      */
     private function applyPrefix($key)
     {
