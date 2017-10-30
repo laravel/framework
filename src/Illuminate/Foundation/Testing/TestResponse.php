@@ -364,7 +364,7 @@ class TestResponse
      */
     public function assertJsonMissing(array $data, $exact = false)
     {
-        if ( $exact ) {
+        if ($exact) {
             return $this->assertJsonMissingExact($data);
         }
 
@@ -373,12 +373,12 @@ class TestResponse
         ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
-            $expected = substr(json_encode([$key => $value]), 1, -1);
+            $unexpected = substr(json_encode([$key => $value]), 1, -1);
 
             PHPUnit::assertFalse(
-                Str::contains($actual, $expected),
+                Str::contains($actual, $unexpected),
                 'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-                "[{$expected}]".PHP_EOL.PHP_EOL.
+                "[{$unexpected}]".PHP_EOL.PHP_EOL.
                 'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
@@ -399,17 +399,17 @@ class TestResponse
             (array) $this->decodeResponseJson()
         ));
 
-        foreach( Arr::sortRecursive($data) as $key => $value ) {
+        foreach(Arr::sortRecursive($data) as $key => $value) {
             $unexpected = substr(json_encode([$key => $value]), 1, -1);
 
-            if ( ! Str::contains($actual, $unexpected) ) {
+            if (! Str::contains($actual, $unexpected)) {
                 return $this;
             }
         }
 
         PHPUnit::fail(
             'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-            "[" . json_encode($data) . "]".PHP_EOL.PHP_EOL.
+            '['.json_encode($data).']'.PHP_EOL.PHP_EOL.
             'within'.PHP_EOL.PHP_EOL.
             "[{$actual}]."
         );
