@@ -1063,6 +1063,7 @@ if (! function_exists('throw_unless')) {
      * @param  \Throwable|string  $exception
      * @param  array  ...$parameters
      * @return void
+     * @throws \Throwable
      */
     function throw_unless($boolean, $exception, ...$parameters)
     {
