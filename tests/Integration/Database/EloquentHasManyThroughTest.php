@@ -50,12 +50,12 @@ class EloquentHasManyThroughTest extends TestCase
         $team1 = Team::create(['owner_id' => $user->id]);
         $team2 = Team::create(['owner_id' => $user->id]);
 
-        $member1 = User::create(['name' => str_random(), 'team_id' => $team1->id]);
-        $member2 = User::create(['name' => str_random(), 'team_id' => $team1->id]);
+        $mate1 = User::create(['name' => str_random(), 'team_id' => $team1->id]);
+        $mate2 = User::create(['name' => str_random(), 'team_id' => $team2->id]);
 
         $notMember = User::create(['name' => str_random()]);
 
-        $this->assertEquals([$member1->id, $member2->id], $user->members->pluck('id')->toArray());
+        $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
     }
 }
 
@@ -65,7 +65,7 @@ class User extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 
-    public function members()
+    public function teamMates()
     {
         return $this->hasManyThrough(self::class, Team::class, 'owner_id', 'team_id');
     }
