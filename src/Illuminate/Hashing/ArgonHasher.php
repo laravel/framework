@@ -45,7 +45,7 @@ class ArgonHasher implements HasherContract
         ]);
 
         if ($hash === false) {
-            throw new RuntimeException('Bcrypt hashing not supported.');
+            throw new RuntimeException('Argon2 hashing not supported.');
         }
 
         return $hash;
