@@ -124,6 +124,28 @@ if (! function_exists('app_path')) {
     }
 }
 
+if(! function_exists("array_flatten_keeping_keys")) {
+    /**
+     * @param $array
+     * @param string $prefix
+     * @return array
+     * Thanks
+     * https://stackoverflow.com/questions/9546181/flatten-multidimensional-array-concatenating-keys/9546215#9546215
+     */
+    function array_flatten_keeping_keys($array, $prefix = '') {
+        $result = array();
+        foreach($array as $key=>$value) {
+            if(is_array($value)) {
+                $result = $result + array_flatten_keeping_keys($value, $prefix . $key . '.');
+            }
+            else {
+                $result[$prefix . $key] = $value;
+            }
+        }
+        return $result;
+    }
+}
+
 if (! function_exists('asset')) {
     /**
      * Generate an asset path for the application.
