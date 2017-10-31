@@ -72,7 +72,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      * Create new anonymous resource collection.
      *
      * @param  mixed  $resource
-     * @return mixed
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public static function collection($resource)
     {
