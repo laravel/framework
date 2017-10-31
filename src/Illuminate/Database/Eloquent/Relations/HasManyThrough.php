@@ -432,11 +432,11 @@ class HasManyThrough extends Relation
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        $this->performJoin($query);
-
         if ($parentQuery->getQuery()->from == $query->getQuery()->from) {
             return $this->getRelationExistenceQueryForSelfRelation($query, $parentQuery, $columns);
         }
+
+        $this->performJoin($query);
 
         return $query->select($columns)->whereColumn(
             $this->getExistenceCompareKey(), '=', $this->getQualifiedFirstKeyName()
@@ -453,14 +453,18 @@ class HasManyThrough extends Relation
      */
     public function getRelationExistenceQueryForSelfRelation(Builder $query, Builder $parentQuery, $columns = ['*'])
     {
-        $parentQuery->select($columns)->from(
-            $query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash()
-        );
+        $query->from($query->getModel()->getTable().' as '.$hash = $this->getRelationCountHash());
 
-        $parentQuery->getModel()->setTable($hash);
+        $query->join($this->throughParent->getTable(), $this->getQualifiedParentKeyName(), '=', $hash.'.'.$this->secondLocalKey);
 
-        return $query->whereColumn(
-            $hash.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedFirstKeyName()
+        if ($this->throughParentSoftDeletes()) {
+            $query->whereNull($this->throughParent->getQualifiedDeletedAtColumn());
+        }
+
+        $query->getModel()->setTable($hash);
+
+        return $query->select($columns)->whereColumn(
+            $parentQuery->getQuery()->from.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedFirstKeyName()
         );
     }
 
