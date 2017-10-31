@@ -97,13 +97,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $footer = [];
 
     /**
-     * Placeholder to temporary mark the position of raw blocks.
-     *
-     * @var string
-     */
-    protected $rawPlaceholder = '@__raw-block__@';
-
-    /**
      * Array to temporary store the raw blocks found in the template.
      *
      * @var array
@@ -202,7 +195,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
             $this->rawBlocks[] = $matches[1];
 
-            return $this->rawPlaceholder;
+            return $this->getRawPlaceHolder(count($this->rawBlocks) - 1);
         }, $value);
     }
 
@@ -217,8 +210,19 @@ class BladeCompiler extends Compiler implements CompilerInterface
         return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
             $this->rawBlocks[] = "<?php{$matches[1]}?>";
 
-            return $this->rawPlaceholder;
+            return $this->getRawPlaceholder(count($this->rawBlocks) - 1);
         }, $value);
+    }
+
+    /**
+     * Placeholder to temporary mark the position of raw blocks.
+     *
+     * @param  string  $replace
+     * @return string
+     */
+    protected function getRawPlaceholder($replace)
+    {
+        return str_replace('#', $replace, '@__raw_block_#__@');
     }
 
     /**
@@ -229,8 +233,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.preg_quote($this->rawPlaceholder).'/', function () {
-            return array_shift($this->rawBlocks);
+        $result = preg_replace_callback('/'.$this->getRawPlaceholder('(\d+)').'/', function ($matches) {
+            return $this->rawBlocks[$matches[1]];
         }, $result);
 
         $this->rawBlocks = [];
