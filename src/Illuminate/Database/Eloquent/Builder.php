@@ -708,7 +708,7 @@ class Builder
         $query = $this->toBase();
 
         $count = $query->distinct
-                        ? [ sprintf("%s.%s", $this->model->getTable(), $this->model->getKeyName()) ]
+                        ? [sprintf("%s.%s", $this->model->getTable(), $this->model->getKeyName())]
                         : $columns;
 
         $results = ($total = $query->getCountForPagination($count))
