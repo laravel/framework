@@ -1801,8 +1801,6 @@ class Builder
         return array_map(function ($column) {
             return is_string($column) && ($aliasPosition = strpos(strtolower($column), ' as ')) !== false
                     ? substr($column, 0, $aliasPosition) : $column;
-
-            return preg_replace("/\.\*$/", ".id", $column);
         }, $columns);
     }
 
