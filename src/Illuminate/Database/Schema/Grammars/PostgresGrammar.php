@@ -30,13 +30,6 @@ class PostgresGrammar extends Grammar
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
 
     /**
-     * The commands to be executed outside of create or alter command.
-     *
-     * @var array
-     */
-    protected $fluentCommands = ['Comment'];
-
-    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -302,22 +295,6 @@ class PostgresGrammar extends Grammar
     public function compileDisableForeignKeyConstraints()
     {
         return 'SET CONSTRAINTS ALL DEFERRED;';
-    }
-
-    /**
-     * Compile a comment command.
-     *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
-     * @return string
-     */
-    public function compileComment(Blueprint $blueprint, Fluent $command)
-    {
-        return sprintf('comment on column %s.%s is %s',
-            $this->wrapTable($blueprint),
-            $this->wrap($command->column->name),
-            "'".addslashes($command->value)."'"
-        );
     }
 
     /**
