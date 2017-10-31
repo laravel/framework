@@ -305,6 +305,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Hello', 'second' => 'World'], $c->filter(function ($item, $key) {
             return $key != 'id';
         })->all());
+
+        $c = new Collection([
+            ['value' => 'foo', 'nested' => ['included' => true]],
+            ['value' => 'bar', 'nested' => ['included' => false]],
+            ['value' => 'baz', 'nested' => ['included' => true]],
+        ]);
+        $this->assertEquals(['foo', 'baz'], $c->filter('nested.included')->pluck('value')->toArray());
     }
 
     public function testHigherOrderKeyBy()
