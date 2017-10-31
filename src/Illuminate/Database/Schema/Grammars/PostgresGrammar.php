@@ -23,18 +23,18 @@ class PostgresGrammar extends Grammar
     protected $modifiers = ['Increment', 'Nullable', 'Default'];
 
     /**
-     * Enable other commands to be executed outside of create or alter command (like indexes).
-     *
-     * @var array
-     */
-    protected $fluentCommands = ['Comment'];
-
-    /**
      * The columns available as serials.
      *
      * @var array
      */
     protected $serials = ['bigInteger', 'integer', 'mediumInteger', 'smallInteger', 'tinyInteger'];
+
+    /**
+     * The commands to be executed outside of create or alter command.
+     *
+     * @var array
+     */
+    protected $fluentCommands = ['Comment'];
 
     /**
      * Compile the query to determine if a table exists.
@@ -305,7 +305,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Compile a plain index key command.
+     * Compile a comment command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command

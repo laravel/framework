@@ -119,6 +119,7 @@ class Blueprint
     /**
      * Add the commands that are implied by the blueprint's state.
      *
+     * @param  \Illuminate\Database\Grammar  $grammer
      * @return void
      */
     protected function addImpliedCommands(Grammar $grammar)
@@ -166,6 +167,12 @@ class Blueprint
         }
     }
 
+    /**
+     * Add the fluent commands specified on any columns.
+     *
+     * @param  \Illuminate\Database\Grammar  $grammer
+     * @param
+     */
     public function addFluentCommands(Grammar $grammar)
     {
         foreach ($this->columns as $column) {

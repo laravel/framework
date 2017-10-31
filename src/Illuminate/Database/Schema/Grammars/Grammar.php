@@ -20,7 +20,7 @@ abstract class Grammar extends BaseGrammar
     protected $transactions = false;
 
     /**
-     * Enable other commands to be executed outside of create or alter command (like indexes).
+     * The commands to be executed outside of create or alter command.
      *
      * @var array
      */
@@ -125,14 +125,6 @@ abstract class Grammar extends BaseGrammar
     protected function getType(Fluent $column)
     {
         return $this->{'type'.ucfirst($column->type)}($column);
-    }
-
-    /**
-     * @return array
-     */
-    public function getFluentCommands()
-    {
-        return $this->fluentCommands;
     }
 
     /**
@@ -256,6 +248,16 @@ abstract class Grammar extends BaseGrammar
         return tap(new TableDiff($table), function ($tableDiff) use ($schema, $table) {
             $tableDiff->fromTable = $schema->listTableDetails($table);
         });
+    }
+
+    /**
+     * Get the fluent commands for the grammar.
+     *
+     * @return array
+     */
+    public function getFluentCommands()
+    {
+        return $this->fluentCommands;
     }
 
     /**
