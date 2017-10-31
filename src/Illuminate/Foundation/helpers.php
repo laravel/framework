@@ -124,6 +124,22 @@ if (! function_exists('app_path')) {
     }
 }
 
+if (! function_exists('argon')) {
+    /**
+     * Hash the given value against the Argon2i algorithm.
+     *
+     * @param  string  $value
+     * @param  array   $options
+     * @return string
+     */
+    function argon($value, $options = [])
+    {
+        return app('hash')
+            ->driver('argon')
+            ->make($value, $options);
+    }
+}
+
 if (! function_exists('asset')) {
     /**
      * Generate an asset path for the application.
@@ -185,7 +201,7 @@ if (! function_exists('base_path')) {
 
 if (! function_exists('bcrypt')) {
     /**
-     * Hash the given value.
+     * Hash the given value against the bcrypt algorithm.
      *
      * @param  string  $value
      * @param  array   $options
@@ -193,7 +209,9 @@ if (! function_exists('bcrypt')) {
      */
     function bcrypt($value, $options = [])
     {
-        return app('hash')->make($value, $options);
+        return app('hash')
+            ->driver('bcrypt')
+            ->make($value, $options);
     }
 }
 

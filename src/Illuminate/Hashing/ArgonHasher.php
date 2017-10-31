@@ -2,14 +2,13 @@
 
 namespace Illuminate\Hashing;
 
-
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
 class ArgonHasher implements HasherContract
 {
     /**
-     * Default threads factor
+     * Default threads factor.
      *
      * @var int
      */
@@ -105,7 +104,7 @@ class ArgonHasher implements HasherContract
      *
      * @return $this
      */
-    public function setMemory($memory)
+    public function setMemory(int $memory)
     {
         $this->memory = $memory;
 
