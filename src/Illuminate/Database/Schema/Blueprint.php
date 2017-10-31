@@ -96,7 +96,7 @@ class Blueprint
      */
     public function toSql(Connection $connection, Grammar $grammar)
     {
-        $this->addImpliedCommands();
+        $this->addImpliedCommands($grammar);
 
         $statements = [];
 
@@ -121,7 +121,7 @@ class Blueprint
      *
      * @return void
      */
-    protected function addImpliedCommands()
+    protected function addImpliedCommands(Grammar $grammar)
     {
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
@@ -132,6 +132,8 @@ class Blueprint
         }
 
         $this->addFluentIndexes();
+
+        $this->addFluentCommands($grammar);
     }
 
     /**
@@ -160,6 +162,25 @@ class Blueprint
 
                     continue 2;
                 }
+            }
+        }
+    }
+
+    public function addFluentCommands(Grammar $grammar)
+    {
+        foreach ($this->columns as $column) {
+            foreach ($grammar->getFluentCommands() as $commandName) {
+                $attributeName = lcfirst($commandName);
+
+                if (! isset($column->{$attributeName})) {
+                    continue;
+                }
+
+                $value = $column->{$attributeName};
+
+                $this->addCommand(
+                    $commandName, compact('value', 'column')
+                );
             }
         }
     }
