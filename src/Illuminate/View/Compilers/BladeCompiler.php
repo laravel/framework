@@ -193,9 +193,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storeVerbatimBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            $this->rawBlocks[] = $matches[1];
-
-            return $this->getRawPlaceHolder(count($this->rawBlocks) - 1);
+            return $this->storeRawBlock($matches[1]);
         }, $value);
     }
 
@@ -208,16 +206,27 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storePhpBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
-            $this->rawBlocks[] = "<?php{$matches[1]}?>";
-
-            return $this->getRawPlaceholder(count($this->rawBlocks) - 1);
+            return $this->storeRawBlock("<?php{$matches[1]}?>");
         }, $value);
+    }
+
+    /**
+     * Store a raw block and return a unique raw placeholder.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function storeRawBlock($value)
+    {
+        return $this->getRawPlaceHolder(
+            array_push($this->rawBlocks, $value) - 1
+        );
     }
 
     /**
      * Placeholder to temporary mark the position of raw blocks.
      *
-     * @param  string  $replace
+     * @param  int|string  $replace
      * @return string
      */
     protected function getRawPlaceholder($replace)
