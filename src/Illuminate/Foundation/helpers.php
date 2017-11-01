@@ -124,22 +124,6 @@ if (! function_exists('app_path')) {
     }
 }
 
-if (! function_exists('argon')) {
-    /**
-     * Hash the given value against the Argon2i algorithm.
-     *
-     * @param  string  $value
-     * @param  array   $options
-     * @return string
-     */
-    function argon($value, $options = [])
-    {
-        return app('hash')
-            ->driver('argon')
-            ->make($value, $options);
-    }
-}
-
 if (! function_exists('asset')) {
     /**
      * Generate an asset path for the application.
