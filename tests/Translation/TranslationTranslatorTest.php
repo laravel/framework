@@ -93,7 +93,7 @@ class TranslationTranslatorTest extends TestCase
         $values = ['foo', 'bar', 'baz'];
         $t->choice('foo', $values, ['replace']);
 
-        $values = new \Illuminate\Support\Collection(['foo', 'bar', 'baz']);
+        $values = new \Illuminate\Collections\Collection(['foo', 'bar', 'baz']);
         $t->choice('foo', $values, ['replace']);
     }
 

@@ -13,7 +13,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * The notifiable entities that should receive the notification.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Collections\Collection
      */
     public $notifiables;
 
@@ -34,7 +34,7 @@ class SendQueuedNotifications implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Support\Collection  $notifiables
+     * @param  \Illuminate\Collections\Collection  $notifiables
      * @param  \Illuminate\Notifications\Notification  $notification
      * @param  array  $channels
      * @return void

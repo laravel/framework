@@ -347,7 +347,7 @@ class BelongsToMany extends Relation
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Support\Collection|\Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Collections\Collection|\Illuminate\Database\Eloquent\Model
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -724,7 +724,7 @@ class BelongsToMany extends Relation
     /**
      * Get all of the IDs for the related models.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function allRelatedIds()
     {
@@ -751,7 +751,7 @@ class BelongsToMany extends Relation
     /**
      * Save an array of new models and attach them to the parent model.
      *
-     * @param  \Illuminate\Support\Collection|array  $models
+     * @param  \Illuminate\Collections\Collection|array  $models
      * @param  array  $pivotAttributes
      * @return array
      */

@@ -134,7 +134,7 @@ class Schedule
      * Get all of the events on the schedule that are due.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function dueEvents($app)
     {

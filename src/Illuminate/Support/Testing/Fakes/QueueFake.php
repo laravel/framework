@@ -98,7 +98,7 @@ class QueueFake extends QueueManager implements Queue
      *
      * @param  string  $job
      * @param  callable|null  $callback
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function pushed($job, $callback = null)
     {

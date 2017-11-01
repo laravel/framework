@@ -7,7 +7,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Collections\Collection as BaseCollection;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {

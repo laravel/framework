@@ -8,14 +8,14 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 
 /**
- * @mixin \Illuminate\Support\Collection
+ * @mixin \Illuminate\Collections\Collection
  */
 abstract class AbstractPaginator implements Htmlable
 {
     /**
      * All of the items being paginated.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Collections\Collection
      */
     protected $items;
 
@@ -490,7 +490,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function getCollection()
     {
@@ -500,7 +500,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Collections\Collection  $collection
      * @return $this
      */
     public function setCollection(Collection $collection)
