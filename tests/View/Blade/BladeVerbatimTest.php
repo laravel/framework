@@ -77,7 +77,6 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
-
     public function testRawBlocksDontGetMixedUpWhenSomeAreRemovedByBladeComments()
     {
         $string = '{{-- @verbatim Block #1 @endverbatim --}} @php "Block #2" @endphp';
