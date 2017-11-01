@@ -178,7 +178,7 @@ class HasManyThrough extends Relation
         // link them up with their children using the keyed dictionary to make the
         // matching very convenient and easy work. Then we'll just return them.
         foreach ($models as $model) {
-            if (isset($dictionary[$key = $model->getKey()])) {
+            if (isset($dictionary[$key = $model->getAttribute($this->localKey)])) {
                 $model->setRelation(
                     $relation, $this->related->newCollection($dictionary[$key])
                 );
