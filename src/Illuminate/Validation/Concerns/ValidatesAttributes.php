@@ -360,7 +360,7 @@ trait ValidatesAttributes
 
         $date = date_create_from_format('!'.$parameters[0], $value);
 
-        return $date->format($parameters[0]) === $value;
+        return $date && $date->format($parameters[0]) === $value;
     }
 
     /**
