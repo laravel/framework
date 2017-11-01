@@ -288,7 +288,7 @@ class TestResponse
     {
         $errors = $this->json()['errors'];
 
-        foreach(array_wrap($keys) as $key) {
+        foreach (array_wrap($keys) as $key) {
             PHPUnit::assertTrue(
                 isset($errors[$key]),
                 "Failed to find a validation error in the response for key: '{$key}'"
