@@ -408,15 +408,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Run a filter over each of the items.
      *
-     * @param  mixed|null  $callback
+     * @param  callable|null  $callback
      * @return static
      */
-    public function filter($callback = null)
+    public function filter(callable $callback = null)
     {
-        if (is_string($callback)) {
-            $callback = $this->valueRetriever($callback);
-        }
-
         if ($callback) {
             return new static(Arr::where($this->items, $callback));
         }
