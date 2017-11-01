@@ -1261,6 +1261,21 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create overlapping chunks of the given size, by passing a "sliding window" over them.
+     *
+     * @param  int  $size
+     * @return static
+     */
+    public function sliding($size)
+    {
+        $chunks = $this->count() - $size + 1;
+
+        return static::times($chunks, function ($number) use ($size) {
+            return $this->slice($number - 1, $size);
+        });
+    }
+
+    /**
      * Shuffle the items in the collection.
      *
      * @param  int  $seed

@@ -50,7 +50,11 @@ class CallQueuedHandler
         );
 
         if (! $job->hasFailed() && ! $job->isReleased()) {
-            $this->ensureNextJobInChainIsDispatched($command);
+            // This does not belong here, obviously. We should
+            // instead add it to some service provider, and
+            // do this from within a JobProccessed event.
+            app(\Illuminate\Foundation\Bus\ChainConductor::class)
+                ->jobCompleted($command);
         }
 
         if (! $job->isDeletedOrReleased()) {
@@ -93,19 +97,6 @@ class CallQueuedHandler
     }
 
     /**
-     * Ensure the next job in the chain is dispatched if applicable.
-     *
-     * @param  mixed  $command
-     * @return void
-     */
-    protected function ensureNextJobInChainIsDispatched($command)
-    {
-        if (method_exists($command, 'dispatchNextJobInChain')) {
-            $command->dispatchNextJobInChain();
-        }
-    }
-
-    /**
      * Handle a model not found exception.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job
@@ -144,6 +135,12 @@ class CallQueuedHandler
     public function failed(array $data, $e)
     {
         $command = unserialize($data['command']);
+
+        // This does not belong here, obviously. We should
+        // instead add it to some service provider, and
+        // do this from within a JobFailed event.
+        app(\Illuminate\Foundation\Bus\ChainConductor::class)
+            ->jobFailed($command);
 
         if (method_exists($command, 'failed')) {
             $command->failed($e);
