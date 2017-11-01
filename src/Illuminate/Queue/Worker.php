@@ -477,21 +477,6 @@ class Worker
     }
 
     /**
-     * Raise the failed queue job event.
-     *
-     * @param  string  $connectionName
-     * @param  \Illuminate\Contracts\Queue\Job  $job
-     * @param  \Exception  $e
-     * @return void
-     */
-    protected function raiseFailedJobEvent($connectionName, $job, $e)
-    {
-        $this->events->dispatch(new Events\JobFailed(
-            $connectionName, $job, $e
-        ));
-    }
-
-    /**
      * Determine if the queue worker should restart.
      *
      * @param  int|null  $lastRestart
