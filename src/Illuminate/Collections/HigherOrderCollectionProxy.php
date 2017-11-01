@@ -1,16 +1,16 @@
 <?php
 
-namespace Illuminate\Support;
+namespace Illuminate\Collections;
 
 /**
- * @mixin \Illuminate\Support\Collection
+ * @mixin \Illuminate\Collections\Collection
  */
 class HigherOrderCollectionProxy
 {
     /**
      * The collection being operated on.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Collections\Collection
      */
     protected $collection;
 
@@ -24,7 +24,7 @@ class HigherOrderCollectionProxy
     /**
      * Create a new proxy instance.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Collections\Collection  $collection
      * @param  string  $method
      * @return void
      */

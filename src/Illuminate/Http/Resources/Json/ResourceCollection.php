@@ -20,7 +20,7 @@ class ResourceCollection extends Resource implements IteratorAggregate
     /**
      * The mapped collection instance.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Collections\Collection
      */
     public $collection;
 

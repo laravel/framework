@@ -127,7 +127,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Run a map over each of the items.
      *
      * @param  callable  $callback
-     * @return \Illuminate\Support\Collection|static
+     * @return \Illuminate\Collections\Collection|static
      */
     public function map(callable $callback)
     {
@@ -211,7 +211,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  string|callable|null  $key
      * @param  bool  $strict
-     * @return static|\Illuminate\Support\Collection
+     * @return static|\Illuminate\Collections\Collection
      */
     public function unique($key = null, $strict = false)
     {
@@ -306,7 +306,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  string  $value
      * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function pluck($value, $key = null)
     {
@@ -316,7 +316,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Get the keys of the collection items.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function keys()
     {
@@ -327,7 +327,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Zip the collection together with one or more arrays.
      *
      * @param  mixed ...$items
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function zip($items)
     {
@@ -337,7 +337,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Collapse the collection of items into a single array.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function collapse()
     {
@@ -348,7 +348,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function flatten($depth = INF)
     {
@@ -358,7 +358,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Flip the items in the collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function flip()
     {
@@ -370,7 +370,7 @@ class Collection extends BaseCollection implements QueueableCollection
      *
      * @param  int  $size
      * @param  mixed $value
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function pad($size, $value)
     {

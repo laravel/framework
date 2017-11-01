@@ -44,6 +44,7 @@
         "illuminate/broadcasting": "self.version",
         "illuminate/bus": "self.version",
         "illuminate/cache": "self.version",
+        "illuminate/collections": "self.version",
         "illuminate/config": "self.version",
         "illuminate/console": "self.version",
         "illuminate/container": "self.version",
@@ -67,8 +68,7 @@
         "illuminate/support": "self.version",
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
-        "illuminate/view": "self.version",
-        "tightenco/collect": "self.version"
+        "illuminate/view": "self.version"
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
@@ -84,6 +84,7 @@
     },
     "autoload": {
         "files": [
+            "src/Illuminate/Collections/helpers.php",
             "src/Illuminate/Foundation/helpers.php",
             "src/Illuminate/Support/helpers.php"
         ],

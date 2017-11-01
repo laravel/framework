@@ -68,7 +68,7 @@ class BusFake implements Dispatcher
      *
      * @param  string  $command
      * @param  callable|null  $callback
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function dispatched($command, $callback = null)
     {

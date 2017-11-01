@@ -78,7 +78,7 @@ class EventFake implements Dispatcher
      *
      * @param  string  $event
      * @param  callable|null  $callback
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collections\Collection
      */
     public function dispatched($event, $callback = null)
     {

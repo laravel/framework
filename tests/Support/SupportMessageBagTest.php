@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Support;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Collection;
 
 class SupportMessageBagTest extends TestCase
 {

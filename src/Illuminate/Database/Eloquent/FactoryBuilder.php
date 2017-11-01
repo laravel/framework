@@ -159,7 +159,7 @@ class FactoryBuilder
     /**
      * Set the connection name on the results and store them.
      *
-     * @param  \Illuminate\Support\Collection  $results
+     * @param  \Illuminate\Collections\Collection  $results
      * @return void
      */
     protected function store($results)
