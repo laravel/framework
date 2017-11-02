@@ -20,8 +20,16 @@ class HashServiceProvider extends ServiceProvider
      */
     public function register()
     {
+        $this->app->singleton('hash.manager', function ($app) {
+            return (new HashManager($app));
+        });
+
         $this->app->singleton('hash', function ($app) {
-            return (new HashManager($app))->driver();
+            return $app['hash.manager']->driver();
+        });
+
+        $this->app->singleton('hash.bcrypt', function($app) {
+            return $app['hash.manager']->driver('bcrypt');
         });
     }
 
@@ -32,6 +40,6 @@ class HashServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['hash'];
+        return ['hash', 'hash.manager', 'hash.bcrypt'];
     }
 }

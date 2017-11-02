@@ -193,8 +193,7 @@ if (! function_exists('bcrypt')) {
      */
     function bcrypt($value, $options = [])
     {
-        return app('hash')
-            ->driver('bcrypt')
+        return app('hash.bcrypt')
             ->make($value, $options);
     }
 }
