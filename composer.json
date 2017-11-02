@@ -115,7 +115,7 @@
         "nexmo/client": "Required to use the Nexmo transport (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~3.0).",
         "symfony/css-selector": "Required to use some of the crawler integration testing tools (~3.3).",
         "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (~3.3).",
         "symfony/psr-http-message-bridge": "Required to psr7 bridging features (~1.0)."

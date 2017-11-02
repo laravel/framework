@@ -725,7 +725,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([$object1, $object2], $data->collapse()->all());
     }
 
-    public function testCollapseWithNestedCollactions()
+    public function testCollapseWithNestedCollections()
     {
         $data = new Collection([new Collection([1, 2, 3]), new Collection([4, 5, 6])]);
         $this->assertEquals([1, 2, 3, 4, 5, 6], $data->collapse()->all());
