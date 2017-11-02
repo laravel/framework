@@ -55,8 +55,9 @@ class BladeVerbatimTest extends AbstractBladeTestCase
 @if ($conditional)
     {{ $third }}
 @endif
+@include("users")
 @verbatim
-    {{ $fourth }} 
+    {{ $fourth }} @include("test")
 @endverbatim 
 @php echo $fifth; @endphp';
 
@@ -69,8 +70,9 @@ class BladeVerbatimTest extends AbstractBladeTestCase
     <?php echo e($third); ?>
 
 <?php endif; ?>
+<?php echo $__env->make("users", array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>
 
-    {{ $fourth }} 
+    {{ $fourth }} @include("test")
  
 <?php echo $fifth; ?>';
 
