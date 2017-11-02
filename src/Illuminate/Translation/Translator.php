@@ -5,7 +5,7 @@ namespace Illuminate\Translation;
 use Countable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\NamespacedItemResolver;

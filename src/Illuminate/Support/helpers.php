@@ -3,8 +3,8 @@
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Optional;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
+use Illuminate\Collection\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
 
@@ -408,19 +408,6 @@ if (! function_exists('class_uses_recursive')) {
         }
 
         return array_unique($results);
-    }
-}
-
-if (! function_exists('collect')) {
-    /**
-     * Create a collection from the given value.
-     *
-     * @param  mixed  $value
-     * @return \Illuminate\Support\Collection
-     */
-    function collect($value = null)
-    {
-        return new Collection($value);
     }
 }
 

@@ -4,8 +4,8 @@ namespace Illuminate\Http\Resources\Json;
 
 use ArrayAccess;
 use JsonSerializable;
-use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Collection\Collection;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Support\Responsable;

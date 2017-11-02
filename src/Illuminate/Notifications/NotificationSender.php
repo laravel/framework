@@ -3,7 +3,7 @@
 namespace Illuminate\Notifications;
 
 use Ramsey\Uuid\Uuid;
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
@@ -49,7 +49,7 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Collection\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @return void
      */
@@ -67,7 +67,7 @@ class NotificationSender
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
+     * @param  \Illuminate\Collection\Collection|array|mixed  $notifiables
      * @param  mixed  $notification
      * @param  array  $channels
      * @return void

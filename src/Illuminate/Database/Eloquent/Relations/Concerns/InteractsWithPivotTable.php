@@ -4,7 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Collection\Collection as BaseCollection;
 
 trait InteractsWithPivotTable
 {
@@ -64,7 +64,7 @@ trait InteractsWithPivotTable
     /**
      * Sync the intermediate tables with a list of IDs without detaching.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array  $ids
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Collection\Collection|array  $ids
      * @return array
      */
     public function syncWithoutDetaching($ids)
@@ -75,7 +75,7 @@ trait InteractsWithPivotTable
     /**
      * Sync the intermediate tables with a list of IDs or collection of models.
      *
-     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Support\Collection|array  $ids
+     * @param  \Illuminate\Database\Eloquent\Collection|\Illuminate\Collection\Collection|array  $ids
      * @param  bool   $detaching
      * @return array
      */

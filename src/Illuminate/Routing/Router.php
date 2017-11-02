@@ -9,8 +9,8 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Collection\Collection;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -666,7 +666,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Sort the given middleware by priority.
      *
-     * @param  \Illuminate\Support\Collection  $middlewares
+     * @param  \Illuminate\Collection\Collection  $middlewares
      * @return array
      */
     protected function sortMiddleware(Collection $middlewares)

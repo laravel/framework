@@ -3,14 +3,14 @@
 namespace Illuminate\Mail\Transport;
 
 use Swift_Mime_SimpleMessage;
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 
 class ArrayTransport extends Transport
 {
     /**
      * The collection of Swift Messages.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Collection\Collection
      */
     protected $messages;
 
@@ -39,7 +39,7 @@ class ArrayTransport extends Transport
     /**
      * Retrieve the collection of messages.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     public function messages()
     {
@@ -49,7 +49,7 @@ class ArrayTransport extends Transport
     /**
      * Clear all of the messages from the local collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     public function flush()
     {

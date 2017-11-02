@@ -2,7 +2,7 @@
 
 namespace Illuminate\Routing;
 
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 
 class SortedMiddleware extends Collection
 {
