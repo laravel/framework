@@ -77,6 +77,17 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The SQLite database driver does not support spatial indexes.
+     */
+    public function testDropSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');

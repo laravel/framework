@@ -58,6 +58,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDefaultCurrentTimestamp()

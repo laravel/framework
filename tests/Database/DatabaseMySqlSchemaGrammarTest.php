@@ -201,6 +201,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` drop index `foo`', $statements[0]);
     }
 
+    public function testDropSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` drop index `geo_coordinates_spatialindex`', $statements[0]);
+    }
+
     public function testDropForeign()
     {
         $blueprint = new Blueprint('users');

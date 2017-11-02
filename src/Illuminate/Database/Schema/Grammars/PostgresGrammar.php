@@ -264,6 +264,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a drop spatial index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return $this->compileDropIndex($blueprint, $command);
+    }
+
+    /**
      * Compile a drop foreign key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

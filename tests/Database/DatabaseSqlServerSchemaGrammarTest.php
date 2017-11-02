@@ -130,6 +130,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo" on "users"', $statements[0]);
     }
 
+    public function testDropSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('drop index "geo_coordinates_spatialindex" on "geo"', $statements[0]);
+    }
+
     public function testDropForeign()
     {
         $blueprint = new Blueprint('users');

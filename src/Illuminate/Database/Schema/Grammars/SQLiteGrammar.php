@@ -282,6 +282,18 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile a drop spatial index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @throws \RuntimeException
+     */
+    public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('The SQLite database driver does not support spatial indexes.');
+    }
+
+    /**
      * Compile a rename table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
