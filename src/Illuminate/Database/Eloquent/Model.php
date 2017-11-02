@@ -1436,13 +1436,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        try {
-            return $this->newQuery()->$method(...$parameters);
-        } catch (BadMethodCallException $e) {
-            throw new BadMethodCallException(
-                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
-            );
-        }
+        return $this->newQuery()->$method(...$parameters);
     }
 
     /**
