@@ -185,7 +185,7 @@ if (! function_exists('base_path')) {
 
 if (! function_exists('bcrypt')) {
     /**
-     * Hash the given value.
+     * Hash the given value against the bcrypt algorithm.
      *
      * @param  string  $value
      * @param  array   $options
@@ -193,7 +193,9 @@ if (! function_exists('bcrypt')) {
      */
     function bcrypt($value, $options = [])
     {
-        return app('hash')->make($value, $options);
+        return app('hash')
+            ->driver('bcrypt')
+            ->make($value, $options);
     }
 }
 
