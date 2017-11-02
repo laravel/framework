@@ -585,6 +585,94 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Create the column definition for a geometry type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeGeometry(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a point type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typePoint(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a linestring type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeLinestring(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a polygon type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typePolygon(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a geometrycollection type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeGeometrycollection(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a multipoint type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeMultipoint(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a multilinestring type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeMultilinestring(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
+     * Create the column definition for a multipolygon type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    public function typeMultipolygon(Fluent $column)
+    {
+        return 'geography';
+    }
+
+    /**
      * Get the SQL for a collation column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
