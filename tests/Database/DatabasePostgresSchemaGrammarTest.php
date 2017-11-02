@@ -107,6 +107,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
+    public function testDropSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('drop index "geo_coordinates_spatialindex"', $statements[0]);
+    }
+
     public function testDropForeign()
     {
         $blueprint = new Blueprint('users');
@@ -185,6 +195,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
+    }
+
+    public function testAddingSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[0]);
+    }
+
+    public function testAddingFluentSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates')->spatialIndex();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[1]);
     }
 
     public function testAddingIncrementingID()
@@ -570,83 +600,85 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add constraint "users_parent_id_foreign" foreign key ("parent_id") references "parents" ("id") on delete cascade deferrable initially deferred', $statements[0]);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The database driver in use does not support the Geometry spatial column type.
+     */
     public function testAddingGeometry()
     {
-        $this->expectException(\Exception::class);
-
-        $blueprint = new Blueprint('users');
-        $blueprint->geometry('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->geometry('coordinates');
         $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testAddingPoint()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->point('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(point, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(point, 4326) not null', $statements[0]);
     }
 
-    public function testAddingLinestring()
+    public function testAddingLineString()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->linestring('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->linestring('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(linestring, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(linestring, 4326) not null', $statements[0]);
     }
 
     public function testAddingPolygon()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->polygon('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->polygon('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(polygon, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(polygon, 4326) not null', $statements[0]);
     }
 
     public function testAddingGeometryCollection()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->geometrycollection('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->geometrycollection('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(geometrycollection, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(geometrycollection, 4326) not null', $statements[0]);
     }
 
-    public function testAddingMultipoint()
+    public function testAddingMultiPoint()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->multipoint('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->multipoint('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(multipoint, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(multipoint, 4326) not null', $statements[0]);
     }
 
-    public function testAddingMultiLinestring()
+    public function testAddingMultiLineString()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->multilinestring('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->multilinestring('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(multilinestring, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(multilinestring, 4326) not null', $statements[0]);
     }
 
     public function testAddingMultiPolygon()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->multipolygon('foo');
+        $blueprint = new Blueprint('geo');
+        $blueprint->multipolygon('coordinates');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" geography(multipolygon, 4326) not null', $statements[0]);
+        $this->assertEquals('alter table "geo" add column "coordinates" geography(multipolygon, 4326) not null', $statements[0]);
     }
 
     public function testDropAllTablesEscapesTableNames()
