@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -169,6 +170,18 @@ class SQLiteGrammar extends Grammar
             $this->wrapTable($blueprint),
             $this->columnize($command->columns)
         );
+    }
+
+    /**
+     * Compile a spatial index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @throws \RuntimeException
+     */
+    public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        throw new RuntimeException('The SQLite database driver does not support spatial indexes.');
     }
 
     /**

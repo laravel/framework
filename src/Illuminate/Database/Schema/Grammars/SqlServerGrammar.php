@@ -122,6 +122,22 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a spatial index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('create spatial index %s on %s (%s)',
+            $this->wrap($command->index),
+            $this->wrapTable($blueprint),
+            $this->columnize($command->columns)
+        );
+    }
+
+    /**
      * Compile a drop table command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint

@@ -187,6 +187,26 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" using hash ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[0]);
+    }
+
+    public function testAddingFluentSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates')->spatialIndex();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('create index "geo_coordinates_spatialindex" on "geo" using gist ("coordinates")', $statements[1]);
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

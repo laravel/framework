@@ -131,6 +131,28 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The SQLite database driver does not support spatial indexes.
+     */
+    public function testAddingSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage The SQLite database driver does not support spatial indexes.
+     */
+    public function testAddingFluentSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates')->spatialIndex();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+    }
+
     public function testAddingIncrementingID()
     {
         $blueprint = new Blueprint('users');

@@ -40,6 +40,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->index('foo');
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDropIndexDefaultNames()

@@ -128,6 +128,20 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a spatial index key command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $command
+     * @return string
+     */
+    public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
+    {
+        $command->algorithm = 'gist';
+
+        return $this->compileIndex($blueprint, $command);
+    }
+
+    /**
      * Compile a foreign key command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
