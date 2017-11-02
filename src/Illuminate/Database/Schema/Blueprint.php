@@ -303,6 +303,17 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given spatial index should be dropped.
+     *
+     * @param  string|array  $index
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropSpatialIndex($index)
+    {
+        return $this->dropIndexCommand('dropSpatialIndex', 'spatialIndex', $index);
+    }
+
+    /**
      * Indicate that the given foreign key should be dropped.
      *
      * @param  string|array  $index

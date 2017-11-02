@@ -1,5 +1,14 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+## Changed
+- Added "kin" as uncountable word ([#21843](https://github.com/laravel/framework/pull/21843))
+
+## Fixed
+- Fixed `BroadcastController` namespace issue ([#21844](https://github.com/laravel/framework/pull/21844))
+
+
 ## v5.5.19 (2017-10-25)
 
 ### Added
