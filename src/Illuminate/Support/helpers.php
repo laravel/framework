@@ -424,6 +424,30 @@ if (! function_exists('collect')) {
     }
 }
 
+if (! function_exists('contract')) {
+    /**
+     * Create a concrete class if it implements a given contract.
+     *
+     * @param  string $concrete
+     * @param  string $contract
+     * @return mixed
+     */
+    function contract($concrete, $contract = null)
+    {
+        if (is_string($concrete)) {
+            $concrete = app($concrete);
+        }
+
+        if (! is_null($contract) && ! $concrete instanceof $contract) {
+            throw new \RuntimeException(sprintf(
+                '%s must implement %s', get_class($concrete), $contract
+            ));
+        }
+
+        return $concrete;
+    }
+}
+
 if (! function_exists('data_fill')) {
     /**
      * Fill in data where it's missing.
