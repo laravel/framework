@@ -801,9 +801,9 @@ class Blueprint
      * @param  string  $column
      * @return \Illuminate\Support\Fluent
      */
-    public function time($column)
+    public function time($column, $precision = 0)
     {
-        return $this->addColumn('time', $column);
+        return $this->addColumn('time', $column, compact('precision'));
     }
 
     /**
