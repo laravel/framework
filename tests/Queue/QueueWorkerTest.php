@@ -393,6 +393,11 @@ class WorkerFakeJob
     {
         return $this->failed;
     }
+    
+    public function getName()
+    {
+        return 'WorkerFakeJob';
+    }
 
     public function setConnectionName($name)
     {
