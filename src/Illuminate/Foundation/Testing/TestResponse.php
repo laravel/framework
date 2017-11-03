@@ -322,7 +322,7 @@ class TestResponse
      */
     public function assertJsonCount(int $count, $key = null)
     {
-        if ( $key ) {
+        if ($key) {
             PHPUnit::assertCount($count,
                 $this->json()[$key],
                 "Failed to assert that the response count matched the expected {$count}"
