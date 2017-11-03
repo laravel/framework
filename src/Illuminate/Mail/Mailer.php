@@ -74,6 +74,9 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected $failedRecipients = [];
 
+
+    protected $beforeSendingMailableCallbacks = [];
+
     /**
      * Create a new Mailer instance.
      *
@@ -246,6 +249,8 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendMailable(MailableContract $mailable)
     {
+        $this->fireBeforeSendingMailablesCallbacks($mailable);
+
         return $mailable instanceof ShouldQueue
                 ? $mailable->queue($this->queue) : $mailable->send($this);
     }
@@ -552,5 +557,17 @@ class Mailer implements MailerContract, MailQueueContract
         $this->queue = $queue;
 
         return $this;
+    }
+
+    public function beforeSendingMailable(callable $callback)
+    {
+        $this->beforeSendingMailableCallbacks[] = $callback;
+    }
+
+    protected function fireBeforeSendingMailablesCallbacks(MailableContract $mailable)
+    {
+        foreach($this->beforeSendingMailableCallbacks as $callback) {
+            $callback($mailable);
+        }
     }
 }
