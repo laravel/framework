@@ -34,6 +34,13 @@ class PendingMail
      */
     protected $bcc = [];
 
+	/**
+	 * The subject of the message.
+	 *
+	 * @var string
+	 */
+	protected $subject;
+
     /**
      * Create a new mailable mailer instance.
      *
@@ -83,6 +90,19 @@ class PendingMail
 
         return $this;
     }
+
+	/**
+	 * Set the subject of the message.
+	 *
+	 * @param  string
+	 * @return $this
+	 */
+	public function subject($subject)
+	{
+		$this->subject = $subject;
+
+		return $this;
+	}
 
     /**
      * Send a new mailable message instance.
@@ -149,6 +169,7 @@ class PendingMail
     {
         return $mailable->to($this->to)
                         ->cc($this->cc)
-                        ->bcc($this->bcc);
+                        ->bcc($this->bcc)
+                        ->subject($this->subject);
     }
 }
