@@ -392,7 +392,7 @@ class Worker
         }
 
         $this->failJob($connectionName, $job, $e = new MaxAttemptsExceededException(
-            $job->getName().' has been attempted too many times or run too long. The job may have previously timed out.'
+            $job->resolveName().' has been attempted too many times or run too long. The job may have previously timed out.'
         ));
 
         throw $e;
