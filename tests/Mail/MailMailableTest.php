@@ -141,7 +141,7 @@ class MailMailableTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(Mockery::type('Illuminate\Mail\Events\MailableQueued'));
 
         $mailable = new QueuedWelcomeMailableStub;
-        $mailable->queue($queue);
+        $mailable->queue($queue, $events);
     }
 
     public function testMailableDoesNotDispatchQueuedEventWhenDispatcherIsNotAvailable()
