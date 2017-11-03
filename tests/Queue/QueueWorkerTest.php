@@ -393,7 +393,7 @@ class WorkerFakeJob
     {
         return $this->failed;
     }
-    
+
     public function getName()
     {
         return 'WorkerFakeJob';
