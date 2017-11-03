@@ -394,7 +394,7 @@ class WorkerFakeJob
         return $this->failed;
     }
 
-    public function getName()
+    public function resolveName()
     {
         return 'WorkerFakeJob';
     }
