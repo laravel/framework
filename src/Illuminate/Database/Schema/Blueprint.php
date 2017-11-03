@@ -799,6 +799,7 @@ class Blueprint
      * Create a new time column on the table.
      *
      * @param  string  $column
+     * @param  int     $precision
      * @return \Illuminate\Support\Fluent
      */
     public function time($column, $precision = 0)
