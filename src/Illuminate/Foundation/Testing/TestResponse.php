@@ -281,7 +281,6 @@ class TestResponse
      * Assert that the response has validation errors for the given keys.
      *
      * @param string|array $keys
-     *
      * @return $this
      */
     public function assertValidationErrors($keys)
@@ -316,12 +315,22 @@ class TestResponse
 
     /**
      * Assert that the response json has the expected count.
-     * @param int $count
      *
+     * @param int $count
+     * @param string|null $key
      * @return $this
      */
-    public function assertJsonCount(int $count)
+    public function assertJsonCount(int $count, $key = null)
     {
+        if ( $key ) {
+            PHPUnit::assertCount($count,
+                $this->json()[$key],
+                "Failed to assert that the response count matched the expected {$count}"
+            );
+
+            return $this;
+        }
+
         PHPUnit::assertCount($count,
             $this->json(),
             "Failed to assert that the response count matched the expected {$count}"
