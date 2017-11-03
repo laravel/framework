@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
+use \Mockery;
 
 class MailMailableTest extends TestCase
 {
@@ -101,6 +104,48 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
     }
 
+    public function testMailableDispatchesSentEvent()
+    {
+        $mailer = Mockery::mock(Mailer::class);
+        $mailer->shouldReceive('send')->once();
+
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('dispatch')->once()->with(Mockery::type('Illuminate\Mail\Events\MailableSent'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->send($mailer, $events);
+    }
+
+    public function testMailableDoesNotDispatchSentEventWhenDispatcherIsNotAvailable()
+    {
+        $mailer = Mockery::mock(Mailer::class);
+        $mailer->shouldReceive('send')->once();
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->send($mailer, null);
+    }
+
+    public function testMailableDispatchesQueuedEvent()
+    {
+        $queue = Mockery::mock(\Illuminate\Contracts\Queue\Factory::class);
+        $queue->shouldReceive('connection->pushOn');
+
+        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
+        $events->shouldReceive('dispatch')->once()->with(Mockery::type('Illuminate\Mail\Events\MailableQueued'));
+
+        $mailable = new QueuedWelcomeMailableStub;
+        $mailable->queue($queue);
+    }
+
+    public function testMailableDoesNotDispatchQueuedEventWhenDispatcherIsNotAvailable()
+    {
+        $queue = Mockery::mock(\Illuminate\Contracts\Queue\Factory::class);
+        $queue->shouldReceive('connection->pushOn');
+
+        $mailable = new QueuedWelcomeMailableStub;
+        $mailable->queue($queue);
+    }
+
     public function testMailableBuildsViewData()
     {
         $mailable = new WelcomeMailableStub;
@@ -118,6 +163,24 @@ class MailMailableTest extends TestCase
 }
 
 class WelcomeMailableStub extends Mailable
+{
+    public $framework = 'Laravel';
+
+    protected $version = '5.3';
+
+    /**
+     * Build the message.
+     *
+     * @return $this
+     */
+    public function build()
+    {
+        $this->with('first_name', 'Taylor')
+             ->withLastName('Otwell');
+    }
+}
+
+class QueuedWelcomeMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 

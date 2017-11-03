@@ -2,8 +2,9 @@
 
 namespace Illuminate\Mail;
 
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
 
 class SendQueuedMailable
 {
@@ -13,6 +14,13 @@ class SendQueuedMailable
      * @var Mailable
      */
     public $mailable;
+
+    /**
+     * The dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $dispatcher;
 
     /**
      * The number of times the job may be attempted.
@@ -32,11 +40,13 @@ class SendQueuedMailable
      * Create a new job instance.
      *
      * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
+     * @param  \Illuminate\Contracts\Events\Dispatcher $dispatcher
      * @return void
      */
-    public function __construct(MailableContract $mailable)
+    public function __construct(MailableContract $mailable, Dispatcher $dispatcher = null)
     {
         $this->mailable = $mailable;
+        $this->dispatcher = $dispatcher;
         $this->tries = property_exists($mailable, 'tries') ? $mailable->tries : null;
         $this->timeout = property_exists($mailable, 'timeout') ? $mailable->timeout : null;
     }
@@ -49,7 +59,8 @@ class SendQueuedMailable
      */
     public function handle(MailerContract $mailer)
     {
-        $this->mailable->send($mailer);
+        $this->mailable->send($mailer, $this->dispatcher);
+
     }
 
     /**

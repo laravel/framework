@@ -2,6 +2,7 @@
 
 namespace Illuminate\Contracts\Mail;
 
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Queue\Factory as Queue;
 
 interface Mailable
@@ -12,7 +13,7 @@ interface Mailable
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
      * @return void
      */
-    public function send(Mailer $mailer);
+    public function send(Mailer $mailer, Dispatcher $dispatcher = null);
 
     /**
      * Queue the given message.
@@ -20,7 +21,7 @@ interface Mailable
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
-    public function queue(Queue $queue);
+    public function queue(Queue $queue, Dispatcher $dispatcher = null);
 
     /**
      * Deliver the queued message after the given delay.
