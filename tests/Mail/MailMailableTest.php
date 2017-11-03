@@ -10,6 +10,13 @@ use \Mockery;
 
 class MailMailableTest extends TestCase
 {
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        Mockery::close();
+    }
+
     public function testMailableSetsRecipientsCorrectly()
     {
         $mailable = new WelcomeMailableStub;
