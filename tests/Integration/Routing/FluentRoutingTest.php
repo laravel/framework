@@ -37,7 +37,6 @@ class FluentRoutingTest extends TestCase
     }
 }
 
-
 class Middleware
 {
     public function handle($request, $next)
