@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+use Closure;
 use Swift_Mailer;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
@@ -73,6 +74,14 @@ class Mailer implements MailerContract, MailQueueContract
      * @var array
      */
     protected $failedRecipients = [];
+
+
+    /**
+     * All of the before sending mailable callbacks.
+     *
+     * @var array
+     */
+    protected $beforeSendingMailableCallbacks = [];
 
     /**
      * Create a new Mailer instance.
@@ -246,6 +255,8 @@ class Mailer implements MailerContract, MailQueueContract
      */
     protected function sendMailable(MailableContract $mailable)
     {
+        $this->fireBeforeSendingMailablesCallbacks($mailable);
+
         return $mailable instanceof ShouldQueue
                 ? $mailable->queue($this->queue) : $mailable->send($this);
     }
@@ -552,5 +563,29 @@ class Mailer implements MailerContract, MailQueueContract
         $this->queue = $queue;
 
         return $this;
+    }
+
+    /**
+     * Register a new before sending mailable callback.
+     *
+     * @param  \Closure $callback
+     * @return void
+     */
+    public function beforeSendingMailable(Closure $callback)
+    {
+        $this->beforeSendingMailableCallbacks[] = $callback;
+    }
+
+    /**
+     * Fire all of the before sending mailables callbacks.
+     * 
+     * @param  \Illuminate\Contracts\Mail\Mailable $mailable
+     * @return void
+     */
+    protected function fireBeforeSendingMailablesCallbacks(MailableContract $mailable)
+    {
+        foreach($this->beforeSendingMailableCallbacks as $callback) {
+            $callback($mailable);
+        }
     }
 }

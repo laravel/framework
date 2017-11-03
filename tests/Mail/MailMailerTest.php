@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Mail;
 
 use Mockery as m;
 use Illuminate\Mail\Mailer;
+use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
 
@@ -160,6 +161,22 @@ class MailMailerTest extends TestCase
         $this->assertEquals(
             'bar', $mailer->foo()
         );
+    }
+
+    public function testBeforeSendingMailable()
+    {
+        unset($_SERVER['__mailer.test']);
+        $mailer = $this->getMailer();
+
+        $mailer->beforeSendingMailable(function($mailable) {
+            $mailable->to('foo@bar.com');
+        });
+
+        $mailable = m::mock(Mailable::class);
+        $mailable->shouldReceive('to')->once()->with('foo@bar.com');
+        $mailable->shouldReceive('send');
+    
+        $mailer->send($mailable);
     }
 
     protected function getMailer($events = null)
