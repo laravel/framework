@@ -11,6 +11,7 @@ interface Mailable
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
      * @return void
      */
     public function send(Mailer $mailer, Dispatcher $dispatcher = null);
@@ -19,6 +20,7 @@ interface Mailable
      * Queue the given message.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
      * @return mixed
      */
     public function queue(Queue $queue, Dispatcher $dispatcher = null);

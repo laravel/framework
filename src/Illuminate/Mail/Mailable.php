@@ -111,7 +111,7 @@ class Mailable implements MailableContract, Renderable
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
-     * @param  \Illuminate\Contracts\Events\Dispatcher $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
      * @return void
      */
     public function send(MailerContract $mailer, Dispatcher $dispatcher = null)
