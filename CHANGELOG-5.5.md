@@ -2,11 +2,23 @@
 
 ## [Unreleased]
 
-## Changed
-- Added "kin" as uncountable word ([#21843](https://github.com/laravel/framework/pull/21843))
+### Added
+- Added `TestResponse::assertJsonMissingExact()` ([#21881](https://github.com/laravel/framework/pull/21881))
+- Added `allOnQueue()` and `allOnConnection()` for job chaining ([#21765](https://github.com/laravel/framework/pull/21765))
+- Support variadic arguments on fluent `Route::middleware()` ([#21930](https://github.com/laravel/framework/pull/21930))
+- Added precision to `Blueprint::time()` ([#21936](https://github.com/laravel/framework/pull/21936))
 
-## Fixed
+### Changed
+- Added "kin" as an uncountable word ([#21843](https://github.com/laravel/framework/pull/21843))
+- Improved geo spatial support ([#21919](https://github.com/laravel/framework/pull/21919))
+- Include job name in the `MaxAttemptsExcededException` ([#21941](https://github.com/laravel/framework/pull/21941), [#21943](https://github.com/laravel/framework/pull/21943))
+
+### Fixed
 - Fixed `BroadcastController` namespace issue ([#21844](https://github.com/laravel/framework/pull/21844))
+- Fixed eager loading `HasManyThrough` relations with custom intermediate and local key ([#21902](https://github.com/laravel/framework/pull/21902))
+- Use table aliases when calling self-referencing `HasManyThrough` relation ([#21883](https://github.com/laravel/framework/pull/21883))
+- Fixed Vue component file name in React present ([#21945](https://github.com/laravel/framework/pull/21945))
+- Reverted changes to `BadMethodException` in [#20196](https://github.com/laravel/framework/pull/20196) ([#21929](https://github.com/laravel/framework/pull/21929))
 
 
 ## v5.5.19 (2017-10-25)
