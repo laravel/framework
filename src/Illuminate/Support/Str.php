@@ -291,7 +291,7 @@ class Str
 
         $result = 0;
 
-        for ($i = 0; $i < $knownLength; ++$i) {
+        for ($i = 0; $i < $knownLength; $i++) {
             $result |= (ord($knownString[$i]) ^ ord($userInput[$i]));
         }
 

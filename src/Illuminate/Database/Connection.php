@@ -520,7 +520,7 @@ class Connection implements ConnectionInterface
             );
         }
 
-        ++$this->transactions;
+        $this->transactions++;
 
         $this->fireConnectionEvent('beganTransaction');
     }
@@ -536,7 +536,7 @@ class Connection implements ConnectionInterface
             $this->pdo->commit();
         }
 
-        --$this->transactions;
+        $this->transactions--;
 
         $this->fireConnectionEvent('committed');
     }
