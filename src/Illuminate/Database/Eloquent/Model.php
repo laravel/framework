@@ -5,7 +5,6 @@ namespace Illuminate\Database\Eloquent;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
-use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
@@ -926,7 +925,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string|null  $using
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(Model $parent, array $attributes, $table, $exists, $using = null)
+    public function newPivot(self $parent, array $attributes, $table, $exists, $using = null)
     {
         return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
                       : Pivot::fromAttributes($parent, $attributes, $table, $exists);
@@ -1467,13 +1466,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        try {
-            return $this->newQuery()->$method(...$parameters);
-        } catch (BadMethodCallException $e) {
-            throw new BadMethodCallException(
-                sprintf('Call to undefined method %s::%s()', get_class($this), $method)
-            );
-        }
+        return $this->newQuery()->$method(...$parameters);
     }
 
     /**
