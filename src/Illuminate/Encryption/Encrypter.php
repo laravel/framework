@@ -61,7 +61,7 @@ class Encrypter implements EncrypterContract
             $this->cipher = $cipher;
             $this->aead = self::$supportedCiphers[$this->cipher]['aead'];
         } else {
-            $ciphers = implode(', ', array_map('strtoupper', array_keys(self::$supportedCiphers)));
+            $ciphers = implode(', ', $this->getAvailableCiphers());
             throw new RuntimeException("The only supported ciphers are $ciphers with the correct key lengths.");
         }
     }
@@ -348,6 +348,25 @@ class Encrypter implements EncrypterContract
         return hash_hmac(
             'sha256', $this->hash($payload['iv'], $payload['value']), $bytes, true
         );
+    }
+
+    /**
+     * Get available ciphers.
+     *
+     * @return array
+     */
+    private function getAvailableCiphers()
+    {
+        $availableCiphers = [];
+        foreach (self::$supportedCiphers as $cipherName => $setting) {
+            if (! isset($setting['since']) ||
+                version_compare(PHP_VERSION, $setting['since'], '>=')
+            ) {
+                $availableCiphers[] = strtoupper($cipherName);
+            }
+        }
+
+        return $availableCiphers;
     }
 
     /**

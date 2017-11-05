@@ -118,7 +118,7 @@ class EncrypterTest extends TestCase
      */
     private function onlyForAead()
     {
-        if (version_compare(PHP_VERSION, 'PHP-7.1', '<')) {
+        if (version_compare(PHP_VERSION, '7.1', '<')) {
             $this->markTestSkipped('The AEAD is not supported in PHP 7.0');
         }
     }
