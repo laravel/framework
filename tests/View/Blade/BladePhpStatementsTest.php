@@ -26,11 +26,11 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     {
         $string = '@php($set = true)'
             ."\n@php"
-            ."\n    $string = 'value';"
+            ."\n    \$string = 'value';"
             ."\n@endphp";
         $expected = '<?php $set = true; ?>'
             ."\n<?php"
-            ."\n    $string = 'value';"
+            ."\n    \$string = 'value';"
             ."\n?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
