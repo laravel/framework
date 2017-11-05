@@ -44,9 +44,19 @@ class EncrypterTest extends TestCase
         $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
+    public function testAeadCipher()
+    {
+        $this->onlyForAead();
+
+        $e = new Encrypter(str_repeat('b', 32), 'AES-256-GCM');
+        $encrypted = $e->encrypt('bar');
+        $this->assertNotEquals('bar', $encrypted);
+        $this->assertEquals('bar', $e->decrypt($encrypted));
+    }
+
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessageRegExp /The only supported ciphers are (AES-\d{3}-[A-Z]{3}(, )?)+ with the correct key lengths./
      */
     public function testDoNoAllowLongerKey()
     {
@@ -55,7 +65,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessageRegExp /The only supported ciphers are (AES-\d{3}-[A-Z]{3}(, )?)+ with the correct key lengths./
      */
     public function testWithBadKeyLength()
     {
@@ -64,7 +74,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessageRegExp /The only supported ciphers are (AES-\d{3}-[A-Z]{3}(, )?)+ with the correct key lengths./
      */
     public function testWithBadKeyLengthAlternativeCipher()
     {
@@ -73,7 +83,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessageRegExp /The only supported ciphers are (AES-\d{3}-[A-Z]{3}(, )?)+ with the correct key lengths./
      */
     public function testWithUnsupportedCipher()
     {
@@ -101,5 +111,15 @@ class EncrypterTest extends TestCase
         $a = new Encrypter(str_repeat('a', 16));
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
+    }
+
+    /**
+     * Run test only for AEAD.
+     */
+    private function onlyForAead()
+    {
+        if (version_compare(PHP_VERSION, 'PHP-7.1', '<')) {
+            $this->markTestSkipped('The AEAD is not supported in PHP 7.0');
+        }
     }
 }
