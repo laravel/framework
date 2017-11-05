@@ -7,7 +7,7 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     public function testPhpStatementsWithExpressionAreCompiled()
     {
         $string = '@php($set = true)';
-        $expected = '<?php ($set = true); ?>';
+        $expected = '<?php $set = true; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -19,6 +19,19 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
 
         $string = '{{ "Ignore: @php" }}';
         $expected = '<?php echo e("Ignore: @php"); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCombinedShorthandAndClosedPhpStatements()
+    {
+        $string = '@php($set = true)'
+            ."\n@php"
+            ."\n    \$string = 'value';"
+            ."\n@endphp";
+        $expected = '<?php $set = true; ?>'
+            ."\n<?php"
+            ."\n    \$string = 'value';"
+            ."\n?>";
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
