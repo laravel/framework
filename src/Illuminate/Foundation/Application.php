@@ -586,6 +586,18 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider->register();
         }
 
+        if (property_exists($provider, 'bind')) {
+            foreach ($provider->bind as $abstract => $concrete) {
+                $this->bind($abstract, $concrete);
+            }
+        }
+
+        if (property_exists($provider, 'singletons')) {
+            foreach ($provider->singletons as $abstract => $concrete) {
+                $this->singleton($abstract, $concrete);
+            }
+        }
+
         $this->markAsRegistered($provider);
 
         // If the application has already booted, we will call this boot method on
