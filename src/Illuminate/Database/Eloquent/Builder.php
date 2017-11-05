@@ -761,7 +761,7 @@ class Builder
      * @param  string  $boolean
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
+    protected function addHasWhere(self $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
         $this->mergeWheresToHas($hasQuery, $relation);
 
@@ -779,7 +779,7 @@ class Builder
      * @param  \Illuminate\Database\Eloquent\Relations\Relation  $relation
      * @return void
      */
-    protected function mergeWheresToHas(Builder $hasQuery, Relation $relation)
+    protected function mergeWheresToHas(self $hasQuery, Relation $relation)
     {
         // Here we have the "has" query and the original relation. We need to copy over any
         // where clauses the developer may have put in the relationship function over to

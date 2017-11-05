@@ -1894,7 +1894,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  bool  $exists
      * @return \Illuminate\Database\Eloquent\Relations\Pivot
      */
-    public function newPivot(Model $parent, array $attributes, $table, $exists)
+    public function newPivot(self $parent, array $attributes, $table, $exists)
     {
         return new Pivot($parent, $attributes, $table, $exists);
     }
