@@ -224,17 +224,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Placeholder to temporary mark the position of raw blocks.
-     *
-     * @param  int|string  $replace
-     * @return string
-     */
-    protected function getRawPlaceholder($replace)
-    {
-        return str_replace('#', $replace, '@__raw_block_#__@');
-    }
-
-    /**
      * Replace the raw placeholders with the original code stored in the raw blocks.
      *
      * @param  string  $result
@@ -249,6 +238,17 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $this->rawBlocks = [];
 
         return $result;
+    }
+
+    /**
+     * Get a placeholder to temporary mark the position of raw blocks.
+     *
+     * @param  int|string  $replace
+     * @return string
+     */
+    protected function getRawPlaceholder($replace)
+    {
+        return str_replace('#', $replace, '@__raw_block_#__@');
     }
 
     /**
