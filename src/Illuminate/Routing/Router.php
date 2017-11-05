@@ -305,7 +305,7 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Register an array of api resource controllers.
+     * Register an array of API resource controllers.
      *
      * @param  array  $resources
      * @return void
@@ -318,7 +318,7 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Route an api resource to a controller.
+     * Route an API resource to a controller.
      *
      * @param  string  $name
      * @param  string  $controller
