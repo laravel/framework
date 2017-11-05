@@ -21,7 +21,7 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $expected = '<?php echo e("Ignore: @php"); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
-    
+
     public function testCombinedShorthandAndClosedPhpStatements()
     {
         $string = '@php($set = true)'
