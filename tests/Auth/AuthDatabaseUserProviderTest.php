@@ -35,6 +35,47 @@ class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase
         $this->assertNull($user);
     }
 
+    public function testRetrieveByTokenReturnsUser()
+    {
+        $mockUser = new \stdClass();
+        $mockUser->remember_token = 'a';
+
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn($mockUser);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertEquals(new Illuminate\Auth\GenericUser((array) $mockUser), $user);
+    }
+
+    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    {
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn(null);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertNull($user);
+    }
+
+    public function testRetrieveByBadTokenReturnsNull()
+    {
+        $mockUser = new \stdClass();
+        $mockUser->remember_token = null;
+        $conn = m::mock('Illuminate\Database\Connection');
+        $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
+        $conn->shouldReceive('find')->once()->with(1)->andReturn($mockUser);
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new Illuminate\Auth\DatabaseUserProvider($conn, $hasher, 'foo');
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertNull($user);
+    }
+
     public function testRetrieveByCredentialsReturnsUserWhenUserIsFound()
     {
         $conn = m::mock('Illuminate\Database\Connection');
