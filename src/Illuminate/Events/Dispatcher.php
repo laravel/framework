@@ -7,6 +7,7 @@ use ReflectionClass;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\ReflectOnEvent;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -381,14 +382,10 @@ class Dispatcher implements DispatcherContract
     {
         list($class, $method) = $this->parseClassCallable($listener);
 
-        if (array_get($payload, 0) instanceof $event) {
-            $constructorParameters = get_object_vars($payload[0]);
-        }
-
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         } else {
-            return [$this->container->makeWith($class, $constructorParameters ?? []), $method];
+            return [$this->instantiateClassHandler($class, $event, $payload), $method];
         }
     }
 
@@ -401,6 +398,38 @@ class Dispatcher implements DispatcherContract
     protected function parseClassCallable($listener)
     {
         return Str::parseCallback($listener, 'handle');
+    }
+
+    /**
+     * @param $class
+     * @param $event
+     * @param $payload
+     * @return mixed
+     */
+    protected function instantiateClassHandler($class, $event, $payload)
+    {
+        if (array_get($payload, 0) instanceof $event && $this->handlerReflectsOnEvent($class)) {
+            $constructorParameters = get_object_vars($payload[0]);
+        }
+
+        return $this->container->makeWith($class, $constructorParameters ?? []);
+    }
+
+    /**
+     * Determine if the listener wants to instantiate with public event properties
+     *
+     * @param $class
+     * @return bool
+     */
+    protected function handlerReflectsOnEvent($class)
+    {
+        try {
+            return (new ReflectionClass($class))->implementsInterface(
+                ReflectOnEvent::class
+            );
+        } catch (Exception $e) {
+            return false;
+        }
     }
 
     /**

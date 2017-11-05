@@ -6,6 +6,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Contracts\Events\ReflectOnEvent;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -283,7 +284,7 @@ class EventWithProperties
     public $foo = 'bar';
 }
 
-class ListenerWithConstructor
+class ListenerWithConstructor implements ReflectOnEvent
 {
     protected $saying;
 
