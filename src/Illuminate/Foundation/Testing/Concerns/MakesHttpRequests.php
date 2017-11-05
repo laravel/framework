@@ -33,6 +33,13 @@ trait MakesHttpRequests
     protected $followRedirects = false;
 
     /**
+     * Http response
+     *
+     * @var \Illuminate\Foundation\Testing\TestResponse|null
+     */
+    protected $response;    
+
+    /**
      * Define additional headers to be sent with the request.
      *
      * @param  array $headers
@@ -330,7 +337,9 @@ trait MakesHttpRequests
 
         $kernel->terminate($request, $response);
 
-        return $this->createTestResponse($response);
+        $this->response = $this->createTestResponse($response);
+
+        return $this->response;
     }
 
     /**
