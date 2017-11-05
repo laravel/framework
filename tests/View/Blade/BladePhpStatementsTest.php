@@ -7,7 +7,7 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
     public function testPhpStatementsWithExpressionAreCompiled()
     {
         $string = '@php($set = true)';
-        $expected = '<?php ($set = true); ?>';
+        $expected = '<?php $set = true; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -28,7 +28,7 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
             ."\n@php"
             ."\n    $string = 'value';"
             ."\n@endphp";
-        $expected = '<?php ($set = true); ?>'
+        $expected = '<?php $set = true; ?>'
             ."\n<?php"
             ."\n    $string = 'value';"
             ."\n?>";
