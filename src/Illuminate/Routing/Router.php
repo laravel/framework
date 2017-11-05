@@ -305,6 +305,19 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register an array of api resource controllers.
+     *
+     * @param  array  $resources
+     * @return void
+     */
+    public function apiResources(array $resources)
+    {
+        foreach ($resources as $name => $controller) {
+            $this->apiResource($name, $controller);
+        }
+    }
+
+    /**
      * Route an api resource to a controller.
      *
      * @param  string  $name
