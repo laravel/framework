@@ -362,10 +362,10 @@ class Dispatcher implements DispatcherContract
     {
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
-                return call_user_func($this->createClassCallable($listener), $event, $payload);
+                return call_user_func($this->createClassCallable($listener, $event, $payload), $event, $payload);
             } else {
                 return call_user_func_array(
-                    $this->createClassCallable($listener), $payload
+                    $this->createClassCallable($listener, $event, $payload), $payload
                 );
             }
         };
@@ -377,14 +377,18 @@ class Dispatcher implements DispatcherContract
      * @param  string  $listener
      * @return callable
      */
-    protected function createClassCallable($listener)
+    protected function createClassCallable($listener, $event, $payload)
     {
         list($class, $method) = $this->parseClassCallable($listener);
+
+        if (array_get($payload, 0) instanceof $event) {
+            $constructorParameters = get_object_vars($payload[0]);
+        }
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
         } else {
-            return [$this->container->make($class), $method];
+            return [$this->container->makeWith($class, $constructorParameters ?? []), $method];
         }
     }
 

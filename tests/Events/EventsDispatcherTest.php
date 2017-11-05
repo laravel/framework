@@ -43,7 +43,7 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlers()
     {
         $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('stdClass'));
+        $container->shouldReceive('makeWith')->once()->with('FooHandler', [])->andReturn($handler = m::mock('stdClass'));
         $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler@onFooEvent');
         $d->fire('foo', ['foo', 'bar']);
@@ -52,7 +52,7 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
         $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('stdClass'));
+        $container->shouldReceive('makeWith')->once()->with('FooHandler', [])->andReturn($handler = m::mock('stdClass'));
         $handler->shouldReceive('handle')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler');
         $d->fire('foo', ['foo', 'bar']);
@@ -196,6 +196,16 @@ class EventsDispatcherTest extends TestCase
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
 
+    public function testEventClassesWorkWithListenerClasses()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen(EventWithProperties::class, ListenerWithConstructor::class);
+        $d->fire(new EventWithProperties);
+
+        $this->assertSame('constructed with bar', $_SERVER['__event.test']);
+    }
+
     public function testInterfacesWork()
     {
         unset($_SERVER['__event.test']);
@@ -263,6 +273,28 @@ class TestDispatcherQueuedHandlerCustomQueue implements \Illuminate\Contracts\Qu
     public function queue($queue, $handler, array $payload)
     {
         $queue->push($handler, $payload);
+    }
+}
+
+class EventWithProperties
+{
+    public $bin = 'baz';
+
+    public $foo = 'bar';
+}
+
+class ListenerWithConstructor
+{
+    protected $saying;
+
+    public function __construct($foo)
+    {
+        $this->saying = $foo;
+    }
+
+    public function handle($event)
+    {
+        $_SERVER['__event.test'] = 'constructed with '.$this->saying;
     }
 }
 

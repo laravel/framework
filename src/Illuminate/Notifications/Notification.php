@@ -6,7 +6,7 @@ use Illuminate\Queue\SerializesModels;
 
 class Notification
 {
-    use SerializesModels;
+    use HandlesEvents, SerializesModels;
 
     /**
      * The unique identifier for the notification.
