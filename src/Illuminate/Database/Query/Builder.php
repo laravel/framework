@@ -1744,6 +1744,10 @@ class Builder
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
+        if ($this->limit > 0) {
+            $total = (int) ceil($this->limit / $perPage);
+            $page = min($page, $total);
+        }
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
@@ -1765,15 +1769,18 @@ class Builder
         // Once we have run the pagination count query, we will get the resulting count and
         // take into account what type of query it was. When there is a group by we will
         // just return the count of the entire results set since that will be correct.
+        $total = 0;
         if (isset($this->groups)) {
-            return count($results);
+            $total = count($results);
         } elseif (! isset($results[0])) {
-            return 0;
+            $total = 0;
         } elseif (is_object($results[0])) {
-            return (int) $results[0]->aggregate;
+            $total = (int) $results[0]->aggregate;
         } else {
-            return (int) array_change_key_case((array) $results[0])['aggregate'];
+            $total = (int) array_change_key_case((array) $results[0])['aggregate'];
         }
+
+        return ($this->limit > 0) ? min($this->limit, $total) : $total;
     }
 
     /**
