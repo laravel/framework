@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
