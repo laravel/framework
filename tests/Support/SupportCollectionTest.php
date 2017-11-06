@@ -1216,6 +1216,63 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['baz'], $cut->all());
     }
 
+    public function testStDevIsZeroWhenNoItems()
+    {
+        $data = new Collection();
+        $this->assertEquals(0.0,$data->stDev());
+    }
+    public function testStDevIsZeroWhenOneItem()
+    {
+        $data = new Collection([7]);
+        $this->assertEquals(0.0,$data->stDev());
+    }
+
+    public function testStDev()
+    {
+        $data = new Collection([5,5,6,6]);
+        $this->assertEquals(0.5, $data->stDev());
+        $this->assertEquals(
+            0.577350,
+            $data->stDev(null,true),
+            'Sample standard dev should be 0.577350',
+            0.000001);
+    }
+
+    public function testStDevWithCallBack()
+    {
+        $data = new Collection([['foo' => 5], ['foo' => 5], ['foo' => 6], ['foo' => 6]]);
+
+        $this->assertEquals(0.5, $data->stDev('foo'));
+        $this->assertEquals(0.577350,
+            $data->stDev('foo', true),
+            'Sample standard dev should be 0.577350',
+            0.000001);
+    }
+
+    public function testStDevWithObject()
+    {
+        $data = new Collection([ (object) ['foo' => 5], (object) ['foo' => 5], (object) ['foo' => 6], (object) ['foo' => 6]]);
+
+        $stDev = $data->stDev(function($i) {
+            return $i->foo;
+        });
+        $this->assertEquals(0.5, $stDev);
+    }
+    public function testStDevWithObjectAsSample()
+    {
+        $data = new Collection([ (object) ['foo' => 5], (object) ['foo' => 5], (object) ['foo' => 6], (object) ['foo' => 6]]);
+
+        $stDev = $data->stDev(function($i) {
+            return $i->foo;
+        },true);
+        $this->assertEquals(
+            0.577350,
+            $stDev,
+            'Sample stDev should be 0.577350',
+            0.000001
+        );
+    }
+
     public function testGetPluckValueWithAccessors()
     {
         $model = new TestAccessorEloquentTestStub(['some' => 'foo']);
