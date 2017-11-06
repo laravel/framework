@@ -566,6 +566,8 @@ class Worker
      */
     public function kill($status = 0)
     {
+        $this->events->dispatch(new Events\WorkerStopping);
+
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
         }
