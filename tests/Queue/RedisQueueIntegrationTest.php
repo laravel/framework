@@ -9,7 +9,7 @@ use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Tests\Redis\InteractsWithRedis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 class RedisQueueIntegrationTest extends TestCase
 {
