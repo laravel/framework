@@ -83,7 +83,7 @@ class Fluent implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
      */
     public function toJson($options = 0)
     {
-        return json_encode($this->jsonSerialize(), $options);
+        return json_encode((object) $this->jsonSerialize(), $options);
     }
 
     /**

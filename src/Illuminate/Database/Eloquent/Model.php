@@ -951,7 +951,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function toJson($options = 0)
     {
-        $json = json_encode($this->jsonSerialize(), $options);
+        $json = json_encode((object) $this->jsonSerialize(), $options);
 
         if (JSON_ERROR_NONE !== json_last_error()) {
             throw JsonEncodingException::forModel($this, json_last_error_msg());

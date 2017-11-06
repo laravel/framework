@@ -189,6 +189,8 @@ class SupportMessageBagTest extends TestCase
     public function testMessageBagReturnsExpectedJson()
     {
         $container = new MessageBag;
+        $this->assertEquals('{}', $container->toJson());
+
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
