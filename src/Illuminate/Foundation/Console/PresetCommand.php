@@ -15,7 +15,7 @@ class PresetCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'preset { type : The preset type (none, bootstrap, vue, react) }';
+    protected $signature = 'preset { type? : The preset type. Omit to show all presets. }';
 
     /**
      * The console command description.
@@ -35,8 +35,10 @@ class PresetCommand extends Command
             return call_user_func(static::$macros[$this->argument('type')], $this);
         }
 
-        if (! in_array($this->argument('type'), ['none', 'bootstrap', 'vue', 'react'])) {
-            throw new InvalidArgumentException('Invalid preset.');
+        $presets = array_merge(['none', 'bootstrap', 'vue', 'react'], array_keys(static::$macros));
+
+        if (! in_array($this->argument('type'), $presets)) {
+            throw new InvalidArgumentException('Invalid preset. Available presets are: '.implode($presets, ', '));
         }
 
         return $this->{$this->argument('type')}();
