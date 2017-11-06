@@ -6,8 +6,8 @@ use Throwable;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Redis\InteractsWithRedis;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 /**
  * @group integration
