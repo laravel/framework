@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Container\Container;
@@ -78,6 +77,36 @@ class GateTest extends TestCase
         });
 
         $this->assertFalse($gate->check('foo'));
+    }
+
+    public function test_basic_closures_gate_calls_method_independently_of_ability_name()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('ability1', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithMixedPermissions@update');
+        $gate->define('ability2', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithMixedPermissions@edit');
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithMixedPermissions::class);
+
+        $this->assertTrue($gate->check('ability1', new AccessGateTestDummy));
+        $this->assertFalse($gate->check('ability2', new AccessGateTestDummy));
+    }
+
+    public function test_custom_resource_gate_calls_method_independently_of_ability_name()
+    {
+        $gate = $this->getBasicGate();
+
+        $abilities = [
+            'ability1' => 'update',
+            'ability2' => 'edit',
+        ];
+
+        $gate->resource('test', AccessGateTestPolicyWithMixedPermissions::class, $abilities);
+
+        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithMixedPermissions::class);
+
+        $this->assertTrue($gate->check('test.ability1', new AccessGateTestDummy));
+        $this->assertFalse($gate->check('test.ability2', new AccessGateTestDummy));
     }
 
     public function test_before_callbacks_dont_interrupt_gate_check_if_no_value_is_returned()
@@ -175,6 +204,8 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicy@update');
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
@@ -183,6 +214,8 @@ class GateTest extends TestCase
     public function test_policy_classes_handle_checks_for_all_subtypes()
     {
         $gate = $this->getBasicGate();
+
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicy@update');
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -193,18 +226,11 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicy@update');
+
         $gate->policy(AccessGateTestDummyInterface::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
-    }
-
-    public function test_policy_converts_dash_to_camel()
-    {
-        $gate = $this->getBasicGate();
-
-        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
-
-        $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
     public function test_policy_default_to_false_if_method_does_not_exist_and_gate_does_not_exist()
@@ -220,6 +246,8 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate(true);
 
+        $gate->define('create', '\Illuminate\Tests\Auth\AccessGateTestPolicy@create');
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('create', [AccessGateTestDummy::class, true]));
@@ -229,20 +257,9 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithBefore@update');
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithBefore::class);
-
-        $this->assertTrue($gate->check('update', new AccessGateTestDummy));
-    }
-
-    public function test_policies_always_override_closures_with_same_name()
-    {
-        $gate = $this->getBasicGate();
-
-        $gate->define('update', function () {
-            $this->fail();
-        });
-
-        $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
@@ -282,6 +299,8 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
+        $gate->define('create', '\Illuminate\Tests\Auth\AccessGateTestPolicy@create');
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
         $gate->authorize('create', new AccessGateTestDummy);
@@ -290,6 +309,8 @@ class GateTest extends TestCase
     public function test_authorize_returns_allowed_response()
     {
         $gate = $this->getBasicGate(true);
+
+        $gate->define('create', '\Illuminate\Tests\Auth\AccessGateTestPolicy@create');
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -304,6 +325,8 @@ class GateTest extends TestCase
     public function test_authorize_returns_an_allowed_response_for_a_truthy_return()
     {
         $gate = $this->getBasicGate();
+
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicy@update');
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);
 
@@ -324,6 +347,9 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithAllPermissions@update');
+        $gate->define('edit', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithAllPermissions@edit');
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllPermissions::class);
 
         $this->assertTrue($gate->any(['edit', 'update'], new AccessGateTestDummy));
@@ -332,6 +358,9 @@ class GateTest extends TestCase
     public function test_any_ability_check_passes_if_at_least_one_passes()
     {
         $gate = $this->getBasicGate();
+
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithMixedPermissions@update');
+        $gate->define('edit', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithMixedPermissions@edit');
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithMixedPermissions::class);
 
@@ -342,6 +371,9 @@ class GateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithNoPermissions@update');
+        $gate->define('edit', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithNoPermissions@edit');
+
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
 
         $this->assertFalse($gate->any(['edit', 'update'], new AccessGateTestDummy));
@@ -350,6 +382,9 @@ class GateTest extends TestCase
     public function test_every_ability_check_passes_if_all_pass()
     {
         $gate = $this->getBasicGate();
+
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithAllPermissions@update');
+        $gate->define('edit', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithAllPermissions@edit');
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithAllPermissions::class);
 
@@ -368,6 +403,9 @@ class GateTest extends TestCase
     public function test_every_ability_check_fails_if_none_pass()
     {
         $gate = $this->getBasicGate();
+
+        $gate->define('update', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithNoPermissions@update');
+        $gate->define('edit', '\Illuminate\Tests\Auth\AccessGateTestPolicyWithNoPermissions@edit');
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicyWithNoPermissions::class);
 
@@ -420,11 +458,6 @@ class AccessGateTestPolicy
     public function update($user, AccessGateTestDummy $dummy)
     {
         return ! $user->isAdmin;
-    }
-
-    public function updateDash($user, AccessGateTestDummy $dummy)
-    {
-        return $user instanceof stdClass;
     }
 }
 

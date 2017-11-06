@@ -320,7 +320,9 @@ class Gate implements GateContract
     {
         $callback = $this->resolveAuthCallback($user, $ability, $arguments);
 
-        return $callback($user, ...$arguments);
+        return is_bool($callback)
+            ? $callback
+            : $callback($user, ...$arguments);
     }
 
     /**
@@ -434,38 +436,34 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
-            return false;
+        // This callback will be responsible for calling the policy's before method and
+        // running this policy method if necessary. This is used to when objects are
+        // mapped to policy objects in the user's configurations or on this class.
+        $result = $this->callPolicyBefore(
+            $policy, $user, $ability, $arguments
+        );
+
+        // When we receive a non-null result from this before method, we will return it
+        // as the "final" results. This will allow developers to override the checks
+        // in this policy to return the result for all rules defined in the class.
+        if (! is_null($result)) {
+            return $result;
         }
 
-        return function () use ($user, $ability, $arguments, $policy) {
-            // This callback will be responsible for calling the policy's before method and
-            // running this policy method if necessary. This is used to when objects are
-            // mapped to policy objects in the user's configurations or on this class.
-            $result = $this->callPolicyBefore(
-                $policy, $user, $ability, $arguments
-            );
+        // If this first argument is a string, that means they are passing a class name
+        // to the policy. We will remove the first argument from this argument array
+        // because this policy already knows what type of models it can authorize.
+        if (isset($arguments[0]) && is_string($arguments[0])) {
+            array_shift($arguments);
+        }
 
-            // When we receive a non-null result from this before method, we will return it
-            // as the "final" results. This will allow developers to override the checks
-            // in this policy to return the result for all rules defined in the class.
-            if (! is_null($result)) {
-                return $result;
-            }
+        $callback = isset($this->abilities[$ability])
+                ? $this->abilities[$ability]
+                : null;
 
-            $ability = $this->formatAbilityToMethod($ability);
-
-            // If this first argument is a string, that means they are passing a class name
-            // to the policy. We will remove the first argument from this argument array
-            // because this policy already knows what type of models it can authorize.
-            if (isset($arguments[0]) && is_string($arguments[0])) {
-                array_shift($arguments);
-            }
-
-            return is_callable([$policy, $ability])
-                        ? $policy->{$ability}($user, ...$arguments)
-                        : false;
-        };
+        return is_callable($callback)
+                ? $callback
+                : false;
     }
 
     /**
@@ -482,17 +480,6 @@ class Gate implements GateContract
         if (method_exists($policy, 'before')) {
             return $policy->before($user, $ability, ...$arguments);
         }
-    }
-
-    /**
-     * Format the policy ability into a method name.
-     *
-     * @param  string  $ability
-     * @return string
-     */
-    protected function formatAbilityToMethod($ability)
-    {
-        return strpos($ability, '-') !== false ? Str::camel($ability) : $ability;
     }
 
     /**
