@@ -2,11 +2,12 @@
 
 namespace Illuminate\Notifications;
 
+use Illuminate\Contracts\Events\ReflectOnEvent;
 use Illuminate\Queue\SerializesModels;
 
-class Notification
+class Notification implements ReflectOnEvent
 {
-    use SerializesModels;
+    use HandlesEvents, SerializesModels;
 
     /**
      * The unique identifier for the notification.
