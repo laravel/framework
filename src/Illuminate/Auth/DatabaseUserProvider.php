@@ -109,6 +109,10 @@ class DatabaseUserProvider implements UserProvider
             }
         }
 
+        if (empty($query->wheres)) {
+            return;
+        }
+
         // Now we are ready to execute the query to see if we have an user matching
         // the given credentials. If not, we will just return nulls and indicate
         // that there are no matching users for these given credential arrays.
