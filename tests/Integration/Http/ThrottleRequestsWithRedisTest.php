@@ -6,8 +6,8 @@ use Throwable;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Tests\Redis\InteractsWithRedis;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 /**
  * @group integration
@@ -20,6 +20,11 @@ class ThrottleRequestsWithRedisTest extends TestCase
     {
         parent::tearDown();
         Carbon::setTestNow(null);
+    }
+
+    public function getEnvironmentSetUp($app)
+    {
+        $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
     public function test_lock_opens_immediately_after_decay()
