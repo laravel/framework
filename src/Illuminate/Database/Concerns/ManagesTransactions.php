@@ -63,7 +63,7 @@ trait ManagesTransactions
         // let the developer handle it in another way. We will decrement too.
         if ($this->causedByDeadlock($e) &&
             $this->transactions > 1) {
-            --$this->transactions;
+            $this->transactions--;
 
             throw $e;
         }
@@ -91,7 +91,7 @@ trait ManagesTransactions
     {
         $this->createTransaction();
 
-        ++$this->transactions;
+        $this->transactions++;
 
         $this->fireConnectionEvent('beganTransaction');
     }
