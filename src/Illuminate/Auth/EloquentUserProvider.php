@@ -116,10 +116,6 @@ class EloquentUserProvider implements UserProvider
             }
         }
 
-        if (empty($query->wheres)) {
-            return;
-        }
-
         return $query->first();
     }
 
