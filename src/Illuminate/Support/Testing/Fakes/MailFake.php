@@ -146,7 +146,7 @@ class MailFake implements Mailer
      *
      * @param  string  $mailable
      * @param  callable|null  $callback
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     public function sent($mailable, $callback = null)
     {
@@ -179,7 +179,7 @@ class MailFake implements Mailer
      *
      * @param  string  $mailable
      * @param  callable|null  $callback
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     public function queued($mailable, $callback = null)
     {
@@ -211,7 +211,7 @@ class MailFake implements Mailer
      * Get all of the mailed mailables for a given type.
      *
      * @param  string  $type
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     protected function mailablesOf($type)
     {
@@ -224,7 +224,7 @@ class MailFake implements Mailer
      * Get all of the mailed mailables for a given type.
      *
      * @param  string  $type
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     protected function queuedMailablesOf($type)
     {

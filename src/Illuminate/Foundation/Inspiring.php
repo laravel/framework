@@ -2,7 +2,7 @@
 
 namespace Illuminate\Foundation;
 
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 
 class Inspiring
 {

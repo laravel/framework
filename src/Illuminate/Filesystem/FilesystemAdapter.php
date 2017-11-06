@@ -8,7 +8,7 @@ use Illuminate\Http\File;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 use League\Flysystem\AdapterInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FilesystemInterface;

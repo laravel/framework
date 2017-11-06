@@ -4,18 +4,18 @@ namespace Illuminate\Pagination;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 use Illuminate\Contracts\Support\Htmlable;
 
 /**
- * @mixin \Illuminate\Support\Collection
+ * @mixin \Illuminate\Collection\Collection
  */
 abstract class AbstractPaginator implements Htmlable
 {
     /**
      * All of the items being paginated.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Collection\Collection
      */
     protected $items;
 
@@ -490,7 +490,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Get the paginator's underlying collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collection\Collection
      */
     public function getCollection()
     {
@@ -500,7 +500,7 @@ abstract class AbstractPaginator implements Htmlable
     /**
      * Set the paginator's underlying collection.
      *
-     * @param  \Illuminate\Support\Collection  $collection
+     * @param  \Illuminate\Collection\Collection  $collection
      * @return $this
      */
     public function setCollection(Collection $collection)

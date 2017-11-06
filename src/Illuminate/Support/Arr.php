@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use InvalidArgumentException;
+use Illuminate\Collection\Collection;
 use Illuminate\Support\Traits\Macroable;
 
 class Arr

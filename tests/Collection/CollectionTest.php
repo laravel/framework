@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Collection;
 
 use stdClass;
 use ArrayAccess;
@@ -8,11 +8,11 @@ use Mockery as m;
 use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
+use Illuminate\Collection\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-class SupportCollectionTest extends TestCase
+class CollectionTest extends TestCase
 {
     public function testFirstReturnsFirstItemInCollection()
     {
