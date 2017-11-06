@@ -17,6 +17,26 @@ class SupportPluralizerTest extends TestCase
         $this->assertEquals('children', Str::plural('child'));
     }
 
+    public function testPlural()
+    {
+        $this->assertEquals('unit', Str::plural('unit', 1));
+
+        $this->assertEquals('units', Str::plural('unit', 0));
+        $this->assertEquals('units', Str::plural('unit', -1));
+
+        $this->assertEquals('units', Str::plural('unit', 0.1));
+        $this->assertEquals('units', Str::plural('unit', 0.9));
+        $this->assertEquals('units', Str::plural('unit', 1.1));
+        $this->assertEquals('units', Str::plural('unit', 1.9));
+        $this->assertEquals('units', Str::plural('unit', 2));
+
+        $this->assertEquals('units', Str::plural('unit', -0.1));
+        $this->assertEquals('units', Str::plural('unit', -0.9));
+        $this->assertEquals('units', Str::plural('unit', -1.1));
+        $this->assertEquals('units', Str::plural('unit', -1.9));
+        $this->assertEquals('units', Str::plural('unit', -2));
+    }
+
     public function testCaseSensitiveSingularUsage()
     {
         $this->assertEquals('Child', Str::singular('Children'));

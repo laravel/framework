@@ -58,12 +58,12 @@ class Pluralizer
      * Get the plural form of an English word.
      *
      * @param  string  $value
-     * @param  int     $count
+     * @param  float|int  $count
      * @return string
      */
     public static function plural($value, $count = 2)
     {
-        if ((int) $count === 1 || static::uncountable($value)) {
+        if ($count == 1 || static::uncountable($value)) {
             return $value;
         }
 
