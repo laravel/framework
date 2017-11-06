@@ -40,7 +40,7 @@ class ArgonHasher implements HasherContract
         $hash = password_hash($value, PASSWORD_ARGON2I, [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
-            'threads' => $this->processors($options)
+            'threads' => $this->processors($options),
         ]);
 
         if ($hash === false) {
@@ -79,7 +79,7 @@ class ArgonHasher implements HasherContract
         return password_needs_rehash($hashedValue, PASSWORD_ARGON2I, [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
-            'threads' => $this->processors($options)
+            'threads' => $this->processors($options),
         ]);
     }
 
