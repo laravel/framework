@@ -1416,7 +1416,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Calculate the standard deviation of the collection.
      *
-     * @param  callable|null  $callback
+     * @param  callable|string|null  $callback
      * @param  bool  $sample
      * @return  float
      */
