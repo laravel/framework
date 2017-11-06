@@ -705,6 +705,12 @@ class Builder
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
+        // Add limit
+        if ($this->toBase()->limit > 0) {
+            $maxPage = (int) ceil($this->toBase()->limit / $perPage);
+            $page = min($page, $maxPage);
+        }
+
         $results = ($total = $this->toBase()->getCountForPagination())
                                     ? $this->forPage($page, $perPage)->get($columns)
                                     : $this->model->newCollection();
@@ -729,6 +735,12 @@ class Builder
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
+
+        // Add limit
+        if ($this->toBase()->limit > 0) {
+            $maxPage = (int) ceil($this->toBase()->limit / $perPage);
+            $page = min($page, $maxPage);
+        }
 
         // Next we will set the limit and offset for this query so that when we get the
         // results we get the proper section of results. Then, we'll create the full
