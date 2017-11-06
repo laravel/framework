@@ -1414,6 +1414,45 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Calculate the standard deviation of the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  bool  $sample
+     * @return  float
+     */
+    public function stDev($callback = null, $sample = false)
+    {
+        $n = $this->count();
+        if ($n === 0 || $n === 1) {
+            return 0.0;
+        }
+        $carry = 0.0;
+
+        if (is_null($callback)) {
+            $mean = $this->avg();
+            foreach ($this->items as $val) {
+                $d = ((float) $val) - $mean;
+                $carry += $d * $d;
+            }
+        }else {
+            $mean = $this->avg($callback);
+            $callback = $this->valueRetriever($callback);
+
+            foreach ($this->items as $key =>$val) {
+                $val = $callback($val);
+                $d = ((float) $val) - $mean;
+                $carry += $d * $d;
+            }
+        }
+        if ($sample) {
+            --$n;
+        }
+
+        return sqrt($carry / $n);
+    }
+
+
+    /**
      * Get the sum of the given values.
      *
      * @param  callable|string|null  $callback
