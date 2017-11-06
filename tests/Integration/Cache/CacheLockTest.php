@@ -6,7 +6,7 @@ use Memcached;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Tests\Redis\InteractsWithRedis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 /**
  * @group integration
