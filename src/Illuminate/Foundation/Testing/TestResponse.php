@@ -278,26 +278,6 @@ class TestResponse
     }
 
     /**
-     * Assert that the response has validation errors for the given keys.
-     *
-     * @param string|array $keys
-     * @return $this
-     */
-    public function assertValidationErrors($keys)
-    {
-        $errors = $this->json()['errors'];
-
-        foreach (array_wrap($keys) as $key) {
-            PHPUnit::assertTrue(
-                isset($errors[$key]),
-                "Failed to find a validation error in the response for key: '{$key}'"
-            );
-        }
-
-        return $this;
-    }
-
-    /**
      * Assert that the response is a superset of the given JSON.
      *
      * @param  array  $data
@@ -308,32 +288,6 @@ class TestResponse
     {
         PHPUnit::assertArraySubset(
             $data, $this->decodeResponseJson(), $strict, $this->assertJsonMessage($data)
-        );
-
-        return $this;
-    }
-
-    /**
-     * Assert that the response json has the expected count.
-     *
-     * @param int $count
-     * @param string|null $key
-     * @return $this
-     */
-    public function assertJsonCount(int $count, $key = null)
-    {
-        if ($key) {
-            PHPUnit::assertCount($count,
-                $this->json()[$key],
-                "Failed to assert that the response count matched the expected {$count}"
-            );
-
-            return $this;
-        }
-
-        PHPUnit::assertCount($count,
-            $this->json(),
-            "Failed to assert that the response count matched the expected {$count}"
         );
 
         return $this;
@@ -492,6 +446,52 @@ class TestResponse
             } else {
                 PHPUnit::assertArrayHasKey($value, $responseData);
             }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response JSON has the expected count of items at the given key.
+     *
+     * @param int $count
+     * @param string|null $key
+     * @return $this
+     */
+    public function assertJsonCount(int $count, $key = null)
+    {
+        if ($key) {
+            PHPUnit::assertCount($count,
+                $this->json()[$key],
+                "Failed to assert that the response count matched the expected {$count}"
+            );
+
+            return $this;
+        }
+
+        PHPUnit::assertCount($count,
+            $this->json(),
+            "Failed to assert that the response count matched the expected {$count}"
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has the given JSON validation errors for the given keys.
+     *
+     * @param string|array $keys
+     * @return $this
+     */
+    public function assertJsonValidationErrors($keys)
+    {
+        $errors = $this->json()['errors'];
+
+        foreach (Arr::wrap($keys) as $key) {
+            PHPUnit::assertTrue(
+                isset($errors[$key]),
+                "Failed to find a validation error in the response for key: '{$key}'"
+            );
         }
 
         return $this;
