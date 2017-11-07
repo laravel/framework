@@ -321,7 +321,7 @@ class BelongsToMany extends Relation
     protected function freshInstanceForSubPivotQuery($query)
     {
         $contraints = static::$constraints;
-        static::$constraints = null;
+        static::$constraints = false;
 
         $instance = new static(
             $query,
