@@ -300,7 +300,7 @@ class BelongsToMany extends Relation
         if ($column instanceof Closure) {
             $query = $this->getModel()->newQueryWithoutScopes();
 
-            $column($this->freshInstanceWithQuery($query));
+            $column($this->freshInstanceForSubPivotQuery($query));
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
 
@@ -318,9 +318,12 @@ class BelongsToMany extends Relation
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return static
      */
-    protected function freshInstanceWithQuery($query)
+    protected function freshInstanceForSubPivotQuery($query)
     {
-        return new static(
+        $contraints = static::$constraints;
+        static::$constraints = null;
+
+        $instance = new static(
             $query,
             $this->parent,
             $this->table,
@@ -330,6 +333,11 @@ class BelongsToMany extends Relation
             $this->relatedKey,
             $this->relationName
         );
+
+        $instance->getBaseQuery()->joins = null;
+
+        static::$constraints = $contraints;
+        return $instance;
     }
 
     /**
