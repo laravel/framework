@@ -373,7 +373,7 @@ class Str
     /**
      * Wraps a string with a given value.
      *
-     * @param  string  $values
+     * @param  string  $value
      * @param  string  $wrap
      * @param  bool    $escape
      * @return string
