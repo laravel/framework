@@ -2063,14 +2063,14 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($collection->median());
     }
 
-    public function testStdDevValueWithArrayCollection()
+    public function testStddevValueWithArrayCollection()
     {
         $collection = new Collection([1, 2, 2, 4]);
 
         $this->assertEquals(1.0897247358851685, $collection->stdDev());
     }
 
-    public function testStdDevValueByKey()
+    public function testStddevValueByKey()
     {
         $collection = new Collection([
             (object) ['foo' => 1],
@@ -2081,7 +2081,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(1.0897247358851685, $collection->stdDev('foo'));
     }
 
-    public function testStdDevOnEmptyCollectionReturnsNull()
+    public function testStddevOnEmptyCollectionReturnsNull()
     {
         $collection = new Collection;
         $this->assertNull($collection->stdDev());
