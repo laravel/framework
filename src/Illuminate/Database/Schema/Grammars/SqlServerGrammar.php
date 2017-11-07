@@ -496,6 +496,12 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
+        if ($column->useCurrent) {
+            return $column->precision
+                ? "datetime2($column->precision) default CURRENT_TIMESTAMP"
+                : 'datetime default CURRENT_TIMESTAMP';
+        }
+
         return $column->precision ? "datetime2($column->precision)" : 'datetime';
     }
 
@@ -507,7 +513,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        if ($column->useCurrent) {
+            return $column->precision
+                ? "datetimeoffset($column->precision) default CURRENT_TIMESTAMP"
+                : 'datetimeoffset default CURRENT_TIMESTAMP';
+        }
+
+        return "datetimeoffset($column->precision)";
     }
 
     /**
@@ -529,7 +541,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -540,13 +552,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetime2($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
@@ -559,13 +565,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetimeoffset($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetimeoffset default CURRENT_TIMESTAMP';
-        }
-
-        return "datetimeoffset($column->precision)";
+        return $this->typeDateTimeTz($column);
     }
 
     /**
