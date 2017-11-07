@@ -553,7 +553,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return 'datetime';
+        return $column->useCurrent ? 'datetime default CURRENT_TIMESTAMP' : 'datetime';
     }
 
     /**
@@ -567,7 +567,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
@@ -589,7 +589,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -600,11 +600,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
@@ -615,11 +611,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return 'datetime';
+        return $this->typeDateTimeTz($column);
     }
 
     /**

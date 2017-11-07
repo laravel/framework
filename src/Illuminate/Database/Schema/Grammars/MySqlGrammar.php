@@ -626,7 +626,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
