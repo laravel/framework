@@ -369,6 +369,20 @@ class Str
 
         return $prefix.preg_replace('/^(?:'.$quoted.')+/u', '', $value);
     }
+    
+    /**
+     * Wraps a string with a given value.
+     *
+     * @param  string  $value
+     * @param  string  $wrap
+     * @param  bool    $escape
+     * @return string
+     */
+    public static function wrap($value, $wrap, $escape)
+    {
+        $value = $escape ? addslashes($value) : $value;
+        return $wrap.$value.$wrap;
+    }
 
     /**
      * Convert the given string to upper-case.

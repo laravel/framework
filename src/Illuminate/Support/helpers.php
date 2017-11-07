@@ -1005,6 +1005,21 @@ if (! function_exists('str_start')) {
     }
 }
 
+if (! function_exists('str_wrap')) {
+    /**
+     * Wrap a string with a given value.
+     *
+     * @param  string  $value
+     * @param  string  $wrap
+     * @param  bool    $escape
+     * @return string
+     */
+    function str_wrap($value, $wrap = '"', $escape = false)
+    {
+        return Str::wrap($value, $wrap, $escape);
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
