@@ -105,6 +105,8 @@
         }
     },
     "suggest": {
+        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.5).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
