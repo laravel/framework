@@ -337,6 +337,7 @@ class BelongsToMany extends Relation
         $instance->getBaseQuery()->joins = null;
 
         static::$constraints = $contraints;
+
         return $instance;
     }
 
