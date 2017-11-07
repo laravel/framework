@@ -1,17 +1,25 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.20 (2017-11-07)
 
 ### Added
 - Added `TestResponse::assertJsonMissingExact()` ([#21881](https://github.com/laravel/framework/pull/21881))
+- Added `assertValidationErrors()` and `assertJsonCount()` to `TestResponse` ([#21917](https://github.com/laravel/framework/pull/21917))
 - Added `allOnQueue()` and `allOnConnection()` for job chaining ([#21765](https://github.com/laravel/framework/pull/21765))
 - Support variadic arguments on fluent `Route::middleware()` ([#21930](https://github.com/laravel/framework/pull/21930))
 - Added precision to `Blueprint::time()` ([#21936](https://github.com/laravel/framework/pull/21936))
+- Added `Router::apiResources()` method ([#21956](https://github.com/laravel/framework/pull/21956))
+- Support graceful handling of `SIGTERM` in queue workers ([#21964](https://github.com/laravel/framework/pull/21964))
 
 ### Changed
 - Added "kin" as an uncountable word ([#21843](https://github.com/laravel/framework/pull/21843))
 - Improved geo spatial support ([#21919](https://github.com/laravel/framework/pull/21919))
 - Include job name in the `MaxAttemptsExcededException` ([#21941](https://github.com/laravel/framework/pull/21941), [#21943](https://github.com/laravel/framework/pull/21943))
+- Support rendering multiple `@verbatim` and `@php` blocks ([#21900](https://github.com/laravel/framework/pull/21900))
+- Moved `InteractsWithRedis` to `Illuminate\Foundation\Testing` ([#21967](https://github.com/laravel/framework/pull/21967))
+- Don't bind macro when it is not a `Closure` ([#21980](https://github.com/laravel/framework/pull/21980))
+- Check for `before()` method on policies classes ([#21989](https://github.com/laravel/framework/pull/21989))
+- Detect lost pgbouncer connections ([#21988](https://github.com/laravel/framework/pull/21988))
 
 ### Fixed
 - Fixed `BroadcastController` namespace issue ([#21844](https://github.com/laravel/framework/pull/21844))
