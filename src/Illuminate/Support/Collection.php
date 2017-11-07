@@ -166,6 +166,42 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the standard deviation of a given key.
+     *
+     * @param  null $key
+     * @return mixed
+     */
+    public function stddev($key = null)
+    {
+        $count = $this->count();
+
+        if ($count == 0) {
+            return;
+        }
+
+        $values = (isset($key) ? $this->pluck($key) : $this)
+            ->values();
+
+        $mean = $values->average();
+        $deviations = $values->map(function($value) use ($mean) {
+            return pow($value - $mean, 2);
+        });
+
+        return sqrt($deviations->sum() / $count);
+    }
+
+    /**
+     * Alias for the "stddev" method.
+     *
+     * @param  null $key
+     * @return mixed
+     */
+    public function standardDeviation($key = null)
+    {
+        $this->stddev($key);
+    }
+
+    /**
      * Get the mode of a given key.
      *
      * @param  mixed  $key
