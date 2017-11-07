@@ -1011,11 +1011,12 @@ if (! function_exists('str_wrap')) {
      *
      * @param  string  $value
      * @param  string  $wrap
+     * @param  bool    $escape
      * @return string
      */
-    function str_wrap($value, $wrap = '"')
+    function str_wrap($value, $wrap = '"', $escape = false)
     {
-        return Str::wrap($value, $wrap);
+        return Str::wrap($value, $wrap, $escape);
     }
 }
 
