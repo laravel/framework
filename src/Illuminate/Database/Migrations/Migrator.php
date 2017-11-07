@@ -5,11 +5,19 @@ namespace Illuminate\Database\Migrations;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
 {
+    /**
+     * The IoC container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
     /**
      * The migration repository implementation.
      *
@@ -60,12 +68,11 @@ class Migrator
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @return void
      */
-    public function __construct(MigrationRepositoryInterface $repository,
-                                Resolver $resolver,
-                                Filesystem $files)
+    public function __construct(MigrationRepositoryInterface $repository, Resolver $resolver, Filesystem $files, Container $container)
     {
         $this->files = $files;
         $this->resolver = $resolver;
+        $this->container = $container;
         $this->repository = $repository;
     }
 
@@ -414,7 +421,7 @@ class Migrator
     {
         $class = Str::studly(implode('_', array_slice(explode('_', $file), 4)));
 
-        return new $class;
+        return $this->container->make($class);
     }
 
     /**
