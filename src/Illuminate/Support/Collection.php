@@ -198,7 +198,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function standardDeviation($key = null)
     {
-        $this->stddev($key);
+        return $this->stddev($key);
     }
 
     /**
