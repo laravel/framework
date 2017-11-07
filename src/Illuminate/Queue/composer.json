@@ -35,6 +35,8 @@
         }
     },
     "suggest": {
+        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver (~3.0).",
         "illuminate/redis": "Required to use the Redis queue driver (5.5.*).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (~3.0)."
