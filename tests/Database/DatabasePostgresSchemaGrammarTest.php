@@ -426,16 +426,6 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar(255) check ("foo" in (\'bar\', \'baz\')) not null', $statements[0]);
     }
 
-    public function testAddingDate()
-    {
-        $blueprint = new Blueprint('users');
-        $blueprint->date('foo');
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
-        $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" date not null', $statements[0]);
-    }
-
     public function testAddingJson()
     {
         $blueprint = new Blueprint('users');
@@ -456,84 +446,164 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" jsonb not null', $statements[0]);
     }
 
-    public function testAddingDateTime()
+    public function testAddingDate()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dateTime('foo');
+        $blueprint->date('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" date not null', $statements[0]);
+    }
+
+    public function testAddingDateTime()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('created_at');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(1) without time zone not null', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dateTimeTz('foo');
+        $blueprint->dateTimeTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTimeTz('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(1) with time zone not null', $statements[0]);
     }
 
     public function testAddingTime()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->time('foo');
+        $blueprint->time('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" time(0) without time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" time(0) without time zone not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->time('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" time(1) without time zone not null', $statements[0]);
     }
 
     public function testAddingTimeTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timeTz('foo');
+        $blueprint->timeTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" time(0) with time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" time(0) with time zone not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timeTz('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" time(1) with time zone not null', $statements[0]);
     }
 
-    public function testAddingTimeStamp()
+    public function testAddingTimestamp()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo');
+        $blueprint->timestamp('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" timestamp(0) without time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(1) without time zone not null', $statements[0]);
     }
 
-    public function testAddingTimeStampTz()
+    public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo');
+        $blueprint->timestampTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" timestamp(0) with time zone not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(1) with time zone not null', $statements[0]);
     }
 
-    public function testAddingTimeStamps()
+    public function testAddingTimestamps()
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) without time zone null, add column "updated_at" timestamp(0) without time zone null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(1) without time zone null, add column "updated_at" timestamp(1) without time zone null', $statements[0]);
     }
 
-    public function testAddingTimeStampsTz()
+    public function testAddingTimestampsTz()
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" timestamp(1) with time zone null, add column "updated_at" timestamp(1) with time zone null', $statements[0]);
+    }
+
+    public function testAddingSoftDeletes()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletes();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "deleted_at" timestamp(0) without time zone null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletes('deleted_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "deleted_at" timestamp(1) without time zone null', $statements[0]);
+    }
+
+    public function testAddingSoftDeletesTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletesTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "deleted_at" timestamp(0) with time zone null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletesTz(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "deleted_at" timestamp(1) with time zone null', $statements[0]);
     }
 
     public function testAddingBinary()
