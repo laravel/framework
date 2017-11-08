@@ -5,8 +5,8 @@ namespace Illuminate\Database\Migrations;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
-use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -14,7 +14,7 @@ class Migrator
     /**
      * The IoC container instance.
      *
-     * @var \Illuminate\Container\Container
+     * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
 
@@ -66,7 +66,7 @@ class Migrator
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
      * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
      * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container  $container
      * @return void
      */
     public function __construct(
