@@ -533,6 +533,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_DATE');
+
         return 'date';
     }
 
@@ -566,6 +568,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIME');
+
         return "time($column->precision) without time zone";
     }
 
@@ -577,6 +581,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIME');
+
         return "time($column->precision) with time zone";
     }
 
@@ -588,9 +594,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $type = "timestamp($column->precision) without time zone";
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return "timestamp($column->precision) without time zone";
     }
 
     /**
@@ -601,9 +607,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $type = "timestamp($column->precision) with time zone";
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return "timestamp($column->precision) with time zone";
     }
 
     /**

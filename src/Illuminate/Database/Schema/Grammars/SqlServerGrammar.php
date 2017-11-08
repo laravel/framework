@@ -485,6 +485,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
         return 'date';
     }
 
@@ -496,9 +498,9 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        $type = $column->precision ? "datetime2($column->precision)" : 'datetime';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return $column->precision ? "datetime2($column->precision)" : 'datetime';
     }
 
     /**
@@ -509,9 +511,9 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        $type = "datetimeoffset($column->precision)";
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return "datetimeoffset($column->precision)";
     }
 
     /**
@@ -522,6 +524,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
         return "time($column->precision)";
     }
 

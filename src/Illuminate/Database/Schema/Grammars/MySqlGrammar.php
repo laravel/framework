@@ -593,6 +593,8 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
         return $column->precision ? "datetime($column->precision)" : 'datetime';
     }
 
@@ -637,9 +639,9 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $type = $column->precision ? "timestamp($column->precision)" : 'timestamp';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return $column->precision ? "timestamp($column->precision)" : 'timestamp';
     }
 
     /**

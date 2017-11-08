@@ -542,6 +542,8 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_DATE');
+
         return 'date';
     }
 
@@ -553,7 +555,9 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return $column->useCurrent ? 'datetime default CURRENT_TIMESTAMP' : 'datetime';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
+        return 'datetime';
     }
 
     /**
@@ -578,6 +582,8 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIME');
+
         return 'time';
     }
 
