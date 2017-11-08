@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use RuntimeException;
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 
 class PostgresGrammar extends Grammar
@@ -533,6 +534,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'date';
     }
 
@@ -544,18 +547,18 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return "timestamp($column->precision) without time zone";
+        return $this->typeTimestamp($column);
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return "timestamp($column->precision) with time zone";
+        return $this->typeTimestampTz($column);
     }
 
     /**
@@ -566,18 +569,22 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time(0) without time zone';
+        $this->parseTemporalType($column);
+
+        return sprintf('time(%d) without time zone', $column->precision ?: 0);
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time(0) with time zone';
+        $this->parseTemporalType($column);
+
+        return sprintf('time(%d) with time zone', $column->precision ?: 0);
     }
 
     /**
@@ -588,26 +595,22 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) without time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $this->parseTemporalType($column);
 
-        return "timestamp($column->precision) without time zone";
+        return sprintf('timestamp(%d) without time zone', $column->precision ?: 0);
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) with time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $this->parseTemporalType($column);
 
-        return "timestamp($column->precision) with time zone";
+        return sprintf('timestamp(%d) with time zone', $column->precision ?: 0);
     }
 
     /**
@@ -751,6 +754,35 @@ class PostgresGrammar extends Grammar
     private function formatPostGisType(string $type)
     {
         return "geography($type, 4326)";
+    }
+
+    /**
+     * Parse the default value for a temporal column type.
+     *
+     * @see  https://www.postgresql.org/docs/10/static/functions-datetime.html#functions-datetime-current
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     */
+    protected function parseTemporalType(Fluent &$column)
+    {
+        if ($column->useCurrent) {
+            switch ($column->type) {
+                case 'date':
+                    $column->default = new Expression('CURRENT_DATE');
+                    break;
+                case 'time':
+                case 'timeTz':
+                    $column->default = new Expression('CURRENT_TIME');
+                    break;
+                case 'dateTime':
+                case 'dateTimeTz':
+                case 'timestamp':
+                case 'timestampTz':
+                    $column->default = new Expression('CURRENT_TIMESTAMP');
+                    break;
+            }
+        }
     }
 
     /**

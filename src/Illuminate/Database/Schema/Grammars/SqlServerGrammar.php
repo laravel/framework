@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 
 class SqlServerGrammar extends Grammar
@@ -485,6 +486,8 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'date';
     }
 
@@ -496,18 +499,22 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        $this->parseTemporalType($column);
+
+        return sprintf('datetime2(%d)', $column->precision ?: 0);
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        $this->parseTemporalType($column);
+
+        return sprintf('datetimeoffset(%d)', $column->precision ?: 0);
     }
 
     /**
@@ -518,18 +525,20 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time';
+        $this->parseTemporalType($column);
+
+        return sprintf('time(%d)', $column->precision ?: 0);
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -540,32 +549,18 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetime2($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
-     * Create the column definition for a timestamp type.
-     *
-     * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetimeoffset($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetimeoffset default CURRENT_TIMESTAMP';
-        }
-
-        return "datetimeoffset($column->precision)";
+        return $this->typeDateTimeTz($column);
     }
 
     /**
@@ -698,6 +693,31 @@ class SqlServerGrammar extends Grammar
     public function typeMultiPolygon(Fluent $column)
     {
         return 'geography';
+    }
+
+    /**
+     * Parse the default value for a temporal column type.
+     *
+     * @see  https://docs.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql#default-definitions
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     */
+    protected function parseTemporalType(Fluent &$column)
+    {
+        if ($column->useCurrent) {
+            switch ($column->type) {
+                case 'date':
+                case 'time':
+                case 'timeTz':
+                case 'dateTime':
+                case 'dateTimeTz':
+                case 'timestamp':
+                case 'timestampTz':
+                    $column->default = new Expression('CURRENT_TIMESTAMP');
+                    break;
+            }
+        }
     }
 
     /**

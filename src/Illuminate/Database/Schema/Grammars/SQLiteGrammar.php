@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use RuntimeException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 
 class SQLiteGrammar extends Grammar
@@ -542,84 +543,91 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'date';
     }
 
     /**
      * Create the column definition for a date-time type.
      *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see  https://www.sqlite.org/datatype3.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTime(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'datetime';
     }
 
     /**
-     * Create the column definition for a date-time type.
-     *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
      * Create the column definition for a time type.
+     *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see  https://www.sqlite.org/datatype3.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTime(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'time';
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
      * Create the column definition for a timestamp type.
+     *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see  https://www.sqlite.org/datatype3.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return 'datetime';
+        return $this->typeDateTimeTz($column);
     }
 
     /**
@@ -752,6 +760,35 @@ class SQLiteGrammar extends Grammar
     public function typeMultiPolygon(Fluent $column)
     {
         return 'multipolygon';
+    }
+
+    /**
+     * Parse the default value for a temporal column type.
+     *
+     * @see  https://www.sqlite.org/lang_createtable.html#tablecoldef
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     */
+    protected function parseTemporalType(Fluent &$column)
+    {
+        if ($column->useCurrent) {
+            switch ($column->type) {
+                case 'date':
+                    $column->default = new Expression('CURRENT_DATE');
+                    break;
+                case 'time':
+                case 'timeTz':
+                    $column->default = new Expression('CURRENT_TIME');
+                    break;
+                case 'dateTime':
+                case 'dateTimeTz':
+                case 'timestamp':
+                case 'timestampTz':
+                    $column->default = new Expression('CURRENT_TIMESTAMP');
+                    break;
+            }
+        }
     }
 
     /**
