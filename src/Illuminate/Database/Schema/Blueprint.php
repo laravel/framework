@@ -784,7 +784,7 @@ class Blueprint
     }
 
     /**
-     * Create a new date-time column (with time zone) on the table.
+     * Create a new date-time (with time zone) column on the table.
      *
      * @param  string  $column
      * @param  int  $precision
@@ -808,7 +808,7 @@ class Blueprint
     }
 
     /**
-     * Create a new time column (with time zone) on the table.
+     * Create a new time (with time zone) column on the table.
      *
      * @param  string  $column
      * @param  int  $precision
@@ -844,7 +844,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add nullable creation and update timestamps columns to the table.
      *
      * @param  int  $precision
      * @return void
@@ -857,7 +857,7 @@ class Blueprint
     }
 
     /**
-     * Add nullable creation and update timestamps to the table.
+     * Add nullable creation and update timestamps columns to the table.
      *
      * Alias for self::timestamps().
      *
@@ -870,7 +870,7 @@ class Blueprint
     }
 
     /**
-     * Add creation and update timestampTz columns to the table.
+     * Add nullable creation and update timestamps (with time zone) columns to the table.
      *
      * @param  int  $precision
      * @return void
@@ -883,7 +883,7 @@ class Blueprint
     }
 
     /**
-     * Add a "deleted at" timestamp for the table.
+     * Add a nullable deletion timestamp column to the table.
      *
      * @param  string  $column
      * @param  int  $precision
@@ -895,7 +895,7 @@ class Blueprint
     }
 
     /**
-     * Add a "deleted at" timestampTz for the table.
+     * Add a nullable deletion timestamp (with time zone) column to the table.
      *
      * @param  int  $precision
      * @return \Illuminate\Support\Fluent

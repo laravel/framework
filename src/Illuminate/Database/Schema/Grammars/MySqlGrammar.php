@@ -577,6 +577,8 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
+     * @see https://dev.mysql.com/doc/refman/5.7/en/datetime.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -587,6 +589,8 @@ class MySqlGrammar extends Grammar
 
     /**
      * Create the column definition for a date-time type.
+     *
+     * @see https://dev.mysql.com/doc/refman/5.7/en/datetime.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -599,7 +603,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -612,6 +616,8 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a time type.
      *
+     * @see https://dev.mysql.com/doc/refman/5.7/en/time.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -621,7 +627,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -634,6 +640,8 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a timestamp type.
      *
+     * @see https://dev.mysql.com/doc/refman/5.7/en/datetime.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -645,7 +653,7 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
