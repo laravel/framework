@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use RuntimeException;
 use Illuminate\Support\Fluent;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 
 class PostgresGrammar extends Grammar
@@ -533,6 +534,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'date';
     }
 
@@ -566,6 +569,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return sprintf('time(%d) without time zone', $column->precision ?: 0);
     }
 
@@ -577,6 +582,8 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return sprintf('time(%d) with time zone', $column->precision ?: 0);
     }
 
@@ -588,9 +595,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $type = sprintf('timestamp(%d) without time zone', $column->precision ?: 0);
+        $this->parseTemporalType($column);
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return sprintf('timestamp(%d) without time zone', $column->precision ?: 0);
     }
 
     /**
@@ -601,9 +608,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $type = sprintf('timestamp(%d) with time zone', $column->precision ?: 0);
+        $this->parseTemporalType($column);
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return sprintf('timestamp(%d) with time zone', $column->precision ?: 0);
     }
 
     /**
@@ -747,6 +754,33 @@ class PostgresGrammar extends Grammar
     private function formatPostGisType(string $type)
     {
         return "geography($type, 4326)";
+    }
+
+    /**
+     * Parse the default value for a temporal column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     */
+    protected function parseTemporalType(Fluent &$column)
+    {
+        if ($column->useCurrent) {
+            switch ($column->type) {
+                case 'date':
+                    $column->default = new Expression('CURRENT_DATE');
+                    break;
+                case 'time':
+                case 'timeTz':
+                    $column->default = new Expression('CURRENT_TIME');
+                    break;
+                case 'dateTime':
+                case 'dateTimeTz':
+                case 'timestamp':
+                case 'timestampTz':
+                    $column->default = new Expression('CURRENT_TIMESTAMP');
+                    break;
+            }
+        }
     }
 
     /**

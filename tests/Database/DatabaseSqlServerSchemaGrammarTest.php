@@ -469,6 +469,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" date not null', $statements[0]);
     }
 
+    public function testAddingDateWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->date('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" date not null default CURRENT_TIMESTAMP', $statements[0]);
+    }
+
     public function testAddingDateTime()
     {
         $blueprint = new Blueprint('users');
@@ -482,6 +491,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add "created_at" datetime2(1) not null', $statements[0]);
+    }
+
+    public function testAddingDateTimeWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" datetime2(0) not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
@@ -499,6 +517,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetimeoffset(1) not null', $statements[0]);
     }
 
+    public function testAddingDateTimeTzWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTimeTz('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null default CURRENT_TIMESTAMP', $statements[0]);
+    }
+
     public function testAddingTime()
     {
         $blueprint = new Blueprint('users');
@@ -512,6 +539,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add "created_at" time(1) not null', $statements[0]);
+    }
+
+    public function testAddingTimeWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->time('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" time(0) not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingTimeTz()
@@ -529,6 +565,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" time(1) not null', $statements[0]);
     }
 
+    public function testAddingTimeTzWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timeTz('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" time(0) not null default CURRENT_TIMESTAMP', $statements[0]);
+    }
+
     public function testAddingTimestamp()
     {
         $blueprint = new Blueprint('users');
@@ -544,6 +589,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetime2(1) not null', $statements[0]);
     }
 
+    public function testAddingTimestampWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" datetime2(0) not null default CURRENT_TIMESTAMP', $statements[0]);
+    }
+
     public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
@@ -557,6 +611,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add "created_at" datetimeoffset(1) not null', $statements[0]);
+    }
+
+    public function testAddingTimestampTzWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingTimestamps()

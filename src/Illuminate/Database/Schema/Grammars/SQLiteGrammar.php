@@ -5,6 +5,7 @@ namespace Illuminate\Database\Schema\Grammars;
 use RuntimeException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 
 class SQLiteGrammar extends Grammar
@@ -542,6 +543,8 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'date';
     }
 
@@ -553,7 +556,9 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return $column->useCurrent ? 'datetime default CURRENT_TIMESTAMP' : 'datetime';
+        $this->parseTemporalType($column);
+
+        return 'datetime';
     }
 
     /**
@@ -578,6 +583,8 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'time';
     }
 
@@ -744,6 +751,33 @@ class SQLiteGrammar extends Grammar
     public function typeMultiPolygon(Fluent $column)
     {
         return 'multipolygon';
+    }
+
+    /**
+     * Parse the default value for a temporal column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     */
+    protected function parseTemporalType(Fluent &$column)
+    {
+        if ($column->useCurrent) {
+            switch ($column->type) {
+                case 'date':
+                    $column->default = new Expression('CURRENT_DATE');
+                    break;
+                case 'time':
+                case 'timeTz':
+                    $column->default = new Expression('CURRENT_TIME');
+                    break;
+                case 'dateTime':
+                case 'dateTimeTz':
+                case 'timestamp':
+                case 'timestampTz':
+                    $column->default = new Expression('CURRENT_TIMESTAMP');
+                    break;
+            }
+        }
     }
 
     /**

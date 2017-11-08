@@ -403,6 +403,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" date not null', $statements[0]);
     }
 
+    public function testAddingDateWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->date('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" date not null default CURRENT_DATE', $statements[0]);
+    }
+
     public function testAddingDateTime()
     {
         $blueprint = new Blueprint('users');
@@ -416,6 +425,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
+    }
+
+    public function testAddingDateTimeWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" datetime not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
@@ -433,6 +451,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
+    public function testAddingDateTimeTzWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTimeTz('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" datetime not null default CURRENT_TIMESTAMP', $statements[0]);
+    }
+
     public function testAddingTime()
     {
         $blueprint = new Blueprint('users');
@@ -446,6 +473,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" time not null', $statements[0]);
+    }
+
+    public function testAddingTimeWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->time('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" time not null default CURRENT_TIME', $statements[0]);
     }
 
     public function testAddingTimeTz()
@@ -463,6 +499,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" time not null', $statements[0]);
     }
 
+    public function testAddingTimeTzWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timeTz('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" time not null default CURRENT_TIME', $statements[0]);
+    }
+
     public function testAddingTimestamp()
     {
         $blueprint = new Blueprint('users');
@@ -478,6 +523,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
+    public function testAddingTimestampWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" datetime not null default CURRENT_TIMESTAMP', $statements[0]);
+    }
+
     public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
@@ -491,6 +545,15 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
+    }
+
+    public function testAddingTimestampTzWithCurrentAsDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('created_at')->useCurrent();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "created_at" datetime not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingTimestamps()

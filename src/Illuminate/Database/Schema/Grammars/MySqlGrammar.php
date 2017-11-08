@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
+use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Schema\Blueprint;
 
 class MySqlGrammar extends Grammar
@@ -582,6 +583,8 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDate(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return 'date';
     }
 
@@ -593,6 +596,8 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return $column->precision ? "datetime($column->precision)" : 'datetime';
     }
 
@@ -615,6 +620,8 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
+        $this->parseTemporalType($column);
+
         return $column->precision ? "time($column->precision)" : 'time';
     }
 
@@ -637,9 +644,9 @@ class MySqlGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $type = $column->precision ? "timestamp($column->precision)" : 'timestamp';
+        $this->parseTemporalType($column);
 
-        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
+        return $column->precision ? "timestamp($column->precision)" : 'timestamp';
     }
 
     /**
@@ -783,6 +790,26 @@ class MySqlGrammar extends Grammar
     public function typeMultiPolygon(Fluent $column)
     {
         return 'multipolygon';
+    }
+
+    /**
+     * Parse the default value for a temporal column type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return void
+     */
+    protected function parseTemporalType(Fluent &$column)
+    {
+        if ($column->useCurrent) {
+            switch ($column->type) {
+                case 'dateTime':
+                case 'dateTimeTz':
+                case 'timestamp':
+                case 'timestampTz':
+                    $column->default = new Expression('CURRENT_TIMESTAMP');
+                    break;
+            }
+        }
     }
 
     /**
