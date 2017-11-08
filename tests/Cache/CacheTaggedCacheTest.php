@@ -88,7 +88,7 @@ class CacheTaggedCacheTest extends TestCase
         $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
-        $store->shouldReceive('push')->with(sha1('foo|bar').':key1', 'key1:value');
+        $store->shouldReceive('put')->with(sha1('foo|bar').':key1', 'key1:value', $redis->getDefaultCacheTime());
 
         $redis->put('key1', 'key1:value');
     }
