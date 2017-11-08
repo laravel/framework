@@ -2,11 +2,11 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Foundation\Http\FormRequest;
-use Symfony\Component\HttpFoundation\Request;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
 class FormRequestServiceProvider extends ServiceProvider
 {
@@ -42,7 +42,7 @@ class FormRequestServiceProvider extends ServiceProvider
      * Initialize the form request with data from the given request.
      *
      * @param  \Illuminate\Foundation\Http\FormRequest  $form
-     * @param  \Symfony\Component\HttpFoundation\Request  $current
+     * @param  \Illuminate\Http\Request  $current
      * @return void
      */
     protected function initializeRequest(FormRequest $form, Request $current)
@@ -65,5 +65,7 @@ class FormRequestServiceProvider extends ServiceProvider
         $form->setUserResolver($current->getUserResolver());
 
         $form->setRouteResolver($current->getRouteResolver());
+
+        $form->setOrigin($current);
     }
 }

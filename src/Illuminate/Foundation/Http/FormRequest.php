@@ -2,15 +2,15 @@
 
 namespace Illuminate\Foundation\Http;
 
+use Illuminate\Auth\Access\AuthorizationException;
+use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Contracts\Validation\ValidatesWhenResolved;
+use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
-use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Validation\Validator;
-use Illuminate\Validation\ValidationException;
-use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Validation\ValidatesWhenResolvedTrait;
-use Illuminate\Contracts\Validation\ValidatesWhenResolved;
-use Illuminate\Contracts\Validation\Factory as ValidationFactory;
+use Illuminate\Validation\ValidationException;
 
 class FormRequest extends Request implements ValidatesWhenResolved
 {
@@ -29,6 +29,13 @@ class FormRequest extends Request implements ValidatesWhenResolved
      * @var \Illuminate\Routing\Redirector
      */
     protected $redirector;
+
+    /**
+     * The origin request instance.
+     *
+     * @var \Illuminate\Http\Request
+     */
+    protected $origin;
 
     /**
      * The URI to redirect to if validation fails.
@@ -197,6 +204,29 @@ class FormRequest extends Request implements ValidatesWhenResolved
     public function attributes()
     {
         return [];
+    }
+
+    /**
+     * Get the origin request instance.
+     *
+     * @return \Illuminate\Http\Request
+     */
+    public function getOrigin()
+    {
+        return $this->origin;
+    }
+
+    /**
+     * Set the origin request instance.
+     *
+     * @param  \Illuminate\Http\Request $request
+     * @return $this
+     */
+    public function setOrigin(Request $request)
+    {
+        $this->origin = $request;
+
+        return $this;
     }
 
     /**
