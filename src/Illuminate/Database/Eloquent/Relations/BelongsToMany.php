@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -288,7 +289,7 @@ class BelongsToMany extends Relation
     /**
      * Set a where clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string  $column|\Closure
      * @param  string  $operator
      * @param  mixed   $value
      * @param  string  $boolean
@@ -296,9 +297,48 @@ class BelongsToMany extends Relation
      */
     public function wherePivot($column, $operator = null, $value = null, $boolean = 'and')
     {
+        if ($column instanceof Closure) {
+            $query = $this->getModel()->newQueryWithoutScopes();
+
+            $column($this->freshInstanceForSubPivotQuery($query));
+
+            $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
+
+            return $this;
+        }
+
         $this->pivotWheres[] = func_get_args();
 
         return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Create a fresh instance with query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return static
+     */
+    protected function freshInstanceForSubPivotQuery($query)
+    {
+        $contraints = static::$constraints;
+        static::$constraints = false;
+
+        $instance = new static(
+            $query,
+            $this->parent,
+            $this->table,
+            $this->foreignPivotKey,
+            $this->relatedPivotKey,
+            $this->parentKey,
+            $this->relatedKey,
+            $this->relationName
+        );
+
+        $instance->getBaseQuery()->joins = null;
+
+        static::$constraints = $contraints;
+
+        return $instance;
     }
 
     /**

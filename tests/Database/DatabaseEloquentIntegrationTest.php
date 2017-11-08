@@ -1085,6 +1085,18 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('Jule Doe', $johnWithFriends->friends->find(4)->pivot->friend->name);
     }
 
+    public function testWherePivotWithClosureOnBelongsToManyPrefixesPivotTable()
+    {
+        $expected = (new EloquentTestUser)->roles()->where(function ($query) {
+            $query->where('eloquent_test_user_role.pivot_table_column', 'Illuminate');
+        });
+        $result = (new EloquentTestUser)->roles()->wherePivot(function ($query) {
+            $query->wherePivot('pivot_table_column', 'Illuminate');
+        });
+
+        $this->assertEquals($expected, $result);
+    }
+
     public function testIsAfterRetrievingTheSameModel()
     {
         $saved = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1208,6 +1220,16 @@ class EloquentTestUser extends Eloquent
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
     }
+
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class);
+    }
+}
+
+class Role extends Eloquent
+{
+    //
 }
 
 class EloquentTestUserWithCustomFriendPivot extends EloquentTestUser
