@@ -75,7 +75,7 @@
         "doctrine/dbal": "~2.5",
         "filp/whoops": "^2.1.4",
         "mockery/mockery": "~1.0",
-        "orchestra/testbench-core": "3.5.*",
+        "orchestra/testbench-core": "3.6.*",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~6.0",
         "predis/predis": "^1.1.1",
@@ -105,6 +105,8 @@
         }
     },
     "suggest": {
+        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.5).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
