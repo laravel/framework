@@ -300,7 +300,7 @@ class BelongsToMany extends Relation
         if ($column instanceof Closure) {
             $query = $this->getModel()->newQueryWithoutScopes();
 
-            $column($this->freshInstanceForSubPivotQuery($query));
+            call_user_func($column, $this->freshInstanceForSubPivotQuery($query));
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
 
@@ -320,25 +320,18 @@ class BelongsToMany extends Relation
      */
     protected function freshInstanceForSubPivotQuery($query)
     {
-        $contraints = static::$constraints;
-        static::$constraints = false;
-
-        $instance = new static(
-            $query,
-            $this->parent,
-            $this->table,
-            $this->foreignPivotKey,
-            $this->relatedPivotKey,
-            $this->parentKey,
-            $this->relatedKey,
-            $this->relationName
-        );
-
-        $instance->getBaseQuery()->joins = null;
-
-        static::$constraints = $contraints;
-
-        return $instance;
+        return $this->noConstraints(function () use ($query) {
+            return new static(
+                $query,
+                $this->parent,
+                $this->table,
+                $this->foreignPivotKey,
+                $this->relatedPivotKey,
+                $this->parentKey,
+                $this->relatedKey,
+                $this->relationName
+            );
+        });
     }
 
     /**
