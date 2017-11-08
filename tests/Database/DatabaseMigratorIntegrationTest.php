@@ -36,7 +36,8 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
-            new Filesystem
+            new Filesystem,
+            $container
         );
 
         if (! $repository->repositoryExists()) {
