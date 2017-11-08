@@ -203,6 +203,10 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function set($key, $value, $ttl = null)
     {
+        if (is_null($ttl)) {
+            $ttl = $this->getDefaultCacheTime();
+        }
+
         $this->put($key, $value, $ttl);
     }
 
