@@ -505,7 +505,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -531,7 +531,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -553,9 +553,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a timestamp type.
-     *
-     * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -699,6 +697,8 @@ class SqlServerGrammar extends Grammar
 
     /**
      * Parse the default value for a temporal column type.
+     *
+     * @see  https://docs.microsoft.com/en-us/sql/t-sql/statements/create-table-transact-sql#default-definitions
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return void

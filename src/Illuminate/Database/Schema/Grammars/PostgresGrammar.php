@@ -551,7 +551,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -575,7 +575,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -601,7 +601,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -758,6 +758,8 @@ class PostgresGrammar extends Grammar
 
     /**
      * Parse the default value for a temporal column type.
+     *
+     * @see  https://www.postgresql.org/docs/10/static/functions-datetime.html#functions-datetime-current
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return void

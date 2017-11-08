@@ -735,7 +735,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestamp('created_at')->useCurrent();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals("alter table `users` add `created_at` timestamp not null default CURRENT_TIMESTAMP", $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingTimestampTz()
@@ -759,7 +759,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->timestampTz('created_at')->useCurrent();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals("alter table `users` add `created_at` timestamp not null default CURRENT_TIMESTAMP", $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp not null default CURRENT_TIMESTAMP', $statements[0]);
     }
 
     public function testAddingTimestamps()

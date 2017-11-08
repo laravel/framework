@@ -551,6 +551,10 @@ class SQLiteGrammar extends Grammar
     /**
      * Create the column definition for a date-time type.
      *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see  https://www.sqlite.org/datatype3.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -562,10 +566,7 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
-     *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -578,6 +579,10 @@ class SQLiteGrammar extends Grammar
     /**
      * Create the column definition for a time type.
      *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see  https://www.sqlite.org/datatype3.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -589,7 +594,7 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -602,6 +607,10 @@ class SQLiteGrammar extends Grammar
     /**
      * Create the column definition for a timestamp type.
      *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see  https://www.sqlite.org/datatype3.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
@@ -611,7 +620,7 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -755,6 +764,8 @@ class SQLiteGrammar extends Grammar
 
     /**
      * Parse the default value for a temporal column type.
+     *
+     * @see  https://www.sqlite.org/lang_createtable.html#tablecoldef
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return void
