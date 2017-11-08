@@ -158,7 +158,7 @@ class VerifyCsrfToken
         $response->headers->setCookie(
             new Cookie(
                 'XSRF-TOKEN', $request->session()->token(), $this->availableAt(60 * $config['lifetime']),
-                $config['path'], $config['domain'], $config['secure'], false, false, $config['same_site'] ?? null
+                $config['path'], $config['domain'], $config['secure'], $config['http_only'], false, $config['same_site'] ?? null
             )
         );
 
