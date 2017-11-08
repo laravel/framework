@@ -602,150 +602,191 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingDate()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->date('foo');
+        $blueprint->date('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` date not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` date not null', $statements[0]);
     }
 
     public function testAddingDateTime()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dateTime('foo');
+        $blueprint->dateTime('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` datetime not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->dateTime('foo', 1);
+        $blueprint->dateTime('created_at', 1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` datetime(1) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` datetime(1) not null', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->dateTimeTz('foo', 1);
+        $blueprint->dateTimeTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` datetime(1) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` datetime not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->dateTimeTz('foo');
+        $blueprint->dateTimeTz('created_at', 1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` datetime(1) not null', $statements[0]);
     }
 
     public function testAddingTime()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->time('foo');
+        $blueprint->time('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` time not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` time not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->time('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` time(1) not null', $statements[0]);
     }
 
     public function testAddingTimeTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timeTz('foo');
+        $blueprint->timeTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` time not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` time not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timeTz('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` time(1) not null', $statements[0]);
     }
 
-    public function testAddingTimeStamp()
+    public function testAddingTimestamp()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo', 1);
+        $blueprint->timestamp('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo');
+        $blueprint->timestamp('created_at', 1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) not null', $statements[0]);
     }
 
-    public function testAddingTimeStampWithDefault()
+    public function testAddingTimestampWithDefault()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo', 1)->default('2015-07-22 11:43:17');
+        $blueprint->timestamp('created_at')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo')->default('2015-07-22 11:43:17');
+        $blueprint->timestamp('created_at', 1)->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals("alter table `users` add `created_at` timestamp(1) not null default '2015-07-22 11:43:17'", $statements[0]);
     }
 
-    public function testAddingTimeStampTz()
+    public function testAddingTimestampTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo', 1);
+        $blueprint->timestampTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp not null', $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo');
+        $blueprint->timestampTz('created_at', 1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) not null', $statements[0]);
     }
 
-    public function testAddingTimeStampTzWithDefault()
+    public function testAddingTimestampTzWithDefault()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo', 1)->default('2015-07-22 11:43:17');
+        $blueprint->timestampTz('created_at')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(1) not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
 
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo')->default('2015-07-22 11:43:17');
+        $blueprint->timestampTz('created_at', 1)->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals("alter table `users` add `created_at` timestamp(1) not null default '2015-07-22 11:43:17'", $statements[0]);
     }
 
-    public function testAddingTimeStamps()
+    public function testAddingTimestamps()
     {
-        $blueprint = new Blueprint('users');
-        $blueprint->timestamps(1);
-        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-        $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `created_at` timestamp(1) null, add `updated_at` timestamp(1) null', $statements[0]);
-
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
-    }
 
-    public function testAddingTimeStampsTz()
-    {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampsTz(1);
+        $blueprint->timestamps(1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `created_at` timestamp(1) null, add `updated_at` timestamp(1) null', $statements[0]);
+    }
 
+    public function testAddingTimestampsTz()
+    {
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) null, add `updated_at` timestamp(1) null', $statements[0]);
+    }
+
+    public function testAddingSoftDeletes()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletes();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `deleted_at` timestamp null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletes('deleted_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `deleted_at` timestamp(1) null', $statements[0]);
+    }
+
+    public function testAddingSoftDeletesTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletesTz();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `deleted_at` timestamp null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->softDeletesTz(1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `deleted_at` timestamp(1) null', $statements[0]);
     }
 
     public function testAddingRememberToken()

@@ -566,7 +566,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time(0) without time zone';
+        return sprintf('time(%d) without time zone', $column->precision ?: 0);
     }
 
     /**
@@ -577,7 +577,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time(0) with time zone';
+        return sprintf('time(%d) with time zone', $column->precision ?: 0);
     }
 
     /**
@@ -588,11 +588,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) without time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $type = sprintf('timestamp(%d) without time zone', $column->precision ?: 0);
 
-        return "timestamp($column->precision) without time zone";
+        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
     }
 
     /**
@@ -603,11 +601,9 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) with time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $type = sprintf('timestamp(%d) with time zone', $column->precision ?: 0);
 
-        return "timestamp($column->precision) with time zone";
+        return $column->useCurrent ? "$type default CURRENT_TIMESTAMP" : $type;
     }
 
     /**
