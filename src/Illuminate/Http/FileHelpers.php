@@ -59,4 +59,22 @@ trait FileHelpers
 
         return $path.$hash.'.'.$this->guessExtension();
     }
+
+    /**
+     * Get a fixed hash filename from same file, expecially for a file which is  uploaded many times.
+     * -- by wg
+     *
+     * @param null $path
+     * @return string
+     */
+    public function fixedHashName($path = null)
+    {
+        if ($path) {
+            $path = rtrim($path, '/').'/';
+        }
+
+        $hash = sha1_file($this->path());
+
+        return $path.$hash.'.'.$this->guessExtension();
+    }
 }
