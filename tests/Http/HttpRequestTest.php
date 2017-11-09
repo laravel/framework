@@ -293,6 +293,14 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 
+    public function testItemMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => '']);
+        $this->assertEquals('Ahmed Fathy', $request->item('name', 'Ahmed Fathy'));
+        $this->assertEquals('', $request['name']);
+        $this->assertEquals('Bob', $request->item('foo', 'Bob'));
+    }
+
     public function testAllMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
