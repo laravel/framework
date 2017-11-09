@@ -204,6 +204,13 @@ class CacheRepositoryTest extends TestCase
         $repo->set($key, $value, 1);
     }
 
+    public function testSettingCacheWithoutTTLUsesDefaultTime()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', $repo->getDefaultCacheTime());
+        $repo->set($key, $value);
+    }
+
     public function testClearingWholeCache()
     {
         $repo = $this->getRepository();
