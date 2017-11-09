@@ -188,6 +188,18 @@ trait InteractsWithInput
             $this->getInputSource()->all() + $this->query->all(), $key, $default
         );
     }
+    
+    /**
+     * Retrieve an input item or default if the request contains a non-empty value for an input item.
+     *
+     * @param  string  $key
+     * @param  string|array|null  $default
+     * @return string|array
+     */
+    public function item($key = null, $default = null)
+    {
+        return $this->filled($key) ? $this->input($key) : value($default);
+    }
 
     /**
      * Get a subset containing the provided keys with values from the input data.
