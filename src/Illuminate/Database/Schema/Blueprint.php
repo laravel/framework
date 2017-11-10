@@ -848,6 +848,8 @@ class Blueprint
      *
      * Alias for self::timestamps().
      *
+     * @deprecated
+     *
      * @param  int     $precision
      * @return void
      */
