@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
+use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Database\Migrations\Migrator;
 use Symfony\Component\Console\Input\InputOption;
@@ -55,10 +56,10 @@ class StatusCommand extends BaseCommand
             return $this->error('No migrations found.');
         }
 
-        $ran = $this->migrator->getRepository()->getRan();
+        $ran = $this->migrator->getRepository()->getRanWithBatches();
 
         if (count($migrations = $this->getStatusFor($ran)) > 0) {
-            $this->table(['Ran?', 'Migration'], $migrations);
+            $this->table(['Ran?', 'Migration', 'Batch'], $migrations);
         } else {
             $this->error('No migrations found');
         }
@@ -72,13 +73,15 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran)
     {
+        $ran = Arr::pluck($ran, 'batch', 'migration');
+
         return Collection::make($this->getAllMigrationFiles())
                     ->map(function ($migration) use ($ran) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
-                        return in_array($migrationName, $ran)
-                                ? ['<info>Y</info>', $migrationName]
-                                : ['<fg=red>N</fg=red>', $migrationName];
+                        return array_key_exists($migrationName, $ran)
+                                ? ['<info>Y</info>', $migrationName, $ran[$migrationName]]
+                                : ['<fg=red>N</fg=red>', $migrationName, '-'];
                     });
     }
 
