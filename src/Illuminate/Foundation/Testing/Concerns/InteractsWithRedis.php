@@ -1,21 +1,30 @@
 <?php
 
-namespace Illuminate\Tests\Redis;
+namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Redis\RedisManager;
 
 trait InteractsWithRedis
 {
     /**
+     * Indicate connection failed if redis is not available.
+     *
      * @var bool
      */
     private static $connectionFailedOnceWithDefaultsSkip = false;
 
     /**
-     * @var RedisManager[]
+     * Redis manager instance.
+     *
+     * @var \Illuminate\Redis\RedisManager[]
      */
     private $redis;
 
+    /**
+     * Setup redis connection.
+     *
+     * @return void
+     */
     public function setUpRedis()
     {
         $host = getenv('REDIS_HOST') ?: '127.0.0.1';
@@ -51,6 +60,11 @@ trait InteractsWithRedis
         }
     }
 
+    /**
+     * Teardown redis connection.
+     *
+     * @return void
+     */
     public function tearDownRedis()
     {
         $this->redis['predis']->connection()->flushdb();
@@ -60,6 +74,11 @@ trait InteractsWithRedis
         }
     }
 
+    /**
+     * Get redis driver provider.
+     *
+     * @return array
+     */
     public function redisDriverProvider()
     {
         $providers = [
@@ -73,6 +92,12 @@ trait InteractsWithRedis
         return $providers;
     }
 
+    /**
+     * Run test if redis is available.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
     public function ifRedisAvailable($callback)
     {
         $this->setUpRedis();

@@ -389,7 +389,12 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $bar;
         });
 
-        $this->assertEquals($this->getBuilder()->foo('bar'), 'bar');
+        Builder::macro('bam', [Builder::class, 'getQuery']);
+
+        $builder = $this->getBuilder();
+
+        $this->assertEquals($builder->foo('bar'), 'bar');
+        $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
     public function testGetModelsProperlyHydratesModels()
