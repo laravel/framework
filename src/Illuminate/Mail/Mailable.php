@@ -8,6 +8,7 @@ use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -110,9 +111,10 @@ class Mailable implements MailableContract, Renderable
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
      * @return void
      */
-    public function send(MailerContract $mailer)
+    public function send(MailerContract $mailer, Dispatcher $dispatcher = null)
     {
         Container::getInstance()->call([$this, 'build']);
 
@@ -123,15 +125,18 @@ class Mailable implements MailableContract, Renderable
                  ->buildAttachments($message)
                  ->runCallbacks($message);
         });
+
+        $this->dispatchEvent($dispatcher, new Events\MailableSent($this));
     }
 
     /**
      * Queue the message for sending.
      *
      * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null @dispatcher
      * @return mixed
      */
-    public function queue(Queue $queue)
+    public function queue(Queue $queue, Dispatcher $dispatcher = null)
     {
         if (property_exists($this, 'delay')) {
             return $this->later($this->delay, $queue);
@@ -141,9 +146,24 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
-        return $queue->connection($connection)->pushOn(
+        return tap($queue->connection($connection)->pushOn(
             $queueName ?: null, new SendQueuedMailable($this)
-        );
+        ), function ($queue) use ($dispatcher) {
+            $this->dispatchEvent($dispatcher, new Events\MailableQueued($this));
+        });
+    }
+
+    /**
+     * Dispatches the given event if the dispatcher is present.
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null $dispatcher
+     * @param  mixed $event
+     * @return void
+     */
+    protected function dispatchEvent(Dispatcher $dispatcher = null, $event)
+    {
+        if($dispatcher) {
+            $dispatcher->dispatch($event);
+        }
     }
 
     /**
