@@ -29,6 +29,21 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertEquals(['bar'], $repo->getRan());
     }
 
+    public function testGetRanMigrationsWithBatchesListMigrations()
+    {
+        $repo = $this->getRepository();
+        $query = m::mock('stdClass');
+        $connectionMock = m::mock('Illuminate\Database\Connection');
+        $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
+        $repo->getConnection()->shouldReceive('table')->once()->with('migrations')->andReturn($query);
+        $query->shouldReceive('orderBy')->once()->with('batch', 'asc')->andReturn($query);
+        $query->shouldReceive('orderBy')->once()->with('migration', 'asc')->andReturn($query);
+        $query->shouldReceive('get')->once()->with(['migration', 'batch'])->andReturn(new Collection(['migration' => 'bar', 'batch' => 1]));
+        $query->shouldReceive('useWritePdo')->once()->andReturn($query);
+
+        $this->assertEquals(['migration' => 'bar', 'batch' => 1], $repo->getRanWithBatches());
+    }
+
     public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
     {
         $repo = $this->getMockBuilder('Illuminate\Database\Migrations\DatabaseMigrationRepository')->setMethods(['getLastBatchNumber'])->setConstructorArgs([
