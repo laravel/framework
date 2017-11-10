@@ -350,6 +350,15 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     protected function getAwsUrl($adapter, $path)
     {
+        $config = $this->driver->getConfig();
+
+        // If an explicit base URL has been set on the disk configuration then we will use
+        // it as the base URL instead of the default path. This allows the developer to
+        // have full control over the base path for this filesystem's generated URLs.
+        if (! is_null($url = $config->get('url'))) {
+            return $this->concatPathToUrl($url, $path);
+        }
+
         return $adapter->getClient()->getObjectUrl(
             $adapter->getBucket(), $adapter->getPathPrefix().$path
         );
@@ -381,7 +390,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         // it as the base URL instead of the default path. This allows the developer to
         // have full control over the base path for this filesystem's generated URLs.
         if ($config->has('url')) {
-            return rtrim($config->get('url'), '/').'/'.ltrim($path, '/');
+            return $this->concatPathToUrl($config->get('url'), $path);
         }
 
         $path = '/storage/'.$path;
@@ -458,6 +467,18 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             $options['method'] ?? 'GET',
             $options['forcePublicUrl'] ?? true
         );
+    }
+
+    /**
+     * Concatenate a path to a URL.
+     *
+     * @param  string $url
+     * @param  string $path
+     * @return string
+     */
+    protected function concatPathToUrl($url, $path)
+    {
+        return rtrim($url, '/').'/'.ltrim($path, '/');
     }
 
     /**
