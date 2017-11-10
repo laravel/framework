@@ -586,15 +586,18 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $provider->register();
         }
 
-        if (property_exists($provider, 'bind')) {
-            foreach ($provider->bind as $abstract => $concrete) {
-                $this->bind($abstract, $concrete);
+        // If there are bindings / singletons set as properties on the provider we
+        // will spin through them and register them with the application, which
+        // serves as a convenience layer while registering a lot of bindings.
+        if (property_exists($provider, 'bindings')) {
+            foreach ($provider->bindings as $key => $value) {
+                $this->bind($key, $value);
             }
         }
 
         if (property_exists($provider, 'singletons')) {
-            foreach ($provider->singletons as $abstract => $concrete) {
-                $this->singleton($abstract, $concrete);
+            foreach ($provider->singletons as $key => $value) {
+                $this->singleton($key, $value);
             }
         }
 
