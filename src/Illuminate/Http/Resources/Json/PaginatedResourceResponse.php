@@ -55,13 +55,13 @@ class PaginatedResourceResponse extends ResourceResponse
     {
         $links = [
             'prev' => $paginator->previousPageUrl(),
-            'next' => $paginator->nextPageUrl()
+            'next' => $paginator->nextPageUrl(),
         ];
 
         if ($this->isLengthAware()) {
             $links += [
                 'first' => $paginator->url(1),
-                'last' => $paginator->url($paginator->lastPage())
+                'last' => $paginator->url($paginator->lastPage()),
             ];
         }
 
@@ -81,13 +81,13 @@ class PaginatedResourceResponse extends ResourceResponse
             'from' => $paginator->firstItem(),
             'path' => $paginator->path,
             'per_page' => $paginator->perPage(),
-            'to' => $paginator->lastItem()
+            'to' => $paginator->lastItem(),
         ];
 
         if ($this->isLengthAware()) {
             $meta += [
                 'last_page' => $paginator->lastPage(),
-                'total' => $paginator->total()
+                'total' => $paginator->total(),
             ];
         }
 
