@@ -2,7 +2,7 @@
 
 namespace Illuminate\Http\Resources\Json;
 
-use Illuminate\Support\Arr;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PaginatedResourceResponse extends ResourceResponse
 {
@@ -37,44 +37,70 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function paginationInformation($request)
     {
-        $paginated = $this->resource->resource->toArray();
+        $paginator = $this->resource->resource;
 
         return [
-            'links' => $this->paginationLinks($paginated),
-            'meta' => $this->meta($paginated),
+            'links' => $this->paginationLinks($paginator),
+            'meta' => $this->meta($paginator),
         ];
     }
 
     /**
      * Get the pagination links for the response.
      *
-     * @param  array  $paginated
+     * @param  \Illuminate\Pagination\AbstractPaginator  $paginator
      * @return array
      */
-    protected function paginationLinks($paginated)
+    protected function paginationLinks($paginator)
     {
-        return [
-            'first' => $paginated['first_page_url'] ?? null,
-            'last' => $paginated['last_page_url'] ?? null,
-            'prev' => $paginated['prev_page_url'] ?? null,
-            'next' => $paginated['next_page_url'] ?? null,
+        $links = [
+            'prev' => $paginator->previousPageUrl(),
+            'next' => $paginator->nextPageUrl(),
         ];
+
+        if ($this->isLengthAware()) {
+            $links += [
+                'first' => $paginator->url(1),
+                'last' => $paginator->url($paginator->lastPage()),
+            ];
+        }
+
+        return $links;
     }
 
     /**
      * Gather the meta data for the response.
      *
-     * @param  array  $paginated
+     * @param  \Illuminate\Pagination\AbstractPaginator  $paginator
      * @return array
      */
-    protected function meta($paginated)
+    protected function meta($paginator)
     {
-        return Arr::except($paginated, [
-            'data',
-            'first_page_url',
-            'last_page_url',
-            'prev_page_url',
-            'next_page_url',
-        ]);
+        $meta = [
+            'current_page' => $paginator->currentPage(),
+            'from' => $paginator->firstItem(),
+            'path' => $paginator->path,
+            'per_page' => $paginator->perPage(),
+            'to' => $paginator->lastItem(),
+        ];
+
+        if ($this->isLengthAware()) {
+            $meta += [
+                'last_page' => $paginator->lastPage(),
+                'total' => $paginator->total(),
+            ];
+        }
+
+        return $meta;
+    }
+
+    /**
+     * Is it a LengthAwarePaginator.
+     *
+     * @return bool
+     */
+    protected function isLengthAware()
+    {
+        return $this->resource->resource instanceof LengthAwarePaginator;
     }
 }
