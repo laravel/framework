@@ -480,56 +480,75 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/data-types/date-transact-sql
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDate(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
         return 'date';
     }
 
     /**
      * Create the column definition for a date-time type.
      *
+     * Note: DATETIME is being used in place of DATETIME2(0) for SQL Server 2005 compatibility
+     *
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime2-transact-sql
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetime-transact-sql
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
         return $column->precision ? "datetime2($column->precision)" : 'datetime';
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
+     *
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/data-types/datetimeoffset-transact-sql
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
+        return "datetimeoffset($column->precision)";
     }
 
     /**
      * Create the column definition for a time type.
+     *
+     * @see https://docs.microsoft.com/en-us/sql/t-sql/data-types/time-transact-sql
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
+        return "time($column->precision)";
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -540,32 +559,18 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetime2($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
-     * Create the column definition for a timestamp type.
-     *
-     * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetimeoffset($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetimeoffset default CURRENT_TIMESTAMP';
-        }
-
-        return "datetimeoffset($column->precision)";
+        return $this->typeDateTimeTz($column);
     }
 
     /**

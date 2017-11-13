@@ -537,59 +537,74 @@ class SQLiteGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see https://sqlite.org/datatype3.html#date_and_time_datatype
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDate(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_DATE');
+
         return 'date';
     }
 
     /**
      * Create the column definition for a date-time type.
      *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see https://sqlite.org/datatype3.html#date_and_time_datatype
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
+
         return 'datetime';
     }
 
     /**
-     * Create the column definition for a date-time type.
-     *
-     * Note: "SQLite does not have a storage class set aside for storing dates and/or times."
-     * @link https://www.sqlite.org/datatype3.html
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
      * Create the column definition for a time type.
+     *
+     * Note: SQLite does not have a storage class set aside for storing dates and/or times.
+     *
+     * @see https://sqlite.org/datatype3.html#date_and_time_datatype
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTime(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIME');
+
         return 'time';
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -600,26 +615,18 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return 'datetime';
+        return $this->typeDateTime($column);
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return 'datetime default CURRENT_TIMESTAMP';
-        }
-
-        return 'datetime';
+        return $this->typeDateTimeTz($column);
     }
 
     /**

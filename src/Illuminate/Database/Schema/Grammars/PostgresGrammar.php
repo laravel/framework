@@ -551,11 +551,15 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
+     * @see https://www.postgresql.org/docs/current/static/datatype-datetime.html
+     *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDate(Fluent $column)
     {
+        $this->setDefaultTimeFunction($column, 'CURRENT_DATE');
+
         return 'date';
     }
 
@@ -567,68 +571,76 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return "timestamp($column->precision) without time zone";
+        return $this->typeTimestamp($column);
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return "timestamp($column->precision) with time zone";
+        return $this->typeTimestampTz($column);
     }
 
     /**
      * Create the column definition for a time type.
+     *
+     * @see https://www.postgresql.org/docs/current/static/datatype-datetime.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time(0) without time zone';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIME');
+
+        return "time($column->precision) without time zone";
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
+     *
+     * @see https://www.postgresql.org/docs/current/static/datatype-datetime.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time(0) with time zone';
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIME');
+
+        return "time($column->precision) with time zone";
     }
 
     /**
      * Create the column definition for a timestamp type.
+     *
+     * @see https://www.postgresql.org/docs/current/static/datatype-datetime.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) without time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
         return "timestamp($column->precision) without time zone";
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
+     *
+     * @see https://www.postgresql.org/docs/current/static/datatype-datetime.html
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) with time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $this->setDefaultTimeFunction($column, 'CURRENT_TIMESTAMP');
 
         return "timestamp($column->precision) with time zone";
     }

@@ -235,6 +235,20 @@ abstract class Grammar extends BaseGrammar
     }
 
     /**
+     * Set the default time function for a temporal type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @param  string  $function
+     * @return void
+     */
+    protected function setDefaultTimeFunction(Fluent &$column, $function)
+    {
+        if ($column->useCurrent) {
+            $column->default = new Expression($function);
+        }
+    }
+
+    /**
      * Create an empty Doctrine DBAL TableDiff from the Blueprint.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
