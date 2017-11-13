@@ -105,6 +105,24 @@ class MailFakeTest extends TestCase
 
         $this->fake->assertNothingSent();
     }
+
+    public function testAttachmentsAreBuilt()
+    {
+        $this->fake->to('taylor@laravel.com')->send($this->mailable);
+
+        $this->fake->assertSent(MailableStub::class, function ($mail) {
+            return $mail->attachments[0]['file'] == 'file.txt';
+        });
+    }
+
+    public function testAttachmentsAreBuiltWhenQueued()
+    {
+        $this->fake->to('taylor@laravel.com')->queue($this->mailable);
+
+        $this->fake->assertQueued(MailableStub::class, function ($mail) {
+            return $mail->attachments[0]['file'] == 'file.txt';
+        });
+    }
 }
 
 class MailableStub extends Mailable
@@ -121,7 +139,8 @@ class MailableStub extends Mailable
     public function build()
     {
         $this->with('first_name', 'Taylor')
-             ->withLastName('Otwell');
+             ->withLastName('Otwell')
+             ->attach('file.txt');
     }
 }
 
