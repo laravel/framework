@@ -20,7 +20,7 @@ class MakesHttpRequestsTest extends TestCase
 
     public function testWithoutAndWithMiddlewareWithParameter()
     {
-        $next = function($request) {
+        $next = function ($request) {
             return $request;
         };
 
@@ -29,7 +29,6 @@ class MakesHttpRequestsTest extends TestCase
             'fooWithMiddleware',
             $this->app->make(MyMiddleware::class)->handle('foo', $next)
         );
-
 
         $this->withoutMiddleware(MyMiddleware::class);
         $this->assertTrue($this->app->has(MyMiddleware::class));
@@ -47,9 +46,10 @@ class MakesHttpRequestsTest extends TestCase
     }
 }
 
-class MyMiddleware {
+class MyMiddleware
+{
     public function handle($request, $next)
     {
-        return $next($request . 'WithMiddleware');
+        return $next($request.'WithMiddleware');
     }
 }
