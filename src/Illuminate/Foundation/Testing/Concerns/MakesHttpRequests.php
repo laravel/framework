@@ -111,6 +111,27 @@ trait MakesHttpRequests
     }
 
     /**
+     * Enable the given middleware for the test.
+     *
+     * @param  string|array  $middleware
+     * @return $this
+     */
+    public function withMiddleware($middleware = null)
+    {
+        if (is_null($middleware)) {
+            unset($this->app['middleware.disable']);
+
+            return $this;
+        }
+
+        foreach ((array) $middleware as $abstract) {
+            unset($this->app[$abstract]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Automatically follow any redirects returned from the response.
      *
      * @return $this
