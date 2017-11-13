@@ -112,7 +112,7 @@ trait MakesHttpRequests
 
 
     /**
-     * Re-enable middleware for the test if disabled.
+     * Enable the given middleware for the test.
      *
      * @param  string|array  $middleware
      * @return $this
