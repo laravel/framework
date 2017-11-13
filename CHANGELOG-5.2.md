@@ -1,4 +1,4 @@
-# Release Noteslla
+# Release Notes
 
 ## [Unreleased]
 
