@@ -275,9 +275,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @return void
      */
-    public function dd()
+    public function dd(...$args)
     {
-        dd($this->all());
+        call_user_func_array([$this, 'dump'], $args);
+
+        die(1);
     }
 
     /**
@@ -1482,10 +1484,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unique($key = null, $strict = false)
     {
-        if (is_null($key)) {
-            return new static(array_unique($this->items, SORT_REGULAR));
-        }
-
         $callback = $this->valueRetriever($key);
 
         $exists = [];

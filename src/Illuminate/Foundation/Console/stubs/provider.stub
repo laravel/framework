@@ -7,7 +7,7 @@ use Illuminate\Support\ServiceProvider;
 class DummyClass extends ServiceProvider
 {
     /**
-     * Bootstrap the application services.
+     * Bootstrap services.
      *
      * @return void
      */
@@ -17,7 +17,7 @@ class DummyClass extends ServiceProvider
     }
 
     /**
-     * Register the application services.
+     * Register services.
      *
      * @return void
      */

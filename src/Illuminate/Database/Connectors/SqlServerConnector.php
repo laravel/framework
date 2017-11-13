@@ -134,6 +134,10 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             $arguments['TransactionIsolation'] = $config['transaction_isolation'];
         }
 
+        if (isset($config['multi_subnet_failover'])) {
+            $arguments['MultiSubnetFailover'] = $config['multi_subnet_failover'];
+        }
+
         return $this->buildConnectString('sqlsrv', $arguments);
     }
 

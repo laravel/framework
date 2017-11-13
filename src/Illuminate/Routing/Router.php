@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -713,6 +714,8 @@ class Router implements RegistrarContract, BindingRegistrar
 
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
+        } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
+            $response = new JsonResponse($response, 201);
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
                     $response instanceof Jsonable ||
