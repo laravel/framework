@@ -1,5 +1,16 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Add support for `MultiSubnetFailover` parameter to SqlServer ([#22022](https://github.com/laravel/framework/pull/22022))
+- Support custom URLs for S3 ([#22037](https://github.com/laravel/framework/pull/22037))
+
+### Changed
+- Display controller name in `BadMethodCallException` ([#22005](https://github.com/laravel/framework/pull/22005))
+- Unify `Collection::dd()` and `Collection::dump()` output ([#22036](https://github.com/laravel/framework/pull/22036))
+
+
 ## v5.5.20 (2017-11-07)
 
 ### Added
