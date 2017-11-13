@@ -110,7 +110,6 @@ trait MakesHttpRequests
         return $this;
     }
 
-
     /**
      * Enable the given middleware for the test.
      *
