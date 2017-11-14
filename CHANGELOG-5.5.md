@@ -1,14 +1,16 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.21 (2017-11-14)
 
 ### Added
 - Add support for `MultiSubnetFailover` parameter to SqlServer ([#22022](https://github.com/laravel/framework/pull/22022))
 - Support custom URLs for S3 ([#22037](https://github.com/laravel/framework/pull/22037))
+- Added `MakesHttpRequests::withMiddleware()` method ([#22060](https://github.com/laravel/framework/pull/22060))
 
 ### Changed
 - Display controller name in `BadMethodCallException` ([#22005](https://github.com/laravel/framework/pull/22005))
 - Unify `Collection::dd()` and `Collection::dump()` output ([#22036](https://github.com/laravel/framework/pull/22036))
+- Support event generation from multiple service providers ([#22063](https://github.com/laravel/framework/pull/22063))
 
 
 ## v5.5.20 (2017-11-07)
