@@ -606,11 +606,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getProvider($provider)
     {
-        $name = is_string($provider) ? $provider : get_class($provider);
-
-        return Arr::first($this->serviceProviders, function ($value) use ($name) {
-            return $value instanceof $name;
-        });
+        return array_values($this->getProviders($provider))[0] ?? null;
     }
 
     /**
