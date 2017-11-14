@@ -584,10 +584,10 @@ class Grammar extends BaseGrammar
     public function compileField($column, $columnValues)
     {
         $columnValues = collect($columnValues)->map(function ($columnValue) {
-            return '"' . $columnValue . '"';
+            return '"'.$columnValue.'"';
         })->implode(', ');
 
-        return 'field(' . $column . ', ' . $columnValues . ')';
+        return 'field(`'.$column.'`, '.$columnValues.')';
     }
 
     /**
