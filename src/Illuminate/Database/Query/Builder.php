@@ -1455,6 +1455,17 @@ class Builder
     }
 
     /**
+     * Add an "order by field" clause to the query.
+     * @param string $column
+     * @param array $columnValues
+     * @return $this
+     */
+    public function orderByField($column, $columnValues)
+    {
+        return $this->orderByRaw($this->grammar->compileField($column, $columnValues));
+    }
+
+    /**
      * Add a raw "order by" clause to the query.
      *
      * @param  string  $sql
