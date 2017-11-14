@@ -285,6 +285,8 @@ class MailFake implements Mailer
             return $this->queue($view, $data, $callback);
         }
 
+        $view->build();
+
         $this->mailables[] = $view;
     }
 
@@ -302,6 +304,8 @@ class MailFake implements Mailer
         if (! $view instanceof Mailable) {
             return;
         }
+
+        $view->build();
 
         $this->queuedMailables[] = $view;
     }
