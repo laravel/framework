@@ -407,7 +407,9 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getQueueableIds()
     {
-        return $this->modelKeys();
+        return array_map(function ($model) {
+            return $model->getQueueableId();
+        }, $this->items);
     }
 
     /**
