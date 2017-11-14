@@ -576,6 +576,21 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile the field database function into SQL.
+     * @param string $column
+     * @param array $columnValues
+     * @return string
+     */
+    public function compileField($column, $columnValues)
+    {
+        $columnValues = collect($columnValues)->map(function ($columnValue) {
+            return '"'.$columnValue.'"';
+        })->implode(', ');
+
+        return 'field(`'.$column.'`, '.$columnValues.')';
+    }
+
+    /**
      * Compile the "limit" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
