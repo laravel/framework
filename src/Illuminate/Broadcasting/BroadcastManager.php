@@ -120,10 +120,19 @@ class BroadcastManager implements FactoryContract
         } elseif (isset($event->queue)) {
             $queue = $event->queue;
         }
-
-        $this->app->make('queue')->connection($connection)->pushOn(
-            $queue, new BroadcastEvent(clone $event)
-        );
+    
+        $queueManager = $this->app->make('queue')->connection($connection);
+    
+        if (method_exists($event, 'broadcastLater')) {
+            $delay = $event->broadcastLater();
+            $queueManager->laterOn(
+                $queue, $delay, new BroadcastEvent(clone $event)
+            );
+        } else {
+            $queueManager->pushOn(
+                $queue, new BroadcastEvent(clone $event)
+            );
+        }
     }
 
     /**
