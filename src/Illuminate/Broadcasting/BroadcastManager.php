@@ -120,9 +120,9 @@ class BroadcastManager implements FactoryContract
         } elseif (isset($event->queue)) {
             $queue = $event->queue;
         }
-    
+
         $queueManager = $this->app->make('queue')->connection($connection);
-    
+
         if (method_exists($event, 'broadcastLater')) {
             $delay = $event->broadcastLater();
             $queueManager->laterOn(
