@@ -31,4 +31,12 @@ interface Hasher
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = []);
+
+    /**
+     * Get info about the current hashedValue.
+     *
+     * @param  string  $hashedValue
+     * @return array
+     */
+    public function info($hashedValue);
 }
