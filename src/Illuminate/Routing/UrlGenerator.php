@@ -349,7 +349,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function formatAction($action)
     {
-        if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
+        if ($this->rootNamespace && strpos($action, '\\') === false) {
             return $this->rootNamespace.'\\'.$action;
         } else {
             return trim($action, '\\');
