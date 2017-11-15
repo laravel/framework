@@ -196,6 +196,17 @@ class HttpResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
+
+    public function testNonEmptyOriginalContentIsNotChamnged()
+    {
+        $response = new \Illuminate\Http\Response();
+        $this->assertEquals(null, $response->getOriginalContent());
+        $response->setContent('original content');
+        $this->assertEquals('original content', $response->getOriginalContent());
+        $response->setContent('modified content');
+        $this->assertEquals('modified content', $response->getContent());
+        $this->assertEquals('original content', $response->getOriginalContent());
+    }
 }
 
 class ArrayableStub implements Arrayable

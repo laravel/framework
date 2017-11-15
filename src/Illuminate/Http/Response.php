@@ -24,7 +24,9 @@ class Response extends BaseResponse
      */
     public function setContent($content)
     {
-        $this->original = $content;
+        if ($this->original == '') {
+            $this->original = $content;
+        }
 
         // If the content is "JSONable" we will set the appropriate header and convert
         // the content to JSON. This is useful when returning something like models
