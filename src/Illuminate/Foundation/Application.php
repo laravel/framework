@@ -1085,6 +1085,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this['translator']->setLocale($locale);
 
         $this['events']->dispatch(new Events\LocaleUpdated($locale));
+        
+        \Locale::setDefault($locale);
     }
 
     /**
