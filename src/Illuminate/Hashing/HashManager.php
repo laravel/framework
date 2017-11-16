@@ -64,6 +64,11 @@ class HashManager extends Manager implements Hasher
         return $this->driver()->needsRehash($hashedValue, $options);
     }
 
+    public function info($hashedValue)
+    {
+        return $this->driver()->info($hashedValue);
+    }
+
     /**
      * Get the default driver name.
      *

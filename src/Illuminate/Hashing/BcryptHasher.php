@@ -90,4 +90,16 @@ class BcryptHasher implements HasherContract
     {
         return $options['rounds'] ?? $this->rounds;
     }
+
+    /**
+     * Get info about the current hashedValue.
+     *
+     * @param  string $hashedValue
+     *
+     * @return array
+     */
+    public function info($hashedValue)
+    {
+        return password_get_info($hashedValue);
+    }
 }
