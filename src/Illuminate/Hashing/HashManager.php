@@ -28,6 +28,17 @@ class HashManager extends Manager implements Hasher
     }
 
     /**
+     * Get information about the given hashed value.
+     *
+     * @param  string  $hashedValue
+     * @return array
+     */
+    public function info($hashedValue)
+    {
+        return $this->driver()->info($hashedValue);
+    }
+
+    /**
      * Hash the given value.
      *
      * @param  string  $value
@@ -62,11 +73,6 @@ class HashManager extends Manager implements Hasher
     public function needsRehash($hashedValue, array $options = [])
     {
         return $this->driver()->needsRehash($hashedValue, $options);
-    }
-
-    public function info($hashedValue)
-    {
-        return $this->driver()->info($hashedValue);
     }
 
     /**

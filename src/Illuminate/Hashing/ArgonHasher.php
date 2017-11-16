@@ -8,25 +8,36 @@ use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 class ArgonHasher implements HasherContract
 {
     /**
-     * Default threads factor.
+     * The default threads factor.
      *
      * @var int
      */
     protected $processors = 2;
 
     /**
-     * Default memory cost factor.
+     * The default memory cost factor.
      *
      * @var int
      */
     protected $memory = 1024;
 
     /**
-     * Default time cost factor.
+     * The default time cost factor.
      *
      * @var int
      */
     protected $time = 2;
+
+    /**
+     * Get information about the given hashed value.
+     *
+     * @param  string  $hashedValue
+     * @return array
+     */
+    public function info($hashedValue)
+    {
+        return password_get_info($hashedValue);
+    }
 
     /**
      * Hash the given value.
@@ -156,17 +167,5 @@ class ArgonHasher implements HasherContract
     protected function processors($options)
     {
         return $options['processors'] ?? $this->processors;
-    }
-
-    /**
-     * Get info about the current hashedValue.
-     *
-     * @param  string $hashedValue
-     *
-     * @return array
-     */
-    public function info($hashedValue)
-    {
-        return password_get_info($hashedValue);
     }
 }
