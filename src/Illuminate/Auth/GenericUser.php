@@ -3,8 +3,9 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
+use Illuminate\Contracts\Auth\RememberSession as RememberSessionContract;
 
-class GenericUser implements UserContract
+class GenericUser implements UserContract, RememberSessionContract
 {
     /**
      * All of the user's attributes.
