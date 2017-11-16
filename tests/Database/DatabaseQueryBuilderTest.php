@@ -416,6 +416,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereNotBetween('id', [1, 2]);
         $this->assertEquals('select * from "users" where "id" not between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [2, 1]);
+        $this->assertEquals('select * from "users" where "id" between ? and ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWhereBetweensException()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotBetween('id', [2, 1, 3]);
+        $this->expectException(\InvalidArgumentException::class);
     }
 
     public function testBasicOrWheres()
