@@ -218,6 +218,7 @@ class Arr
                 $result = array_merge($result, static::flatten($item, $depth - 1));
             }
         }
+
         return $result;
     }
 
