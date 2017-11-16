@@ -207,6 +207,7 @@ class Arr
     public static function flatten($array, $depth = INF)
     {
         $result = [];
+
         foreach ($array as $item) {
             $item = $item instanceof Collection ? $item->all() : $item;
 
