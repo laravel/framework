@@ -13,7 +13,7 @@ use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
-class Mailable implements MailableContract, Renderable
+abstract class Mailable implements MailableContract, Renderable
 {
     /**
      * The person the message is from.
