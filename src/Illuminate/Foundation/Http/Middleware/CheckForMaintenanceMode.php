@@ -46,11 +46,17 @@ class CheckForMaintenanceMode
         return $next($request);
     }
 
+    /**
+     * Check if is allowed ip in maintenance mode.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return boolean
+     */
     protected function isAllowedIp($request)
     {
         $ip = $request->getClientIp();
-        $allowed = explode(',', getenv('MAINTENANCE_ALLOWED_IPS'));
+        $allowed = config('app.maintenance_allowed_ips');
 
-        return in_array($ip, $allowed);
+        return $allowed && in_array($ip, $allowed);
     }
 }
