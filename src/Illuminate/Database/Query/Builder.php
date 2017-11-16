@@ -904,6 +904,14 @@ class Builder
 
         $this->wheres[] = compact('column', 'type', 'boolean', 'not');
 
+        if (count($values) !== 2) {
+            throw new InvalidArgumentException('Invalid count of binding values.');
+        }
+
+        if (array_first($values) > array_last($values)) {
+            $values = array_reverse($values);
+        }
+
         $this->addBinding($values, 'where');
 
         return $this;
