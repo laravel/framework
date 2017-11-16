@@ -110,6 +110,49 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Create a streamed response for a given file.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array|null  $headers
+     * @param  string|null  $disposition
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function response($path, $name = null, array $headers = [], $disposition = 'inline')
+    {
+        $response = new StreamedResponse;
+
+        $disposition = $response->headers->makeDisposition($disposition, $name ?? basename($path));
+
+        $response->headers->replace($headers + [
+            'Content-Type' => $this->mimeType($path),
+            'Content-Length' => $this->size($path),
+            'Content-Disposition' => $disposition,
+        ]);
+
+        $response->setCallback(function () use ($path) {
+            $stream = $this->driver->readStream($path);
+            fpassthru($stream);
+            fclose($stream);
+        });
+
+        return $response;
+    }
+
+    /**
+     * Create a streamed download response for a given file.
+     *
+     * @param  string  $path
+     * @param  string|null  $name
+     * @param  array|null  $headers
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function download($path, $name = null, array $headers = [])
+    {
+        return $this->response($path, $name, $headers, 'attachment');
+    }
+
+    /**
      * Write the contents of a file.
      *
      * @param  string  $path
@@ -317,49 +360,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function lastModified($path)
     {
         return $this->driver->getTimestamp($path);
-    }
-
-    /**
-     * Create a streamed response for a given file.
-     *
-     * @param  string  $path
-     * @param  string|null  $name
-     * @param  array|null  $headers
-     * @param  string|null  $disposition
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
-     */
-    public function response($path, $name = null, array $headers = [], $disposition = 'inline')
-    {
-        $response = new StreamedResponse();
-
-        $disposition = $response->headers->makeDisposition($disposition, $name ?? basename($path));
-
-        $response->headers->replace($headers + [
-            'Content-Type' => $this->mimeType($path),
-            'Content-Length' => $this->size($path),
-            'Content-Disposition' => $disposition,
-        ]);
-
-        $response->setCallback(function () use ($path) {
-            $stream = $this->driver->readStream($path);
-            fpassthru($stream);
-            fclose($stream);
-        });
-
-        return $response;
-    }
-
-    /**
-     * Create a streamed download response for a given file.
-     *
-     * @param  string  $path
-     * @param  string|null  $name
-     * @param  array|null  $headers
-     * @return \Symfony\Component\HttpFoundation\StreamedResponse
-     */
-    public function download($path, $name = null, array $headers = [])
-    {
-        return $this->response($path, $name, $headers, 'attachment');
     }
 
     /**
