@@ -75,7 +75,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         return $this->buildConnectString('dblib', array_merge([
             'host' => $this->buildHostString($config, ':'),
             'dbname' => $config['database'],
-        ], Arr::only($config, ['appname', 'charset'])));
+        ], Arr::only($config, ['appname', 'charset', 'version'])));
     }
 
     /**
