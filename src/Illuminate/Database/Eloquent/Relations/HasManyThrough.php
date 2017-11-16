@@ -439,7 +439,7 @@ class HasManyThrough extends Relation
         $this->performJoin($query);
 
         return $query->select($columns)->whereColumn(
-            $this->getExistenceCompareKey(), '=', $this->getQualifiedFirstKeyName()
+            $this->getQualifiedLocalKeyName(), '=', $this->getQualifiedFirstKeyName()
         );
     }
 
@@ -479,16 +479,6 @@ class HasManyThrough extends Relation
     }
 
     /**
-     * Get the key for comparing against the parent key in "has" query.
-     *
-     * @return string
-     */
-    public function getExistenceCompareKey()
-    {
-        return $this->farParent->getQualifiedKeyName();
-    }
-
-    /**
      * Get the qualified foreign key on the related model.
      *
      * @return string
@@ -496,6 +486,16 @@ class HasManyThrough extends Relation
     public function getQualifiedFarKeyName()
     {
         return $this->getQualifiedForeignKeyName();
+    }
+
+    /**
+     * Get the qualified foreign key on the "through" model.
+     *
+     * @return string
+     */
+    public function getQualifiedFirstKeyName()
+    {
+        return $this->throughParent->getTable().'.'.$this->firstKey;
     }
 
     /**
@@ -509,12 +509,12 @@ class HasManyThrough extends Relation
     }
 
     /**
-     * Get the qualified foreign key on the "through" model.
+     * Get the qualified local key on the far parent model.
      *
      * @return string
      */
-    public function getQualifiedFirstKeyName()
+    public function getQualifiedLocalKeyName()
     {
-        return $this->throughParent->getTable().'.'.$this->firstKey;
+        return $this->farParent->getTable().'.'.$this->localKey;
     }
 }

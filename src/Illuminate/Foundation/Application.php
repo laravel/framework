@@ -621,9 +621,20 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getProvider($provider)
     {
+        return array_values($this->getProviders($provider))[0] ?? null;
+    }
+
+    /**
+     * Get the registered service provider instances if any exist.
+     *
+     * @param  \Illuminate\Support\ServiceProvider|string  $provider
+     * @return array
+     */
+    public function getProviders($provider)
+    {
         $name = is_string($provider) ? $provider : get_class($provider);
 
-        return Arr::first($this->serviceProviders, function ($value) use ($name) {
+        return Arr::where($this->serviceProviders, function ($value) use ($name) {
             return $value instanceof $name;
         });
     }
