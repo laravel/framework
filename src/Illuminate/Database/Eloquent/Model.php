@@ -83,6 +83,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected $perPage = 15;
 
     /**
+     * The collection instance to be returned.
+     *
+     * @var \Illuminate\Database\Eloquent\Collection
+     */
+    protected $collection = Collection::class;
+
+    /**
      * Indicates if the model exists.
      *
      * @var bool
@@ -912,7 +919,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newCollection(array $models = [])
     {
-        return new Collection($models);
+        return new $this->collection($models);
     }
 
     /**
