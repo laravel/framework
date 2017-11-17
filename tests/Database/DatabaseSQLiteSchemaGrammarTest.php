@@ -37,6 +37,19 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals($expected, $statements);
     }
 
+    public function testCreateTemporaryTable()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create temporary table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
+    }
+
     public function testDropTable()
     {
         $blueprint = new Blueprint('users');

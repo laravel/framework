@@ -127,6 +127,23 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
     }
 
+    public function testCreateTemporaryTable()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create temporary table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+    }
+
     public function testDropTable()
     {
         $blueprint = new Blueprint('users');
