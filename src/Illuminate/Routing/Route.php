@@ -761,7 +761,7 @@ class Route
         // it into string syntax.
         array_walk($middleware, function (&$value, $key) {
             if (is_array($value)) {
-                $value = "{$key}:" . implode(',', $value);
+                $value = "{$key}:".implode(',', $value);
             }
         });
 
