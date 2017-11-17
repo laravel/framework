@@ -563,6 +563,23 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
+    public function testBindMethodAcceptsAnArray()
+    {
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable');
+        $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
+        $this->assertEquals(['foo', 'bar'], $result);
+    }
+
     public function testContainerCanInjectDifferentImplementationsDependingOnContext()
     {
         $container = new Container;
