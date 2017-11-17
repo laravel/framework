@@ -230,9 +230,9 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Create a redirect from one URI to another.
      *
-     * @param string  $uri
-     * @param string  $destination
-     * @param int  $status
+     * @param  string  $uri
+     * @param  string  $destination
+     * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
     public function redirect($uri, $destination, $status = 301)

@@ -286,8 +286,8 @@ class FactoryBuilder
     /**
      * Get the state attributes.
      *
-     * @param string $state
-     * @param array $attributes
+     * @param  string  $state
+     * @param  array  $attributes
      * @return array
      */
     protected function stateAttributes($state, array $attributes)
