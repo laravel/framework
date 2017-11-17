@@ -48,10 +48,12 @@ trait SerializesAndRestoresModelIdentifiers
             return $value;
         }
 
+        $model = (new $value->class)->setConnection($value->connection);
+
         return is_array($value->id)
-                ? $this->restoreCollection($value)
-                : $this->getQueryForModelRestoration((new $value->class)->setConnection($value->connection))
-                    ->useWritePdo()->findOrFail($value->id);
+            ? $this->restoreCollection($value)
+            : $this->getQueryForModelRestoration($model, $value->id)
+                ->useWritePdo()->firstOrFail();
     }
 
     /**
@@ -68,18 +70,19 @@ trait SerializesAndRestoresModelIdentifiers
 
         $model = (new $value->class)->setConnection($value->connection);
 
-        return $this->getQueryForModelRestoration($model)->useWritePdo()
-                    ->whereIn($model->getQualifiedKeyName(), $value->id)->get();
+        return $this->getQueryForModelRestoration($model, $value->id)
+            ->useWritePdo()->get();
     }
 
     /**
      * Get the query for restoration.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array|int                            $ids
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function getQueryForModelRestoration($model)
+    protected function getQueryForModelRestoration($model, $ids)
     {
-        return $model->newQueryWithoutScopes();
+        return $model->newQueryForRestoration($ids);
     }
 }
