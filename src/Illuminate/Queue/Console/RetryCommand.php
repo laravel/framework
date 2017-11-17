@@ -54,6 +54,12 @@ class RetryCommand extends Command
 
         if (count($ids) === 1 && $ids[0] === 'all') {
             $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
+        } elseif (count($ids) === 1 && count($rangeEdges = explode('-', $ids[0])) == 2 && $rangeEdges[1] > 0) {
+            $rangeIds = [];
+            for ($i = $rangeEdges[0]; $i <= $rangeEdges[1]; $i++) {
+                $rangeIds[] = $i;
+            }
+            $ids = $rangeIds;
         }
 
         return $ids;
