@@ -211,6 +211,25 @@ class RoutingRouteTest extends TestCase
         );
     }
 
+    public function testArraySyntaxParametersMiddleware()
+    {
+        unset($_SERVER['route.test.array.syntax.parameters.middleware']);
+
+        $router = $this->getRouter();
+
+        $router->get('foo/bar', [
+            'middleware' => [
+                'Illuminate\Tests\Routing\RouteTestArraySyntaxParametersMiddleware' => ['one', 'two'],
+            ],
+            function () {
+                return 'Hello';
+            },
+        ]);
+
+        $this->assertEquals('Hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertEquals(['one', 'two'], $_SERVER['route.test.array.syntax.parameters.middleware']);
+    }
+
     /**
      * @expectedException \LogicException
      * @expectedExceptionMessage Route for [foo/bar] has no action.
@@ -1488,6 +1507,16 @@ class RouteTestControllerCallableStub extends Controller
     public function __call($method, $arguments = [])
     {
         return $method;
+    }
+}
+
+class RouteTestArraySyntaxParametersMiddleware
+{
+    public function handle($request, $next, ...$parameters)
+    {
+        $_SERVER['route.test.array.syntax.parameters.middleware'] = $parameters;
+
+        return $next($request);
     }
 }
 

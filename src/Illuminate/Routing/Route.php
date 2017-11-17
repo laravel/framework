@@ -753,9 +753,19 @@ class Route
 
         $this->computedMiddleware = [];
 
-        return $this->computedMiddleware = array_unique(array_merge(
+        $middleware = array_unique(array_merge(
             $this->middleware(), $this->controllerMiddleware()
         ), SORT_REGULAR);
+
+        // When middleware uses the array syntax, transform
+        // it into string syntax.
+        array_walk($middleware, function (&$value, $key) {
+            if (is_array($value)) {
+                $value = "{$key}:".implode(',', $value);
+            }
+        });
+
+        return $this->computedMiddleware = $middleware;
     }
 
     /**
