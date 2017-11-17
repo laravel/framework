@@ -811,11 +811,12 @@ class Blueprint
      * Create a new time column (with time zone) on the table.
      *
      * @param  string  $column
+     * @param  int  $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function timeTz($column)
+    public function timeTz($column, $precision = 0)
     {
-        return $this->addColumn('timeTz', $column);
+        return $this->addColumn('timeTz', $column, compact('precision'));
     }
 
     /**
