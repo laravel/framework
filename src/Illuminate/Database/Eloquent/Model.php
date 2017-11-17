@@ -879,6 +879,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get a new query to restore one or more models by the queueable IDs.
+     *
+     * @param  array|int  $ids
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryForRestoration($ids)
+    {
+        if (is_array($ids)) {
+            return $this->newQueryWithoutScopes()->whereIn(
+                $this->getQualifiedKeyName(),
+                $ids
+            );
+        }
+
+        return $this->newQueryWithoutScopes()->whereKey($ids);
+    }
+
+    /**
      * Create a new Eloquent query builder for the model.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
