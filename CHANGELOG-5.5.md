@@ -1,5 +1,26 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added `response()` and `download()` methods to file system ([#22089](https://github.com/laravel/framework/pull/22089))
+
+### Changed
+- Updated depreciated `MailFake::queue()` method signature ([#22072](https://github.com/laravel/framework/pull/22072))
+- Use `MEDIUMTEXT` instead of `TEXT` for database cache values (MySQL only) ([#22091](https://github.com/laravel/framework/pull/22091))
+- Include the name of the scheduled job in the output email subject ([#22098](https://github.com/laravel/framework/pull/22098))
+- Support `Dblib` version config for SQL Server ([#22102](https://github.com/laravel/framework/pull/22102))
+- Set `Model::$exists` to `false` when force-deleting a model using `SoftDeletes` ([#22100](https://github.com/laravel/framework/pull/22100))
+- Support empty strings in `HasAttributes::fromDateTime()` ([#22108](https://github.com/laravel/framework/pull/22108))
+
+### Fixed
+- Fixed `HasManyThrough` relation with custom intermediate and local keys when used in `whereHas()` ([#22071](https://github.com/laravel/framework/pull/22071), [3788cbd](https://github.com/laravel/framework/commit/3788cbd3e606caa4a6e4137f92709c85e52b2cf3))
+- Fixed SQL Server handling of `DATETIME` columns ([#22052](https://github.com/laravel/framework/pull/22052))
+- Return default value from `old()` when session isn't available ([#22082](https://github.com/laravel/framework/pull/22082))
+- Refactor `Arr::flatten()` to prevent performance issue ([#22103](https://github.com/laravel/framework/pull/22103))
+- Wrap MySQL JSON keys are in double quotes when updating JSON columns ([#22118](https://github.com/laravel/framework/pull/22118))
+
+
 ## v5.5.21 (2017-11-14)
 
 ### Added
