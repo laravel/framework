@@ -683,7 +683,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($questionMarksCount, $bindingsCount);
     }
 
-    public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
+    public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedOrCursorRequest()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
@@ -694,6 +694,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $this->assertEquals($user->id, $friends->first()->pivot->user_id);
             $this->assertEquals($friend->id, $friends->first()->pivot->friend_id);
         });
+
+        foreach (EloquentTestUser::first()->friends()->cursor() as $friend) {
+            $this->assertInstanceOf(EloquentTestUser::class, $friend);
+            $this->assertEquals('abigailotwell@gmail.com', $friend->email);
+            $this->assertEquals($user->id, $friend->pivot->user_id);
+            $this->assertEquals($friend->id, $friend->pivot->friend_id);
+        }
     }
 
     public function testBasicHasManyEagerLoading()

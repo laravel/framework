@@ -621,6 +621,21 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor()
+    {
+        $this->query->addSelect($this->shouldSelect());
+
+        foreach ($this->query->cursor() as $model) {
+            $this->hydratePivotRelation([$model]);
+            yield $model;
+        }
+    }
+
+    /**
      * Hydrate the pivot table relationship on the models.
      *
      * @param  array  $models
