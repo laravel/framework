@@ -36,6 +36,7 @@ class RedisManager implements Factory
      *
      * @param  string  $driver
      * @param  array  $config
+     * @return void
      */
     public function __construct($driver, array $config)
     {

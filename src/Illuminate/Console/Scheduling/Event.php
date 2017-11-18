@@ -434,7 +434,7 @@ class Event
             return $this->description;
         }
 
-        return 'Scheduled Job Output';
+        return "Scheduled Job Output For [{$this->command}]";
     }
 
     /**

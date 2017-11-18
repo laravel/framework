@@ -735,7 +735,7 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return is_null($value) ? $value : $this->asDateTime($value)->format(
+        return empty($value) ? $value : $this->asDateTime($value)->format(
             $this->getDateFormat()
         );
     }

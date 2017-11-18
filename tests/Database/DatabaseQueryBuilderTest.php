@@ -1676,7 +1676,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?',
+                        'update `users` set `name` = json_set(`name`, \'$."first_name"\', ?), `name` = json_set(`name`, \'$."last_name"\', ?) where `active` = ?',
                         ['John', 'Doe', 1]
                     );
 
@@ -1694,7 +1694,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
                     ->once()
                     ->with(
-                        'update `users` set `options` = json_set(`options`, "$.enable", false), `updated_at` = ? where `id` = ?',
+                        'update `users` set `options` = json_set(`options`, \'$."enable"\', false), `updated_at` = ? where `id` = ?',
                         ['2015-05-26 22:02:06', 0]
                     );
         $builder = new Builder($connection, $grammar, $processor);
@@ -1703,7 +1703,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
             ->once()
             ->with(
-                'update `users` set `options` = json_set(`options`, "$.size", 45), `updated_at` = ? where `id` = ?',
+                'update `users` set `options` = json_set(`options`, \'$."size"\', 45), `updated_at` = ? where `id` = ?',
                 ['2015-05-26 22:02:06', 0]
             );
         $builder = new Builder($connection, $grammar, $processor);
@@ -1750,8 +1750,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereRaw('items->"$.price" = 1');
-        $this->assertEquals('select * from `users` where items->"$.price" = 1', $builder->toSql());
+        $builder->select('*')->from('users')->whereRaw('items->\'$."price"\' = 1');
+        $this->assertEquals('select * from `users` where items->\'$."price"\' = 1', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');

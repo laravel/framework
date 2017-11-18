@@ -163,7 +163,7 @@ class MySqlGrammar extends Grammar
 
         $field = $this->wrapValue(array_shift($path));
 
-        $accessor = '"$.'.implode('.', $path).'"';
+        $accessor = "'$.\"".implode('.', $path)."\"'";
 
         return "{$field} = json_set({$field}, {$accessor}, {$value->getValue()})";
     }
