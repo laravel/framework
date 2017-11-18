@@ -422,6 +422,18 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor()
+    {
+        $this->query->addSelect($this->shouldSelect());
+
+        yield from $this->query->cursor();
+    }
+
+    /**
      * Set the select clause for the relation query.
      *
      * @param  array  $columns
