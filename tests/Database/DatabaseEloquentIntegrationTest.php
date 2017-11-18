@@ -695,7 +695,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $this->assertEquals($friend->id, $friends->first()->pivot->friend_id);
         });
 
-        foreach (EloquentTestUser::first()->friends() as $friend) {
+        foreach (EloquentTestUser::first()->friends()->cursor() as $friend) {
             $this->assertInstanceOf(EloquentTestUser::class, $friend);
             $this->assertEquals('abigailotwell@gmail.com', $friend->email);
             $this->assertEquals($user->id, $friend->pivot->user_id);
