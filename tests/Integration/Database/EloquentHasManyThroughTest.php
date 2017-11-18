@@ -58,6 +58,49 @@ class EloquentHasManyThroughTest extends TestCase
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
         $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
     }
+
+    /**
+     * @test
+     */
+    public function retrieve_results_in_chunks_without_attribute_shadowing()
+    {
+        $user = $this->stubUserTeamMates();
+
+        $ids_by_get = $user->teamMates()->forPage(1, 10)->get()->pluck('id');
+
+        $ids_by_chunk = collect();
+        $user->teamMates()->chunk(10, function ($posts) use (&$ids_by_chunk) {
+            $ids_by_chunk = $ids_by_chunk->merge($posts->pluck('id'));
+        });
+
+        $this->assertEquals($ids_by_get->toArray(), $ids_by_chunk->toArray());
+    }
+
+    /**
+     * @test
+     */
+    public function pluck_column_without_attribute_shadowing()
+    {
+        $user = $this->stubUserTeamMates();
+
+        $mates_by_get = $user->teamMates()->get();
+
+        $mates_by_cursor = collect($user->teamMates()->cursor());
+
+        $this->assertEquals($mates_by_get->toArray(), $mates_by_cursor->toArray());
+    }
+
+    protected function stubUserTeamMates()
+    {
+        $user = User::create(['name' => str_random()]);
+
+        $team = Team::create(['owner_id' => $user->id]);
+
+        $mate1 = User::create(['name' => str_random(), 'team_id' => $team->id]);
+        $mate2 = User::create(['name' => str_random(), 'team_id' => $team->id]);
+
+        return $user;
+    }
 }
 
 class User extends Model
