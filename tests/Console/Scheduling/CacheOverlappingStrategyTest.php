@@ -83,7 +83,8 @@ class CacheMutexTest extends TestCase
 
     public function testResetOverlap()
     {
-        $this->cacheRepository->shouldReceive('forget')->once();
+        $this->cacheRepository->shouldReceive('forget')->with($this->event->mutexName())->once();
+        $this->cacheRepository->shouldReceive('forget')->with($this->event->mutexName().date('Hi'))->never();
 
         $this->cacheMutex->forget($this->event);
     }
