@@ -350,8 +350,10 @@ trait HasEvents
 
         $this->unsetEventDispatcher();
 
-        $callback();
-
-        $this->setEventDispatcher($dispatcher);
+        try {
+            $callback();
+        } finally {
+            $this->setEventDispatcher($dispatcher);
+        }
     }
 }
