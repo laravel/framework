@@ -337,7 +337,7 @@ trait HasEvents
     {
         static::$dispatcher = null;
     }
-    
+
     /**
      * Call a callback without firing events.
      *
