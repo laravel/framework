@@ -75,8 +75,8 @@ class CacheMutexTest extends TestCase
 
     public function testOverlapsForRunningTaskLongerThanMinute()
     {
-        $this->cacheRepository->shouldReceive('has')->once()->andReturn(false);
-        $this->cacheRepository->shouldReceive('has')->once()->andReturn(true);
+        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName())->andReturn(false);
+        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName().date('Hi'))->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->exists($this->event));
     }
