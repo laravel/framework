@@ -337,4 +337,21 @@ trait HasEvents
     {
         static::$dispatcher = null;
     }
+    
+    /**
+     * Call a callback without firing events.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public function withoutEvents($callback)
+    {
+        $dispatcher = $this->getEventDispatcher();
+
+        $this->unsetEventDispatcher();
+
+        $callback();
+
+        $this->setEventDispatcher($dispatcher);
+    }
 }
