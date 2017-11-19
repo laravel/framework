@@ -37,6 +37,13 @@ class Event
     public $timezone;
 
     /**
+     * The timestamp the event was initialized.
+     *
+     * @var \Illuminate\Support\Carbon
+     */
+    public $timestamp;
+
+    /**
      * The user the command should run as.
      *
      * @var string
@@ -146,6 +153,7 @@ class Event
         $this->mutex = $mutex;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
+        $this->timestamp = Carbon::now();
     }
 
     /**
@@ -287,13 +295,11 @@ class Event
      */
     protected function expressionPasses()
     {
-        $date = Carbon::now();
-
         if ($this->timezone) {
-            $date->setTimezone($this->timezone);
+            $this->timestamp->setTimezone($this->timezone);
         }
 
-        return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
+        return CronExpression::factory($this->expression)->isDue($this->timestamp->toDateTimeString());
     }
 
     /**
