@@ -15,6 +15,11 @@ class CacheMutexTest extends TestCase
     protected $cacheMutex;
 
     /**
+     * @var \Illuminate\Console\Scheduling\Event
+     */
+    protected $event;
+
+    /**
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cacheRepository;
@@ -25,60 +30,61 @@ class CacheMutexTest extends TestCase
 
         $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
         $this->cacheMutex = new CacheMutex($this->cacheRepository);
+        $this->event = new Event($this->cacheMutex, 'command');
     }
 
     public function testPreventOverlap()
     {
-        $cacheMutex = $this->cacheMutex;
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().date('Hi'), true, 1)->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName(), true, $this->event->expiresAt)->andReturn(true);
 
-        $this->cacheRepository->shouldReceive('add');
-
-        $event = new Event($this->cacheMutex, 'command');
-
-        $cacheMutex->create($event);
+        $this->cacheMutex->create($this->event);
     }
 
-    public function testPreventOverlapFails()
+    public function testPreventOverlapFailsDueToTaskRunningThisMinute()
     {
-        $cacheMutex = $this->cacheMutex;
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().date('Hi'), true, 1)->andReturn(false);
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName(), true, $this->event->expiresAt)->never();
 
-        $this->cacheRepository->shouldReceive('add')->andReturn(false);
-
-        $event = new Event($this->cacheMutex, 'command');
-
-        $this->assertFalse($cacheMutex->create($event));
+        $this->assertFalse($this->cacheMutex->create($this->event));
     }
 
-    public function testOverlapsForNonRunningTask()
+    public function testPreventOverlapFailsDueToTaskStillRunning()
     {
-        $cacheMutex = $this->cacheMutex;
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().date('Hi'), true, 1)->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName(), true, $this->event->expiresAt)->andReturn(false);
 
-        $this->cacheRepository->shouldReceive('has')->andReturn(false);
-
-        $event = new Event($this->cacheMutex, 'command');
-
-        $this->assertFalse($cacheMutex->exists($event));
+        $this->assertFalse($this->cacheMutex->create($this->event));
     }
 
-    public function testOverlapsForRunningTask()
+    public function testOverlapsForNonRunningTaskThatHasNotRunThisMinute()
     {
-        $cacheMutex = $this->cacheMutex;
+        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName())->andReturn(false);
+        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName().date('Hi'))->andReturn(false);
 
-        $this->cacheRepository->shouldReceive('has')->andReturn(true);
+        $this->assertFalse($this->cacheMutex->exists($this->event));
+    }
 
-        $event = new Event($this->cacheMutex, 'command');
+    public function testOverlapsForRunningTaskOncePerMinutue()
+    {
+        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName())->andReturn(true);
+        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName().date('Hi'))->never();
 
-        $this->assertTrue($cacheMutex->exists($event));
+        $this->assertTrue($this->cacheMutex->exists($this->event));
+    }
+
+    public function testOverlapsForRunningTaskLongerThanMinute()
+    {
+        $this->cacheRepository->shouldReceive('has')->once()->andReturn(false);
+        $this->cacheRepository->shouldReceive('has')->once()->andReturn(true);
+
+        $this->assertTrue($this->cacheMutex->exists($this->event));
     }
 
     public function testResetOverlap()
     {
-        $cacheMutex = $this->cacheMutex;
+        $this->cacheRepository->shouldReceive('forget')->once();
 
-        $this->cacheRepository->shouldReceive('forget');
-
-        $event = new Event($this->cacheMutex, 'command');
-
-        $cacheMutex->forget($event);
+        $this->cacheMutex->forget($this->event);
     }
 }
