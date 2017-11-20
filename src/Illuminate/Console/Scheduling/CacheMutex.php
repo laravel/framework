@@ -33,7 +33,7 @@ class CacheMutex implements Mutex
     public function create(Event $event)
     {
         return $this->cache->add(
-            $event->mutexName().$event->timestamp->format('Hi'), true, 1
+            $event->mutexName().$event->timestamp->format('Hi'), true, 60
         ) && $this->cache->add(
             $event->mutexName(), true, $event->expiresAt
         );

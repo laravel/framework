@@ -35,7 +35,7 @@ class CacheMutexTest extends TestCase
 
     public function testPreventOverlap()
     {
-        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().$this->event->timestamp->format('Hi'), true, 1)->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().$this->event->timestamp->format('Hi'), true, 60)->andReturn(true);
         $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName(), true, $this->event->expiresAt)->andReturn(true);
 
         $this->cacheMutex->create($this->event);
@@ -43,7 +43,7 @@ class CacheMutexTest extends TestCase
 
     public function testPreventOverlapFailsDueToTaskRunningThisMinute()
     {
-        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().$this->event->timestamp->format('Hi'), true, 1)->andReturn(false);
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().$this->event->timestamp->format('Hi'), true, 60)->andReturn(false);
         $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName(), true, $this->event->expiresAt)->never();
 
         $this->assertFalse($this->cacheMutex->create($this->event));
@@ -51,7 +51,7 @@ class CacheMutexTest extends TestCase
 
     public function testPreventOverlapFailsDueToTaskStillRunning()
     {
-        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().$this->event->timestamp->format('Hi'), true, 1)->andReturn(true);
+        $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName().$this->event->timestamp->format('Hi'), true, 60)->andReturn(true);
         $this->cacheRepository->shouldReceive('add')->with($this->event->mutexName(), true, $this->event->expiresAt)->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->create($this->event));
