@@ -1053,6 +1053,8 @@ if (! function_exists('throw_if')) {
         if ($boolean) {
             throw (is_string($exception) ? new $exception(...$parameters) : $exception);
         }
+
+        return $boolean;
     }
 }
 
@@ -1071,6 +1073,8 @@ if (! function_exists('throw_unless')) {
         if (! $boolean) {
             throw (is_string($exception) ? new $exception(...$parameters) : $exception);
         }
+
+        return $boolean;
     }
 }
 
