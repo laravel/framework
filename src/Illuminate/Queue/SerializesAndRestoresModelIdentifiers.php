@@ -51,9 +51,9 @@ trait SerializesAndRestoresModelIdentifiers
         $model = (new $value->class)->setConnection($value->connection);
 
         return is_array($value->id)
-            ? $this->restoreCollection($value)
-            : $this->getQueryForModelRestoration($model, $value->id)
-                ->useWritePdo()->firstOrFail();
+                ? $this->restoreCollection($value)
+                : $this->getQueryForModelRestoration($model, $value->id)
+                        ->useWritePdo()->firstOrFail();
     }
 
     /**
@@ -68,10 +68,9 @@ trait SerializesAndRestoresModelIdentifiers
             return new EloquentCollection;
         }
 
-        $model = (new $value->class)->setConnection($value->connection);
-
-        return $this->getQueryForModelRestoration($model, $value->id)
-            ->useWritePdo()->get();
+        return $this->getQueryForModelRestoration(
+            (new $value->class)->setConnection($value->connection), $value->id
+        )->useWritePdo()->get();
     }
 
     /**
