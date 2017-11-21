@@ -7,7 +7,9 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Filesystem\File;
 use Illuminate\Contracts\Support\Arrayable;
+use League\Flysystem\FileNotFoundException;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -48,6 +50,13 @@ trait HasAttributes
      * @var array
      */
     protected $dates = [];
+
+    /**
+     * The attributes that should be mutated to File.
+     *
+     * @var array
+     */
+    protected $files = [];
 
     /**
      * The storage format of the model's date columns.
@@ -353,6 +362,12 @@ trait HasAttributes
         if (in_array($key, $this->getDates()) &&
             ! is_null($value)) {
             return $this->asDateTime($value);
+        }
+
+        // If the attribute is listed as a file, we will convert it to a File instance
+        if ((in_array($key, $this->getFiles()) || array_key_exists($key, $this->getFiles())) && ! is_null($value))
+        {
+            return $this->asFile($value, is_string($key) ? $this->getFiles()[$key] : null);
         }
 
         return $value;
@@ -1137,5 +1152,35 @@ trait HasAttributes
         preg_match_all('/(?<=^|;)get([^;]+?)Attribute(;|$)/', implode(';', get_class_methods($class)), $matches);
 
         return $matches[1];
+    }
+
+    /**
+     * Get the files.
+     *
+     * @return array
+     */
+    public function getFiles()
+    {
+        return $this->files;
+    }
+
+    /**
+     * Create a file for a path.
+     *
+     * @param string      $path
+     * @param string|null $disk
+     *
+     * @return File|null
+     */
+    protected function asFile($path, $disk = null)
+    {
+        try
+        {
+            return new File($path, $disk);
+        }
+        catch (FileNotFoundException $exception)
+        {
+            return null;
+        }
     }
 }
