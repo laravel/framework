@@ -454,8 +454,8 @@ class TestResponse
     /**
      * Assert that the response JSON has the expected count of items at the given key.
      *
-     * @param int $count
-     * @param string|null $key
+     * @param  int  $count
+     * @param  string|null  $key
      * @return $this
      */
     public function assertJsonCount(int $count, $key = null)
@@ -480,7 +480,7 @@ class TestResponse
     /**
      * Assert that the response has the given JSON validation errors for the given keys.
      *
-     * @param string|array $keys
+     * @param  string|array  $keys
      * @return $this
      */
     public function assertJsonValidationErrors($keys)

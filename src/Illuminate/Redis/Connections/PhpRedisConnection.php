@@ -50,7 +50,7 @@ class PhpRedisConnection extends Connection
     /**
      * Determine if the given keys exist.
      *
-     * @param  dynamic  $key
+     * @param  dynamic  $keys
      * @return int
      */
     public function exists(...$keys)
@@ -65,11 +65,11 @@ class PhpRedisConnection extends Connection
     /**
      * Set the string value in argument as value of the key.
      *
-     * @param string  $key
-     * @param mixed  $value
-     * @param string|null  $expireResolution
-     * @param int|null  $expireTTL
-     * @param string|null  $flag
+     * @param  string  $key
+     * @param  mixed  $value
+     * @param  string|null  $expireResolution
+     * @param  int|null  $expireTTL
+     * @param  string|null  $flag
      * @return bool
      */
     public function set($key, $value, $expireResolution = null, $expireTTL = null, $flag = null)
@@ -385,7 +385,8 @@ class PhpRedisConnection extends Connection
     /**
      * Apply prefix to the given key if necessary.
      *
-     * @param $key
+     * @param  string  $key
+     * @return string
      */
     private function applyPrefix($key)
     {

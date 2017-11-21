@@ -551,7 +551,7 @@ class Grammar extends BaseGrammar
     /**
      * Compile the query orders to an array.
      *
-     * @param  \Illuminate\Database\Query\Builder
+     * @param  \Illuminate\Database\Query\Builder  $query
      * @param  array  $orders
      * @return array
      */

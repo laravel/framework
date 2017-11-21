@@ -496,10 +496,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     /**
      * Get a temporary URL for the file at the given path.
      *
-     * @param  \League\Flysystem\Rackspace\RackspaceAdapter $adapter
-     * @param  string $path
-     * @param  \DateTimeInterface $expiration
-     * @param  $options
+     * @param  \League\Flysystem\Rackspace\RackspaceAdapter  $adapter
+     * @param  string  $path
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $options
      * @return string
      */
     public function getRackspaceTemporaryUrl($adapter, $path, $expiration, $options)

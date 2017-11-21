@@ -135,7 +135,7 @@ class VendorPublishCommand extends Command
     /**
      * Parse the answer that was given via the prompt.
      *
-     * @param string $choice
+     * @param  string  $choice
      * @return void
      */
     protected function parseChoice($choice)
