@@ -748,6 +748,11 @@ class SupportHelpersTest extends TestCase
         throw_if(true, new RuntimeException);
     }
 
+    public function testThrowReturnIfNotThrown()
+    {
+        $this->assertSame('foo', throw_unless('foo', new RuntimeException));
+    }
+
     /**
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Test Message
