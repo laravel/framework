@@ -124,6 +124,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $globalScopes = [];
 
     /**
+     * The array of relationships that will be deleted with this model.
+     *
+     * @var array
+     */
+    protected $cascadeDeletes = [];
+    
+    /**
      * The name of the "created at" column.
      *
      * @var string
@@ -767,6 +774,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // by the timestamp. Then we will go ahead and delete the model instance.
         $this->touchOwners();
 
+        // Verifies if the model uses cascade deletes
+        if ( $this->hasCascadeDeletes() ) {
+            $this->performCascadeDeletes();
+        }
+        
+        
         $this->performDeleteOnModel();
 
         // Once the model has been deleted, we will fire off the deleted event so that
@@ -1483,5 +1496,59 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __wakeup()
     {
         $this->bootIfNotBooted();
+    }
+    
+    /**
+     * Verify if this model uses cascade deletes
+     *
+     * @return bool
+     */
+    protected function hasCascadeDeletes () : bool
+    {
+        return isset($this->cascadeDeletes);
+
+    }
+
+
+    /**
+     * If this model use cascade delete, run through relations and delete the models
+     *
+     * @return bool|void
+     */
+    protected function performCascadeDeletes ( )
+    {
+        $relations = collect($this->cascadeDeletes);
+        $relations->map(function ($relation) {
+            $this->performDeleteOnRelation($relation);
+        });
+
+    }
+
+    /**
+     * This verifies if has or not subrelations to delete data from models
+     *
+     * @param $item
+     * @param bool $subRelation
+     * @return bool|void
+     */
+    protected function performDeleteOnRelation ( $item, $subRelation = true )
+    {
+
+        if ( $item == null || !$subRelation ) return;
+
+        // perform the delete on model
+        $this->load([ $item => function ( $q ) {
+            $q->delete();
+        }]);
+
+        // Check if is the last element
+        if ( strpos('.', $item) !== false ) {
+            return true;
+        }
+
+        // for recursive relations
+        $item = substr($item, 0, strripos($item, '.'));
+        $this->performDeleteOnRelation($item, true);
+
     }
 }
