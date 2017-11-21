@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Tests\Integration\Routing\Fixtures\RunCountMiddleware;
 
 /**
  * @group integration
@@ -94,5 +95,26 @@ class FallbackRouteTest extends TestCase
 
         $this->assertContains('one', $this->get('/one')->getContent());
         $this->assertEquals(200, $this->get('/one')->getStatusCode());
+    }
+
+    public function test_respond_with_named_fallback_route_doesnt_rerun_middleware()
+    {
+        app("router")->pushMiddlewareToGroup("test", RunCountMiddleware::class);
+
+        Route::fallback(function () {
+            return response('fallback', 404);
+        })->name('testFallbackRoute')->middleware("test");
+
+        Route::get('one', function () {
+            return Route::respondWithRoute('testFallbackRoute');
+        })->middleware("test");
+
+        RunCountMiddleware::$runCount = 0;
+        $this->assertContains('fallback', $this->get('/non-existing')->getContent());
+        $this->assertEquals(1, RunCountMiddleware::$runCount);
+
+        RunCountMiddleware::$runCount = 0;
+        $this->assertContains('fallback', $this->get('/one')->getContent());
+        $this->assertEquals(1, RunCountMiddleware::$runCount);
     }
 }
