@@ -366,11 +366,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     public function testAddingEnum()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->enum('foo', ['bar', 'baz']);
+        $blueprint->enum('role', ['member', 'admin']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
     public function testAddingJson()

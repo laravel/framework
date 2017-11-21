@@ -512,18 +512,18 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for an enum type.
+     * Create the column definition for an enumeration type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeEnum(Fluent $column)
     {
-        $allowed = array_map(function ($a) {
-            return "'{$a}'";
-        }, $column->allowed);
-
-        return "varchar(255) check (\"{$column->name}\" in (".implode(', ', $allowed).'))';
+        return sprintf(
+            'varchar(255) check ("%s" in (%s))',
+            $column->name,
+            $this->quote($column->allowed)
+        );
     }
 
     /**
