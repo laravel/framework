@@ -1513,7 +1513,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * If this model use cascade delete, run through relations and delete the models
      *
-     * @return bool|void
+     * @return void
      */
     protected function performCascadeDeletes ( )
     {
@@ -1529,7 +1529,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param $item
      * @param bool $subRelation
-     * @return bool|void
+     * @return bool
      */
     protected function performDeleteOnRelation ( $item, $subRelation = true )
     {
