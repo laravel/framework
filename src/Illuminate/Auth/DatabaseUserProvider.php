@@ -98,6 +98,12 @@ class DatabaseUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
+        if (empty($credentials) ||
+           (count($credentials) === 1 &&
+            array_key_exists('password', $credentials))) {
+            return;
+        }
+
         // First we will add each credential element to the query as a where clause.
         // Then we can execute the query and, if we found a user, return it in a
         // generic "user" object that will be utilized by the Guard instances.

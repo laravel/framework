@@ -500,7 +500,7 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -518,18 +518,18 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time';
+        return $column->precision ? "time($column->precision)" : 'time';
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time';
+        return $this->typeTime($column);
     }
 
     /**
@@ -540,17 +540,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetime2($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetime default CURRENT_TIMESTAMP';
-        }
+        $columnType = $column->precision ? "datetime2($column->precision)" : 'datetime';
 
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
      *
@@ -560,9 +556,9 @@ class SqlServerGrammar extends Grammar
     protected function typeTimestampTz(Fluent $column)
     {
         if ($column->useCurrent) {
-            return $column->precision
-                    ? "datetimeoffset($column->precision) default CURRENT_TIMESTAMP"
-                    : 'datetimeoffset default CURRENT_TIMESTAMP';
+            $columnType = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+
+            return "$columnType default CURRENT_TIMESTAMP";
         }
 
         return "datetimeoffset($column->precision)";

@@ -44,7 +44,7 @@ trait CompilesIncludes
     /**
      * Compile the include-when statements into valid PHP.
      *
-     * @param string $expression
+     * @param  string  $expression
      * @return string
      */
     protected function compileIncludeWhen($expression)

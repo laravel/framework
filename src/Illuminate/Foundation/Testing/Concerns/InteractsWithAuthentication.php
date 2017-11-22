@@ -74,7 +74,7 @@ trait InteractsWithAuthentication
     /**
      * Assert that the user is authenticated as the given user.
      *
-     * @param  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string|null  $guard
      * @return $this
      */

@@ -105,7 +105,7 @@ class SparkPostTransport extends Transport
     /**
      * Get the transmission ID from the response.
      *
-     * @param \GuzzleHttp\Psr7\Response $response
+     * @param  \GuzzleHttp\Psr7\Response  $response
      * @return string
      */
     protected function getTransmissionId($response)

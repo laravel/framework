@@ -571,7 +571,7 @@ class PostgresGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a date-time type.
+     * Create the column definition for a date-time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
@@ -589,18 +589,18 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTime(Fluent $column)
     {
-        return 'time(0) without time zone';
+        return "time($column->precision) without time zone";
     }
 
     /**
-     * Create the column definition for a time type.
+     * Create the column definition for a time (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
     {
-        return 'time(0) with time zone';
+        return "time($column->precision) with time zone";
     }
 
     /**
@@ -611,26 +611,22 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) without time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $columnType = "timestamp($column->precision) without time zone";
 
-        return "timestamp($column->precision) without time zone";
+        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
 
     /**
-     * Create the column definition for a timestamp type.
+     * Create the column definition for a timestamp (with time zone) type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            return "timestamp($column->precision) with time zone default CURRENT_TIMESTAMP($column->precision)";
-        }
+        $columnType = "timestamp($column->precision) with time zone";
 
-        return "timestamp($column->precision) with time zone";
+        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
 
     /**
