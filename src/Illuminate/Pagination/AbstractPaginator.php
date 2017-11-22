@@ -141,23 +141,23 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function url($page)
     {
-        if ($page <= 0) {
-            $page = 1;
-        }
-
         // If we have any extra query string key / value pairs that need to be added
         // onto the URL, we will put them in query string form and then attach it
         // to the URL. This allows for extra information like sortings storage.
-        $parameters = [$this->pageName => $page];
+        $parameters = $page > 1 ? [$this->pageName => $page] : [];
 
         if (count($this->query) > 0) {
             $parameters = array_merge($this->query, $parameters);
         }
 
-        return $this->path
-                        .(Str::contains($this->path, '?') ? '&' : '?')
-                        .http_build_query($parameters, '', '&')
-                        .$this->buildFragment();
+        $url = $this->path;
+
+        if ($parameters) {
+            $url .= (Str::contains($this->path, '?') ? '&' : '?')
+                .http_build_query($parameters, '', '&');
+        }
+
+        return $url.$this->buildFragment();
     }
 
     /**
