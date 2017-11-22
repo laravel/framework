@@ -135,10 +135,13 @@ class FileLoader implements Loader
     {
         return collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
-                return $this->files->exists($full = "{$path}/{$locale}.json")
-                    ? array_merge($output,
-                        json_decode($this->files->get($full), true)
-                    ) : $output;
+                if ($this->files->exists($full = "{$path}/{$locale}.json")) {
+                    $filecontent = json_decode($this->files->get($full), true);
+                    if (!is_null($filecontent) && json_last_error() === 0) {
+                        $output = array_merge($output, $filecontent);
+                    }
+                }
+                return $output;
             }, []);
     }
 
