@@ -506,6 +506,22 @@ trait HasAttributes
     {
         return trim(strtolower($this->getCasts()[$key]));
     }
+    
+    
+     /**
+     * Set the type of cast for a model attribute.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return $this
+     */
+    public function setCastType($key, $value)
+    {
+        $this->casts[$key] = $value;
+        return $this;
+    }
+    
+    
 
     /**
      * Set a given attribute on the model.
