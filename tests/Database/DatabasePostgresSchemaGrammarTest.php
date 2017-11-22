@@ -46,6 +46,19 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('comment on column "users"."email" is \'my first comment\'', $statements[1]);
     }
 
+    public function testCreateTemporaryTable()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create temporary table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
+    }
+
     public function testDropTable()
     {
         $blueprint = new Blueprint('users');
