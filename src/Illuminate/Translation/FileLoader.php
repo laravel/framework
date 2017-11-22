@@ -140,11 +140,12 @@ class FileLoader implements Loader
             ->reduce(function ($output, $path) use ($locale) {
                 if ($this->files->exists($full = "{$path}/{$locale}.json")) {
                     $filecontent = json_decode($this->files->get($full), true);
-                    if (! is_null($filecontent) && json_last_error() === 0) {
-                        $output = array_merge($output, $filecontent);
-                    } else {
+                    
+                    if (is_null($filecontent) || json_last_error() !== JSON_ERROR_NONE) {
                         throw new JsonFileInvalidException("{$full} contains an invalid json object.");
                     }
+
+                    $output = array_merge($output, $filecontent);
                 }
 
                 return $output;
