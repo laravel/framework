@@ -138,6 +138,21 @@ abstract class Grammar
     }
 
     /**
+     * Quote string literals.
+     *
+     * @param  string|array  $value
+     * @return string
+     */
+    public function quote($value)
+    {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, 'quote'], $value));
+        }
+
+        return "'$value'";
+    }
+
+    /**
      * Get the appropriate query parameter place-holder for a value.
      *
      * @param  mixed   $value

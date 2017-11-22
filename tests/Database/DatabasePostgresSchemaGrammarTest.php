@@ -432,11 +432,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddingEnum()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->enum('foo', ['bar', 'baz']);
+        $blueprint->enum('role', ['member', 'admin']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" varchar(255) check ("foo" in (\'bar\', \'baz\')) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "role" varchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
     public function testAddingDate()
