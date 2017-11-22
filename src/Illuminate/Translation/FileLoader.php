@@ -2,9 +2,9 @@
 
 namespace Illuminate\Translation;
 
+use RuntimeException;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Translation\Loader;
-use Illuminate\Contracts\Translation\JsonFileInvalidException;
 
 class FileLoader implements Loader
 {
@@ -132,20 +132,20 @@ class FileLoader implements Loader
      * @param  string  $locale
      * @return array
      *
-     * @throws \Illuminate\Contracts\Translation\JsonFileInvalidException
+     * @throws \RuntimeException
      */
     protected function loadJsonPaths($locale)
     {
         return collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
                 if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-                    $filecontent = json_decode($this->files->get($full), true);
-                    
-                    if (is_null($filecontent) || json_last_error() !== JSON_ERROR_NONE) {
-                        throw new JsonFileInvalidException("{$full} contains an invalid json object.");
+                    $decoded = json_decode($this->files->get($full), true);
+
+                    if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                        throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
                     }
 
-                    $output = array_merge($output, $filecontent);
+                    $output = array_merge($output, $decoded);
                 }
 
                 return $output;
