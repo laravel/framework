@@ -19,7 +19,7 @@ class UrlWindowTest extends TestCase
     {
         $p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
         $window = new UrlWindow($p);
-        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
+        $this->assertEquals(['first' => [1 => '/', 2 => '/?page=2'], 'slider' => null, 'last' => null], $window->get());
     }
 
     public function testPresenterCanGetAUrlRangeForAWindowOfLinks()
@@ -35,7 +35,7 @@ class UrlWindowTest extends TestCase
             $slider[$i] = '/?page='.$i;
         }
 
-        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
+        $this->assertEquals(['first' => [1 => '/', 2 => '/?page=2'], 'slider' => $slider, 'last' => [12 => '/?page=12', 13 => '/?page=13']], $window->get());
 
         /*
          * Test Being Near The End Of The List
@@ -47,6 +47,6 @@ class UrlWindowTest extends TestCase
             $last[$i] = '/?page='.$i;
         }
 
-        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
+        $this->assertEquals(['first' => [1 => '/', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
     }
 }
