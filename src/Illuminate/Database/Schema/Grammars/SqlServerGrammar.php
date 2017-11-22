@@ -22,21 +22,6 @@ class SqlServerGrammar extends Grammar
     protected $serials = ['tinyInteger', 'smallInteger', 'mediumInteger', 'integer', 'bigInteger'];
 
     /**
-     * Wrap a table in keyword identifiers.
-     *
-     * @param  \Illuminate\Database\Query\Expression|string  $table
-     * @return string
-     */
-    public function wrapTable($table)
-    {
-        if ($table instanceof Blueprint && $table->temporary) {
-            $this->setTablePrefix('#');
-        }
-
-        return parent::wrapTable($table);
-    }
-
-    /**
      * Compile the query to determine if a table exists.
      *
      * @return string
@@ -763,5 +748,20 @@ class SqlServerGrammar extends Grammar
         if (in_array($column->type, $this->serials) && $column->autoIncrement) {
             return ' identity primary key';
         }
+    }
+
+    /**
+     * Wrap a table in keyword identifiers.
+     *
+     * @param  \Illuminate\Database\Query\Expression|string  $table
+     * @return string
+     */
+    public function wrapTable($table)
+    {
+        if ($table instanceof Blueprint && $table->temporary) {
+            $this->setTablePrefix('#');
+        }
+
+        return parent::wrapTable($table);
     }
 }
