@@ -549,7 +549,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeEnum(Fluent $column)
     {
-        return sprintf('enum(%s)', $this->quote($column->allowed));
+        return sprintf('enum(%s)', $this->quoteString($column->allowed));
     }
 
     /**

@@ -138,21 +138,6 @@ abstract class Grammar
     }
 
     /**
-     * Quote string literals.
-     *
-     * @param  string|array  $value
-     * @return string
-     */
-    public function quote($value)
-    {
-        if (is_array($value)) {
-            return implode(', ', array_map([$this, 'quote'], $value));
-        }
-
-        return "'$value'";
-    }
-
-    /**
      * Get the appropriate query parameter place-holder for a value.
      *
      * @param  mixed   $value
@@ -161,6 +146,21 @@ abstract class Grammar
     public function parameter($value)
     {
         return $this->isExpression($value) ? $this->getValue($value) : '?';
+    }
+
+    /**
+     * Quote the given string literal.
+     *
+     * @param  string|array  $value
+     * @return string
+     */
+    public function quoteString($value)
+    {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, __FUNCTION__], $value));
+        }
+
+        return "'$value'";
     }
 
     /**

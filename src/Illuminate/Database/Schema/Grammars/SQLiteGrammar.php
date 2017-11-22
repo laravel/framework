@@ -512,7 +512,7 @@ class SQLiteGrammar extends Grammar
         return sprintf(
             'varchar check ("%s" in (%s))',
             $column->name,
-            $this->quote($column->allowed)
+            $this->quoteString($column->allowed)
         );
     }
 

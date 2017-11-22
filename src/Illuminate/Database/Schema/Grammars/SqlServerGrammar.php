@@ -455,7 +455,7 @@ class SqlServerGrammar extends Grammar
         return sprintf(
             'nvarchar(255) check ("%s" in (%s))',
             $column->name,
-            $this->quote($column->allowed)
+            $this->quoteString($column->allowed)
         );
     }
 
