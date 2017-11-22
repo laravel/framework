@@ -486,22 +486,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            try {
-                switch ($operator) {
-                    default:
-                    case '=':
-                    case '==':  return $retrieved == $value;
-                    case '!=':
-                    case '<>':  return $retrieved != $value;
-                    case '<':   return $retrieved < $value;
-                    case '>':   return $retrieved > $value;
-                    case '<=':  return $retrieved <= $value;
-                    case '>=':  return $retrieved >= $value;
-                    case '===': return $retrieved === $value;
-                    case '!==': return $retrieved !== $value;
-                }
-            } catch (Exception $e) {
+            if (count(array_filter([$retrieved, $value], 'is_object')) == 1) {
                 return false;
+            }
+
+            switch ($operator) {
+                default:
+                case '=':
+                case '==':  return $retrieved == $value;
+                case '!=':
+                case '<>':  return $retrieved != $value;
+                case '<':   return $retrieved < $value;
+                case '>':   return $retrieved > $value;
+                case '<=':  return $retrieved <= $value;
+                case '>=':  return $retrieved >= $value;
+                case '===': return $retrieved === $value;
+                case '!==': return $retrieved !== $value;
             }
         };
     }
