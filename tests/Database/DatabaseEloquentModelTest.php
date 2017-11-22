@@ -1840,6 +1840,7 @@ class EloquentModelSaveStub extends Model
         $mock->shouldReceive('getQueryGrammar')->andReturn(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
         $mock->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
         $mock->shouldReceive('getName')->andReturn('name');
+
         return $mock;
     }
 }
