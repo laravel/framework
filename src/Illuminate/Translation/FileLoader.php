@@ -141,6 +141,7 @@ class FileLoader implements Loader
                         $output = array_merge($output, $filecontent);
                     }
                 }
+
                 return $output;
             }, []);
     }
