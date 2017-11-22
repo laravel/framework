@@ -92,7 +92,7 @@ class Builder
      *
      * @var array
      */
-    public $joins;
+    public $joins = [];
 
     /**
      * The where constraints for the query.
