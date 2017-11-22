@@ -98,7 +98,9 @@ class DatabaseUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
-        if (empty($credentials) || (count($credentials) === 1 && array_key_exists('password', $credentials))) {
+        if (empty($credentials) ||
+           (count($credentials) === 1 &&
+            array_key_exists('password', $credentials))) {
             return;
         }
 
