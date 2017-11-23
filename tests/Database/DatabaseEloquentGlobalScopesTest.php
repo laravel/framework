@@ -4,12 +4,26 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        tap(new DB)->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+        ])->bootEloquent();
+    }
+
     public function tearDown()
     {
         m::close();
+
+        Eloquent::unsetConnectionResolver();
     }
 
     public function testGlobalScopeIsApplied()
