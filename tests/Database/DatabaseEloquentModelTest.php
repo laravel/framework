@@ -202,6 +202,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testWithoutMethodRemovesEagerLoadedRelationshipCorrectly()
     {
         $model = new EloquentModelWithoutRelationStub;
+        $this->addMockConnection($model);
         $instance = $model->newInstance()->newQuery()->without('foo');
         $this->assertEmpty($instance->getEagerLoads());
     }
@@ -1831,6 +1832,16 @@ class EloquentModelSaveStub extends Model
     public function setIncrementing($value)
     {
         $this->incrementing = $value;
+    }
+
+    public function getConnection()
+    {
+        $mock = m::mock('Illuminate\Database\Connection');
+        $mock->shouldReceive('getQueryGrammar')->andReturn(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
+        $mock->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
+        $mock->shouldReceive('getName')->andReturn('name');
+
+        return $mock;
     }
 }
 
