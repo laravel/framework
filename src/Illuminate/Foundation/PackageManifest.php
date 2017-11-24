@@ -77,7 +77,7 @@ class PackageManifest
      */
     public function aliases()
     {
-        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration) {
             return (array) ($configuration['aliases'] ?? []);
         })->filter()->all();
     }
