@@ -4,6 +4,9 @@
 
 ### Added
 - Added `response()` and `download()` methods to file system ([#22089](https://github.com/laravel/framework/pull/22089))
+- Added complete temporary table support ([#22110](https://github.com/laravel/framework/pull/22110))
+- Added `Mode::newQueryForRestoration()` method ([#22119](https://github.com/laravel/framework/pull/22119))
+- Added precision support for date/time columns ([#22122](https://github.com/laravel/framework/pull/22122))
 
 ### Changed
 - Updated depreciated `MailFake::queue()` method signature ([#22072](https://github.com/laravel/framework/pull/22072))
@@ -12,6 +15,9 @@
 - Support `Dblib` version config for SQL Server ([#22102](https://github.com/laravel/framework/pull/22102))
 - Set `Model::$exists` to `false` when force-deleting a model using `SoftDeletes` ([#22100](https://github.com/laravel/framework/pull/22100))
 - Support empty strings in `HasAttributes::fromDateTime()` ([#22108](https://github.com/laravel/framework/pull/22108))
+- Return condition from `throw_*` helpers ([#22149](https://github.com/laravel/framework/pull/22149))
+- Make `Collection::where()` independent of error reporting ([#22172](https://github.com/laravel/framework/pull/22172))
+- Show more meaningful message when json translation file contains errors ([#22165](https://github.com/laravel/framework/pull/22165), [cf29b88](https://github.com/laravel/framework/commit/cf29b884006a4ce4d84a115b531143337a875211))
 
 ### Fixed
 - Fixed `HasManyThrough` relation with custom intermediate and local keys when used in `whereHas()` ([#22071](https://github.com/laravel/framework/pull/22071), [3788cbd](https://github.com/laravel/framework/commit/3788cbd3e606caa4a6e4137f92709c85e52b2cf3))
@@ -19,6 +25,11 @@
 - Return default value from `old()` when session isn't available ([#22082](https://github.com/laravel/framework/pull/22082))
 - Refactor `Arr::flatten()` to prevent performance issue ([#22103](https://github.com/laravel/framework/pull/22103))
 - Wrap MySQL JSON keys are in double quotes when updating JSON columns ([#22118](https://github.com/laravel/framework/pull/22118))
+- Fixed custom URLs with prefix (`root`) for AWS storage ([#22130](https://github.com/laravel/framework/pull/22130))
+- Prevent authentication if `password` is the only specified field ([#22167](https://github.com/laravel/framework/pull/22167))
+
+### Removed
+- Removed `between` operator from basic where clauses ([#22182](https://github.com/laravel/framework/pull/22182))
 
 
 ## v5.5.21 (2017-11-14)
