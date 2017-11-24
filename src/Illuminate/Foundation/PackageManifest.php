@@ -65,7 +65,7 @@ class PackageManifest
      */
     public function providers()
     {
-        return collect($this->getManifest())->flatMap(function ($configuration, $name) {
+        return collect($this->getManifest())->flatMap(function ($configuration) {
             return (array) ($configuration['providers'] ?? []);
         })->filter()->all();
     }
