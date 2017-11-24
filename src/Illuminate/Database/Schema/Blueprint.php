@@ -41,6 +41,13 @@ class Blueprint
     public $engine;
 
     /**
+     * The comment description for the table.
+     *
+     * @var string
+     */
+    public $comment;
+
+    /**
      * The default character set that should be used for the table.
      */
     public $charset;

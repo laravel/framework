@@ -66,6 +66,11 @@ class MySqlGrammar extends Grammar
             $sql, $connection, $blueprint
         );
 
+        // We can add a comment on the table if it's present.
+        $sql = $this->compileCreateComment(
+            $sql, $connection, $blueprint
+        );
+
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
         // added the query will be ready to execute against the real connections.
@@ -117,6 +122,25 @@ class MySqlGrammar extends Grammar
             $sql .= ' collate '.$blueprint->collation;
         } elseif (! is_null($collation = $connection->getConfig('collation'))) {
             $sql .= ' collate '.$collation;
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Append the comment specifications to a command.
+     *
+     * @param  string  $sql
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function compileCreateComment($sql, Connection $connection, Blueprint $blueprint)
+    {
+        if (isset($blueprint->comment)) {
+            return $sql.' comment = '."'".addslashes($blueprint->comment)."'";
+        } elseif (! is_null($comment = $connection->getConfig('comment'))) {
+            return $sql.' comment = '."'".addslashes($comment)."'";
         }
 
         return $sql;
