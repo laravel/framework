@@ -44,7 +44,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
     }
 
-
     public function testCommentCreateTable()
     {
         $blueprint = new Blueprint('users');
