@@ -1657,7 +1657,7 @@ class Builder
     {
         dump([
             'bindings' => $this->bindings,
-            'sql' => $this->toSql()
+            'sql' => $this->toSql(),
         ]);
 
         return $this;
