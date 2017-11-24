@@ -1649,6 +1649,37 @@ class Builder
     }
 
     /**
+     * Dump useful properties of the builder.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function dump() {
+        dump([
+            'bindings' => $this->bindings,
+            'sql' => $this->toSql(),
+            'raw' => $this->toRawSql($this->toSql(), $this->bindings)
+        ]);
+
+        return $this;
+    }
+
+    /**
+     * Get the SQL representation of the query with
+     * substituted bindings.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function toRawSql($sql, $bindings) {
+        $flat = array_flatten($bindings);
+        foreach ($flat as $binding) {
+            $binded = is_numeric($binding) ? $binding : "'{$binding}'";
+            $sql = preg_replace('/\?/', $binded, $sql, 1);
+        }
+
+        return $sql;
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int    $id
