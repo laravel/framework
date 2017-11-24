@@ -48,7 +48,7 @@ class ThrottleRequests
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
-        if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
+        if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
             throw $this->buildException($key, $maxAttempts);
         }
 
