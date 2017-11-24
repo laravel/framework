@@ -1649,6 +1649,21 @@ class Builder
     }
 
     /**
+     * Dump useful properties of the builder.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    public function dump()
+    {
+        dump([
+            'bindings' => $this->bindings,
+            'sql' => $this->toSql(),
+        ]);
+
+        return $this;
+    }
+
+    /**
      * Execute a query for a single record by ID.
      *
      * @param  int    $id
