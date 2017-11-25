@@ -36,6 +36,12 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['foo', 'bar', 'baz'], Arr::collapse($data));
     }
 
+    public function testClean()
+    {
+        $data = ['foo' => ['foo' => 'bar', 'bar' => []]];
+        $this->assertEquals(['foo' => ['foo' => 'bar']], Arr::clean($data));
+    }
+
     public function testCrossJoin()
     {
         // Single dimension
