@@ -56,7 +56,7 @@ class ScheduleRunCommand extends Command
 
             $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
-            $event->run($this->laravel);
+            $event->run($this->laravel, config('scheduling.multi_server'));
 
             $eventsRan = true;
         }

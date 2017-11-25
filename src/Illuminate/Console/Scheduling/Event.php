@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
+use LogicException;
 use Cron\CronExpression;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
@@ -63,6 +64,13 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
+
+    /**
+     * Indicates if the command should be allowed to override and run on all servers simultaneously.
+     *
+     * @var bool
+     */
+    public $runOnAllServers = false;
 
     /**
      * The amount of time the mutex should be valid.
@@ -128,6 +136,13 @@ class Event
     public $description;
 
     /**
+     * The cron timestamp the event was evaluated to run at.
+     *
+     * @var \Illuminate\Support\Carbon
+     */
+    public $timestamp;
+
+    /**
      * The mutex implementation.
      *
      * @var \Illuminate\Console\Scheduling\Mutex
@@ -146,6 +161,7 @@ class Event
         $this->mutex = $mutex;
         $this->command = $command;
         $this->output = $this->getDefaultOutput();
+        $this->timestamp = Carbon::now();
     }
 
     /**
@@ -162,10 +178,17 @@ class Event
      * Run the given event.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  bool  $multiServerScheduling
      * @return void
      */
-    public function run(Container $container)
+    public function run(Container $container, $multiServerScheduling = false)
     {
+        if ($multiServerScheduling &&
+            ! $this->runOnAllServers &&
+            ! $this->mutex->serverCreate($this)) {
+            return;
+        }
+
         if ($this->withoutOverlapping &&
             ! $this->mutex->create($this)) {
             return;
@@ -287,13 +310,11 @@ class Event
      */
     protected function expressionPasses()
     {
-        $date = Carbon::now();
-
         if ($this->timezone) {
-            $date->setTimezone($this->timezone);
+            $this->timestamp->setTimezone($this->timezone);
         }
 
-        return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
+        return CronExpression::factory($this->expression)->isDue($this->timestamp->toDateTimeString());
     }
 
     /**
@@ -518,9 +539,17 @@ class Event
      *
      * @param  int  $expiresAt
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
+        if ($this->runOnAllServers) {
+            throw new LogicException(
+                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
+            );
+        }
+
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
@@ -530,6 +559,26 @@ class Event
         })->skip(function () {
             return $this->mutex->exists($this);
         });
+    }
+
+    /**
+     * Allow the event to run on all servers for each cron expression.
+     *
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function runOnAllServers()
+    {
+        if ($this->withoutOverlapping) {
+            throw new LogicException(
+                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
+            );
+        }
+
+        $this->runOnAllServers = true;
+
+        return $this;
     }
 
     /**

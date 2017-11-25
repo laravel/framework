@@ -24,6 +24,13 @@ class Schedule
     protected $mutex;
 
     /**
+     * Enable multi server scheduling support.
+     *
+     * @var bool
+     */
+    public $enableMultiServerScheduling = false;
+
+    /**
      * Create a new schedule instance.
      *
      * @return void
