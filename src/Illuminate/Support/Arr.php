@@ -39,6 +39,28 @@ class Arr
     }
 
     /**
+     * Recursively empty entries on an array.
+     *
+     * @param array $haystack
+     *
+     * @return array
+     */
+    public static function clean($haystack)
+    {
+        foreach ($haystack as $key => $value) {
+            if (is_array($value)) {
+                $haystack[$key] = static::clean($haystack[$key]);
+            }
+
+            if (empty($haystack[$key])) {
+                unset($haystack[$key]);
+            }
+        }
+
+        return $haystack;
+    }
+
+    /**
      * Collapse an array of arrays into a single array.
      *
      * @param  array  $array
