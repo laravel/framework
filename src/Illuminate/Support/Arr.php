@@ -39,7 +39,7 @@ class Arr
     }
 
     /**
-     * Remove empty entries on arrays
+     * Recursively empty entries on an array.
      *
      * @param array $haystack
      *
@@ -57,7 +57,7 @@ class Arr
             }
         }
 
-       return $haystack;
+        return $haystack;
     }
 
     /**
