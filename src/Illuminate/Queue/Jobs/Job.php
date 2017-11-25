@@ -99,10 +99,9 @@ abstract class Job
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
      * @return void
      */
-    public function release($delay = 0)
+    public function release()
     {
         $this->released = true;
     }
