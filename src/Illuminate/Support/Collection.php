@@ -781,6 +781,35 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if the collection has any elements.
+     *
+     * @param  callable|string|null  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function any($key = null, $operator = null, $value = null)
+    {
+        if (func_num_args() == 0) {
+            return $this->isNotEmpty();
+        }
+
+        if (func_num_args() == 1) {
+            if ($this->useAsCallable($key)) {
+                return $this->contains($key);
+            }
+
+            return $this->has($key);
+        }
+
+        if (func_num_args() == 2) {
+            return $this->where($key, $operator)->isNotEmpty();
+        }
+
+        return $this->where($key, $operator, $value)->isNotEmpty();
+    }
+
+    /**
      * Determine if the given value is callable, but not a string.
      *
      * @param  mixed  $value
