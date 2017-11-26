@@ -884,7 +884,7 @@ if (! function_exists('str_compare')) {
      */
     function str_compare($string, $value)
     {
-        return Str::lower($string) === Str::lower($value);
+        return strcasecmp($string, $value) === 0;
     }
 }
 
@@ -898,7 +898,7 @@ if (! function_exists('str_exactly')) {
      */
     function str_exactly($string, $value)
     {
-        return $string === $value;
+        return strcmp($string, $value) === 0;
     }
 }
 
