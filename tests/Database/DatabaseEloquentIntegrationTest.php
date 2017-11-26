@@ -125,6 +125,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
 
         Relation::morphMap([], false);
+        Eloquent::unsetConnectionResolver();
     }
 
     /**
