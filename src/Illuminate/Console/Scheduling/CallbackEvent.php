@@ -4,7 +4,6 @@ namespace Illuminate\Console\Scheduling;
 
 use LogicException;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Container\Container;
 
 class CallbackEvent extends Event

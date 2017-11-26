@@ -107,8 +107,8 @@ class ConsoleScheduledEventTest extends TestCase
     }
 
     /**
-    * @expectedException LogicException
-    */
+     * @expectedException LogicException
+     */
     public function testEventPreventsRunOnAllServersAndWithoutOverlappingTogether()
     {
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php foo');

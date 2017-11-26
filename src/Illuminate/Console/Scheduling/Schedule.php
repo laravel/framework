@@ -129,13 +129,13 @@ class Schedule
     }
 
     /**
-     * Add a new command event to the schedule.
+     * Check if the server is allowed to run this event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @param  \Illuminate\Support\Carbon  $time
      * @return bool
      */
-    public function getMutex(Event $event, Carbon $time)
+    public function allowServerToRun(Event $event, Carbon $time)
     {
         return $this->schedulingMutex->create($event, $time);
     }
