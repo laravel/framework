@@ -874,6 +874,34 @@ if (! function_exists('str_is')) {
     }
 }
 
+if (! function_exists('str_compare')) {
+    /**
+     * Determine if a given string is equal to an-other string ignoring the case.
+     *
+     * @param  string $string
+     * @param  string $value
+     * @return bool
+     */
+    function str_compare($string, $value)
+    {
+        return strcasecmp($string, $value) === 0;
+    }
+}
+
+if (! function_exists('str_exactly')) {
+    /**
+     * Determine if a given string is equal to the second string.
+     *
+     * @param  string $string
+     * @param  string $value
+     * @return bool
+     */
+    function str_exactly($string, $value)
+    {
+        return strcmp($string, $value) === 0;
+    }
+}
+
 if (! function_exists('str_limit')) {
     /**
      * Limit the number of characters in a string.
