@@ -111,6 +111,82 @@ class SupportCollectionTest extends TestCase
         $this->assertTrue($c->isNotEmpty());
     }
 
+    public function testAnyElementsPresent()
+    {
+        $c = new Collection(['foo', 'bar']);
+
+        $this->assertTrue($c->any());
+    }
+
+    public function testAnyElementsNotPresent()
+    {
+        $c = new Collection([]);
+
+        $this->assertFalse($c->any());
+    }
+
+    public function testAnyElementsPresentByKey()
+    {
+        $c = new Collection(['foo' => 'bar']);
+
+        $this->assertTrue($c->any('foo'));
+    }
+
+    public function testAnyElementsNotPresentByKey()
+    {
+        $c = new Collection(['foo' => 'bar']);
+
+        $this->assertFalse($c->any('baz'));
+    }
+
+    public function testAnyElementsPresentByWhere()
+    {
+        $c = new Collection([['foo' => 'bar']]);
+
+        $this->assertTrue($c->any('foo', 'bar'));
+    }
+
+    public function testAnyElementsNotPresentByWhere()
+    {
+        $c = new Collection([['foo' => 'bar']]);
+
+        $this->assertFalse($c->any('foo', 'baz'));
+    }
+
+    public function testAnyElementsPresentByWhereWithOperator()
+    {
+        $c = new Collection([['foo' => 'bar']]);
+
+        $this->assertTrue($c->any('foo', '=', 'bar'));
+        $this->assertTrue($c->any('foo', '!=', 'baz'));
+    }
+
+    public function testAnyElementsNotPresentByWhereWithOperator()
+    {
+        $c = new Collection([['foo' => 'bar']]);
+
+        $this->assertFalse($c->any('foo', '!=', 'bar'));
+        $this->assertFalse($c->any('foo', '=', 'baz'));
+    }
+
+    public function testAnyElementsPresentByCallable()
+    {
+        $c = new Collection(['foo' => 'bar']);
+
+        $this->assertTrue($c->any(function ($item) {
+            return $item == 'bar';
+        }));
+    }
+
+    public function testAnyElementsNotPresentByCallable()
+    {
+        $c = new Collection(['foo' => 'bar']);
+
+        $this->assertFalse($c->any(function ($item) {
+            return $item != 'bar';
+        }));
+    }
+
     public function testCollectionIsConstructed()
     {
         $collection = new Collection('foo');
