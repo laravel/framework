@@ -58,4 +58,28 @@ class CacheMutex implements Mutex
     {
         $this->cache->forget($event->mutexName());
     }
+
+    /**
+     * Attempt to obtain a server mutex for the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return bool
+     */
+    public function serverCreate(Event $event)
+    {
+        return $this->cache->add(
+            $event->mutexName().$event->timestamp->format('Hi'), true, 60
+        );
+    }
+
+    /**
+     * Determine if a server mutex exists for the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return bool
+     */
+    public function serverExists(Event $event)
+    {
+        return $this->cache->has($event->mutexName().$event->timestamp->format('Hi'));
+    }
 }

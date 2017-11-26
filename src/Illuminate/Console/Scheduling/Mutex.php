@@ -27,4 +27,20 @@ interface Mutex
      * @return void
      */
     public function forget(Event $event);
+
+    /**
+     * Attempt to obtain a server mutex for the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return bool
+     */
+    public function serverCreate(Event $event);
+
+    /**
+     * Determine if a server mutex exists for the given event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @return bool
+     */
+    public function serverExists(Event $event);
 }
