@@ -14,10 +14,12 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $container = \Illuminate\Container\Container::getInstance();
 
-        $container->instance('Illuminate\Console\Scheduling\Mutex', m::mock('Illuminate\Console\Scheduling\CacheMutex'));
+        $container->instance('Illuminate\Console\Scheduling\EventMutex', m::mock('Illuminate\Console\Scheduling\CacheEventMutex'));
+
+        $container->instance('Illuminate\Console\Scheduling\SchedulingMutex', m::mock('Illuminate\Console\Scheduling\CacheSchedulingMutex'));
 
         $container->instance(
-            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Console\Scheduling\Mutex'))
+            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Console\Scheduling\EventMutex'))
         );
     }
 
@@ -78,6 +80,17 @@ class ConsoleEventSchedulerTest extends TestCase
         $events = $schedule->events();
         $binary = $escape.PHP_BINARY.$escape;
         $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
+    }
+
+    public function testMultiServerConfig()
+    {
+        $schedule = $this->schedule;
+
+        $this->assertFalse($schedule->isMultiServer());
+
+        $schedule->enableMultiServerScheduling();
+
+        $this->assertTrue($schedule->isMultiServer());
     }
 }
 

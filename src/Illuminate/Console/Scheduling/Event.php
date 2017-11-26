@@ -3,6 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
+use LogicException;
 use Cron\CronExpression;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
@@ -63,6 +64,13 @@ class Event
      * @var bool
      */
     public $withoutOverlapping = false;
+
+    /**
+     * Indicates if the command should be allowed to override and run on all servers simultaneously.
+     *
+     * @var bool
+     */
+    public $runOnAllServers = false;
 
     /**
      * The amount of time the mutex should be valid.
@@ -128,9 +136,9 @@ class Event
     public $description;
 
     /**
-     * The mutex implementation.
+     * The event mutex implementation.
      *
-     * @var \Illuminate\Console\Scheduling\Mutex
+     * @var \Illuminate\Console\Scheduling\EventMutex
      */
     public $mutex;
 
@@ -141,7 +149,7 @@ class Event
      * @param  string  $command
      * @return void
      */
-    public function __construct(Mutex $mutex, $command)
+    public function __construct(EventMutex $mutex, $command)
     {
         $this->mutex = $mutex;
         $this->command = $command;
@@ -521,6 +529,12 @@ class Event
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
+        if ($this->runOnAllServers) {
+            throw new LogicException(
+                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
+            );
+        }
+
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
@@ -530,6 +544,26 @@ class Event
         })->skip(function () {
             return $this->mutex->exists($this);
         });
+    }
+
+    /**
+     * Allow the event to run on all servers for each cron expression.
+     *
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function runOnAllServers()
+    {
+        if ($this->withoutOverlapping) {
+            throw new LogicException(
+                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
+            );
+        }
+
+        $this->runOnAllServers = true;
+
+        return $this;
     }
 
     /**
@@ -663,12 +697,12 @@ class Event
     }
 
     /**
-     * Set the mutex implementation to be used.
+     * Set the event mutex implementation to be used.
      *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @return $this
      */
-    public function preventOverlapsUsing(Mutex $mutex)
+    public function preventOverlapsUsing(EventMutex $mutex)
     {
         $this->mutex = $mutex;
 

@@ -4,6 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use LogicException;
 use InvalidArgumentException;
+use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Container\Container;
 
 class CallbackEvent extends Event
@@ -25,14 +26,14 @@ class CallbackEvent extends Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @param  string  $callback
      * @param  array  $parameters
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    public function __construct(Mutex $mutex, $callback, array $parameters = [])
+    public function __construct(EventMutex $mutex, $callback, array $parameters = [])
     {
         if (! is_string($callback) && ! is_callable($callback)) {
             throw new InvalidArgumentException(
@@ -100,6 +101,12 @@ class CallbackEvent extends Event
         if (! isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
+            );
+        }
+
+        if ($this->runOnAllServers) {
+            throw new LogicException(
+                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
             );
         }
 

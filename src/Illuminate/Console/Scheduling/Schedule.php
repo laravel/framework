@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -17,11 +18,25 @@ class Schedule
     protected $events = [];
 
     /**
-     * The mutex implementation.
+     * Is the scheduler running on multiple servers.
      *
-     * @var \Illuminate\Console\Scheduling\Mutex
+     * @var bool
      */
-    protected $mutex;
+    protected $multiServerScheduling = false;
+
+    /**
+     * The event mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\EventMutex
+     */
+    protected $eventMutex;
+
+    /**
+     * The scheduling mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\SchedulingMutex
+     */
+    protected $schedulingMutex;
 
     /**
      * Create a new schedule instance.
@@ -32,9 +47,13 @@ class Schedule
     {
         $container = Container::getInstance();
 
-        $this->mutex = $container->bound(Mutex::class)
-                                ? $container->make(Mutex::class)
-                                : $container->make(CacheMutex::class);
+        $this->eventMutex = $container->bound(EventMutex::class)
+                                ? $container->make(EventMutex::class)
+                                : $container->make(CacheEventMutex::class);
+
+        $this->schedulingMutex = $container->bound(SchedulingMutex::class)
+                                ? $container->make(SchedulingMutex::class)
+                                : $container->make(CacheSchedulingMutex::class);
     }
 
     /**
@@ -47,7 +66,7 @@ class Schedule
     public function call($callback, array $parameters = [])
     {
         $this->events[] = $event = new CallbackEvent(
-            $this->mutex, $callback, $parameters
+            $this->eventMutex, $callback, $parameters
         );
 
         return $event;
@@ -104,9 +123,21 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->mutex, $command);
+        $this->events[] = $event = new Event($this->eventMutex, $command);
 
         return $event;
+    }
+
+    /**
+     * Add a new command event to the schedule.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \Illuminate\Support\Carbon  $time
+     * @return bool
+     */
+    public function getMutex(Event $event, Carbon $time)
+    {
+        return $this->schedulingMutex->create($event, $time);
     }
 
     /**
@@ -149,5 +180,25 @@ class Schedule
     public function events()
     {
         return $this->events;
+    }
+
+    /**
+     * Enable the scheduler for multi server scheduling.
+     *
+     * @return void
+     */
+    public function enableMultiServerScheduling()
+    {
+        $this->multiServerScheduling = true;
+    }
+
+    /**
+     * Check if the scheduler supporting multi server scheduling.
+     *
+     * @return bool
+     */
+    public function isMultiServer()
+    {
+        return $this->multiServerScheduling;
     }
 }
