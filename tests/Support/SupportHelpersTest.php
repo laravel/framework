@@ -124,7 +124,7 @@ class SupportHelpersTest extends TestCase
     {
         $array = ['name' => 'taylor', 'age' => 26];
         $this->assertEquals(['name' => 'taylor'], Arr::only($array, ['name']));
-        $this->assertSame([], Arr::only($array, ['nonExistingKey']));
+        $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
     }
 
     public function testArrayCollapse()
