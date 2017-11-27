@@ -68,14 +68,14 @@ class SupportArrTest extends TestCase
         );
 
         // With 1 empty dimension
-        $this->assertSame([], Arr::crossJoin([], ['a', 'b'], ['I', 'II', 'III']));
-        $this->assertSame([], Arr::crossJoin([1, 2], [], ['I', 'II', 'III']));
-        $this->assertSame([], Arr::crossJoin([1, 2], ['a', 'b'], []));
+        $this->assertEmpty(Arr::crossJoin([], ['a', 'b'], ['I', 'II', 'III']));
+        $this->assertEmpty(Arr::crossJoin([1, 2], [], ['I', 'II', 'III']));
+        $this->assertEmpty(Arr::crossJoin([1, 2], ['a', 'b'], []));
 
         // With empty arrays
-        $this->assertSame([], Arr::crossJoin([], [], []));
-        $this->assertSame([], Arr::crossJoin([], []));
-        $this->assertSame([], Arr::crossJoin([]));
+        $this->assertEmpty(Arr::crossJoin([], [], []));
+        $this->assertEmpty(Arr::crossJoin([], []));
+        $this->assertEmpty(Arr::crossJoin([]));
 
         // Not really a proper usage, still, test for preserving BC
         $this->assertSame([[]], Arr::crossJoin());
@@ -269,8 +269,8 @@ class SupportArrTest extends TestCase
         $this->assertSame('default', Arr::get(null, null, 'default'));
 
         // Test $array is empty and key is null
-        $this->assertSame([], Arr::get([], null));
-        $this->assertSame([], Arr::get([], null, 'default'));
+        $this->assertEmpty(Arr::get([], null));
+        $this->assertEmpty(Arr::get([], null, 'default'));
     }
 
     public function testHas()

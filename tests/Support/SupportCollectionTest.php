@@ -123,10 +123,10 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([false], $collection->all());
 
         $collection = new Collection(null);
-        $this->assertSame([], $collection->all());
+        $this->assertEmpty($collection->all());
 
         $collection = new Collection;
-        $this->assertSame([], $collection->all());
+        $this->assertEmpty($collection->all());
     }
 
     public function testGetArrayableItems()
