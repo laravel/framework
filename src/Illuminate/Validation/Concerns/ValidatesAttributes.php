@@ -447,10 +447,6 @@ trait ValidatesAttributes
      */
     public function validateDimensions($attribute, $value, $parameters)
     {
-        if ($this->isValidFileInstance($value) && $value->getClientMimeType() == 'image/svg+xml') {
-            return true;
-        }
-
         if (! $this->isValidFileInstance($value) || ! $sizeDetails = @getimagesize($value->getRealPath())) {
             return false;
         }
@@ -533,7 +529,7 @@ trait ValidatesAttributes
         });
 
         if (in_array('ignore_case', $parameters)) {
-            return empty(preg_grep('/'.preg_quote($value, '/').'/iu', $data));
+            return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
         return ! in_array($value, array_values($data));
