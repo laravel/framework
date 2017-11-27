@@ -2306,8 +2306,8 @@ class SupportCollectionTest extends TestCase
     {
         $collection = new Collection(['michael', 'tom']);
 
-        $collection->when(true, function ($collection) {
-            return $collection->push('adam');
+        $collection->when('adam', function ($collection, $newName) {
+            return $collection->push($newName);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());
