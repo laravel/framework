@@ -119,6 +119,15 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertEquals(TestUser::first(), $like->likeable->owner);
     }
 
+    public function testItDeleteRecordIfWithCountNotEmpty()
+    {
+        $this->seedData();
+
+        $like = TestPost::first()->delete();
+
+        $this->assertNull(TestPost::first());
+    }
+
     /**
      * Helpers...
      */
@@ -172,6 +181,7 @@ class TestUser extends Eloquent
 class TestPost extends Eloquent
 {
     protected $table = 'posts';
+    protected $withCount = ['comments'];
     protected $guarded = [];
 
     public function comments()
