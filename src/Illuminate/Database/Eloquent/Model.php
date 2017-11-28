@@ -309,16 +309,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string|null  $connection
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public static function on($connection = null)
+    public function on($connection = null)
     {
         // First we will just create a fresh instance of this model, and then we can
         // set the connection on the model so that it is be used for the queries
         // we execute, as well as being set on each relationship we retrieve.
-        $instance = new static;
 
-        $instance->setConnection($connection);
+        $this->setConnection($connection);
 
-        return $instance->newQuery();
+        return $this->newQuery();
     }
 
     /**
@@ -326,11 +325,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return \Illuminate\Database\Query\Builder
      */
-    public static function onWriteConnection()
+    public function onWriteConnection()
     {
-        $instance = new static;
-
-        return $instance->newQuery()->useWritePdo();
+        return $this->newQuery()->useWritePdo();
     }
 
     /**
@@ -339,9 +336,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
-    public static function all($columns = ['*'])
+    public function all($columns = ['*'])
     {
-        return (new static)->newQuery()->get(
+        return $this->newQuery()->get(
             is_array($columns) ? $columns : func_get_args()
         );
     }
@@ -352,9 +349,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array|string  $relations
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public static function with($relations)
+    public function with($relations)
     {
-        return (new static)->newQuery()->with(
+        return $this->newQuery()->with(
             is_string($relations) ? func_get_args() : $relations
         );
     }
