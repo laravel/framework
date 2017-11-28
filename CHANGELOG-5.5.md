@@ -27,7 +27,7 @@
 - Fixed SQL Server handling of `DATETIME` columns ([#22052](https://github.com/laravel/framework/pull/22052))
 - Return default value from `old()` when session isn't available ([#22082](https://github.com/laravel/framework/pull/22082))
 - Refactor `Arr::flatten()` to prevent performance issue ([#22103](https://github.com/laravel/framework/pull/22103))
-- Wrap MySQL JSON keys are in double quotes when updating JSON columns ([#22118](https://github.com/laravel/framework/pull/22118))
+- Wrap MySQL JSON keys in double quotes when updating JSON columns ([#22118](https://github.com/laravel/framework/pull/22118))
 - Fixed custom URLs with prefix (`root`) for AWS storage ([#22130](https://github.com/laravel/framework/pull/22130))
 - Prevent authentication if `password` is the only specified field ([#22167](https://github.com/laravel/framework/pull/22167))
 
