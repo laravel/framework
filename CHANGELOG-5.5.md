@@ -1,12 +1,13 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.22 (2017-11-27)
 
 ### Added
 - Added `response()` and `download()` methods to file system ([#22089](https://github.com/laravel/framework/pull/22089))
 - Added complete temporary table support ([#22110](https://github.com/laravel/framework/pull/22110))
 - Added `Mode::newQueryForRestoration()` method ([#22119](https://github.com/laravel/framework/pull/22119))
 - Added precision support for date/time columns ([#22122](https://github.com/laravel/framework/pull/22122))
+- Added detection for MySQL Galera deadlocks ([#22214](https://github.com/laravel/framework/pull/22214))
 
 ### Changed
 - Updated depreciated `MailFake::queue()` method signature ([#22072](https://github.com/laravel/framework/pull/22072))
@@ -18,6 +19,8 @@
 - Return condition from `throw_*` helpers ([#22149](https://github.com/laravel/framework/pull/22149))
 - Make `Collection::where()` independent of error reporting ([#22172](https://github.com/laravel/framework/pull/22172))
 - Show more meaningful message when json translation file contains errors ([#22165](https://github.com/laravel/framework/pull/22165), [cf29b88](https://github.com/laravel/framework/commit/cf29b884006a4ce4d84a115b531143337a875211))
+- Improve `Model::getTable()` performance ([#22222](https://github.com/laravel/framework/pull/22222))
+- Use transaction in migrations using SQL Server ([#22187](https://github.com/laravel/framework/pull/22187))
 
 ### Fixed
 - Fixed `HasManyThrough` relation with custom intermediate and local keys when used in `whereHas()` ([#22071](https://github.com/laravel/framework/pull/22071), [3788cbd](https://github.com/laravel/framework/commit/3788cbd3e606caa4a6e4137f92709c85e52b2cf3))
