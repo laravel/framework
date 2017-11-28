@@ -253,9 +253,25 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function view($uri, $view = null, $data = [])
     {
+        if (func_num_args() == 2 && is_array($view)) {
+            $data = $view;
+            $view = null;
+        }
+
         return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\ViewController')
-                ->defaults('view', $view ?: $uri)
+                ->defaults('view', $view ?: $this->toViewFormat($uri))
                 ->defaults('data', $data);
+    }
+
+    /**
+     * Converts a URI to a view string format.
+     *
+     * @param  string  $uri
+     * @return string
+     */
+    public function toViewFormat($uri)
+    {
+        return str_replace('/', '.', $uri);
     }
 
     /**
