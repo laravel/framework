@@ -542,14 +542,14 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for an enum type.
+     * Create the column definition for an enumeration type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeEnum(Fluent $column)
     {
-        return "enum('".implode("', '", $column->allowed)."')";
+        return sprintf('enum(%s)', $this->quoteString($column->allowed));
     }
 
     /**

@@ -96,7 +96,7 @@ class Blueprint
      */
     public function toSql(Connection $connection, Grammar $grammar)
     {
-        $this->addImpliedCommands();
+        $this->addImpliedCommands($grammar);
 
         $statements = [];
 
@@ -119,9 +119,10 @@ class Blueprint
     /**
      * Add the commands that are implied by the blueprint's state.
      *
+     * @param  \Illuminate\Database\Grammar  $grammer
      * @return void
      */
-    protected function addImpliedCommands()
+    protected function addImpliedCommands(Grammar $grammar)
     {
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
@@ -132,6 +133,8 @@ class Blueprint
         }
 
         $this->addFluentIndexes();
+
+        $this->addFluentCommands($grammar);
     }
 
     /**
@@ -160,6 +163,31 @@ class Blueprint
 
                     continue 2;
                 }
+            }
+        }
+    }
+
+    /**
+     * Add the fluent commands specified on any columns.
+     *
+     * @param  \Illuminate\Database\Grammar  $grammer
+     * @param
+     */
+    public function addFluentCommands(Grammar $grammar)
+    {
+        foreach ($this->columns as $column) {
+            foreach ($grammar->getFluentCommands() as $commandName) {
+                $attributeName = lcfirst($commandName);
+
+                if (! isset($column->{$attributeName})) {
+                    continue;
+                }
+
+                $value = $column->{$attributeName};
+
+                $this->addCommand(
+                    $commandName, compact('value', 'column')
+                );
             }
         }
     }
@@ -1046,11 +1074,11 @@ class Blueprint
      */
     public function morphs($name, $indexName = null)
     {
-        $this->unsignedInteger("{$name}_id");
-
         $this->string("{$name}_type");
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->unsignedInteger("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**
@@ -1062,11 +1090,11 @@ class Blueprint
      */
     public function nullableMorphs($name, $indexName = null)
     {
-        $this->unsignedInteger("{$name}_id")->nullable();
-
         $this->string("{$name}_type")->nullable();
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->unsignedInteger("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**

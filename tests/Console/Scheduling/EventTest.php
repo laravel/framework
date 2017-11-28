@@ -28,7 +28,7 @@ class EventTest extends TestCase
         $event->runInBackground();
 
         $defaultOutput = (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
-        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 ; '".PHP_BINARY."' artisan schedule:finish \"framework/schedule-c65b1c374c37056e0c57fccb0c08d724ce6f5043\") > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
+        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 ; '".PHP_BINARY."' artisan schedule:finish \"framework/schedule-eeb46c93d45e928d62aaf684d727e213b7094822\") > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()
