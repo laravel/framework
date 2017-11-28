@@ -1506,7 +1506,7 @@ class ValidationValidatorTest extends TestCase
 
         $v = new Validator($trans, ['foo' => ['bar' => ['id' => 2], 'baz' => ['id' => 425]]], ['foo.*.id' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
-        
+
         $v = new Validator($trans, ['foo' => [['id' => 1, 'nested' => ['id' => 1]]]], ['foo.*.id' => 'distinct']);
         $this->assertTrue($v->passes());
 
