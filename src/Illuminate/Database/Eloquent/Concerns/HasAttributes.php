@@ -1138,4 +1138,15 @@ trait HasAttributes
 
         return $matches[1];
     }
+    
+    /**
+     * Checks if a specific attribute exists.
+     *
+     * @param string $key
+     * @return bool
+     */
+    protected function hasAttribute($key)
+    {
+        return array_key_exists($key, $this->attributes);
+    }
 }
