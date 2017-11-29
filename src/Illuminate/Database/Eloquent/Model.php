@@ -629,8 +629,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
-        $query->where($this->getKeyName(), '=', $this->getKeyForSaveQuery());
+        // get the keys
+        $keys = $this->getKeyForSaveQuery();
 
+        // iterate through the key(s)
+        foreach ($keys as $key => $value) {
+            $query->where($key, '=', $value);
+        }
+
+        // return the query
         return $query;
     }
 
@@ -641,8 +648,28 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function getKeyForSaveQuery()
     {
-        return $this->original[$this->getKeyName()]
-                        ?? $this->getKey();
+        // get the primary key
+        $primaryKeys = $this->getKeyName();
+
+        // ensure that the keys are in an array
+        if (! is_array($primaryKeys)) {
+            $primaryKeys = [$primaryKeys];
+        }
+
+        // define the return data
+        $result = [];
+
+        // iterate through the key(s)
+        foreach ($primaryKeys as $key) {
+            if (isset($this->original[$key])) {
+                $result[$key] = $this->original[$key];
+            } else {
+                $result[$key] = $this->getAttribute($key);
+            }
+        }
+
+        // return the keys
+        return $result;
     }
 
     /**

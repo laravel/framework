@@ -36,6 +36,6 @@ class HttpMimeTypeTest extends TestCase
     public function testSearchExtensionFromMimeType()
     {
         $this->assertSame('mov', MimeType::search('video/quicktime'));
-        $this->assertSame(null, MimeType::search('foo/bar'));
+        $this->assertNull(MimeType::search('foo/bar'));
     }
 }
