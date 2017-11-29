@@ -271,7 +271,7 @@ trait FormatsMessages
      * Replace the :input placeholder in the given message.
      *
      * @param  string  $message
-     * @param  string  $value
+     * @param  string  $attribute
      * @return string
      */
     protected function replaceInputPlaceholder($message, $attribute)
