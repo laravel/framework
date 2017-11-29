@@ -796,7 +796,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function performDeleteOnModel()
     {
-        $this->setKeysForSaveQuery($this->newQueryWithoutScopes(true))->delete();
+        $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
 
         $this->exists = false;
     }
@@ -851,21 +851,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Get a new query builder that doesn't have any global scopes.
      *
-     * @param  bool  $withoutCount
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function newQueryWithoutScopes($withoutCount = false)
+    public function newQueryWithoutScopes()
     {
         $builder = $this->newEloquentBuilder($this->newBaseQueryBuilder());
 
         // Once we have the query builders, we will set the model instances so the
         // builder can easily access any information it may need from the model
         // while it is constructing and executing various queries against it.
-        $builder = $builder->setModel($this)
-                    ->with($this->with);
-
-
-        return $withoutCount ? $builder : $builder->withCount($this->withCount);
+        return $builder->setModel($this)
+                    ->with($this->with)
+                    ->withCount($this->withCount);
     }
 
     /**
