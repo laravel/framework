@@ -3,7 +3,6 @@
 namespace Illuminate\Console\Scheduling;
 
 use Closure;
-use LogicException;
 use Cron\CronExpression;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
