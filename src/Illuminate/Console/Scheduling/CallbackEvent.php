@@ -94,18 +94,14 @@ class CallbackEvent extends Event
      *
      * @param  int  $expiresAt
      * @return $this
+     *
+     * @throws \LogicException
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
         if (! isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
-            );
-        }
-
-        if ($this->runOnAllServers) {
-            throw new LogicException(
-                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
             );
         }
 
@@ -116,6 +112,26 @@ class CallbackEvent extends Event
         return $this->skip(function () {
             return $this->mutex->exists($this);
         });
+    }
+
+    /**
+     * Allow the event to only run on one server for each cron expression.
+     *
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function onOneServer()
+    {
+        if (! isset($this->description)) {
+            throw new LogicException(
+                "A scheduled event name is required to only run on one server. Use the 'name' method before 'onOneServer'."
+            );
+        }
+
+        $this->onOneServer = true;
+
+        return $this;
     }
 
     /**

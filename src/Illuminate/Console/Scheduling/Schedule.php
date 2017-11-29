@@ -18,13 +18,6 @@ class Schedule
     protected $events = [];
 
     /**
-     * Is the scheduler running on multiple servers.
-     *
-     * @var bool
-     */
-    protected $multiServerScheduling = false;
-
-    /**
      * The event mutex implementation.
      *
      * @var \Illuminate\Console\Scheduling\EventMutex
@@ -180,25 +173,5 @@ class Schedule
     public function events()
     {
         return $this->events;
-    }
-
-    /**
-     * Enable the scheduler for multi server scheduling.
-     *
-     * @return void
-     */
-    public function enableMultiServerScheduling()
-    {
-        $this->multiServerScheduling = true;
-    }
-
-    /**
-     * Check if the scheduler supporting multi server scheduling.
-     *
-     * @return bool
-     */
-    public function isMultiServer()
-    {
-        return $this->multiServerScheduling;
     }
 }

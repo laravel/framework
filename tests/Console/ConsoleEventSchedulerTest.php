@@ -81,17 +81,6 @@ class ConsoleEventSchedulerTest extends TestCase
         $binary = $escape.PHP_BINARY.$escape;
         $this->assertEquals($binary.' artisan foo:bar --force', $events[0]->command);
     }
-
-    public function testMultiServerConfig()
-    {
-        $schedule = $this->schedule;
-
-        $this->assertFalse($schedule->isMultiServer());
-
-        $schedule->enableMultiServerScheduling();
-
-        $this->assertTrue($schedule->isMultiServer());
-    }
 }
 
 class FooClassStub

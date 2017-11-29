@@ -66,11 +66,11 @@ class Event
     public $withoutOverlapping = false;
 
     /**
-     * Indicates if the command should be allowed to override and run on all servers simultaneously.
+     * Indicates if the command should only be allowed to run on one server each cron expression.
      *
      * @var bool
      */
-    public $runOnAllServers = false;
+    public $onOneServer = false;
 
     /**
      * The amount of time the mutex should be valid.
@@ -529,12 +529,6 @@ class Event
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
-        if ($this->runOnAllServers) {
-            throw new LogicException(
-                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
-            );
-        }
-
         $this->withoutOverlapping = true;
 
         $this->expiresAt = $expiresAt;
@@ -547,21 +541,13 @@ class Event
     }
 
     /**
-     * Allow the event to run on all servers for each cron expression.
+     * Allow the event to only run on one server for each cron expression.
      *
      * @return $this
-     *
-     * @throws \LogicException
      */
-    public function runOnAllServers()
+    public function onOneServer()
     {
-        if ($this->withoutOverlapping) {
-            throw new LogicException(
-                'A scheduled event cannot run simultaneously on all servers using "runOnAllServers()" while at the same time not allowing overlapping using "withoutOverlapping()". They are mutually exclusive commands. Either let the event only run on one server, or allow them to overlap. But you cannot do both.'
-            );
-        }
-
-        $this->runOnAllServers = true;
+        $this->onOneServer = true;
 
         return $this;
     }

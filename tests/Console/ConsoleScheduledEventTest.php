@@ -105,14 +105,4 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
         $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
     }
-
-    /**
-     * @expectedException LogicException
-     */
-    public function testEventPreventsRunOnAllServersAndWithoutOverlappingTogether()
-    {
-        $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php foo');
-
-        $event->withoutOverlapping()->runOnAllServers();
-    }
 }
