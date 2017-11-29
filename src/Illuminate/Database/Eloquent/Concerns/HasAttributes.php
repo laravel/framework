@@ -1140,7 +1140,7 @@ trait HasAttributes
     }
     
     /**
-     * Checks if a specific attribute exists
+     * Checks if a specific attribute exists.
      *
      * @param string $key
      * @return bool
