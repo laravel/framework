@@ -69,7 +69,7 @@ class ScheduleRunCommand extends Command
                 continue;
             }
 
-            if ($event->onOneServer())
+            if ($event->onOneServer) {
                 if ($this->schedule->allowServerToRun($event, $this->startedAt)) {
                     $this->runEvent($event);
                 } else {
