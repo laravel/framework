@@ -651,7 +651,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $primaryKeys = $this->getKeyName();
 
         // ensure that the keys are in an array
-        if (!is_array($primaryKeys)) {
+        if (! is_array($primaryKeys)) {
             $primaryKeys = [$primaryKeys];
         }
 
