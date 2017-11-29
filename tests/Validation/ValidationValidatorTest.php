@@ -1483,6 +1483,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => ['f/oo', 'F/OO']], ['foo.*' => 'distinct:ignore_case']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['1', '1']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['1', '11']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => ['foo', 'bar']], ['foo.*' => 'distinct']);
         $this->assertTrue($v->passes());
 
@@ -1496,6 +1502,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => ['bar' => ['id' => 1], 'baz' => ['id' => 2]]], ['foo.*.id' => 'distinct']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['bar' => ['id' => 2], 'baz' => ['id' => 425]]], ['foo.*.id' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => [['id' => 1, 'nested' => ['id' => 1]]]], ['foo.*.id' => 'distinct']);
