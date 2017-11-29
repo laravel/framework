@@ -592,7 +592,7 @@ class Worker
 
     /**
      * Sleep the script for a given number of seconds.
-     * Allow to use fractions of a second: 0.25, 0.01
+     * Allow to use fractions of a second: 0.25, 0.01.
      *
      * @param  int|float   $seconds
      * @return void
