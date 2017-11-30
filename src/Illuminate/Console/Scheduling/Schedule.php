@@ -3,7 +3,6 @@
 namespace Illuminate\Console\Scheduling;
 
 use DateTimeInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
