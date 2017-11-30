@@ -449,11 +449,12 @@ class Gate implements GateContract
      */
     protected function resolvePolicyCallback($user, $ability, array $arguments, $policy)
     {
-        if (! is_callable([$policy, $this->formatAbilityToMethod($ability)])) {
+        $method = $this->formatAbilityToMethod($ability);
+        if (! is_callable([$policy, $method])) {
             return false;
         }
 
-        return function () use ($user, $ability, $arguments, $policy) {
+        return function () use ($user, $ability, $arguments, $policy, $method) {
             // This callback will be responsible for calling the policy's before method and
             // running this policy method if necessary. This is used to when objects are
             // mapped to policy objects in the user's configurations or on this class.
@@ -468,8 +469,6 @@ class Gate implements GateContract
                 return $result;
             }
 
-            $ability = $this->formatAbilityToMethod($ability);
-
             // If this first argument is a string, that means they are passing a class name
             // to the policy. We will remove the first argument from this argument array
             // because this policy already knows what type of models it can authorize.
@@ -477,9 +476,7 @@ class Gate implements GateContract
                 array_shift($arguments);
             }
 
-            return is_callable([$policy, $ability])
-                        ? $policy->{$ability}($user, ...$arguments)
-                        : false;
+            return $policy->{$method}($user, ...$arguments);
         };
     }
 
