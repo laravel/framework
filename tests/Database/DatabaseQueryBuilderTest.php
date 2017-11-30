@@ -1685,6 +1685,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
     }
 
+    public function testMySqlUpdateWrappingNestedJson()
+    {
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+        $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
+        $connection->expects($this->once())
+                    ->method('update')
+                    ->with(
+                        'update `users` set `meta` = json_set(`meta`, \'$."name"."first_name"\', ?), `meta` = json_set(`meta`, \'$."name"."last_name"\', ?) where `active` = ?',
+                        ['John', 'Doe', 1]
+                    );
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $result = $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
+    }
+
     public function testMySqlUpdateWithJsonRemovesBindingsCorrectly()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;

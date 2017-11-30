@@ -533,7 +533,7 @@ trait ValidatesAttributes
         });
 
         if (in_array('ignore_case', $parameters)) {
-            return empty(preg_grep('/'.preg_quote($value, '/').'/iu', $data));
+            return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
         return ! in_array($value, array_values($data));

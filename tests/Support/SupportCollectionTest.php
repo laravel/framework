@@ -123,10 +123,10 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([false], $collection->all());
 
         $collection = new Collection(null);
-        $this->assertSame([], $collection->all());
+        $this->assertEmpty($collection->all());
 
         $collection = new Collection;
-        $this->assertSame([], $collection->all());
+        $this->assertEmpty($collection->all());
     }
 
     public function testGetArrayableItems()
@@ -402,10 +402,40 @@ class SupportCollectionTest extends TestCase
             $c->where('v', $object)->values()->all()
         );
 
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            $c->where('v', '<>', $object)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            $c->where('v', '!=', $object)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
+            $c->where('v', '!==', $object)->values()->all()
+        );
+
+        $this->assertEquals(
+            [],
+            $c->where('v', '>', $object)->values()->all()
+        );
+
         $c = new Collection([['v' => 1], ['v' => $object]]);
         $this->assertEquals(
             [['v' => $object]],
             $c->where('v', $object)->values()->all()
+        );
+
+        $this->assertEquals(
+            [['v' => 1], ['v' => $object]],
+            $c->where('v', '<>', null)->values()->all()
+        );
+
+        $this->assertEquals(
+            [],
+            $c->where('v', '<', null)->values()->all()
         );
     }
 
@@ -2306,8 +2336,8 @@ class SupportCollectionTest extends TestCase
     {
         $collection = new Collection(['michael', 'tom']);
 
-        $collection->when(true, function ($collection) {
-            return $collection->push('adam');
+        $collection->when('adam', function ($collection, $newName) {
+            return $collection->push($newName);
         });
 
         $this->assertSame(['michael', 'tom', 'adam'], $collection->toArray());

@@ -433,9 +433,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function when($value, callable $callback, callable $default = null)
     {
         if ($value) {
-            return $callback($this);
+            return $callback($this, $value);
         } elseif ($default) {
-            return $default($this);
+            return $default($this, $value);
         }
 
         return $this;
@@ -487,7 +487,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $retrieved = data_get($item, $key);
 
             if (count(array_filter([$retrieved, $value], 'is_object')) == 1) {
-                return false;
+                return in_array($operator, ['!=', '<>', '!==']);
             }
 
             switch ($operator) {
