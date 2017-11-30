@@ -404,22 +404,22 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(
             [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
-            $c->where('v', '<>',$object)->values()->all()
+            $c->where('v', '<>', $object)->values()->all()
         );
 
         $this->assertEquals(
             [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
-            $c->where('v', '!=',$object)->values()->all()
+            $c->where('v', '!=', $object)->values()->all()
         );
 
         $this->assertEquals(
             [['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]],
-            $c->where('v', '!==',$object)->values()->all()
+            $c->where('v', '!==', $object)->values()->all()
         );
 
         $this->assertEquals(
             [],
-            $c->where('v', '>',$object)->values()->all()
+            $c->where('v', '>', $object)->values()->all()
         );
 
         $c = new Collection([['v' => 1], ['v' => $object]]);
