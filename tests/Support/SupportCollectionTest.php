@@ -45,6 +45,19 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testFirstWehre()
+    {
+        $data = new Collection([
+            ['material' => 'paper', 'type' => 'book'],
+            ['material' => 'rubber', 'type' => 'gasket'],
+        ]);
+
+        $this->assertEquals('book', $data->firstWhere('material', 'paper')['type']);
+        $this->assertEquals('gasket', $data->firstWhere('material', 'rubber')['type']);
+        $this->assertNull($data->firstWhere('material', 'nonexistant'));
+        $this->assertNull($data->firstWhere('nonexistant', 'key'));
+    }
+
     public function testLastReturnsLastItemInCollection()
     {
         $c = new Collection(['foo', 'bar']);
