@@ -1145,8 +1145,8 @@ trait HasAttributes
      * @param string $key
      * @return bool
      */
-    protected function hasAttribute($key)
+    public function hasAttribute($key)
     {
-        return array_key_exists($key, $this->attributes);
+        return array_key_exists($key, $this->attributesToArray());
     }
 }
