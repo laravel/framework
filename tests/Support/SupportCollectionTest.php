@@ -45,7 +45,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
-    public function testFirstWehre()
+    public function testFirstWhere()
     {
         $data = new Collection([
             ['material' => 'paper', 'type' => 'book'],
