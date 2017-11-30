@@ -487,7 +487,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $retrieved = data_get($item, $key);
 
             if (count(array_filter([$retrieved, $value], 'is_object')) == 1) {
-                return false;
+                return in_array($operator, ['!=', '<>', '!==']);
             }
 
             switch ($operator) {
