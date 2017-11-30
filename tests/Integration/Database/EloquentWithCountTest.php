@@ -62,6 +62,23 @@ class EloquentWithCountTest extends TestCase
             ['id' => 1, 'twos_count' => 1],
         ], $results->get()->toArray());
     }
+
+    /**
+     * @test
+     */
+    public function testDeleteWithJoins()
+    {
+        Model1::create()
+                ->twos()->create()
+                ->threes()->create();
+
+        Model2::select('two.id')
+                ->join('one', 'one.id', 1)
+                ->join('three', 'two.id', 'three.two_id')
+                ->where('two.id', 1)->delete();
+
+        $this->assertNull(Model2::find(1));
+    }
 }
 
 class Model1 extends Model
