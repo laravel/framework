@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
@@ -122,18 +123,6 @@ class Schedule
     }
 
     /**
-     * Determine if the server is allowed to run this event.
-     *
-     * @param  \Illuminate\Console\Scheduling\Event  $event
-     * @param  \Illuminate\Support\Carbon  $time
-     * @return bool
-     */
-    public function allowServerToRun(Event $event, Carbon $time)
-    {
-        return $this->schedulingMutex->create($event, $time);
-    }
-
-    /**
      * Compile parameters for a command.
      *
      * @param  array  $parameters
@@ -152,6 +141,18 @@ class Schedule
 
             return is_numeric($key) ? $value : "{$key}={$value}";
         })->implode(' ');
+    }
+
+    /**
+     * Determine if the server is allowed to run this event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeInterface  $time
+     * @return bool
+     */
+    public function serverShouldRun(Event $event, DateTimeInterface $time)
+    {
+        return $this->schedulingMutex->create($event, $time);
     }
 
     /**

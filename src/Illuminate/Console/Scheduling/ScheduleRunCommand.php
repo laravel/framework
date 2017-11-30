@@ -70,11 +70,7 @@ class ScheduleRunCommand extends Command
             }
 
             if ($event->onOneServer) {
-                if ($this->schedule->allowServerToRun($event, $this->startedAt)) {
-                    $this->runEvent($event);
-                } else {
-                    $this->line('<info>Skipping command (already run on another server):</info> '.$event->getSummaryForDisplay());
-                }
+                $this->runSingleServerEvent($event);
             } else {
                 $this->runEvent($event);
             }
@@ -88,6 +84,21 @@ class ScheduleRunCommand extends Command
     }
 
     /**
+     * Run the given single server event.
+     *
+     * @param  \Illuminate\Support\Collection  $event
+     * @return void
+     */
+    protected function runSingleServerEvent($event)
+    {
+        if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
+            $this->runEvent($event);
+        } else {
+            $this->line('<info>Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
+        }
+    }
+
+    /**
      * Run the given event.
      *
      * @param  \Illuminate\Support\Collection  $event
@@ -96,7 +107,9 @@ class ScheduleRunCommand extends Command
     protected function runEvent($event)
     {
         $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
+
         $event->run($this->laravel);
+
         $this->eventsRan = true;
     }
 }

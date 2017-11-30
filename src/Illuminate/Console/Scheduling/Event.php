@@ -65,7 +65,7 @@ class Event
     public $withoutOverlapping = false;
 
     /**
-     * Indicates if the command should only be allowed to run on one server each cron expression.
+     * Indicates if the command should only be allowed to run on one server for each cron expression.
      *
      * @var bool
      */
