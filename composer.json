@@ -21,7 +21,7 @@
         "doctrine/inflector": "~1.1",
         "erusev/parsedown": "~1.6",
         "league/flysystem": "~1.0",
-        "monolog/monolog": "~1.12",
+        "monolog/monolog": "~1.15",
         "dragonmantank/cron-expression": "~2.0",
         "nesbot/carbon": "~1.20",
         "psr/container": "~1.0",
