@@ -4,7 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Contracts\Cache\Repository as Cache;
 
-class CacheMutex implements Mutex
+class CacheEventMutex implements EventMutex
 {
     /**
      * The cache repository implementation.
@@ -25,7 +25,7 @@ class CacheMutex implements Mutex
     }
 
     /**
-     * Attempt to obtain a mutex for the given event.
+     * Attempt to obtain an event mutex for the given event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return bool
@@ -38,7 +38,7 @@ class CacheMutex implements Mutex
     }
 
     /**
-     * Determine if a mutex exists for the given event.
+     * Determine if an event mutex exists for the given event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return bool
@@ -49,7 +49,7 @@ class CacheMutex implements Mutex
     }
 
     /**
-     * Clear the mutex for the given event.
+     * Clear the event mutex for the given event.
      *
      * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
