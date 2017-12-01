@@ -101,7 +101,7 @@ class LogServiceProvider extends ServiceProvider
      */
     protected function configureSyslogHandler(Writer $log)
     {
-        $log->useSyslog('laravel', $this->logLevel());
+        $log->useSyslog(env('APP_NAME', 'laravel'), $this->logLevel());
     }
 
     /**
