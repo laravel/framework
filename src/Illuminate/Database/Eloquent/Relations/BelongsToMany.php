@@ -913,6 +913,16 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get the foreign key for the relation.
+     *
+     * @return string
+     */
+    public function getForeignPivotKeyName()
+    {
+        return $this->foreignPivotKey;
+    }
+
+    /**
      * Get the fully qualified foreign key for the relation.
      *
      * @return string
@@ -920,6 +930,16 @@ class BelongsToMany extends Relation
     public function getQualifiedForeignPivotKeyName()
     {
         return $this->table.'.'.$this->foreignPivotKey;
+    }
+
+    /**
+     * Get the "related key" for the relation.
+     *
+     * @return string
+     */
+    public function getRelatedPivotKeyName()
+    {
+        return $this->relatedPivotKey;
     }
 
     /**
