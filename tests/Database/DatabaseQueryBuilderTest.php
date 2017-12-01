@@ -1769,7 +1769,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereRaw('items->\'$."price"\' = 1');
-        $this->assertEquals('select * from `users` where items->>\'$."price"\' = 1', $builder->toSql());
+        $this->assertEquals('select * from `users` where items->\'$."price"\' = 1', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
