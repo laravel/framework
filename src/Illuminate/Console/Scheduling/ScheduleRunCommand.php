@@ -54,7 +54,7 @@ class ScheduleRunCommand extends Command
                 continue;
             }
 
-            $this->line('<info>['.now()->toDateTimeString().']Running scheduled command:</info> '.$event->getSummaryForDisplay());
+            $this->line('<info>['.now()->toDateTimeString().'] Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
             $event->run($this->laravel);
 
