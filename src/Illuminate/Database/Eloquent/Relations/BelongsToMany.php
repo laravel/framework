@@ -952,4 +952,14 @@ class BelongsToMany extends Relation
     {
         return $this->relationName;
     }
+
+    /**
+     * Get the name of the pivot accessor for this relationship.
+     *
+     * @return string
+     */
+    public function getPivotAccessor()
+    {
+        return $this->accessor;
+    }
 }
