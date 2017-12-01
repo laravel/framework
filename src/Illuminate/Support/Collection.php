@@ -226,9 +226,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return in_array($key, $this->items);
         }
 
-        return $this->contains($this->operatorForWhere(
-            ...$this->operatorParams(...func_get_args())
-        ));
+        return $this->contains($this->operatorForWhere(...func_get_args()));
     }
 
     /**
@@ -381,9 +379,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return true;
         }
 
-        return $this->every($this->operatorForWhere(
-            ...$this->operatorParams(...func_get_args())
-        ));
+        return $this->every($this->operatorForWhere(...func_get_args()));
     }
 
     /**
@@ -473,8 +469,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return \Closure
      */
-    protected function operatorForWhere($key, $operator, $value)
+    protected function operatorForWhere($key, $operator, $value = null)
     {
+        if (func_num_args() == 2) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
         return function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
@@ -496,22 +498,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 case '!==': return $retrieved !== $value;
             }
         };
-    }
-
-    /**
-     * Compile the parameters for the "operatorForWhere" method.
-     *
-     * @return array
-     */
-    protected function operatorParams($key, $operator, $value = null)
-    {
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return [$key, $operator, $value];
     }
 
     /**
@@ -606,9 +592,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function firstWhere($key, $operator, $value = null)
     {
-        return $this->first($this->operatorForWhere(
-            ...$this->operatorParams(...func_get_args())
-        ));
+        return $this->first($this->operatorForWhere(...func_get_args()));
     }
 
     /**
