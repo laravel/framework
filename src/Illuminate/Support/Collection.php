@@ -226,13 +226,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return in_array($key, $this->items);
         }
 
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return $this->contains($this->operatorForWhere($key, $operator, $value));
+        return $this->contains($this->operatorForWhere(
+            ...$this->operatorParams(...func_get_args())
+        ));
     }
 
     /**
@@ -385,13 +381,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return true;
         }
 
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return $this->every($this->operatorForWhere($key, $operator, $value));
+        return $this->every($this->operatorForWhere(
+            ...$this->operatorParams(...func_get_args())
+        ));
     }
 
     /**
@@ -507,6 +499,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Compile the parameters for the "operatorForWhere" method.
+     *
+     * @return array
+     */
+    protected function operatorParams($key, $operator, $value = null)
+    {
+        if (func_num_args() == 2) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
+        return [$key, $operator, $value];
+    }
+
+    /**
      * Filter items by the given key value pair using strict comparison.
      *
      * @param  string  $key
@@ -598,13 +606,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function firstWhere($key, $operator, $value = null)
     {
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return $this->first($this->operatorForWhere($key, $operator, $value));
+        return $this->first($this->operatorForWhere(
+            ...$this->operatorParams(...func_get_args())
+        ));
     }
 
     /**
