@@ -76,6 +76,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
+     * Indicates if timestamps are available on the pivot table.
+     *
+     * @var bool
+     */
+    public $withTimestamps = false;
+
+    /**
      * The custom pivot table column for the created_at timestamp.
      *
      * @var string
@@ -877,6 +884,8 @@ class BelongsToMany extends Relation
      */
     public function withTimestamps($createdAt = null, $updatedAt = null)
     {
+        $this->withTimestamps = true;
+
         $this->pivotCreatedAt = $createdAt;
         $this->pivotUpdatedAt = $updatedAt;
 
