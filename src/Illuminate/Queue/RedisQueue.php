@@ -38,20 +38,29 @@ class RedisQueue extends Queue implements QueueContract
     protected $retryAfter = 60;
 
     /**
+     * The maximum number of seconds to block.
+     *
+     * @var int
+     */
+    private $timeout = 0;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string  $connection
      * @param  int  $retryAfter
+     * @param  int  $timeout
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60)
+    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $timeout = 0)
     {
         $this->redis = $redis;
         $this->default = $default;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
+        $this->timeout = $timeout;
     }
 
     /**
@@ -199,6 +208,45 @@ class RedisQueue extends Queue implements QueueContract
      * @return array
      */
     protected function retrieveNextJob($queue)
+    {
+        if ($this->timeout >= 1) {
+            return $this->blockingPop($queue);
+        }
+
+        return $this->nonBlockingPop($queue);
+    }
+
+    /**
+     * Retrieve the next job by blocking-pop.
+     *
+     * @param  string  $queue
+     * @return array
+     */
+    protected function blockingPop($queue)
+    {
+        $rawBody = $this->getConnection()->blpop($queue, $this->timeout);
+
+        if (! is_null($rawBody)) {
+            $payload = json_decode($rawBody[1], true);
+            $payload['attempts']++;
+            $reserved = json_encode($payload);
+            $this->getConnection()->zadd($queue.':reserved', [
+                $reserved => $this->availableAt($this->retryAfter),
+            ]);
+
+            return [$rawBody[1], $reserved];
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * Retrieve the next job by Lua script.
+     *
+     * @param  string  $queue
+     * @return mixed
+     */
+    protected function nonBlockingPop($queue)
     {
         return $this->getConnection()->eval(
             LuaScripts::pop(), 2, $queue, $queue.':reserved',
