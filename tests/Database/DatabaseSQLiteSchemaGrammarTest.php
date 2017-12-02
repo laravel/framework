@@ -575,7 +575,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" binary(16) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "foo" blob(16) not null', $statements[0]);
     }
 
     public function testAddingIpAddress()

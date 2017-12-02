@@ -637,7 +637,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeUuid(Fluent $column)
     {
-        return 'binary(16)';
+        return 'blob(16)';
     }
 
     /**
