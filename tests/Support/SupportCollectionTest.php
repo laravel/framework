@@ -733,6 +733,25 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testUniqueCountMap()
+    {
+        $c = new Collection([
+            'often used',
+            'less often used',
+            'often used',
+            'used once',
+            'often used',
+            'often used',
+            'less often used',
+        ]);
+
+        $this->assertEquals([
+            'often used' => 4,
+            'less often used' => 2,
+            'used once' => 1,
+        ], $c->uniqueCountMap()->all());
+    }
+
     public function testUniqueStrict()
     {
         $c = new Collection([
