@@ -769,7 +769,7 @@ class Grammar extends BaseGrammar
      */
     public function prepareBindingsForDelete(array $bindings)
     {
-        return $bindings;
+        return Arr::flatten($bindings);
     }
 
     /**
