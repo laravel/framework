@@ -518,7 +518,7 @@ class Worker
      */
     protected function hasRunEnoughJobs()
     {
-        return $this->options->jobs > 0 ? $this->jobs >= $this->options->jobs : false;
+        return $this->options->maxJobs > 0 ? $this->jobs >= $this->options->maxJobs : false;
     }
 
     /**
