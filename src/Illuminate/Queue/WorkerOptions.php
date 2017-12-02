@@ -72,6 +72,7 @@ class WorkerOptions
         $this->force = $force;
         $this->memory = $memory;
         $this->timeout = $timeout;
+        $this->maxJobs = $maxJobs;
         $this->maxTries = $maxTries;
     }
 }
