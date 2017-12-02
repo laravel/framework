@@ -40,7 +40,7 @@ trait RoutesNotifications
     public function routeNotificationFor($driver, $notification = null)
     {
         if (method_exists($this, $method = 'routeNotificationFor'.Str::studly($driver))) {
-            return $this->{$method}();
+            return $this->{$method}($notification);
         }
 
         switch ($driver) {
