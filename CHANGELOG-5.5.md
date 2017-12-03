@@ -1,5 +1,22 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added a `Collection::firstWhere()` method ([#22261](https://github.com/laravel/framework/pull/22261), [#22264](https://github.com/laravel/framework/pull/22264))
+- Added several accessors to `BelongsToMany` ([f09ea98](https://github.com/laravel/framework/commit/f09ea98bc814c708215896dad702d715923f3bc3), [cbe8123](https://github.com/laravel/framework/commit/cbe8123a479e81779cd85251eb4a5cf861e93ea3), [3bcf9d1](https://github.com/laravel/framework/commit/3bcf9d1d67ca3f288270e910898c77334322128a))
+
+### Changed
+- Pass test value to `Collection::when()` callbacks ([#22224](https://github.com/laravel/framework/pull/22224))
+- Support worker sleep time of less than 1s ([#22246](https://github.com/laravel/framework/pull/22246), [#22255](https://github.com/laravel/framework/pull/22255))
+- Detect persistent connection resets ([#22277](https://github.com/laravel/framework/pull/22277))
+
+### Fixed
+- Fixed negative comparison to objects in `Collection::where()` ([#22256](https://github.com/laravel/framework/pull/22256))
+- Fixed integer validation using `distinct:ignore_case` ([#22235](https://github.com/laravel/framework/pull/22235))
+- Fixes building nested JSON accessors in `MySqlGrammar` ([#22254](https://github.com/laravel/framework/pull/22254))
+
+
 ## v5.5.22 (2017-11-27)
 
 ### Added
