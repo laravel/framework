@@ -2,7 +2,7 @@
 
 namespace Illuminate\View\Compilers\Concerns;
 
-trait CompilesFormHelpers
+trait CompilesHelpers
 {
     /**
      * Compile the CSRF statements into valid PHP.
@@ -23,5 +23,16 @@ trait CompilesFormHelpers
     protected function compileMethod($method)
     {
         return "<?php echo method_field{$method}; ?>";
+    }
+
+    /*
+     * Compile the dd statements into valid PHP.
+     *
+     * @param  string  $args
+     * @return string
+     */
+    protected function compileDd($args)
+    {
+        return "<?php dd{$args}; ?>";
     }
 }
