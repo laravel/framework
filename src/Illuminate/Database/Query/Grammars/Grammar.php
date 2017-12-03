@@ -762,6 +762,17 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Prepare the bindings for a delete statement.
+     *
+     * @param  array  $bindings
+     * @return array
+     */
+    public function prepareBindingsForDelete(array $bindings)
+    {
+        return Arr::flatten($bindings);
+    }
+
+    /**
      * Compile a truncate table statement into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
