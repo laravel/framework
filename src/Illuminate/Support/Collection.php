@@ -1520,6 +1520,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Group the collection by values with corresponding frequency.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    public function uniqueCountMap()
+    {
+        return new self(array_count_values($this->items));
+    }
+
+    /**
      * Reset the keys on the underlying array.
      *
      * @return static
