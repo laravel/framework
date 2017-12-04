@@ -182,6 +182,16 @@ class ModelSerializationTest extends TestCase
 
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
+
+    /** @test */
+    public function it_serializes_an_empty_collection()
+    {
+        $serialized = serialize(new ModelSerializationTestClass(
+            new \Illuminate\Database\Eloquent\Collection([])
+        ));
+
+        unserialize($serialized);
+    }
 }
 
 class ModelSerializationTestUser extends Model
