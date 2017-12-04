@@ -480,7 +480,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            $strings = array_filter([$retrieved, $value], function($value){
+            $strings = array_filter([$retrieved, $value], function ($value) {
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
             });
 
