@@ -8,14 +8,14 @@ use Faker\Generator;
 trait WithFaker
 {
     /**
-     * Faker generator instance.
+     * The Faker instance.
      *
      * @var \Faker\Generator
      */
     protected $faker;
 
     /**
-     * Setup up faker generator instance.
+     * Setup up the Faker instance.
      *
      * @return void
      */
@@ -25,43 +25,24 @@ trait WithFaker
     }
 
     /**
-     * Get a default faker generator instance or get a new one for given locale.
+     * Get the default Faker instance for a given locale.
      *
      * @param  string  $locale
      * @return \Faker\Generator
      */
-    protected function faker(string $locale = null)
+    protected function faker($locale = null)
     {
-        if (is_null($locale)) {
-            return $this->faker;
-        }
-
-        return $this->makeFaker($locale);
+        return is_null($locale) ? $this->faker : $this->makeFaker($locale);
     }
 
     /**
-     * Set a new faker generator instance for given locale.
-     *
-     * @param  string  $locale
-     * @return void
-     */
-    protected function fakerSetLocale(string $locale)
-    {
-        $this->faker = $this->makeFaker($locale);
-    }
-
-    /**
-     * Make a faker generator instance for given or default locale.
+     * Create a Faker instance for the given locale.
      *
      * @param  string  $locale
      * @return \Faker\Generator
      */
-    protected function makeFaker(string $locale = null)
+    protected function makeFaker($locale = null)
     {
-        if (is_null($locale)) {
-            $locale = Factory::DEFAULT_LOCALE;
-        }
-
-        return Factory::create($locale);
+        return Factory::create($locale ?? Factory::DEFAULT_LOCALE);
     }
 }
