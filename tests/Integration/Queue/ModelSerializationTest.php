@@ -126,6 +126,16 @@ class ModelSerializationTest extends TestCase
 
         unserialize($serialized);
     }
+
+    /** @test */
+    public function it_serializes_an_empty_collection()
+    {
+        $serialized = serialize(new ModelSerializationTestClass(
+            new \Illuminate\Database\Eloquent\Collection([])
+        ));
+
+        unserialize($serialized);
+    }
 }
 
 class ModelSerializationTestUser extends Model
