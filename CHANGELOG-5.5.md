@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.23 (2017-12-04)
 
 ### Added
 - Added a `Collection::firstWhere()` method ([#22261](https://github.com/laravel/framework/pull/22261), [#22264](https://github.com/laravel/framework/pull/22264))
