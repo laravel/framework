@@ -35,6 +35,8 @@ trait ManagesLoops
             'last' => isset($length) ? $length == 1 : null,
             'depth' => count($this->loopsStack) + 1,
             'parent' => $parent ? (object) $parent : null,
+            'even' => ! (bool) ($iteration % 2),
+            'odd' => (bool) ($iteration % 2),
         ];
     }
 
