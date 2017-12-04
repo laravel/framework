@@ -174,6 +174,48 @@ class SQLiteGrammar extends Grammar
         return "insert into $table ($names) select ".implode(' union all select ', $columns);
     }
 
+
+    /**
+     * Compile a delete statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileDelete(Builder $query)
+    {
+        // SQLite delete statment doesn't fully support complex keywords like joins ..
+        // We use select statment as a subquery to overcome this delimma.
+        if (isset($query->joins) || isset($query->limit)) {
+            // Since rowid is common column between all SQLite tables,
+            // we use it in select subquery and in delete where-in statment.
+            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
+
+            return trim(
+                "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})"
+            );
+        }
+
+        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
+
+        return trim("delete from {$this->wrapTable($query->from)} $wheres");
+    }
+
+    /**
+     * Prepare the bindings for a delete statement.
+     *
+     * @param  array  $bindings
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareBindingsForDelete(array $bindings)
+    {
+        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+
+        return array_values(
+            array_merge($bindings['join'], Arr::flatten($cleanBindings))
+        );
+    }
+
     /**
      * Compile a truncate table statement into SQL.
      *
