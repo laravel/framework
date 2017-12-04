@@ -3,7 +3,6 @@
 namespace Illuminate\Foundation\Testing;
 
 use Faker\Factory;
-use Faker\Generator;
 
 trait WithFaker
 {
