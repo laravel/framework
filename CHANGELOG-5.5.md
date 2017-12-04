@@ -10,9 +10,11 @@
 - Pass test value to `Collection::when()` callbacks ([#22224](https://github.com/laravel/framework/pull/22224))
 - Support worker sleep time of less than 1s ([#22246](https://github.com/laravel/framework/pull/22246), [#22255](https://github.com/laravel/framework/pull/22255))
 - Detect persistent connection resets ([#22277](https://github.com/laravel/framework/pull/22277))
+- Seeders are now chainable ([#22288](https://github.com/laravel/framework/pull/22288))
 
 ### Fixed
 - Fixed negative comparison to objects in `Collection::where()` ([#22256](https://github.com/laravel/framework/pull/22256))
+- Fixed comparing strings with objects that can be casted to string in  `Collection::where()` ([#22295](https://github.com/laravel/framework/pull/22295))
 - Fixed integer validation using `distinct:ignore_case` ([#22235](https://github.com/laravel/framework/pull/22235))
 - Fixes building nested JSON accessors in `MySqlGrammar` ([#22254](https://github.com/laravel/framework/pull/22254))
 
