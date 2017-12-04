@@ -58,9 +58,9 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->redis = $redis;
         $this->default = $default;
+        $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
-        $this->blockFor = $blockFor;
     }
 
     /**
@@ -213,7 +213,10 @@ class RedisQueue extends Queue implements QueueContract
             return $this->blockingPop($queue);
         }
 
-        return $this->nonBlockingPop($queue);
+        return $this->getConnection()->eval(
+            LuaScripts::pop(), 2, $queue, $queue.':reserved',
+            $this->availableAt($this->retryAfter)
+        );
     }
 
     /**
@@ -228,8 +231,11 @@ class RedisQueue extends Queue implements QueueContract
 
         if (! is_null($rawBody)) {
             $payload = json_decode($rawBody[1], true);
+
             $payload['attempts']++;
+
             $reserved = json_encode($payload);
+
             $this->getConnection()->zadd($queue.':reserved', [
                 $reserved => $this->availableAt($this->retryAfter),
             ]);
@@ -238,20 +244,6 @@ class RedisQueue extends Queue implements QueueContract
         }
 
         return [null, null];
-    }
-
-    /**
-     * Retrieve the next job by Lua script.
-     *
-     * @param  string  $queue
-     * @return mixed
-     */
-    protected function nonBlockingPop($queue)
-    {
-        return $this->getConnection()->eval(
-            LuaScripts::pop(), 2, $queue, $queue.':reserved',
-            $this->availableAt($this->retryAfter)
-        );
     }
 
     /**
