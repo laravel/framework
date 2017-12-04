@@ -791,7 +791,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` char(36) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` binary(16) not null', $statements[0]);
     }
 
     public function testAddingIpAddress()

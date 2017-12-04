@@ -672,7 +672,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeUuid(Fluent $column)
     {
-        return 'char(36)';
+        return 'binary(16)';
     }
 
     /**
