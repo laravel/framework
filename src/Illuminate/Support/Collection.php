@@ -480,7 +480,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            if (count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+            $strings = array_filter([$retrieved, $value], function ($value) {
+                return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
+            });
+
+            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 

@@ -450,6 +450,18 @@ class SupportCollectionTest extends TestCase
             [],
             $c->where('v', '<', null)->values()->all()
         );
+
+        $c = new Collection([['v' => 1], ['v' => new \Illuminate\Support\HtmlString('hello')]]);
+        $this->assertEquals(
+            [['v' => new \Illuminate\Support\HtmlString('hello')]],
+            $c->where('v', 'hello')->values()->all()
+        );
+
+        $c = new Collection([['v' => 1], ['v' => 'hello']]);
+        $this->assertEquals(
+            [['v' => 'hello']],
+            $c->where('v', new \Illuminate\Support\HtmlString('hello'))->values()->all()
+        );
     }
 
     public function testWhereStrict()
