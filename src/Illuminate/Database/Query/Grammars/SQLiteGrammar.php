@@ -175,7 +175,6 @@ class SQLiteGrammar extends Grammar
         return "insert into $table ($names) select ".implode(' union all select ', $columns);
     }
 
-
     /**
      * Compile a delete statement into SQL.
      *
@@ -191,9 +190,7 @@ class SQLiteGrammar extends Grammar
             // we use it in select sub-query and in delete where-in statement.
             $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
 
-            return trim(
-                "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})"
-            );
+            return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
         }
 
         $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
