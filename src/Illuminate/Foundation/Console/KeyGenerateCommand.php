@@ -90,22 +90,22 @@ class KeyGenerateCommand extends Command
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->keyReplacementPattern(),
+        file_put_contents($this->laravel->environmentFilePath(), str_replace(
+            $this->keyReplacementString(),
             'APP_KEY='.$key,
             file_get_contents($this->laravel->environmentFilePath())
         ));
     }
 
     /**
-     * Get a regex pattern that will match env APP_KEY with any random key.
+     * Get a string that will match env APP_KEY with the current key.
      *
      * @return string
      */
-    protected function keyReplacementPattern()
+    protected function keyReplacementString()
     {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $key = $this->laravel['config']['app.key'];
 
-        return "/^APP_KEY{$escaped}/m";
+        return "APP_KEY=$key";
     }
 }
