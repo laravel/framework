@@ -304,7 +304,8 @@ class FilesystemManager implements FactoryContract
      */
     protected function createRedisCacheStore(array $cacheConfig, array $storeConfig)
     {
-        $key = sprintf('%s:flysystem', $storeConfig['prefix'] ?? $this->app['config']['cache.prefix']);
+        $key = $cacheConfig['prefix']
+            ?? sprintf('%s:flysystem', $storeConfig['prefix'] ?? $this->app['config']['cache.prefix']);
 
         return new PredisStore(
             $this->app['redis.connection']->client(), $key, Arr::get($cacheConfig, 'expire')
