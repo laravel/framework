@@ -77,35 +77,42 @@ class KeyGenerateCommand extends Command
             return false;
         }
 
-        $this->writeNewEnvironmentFileWith($key);
-
-        return true;
+        return $this->writeNewEnvironmentFileWith($key);
     }
 
     /**
      * Write a new environment file with the given key.
      *
      * @param  string  $key
-     * @return void
+     * @return bool
      */
     protected function writeNewEnvironmentFileWith($key)
     {
-        file_put_contents($this->laravel->environmentFilePath(), preg_replace(
-            $this->keyReplacementPattern(),
+        $count = 0;
+        file_put_contents($this->laravel->environmentFilePath(), str_replace(
+            $this->keyReplacementString(),
             'APP_KEY='.$key,
-            file_get_contents($this->laravel->environmentFilePath())
+            file_get_contents($this->laravel->environmentFilePath()),
+            $count
         ));
+        if($count > 1){
+            $this->warn("APP_KEY replaced $count times");
+        }
+        if($count == 0){
+            $this->warn("APP_KEY not found in .env");
+        }
+        return $count > 0;
     }
 
     /**
-     * Get a regex pattern that will match env APP_KEY with any random key.
+     * Get a string that will match env APP_KEY with the current key.
      *
      * @return string
      */
-    protected function keyReplacementPattern()
+    protected function keyReplacementString()
     {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $key = $this->laravel['config']['app.key'];
 
-        return "/^APP_KEY{$escaped}/m";
+        return "APP_KEY=$key";
     }
 }
