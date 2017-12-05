@@ -9,11 +9,14 @@ use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
+use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
 use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
+use League\Flysystem\Cached\Storage\Memory as MemoryStore;
+use League\Flysystem\Cached\Storage\Predis as PredisStore;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 
 /**
@@ -258,9 +261,54 @@ class FilesystemManager implements FactoryContract
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config)
     {
+        $cache = Arr::pull($config, 'cache');
+
         $config = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
 
+        if ($cache) {
+            $adapter = new CachedAdapter($adapter, $this->createCacheStore($cache));
+        }
+
         return new Flysystem($adapter, count($config) > 0 ? $config : null);
+    }
+
+    /**
+     * Create a cache store instance.
+     *
+     * @param  mixed  $config
+     * @return \League\Flysystem\Cached\CacheInterface
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function createCacheStore($config)
+    {
+        if ($config === true) {
+            return new MemoryStore;
+        }
+
+        $storeConfig = $this->app['config']['cache.stores.'.Arr::get($config, 'store')];
+
+        if (Arr::get($storeConfig, 'driver') === 'redis') {
+            return $this->createRedisCacheStore($config, $storeConfig);
+        }
+
+        throw new InvalidArgumentException("Cache driver [$driver] is not supported.");
+    }
+
+    /**
+     * Create a Redis cache store instance.
+     *
+     * @param  array  $cacheConfig
+     * @param  array  $storeConfig
+     * @return \League\Flysystem\Cached\CacheInterface
+     */
+    protected function createRedisCacheStore(array $cacheConfig, array $storeConfig)
+    {
+        $key = sprintf('%s:flysystem', $storeConfig['prefix'] ?? $this->app['config']['cache.prefix']);
+
+        return new PredisStore(
+            $this->app['redis.connection']->client(), $key, Arr::get($cacheConfig, 'expire')
+        );
     }
 
     /**
