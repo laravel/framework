@@ -15,7 +15,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 /**
  * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder
+class Builder implements \IteratorAggregate
 {
     use BuildsQueries, Concerns\QueriesRelationships;
 

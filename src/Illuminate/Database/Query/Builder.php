@@ -18,7 +18,7 @@ use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
-class Builder
+class Builder implements \IteratorAggregate
 {
     use BuildsQueries, Macroable {
         __call as macroCall;

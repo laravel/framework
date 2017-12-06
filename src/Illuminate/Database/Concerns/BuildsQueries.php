@@ -158,4 +158,14 @@ trait BuildsQueries
             'items', 'perPage', 'currentPage', 'options'
         ));
     }
+
+    /**
+     * Execute the query and return the collection iterator
+     *
+     * @return \ArrayIterator|Traversable
+     */
+    public function getIterator()
+    {
+        return $this->get()->getIterator();
+    }
 }
