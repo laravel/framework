@@ -615,6 +615,20 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
+     * Flush the Flysystem cache.
+     *
+     * @return void
+     */
+    public function flushCache()
+    {
+        $adapter = $this->driver->getAdapter();
+
+        if ($adapter instanceof CachedAdapter) {
+            $adapter->getCache()->flush();
+        }
+    }
+
+    /**
      * Filter directory contents by type.
      *
      * @param  array  $contents
