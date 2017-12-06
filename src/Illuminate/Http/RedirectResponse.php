@@ -81,6 +81,18 @@ class RedirectResponse extends BaseRedirectResponse
     }
 
     /**
+     * Reflash all of the session flash data along with this response.
+     *
+     * @return $this
+     */
+    public function withReflash()
+    {
+        $this->session->reflash();
+
+        return $this;
+    }
+
+    /**
      * Remove all uploaded files form the given input array.
      *
      * @param  array  $input
