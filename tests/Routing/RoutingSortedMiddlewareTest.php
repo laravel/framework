@@ -32,9 +32,9 @@ class RoutingSortedMiddlewareTest extends TestCase
         $expected = [
             'Something',
             'First:api',
+            'Otherthing',
             'First:foo,bar',
             'Second',
-            'Otherthing',
             'Third:foo',
             'Third',
         ];
