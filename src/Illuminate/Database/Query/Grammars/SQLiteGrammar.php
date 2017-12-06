@@ -183,11 +183,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileDelete(Builder $query)
     {
-        // SQLite delete statement doesn't fully support complex keywords like joins ..
-        // We use select statement as a sub-query to overcome this dilemma.
         if (isset($query->joins) || isset($query->limit)) {
-            // Since rowid is common column between all SQLite tables,
-            // we use it in select sub-query and in delete where-in statement.
             $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
 
             return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
@@ -207,7 +203,7 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareBindingsForDelete(array $bindings)
     {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+        $cleanBindings = Arr::except($bindings, ['select', 'join']);
 
         return array_values(
             array_merge($bindings['join'], Arr::flatten($cleanBindings))
