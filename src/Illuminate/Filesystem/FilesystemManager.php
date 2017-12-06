@@ -16,7 +16,6 @@ use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
 use League\Flysystem\Cached\Storage\Memory as MemoryStore;
-use League\Flysystem\Cached\Storage\Predis as PredisStore;
 use Illuminate\Contracts\Filesystem\Factory as FactoryContract;
 
 /**
