@@ -47,8 +47,8 @@ class SortedMiddleware extends Collection
 
             if (isset($priorityMap[$stripped])) {
                 $priorityIndex = $priorityMap[$stripped];
-                $prioritySortMap[$priorityIndex][]= $middleware;
-                $originalIndexes []= $index;
+                $prioritySortMap[$priorityIndex][] = $middleware;
+                $originalIndexes[] = $index;
 
                 // This middleware is in the priority map. If we have encountered another middleware
                 // that was also in the priority map and was at a lower priority than the current
@@ -63,7 +63,7 @@ class SortedMiddleware extends Collection
                 $lastPriorityIndex = $priorityIndex;
             }
         }
-        
+
         if (! $hasReverse) {
             return array_values(array_unique($middlewares, SORT_REGULAR));
         }
