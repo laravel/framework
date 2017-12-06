@@ -986,8 +986,8 @@ trait ValidatesAttributes
         }
 
         return ($value instanceof UploadedFile)
-           ? strtolower($value->getClientOriginalExtension()) === 'php'
-           : strtolower($value->getExtension()) === 'php';
+           ? trim(strtolower($value->getClientOriginalExtension())) === 'php'
+           : trim(strtolower($value->getExtension())) === 'php';
     }
 
     /**
