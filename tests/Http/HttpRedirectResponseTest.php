@@ -46,6 +46,23 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertEquals('bar', $cookies[0]->getValue());
     }
 
+    public function testWithReflashOnRedirect()
+    {
+        /**
+         * @var \Mockery\MockInterface|\Illuminate\Session\Store $session
+         */
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]);
+        $response = new RedirectResponse('foo.bar');
+        $session = m::mock('Illuminate\Session\Store');
+
+        $response->setRequest($request);
+        $response->setSession($session);
+
+        $session->shouldReceive('reflash')->once();
+
+        $response->withReflash();
+    }
+
     public function testInputOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');
