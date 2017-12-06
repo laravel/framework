@@ -762,8 +762,8 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals([
             Placeholder1::class,
             Authenticate::class,
-            SubstituteBindings::class,
             Placeholder2::class,
+            SubstituteBindings::class,
             Placeholder3::class,
         ], $router->gatherRouteMiddleware($route));
     }
