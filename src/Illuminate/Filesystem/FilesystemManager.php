@@ -286,29 +286,10 @@ class FilesystemManager implements FactoryContract
             return new MemoryStore;
         }
 
-        $storeConfig = $this->app['config']['cache.stores.'.Arr::get($config, 'store')];
-
-        if (Arr::get($storeConfig, 'driver') === 'redis') {
-            return $this->createRedisCacheStore($config, $storeConfig);
-        }
-
-        throw new InvalidArgumentException("Cache driver [$driver] is not supported.");
-    }
-
-    /**
-     * Create a Redis cache store instance.
-     *
-     * @param  array  $cacheConfig
-     * @param  array  $storeConfig
-     * @return \League\Flysystem\Cached\CacheInterface
-     */
-    protected function createRedisCacheStore(array $cacheConfig, array $storeConfig)
-    {
-        $key = $cacheConfig['prefix']
-            ?? sprintf('%s:flysystem', $storeConfig['prefix'] ?? $this->app['config']['cache.prefix']);
-
-        return new PredisStore(
-            $this->app['redis.connection']->client(), $key, Arr::get($cacheConfig, 'expire')
+        return new Cache(
+            $this->app['cache']->store($config['store']),
+            Arr::get($config, 'prefix', 'flysystem'),
+            Arr::get($config, 'expire')
         );
     }
 
