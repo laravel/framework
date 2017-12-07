@@ -108,4 +108,12 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
     }
+
+    public function testBuildDatabaseRecordWithPayloadAtTheEnd()
+    {
+        $queue = m::mock('Illuminate\Queue\DatabaseQueue');
+        $record = $queue->buildDatabaseRecord('queue','any_payload',0);
+        $this->assertArrayHasKey('payload', $record);
+        $this->assertArrayHasKey('payload', array_slice($record, -1, 1, TRUE));
+    }
 }
