@@ -496,6 +496,20 @@ class Command extends SymfonyCommand
     }
 
     /**
+     * Write a string as task output.
+     *
+     * @param  string  $string
+     * @param  callable  $callable
+     * @return void
+     */
+    public function task($string, callable $callable)
+    {
+        $result = $callable() ? '<info>✔</info>' : '<error>fail</error>';
+
+        $this->output->writeln("$string: $result");
+    }
+
+    /**
      * Set the verbosity level.
      *
      * @param  string|int  $level
