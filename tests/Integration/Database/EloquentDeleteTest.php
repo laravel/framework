@@ -44,12 +44,12 @@ class EloquentDeleteTest extends TestCase
 
     public function testOnlyDeleteWhatGiven()
     {
-        for($i = 1; $i <= 10; $i++) {
+        for ($i = 1; $i <= 10; $i++) {
             Comment::create([
-                'post_id' => Post::create()->id
+                'post_id' => Post::create()->id,
             ]);
         }
-        
+
         Post::latest('id')->limit(1)->delete();
         $this->assertEquals(9, Post::all()->count());
 

@@ -1583,7 +1583,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
         $this->assertEquals(1, $result);
 
-
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
