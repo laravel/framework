@@ -7,8 +7,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -350,6 +352,50 @@ class TestResponse
                 'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains the given Eloquent model.
+     *
+     * @param  Model  $model
+     * @return $this
+     */
+    public function assertJsonModel(Model $model)
+    {
+        $actual = json_encode(Arr::sortRecursive(
+            (array) $this->decodeResponseJson()
+        ));
+
+        $data = $model->toArray();
+
+        foreach (Arr::sortRecursive($data) as $key => $value) {
+            $expected = substr(json_encode([$key => $value]), 1, -1);
+
+            PHPUnit::assertTrue(
+                Str::contains($actual, $expected),
+                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
+                "[{$expected}]".PHP_EOL.PHP_EOL.
+                'within'.PHP_EOL.PHP_EOL.
+                "[{$actual}]."
+            );
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains all of the given Eloquent models.
+     *
+     * @param  Collection  $models
+     * @return $this
+     */
+    public function assertJsonModels(Collection $models)
+    {
+        foreach ($models as $model) {
+            $this->assertJsonModel($model);
         }
 
         return $this;
