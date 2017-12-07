@@ -59,7 +59,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
     public function testHasColumnWithTablePrefix()
     {
         $this->db->connection()->setTablePrefix('test_');
-        
+
         $this->db->connection()->getSchemaBuilder()->create('table1', function ($table) {
             $table->integer('id');
             $table->string('name');
