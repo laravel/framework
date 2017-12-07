@@ -473,19 +473,19 @@ class SupportArrTest extends TestCase
         try {
             Arr::random([]);
         } catch (\InvalidArgumentException $e) {
-            ++$exceptions;
+            $exceptions++;
         }
 
         try {
             Arr::random([], 1);
         } catch (\InvalidArgumentException $e) {
-            ++$exceptions;
+            $exceptions++;
         }
 
         try {
             Arr::random([], 2);
         } catch (\InvalidArgumentException $e) {
-            ++$exceptions;
+            $exceptions++;
         }
 
         $this->assertSame(3, $exceptions);

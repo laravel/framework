@@ -961,19 +961,19 @@ class SupportCollectionTest extends TestCase
         try {
             $data->random();
         } catch (\InvalidArgumentException $e) {
-            ++$exceptions;
+            $exceptions++;
         }
 
         try {
             $data->random(1);
         } catch (\InvalidArgumentException $e) {
-            ++$exceptions;
+            $exceptions++;
         }
 
         try {
             $data->random(2);
         } catch (\InvalidArgumentException $e) {
-            ++$exceptions;
+            $exceptions++;
         }
 
         $this->assertSame(3, $exceptions);
