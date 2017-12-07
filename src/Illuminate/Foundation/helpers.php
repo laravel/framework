@@ -111,6 +111,19 @@ if (! function_exists('app')) {
     }
 }
 
+if (! function_exists('path')) {
+    /**
+     * replace / or \ with DIRECTORY_SEPARATOR
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function path($path)
+    {
+        return str_replace(['/' , '\\'] , DIRECTORY_SEPARATOR , $path);
+    }
+}
+
 if (! function_exists('app_path')) {
     /**
      * Get the path to the application folder.
@@ -120,7 +133,7 @@ if (! function_exists('app_path')) {
      */
     function app_path($path = '')
     {
-        return app('path').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app('path').(path($path ? DIRECTORY_SEPARATOR.$path : $path));
     }
 }
 
@@ -179,7 +192,7 @@ if (! function_exists('base_path')) {
      */
     function base_path($path = '')
     {
-        return app()->basePath().($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->basePath().(path($path ? DIRECTORY_SEPARATOR.$path : $path));
     }
 }
 
@@ -282,7 +295,7 @@ if (! function_exists('config_path')) {
      */
     function config_path($path = '')
     {
-        return app()->make('path.config').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app()->make('path.config').(path($path ? DIRECTORY_SEPARATOR.$path : $path));
     }
 }
 
@@ -354,7 +367,7 @@ if (! function_exists('database_path')) {
      */
     function database_path($path = '')
     {
-        return app()->databasePath($path);
+        return app()->databasePath(path($path));
     }
 }
 
@@ -635,7 +648,7 @@ if (! function_exists('public_path')) {
      */
     function public_path($path = '')
     {
-        return app()->make('path.public').($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path);
+        return app()->make('path.public').(path($path ? DIRECTORY_SEPARATOR.ltrim($path, DIRECTORY_SEPARATOR) : $path));
     }
 }
 
@@ -743,7 +756,7 @@ if (! function_exists('resource_path')) {
      */
     function resource_path($path = '')
     {
-        return app()->resourcePath($path);
+        return app()->resourcePath(path($path));
     }
 }
 
@@ -843,7 +856,7 @@ if (! function_exists('storage_path')) {
      */
     function storage_path($path = '')
     {
-        return app('path.storage').($path ? DIRECTORY_SEPARATOR.$path : $path);
+        return app('path.storage').(path($path ? DIRECTORY_SEPARATOR.$path : $path));
     }
 }
 
