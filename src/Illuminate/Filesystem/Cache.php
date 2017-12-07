@@ -8,11 +8,11 @@ use League\Flysystem\Cached\Storage\AbstractCache;
 class Cache extends AbstractCache
 {
     /**
-     * The cache repository instance.
+     * The cache repository implementation.
      *
      * @var \Illuminate\Contracts\Cache\Repository
      */
-    protected $repo;
+    protected $repository;
 
     /**
      * The cache key.
@@ -22,7 +22,7 @@ class Cache extends AbstractCache
     protected $key;
 
     /**
-     * The cache expire in minutes.
+     * The cache expiration time in minutes.
      *
      * @var int
      */
@@ -31,16 +31,16 @@ class Cache extends AbstractCache
     /**
      * Create a new cache instance.
      *
-     * @param \Illuminate\Contracts\Cache\Repository $repo
-     * @param string                                 $key
-     * @param int|null                               $expire
+     * @param \Illuminate\Contracts\Cache\Repository  $repository
+     * @param string  $key
+     * @param int|null  $expire
      */
-    public function __construct(Repository $repo, string $key = 'flysystem', int $expire = null)
+    public function __construct(Repository $repository, $key = 'flysystem', $expire = null)
     {
-        $this->repo = $repo;
         $this->key = $key;
+        $this->repository = $repository;
 
-        if ($expire) {
+        if (! is_null($expire)) {
             $this->expire = (int) ceil($expire / 60);
         }
     }
@@ -52,15 +52,15 @@ class Cache extends AbstractCache
      */
     public function load()
     {
-        $contents = $this->repo->get($this->key);
+        $contents = $this->repository->get($this->key);
 
-        if ($contents !== null) {
+        if (! is_null($contents)) {
             $this->setFromStorage($contents);
         }
     }
 
     /**
-     * Store the cache.
+     * Persist the cache.
      *
      * @return void
      */
@@ -68,10 +68,10 @@ class Cache extends AbstractCache
     {
         $contents = $this->getForStorage();
 
-        if ($this->expire !== null) {
-            $this->repo->put($this->key, $contents, $this->expire);
+        if (! is_null($this->expire)) {
+            $this->repository->put($this->key, $contents, $this->expire);
         } else {
-            $this->repo->forever($this->key, $contents);
+            $this->repository->forever($this->key, $contents);
         }
     }
 }

@@ -605,16 +605,6 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     }
 
     /**
-     * Get the Flysystem driver.
-     *
-     * @return \League\Flysystem\FilesystemInterface
-     */
-    public function getDriver()
-    {
-        return $this->driver;
-    }
-
-    /**
      * Flush the Flysystem cache.
      *
      * @return void
@@ -626,6 +616,16 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         if ($adapter instanceof CachedAdapter) {
             $adapter->getCache()->flush();
         }
+    }
+
+    /**
+     * Get the Flysystem driver.
+     *
+     * @return \League\Flysystem\FilesystemInterface
+     */
+    public function getDriver()
+    {
+        return $this->driver;
     }
 
     /**

@@ -287,8 +287,8 @@ class FilesystemManager implements FactoryContract
 
         return new Cache(
             $this->app['cache']->store($config['store']),
-            Arr::get($config, 'prefix', 'flysystem'),
-            Arr::get($config, 'expire')
+            $config['prefix'] ?? 'flysystem',
+            $config['expire'] ?? null
         );
     }
 
