@@ -33,7 +33,7 @@ class StatusCommand extends BaseCommand
      * Create a new migration rollback command instance.
      *
      * @param  \Illuminate\Database\Migrations\Migrator $migrator
-     * @return \Illuminate\Database\Console\Migrations\StatusCommand
+     * @return void
      */
     public function __construct(Migrator $migrator)
     {
@@ -47,7 +47,7 @@ class StatusCommand extends BaseCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         $this->migrator->setConnection($this->option('database'));
 

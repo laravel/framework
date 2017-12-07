@@ -77,7 +77,7 @@ class MigrationCreator
     protected function ensureMigrationDoesntAlreadyExist($name)
     {
         if (class_exists($className = $this->getClassName($name))) {
-            throw new InvalidArgumentException("A {$className} migration already exists.");
+            throw new InvalidArgumentException("A {$className} class already exists.");
         }
     }
 

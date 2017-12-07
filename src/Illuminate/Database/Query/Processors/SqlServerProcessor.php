@@ -63,7 +63,7 @@ class SqlServerProcessor extends Processor
     public function processColumnListing($results)
     {
         return array_map(function ($result) {
-            return with((object) $result)->name;
+            return ((object) $result)->name;
         }, $results);
     }
 }

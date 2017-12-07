@@ -22,7 +22,7 @@ class SessionTableCommandTest extends TestCase
         );
         $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
 
-        $app = new Application();
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $app['migration.creator'] = $creator;
         $command->setLaravel($app);

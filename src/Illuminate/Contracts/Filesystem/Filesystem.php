@@ -41,10 +41,10 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string|resource  $contents
-     * @param  string  $visibility
+     * @param  mixed  $options
      * @return bool
      */
-    public function put($path, $contents, $visibility = null);
+    public function put($path, $contents, $options = []);
 
     /**
      * Get the visibility for the given path.

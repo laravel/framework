@@ -34,7 +34,7 @@ class SyncQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        $queueJob = $this->resolveJob($this->createPayload($job, $data, $queue), $queue);
+        $queueJob = $this->resolveJob($this->createPayload($job, $data), $queue);
 
         try {
             $this->raiseBeforeJobEvent($queueJob);
@@ -72,7 +72,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseBeforeJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobProcessing($this->connectionName, $job));
+            $this->container['events']->dispatch(new Events\JobProcessing($this->connectionName, $job));
         }
     }
 
@@ -85,7 +85,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseAfterJobEvent(Job $job)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobProcessed($this->connectionName, $job));
+            $this->container['events']->dispatch(new Events\JobProcessed($this->connectionName, $job));
         }
     }
 
@@ -99,7 +99,7 @@ class SyncQueue extends Queue implements QueueContract
     protected function raiseExceptionOccurredJobEvent(Job $job, $e)
     {
         if ($this->container->bound('events')) {
-            $this->container['events']->fire(new Events\JobExceptionOccurred($this->connectionName, $job, $e));
+            $this->container['events']->dispatch(new Events\JobExceptionOccurred($this->connectionName, $job, $e));
         }
     }
 
@@ -137,7 +137,7 @@ class SyncQueue extends Queue implements QueueContract
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue

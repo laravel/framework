@@ -14,16 +14,15 @@
         }
     ],
     "require": {
-        "php": ">=5.6.4",
-        "illuminate/console": "5.4.*",
-        "illuminate/container": "5.4.*",
-        "illuminate/contracts": "5.4.*",
-        "illuminate/database": "5.4.*",
-        "illuminate/filesystem": "5.4.*",
-        "illuminate/support": "5.4.*",
-        "nesbot/carbon": "~1.20",
-        "symfony/debug": "~3.2",
-        "symfony/process": "~3.2"
+        "php": ">=7.0",
+        "illuminate/console": "5.5.*",
+        "illuminate/container": "5.5.*",
+        "illuminate/contracts": "5.5.*",
+        "illuminate/database": "5.5.*",
+        "illuminate/filesystem": "5.5.*",
+        "illuminate/support": "5.5.*",
+        "symfony/debug": "~3.3",
+        "symfony/process": "~3.3"
     },
     "autoload": {
         "psr-4": {
@@ -32,12 +31,14 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.4-dev"
+            "dev-master": "5.5-dev"
         }
     },
     "suggest": {
+        "ext-pcntl": "Required to use all features of the queue worker.",
+        "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver (~3.0).",
-        "illuminate/redis": "Required to use the Redis queue driver (5.4.*).",
+        "illuminate/redis": "Required to use the Redis queue driver (5.5.*).",
         "pda/pheanstalk": "Required to use the Beanstalk queue driver (~3.0)."
     },
     "config": {

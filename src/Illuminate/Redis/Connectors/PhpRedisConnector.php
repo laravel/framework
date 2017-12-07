@@ -15,7 +15,7 @@ class PhpRedisConnector
      *
      * @param  array  $config
      * @param  array  $options
-     * @return \Illuminate\Redis\PhpRedisConnection
+     * @return \Illuminate\Redis\Connections\PhpRedisConnection
      */
     public function connect(array $config, array $options)
     {
@@ -92,7 +92,7 @@ class PhpRedisConnector
      */
     protected function establishConnection($client, array $config)
     {
-        $client->{Arr::get($config, 'persistent', false) === true ? 'pconnect' : 'connect'}(
+        $client->{($config['persistent'] ?? false) === true ? 'pconnect' : 'connect'}(
             $config['host'], $config['port'], Arr::get($config, 'timeout', 0)
         );
     }
@@ -109,8 +109,8 @@ class PhpRedisConnector
         return new RedisCluster(
             null,
             array_values($servers),
-            Arr::get($options, 'timeout', 0),
-            Arr::get($options, 'read_timeout', 0),
+            $options['timeout'] ?? 0,
+            $options['read_timeout'] ?? 0,
             isset($options['persistent']) && $options['persistent']
         );
     }

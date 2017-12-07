@@ -15,7 +15,7 @@ interface Repository
     /**
      * Get the specified configuration value.
      *
-     * @param  string  $key
+     * @param  array|string  $key
      * @param  mixed   $default
      * @return mixed
      */

@@ -18,11 +18,19 @@ trait SerializesAndRestoresModelIdentifiers
     protected function getSerializedPropertyValue($value)
     {
         if ($value instanceof QueueableCollection) {
-            return new ModelIdentifier($value->getQueueableClass(), $value->getQueueableIds());
+            return new ModelIdentifier(
+                $value->getQueueableClass(),
+                $value->getQueueableIds(),
+                $value->getQueueableConnection()
+            );
         }
 
         if ($value instanceof QueueableEntity) {
-            return new ModelIdentifier(get_class($value), $value->getQueueableId());
+            return new ModelIdentifier(
+                get_class($value),
+                $value->getQueueableId(),
+                $value->getQueueableConnection()
+            );
         }
 
         return $value;
@@ -42,8 +50,8 @@ trait SerializesAndRestoresModelIdentifiers
 
         return is_array($value->id)
                 ? $this->restoreCollection($value)
-                : $this->getQueryForModelRestoration(new $value->class)
-                            ->useWritePdo()->findOrFail($value->id);
+                : $this->getQueryForModelRestoration((new $value->class)->setConnection($value->connection), $value->id)
+                        ->useWritePdo()->firstOrFail();
     }
 
     /**
@@ -58,20 +66,20 @@ trait SerializesAndRestoresModelIdentifiers
             return new EloquentCollection;
         }
 
-        $model = new $value->class;
-
-        return $this->getQueryForModelRestoration($model)->useWritePdo()
-                    ->whereIn($model->getQualifiedKeyName(), $value->id)->get();
+        return $this->getQueryForModelRestoration(
+            (new $value->class)->setConnection($value->connection), $value->id
+        )->useWritePdo()->get();
     }
 
     /**
      * Get the query for restoration.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  array|int                            $ids
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function getQueryForModelRestoration($model)
+    protected function getQueryForModelRestoration($model, $ids)
     {
-        return $model->newQueryWithoutScopes();
+        return $model->newQueryForRestoration($ids);
     }
 }

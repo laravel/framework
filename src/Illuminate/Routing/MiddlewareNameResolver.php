@@ -12,7 +12,7 @@ class MiddlewareNameResolver
      * @param  string  $name
      * @param  array  $map
      * @param  array  $middlewareGroups
-     * @return string|array
+     * @return \Closure|string|array
      */
     public static function resolve($name, $map, $middlewareGroups)
     {
@@ -39,7 +39,7 @@ class MiddlewareNameResolver
         // which may be run using the Pipeline which accepts this string format.
         list($name, $parameters) = array_pad(explode(':', $name, 2), 2, null);
 
-        return (isset($map[$name]) ? $map[$name] : $name).(! is_null($parameters) ? ':'.$parameters : '');
+        return ($map[$name] ?? $name).(! is_null($parameters) ? ':'.$parameters : '');
     }
 
     /**

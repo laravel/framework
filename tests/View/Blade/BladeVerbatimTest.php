@@ -1,29 +1,18 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeVerbatimTest extends TestCase
+class BladeVerbatimTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testVerbatimBlocksAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@verbatim {{ $a }} @if($b) {{ $b }} @endif @endverbatim';
         $expected = ' {{ $a }} @if($b) {{ $b }} @endif ';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testVerbatimBlocksWithMultipleLinesAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = 'Some text
 @verbatim
     {{ $a }}
@@ -38,19 +27,63 @@ class BladeVerbatimTest extends TestCase
         {{ $b }}
     @endif
 ';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testMultipleVerbatimBlocksAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@verbatim {{ $a }} @endverbatim {{ $b }} @verbatim {{ $c }} @endverbatim';
         $expected = ' {{ $a }}  <?php echo e($b); ?>  {{ $c }} ';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    protected function getFiles()
+    public function testRawBlocksAreRenderedInTheRightOrder()
     {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $string = '@php echo "#1"; @endphp @verbatim {{ #2 }} @endverbatim @verbatim {{ #3 }} @endverbatim @php echo "#4"; @endphp';
+
+        $expected = '<?php echo "#1"; ?>  {{ #2 }}   {{ #3 }}  <?php echo "#4"; ?>';
+
+        $this->assertSame($expected, $this->compiler->compileString($string));
+    }
+
+    public function testMultilineTemplatesWithRawBlocksAreRenderedInTheRightOrder()
+    {
+        $string = '{{ $first }}
+@php
+    echo $second;
+@endphp
+@if ($conditional)
+    {{ $third }}
+@endif
+@include("users")
+@verbatim
+    {{ $fourth }} @include("test")
+@endverbatim 
+@php echo $fifth; @endphp';
+
+        $expected = '<?php echo e($first); ?>
+
+<?php
+    echo $second;
+?>
+<?php if($conditional): ?>
+    <?php echo e($third); ?>
+
+<?php endif; ?>
+<?php echo $__env->make("users", array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>
+
+    {{ $fourth }} @include("test")
+ 
+<?php echo $fifth; ?>';
+
+        $this->assertSame($expected, $this->compiler->compileString($string));
+    }
+
+    public function testRawBlocksDontGetMixedUpWhenSomeAreRemovedByBladeComments()
+    {
+        $string = '{{-- @verbatim Block #1 @endverbatim --}} @php "Block #2" @endphp';
+        $expected = ' <?php "Block #2" ?>';
+
+        $this->assertSame($expected, $this->compiler->compileString($string));
     }
 }

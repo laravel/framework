@@ -36,7 +36,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
      * @expectedExceptionMessage The table is empty.
      */
     public function testSeeInDatabaseDoesNotFindResults()
@@ -49,7 +49,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
      */
     public function testSeeInDatabaseFindsNotMatchingResults()
     {
@@ -64,7 +64,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
      */
     public function testSeeInDatabaseFindsManyNotMatchingResults()
     {
@@ -88,7 +88,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
      */
     public function testDontSeeInDatabaseFindsResults()
     {
@@ -108,7 +108,7 @@ class FoundationInteractsWithDatabaseTest extends TestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_ExpectationFailedException
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
      * @expectedExceptionMessage The table is empty.
      */
     public function testSeeSoftDeletedInDatabaseDoesNotFindResults()

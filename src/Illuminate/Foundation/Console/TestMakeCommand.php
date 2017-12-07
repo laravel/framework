@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 
 class TestMakeCommand extends GeneratorCommand
@@ -49,7 +50,7 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        $name = str_replace_first($this->rootNamespace(), '', $name);
+        $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
         return $this->laravel->basePath().'/tests'.str_replace('\\', '/', $name).'.php';
     }

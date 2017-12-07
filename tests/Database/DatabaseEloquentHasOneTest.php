@@ -26,7 +26,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentHasOneModelStub();
+        $newModel = new EloquentHasOneModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -43,7 +43,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentHasOneModelStub();
+        $newModel = new EloquentHasOneModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -62,7 +62,7 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentHasOneModelStub();
+        $newModel = new EloquentHasOneModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -176,7 +176,8 @@ class DatabaseEloquentHasOneTest extends TestCase
 
         $builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'))->andReturnSelf();
         $relation->getParent()->shouldReceive('getTable')->andReturn('table');
-        $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key');
+        $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
+        $baseQuery->shouldReceive('setBindings')->once()->with([], 'select');
 
         $relation->getRelationExistenceCountQuery($builder, $builder);
     }

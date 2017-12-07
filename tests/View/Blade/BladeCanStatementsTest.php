@@ -1,21 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeCanStatementsTest extends TestCase
+class BladeCanStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCanStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@can (\'update\', [$post])
 breeze
 @elsecan(\'delete\', [$post])
@@ -26,11 +16,6 @@ breeze
 <?php elseif (app(\\Illuminate\\Contracts\\Auth\\Access\\Gate::class)->check(\'delete\', [$post])): ?>
 sneeze
 <?php endif; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

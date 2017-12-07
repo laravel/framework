@@ -96,7 +96,7 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Get the job identifier.
      *
-     * @return string
+     * @return int
      */
     public function getJobId()
     {

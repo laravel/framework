@@ -17,8 +17,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            $composer = m::mock('Illuminate\Support\Composer'),
-            __DIR__.'/vendor'
+            $composer = m::mock('Illuminate\Support\Composer')
         );
         $app = new \Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
@@ -33,8 +32,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
-            __DIR__.'/vendor'
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
         );
         $app = new \Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
@@ -48,8 +46,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
-            __DIR__.'/vendor'
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
         );
         $app = new \Illuminate\Foundation\Application;
         $app->useDatabasePath(__DIR__);
@@ -59,12 +56,25 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
     }
 
+    public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
+        );
+        $app = new \Illuminate\Foundation\Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
+
+        $this->runCommand($command, ['name' => 'create_users_table']);
+    }
+
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing(),
-            __DIR__.'/vendor'
+            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
         );
         $app = new \Illuminate\Foundation\Application;
         $command->setLaravel($app);

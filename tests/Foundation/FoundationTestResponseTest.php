@@ -64,7 +64,7 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertHeader('Location', '/bar');
-        } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
             $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
         }
@@ -147,7 +147,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testCanBeCreatedFromBinaryFileResponses()
     {
-        $files = new Filesystem();
+        $files = new Filesystem;
         $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
         $files->put($tempDir.'/file.txt', 'Hello World');

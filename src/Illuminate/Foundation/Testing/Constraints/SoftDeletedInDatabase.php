@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing\Constraints;
 
-use PHPUnit_Framework_Constraint;
 use Illuminate\Database\Connection;
+use PHPUnit\Framework\Constraint\Constraint;
 
-class SoftDeletedInDatabase extends PHPUnit_Framework_Constraint
+class SoftDeletedInDatabase extends Constraint
 {
     /**
      * Number of records that will be shown in the console in case of failure.

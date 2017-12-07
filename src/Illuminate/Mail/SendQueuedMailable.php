@@ -61,4 +61,27 @@ class SendQueuedMailable
     {
         return get_class($this->mailable);
     }
+
+    /**
+     * Call the failed method on the mailable instance.
+     *
+     * @param  \Exception  $e
+     * @return void
+     */
+    public function failed($e)
+    {
+        if (method_exists($this->mailable, 'failed')) {
+            $this->mailable->failed($e);
+        }
+    }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->mailable = clone $this->mailable;
+    }
 }

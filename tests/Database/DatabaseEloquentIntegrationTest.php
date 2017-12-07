@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
+use ReflectionObject;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -123,6 +125,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
 
         Relation::morphMap([], false);
+        Eloquent::unsetConnectionResolver();
     }
 
     /**
@@ -404,6 +407,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1
      */
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
@@ -412,6 +416,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2
      */
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
@@ -489,7 +494,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friends')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -502,7 +507,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('email', 'abigailotwell@gmail.com');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -514,7 +519,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friends.friends')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -528,7 +533,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('email', 'foo@gmail.com');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -539,7 +544,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friendsOne')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -551,7 +556,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestUser::has('friendsOne.friendsTwo')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('taylorotwell@gmail.com', $results->first()->email);
     }
 
@@ -562,14 +567,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('parentPost')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
     public function testAggregatedValuesOfDatetimeField()
     {
-        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => \Carbon\Carbon::now()]);
-        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => \Carbon\Carbon::now()]);
+        EloquentTestUser::create(['id' => 1, 'email' => 'test1@test.test', 'created_at' => '2016-08-10 09:21:00', 'updated_at' => \Illuminate\Support\Carbon::now()]);
+        EloquentTestUser::create(['id' => 2, 'email' => 'test2@test.test', 'created_at' => '2016-08-01 12:00:00', 'updated_at' => \Illuminate\Support\Carbon::now()]);
 
         $this->assertEquals('2016-08-10 09:21:00', EloquentTestUser::max('created_at'));
         $this->assertEquals('2016-08-01 12:00:00', EloquentTestUser::min('created_at'));
@@ -584,7 +589,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Parent Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -596,7 +601,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('parentPost.parentPost')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -610,7 +615,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Grandparent Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Child Post', $results->first()->name);
     }
 
@@ -621,7 +626,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('childPosts')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Parent Post', $results->first()->name);
     }
 
@@ -634,7 +639,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Child Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Parent Post', $results->first()->name);
     }
 
@@ -646,7 +651,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $results = EloquentTestPost::has('childPosts.childPosts')->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Grandparent Post', $results->first()->name);
     }
 
@@ -660,7 +665,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $query->where('name', 'Child Post');
         })->get();
 
-        $this->assertEquals(1, count($results));
+        $this->assertCount(1, $results);
         $this->assertEquals('Grandparent Post', $results->first()->name);
     }
 
@@ -685,7 +690,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         EloquentTestUser::first()->friends()->chunk(2, function ($friends) use ($user, $friend) {
-            $this->assertEquals(1, count($friends));
+            $this->assertCount(1, $friends);
             $this->assertEquals('abigailotwell@gmail.com', $friends->first()->email);
             $this->assertEquals($user->id, $friends->first()->pivot->user_id);
             $this->assertEquals($friend->id, $friends->first()->pivot->friend_id);
@@ -865,7 +870,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException Exception
+     * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage SQLSTATE[23000]:
      */
     public function testSaveOrFailWithDuplicatedEntry()
     {
@@ -1091,8 +1097,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testFreshMethodOnModel()
     {
-        $now = \Carbon\Carbon::now();
-        \Carbon\Carbon::setTestNow($now);
+        $now = \Illuminate\Support\Carbon::now();
+        \Illuminate\Support\Carbon::setTestNow($now);
 
         $storedUser1 = EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         $storedUser1->newQuery()->update(['email' => 'dev@mathieutu.ovh', 'name' => 'Mathieu TUDISCO']);
@@ -1114,7 +1120,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf(EloquentTestUser::class, $storedUser2);
 
         $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
-        $this->assertEquals(null, $freshNotStoredUser);
+        $this->assertNull($freshNotStoredUser);
     }
 
     public function testFreshMethodOnCollection()
@@ -1129,6 +1135,79 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::find(2)->update(['email' => 'dev@mathieutu.ovh']);
 
         $this->assertEquals($users->map->fresh(), $users->fresh());
+
+        $users = new Collection();
+        $this->assertEquals($users->map->fresh(), $users->fresh());
+    }
+
+    public function testTimestampsUsingDefaultDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s'); // Default MySQL/PostgreSQL/SQLite date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19', $model->fromDateTime($model->getAttribute('created_at')));
+    }
+
+    public function testTimestampsUsingDefaultSqlServerDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.v'); // Default SQL Server date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.000',
+            'updated_at' => '2017-11-14 08:23:19.734',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734000', $this->getRawDateTimeString($model->getAttribute('updated_at')));
+        $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734', $model->fromDateTime($model->getAttribute('updated_at')));
+    }
+
+    public function testTimestampsUsingCustomDateFormat()
+    {
+        // Simulating using custom precisions with timestamps(4)
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.u'); // Custom date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.0000',
+            'updated_at' => '2017-11-14 08:23:19.7348',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734800', $this->getRawDateTimeString($model->getAttribute('updated_at')));
+        // Note: when storing databases would truncate the value to the given precision
+        $this->assertEquals('2017-11-14 08:23:19.000000', $model->fromDateTime($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734800', $model->fromDateTime($model->getAttribute('updated_at')));
+    }
+
+    public function testTimestampsUsingOldSqlServerDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.000',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
+        $model->setRawAttributes([
+            'updated_at' => '2017-11-14 08:23:19.734',
+        ]);
+
+        $attribute = $model->fromDateTime($model->getAttribute('updated_at'));
     }
 
     /**
@@ -1153,6 +1232,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
+    }
+
+    protected function getRawDateTimeString($object)
+    {
+        return (new ReflectionObject($object))->getProperty('date')->getValue($object);
     }
 }
 

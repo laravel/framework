@@ -1,33 +1,22 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeForStatementsTest extends TestCase
+class BladeForStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testForStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @endfor';
         $expected = '<?php for($i = 0; $i < 10; $i++): ?>
 test
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testNestedForStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 @for ($j = 0; $j < 20; $j++)
 test
@@ -38,11 +27,6 @@ test
 test
 <?php endfor; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Mail;
 
 use Aws\Ses\SesClient;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Mail\TransportManager;
@@ -50,7 +51,7 @@ class MailSesTransportTest extends TestCase
 
         // Generate a messageId for our mock to return to ensure that the post-sent message
         // has X-SES-Message-ID in its headers
-        $messageId = str_random(32);
+        $messageId = Str::random(32);
         $sendRawEmailMock = new sendRawEmailMock($messageId);
         $client->expects($this->once())
             ->method('sendRawEmail')

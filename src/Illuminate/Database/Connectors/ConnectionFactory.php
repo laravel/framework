@@ -200,7 +200,7 @@ class ConnectionFactory
      */
     protected function parseHosts(array $config)
     {
-        $hosts = array_wrap($config['host']);
+        $hosts = Arr::wrap($config['host']);
 
         if (empty($hosts)) {
             throw new InvalidArgumentException('Database hosts array is empty.');

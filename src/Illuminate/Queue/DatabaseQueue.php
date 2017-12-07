@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
@@ -97,7 +97,7 @@ class DatabaseQueue extends Queue implements QueueContract
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
@@ -147,7 +147,7 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string|null  $queue
      * @param  string  $payload
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  int  $attempts
      * @return mixed
      */
@@ -171,11 +171,11 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         return [
             'queue' => $queue,
-            'payload' => $payload,
             'attempts' => $attempts,
             'reserved_at' => null,
             'available_at' => $availableAt,
             'created_at' => $this->currentTime(),
+            'payload' => $payload,
         ];
     }
 
@@ -306,7 +306,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string|null  $queue
      * @return string
      */
-    protected function getQueue($queue)
+    public function getQueue($queue)
     {
         return $queue ?: $this->default;
     }

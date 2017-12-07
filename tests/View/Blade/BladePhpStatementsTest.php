@@ -1,36 +1,46 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladePhpStatementsTest extends TestCase
+class BladePhpStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPhpStatementsWithExpressionAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@php($set = true)';
         $expected = '<?php ($set = true); ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testPhpStatementsWithoutExpressionAreCompiled()
+    public function testPhpStatementsWithoutExpressionAreIgnored()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@php';
-        $expected = '<?php ';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $expected = '@php';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        $string = '{{ "Ignore: @php" }}';
+        $expected = '<?php echo e("Ignore: @php"); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    protected function getFiles()
+    public function testPhpStatementsDontParseBladeCode()
     {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $string = '@php echo "{{ This is a blade tag }}" @endphp';
+        $expected = '<?php echo "{{ This is a blade tag }}" ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testVerbatimAndPhpStatementsDontGetMixedUp()
+    {
+        $string = "@verbatim {{ Hello, I'm not blade! }}"
+                ."\n@php echo 'And I'm not PHP!' @endphp"
+                ."\n@endverbatim {{ 'I am Blade' }}"
+                ."\n@php echo 'I am PHP {{ not Blade }}' @endphp";
+
+        $expected = " {{ Hello, I'm not blade! }}"
+                ."\n@php echo 'And I'm not PHP!' @endphp"
+                ."\n <?php echo e('I am Blade'); ?>"
+                ."\n\n<?php echo 'I am PHP {{ not Blade }}' ?>";
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

@@ -4,17 +4,31 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
+    public function setUp()
+    {
+        parent::setUp();
+
+        tap(new DB)->addConnection([
+            'driver'    => 'sqlite',
+            'database'  => ':memory:',
+        ])->bootEloquent();
+    }
+
     public function tearDown()
     {
         m::close();
+
+        Eloquent::unsetConnectionResolver();
     }
 
     public function testGlobalScopeIsApplied()
     {
-        $model = new EloquentGlobalScopesTestModel();
+        $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertEquals('select * from "table" where "active" = ?', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
@@ -22,7 +36,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function testGlobalScopeCanBeRemoved()
     {
-        $model = new EloquentGlobalScopesTestModel();
+        $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope(ActiveScope::class);
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
@@ -30,7 +44,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function testClosureGlobalScopeIsApplied()
     {
-        $model = new EloquentClosureGlobalScopesTestModel();
+        $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertEquals('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
@@ -38,7 +52,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function testClosureGlobalScopeCanBeRemoved()
     {
-        $model = new EloquentClosureGlobalScopesTestModel();
+        $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope('active_scope');
         $this->assertEquals('select * from "table" order by "name" asc', $query->toSql());
         $this->assertEquals([], $query->getBindings());
@@ -46,7 +60,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function testGlobalScopeCanBeRemovedAfterTheQueryIsExecuted()
     {
-        $model = new EloquentClosureGlobalScopesTestModel();
+        $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
         $this->assertEquals('select * from "table" where "active" = ? order by "name" asc', $query->toSql());
         $this->assertEquals([1], $query->getBindings());
@@ -58,7 +72,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function testAllGlobalScopesCanBeRemoved()
     {
-        $model = new EloquentClosureGlobalScopesTestModel();
+        $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScopes();
         $this->assertEquals('select * from "table"', $query->toSql());
         $this->assertEquals([], $query->getBindings());
@@ -70,7 +84,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function testGlobalScopesWithOrWhereConditionsAreNested()
     {
-        $model = new EloquentClosureGlobalScopesWithOrTestModel();
+        $model = new EloquentClosureGlobalScopesWithOrTestModel;
 
         $query = $model->newQuery();
         $this->assertEquals('select "email", "password" from "table" where ("email" = ? or "email" = ?) and "active" = ? order by "name" asc', $query->toSql());

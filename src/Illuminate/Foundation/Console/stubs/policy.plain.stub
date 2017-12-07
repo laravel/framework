@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceUser;
+use NamespacedDummyUserModel;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
 class DummyClass

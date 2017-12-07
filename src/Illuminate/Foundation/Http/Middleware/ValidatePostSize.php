@@ -39,16 +39,17 @@ class ValidatePostSize
         }
 
         $metric = strtoupper(substr($postMaxSize, -1));
+        $postMaxSize = (int) $postMaxSize;
 
         switch ($metric) {
             case 'K':
-                return (int) $postMaxSize * 1024;
+                return $postMaxSize * 1024;
             case 'M':
-                return (int) $postMaxSize * 1048576;
+                return $postMaxSize * 1048576;
             case 'G':
-                return (int) $postMaxSize * 1073741824;
+                return $postMaxSize * 1073741824;
             default:
-                return (int) $postMaxSize;
+                return $postMaxSize;
         }
     }
 }

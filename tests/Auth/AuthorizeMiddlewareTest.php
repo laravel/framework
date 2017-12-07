@@ -56,6 +56,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage This action is unauthorized.
      */
     public function testSimpleAbilityUnauthorized()
     {
@@ -95,6 +96,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage This action is unauthorized.
      */
     public function testModelTypeUnauthorized()
     {
@@ -136,6 +138,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage This action is unauthorized.
      */
     public function testModelUnauthorized()
     {

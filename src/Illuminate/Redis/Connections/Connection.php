@@ -3,6 +3,8 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
+use Illuminate\Redis\Limiters\DurationLimiterBuilder;
+use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 
 /**
  * @mixin \Predis\Client
@@ -25,6 +27,28 @@ abstract class Connection
      * @return void
      */
     abstract public function createSubscription($channels, Closure $callback, $method = 'subscribe');
+
+    /**
+     * Funnel a callback for a maximum number of simultaneous executions.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder
+     */
+    public function funnel($name)
+    {
+        return new ConcurrencyLimiterBuilder($this, $name);
+    }
+
+    /**
+     * Throttle a callback for a maximum number of executions over a given duration.
+     *
+     * @param  string  $name
+     * @return \Illuminate\Redis\Limiters\DurationLimiterBuilder
+     */
+    public function throttle($name)
+    {
+        return new DurationLimiterBuilder($this, $name);
+    }
 
     /**
      * Get the underlying Redis client.

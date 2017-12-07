@@ -224,7 +224,7 @@ abstract class Grammar extends BaseGrammar
 
         return is_bool($value)
                     ? "'".(int) $value."'"
-                    : "'".strval($value)."'";
+                    : "'".(string) $value."'";
     }
 
     /**

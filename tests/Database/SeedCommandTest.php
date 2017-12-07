@@ -11,7 +11,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 
 class SeedCommandTest extends TestCase
 {
-    public function testFire()
+    public function testHandle()
     {
         $seeder = Mockery::mock(Seeder::class);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
@@ -31,9 +31,9 @@ class SeedCommandTest extends TestCase
 
         // call run to set up IO, then fire manually.
         $command->run(new \Symfony\Component\Console\Input\ArrayInput(['--force' => true, '--database' => 'sqlite']), new \Symfony\Component\Console\Output\NullOutput);
-        $command->fire();
+        $command->handle();
 
-        $container->shouldHaveReceived('call')->with([$command, 'fire']);
+        $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
     protected function tearDown()

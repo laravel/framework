@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Auth;
 
 use Mockery as m;
+use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
 
@@ -23,7 +24,8 @@ class AuthPasswordBrokerTest extends TestCase
     }
 
     /**
-     * @expectedException UnexpectedValueException
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage User must implement CanResetPassword interface.
      */
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {
@@ -110,7 +112,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $creds = ['token' => 'token'];
         $broker = $this->getMockBuilder('Illuminate\Auth\Passwords\PasswordBroker')->setMethods(['validateNewPassword'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(array_except($creds, ['token']))->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(Arr::except($creds, ['token']))->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
         $broker->expects($this->once())->method('validateNewPassword')->will($this->returnValue(true));
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 

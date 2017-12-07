@@ -100,6 +100,13 @@ interface Paginator
     public function isEmpty();
 
     /**
+     * Determine if the list of items is not empty.
+     *
+     * @return bool
+     */
+    public function isNotEmpty();
+
+    /**
      * Render the paginator using a given view.
      *
      * @param  string|null  $view

@@ -13,42 +13,42 @@ class AuthorizesResourcesTest extends TestCase
 {
     public function testCreateMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
     }
 
     public function testStoreMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User');
     }
 
     public function testShowMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'show', 'can:view,user');
     }
 
     public function testEditMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
     }
 
     public function testUpdateMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'update', 'can:update,user');
     }
 
     public function testDestroyMethod()
     {
-        $controller = new AuthorizesResourcesController();
+        $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'destroy', 'can:delete,user');
     }

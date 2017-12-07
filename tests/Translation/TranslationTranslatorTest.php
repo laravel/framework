@@ -159,6 +159,6 @@ class TranslationTranslatorTest extends TestCase
 
     protected function getLoader()
     {
-        return m::mock('Illuminate\Translation\LoaderInterface');
+        return m::mock(\Illuminate\Contracts\Translation\Loader::class);
     }
 }

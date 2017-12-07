@@ -2,25 +2,25 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
-use Pusher;
+use Pusher\Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastException;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PusherBroadcaster extends Broadcaster
 {
     /**
      * The Pusher SDK instance.
      *
-     * @var \Pusher
+     * @var \Pusher\Pusher
      */
     protected $pusher;
 
     /**
      * Create a new broadcaster instance.
      *
-     * @param  \Pusher  $pusher
+     * @param  \Pusher\Pusher  $pusher
      * @return void
      */
     public function __construct(Pusher $pusher)
@@ -33,12 +33,13 @@ class PusherBroadcaster extends Broadcaster
      *
      * @param  \Illuminate\Http\Request  $request
      * @return mixed
+     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
     public function auth($request)
     {
         if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
             ! $request->user()) {
-            throw new HttpException(403);
+            throw new AccessDeniedHttpException;
         }
 
         $channelName = Str::startsWith($request->channel_name, 'private-')
@@ -111,7 +112,7 @@ class PusherBroadcaster extends Broadcaster
     /**
      * Get the Pusher SDK instance.
      *
-     * @return \Pusher
+     * @return \Pusher\Pusher
      */
     public function getPusher()
     {

@@ -88,6 +88,6 @@ class BcryptHasher implements HasherContract
      */
     protected function cost(array $options = [])
     {
-        return isset($options['rounds']) ? $options['rounds'] : $this->rounds;
+        return $options['rounds'] ?? $this->rounds;
     }
 }

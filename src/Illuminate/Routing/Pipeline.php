@@ -71,7 +71,8 @@ class Pipeline extends BasePipeline
      */
     protected function handleException($passable, Exception $e)
     {
-        if (! $this->container->bound(ExceptionHandler::class) || ! $passable instanceof Request) {
+        if (! $this->container->bound(ExceptionHandler::class) ||
+            ! $passable instanceof Request) {
             throw $e;
         }
 

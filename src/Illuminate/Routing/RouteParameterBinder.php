@@ -106,7 +106,7 @@ class RouteParameterBinder
     protected function replaceDefaults(array $parameters)
     {
         foreach ($parameters as $key => $value) {
-            $parameters[$key] = isset($value) ? $value : Arr::get($this->route->defaults, $key);
+            $parameters[$key] = $value ?? Arr::get($this->route->defaults, $key);
         }
 
         foreach ($this->route->defaults as $key => $value) {

@@ -53,7 +53,7 @@ class MigrateCommand extends BaseCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         if (! $this->confirmToProceed()) {
             return;

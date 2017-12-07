@@ -18,7 +18,7 @@ class BroadcasterTest extends TestCase
 
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
-        $broadcaster = new FakeBroadcaster();
+        $broadcaster = new FakeBroadcaster;
 
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, $nonModel) {
         };
@@ -58,11 +58,12 @@ class BroadcasterTest extends TestCase
     }
 
     /**
-     * @expectedException Symfony\Component\HttpKernel\Exception\HttpException
+     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
+     * @expectedExceptionMessage
      */
     public function testNotFoundThrowsHttpException()
     {
-        $broadcaster = new FakeBroadcaster();
+        $broadcaster = new FakeBroadcaster;
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
         };
         $broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
@@ -103,7 +104,7 @@ class BroadcasterTestEloquentModelStub extends Model
         return $this;
     }
 
-    public function firstOr()
+    public function first()
     {
         return "model.{$this->value}.instance";
     }
@@ -123,8 +124,8 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
         return $this;
     }
 
-    public function firstOr($callback)
+    public function first()
     {
-        return call_user_func($callback);
+        //
     }
 }

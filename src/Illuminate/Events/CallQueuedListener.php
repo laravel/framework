@@ -40,6 +40,13 @@ class CallQueuedListener implements ShouldQueue
     public $tries;
 
     /**
+     * The timestamp indicating when the job should timeout.
+     *
+     * @var int
+     */
+    public $timeoutAt;
+
+    /**
      * The number of seconds the job can run before timing out.
      *
      * @var int
@@ -137,5 +144,17 @@ class CallQueuedListener implements ShouldQueue
     public function displayName()
     {
         return $this->class;
+    }
+
+    /**
+     * Prepare the instance for cloning.
+     *
+     * @return void
+     */
+    public function __clone()
+    {
+        $this->data = array_map(function ($data) {
+            return is_object($data) ? clone $data : $data;
+        }, $this->data);
     }
 }

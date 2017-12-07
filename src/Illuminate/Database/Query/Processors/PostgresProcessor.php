@@ -35,7 +35,7 @@ class PostgresProcessor extends Processor
     public function processColumnListing($results)
     {
         return array_map(function ($result) {
-            return with((object) $result)->column_name;
+            return ((object) $result)->column_name;
         }, $results);
     }
 }

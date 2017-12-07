@@ -98,9 +98,9 @@ class MailMessageTest extends TestCase
 
     public function testBasicAttachment()
     {
-        $swift = m::mock('StdClass');
+        $swift = m::mock('stdClass');
         $message = $this->getMockBuilder('Illuminate\Mail\Message')->setMethods(['createAttachmentFromPath'])->setConstructorArgs([$swift])->getMock();
-        $attachment = m::mock('StdClass');
+        $attachment = m::mock('stdClass');
         $message->expects($this->once())->method('createAttachmentFromPath')->with($this->equalTo('foo.jpg'))->will($this->returnValue($attachment));
         $swift->shouldReceive('attach')->once()->with($attachment);
         $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');
@@ -110,9 +110,9 @@ class MailMessageTest extends TestCase
 
     public function testDataAttachment()
     {
-        $swift = m::mock('StdClass');
+        $swift = m::mock('stdClass');
         $message = $this->getMockBuilder('Illuminate\Mail\Message')->setMethods(['createAttachmentFromData'])->setConstructorArgs([$swift])->getMock();
-        $attachment = m::mock('StdClass');
+        $attachment = m::mock('stdClass');
         $message->expects($this->once())->method('createAttachmentFromData')->with($this->equalTo('foo'), $this->equalTo('name'))->will($this->returnValue($attachment));
         $swift->shouldReceive('attach')->once()->with($attachment);
         $attachment->shouldReceive('setContentType')->once()->with('image/jpeg');

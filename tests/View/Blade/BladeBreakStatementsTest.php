@@ -1,21 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
-
-class BladeBreakStatementsTest extends TestCase
+class BladeBreakStatementsTest extends AbstractBladeTestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBreakStatementsAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break
@@ -24,12 +14,11 @@ test
 test
 <?php break; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithExpressionAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break(TRUE)
@@ -38,12 +27,11 @@ test
 test
 <?php if(TRUE) break; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithArgumentAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break(2)
@@ -52,12 +40,11 @@ test
 test
 <?php break 2; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithSpacedArgumentAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break( 2 )
@@ -66,12 +53,11 @@ test
 test
 <?php break 2; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
     public function testBreakStatementsWithFaultyArgumentAreCompiled()
     {
-        $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@for ($i = 0; $i < 10; $i++)
 test
 @break(-2)
@@ -80,11 +66,6 @@ test
 test
 <?php break 1; ?>
 <?php endfor; ?>';
-        $this->assertEquals($expected, $compiler->compileString($string));
-    }
-
-    protected function getFiles()
-    {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

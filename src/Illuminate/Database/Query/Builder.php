@@ -27,7 +27,7 @@ class Builder
     /**
      * The database connection instance.
      *
-     * @var \Illuminate\Database\Connection
+     * @var \Illuminate\Database\ConnectionInterface
      */
     public $connection;
 
@@ -178,7 +178,7 @@ class Builder
      */
     public $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=', '<=>',
-        'like', 'like binary', 'not like', 'between', 'ilike',
+        'like', 'like binary', 'not like', 'ilike',
         '&', '|', '^', '<<', '>>',
         'rlike', 'regexp', 'not regexp',
         '~', '~*', '!~', '!~*', 'similar to',
@@ -257,7 +257,7 @@ class Builder
         if ($query instanceof Closure) {
             $callback = $query;
 
-            $callback($query = $this->newQuery());
+            $callback($query = $this->forSubQuery());
         }
 
         // Here, we will parse this query into an SQL string and an array of bindings
@@ -334,8 +334,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @param  string  $type
      * @param  bool    $where
      * @return $this
@@ -389,8 +389,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function leftJoin($table, $first, $operator = null, $second = null)
@@ -417,8 +417,8 @@ class Builder
      *
      * @param  string  $table
      * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function rightJoin($table, $first, $operator = null, $second = null)
@@ -444,9 +444,9 @@ class Builder
      * Add a "cross join" clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
-     * @param  string  $operator
-     * @param  string  $second
+     * @param  string|null  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function crossJoin($table, $first = null, $operator = null, $second = null)
@@ -480,7 +480,7 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
+     * @param  string|null  $operator
      * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
@@ -526,7 +526,7 @@ class Builder
         // where null clause to the query. So, we will allow a short-cut here to
         // that method for convenience so the developer doesn't have to check.
         if (is_null($value)) {
-            return $this->whereNull($column, $boolean, $operator != '=');
+            return $this->whereNull($column, $boolean, $operator !== '=');
         }
 
         // If the column is making a JSON reference we'll check to see if the value
@@ -625,7 +625,7 @@ class Builder
      * Add an "or where" clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
+     * @param  string|null  $operator
      * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -820,7 +820,7 @@ class Builder
         // To create the exists sub-select, we will actually create a query and call the
         // provided callback with the query so the developer may set any of the query
         // conditions they want for the in clause, then we'll put it in this array.
-        call_user_func($callback, $query = $this->newQuery());
+        call_user_func($callback, $query = $this->forSubQuery());
 
         $this->wheres[] = compact('type', 'column', 'query', 'boolean');
 
@@ -1148,7 +1148,7 @@ class Builder
         // Once we have the query instance we can simply execute it so it can add all
         // of the sub-select's conditions to itself, and then we can cache it off
         // in the array of where clauses for the "main" parent query instance.
-        call_user_func($callback, $query = $this->newQuery());
+        call_user_func($callback, $query = $this->forSubQuery());
 
         $this->wheres[] = compact(
             'type', 'column', 'operator', 'query', 'boolean'
@@ -1169,7 +1169,7 @@ class Builder
      */
     public function whereExists(Closure $callback, $boolean = 'and', $not = false)
     {
-        $query = $this->newQuery();
+        $query = $this->forSubQuery();
 
         // Similar to the sub-select clause, we will create a new query instance so
         // the developer may cleanly specify the entire exists query and we will
@@ -1222,7 +1222,7 @@ class Builder
      * @param  bool  $not
      * @return $this
      */
-    public function addWhereExistsQuery(Builder $query, $boolean = 'and', $not = false)
+    public function addWhereExistsQuery(self $query, $boolean = 'and', $not = false)
     {
         $type = $not ? 'NotExists' : 'Exists';
 
@@ -1259,7 +1259,7 @@ class Builder
             // If the segment is not a boolean connector, we can assume it is a column's name
             // and we will add it to the query as a new constraint as a where clause, then
             // we can keep iterating through the dynamic method string's segments again.
-            if ($segment != 'And' && $segment != 'Or') {
+            if ($segment !== 'And' && $segment !== 'Or') {
                 $this->addDynamic($segment, $connector, $parameters, $index);
 
                 $index++;
@@ -1306,7 +1306,7 @@ class Builder
         foreach ($groups as $group) {
             $this->groups = array_merge(
                 (array) $this->groups,
-                array_wrap($group)
+                Arr::wrap($group)
             );
         }
 
@@ -1317,8 +1317,8 @@ class Builder
      * Add a "having" clause to the query.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param  string|null  $operator
+     * @param  string|null  $value
      * @param  string  $boolean
      * @return $this
      */
@@ -1353,8 +1353,8 @@ class Builder
      * Add a "or having" clause to the query.
      *
      * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param  string|null  $operator
+     * @param  string|null  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orHaving($column, $operator = null, $value = null)
@@ -1857,6 +1857,8 @@ class Builder
             }
 
             $lastId = $results->last()->{$alias};
+
+            unset($results);
         } while ($countResults == $count);
 
         return true;
@@ -1950,7 +1952,7 @@ class Builder
      */
     public function count($columns = '*')
     {
-        return (int) $this->aggregate(__FUNCTION__, array_wrap($columns));
+        return (int) $this->aggregate(__FUNCTION__, Arr::wrap($columns));
     }
 
     /**
@@ -2121,7 +2123,7 @@ class Builder
      * Insert a new record and get the value of the primary key.
      *
      * @param  array   $values
-     * @param  string  $sequence
+     * @param  string|null  $sequence
      * @return int
      */
     public function insertGetId(array $values, $sequence = null)
@@ -2222,7 +2224,9 @@ class Builder
         }
 
         return $this->connection->delete(
-            $this->grammar->compileDelete($this), $this->getBindings()
+            $this->grammar->compileDelete($this), $this->cleanBindings(
+                $this->grammar->prepareBindingsForDelete($this->bindings)
+            )
         );
     }
 
@@ -2246,6 +2250,16 @@ class Builder
     public function newQuery()
     {
         return new static($this->connection, $this->grammar, $this->processor);
+    }
+
+    /**
+     * Create a new query instance for a sub-query.
+     *
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function forSubQuery()
+    {
+        return $this->newQuery();
     }
 
     /**
@@ -2329,7 +2343,7 @@ class Builder
      * @param  \Illuminate\Database\Query\Builder  $query
      * @return $this
      */
-    public function mergeBindings(Builder $query)
+    public function mergeBindings(self $query)
     {
         $this->bindings = array_merge_recursive($this->bindings, $query->bindings);
 
@@ -2394,13 +2408,13 @@ class Builder
     /**
      * Clone the query without the given properties.
      *
-     * @param  array  $except
+     * @param  array  $properties
      * @return static
      */
-    public function cloneWithout(array $except)
+    public function cloneWithout(array $properties)
     {
-        return tap(clone $this, function ($clone) use ($except) {
-            foreach ($except as $property) {
+        return tap(clone $this, function ($clone) use ($properties) {
+            foreach ($properties as $property) {
                 $clone->{$property} = null;
             }
         });

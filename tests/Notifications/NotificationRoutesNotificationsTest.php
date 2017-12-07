@@ -21,11 +21,24 @@ class NotificationRoutesNotificationsTest extends TestCase
         $factory = Mockery::mock(Dispatcher::class);
         $container->instance(Dispatcher::class, $factory);
         $notifiable = new RoutesNotificationsTestInstance;
-        $instance = new StdClass;
+        $instance = new stdClass;
         $factory->shouldReceive('send')->with($notifiable, $instance);
         Container::setInstance($container);
 
         $notifiable->notify($instance);
+    }
+
+    public function testNotificationCanBeSentNow()
+    {
+        $container = new Container;
+        $factory = Mockery::mock(Dispatcher::class);
+        $container->instance(Dispatcher::class, $factory);
+        $notifiable = new RoutesNotificationsTestInstance;
+        $instance = new stdClass;
+        $factory->shouldReceive('sendNow')->with($notifiable, $instance, null);
+        Container::setInstance($container);
+
+        $notifiable->notifyNow($instance);
     }
 
     public function testNotificationOptionRouting()

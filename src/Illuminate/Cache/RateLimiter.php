@@ -2,11 +2,13 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Carbon;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\Repository as Cache;
 
 class RateLimiter
 {
+    use InteractsWithTime;
+
     /**
      * The cache store implementation.
      *
@@ -35,33 +37,15 @@ class RateLimiter
      */
     public function tooManyAttempts($key, $maxAttempts, $decayMinutes = 1)
     {
-        if ($this->cache->has($key.':lockout')) {
-            return true;
-        }
-
         if ($this->attempts($key) >= $maxAttempts) {
-            $this->lockout($key, $decayMinutes);
+            if ($this->cache->has($key.':timer')) {
+                return true;
+            }
 
             $this->resetAttempts($key);
-
-            return true;
         }
 
         return false;
-    }
-
-    /**
-     * Add the lockout key to the cache.
-     *
-     * @param  string  $key
-     * @param  int  $decayMinutes
-     * @return void
-     */
-    protected function lockout($key, $decayMinutes)
-    {
-        $this->cache->add(
-            $key.':lockout', Carbon::now()->getTimestamp() + ($decayMinutes * 60), $decayMinutes
-        );
     }
 
     /**
@@ -73,6 +57,10 @@ class RateLimiter
      */
     public function hit($key, $decayMinutes = 1)
     {
+        $this->cache->add(
+            $key.':timer', $this->availableAt($decayMinutes * 60), $decayMinutes
+        );
+
         $added = $this->cache->add($key, 0, $decayMinutes);
 
         $hits = (int) $this->cache->increment($key);
@@ -121,7 +109,7 @@ class RateLimiter
     }
 
     /**
-     * Clear the hits and lockout for the given key.
+     * Clear the hits and lockout timer for the given key.
      *
      * @param  string  $key
      * @return void
@@ -130,7 +118,7 @@ class RateLimiter
     {
         $this->resetAttempts($key);
 
-        $this->cache->forget($key.':lockout');
+        $this->cache->forget($key.':timer');
     }
 
     /**
@@ -141,6 +129,6 @@ class RateLimiter
      */
     public function availableIn($key)
     {
-        return $this->cache->get($key.':lockout') - Carbon::now()->getTimestamp();
+        return $this->cache->get($key.':timer') - $this->currentTime();
     }
 }

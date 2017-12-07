@@ -177,9 +177,7 @@ class Command extends SymfonyCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $method = method_exists($this, 'handle') ? 'handle' : 'fire';
-
-        return $this->laravel->call([$this, $method]);
+        return $this->laravel->call([$this, 'handle']);
     }
 
     /**
@@ -380,10 +378,11 @@ class Command extends SymfonyCommand
      *
      * @param  array   $headers
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $rows
-     * @param  string  $style
+     * @param  string  $tableStyle
+     * @param  array   $columnStyles
      * @return void
      */
-    public function table(array $headers, $rows, $style = 'default')
+    public function table($headers, $rows, $tableStyle = 'default', array $columnStyles = [])
     {
         $table = new Table($this->output);
 
@@ -391,7 +390,13 @@ class Command extends SymfonyCommand
             $rows = $rows->toArray();
         }
 
-        $table->setHeaders($headers)->setRows($rows)->setStyle($style)->render();
+        $table->setHeaders((array) $headers)->setRows($rows)->setStyle($tableStyle);
+
+        foreach ($columnStyles as $columnIndex => $columnStyle) {
+            $table->setColumnStyle($columnIndex, $columnStyle);
+        }
+
+        $table->render();
     }
 
     /**

@@ -137,10 +137,12 @@ class SessionStoreTest extends TestCase
         $session = $this->getSession();
         $session->flash('foo', 'bar');
         $session->flash('bar', 0);
+        $session->flash('baz');
 
         $this->assertTrue($session->has('foo'));
         $this->assertEquals('bar', $session->get('foo'));
         $this->assertEquals(0, $session->get('bar'));
+        $this->assertTrue($session->get('baz'));
 
         $session->ageFlashData();
 
@@ -287,10 +289,10 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->never();
 
-        $session = new \Illuminate\Session\Store('test', m::mock(new \Illuminate\Session\CookieSessionHandler(new \Illuminate\Cookie\CookieJar(), 60)));
+        $session = new \Illuminate\Session\Store('test', m::mock(new \Illuminate\Session\CookieSessionHandler(new \Illuminate\Cookie\CookieJar, 60)));
         $this->assertTrue($session->handlerNeedsRequest());
         $session->getHandler()->shouldReceive('setRequest')->once();
-        $request = new \Symfony\Component\HttpFoundation\Request();
+        $request = new \Symfony\Component\HttpFoundation\Request;
         $session->setRequestOnHandler($request);
     }
 

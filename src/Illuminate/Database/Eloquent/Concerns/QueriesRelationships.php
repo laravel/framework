@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -69,7 +68,7 @@ trait QueriesRelationships
     {
         $relations = explode('.', $relations);
 
-        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $boolean, $callback) {
+        $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
             // reference to itself so it calls itself recursively on each segment.
@@ -216,7 +215,7 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = snake_case(isset($alias) ? $alias : $name).'_count';
+            $column = $alias ?? Str::snake($name.'_count');
 
             $this->selectSub($query->toBase(), $column);
         }
@@ -239,7 +238,7 @@ trait QueriesRelationships
         $hasQuery->mergeConstraintsFrom($relation->getQuery());
 
         return $this->canUseExistsForExistenceCheck($operator, $count)
-                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $not = ($operator === '<' && $count === 1))
+                ? $this->addWhereExistsQuery($hasQuery->toBase(), $boolean, $operator === '<' && $count === 1)
                 : $this->addWhereCountQuery($hasQuery->toBase(), $operator, $count, $boolean);
     }
 
@@ -251,9 +250,7 @@ trait QueriesRelationships
      */
     public function mergeConstraintsFrom(Builder $from)
     {
-        $whereBindings = Arr::get(
-            $from->getQuery()->getRawBindings(), 'where', []
-        );
+        $whereBindings = $from->getQuery()->getRawBindings()['where'] ?? [];
 
         // Here we have some other query that we want to merge the where constraints from. We will
         // copy over any where constraints on the query as well as remove any global scopes the

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 
 trait HasTimestamps
 {
@@ -38,7 +38,7 @@ trait HasTimestamps
     {
         $time = $this->freshTimestamp();
 
-        if (! $this->isDirty(static::UPDATED_AT)) {
+        if (! is_null(static::UPDATED_AT) && ! $this->isDirty(static::UPDATED_AT)) {
             $this->setUpdatedAt($time);
         }
 
@@ -76,7 +76,7 @@ trait HasTimestamps
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Carbon\Carbon
+     * @return \Illuminate\Support\Carbon
      */
     public function freshTimestamp()
     {

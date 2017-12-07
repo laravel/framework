@@ -65,13 +65,22 @@ interface Gate
     public function denies($ability, $arguments = []);
 
     /**
-     * Determine if the given ability should be granted.
+     * Determine if all of the given abilities should be granted for the current user.
      *
-     * @param  string  $ability
+     * @param  iterable|string  $abilities
      * @param  array|mixed  $arguments
      * @return bool
      */
-    public function check($ability, $arguments = []);
+    public function check($abilities, $arguments = []);
+
+    /**
+     * Determine if any one of the given abilities should be granted for the current user.
+     *
+     * @param  iterable|string  $abilities
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    public function any($abilities, $arguments = []);
 
     /**
      * Determine if the given ability should be granted for the current user.
@@ -101,4 +110,11 @@ interface Gate
      * @return static
      */
     public function forUser($user);
+
+    /**
+     * Get all of the defined abilities.
+     *
+     * @return array
+     */
+    public function abilities();
 }

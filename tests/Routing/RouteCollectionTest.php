@@ -18,7 +18,7 @@ class RouteCollectionTest extends TestCase
     {
         parent::setUp();
 
-        $this->routeCollection = new RouteCollection();
+        $this->routeCollection = new RouteCollection;
     }
 
     public function testRouteCollectionCanBeConstructed()
@@ -164,6 +164,30 @@ class RouteCollectionTest extends TestCase
             $routeNew,
         ];
         $this->assertEquals($allRoutes, $this->routeCollection->getRoutes());
+    }
+
+    public function testRouteCollectionCanGetRoutesByName()
+    {
+        $routesByName = [
+            'foo_index' => new Route('GET', 'foo/index', [
+                'uses' => 'FooController@index',
+                'as' => 'foo_index',
+            ]),
+            'foo_show' => new Route('GET', 'foo/show', [
+                'uses' => 'FooController@show',
+                'as' => 'foo_show',
+            ]),
+            'bar_create' => new Route('POST', 'bar', [
+                'uses' => 'BarController@create',
+                'as' => 'bar_create',
+            ]),
+        ];
+
+        $this->routeCollection->add($routesByName['foo_index']);
+        $this->routeCollection->add($routesByName['foo_show']);
+        $this->routeCollection->add($routesByName['bar_create']);
+
+        $this->assertSame($routesByName, $this->routeCollection->getRoutesByName());
     }
 
     public function testRouteCollectionCleansUpOverwrittenRoutes()

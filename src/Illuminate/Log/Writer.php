@@ -54,7 +54,7 @@ class Writer implements LogContract, PsrLoggerInterface
      * Create a new log writer instance.
      *
      * @param  \Monolog\Logger  $monolog
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $dispatcher
+     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
     public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
@@ -257,10 +257,8 @@ class Writer implements LogContract, PsrLoggerInterface
     public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
     {
         $this->monolog->pushHandler(
-            $handler = new ErrorLogHandler($messageType, $this->parseLevel($level))
+            new ErrorLogHandler($messageType, $this->parseLevel($level))
         );
-
-        $handler->setFormatter($this->getDefaultFormatter());
     }
 
     /**
@@ -351,7 +349,9 @@ class Writer implements LogContract, PsrLoggerInterface
      */
     protected function getDefaultFormatter()
     {
-        return new LineFormatter(null, null, true, true);
+        return tap(new LineFormatter(null, null, true, true), function ($formatter) {
+            $formatter->includeStacktraces();
+        });
     }
 
     /**

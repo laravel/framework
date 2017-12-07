@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Traits\Macroable;
@@ -174,9 +173,28 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
-     * Send a new message using a view.
+     * Render the given message as a view.
      *
      * @param  string|array  $view
+     * @param  array  $data
+     * @return \Illuminate\View\View
+     */
+    public function render($view, array $data = [])
+    {
+        // First we need to parse the view, which could either be a string or an array
+        // containing both an HTML and plain text versions of the view which should
+        // be used when sending an e-mail. We will extract both of them out here.
+        list($view, $plain, $raw) = $this->parseView($view);
+
+        $data['message'] = $this->createMessage();
+
+        return $this->renderView($view, $data);
+    }
+
+    /**
+     * Send a new message using a view.
+     *
+     * @param  string|array|MailableContract  $view
      * @param  array  $data
      * @param  \Closure|string  $callback
      * @return void
@@ -208,7 +226,7 @@ class Mailer implements MailerContract, MailQueueContract
             $this->setGlobalTo($message);
         }
 
-        // Next we will determine if the message should be send. We give the developer
+        // Next we will determine if the message should be sent. We give the developer
         // one final chance to stop this message and then we will send it to all of
         // its recipients. We will then fire the sent event for the sent message.
         $swiftMessage = $message->getSwiftMessage();
@@ -223,7 +241,7 @@ class Mailer implements MailerContract, MailQueueContract
     /**
      * Send the given mailable.
      *
-     * @param  MailableContract  $mailable
+     * @param  \Illuminate\Contracts\Mail\Mailable  $mailable
      * @return mixed
      */
     protected function sendMailable(MailableContract $mailable)
@@ -248,7 +266,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         // If the given view is an array with numeric keys, we will just assume that
         // both a "pretty" and "plain" view were provided, so we will return this
-        // array as is, since must should contain both views with numeric keys.
+        // array as is, since it should contain both views with numerical keys.
         if (is_array($view) && isset($view[0])) {
             return [$view[0], $view[1], null];
         }
@@ -258,9 +276,9 @@ class Mailer implements MailerContract, MailQueueContract
         // named keys instead, allowing the developers to use one or the other.
         if (is_array($view)) {
             return [
-                Arr::get($view, 'html'),
-                Arr::get($view, 'text'),
-                Arr::get($view, 'raw'),
+                $view['html'] ?? null,
+                $view['text'] ?? null,
+                $view['raw'] ?? null,
             ];
         }
 
@@ -319,26 +337,24 @@ class Mailer implements MailerContract, MailQueueContract
     protected function setGlobalTo($message)
     {
         $message->to($this->to['address'], $this->to['name'], true);
-        $message->cc($this->to['address'], $this->to['name'], true);
-        $message->bcc($this->to['address'], $this->to['name'], true);
+        $message->cc(null, null, true);
+        $message->bcc(null, null, true);
     }
 
     /**
      * Queue a new e-mail message for sending.
      *
-     * @param  string|array  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  string|array|MailableContract  $view
      * @param  string|null  $queue
      * @return mixed
      */
-    public function queue($view, array $data = [], $callback = null, $queue = null)
+    public function queue($view, $queue = null)
     {
         if (! $view instanceof MailableContract) {
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->queue($this->queue);
+        return $view->queue(is_null($queue) ? $this->queue : $queue);
     }
 
     /**
@@ -346,13 +362,11 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $queue
      * @param  string|array  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
      * @return mixed
      */
-    public function onQueue($queue, $view, array $data, $callback)
+    public function onQueue($queue, $view)
     {
-        return $this->queue($view, $data, $callback, $queue);
+        return $this->queue($view, $queue);
     }
 
     /**
@@ -362,47 +376,41 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string  $queue
      * @param  string|array  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
      * @return mixed
      */
-    public function queueOn($queue, $view, array $data, $callback)
+    public function queueOn($queue, $view)
     {
-        return $this->onQueue($queue, $view, $data, $callback);
+        return $this->onQueue($queue, $view);
     }
 
     /**
      * Queue a new e-mail message for sending after (n) seconds.
      *
-     * @param  int  $delay
-     * @param  string|array  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
+     * @param  string|array|MailableContract  $view
      * @param  string|null  $queue
      * @return mixed
      */
-    public function later($delay, $view, array $data = [], $callback = null, $queue = null)
+    public function later($delay, $view, $queue = null)
     {
         if (! $view instanceof MailableContract) {
             throw new InvalidArgumentException('Only mailables may be queued.');
         }
 
-        return $view->later($delay, $this->queue);
+        return $view->later($delay, is_null($queue) ? $this->queue : $queue);
     }
 
     /**
      * Queue a new e-mail message for sending after (n) seconds on the given queue.
      *
      * @param  string  $queue
-     * @param  int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string|array  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
      * @return mixed
      */
-    public function laterOn($queue, $delay, $view, array $data, $callback)
+    public function laterOn($queue, $delay, $view)
     {
-        return $this->later($delay, $view, $data, $callback, $queue);
+        return $this->later($delay, $view, $queue);
     }
 
     /**
@@ -415,15 +423,15 @@ class Mailer implements MailerContract, MailQueueContract
         $message = new Message($this->swift->createMessage('message'));
 
         // If a global from address has been specified we will set it on every message
-        // instances so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push the address.
+        // instance so the developer does not have to repeat themselves every time
+        // they create a new message. We'll just go ahead and push this address.
         if (! empty($this->from['address'])) {
             $message->from($this->from['address'], $this->from['name']);
         }
 
         // When a global reply address was specified we will set this on every message
-        // instances so the developer does not have to repeat themselves every time
-        // they create a new message. We will just go ahead and push the address.
+        // instance so the developer does not have to repeat themselves every time
+        // they create a new message. We will just go ahead and push this address.
         if (! empty($this->replyTo['address'])) {
             $message->replyTo($this->replyTo['address'], $this->replyTo['name']);
         }

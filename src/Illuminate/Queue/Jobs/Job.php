@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\InteractsWithTime;
+use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
 {
@@ -56,6 +56,13 @@ abstract class Job
     protected $queue;
 
     /**
+     * Get the raw body of the job.
+     *
+     * @return string
+     */
+    abstract public function getRawBody();
+
+    /**
      * Fire the job.
      *
      * @return void
@@ -66,7 +73,7 @@ abstract class Job
 
         list($class, $method) = JobName::parse($payload['job']);
 
-        with($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
+        ($this->instance = $this->resolve($class))->{$method}($this, $payload['data']);
     }
 
     /**
@@ -181,23 +188,33 @@ abstract class Job
     }
 
     /**
-     * The number of times to attempt a job.
+     * Get the number of times to attempt a job.
      *
      * @return int|null
      */
     public function maxTries()
     {
-        return array_get($this->payload(), 'maxTries');
+        return $this->payload()['maxTries'] ?? null;
     }
 
     /**
-     * The number of seconds the job can run.
+     * Get the number of seconds the job can run.
      *
      * @return int|null
      */
     public function timeout()
     {
-        return array_get($this->payload(), 'timeout');
+        return $this->payload()['timeout'] ?? null;
+    }
+
+    /**
+     * Get the timestamp indicating when the job should timeout.
+     *
+     * @return int|null
+     */
+    public function timeoutAt()
+    {
+        return $this->payload()['timeoutAt'] ?? null;
     }
 
     /**

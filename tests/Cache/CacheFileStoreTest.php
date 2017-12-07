@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Carbon\Carbon;
+use Illuminate\Support\Carbon;
 use Illuminate\Cache\FileStore;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
@@ -26,7 +26,7 @@ class CacheFileStoreTest extends TestCase
     public function testNullIsReturnedIfFileDoesntExist()
     {
         $files = $this->mockFilesystem();
-        $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException()));
+        $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException));
         $store = new FileStore($files, __DIR__);
         $value = $store->get('foo');
         $this->assertNull($value);

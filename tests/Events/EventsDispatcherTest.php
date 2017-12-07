@@ -43,7 +43,7 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlers()
     {
         $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('stdClass'));
         $handler->shouldReceive('onFooEvent')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler@onFooEvent');
         $d->fire('foo', ['foo', 'bar']);
@@ -52,7 +52,7 @@ class EventsDispatcherTest extends TestCase
     public function testContainerResolutionOfEventHandlersWithDefaultMethods()
     {
         $d = new Dispatcher($container = m::mock('Illuminate\Container\Container'));
-        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('StdClass'));
+        $container->shouldReceive('make')->once()->with('FooHandler')->andReturn($handler = m::mock('stdClass'));
         $handler->shouldReceive('handle')->once()->with('foo', 'bar');
         $d->listen('foo', 'FooHandler');
         $d->fire('foo', ['foo', 'bar']);
@@ -184,23 +184,6 @@ class EventsDispatcherTest extends TestCase
         $d->fire('some.event', ['foo', 'bar']);
     }
 
-    public function testQueuedEventHandlersAreQueuedWithCustomHandlers()
-    {
-        $d = new Dispatcher;
-        $queue = m::mock('Illuminate\Contracts\Queue\Queue');
-        $queue->shouldReceive('push')->once()->with('Illuminate\Events\CallQueuedHandler@call', [
-            'class' => 'Illuminate\Tests\Events\TestDispatcherQueuedHandlerCustomQueue',
-            'method' => 'someMethod',
-            'data' => serialize(['foo', 'bar']),
-        ]);
-        $d->setQueueResolver(function () use ($queue) {
-            return $queue;
-        });
-
-        $d->listen('some.event', 'Illuminate\Tests\Events\TestDispatcherQueuedHandlerCustomQueue@someMethod');
-        $d->fire('some.event', ['foo', 'bar']);
-    }
-
     public function testClassesWork()
     {
         unset($_SERVER['__event.test']);
@@ -247,7 +230,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $event = new BroadcastEvent();
+        $event = new BroadcastEvent;
 
         $this->assertTrue($d->shouldBroadcast([$event]));
     }
@@ -258,7 +241,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $event = new BroadcastFalseCondition();
+        $event = new BroadcastFalseCondition;
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }

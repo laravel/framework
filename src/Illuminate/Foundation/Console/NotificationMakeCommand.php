@@ -33,9 +33,9 @@ class NotificationMakeCommand extends GeneratorCommand
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
-        if (parent::fire() === false && ! $this->option('force')) {
+        if (parent::handle() === false && ! $this->option('force')) {
             return;
         }
 

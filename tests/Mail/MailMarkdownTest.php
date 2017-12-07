@@ -26,6 +26,22 @@ class MailMarkdownTest extends TestCase
         $this->assertTrue(strpos($result, '<html></html>') !== false);
     }
 
+    public function testRenderFunctionReturnsHtmlWithCustomTheme()
+    {
+        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+        $markdown->theme('yaz');
+        $viewFactory->shouldReceive('flushFinderCache')->once();
+        $viewFactory->shouldReceive('replaceNamespace')->once()->with('mail', $markdown->htmlComponentPaths())->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('view', [])->andReturnSelf();
+        $viewFactory->shouldReceive('make')->with('mail::themes.yaz')->andReturnSelf();
+        $viewFactory->shouldReceive('render')->twice()->andReturn('<html></html>', 'body {}');
+
+        $result = $markdown->render('view', []);
+
+        $this->assertTrue(strpos($result, '<html></html>') !== false);
+    }
+
     public function testRenderTextReturnsText()
     {
         $viewFactory = \Mockery::mock('Illuminate\View\Factory');

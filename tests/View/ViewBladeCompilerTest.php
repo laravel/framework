@@ -22,6 +22,7 @@ class ViewBladeCompilerTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Please provide a valid cache path.
      */
     public function testCannotConstructWithBadCachePath()
     {

@@ -31,6 +31,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
+     * @expectedExceptionMessage This action is unauthorized.
      */
     public function test_exception_is_thrown_if_gate_check_fails()
     {

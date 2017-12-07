@@ -36,6 +36,18 @@ class SupportStrTest extends TestCase
         $this->assertEquals($nbsp, Str::words($nbsp));
     }
 
+    public function testStringAscii()
+    {
+        $this->assertEquals('@', Str::ascii('@'));
+        $this->assertEquals('u', Str::ascii('ü'));
+    }
+
+    public function testStringAsciiWithSpecificLocale()
+    {
+        $this->assertSame('h H sht SHT a A y Y', Str::ascii('х Х щ Щ ъ Ъ ь Ь', 'bg'));
+        $this->assertSame('ae oe ue AE OE UE', Str::ascii('ä ö ü Ä Ö Ü', 'de'));
+    }
+
     public function testStartsWith()
     {
         $this->assertTrue(Str::startsWith('jason', 'jas'));
@@ -53,6 +65,11 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::startsWith(7.123, '7'));
         $this->assertTrue(Str::startsWith(7.123, '7.12'));
         $this->assertFalse(Str::startsWith(7.123, '7.13'));
+        // Test for multibyte string support
+        $this->assertTrue(Str::startsWith('Jönköping', 'Jö'));
+        $this->assertTrue(Str::startsWith('Malmö', 'Malmö'));
+        $this->assertFalse(Str::startsWith('Jönköping', 'Jonko'));
+        $this->assertFalse(Str::startsWith('Malmö', 'Malmo'));
     }
 
     public function testEndsWith()
@@ -72,6 +89,23 @@ class SupportStrTest extends TestCase
         $this->assertTrue(Str::endsWith(0.27, '7'));
         $this->assertTrue(Str::endsWith(0.27, '0.27'));
         $this->assertFalse(Str::endsWith(0.27, '8'));
+        // Test for multibyte string support
+        $this->assertTrue(Str::endsWith('Jönköping', 'öping'));
+        $this->assertTrue(Str::endsWith('Malmö', 'mö'));
+        $this->assertFalse(Str::endsWith('Jönköping', 'oping'));
+        $this->assertFalse(Str::endsWith('Malmö', 'mo'));
+    }
+
+    public function testStrBefore()
+    {
+        $this->assertEquals('han', Str::before('hannah', 'nah'));
+        $this->assertEquals('ha', Str::before('hannah', 'n'));
+        $this->assertEquals('ééé ', Str::before('ééé hannah', 'han'));
+        $this->assertEquals('hannah', Str::before('hannah', 'xxxx'));
+        $this->assertEquals('hannah', Str::before('hannah', ''));
+        $this->assertEquals('han', Str::before('han0nah', '0'));
+        $this->assertEquals('han', Str::before('han0nah', 0));
+        $this->assertEquals('han', Str::before('han2nah', 2));
     }
 
     public function testStrAfter()
@@ -81,6 +115,9 @@ class SupportStrTest extends TestCase
         $this->assertEquals('nah', Str::after('ééé hannah', 'han'));
         $this->assertEquals('hannah', Str::after('hannah', 'xxxx'));
         $this->assertEquals('hannah', Str::after('hannah', ''));
+        $this->assertEquals('nah', Str::after('han0nah', '0'));
+        $this->assertEquals('nah', Str::after('han0nah', 0));
+        $this->assertEquals('nah', Str::after('han2nah', 2));
     }
 
     public function testStrContains()
@@ -106,6 +143,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('hello-world', Str::slug('hello-world'));
         $this->assertEquals('hello-world', Str::slug('hello_world'));
         $this->assertEquals('hello_world', Str::slug('hello_world', '_'));
+        $this->assertEquals('user-at-host', Str::slug('user@host'));
     }
 
     public function testFinish()
@@ -158,14 +196,6 @@ class SupportStrTest extends TestCase
         $this->assertEquals(11, Str::length('foo bar baz'));
     }
 
-    public function testQuickRandom()
-    {
-        $randomInteger = random_int(1, 100);
-        $this->assertEquals($randomInteger, strlen(Str::quickRandom($randomInteger)));
-        $this->assertInternalType('string', Str::quickRandom());
-        $this->assertEquals(16, strlen(Str::quickRandom()));
-    }
-
     public function testRandom()
     {
         $this->assertEquals(16, strlen(Str::random()));
@@ -189,6 +219,9 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foo foobar', Str::replaceFirst('bar', '', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceFirst('xxx', 'yyy', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceFirst('', 'yyy', 'foobar foobar'));
+        // Test for multibyte string support
+        $this->assertEquals('Jxxxnköping Malmö', Str::replaceFirst('ö', 'xxx', 'Jönköping Malmö'));
+        $this->assertEquals('Jönköping Malmö', Str::replaceFirst('', 'yyy', 'Jönköping Malmö'));
     }
 
     public function testReplaceLast()
@@ -198,6 +231,9 @@ class SupportStrTest extends TestCase
         $this->assertEquals('foobar foo', Str::replaceLast('bar', '', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceLast('xxx', 'yyy', 'foobar foobar'));
         $this->assertEquals('foobar foobar', Str::replaceLast('', 'yyy', 'foobar foobar'));
+        // Test for multibyte string support
+        $this->assertEquals('Malmö Jönkxxxping', Str::replaceLast('ö', 'xxx', 'Malmö Jönköping'));
+        $this->assertEquals('Malmö Jönköping', Str::replaceLast('', 'yyy', 'Malmö Jönköping'));
     }
 
     public function testSnake()
@@ -210,6 +246,8 @@ class SupportStrTest extends TestCase
         // ensure cache keys don't overlap
         $this->assertEquals('laravel__php__framework', Str::snake('LaravelPhpFramework', '__'));
         $this->assertEquals('laravel_php_framework_', Str::snake('LaravelPhpFramework_', '_'));
+        $this->assertEquals('laravel_php_framework', Str::snake('laravel php Framework'));
+        $this->assertEquals('laravel_php_frame_work', Str::snake('laravel php FrameWork'));
     }
 
     public function testStudly()

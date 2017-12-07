@@ -90,6 +90,8 @@ class LoadConfiguration
             $files[$directory.basename($file->getRealPath(), '.php')] = $file->getRealPath();
         }
 
+        ksort($files, SORT_NATURAL);
+
         return $files;
     }
 

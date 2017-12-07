@@ -52,7 +52,7 @@ class ScheduleFinishCommand extends Command
      *
      * @return void
      */
-    public function fire()
+    public function handle()
     {
         collect($this->schedule->events())->filter(function ($value) {
             return $value->mutexName() == $this->argument('id');

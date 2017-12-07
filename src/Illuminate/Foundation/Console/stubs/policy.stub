@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyRootNamespaceUser;
+use NamespacedDummyUserModel;
 use NamespacedDummyModel;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
@@ -13,11 +13,11 @@ class DummyClass
     /**
      * Determine whether the user can view the dummyModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
+     * @param  \NamespacedDummyUserModel  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function view(User $user, DummyModel $dummyModel)
+    public function view(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
@@ -25,10 +25,10 @@ class DummyClass
     /**
      * Determine whether the user can create dummyPluralModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
+     * @param  \NamespacedDummyUserModel  $user
      * @return mixed
      */
-    public function create(User $user)
+    public function create(DummyUser $user)
     {
         //
     }
@@ -36,11 +36,11 @@ class DummyClass
     /**
      * Determine whether the user can update the dummyModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
+     * @param  \NamespacedDummyUserModel  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function update(User $user, DummyModel $dummyModel)
+    public function update(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }
@@ -48,11 +48,11 @@ class DummyClass
     /**
      * Determine whether the user can delete the dummyModel.
      *
-     * @param  \DummyRootNamespaceUser  $user
+     * @param  \NamespacedDummyUserModel  $user
      * @param  \NamespacedDummyModel  $dummyModel
      * @return mixed
      */
-    public function delete(User $user, DummyModel $dummyModel)
+    public function delete(DummyUser $user, DummyModel $dummyModel)
     {
         //
     }

@@ -40,6 +40,10 @@ class AuthGuardTest extends TestCase
         $guard->basic('email');
     }
 
+    /**
+     * @expectedException \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
+     * @expectedExceptionMessage
+     */
     public function testBasicReturnsResponseOnFailure()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
@@ -48,10 +52,7 @@ class AuthGuardTest extends TestCase
         $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret'])->andReturn(false);
         $request = \Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
         $guard->setRequest($request);
-        $response = $guard->basic('email');
-
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\Response', $response);
-        $this->assertEquals(401, $response->getStatusCode());
+        $guard->basic('email');
     }
 
     public function testBasicWithExtraConditions()
@@ -168,6 +169,7 @@ class AuthGuardTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Auth\AuthenticationException
+     * @expectedExceptionMessage Unauthenticated.
      */
     public function testAuthenticateThrowsWhenUserIsNull()
     {
@@ -279,12 +281,13 @@ class AuthGuardTest extends TestCase
         $guard = new \Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
         $guard->setCookieJar($cookie);
         $foreverCookie = new \Symfony\Component\HttpFoundation\Cookie($guard->getRecallerName(), 'foo');
-        $cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller')->andReturn($foreverCookie);
+        $cookie->shouldReceive('forever')->once()->with($guard->getRecallerName(), 'foo|recaller|bar')->andReturn($foreverCookie);
         $cookie->shouldReceive('queue')->once()->with($foreverCookie);
         $guard->getSession()->shouldReceive('put')->once()->with($guard->getName(), 'foo');
         $session->shouldReceive('migrate')->once();
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+        $user->shouldReceive('getAuthPassword')->andReturn('bar');
         $user->shouldReceive('getRememberToken')->andReturn('recaller');
         $user->shouldReceive('setRememberToken')->never();
         $provider->shouldReceive('updateRememberToken')->never();
@@ -303,6 +306,7 @@ class AuthGuardTest extends TestCase
         $session->shouldReceive('migrate')->once();
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $user->shouldReceive('getAuthIdentifier')->andReturn('foo');
+        $user->shouldReceive('getAuthPassword')->andReturn('foo');
         $user->shouldReceive('getRememberToken')->andReturn(null);
         $user->shouldReceive('setRememberToken')->once();
         $provider->shouldReceive('updateRememberToken')->once();
@@ -360,7 +364,7 @@ class AuthGuardTest extends TestCase
     {
         $guard = $this->getGuard();
         list($session, $provider, $request, $cookie) = $this->getMocks();
-        $request = \Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller']);
+        $request = \Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [$guard->getRecallerName() => 'id|recaller|baz']);
         $guard = new \Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
         $guard->getSession()->shouldReceive('get')->once()->with($guard->getName())->andReturn(null);
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
