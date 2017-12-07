@@ -478,21 +478,137 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a given validation message for the provided key.
+     *
+     * @param  string $key
+     * @param  string $message
+     * @return $this
+     */
+    public function assertHasValidationError($key, $message = null)
+    {
+        if ($this->session()->has('errors')) {
+            return $this->assertHttpValidationError($key, $message);
+        }
+
+        return $this->assertJsonValidationError($key, $message);
+    }
+
+    /**
+     * Assert that the HTTP response has the given validation message for the provided key.
+     *
+     * @param  string $key
+     * @param  string $message
+     * @return $this
+     */
+    public function assertHttpValidationError($key, $message = null)
+    {
+        $this->assertStatus(302);
+
+        $messageBag = $this->session()->get('errors')->getBag('default');
+        $keys = implode(', ', $messageBag->keys());
+
+        PHPUnit::assertTrue($messageBag->has($key), "Failed to find validation error for [{$key}] in [{$keys}]");
+
+        if ($message) {
+            $messages = implode(', ', $messageBag->all());
+            PHPUnit::assertContains($message, $messageBag->all(), "Failed to find validation message [{$message}] in [{$messages}]");
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the JSON response has the given validation message for the provided key.
+     *
+     * @param  string $key
+     * @param  string $message
+     * @return $this
+     */
+    public function assertJsonValidationError($key, $message = null)
+    {
+        $this->assertStatus(422)
+            ->assertJsonFragment(['message' => 'The given data was invalid.'])
+            ->assertJsonValidationErrors($key);
+
+        if ($message) {
+            $messages = $this->json()['errors'];
+            PHPUnit::assertContains($message, $messages[$key]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given JSON validation errors for the given keys.
      *
-     * @param  string|array  $keys
+     * @param string|array $keys
      * @return $this
      */
     public function assertJsonValidationErrors($keys)
     {
         $errors = $this->json()['errors'];
+        $errorKeys = implode(', ', array_keys($errors));
 
         foreach (Arr::wrap($keys) as $key) {
-            PHPUnit::assertTrue(
-                isset($errors[$key]),
-                "Failed to find a validation error in the response for key: '{$key}'"
+            PHPUnit::assertArrayHasKey(
+                $key,
+                $errors,
+                "Failed to find a validation error for key [{$key}] in [{$errorKeys}]"
             );
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response is missing a validation error for the provided key.
+     *
+     * @param  string $key
+     * @return $this
+     */
+    public function assertValidationErrorMissing($key)
+    {
+        if ($this->session()->has('errors')) {
+            return $this->assertHttpValidationErrorMissing($key);
+        }
+
+        return $this->assertJsonValidationErrorMissing($key);
+    }
+
+    /**
+     * Assert that the HTTP response is missing a validation error for the provided key.
+     *
+     * @param  string $key
+     * @return $this
+     */
+    public function assertHttpValidationErrorMissing($key)
+    {
+        $messageBag = $this->session()->get('errors')->getBag('default');
+
+        $keys = implode(', ', $messageBag->keys());
+
+        PHPUnit::assertFalse($messageBag->has($key), "Found unexpected validation key [{$key}] in [{$keys}]");
+
+        return $this;
+    }
+
+    /**
+     * Assert that the JSON response is missing a validation error for the provided key.
+     *
+     * @param  string $key
+     * @return $this
+     */
+    public function assertJsonValidationErrorMissing($key)
+    {
+        $errors = $this->json()['errors'];
+
+        $keys = implode(', ', array_keys($errors));
+
+        PHPUnit::assertArrayNotHasKey(
+            $key,
+            $errors,
+            "Found unexpected validation key [{$key}] in [{$keys}]"
+        );
 
         return $this;
     }
