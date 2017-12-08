@@ -999,6 +999,10 @@ class Builder
      */
     public function whereTime($column, $operator, $value, $boolean = 'and')
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
 
