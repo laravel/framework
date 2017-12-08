@@ -12,7 +12,7 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        [ $schema, $table ] = $this->getSchema($table);
+        list($schema, $table) = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -71,7 +71,7 @@ class PostgresBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        [ $schema, $table ] = $this->getSchema($table);
+        list($schema, $table) = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -83,26 +83,23 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Determines which schema should be used.
+     * Parse the table name and extract the schema and table.
      *
      * @param  string  $table
-     * @return [ string, string ]
+     * @return array
      */
-    protected function getSchema($table)
+    protected function parseSchemaAndTable($table)
     {
         $table = explode('.', $table);
-        $schema = $this->connection->getConfig('schema');
 
-        if (is_array($schema)) {
-            if (in_array($table[0], $schema)) { // Table contains schema prefix
+        if (is_array($schema = $this->connection->getConfig('schema'))) {
+            if (in_array($table[0], $schema)) {
                 return [array_shift($table), implode('.', $table)];
             }
 
             $schema = head($schema);
         }
 
-        $schema = $schema ?: 'public';
-
-        return [$schema, implode('.', $table)];
+        return [$schema ?: 'public', implode('.', $table)];
     }
 }
