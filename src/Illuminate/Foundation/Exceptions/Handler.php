@@ -371,8 +371,8 @@ class Handler implements ExceptionHandlerContract
                 }
             }
 
-            if (config('app.debug_editor', false)) {
-                $handler->setEditor(config('app.debug_editor'));
+            if (config('app.editor', false)) {
+                $handler->setEditor(config('app.editor'));
             }
 
             $handler->setApplicationPaths(
