@@ -83,9 +83,7 @@ class PostgresBuilder extends Builder
     }
 
     /**
-     * Determines which schema should be used
-     * Returns and array of schema and table name
-     * less schema name if found
+     * Determines which schema should be used.
      *
      * @param  string  $table
      * @return [ string, string ]
