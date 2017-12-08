@@ -318,12 +318,12 @@ class Connection implements ConnectionInterface
             // row from the database table, and will either be an array or objects.
             $statement = $this->getPdoForSelect($useReadPdo)->prepare($query);
 
-            $bindings =  $me->prepareBindings($bindings);
+            $bindings = $me->prepareBindings($bindings);
 
             foreach ($bindings as $key => $value) {
                 // ? placeholder start from 0
                 $placeholder = $key + 1;
-                if(is_numeric($value)) {
+                if (is_numeric($value)) {
                     // when use sqlite , having count(some) < some_numeric query, the result is wrong
                     // but when add bindValue param PDO::PARAM_INT, the result is right
                     $statement->bindValue($placeholder, $value, PDO::PARAM_INT);
