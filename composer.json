@@ -114,6 +114,7 @@
         "laravel/tinker": "Required to use the tinker console command (~1.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
+        "league/flysystem-cached-adapter": "Required to use Flysystem caching (~1.0).",
         "nexmo/client": "Required to use the Nexmo transport (~1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",

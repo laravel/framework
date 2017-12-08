@@ -3,13 +3,22 @@
 ## [Unreleased]
 
 ### Added
+- Added support for Flysystem caching ([#22310](https://github.com/laravel/framework/pull/22310), [0657496](https://github.com/laravel/framework/commit/06574964c677c4205668def84ede22e3ca5eee9c))
+
+
+## v5.5.24 (2017-12-06)
+
+### Added
 - Added `WithFaker` testing trait ([#22280](https://github.com/laravel/framework/pull/22280), [4841089](https://github.com/laravel/framework/commit/4841089645e1772e64b501a4f69478b2ee7f4550), [5c72698](https://github.com/laravel/framework/commit/5c726986ae1ecb926ae9d77e28848bb38d020041))
 
 ### Changed
 - Made `Relation::$morphMap` public ([e44596f](https://github.com/laravel/framework/commit/e44596f65667962af69fd9cd9e63beb927fecaa1))
+- Trim return value of `ValidatesAttributes::shouldBlockPhpUpload()` ([90a8faf](https://github.com/laravel/framework/commit/90a8fafd6b70d8f059e86010de996c5db6da4c37))
 
 ### Fixed
 - Fixed an issue with queueable notifications ([#22275](https://github.com/laravel/framework/pull/22275))
+- Fixed `NullSessionDriver` upstream issues ([#22314](https://github.com/laravel/framework/pull/22314))
+- Move `payload` to the end of the insert array of a job ([#22334](https://github.com/laravel/framework/pull/22334))
 
 
 ## v5.5.23 (2017-12-04)
