@@ -96,8 +96,8 @@ class PostgresBuilder extends Builder
         $schema = $this->connection->getConfig('schema');
 
         if (is_array($schema)) {
-            if (in_array($table[0], $schema)) {
-                return [ $table[0], $table[1] ];
+            if (in_array($table[0], $schema)) { // Table contains schema prefix
+                return [ array_shift($table), implode('.', $table) ];
             }
 
             $schema = head($schema);
