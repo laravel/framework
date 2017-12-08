@@ -13,6 +13,7 @@ use League\Flysystem\AdapterInterface;
 use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
+use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
@@ -372,6 +373,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     {
         $adapter = $this->driver->getAdapter();
 
+        if ($adapter instanceof CachedAdapter) {
+            $adapter = $adapter->getAdapter();
+        }
+
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
@@ -458,6 +463,10 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function temporaryUrl($path, $expiration, array $options = [])
     {
         $adapter = $this->driver->getAdapter();
+
+        if ($adapter instanceof CachedAdapter) {
+            $adapter = $adapter->getAdapter();
+        }
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
@@ -593,6 +602,20 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function deleteDirectory($directory)
     {
         return $this->driver->deleteDir($directory);
+    }
+
+    /**
+     * Flush the Flysystem cache.
+     *
+     * @return void
+     */
+    public function flushCache()
+    {
+        $adapter = $this->driver->getAdapter();
+
+        if ($adapter instanceof CachedAdapter) {
+            $adapter->getCache()->flush();
+        }
     }
 
     /**

@@ -371,6 +371,10 @@ class Handler implements ExceptionHandlerContract
                 }
             }
 
+            if (config('app.editor', false)) {
+                $handler->setEditor(config('app.editor'));
+            }
+
             $handler->setApplicationPaths(
                 array_flip(Arr::except(
                     array_flip($files->directories(base_path())), [base_path('vendor')]
