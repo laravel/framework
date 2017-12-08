@@ -321,15 +321,10 @@ class Connection implements ConnectionInterface
             $bindings = $me->prepareBindings($bindings);
 
             foreach ($bindings as $key => $value) {
-                // ? placeholder start from 0
-                $placeholder = $key + 1;
-                if (is_numeric($value)) {
-                    // when use sqlite , having count(some) < some_numeric query, the result is wrong
-                    // but when add bindValue param PDO::PARAM_INT, the result is right
-                    $statement->bindValue($placeholder, $value, PDO::PARAM_INT);
-                } else {
-                    $statement->bindValue($placeholder, $value);
-                }
+                $statement->bindValue(
+                    is_string($key) ? $key : $key + 1, $value,
+                    is_int($value) ? PDO::PARAM_INT : PDO::PARAM_STR
+                );
             }
 
             $statement->execute();
