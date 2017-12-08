@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class SQLiteGrammar extends Grammar
@@ -173,6 +174,54 @@ class SQLiteGrammar extends Grammar
         $columns = array_fill(0, count($values), implode(', ', $columns));
 
         return "insert into $table ($names) select ".implode(' union all select ', $columns);
+    }
+
+    /**
+     * Compile an update statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $values
+     * @return string
+     */
+    public function compileUpdate(Builder $query, $values)
+    {
+        $table = $this->wrapTable($query->from);
+
+        // SQLite doesn't support dots (table.column) in update columns.
+        // if there is any, We only remove the current table and leave other  
+        // table names as they might be columns that based on a join statement.
+        $columns = collect($values)->map(function ($value, $key) use($query) {
+            return $this->wrap(Str::after($key, $query->from.'.')).' = '.$this->parameter($value);
+        })->implode(', ');
+
+
+        // SQLite doesn't support limits or orders by default in update/delete, 
+        // so we use A workaround sub-query where.
+        if (isset($query->joins) || isset($query->limit)) {
+            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
+
+            return "update {$table} set $columns where {$this->wrap('rowid')} in ({$selectSql})";
+        }
+
+        $wheres = $this->compileWheres($query);
+
+        return trim("update {$table} set $columns $wheres");
+    }
+
+    /**
+     * Prepare the bindings for an update statement.
+     *
+     * @param  array  $bindings
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareBindingsForUpdate(array $bindings, array $values)
+    {
+        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+
+        return array_values(
+            array_merge($values, $bindings['join'], Arr::flatten($cleanBindings))
+        );
     }
 
     /**
