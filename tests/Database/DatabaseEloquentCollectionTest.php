@@ -156,7 +156,7 @@ class DatabaseEloquentCollectionTest extends TestCase
         $c = $this->getMockBuilder('Illuminate\Database\Eloquent\Collection')->setMethods(['first'])->setConstructorArgs([['foo']])->getMock();
         $mockItem = m::mock('stdClass');
         $c->expects($this->once())->method('first')->will($this->returnValue($mockItem));
-        $mockItem->shouldReceive('newQuery')->once()->andReturn($mockItem);
+        $mockItem->shouldReceive('newQueryWithoutRelationships')->once()->andReturn($mockItem);
         $mockItem->shouldReceive('with')->with(['bar', 'baz'])->andReturn($mockItem);
         $mockItem->shouldReceive('eagerLoadRelations')->once()->with(['foo'])->andReturn(['results']);
         $c->load('bar', 'baz');
