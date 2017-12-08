@@ -95,7 +95,7 @@ class PostgresBuilder extends Builder
 
         if (is_array($schema)) {
             if (in_array($table[0], $schema)) { // Table contains schema prefix
-                return [ array_shift($table), implode('.', $table) ];
+                return [array_shift($table), implode('.', $table)];
             }
 
             $schema = head($schema);
@@ -103,6 +103,6 @@ class PostgresBuilder extends Builder
 
         $schema = $schema ?: 'public';
 
-        return [ $schema, implode('.', $table) ];
+        return [$schema, implode('.', $table)];
     }
 }
