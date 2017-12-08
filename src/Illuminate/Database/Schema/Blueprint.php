@@ -100,6 +100,19 @@ class Blueprint
 
         $statements = [];
 
+        if ($connection instanceof \Illuminate\Database\SQLiteConnection) {
+            $badDDLCount = collect($this->commands)
+                ->filter(function($item, $key) {
+                    return in_array($item->name, [ 'dropColumn', 'renameColumn' ]);
+                })
+                ->count();
+
+            if ($badDDLCount > 1) {
+                throw new \BadMethodCallException("Multiple calls to dropColumn/renameColumn in a single table modification are not supported.");
+            }
+        }
+
+
         // Each type of command has a corresponding compiler function on the schema
         // grammar which is used to build the necessary SQL statements to build
         // the blueprint element, so we'll just call that compilers function.
