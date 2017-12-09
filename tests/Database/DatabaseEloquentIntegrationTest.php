@@ -193,6 +193,24 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('abigailotwell@gmail.com', $models[1]->email);
     }
 
+    public function testQueryBuilderIsIterable()
+    {
+        $user = EloquentTestUser::firstOrCreate(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+
+        $user->posts()->create(['name' => 'First post']);
+        $user->posts()->create(['name' => 'Second post']);
+
+        foreach($user->posts() as $post){
+            $this->assertInstanceOf(Eloquent::class, $post);
+        }
+
+        $this->assertEquals(1, $user->posts()->where('name', 'LIKE', '%First%')->count());
+
+        foreach($user->posts()->where('name', 'LIKE', '%First%') as $post){
+            $this->assertInstanceOf(Eloquent::class, $post);
+        }
+    }
+
     public function testPaginatedModelCollectionRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
