@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 
 class SQLiteGrammar extends Grammar
@@ -172,6 +173,41 @@ class SQLiteGrammar extends Grammar
         $columns = array_fill(0, count($values), implode(', ', $columns));
 
         return "insert into $table ($names) select ".implode(' union all select ', $columns);
+    }
+
+    /**
+     * Compile a delete statement into SQL.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    public function compileDelete(Builder $query)
+    {
+        if (isset($query->joins) || isset($query->limit)) {
+            $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
+
+            return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
+        }
+
+        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
+
+        return trim("delete from {$this->wrapTable($query->from)} $wheres");
+    }
+
+    /**
+     * Prepare the bindings for a delete statement.
+     *
+     * @param  array  $bindings
+     * @param  array  $values
+     * @return array
+     */
+    public function prepareBindingsForDelete(array $bindings)
+    {
+        $cleanBindings = Arr::except($bindings, ['select', 'join']);
+
+        return array_values(
+            array_merge($bindings['join'], Arr::flatten($cleanBindings))
+        );
     }
 
     /**

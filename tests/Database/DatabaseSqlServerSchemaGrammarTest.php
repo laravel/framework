@@ -445,11 +445,11 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
     public function testAddingEnum()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->enum('foo', ['bar', 'baz']);
+        $blueprint->enum('role', ['member', 'admin']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "foo" nvarchar(255) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "role" nvarchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
     public function testAddingJson()
@@ -525,6 +525,15 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add "created_at" time not null', $statements[0]);
+    }
+
+    public function testAddingYear()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->year('birth_year');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add "birth_year" int not null', $statements[0]);
     }
 
     public function testAddingTimeWithPrecision()

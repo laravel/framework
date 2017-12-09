@@ -28,11 +28,18 @@ interface Application extends Container
     public function environment();
 
     /**
-     * Determine if we are running in the console.
+     * Determine if the application is running in the console.
      *
      * @return bool
      */
     public function runningInConsole();
+
+    /**
+     * Determine if the application is running unit tests.
+     *
+     * @return bool
+     */
+    public function runningUnitTests();
 
     /**
      * Determine if the application is currently down for maintenance.
