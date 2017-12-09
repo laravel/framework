@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Collection;
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-abstract class Relation
+abstract class Relation implements \IteratorAggregate
 {
     use Macroable {
         __call as macroCall;
@@ -349,6 +349,16 @@ abstract class Relation
         return array_key_exists($alias, self::$morphMap)
                         ? self::$morphMap[$alias]
                         : null;
+    }
+
+    /**
+     * Execute the query and return the collection iterator
+     *
+     * @return \ArrayIterator|\Traversable
+     */
+    public function getIterator()
+    {
+        return $this->get()->getIterator();
     }
 
     /**
