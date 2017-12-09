@@ -784,6 +784,17 @@ class Blueprint
     }
 
     /**
+     * Create a new year column on the table.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function year($column)
+    {
+        return $this->addColumn('year', $column);
+    }
+
+    /**
      * Create a new date-time column (with time zone) on the table.
      *
      * @param  string  $column
