@@ -435,6 +435,24 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
     }
 
+    public function testAssetsRoot()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $url->setAssetsRoot('https://www.bar.com');
+        $this->assertEquals('http://www.bar.com/foo/bar', $url->asset('foo/bar'));
+
+        // Ensure trailing slash is trimmed from root URL as UrlGenerator already handles this
+        $url->setAssetsRoot('//www.foo.com/');
+        $this->assertEquals('//www.foo.com/bar', $url->asset('/bar'));
+
+        $url->setAssetsRoot(null);
+        $this->assertEquals('http://www.foo.com/bar', $url->asset('bar'));
+    }
+
     public function testPrevious()
     {
         $url = new UrlGenerator(
