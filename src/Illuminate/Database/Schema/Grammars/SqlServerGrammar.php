@@ -506,7 +506,6 @@ class SqlServerGrammar extends Grammar
         return $this->typeInteger($column);
     }
 
-
     /**
      * Create the column definition for a date-time type.
      *
