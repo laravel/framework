@@ -661,7 +661,7 @@ class MySqlGrammar extends Grammar
      */
     protected function typeYear(Fluent $column)
     {
-        return "year";
+        return 'year';
     }
 
     /**

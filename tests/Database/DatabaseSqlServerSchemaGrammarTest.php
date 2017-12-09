@@ -536,7 +536,6 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "birth_year" int not null', $statements[0]);
     }
 
-
     public function testAddingTimeWithPrecision()
     {
         $blueprint = new Blueprint('users');
