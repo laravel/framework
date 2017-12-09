@@ -200,13 +200,21 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $user->posts()->create(['name' => 'First post']);
         $user->posts()->create(['name' => 'Second post']);
 
-        foreach($user->posts() as $post){
+        $this->assertEquals(2, $user->posts()->where('name', 'LIKE', '%post%')->count());
+
+        foreach($user->posts()->where('name', 'LIKE', '%post%') as $post){
             $this->assertInstanceOf(Eloquent::class, $post);
         }
+    }
 
-        $this->assertEquals(1, $user->posts()->where('name', 'LIKE', '%First%')->count());
+    public function testRelationIsIterable()
+    {
+        $user = EloquentTestUser::firstOrCreate(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
 
-        foreach($user->posts()->where('name', 'LIKE', '%First%') as $post){
+        $user->posts()->create(['name' => 'First post']);
+        $user->posts()->create(['name' => 'Second post']);
+
+        foreach($user->posts() as $post){
             $this->assertInstanceOf(Eloquent::class, $post);
         }
     }
