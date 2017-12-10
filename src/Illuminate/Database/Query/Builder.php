@@ -1075,7 +1075,7 @@ class Builder
      * @param  string  $type
      * @param  string  $column
      * @param  string  $operator
-     * @param  int  $value
+     * @param  mixed  $value
      * @param  string  $boolean
      * @return $this
      */
