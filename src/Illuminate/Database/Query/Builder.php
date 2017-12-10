@@ -1014,7 +1014,7 @@ class Builder
      * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereTime($column, $operator, $value)
+    public function orWhereTime($column, $operator, $value = null)
     {
         return $this->whereTime($column, $operator, $value, 'or');
     }
