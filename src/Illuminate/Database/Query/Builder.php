@@ -993,12 +993,16 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  int   $value
+     * @param  mixed   $value
      * @param  string   $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereTime($column, $operator, $value, $boolean = 'and')
+    public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
 
@@ -1007,10 +1011,10 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  int   $value
+     * @param  mixed   $value
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereTime($column, $operator, $value)
+    public function orWhereTime($column, $operator, $value = null)
     {
         return $this->whereTime($column, $operator, $value, 'or');
     }

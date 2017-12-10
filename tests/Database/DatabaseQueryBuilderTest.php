@@ -325,6 +325,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereTimeOperatorOptionalMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from `users` where time(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereTimeOperatorOptionalPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from "users" where extract(time from "created_at") = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
     public function testWhereDatePostgres()
     {
         $builder = $this->getPostgresBuilder();
