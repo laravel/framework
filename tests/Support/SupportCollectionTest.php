@@ -2309,6 +2309,40 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([['free' => false, 'title' => 'Premium']], $premium->values()->toArray());
     }
 
+    public function testPartitionWithOperators()
+    {
+        $collection = new Collection([
+            ['name' => 'Tim', 'age' => 17],
+            ['name' => 'Agatha', 'age' => 62],
+            ['name' => 'Kristina', 'age' => 33],
+            ['name' => 'Tim', 'age' => 41],
+        ]);
+
+        list($tims, $others) = $collection->partition('name', 'Tim');
+
+        $this->assertEquals($tims->values()->all(), [
+            ['name' => 'Tim', 'age' => 17],
+            ['name' => 'Tim', 'age' => 41],
+        ]);
+
+        $this->assertEquals($others->values()->all(), [
+            ['name' => 'Agatha', 'age' => 62],
+            ['name' => 'Kristina', 'age' => 33],
+        ]);
+
+        list($adults, $minors) = $collection->partition('age', '>=', 18);
+
+        $this->assertEquals($adults->values()->all(), [
+            ['name' => 'Agatha', 'age' => 62],
+            ['name' => 'Kristina', 'age' => 33],
+            ['name' => 'Tim', 'age' => 41],
+        ]);
+
+        $this->assertEquals($minors->values()->all(), [
+            ['name' => 'Tim', 'age' => 17],
+        ]);
+    }
+
     public function testPartitionPreservesKeys()
     {
         $courses = new Collection([
