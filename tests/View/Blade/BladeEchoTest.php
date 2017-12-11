@@ -11,7 +11,7 @@ class BladeEchoTest extends AbstractBladeTestCase
         $this->assertEquals('<?php echo $name; ?>', $this->compiler->compileString('{!!
             $name
         !!}'));
-        $this->assertEquals('<?php echo isset($name) ? $name : \'foo\'; ?>',
+        $this->assertEquals('<?php echo $name ?? \'foo\'; ?>',
             $this->compiler->compileString('{!! $name or \'foo\' !!}'));
 
         $this->assertEquals('<?php echo e($name); ?>', $this->compiler->compileString('{{{$name}}}'));
@@ -25,27 +25,27 @@ class BladeEchoTest extends AbstractBladeTestCase
         $this->assertEquals("<?php echo e(\$name); ?>\n\n", $this->compiler->compileString("{{ \$name }}\n"));
         $this->assertEquals("<?php echo e(\$name); ?>\r\n\r\n", $this->compiler->compileString("{{ \$name }}\r\n"));
 
-        $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>',
+        $this->assertEquals('<?php echo e($name ?? "foo"); ?>',
             $this->compiler->compileString('{{ $name or "foo" }}'));
-        $this->assertEquals('<?php echo e(isset($user->name) ? $user->name : "foo"); ?>',
+        $this->assertEquals('<?php echo e($user->name ?? "foo"); ?>',
             $this->compiler->compileString('{{ $user->name or "foo" }}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>',
+        $this->assertEquals('<?php echo e($name ?? "foo"); ?>',
             $this->compiler->compileString('{{$name or "foo"}}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : "foo"); ?>', $this->compiler->compileString('{{
+        $this->assertEquals('<?php echo e($name ?? "foo"); ?>', $this->compiler->compileString('{{
             $name or "foo"
         }}'));
 
-        $this->assertEquals('<?php echo e(isset($name) ? $name : \'foo\'); ?>',
+        $this->assertEquals('<?php echo e($name ?? \'foo\'); ?>',
             $this->compiler->compileString('{{ $name or \'foo\' }}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : \'foo\'); ?>',
+        $this->assertEquals('<?php echo e($name ?? \'foo\'); ?>',
             $this->compiler->compileString('{{$name or \'foo\'}}'));
-        $this->assertEquals('<?php echo e(isset($name) ? $name : \'foo\'); ?>', $this->compiler->compileString('{{
+        $this->assertEquals('<?php echo e($name ?? \'foo\'); ?>', $this->compiler->compileString('{{
             $name or \'foo\'
         }}'));
 
-        $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $this->compiler->compileString('{{ $age or 90 }}'));
-        $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $this->compiler->compileString('{{$age or 90}}'));
-        $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $this->compiler->compileString('{{
+        $this->assertEquals('<?php echo e($age ?? 90); ?>', $this->compiler->compileString('{{ $age or 90 }}'));
+        $this->assertEquals('<?php echo e($age ?? 90); ?>', $this->compiler->compileString('{{$age or 90}}'));
+        $this->assertEquals('<?php echo e($age ?? 90); ?>', $this->compiler->compileString('{{
             $age or 90
         }}'));
 
