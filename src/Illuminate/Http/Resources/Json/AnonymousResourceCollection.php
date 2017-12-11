@@ -20,6 +20,8 @@ class AnonymousResourceCollection extends ResourceCollection
      */
     public function __construct($resource, $collects)
     {
+        $this->additional((new $collects($resource))->with(request()));
+        
         $this->collects = $collects;
 
         parent::__construct($resource);
