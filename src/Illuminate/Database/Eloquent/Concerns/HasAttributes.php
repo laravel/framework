@@ -1063,6 +1063,8 @@ trait HasAttributes
         } elseif ($this->hasCast($key)) {
             return $this->castAttribute($key, $current) ===
                    $this->castAttribute($key, $original);
+        } elseif (is_bool($current) {
+            return $current == $original;
         }
 
         return is_numeric($current) && is_numeric($original)
