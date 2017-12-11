@@ -1063,7 +1063,7 @@ trait HasAttributes
         } elseif ($this->hasCast($key)) {
             return $this->castAttribute($key, $current) ===
                    $this->castAttribute($key, $original);
-        } elseif (is_bool($current) {
+        } elseif (is_bool($current)) {
             return $current == $original;
         }
 
