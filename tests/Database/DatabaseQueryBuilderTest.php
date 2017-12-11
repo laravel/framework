@@ -2363,6 +2363,13 @@ class DatabaseQueryBuilderTest extends TestCase
         ]), $result);
     }
 
+    public function testQueryBuilderReturnsIterator()
+    {
+        $builder = $this->getMockQueryBuilder();
+
+        $this->assertTrue(is_iterable($builder));
+    }
+
     protected function getBuilder()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
