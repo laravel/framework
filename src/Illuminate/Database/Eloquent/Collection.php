@@ -48,7 +48,7 @@ class Collection extends BaseCollection implements QueueableCollection
                 $relations = func_get_args();
             }
 
-            $query = $this->first()->newQuery()->with($relations);
+            $query = $this->first()->newQueryWithoutRelationships()->with($relations);
 
             $this->items = $query->eagerLoadRelations($this->items);
         }
