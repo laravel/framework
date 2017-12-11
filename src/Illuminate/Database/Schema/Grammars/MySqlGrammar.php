@@ -586,17 +586,6 @@ class MySqlGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a year  type.
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeYear(Fluent $column)
-    {
-        return 'year';
-    }
-
-    /**
      * Create the column definition for a date-time type.
      *
      * @param  \Illuminate\Support\Fluent  $column
@@ -662,6 +651,17 @@ class MySqlGrammar extends Grammar
     protected function typeTimestampTz(Fluent $column)
     {
         return $this->typeTimestamp($column);
+    }
+
+    /**
+     * Create the column definition for a year type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeYear(Fluent $column)
+    {
+        return 'year';
     }
 
     /**

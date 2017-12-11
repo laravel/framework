@@ -496,17 +496,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for a year type (Polyfill).
-     *
-     * @param  \Illuminate\Support\Fluent  $column
-     * @return string
-     */
-    protected function typeYear(Fluent $column)
-    {
-        return $this->typeInteger($column);
-    }
-
-    /**
      * Create the column definition for a date-time type.
      *
      * @param  \Illuminate\Support\Fluent  $column
@@ -580,6 +569,17 @@ class SqlServerGrammar extends Grammar
         }
 
         return "datetimeoffset($column->precision)";
+    }
+
+    /**
+     * Create the column definition for a year type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeYear(Fluent $column)
+    {
+        return $this->typeInteger($column);
     }
 
     /**
