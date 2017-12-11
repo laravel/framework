@@ -44,6 +44,13 @@ class UrlGenerator implements UrlGeneratorContract
     protected $forceScheme;
 
     /**
+     * The assets URL root.
+     *
+     * @var string
+     */
+    protected $assetsRoot;
+
+    /**
      * A cached copy of the URL root for the current request.
      *
      * @var string|null
@@ -217,12 +224,7 @@ class UrlGenerator implements UrlGeneratorContract
             return $path;
         }
 
-        // Once we get the root URL, we will check to see if it contains an index.php
-        // file in the paths. If it does, we will remove it since it is not needed
-        // for asset paths, but only for routes to endpoints in the application.
-        $root = $this->formatRoot($this->formatScheme($secure));
-
-        return $this->removeIndex($root).'/'.trim($path, '/');
+        return $this->assetFrom($this->assetsRoot, $path, $secure);
     }
 
     /**
@@ -501,6 +503,17 @@ class UrlGenerator implements UrlGeneratorContract
         $this->forcedRoot = rtrim($root, '/');
 
         $this->cachedRoot = null;
+    }
+
+    /**
+     * Set the root URL for assets.
+     *
+     * @param  string|null  $root
+     * @return void
+     */
+    public function setAssetsRoot($root)
+    {
+        $this->assetsRoot = rtrim($root, '/') ?: null;
     }
 
     /**
