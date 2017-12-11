@@ -27,6 +27,6 @@ class ListenerOptions extends WorkerOptions
     {
         $this->environment = $environment;
 
-        parent::__construct($delay, $memory, $timeout, $sleep, $maxTries, $force);
+        parent::__construct($delay, $memory, $timeout, $sleep, $maxTries, 0, $force);
     }
 }

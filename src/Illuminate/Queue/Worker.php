@@ -58,6 +58,13 @@ class Worker
     public $paused = false;
 
     /**
+     * The number of jobs run so far.
+     *
+     * @var int
+     */
+    public $jobs = 0;
+
+    /**
      * Create a new queue worker.
      *
      * @param  \Illuminate\Queue\QueueManager  $manager
@@ -111,6 +118,7 @@ class Worker
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
             if ($job) {
+                $this->jobs++;
                 $this->runJob($job, $connectionName, $options);
             } else {
                 $this->sleep($options->sleep);
@@ -192,6 +200,7 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
+     * @return void
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart)
     {
@@ -499,7 +508,17 @@ class Worker
      */
     protected function queueShouldRestart($lastRestart)
     {
-        return $this->getTimestampOfLastQueueRestart() != $lastRestart;
+        return $this->hasRunEnoughJobs() || $this->getTimestampOfLastQueueRestart() != $lastRestart;
+    }
+
+    /**
+     * Determine if the queue worker has run enough jobs.
+     *
+     * @return bool
+     */
+    protected function hasRunEnoughJobs()
+    {
+        return $this->options->maxJobs > 0 ? $this->jobs >= $this->options->maxJobs : false;
     }
 
     /**

@@ -28,7 +28,8 @@ class WorkCommand extends Command
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
                             {--timeout=60 : The number of seconds a child process can run}
-                            {--tries=0 : Number of times to attempt a job before logging it failed}';
+                            {--tries=0 : Number of times to attempt a job before logging it failed}
+                            {--jobs=0 : The maximum number of jobs to run}';
 
     /**
      * The console command description.
@@ -112,7 +113,8 @@ class WorkCommand extends Command
         return new WorkerOptions(
             $this->option('delay'), $this->option('memory'),
             $this->option('timeout'), $this->option('sleep'),
-            $this->option('tries'), $this->option('force')
+            $this->option('tries'), $this->option('jobs'),
+            $this->option('force')
         );
     }
 
