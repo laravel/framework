@@ -11,38 +11,36 @@ class Cache
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @param  int|null  $maxAge
-     * @param  int|null  $sharedMaxAge
-     * @param  bool|null $public
-     * @param  bool|null $etag
+     * @param  string|array  $options
      * @return \Symfony\Component\HttpFoundation\Response
+     * @throws \InvalidArgumentException
      */
-    public function handle($request, Closure $next, int $maxAge = null, int $sharedMaxAge = null, bool $public = null, bool $etag = false)
+    public function handle($request, Closure $next, $options = [])
     {
         /**
-         * @var   \Symfony\Component\HttpFoundation\Response
+         * @var $response \Symfony\Component\HttpFoundation\Response
          */
         $response = $next($request);
-
         if (! $request->isMethodCacheable() || ! $response->getContent()) {
             return $response;
         }
 
-        if (! $response->getContent()) {
-            return;
+        if (\is_string($options)) {
+            $parsedOptions = [];
+            foreach (explode(';', $options) as $opt) {
+                $data = explode('=', $opt, 2);
+                $parsedOptions[$data[0]] = $data[1] ?? true;
+            }
+
+            $options = $parsedOptions;
         }
-        if ($etag) {
-            $response->setEtag(md5($response->getContent()));
+
+        if (true === ($options['etag'] ?? false)) {
+            $options['etag'] = md5($response->getContent());
         }
-        if (null !== $maxAge) {
-            $response->setMaxAge($maxAge);
-        }
-        if (null !== $sharedMaxAge) {
-            $response->setSharedMaxAge($sharedMaxAge);
-        }
-        if (null !== $public) {
-            $public ? $response->setPublic() : $response->setPrivate();
-        }
+
+        $response->setCache($options);
+        $response->isNotModified($request);
 
         return $response;
     }
