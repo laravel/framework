@@ -35,7 +35,7 @@ class Cache
             $options = $parsedOptions;
         }
 
-        if (true === ($options['etag'] ?? false)) {
+        if (isset($options['etag']) && true === $options['etag']) {
             $options['etag'] = md5($response->getContent());
         }
 
