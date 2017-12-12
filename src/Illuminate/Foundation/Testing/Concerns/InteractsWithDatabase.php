@@ -3,8 +3,9 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
-use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
+use Illuminate\Foundation\Testing\Constraints\TableCount;
+use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 
 trait InteractsWithDatabase
 {
@@ -56,6 +57,23 @@ trait InteractsWithDatabase
     {
         $this->assertThat(
             $table, new SoftDeletedInDatabase($this->getConnection($connection), $data)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert the given table has the wanted number of records
+     *
+     * @param  string  $table
+     * @param  int  $wantedCount
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertTableCount($table, int $wantedCount, $connection = null)
+    {
+        $this->assertThat(
+            $table, new TableCount($this->getConnection($connection), $wantedCount)
         );
 
         return $this;
