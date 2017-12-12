@@ -392,7 +392,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($keys instanceof Collection) {
             $keys = $keys->keys()->items;
-        } elseif (!is_array($keys)) {
+        } elseif (! is_array($keys)) {
             $keys = func_get_args();
         }
 
