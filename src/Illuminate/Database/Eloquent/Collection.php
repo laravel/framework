@@ -57,6 +57,43 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Sets a set of relationships onto the collection.
+     *
+     * @param  mixed  $relations
+     * @return $this
+     */
+    public function setRelations($relations)
+    {
+        if ($this->isNotEmpty()) {
+            if (is_string($relations)) {
+                $relations = func_get_args();
+            }
+
+            $this->each(function($model) use ($relations) {
+                $model->setRelations($relations);
+            });
+        }
+
+        return $this;
+    }
+
+    /**
+     * Checks whether a collection has a
+     * relationship defined on it.
+     *
+     * @param string $relation
+     * @return bool
+     */
+    public function hasRelation($relation)
+    {
+        if (!$this->isNotEmpty()) {
+            return false;
+        }
+
+        return $this->first()->hasRelation($relation);
+    }
+
+    /**
      * Add an item to the collection.
      *
      * @param  mixed  $item

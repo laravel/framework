@@ -729,6 +729,23 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('taylorotwell@gmail.com', $post->first()->parentPost->user->email);
     }
 
+    public function testBasicAutomaticSelfReferenceOnSingularRelationshipAttributes()
+    {
+        $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
+        $user->posts()->create(['name' => 'First Post']);
+
+        $post = $user->posts->first();
+
+        $this->assertNotNull($post->user);
+        $this->assertEquals($user, $post->user);
+
+        $post = $user->posts()->create(['name' => 'First Post']);
+        $user = $post->user;
+
+        $this->assertNotNull($user->post);
+        $this->assertEquals($post, $user->post);
+    }
+
     public function testBasicMorphManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);

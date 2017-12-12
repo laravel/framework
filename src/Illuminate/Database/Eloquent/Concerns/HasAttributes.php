@@ -386,12 +386,28 @@ trait HasAttributes
             return $this->relations[$key];
         }
 
-        // If the "attribute" exists as a method on the model, we will just assume
-        // it is a relationship and will load and return results from the query
-        // and hydrate the relationship's value on the "relationships" array.
-        if (method_exists($this, $key)) {
-            return $this->getRelationshipFromMethod($key);
+        // If the "attribute" exists as a method on the model,
+        // we will just assume it is a relationship.
+        if (! $this->hasRelation($key)) {
+            return;
         }
+
+        // We will load and return results from the query
+        // and hydrate the relationship's value on the "relationships" array.
+        if (! $relationship = $this->getRelationshipFromMethod($key)) {
+            return;
+        }
+
+        // If a reference to this model exists on the relationship loaded,
+        // attach self to the relationship model in order to prevent
+        // any additional database calls for the relationship.
+        $relationshipKey = $this->guessRelationKey();
+
+        if ($relationship->hasRelation($relationshipKey)) {
+            $relationship->setRelations([$relationshipKey => $this]);
+        }
+
+        return $relationship;
     }
 
     /**
