@@ -69,7 +69,7 @@ class Collection extends BaseCollection implements QueueableCollection
                 $relations = func_get_args();
             }
 
-            $this->each(function($model) use ($relations) {
+            $this->each(function ($model) use ($relations) {
                 $model->setRelations($relations);
             });
         }
@@ -86,7 +86,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function hasRelation($relation)
     {
-        if (!$this->isNotEmpty()) {
+        if (! $this->isNotEmpty()) {
             return false;
         }
 
