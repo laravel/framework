@@ -543,6 +543,18 @@ trait HasRelationships
     }
 
     /**
+     * Checks whether a relationship
+     * is defined on the model.
+     *
+     * @param string $relation
+     * @return bool
+     */
+    public function hasRelation($relation)
+    {
+        return method_exists($this, $relation);
+    }
+
+    /**
      * Set the specific relationship in the model.
      *
      * @param  string  $relation
@@ -590,5 +602,18 @@ trait HasRelationships
         $this->touches = $touches;
 
         return $this;
+    }
+
+    /**
+     * Attempts to guess the relationship key for a model.
+     *
+     * @param  Model  $model
+     * @return string
+     */
+    protected function guessRelationKey(Model $model = null)
+    {
+        $model = $model ?: $this;
+
+        return strtolower(str_singular($model->getTable()));
     }
 }
