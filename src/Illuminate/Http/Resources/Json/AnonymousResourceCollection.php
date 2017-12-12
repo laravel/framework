@@ -2,6 +2,8 @@
 
 namespace Illuminate\Http\Resources\Json;
 
+use Illuminate\Container\Container;
+
 class AnonymousResourceCollection extends ResourceCollection
 {
     /**
@@ -20,6 +22,10 @@ class AnonymousResourceCollection extends ResourceCollection
      */
     public function __construct($resource, $collects)
     {
+        $this->additional((new $collects($resource))->with(
+            Container::getInstance()->make('request')
+        ));
+        
         $this->collects = $collects;
 
         parent::__construct($resource);
