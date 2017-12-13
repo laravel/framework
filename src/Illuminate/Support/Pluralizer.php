@@ -51,7 +51,6 @@ class Pluralizer
         'software',
         'species',
         'swine',
-        'tarmac',
         'traffic',
         'wheat',
     ];
