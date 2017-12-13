@@ -7,9 +7,6 @@ use PHPUnit\Framework\TestCase;
 
 class SupportStrTest extends TestCase
 {
-    /**
-     * Test the Str::words method.
-     */
     public function testStringCanBeLimitedByWords()
     {
         $this->assertEquals('Taylor...', Str::words('Taylor Otwell', 1));
