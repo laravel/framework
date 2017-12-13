@@ -1,9 +1,18 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.25 (2017-12-11)
 
 ### Added
 - Added support for Flysystem caching ([#22310](https://github.com/laravel/framework/pull/22310), [0657496](https://github.com/laravel/framework/commit/06574964c677c4205668def84ede22e3ca5eee9c))
+- Added support for `year` data type ([#22377](https://github.com/laravel/framework/pull/22377))
+- Added support for setting Whoops debug editor ([#22350](https://github.com/laravel/framework/pull/22350), [c6e3a73](https://github.com/laravel/framework/commit/c6e3a73d28ca91a3119a6eb51ef14dd332a64719))
+
+### Changed
+- Use `Model::newQueryWithoutRelationships()` in `Collection::load()` ([#22363](https://github.com/laravel/framework/pull/22363))
+- Respect `schema` config in `PostgresBuilder` ([#22365](https://github.com/laravel/framework/pull/22365), [de561cb](https://github.com/laravel/framework/commit/de561cb0c3de5d793a2bf93c5353dcec00c9544b))
+
+### Fixed
+- Fixed SQS queue driver for PHP 7.2 ([#22374](https://github.com/laravel/framework/pull/22374))
 
 
 ## v5.5.24 (2017-12-06)
