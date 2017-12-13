@@ -40,7 +40,9 @@ class RouteAction
         }
 
         if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
-            $action['uses'] = static::makeInvokable($action['uses']);
+            $action['uses'] = method_exists($action['uses'], 'handle')
+                ? $action['uses'].'@handle'
+                : static::makeInvokable($action['uses']);
         }
 
         return $action;
