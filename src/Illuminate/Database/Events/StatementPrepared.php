@@ -2,6 +2,9 @@
 
 namespace Illuminate\Database\Events;
 
+use Illuminate\Database\Connection;
+use PDOStatement;
+
 class StatementPrepared
 {
     /**
@@ -25,7 +28,7 @@ class StatementPrepared
      * @param  \PDOStatement  $statement
      * @return void
      */
-    public function __construct($connection, $statement)
+    public function __construct(Connection $connection, PDOStatement $statement)
     {
         $this->statement = $statement;
         $this->connection = $connection;

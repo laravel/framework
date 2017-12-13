@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Events;
 
+use Illuminate\Database\Connection;
+
 class QueryExecuted
 {
     /**
@@ -21,7 +23,7 @@ class QueryExecuted
     /**
      * The number of milliseconds it took to execute the query.
      *
-     * @var float
+     * @var float|null
      */
     public $time;
 
@@ -44,11 +46,11 @@ class QueryExecuted
      *
      * @param  string  $sql
      * @param  array  $bindings
-     * @param  float  $time
-     * @param  string  $connection
+     * @param  float|null  $time
+     * @param  \Illuminate\Database\Connection  $connection
      * @return void
      */
-    public function __construct($sql, $bindings, $time, $connection)
+    public function __construct(string $sql, array $bindings, float $time = null, Connection $connection)
     {
         $this->sql = $sql;
         $this->time = $time;
