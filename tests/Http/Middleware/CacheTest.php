@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Http\Middleware;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\Middleware\Cache;
+use Illuminate\Http\Middleware\SetCacheHeaders as Cache;
 
 class CacheTest extends TestCase
 {
