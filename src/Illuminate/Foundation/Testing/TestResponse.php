@@ -362,7 +362,7 @@ class TestResponse
     /**
      * Assert that the response contains the given Eloquent model.
      *
-     * @param  Model  $model
+     * @param  \Illuminate\Database\Eloquent\Model  $model
      * @return $this
      */
     public function assertJsonModel(Model $model)
@@ -373,7 +373,7 @@ class TestResponse
     /**
      * Assert that the response contains all of the given Eloquent models.
      *
-     * @param  Collection  $models
+     * @param  \Illuminate\Database\Eloquent\Collection  $models
      * @return $this
      */
     public function assertJsonModelCollection(Collection $models)
@@ -388,7 +388,7 @@ class TestResponse
     /**
      * Assert that the response contains the given Json Resource.
      *
-     * @param  Resource  $resource
+     * @param  \Illuminate\Http\Resources\Json\Resource  $resource
      * @return $this
      */
     public function assertJsonResource(Resource $resource)
@@ -399,7 +399,7 @@ class TestResponse
     /**
      * Assert that the response contains the given Json Resource Collection.
      *
-     * @param  ResourceCollection  $collection
+     * @param  \Illuminate\Http\Resources\Json\ResourceCollection  $collection
      * @return $this
      */
     public function assertJsonResourceCollection(ResourceCollection $collection)
