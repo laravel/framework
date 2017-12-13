@@ -16,9 +16,7 @@
     "require": {
         "php": ">=7.0",
         "ext-mbstring": "*",
-        "doctrine/inflector": "~1.1",
-        "illuminate/contracts": "5.5.*",
-        "nesbot/carbon": "^1.20"
+        "illuminate/contracts": "5.5.*"
     },
     "replace": {
         "tightenco/collect": "self.version"
@@ -39,7 +37,9 @@
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.2.*).",
         "symfony/process": "Required to use the composer class (~3.3).",
-        "symfony/var-dumper": "Required to use the dd function (~3.3)."
+        "symfony/var-dumper": "Required to use the dd function (~3.3).",
+        "doctrine/inflector": "Required to use pluralizer (~1.1).",
+        "nesbot/carbon": "Required to use carbon class (^1.20)."
     },
     "config": {
         "sort-packages": true
