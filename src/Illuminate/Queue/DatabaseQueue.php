@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use Throwable;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
@@ -198,9 +199,10 @@ class DatabaseQueue extends Queue implements QueueContract
             }
 
             $this->database->commit();
-        } catch (\Throwable $ex) {
+        } catch (Throwable $e) {
             $this->database->rollBack();
-            throw $ex;
+
+            throw $e;
         }
     }
 
