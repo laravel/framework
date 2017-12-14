@@ -1608,9 +1608,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return json_decode($value->toJson(), true);
             } elseif ($value instanceof Arrayable) {
                 return $value->toArray();
-            } else {
-                return $value;
             }
+
+            return $value;
         }, $this->items);
     }
 

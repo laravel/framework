@@ -888,9 +888,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (is_array($ids)) {
             return $this->newQueryWithoutScopes()->whereIn($this->getQualifiedKeyName(), $ids);
-        } else {
-            return $this->newQueryWithoutScopes()->whereKey($ids);
         }
+
+        return $this->newQueryWithoutScopes()->whereKey($ids);
     }
 
     /**

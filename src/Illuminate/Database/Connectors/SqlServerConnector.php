@@ -47,9 +47,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             return $this->getDblibDsn($config);
         } elseif ($this->prefersOdbc($config)) {
             return $this->getOdbcDsn($config);
-        } else {
-            return $this->getSqlSrvDsn($config);
         }
+
+        return $this->getSqlSrvDsn($config);
     }
 
     /**
