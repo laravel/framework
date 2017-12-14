@@ -48,15 +48,13 @@ class MigrationCreator
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
-        // First we will get the stub file for the migration, which serves as a type
-        // of template for the migration. Once we have those we will populate the
-        // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        // First we will get the file path for the migration and generate the contents
+        // dynamically based on the arguments provided by the developer. Once we
+        // have these we will save the file and fire the post create event.
+        $path = $this->getPath($name, $path);
+        $content = $this->getContent($name, $table, $create);
 
-        $this->files->put(
-            $path = $this->getPath($name, $path),
-            $this->populateStub($name, $stub, $table)
-        );
+        $this->files->put($path, $content);
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
         // created. Once that is done we'll be ready to return the full path to the
@@ -67,7 +65,7 @@ class MigrationCreator
     }
 
     /**
-     * Ensure that a migration with the given name doesn't already exist.
+     * Ensure that a migration with the given name does not already exist.
      *
      * @param  string  $name
      * @return void
@@ -82,48 +80,88 @@ class MigrationCreator
     }
 
     /**
-     * Get the migration stub file.
+     * Generate the content for the migration file.
      *
+     * @param  string  $name
      * @param  string  $table
      * @param  bool    $create
      * @return string
      */
-    protected function getStub($table, $create)
+    protected function getContent($name, $table, $create)
     {
-        if (is_null($table)) {
-            return $this->files->get($this->stubPath().'/blank.stub');
+        $stub = $this->getStub($name, $table, $create);
+        $placeholders = $this->getPlaceholders($name, $table);
+
+        // Here we will replace the any place-holders with the values specified by
+        // the developer, which is useful for quickly creating a tables creation
+        // or update migration from the console instead of typing it manually.
+
+        return $this->populateStub($stub, $placeholders);
+    }
+
+    /**
+     * Get the migration stub file.
+     *
+     * @param  string  $name
+     * @param  string  $table
+     * @param  bool    $create
+     * @return string
+     */
+    protected function getStub($name, $table, $create)
+    {
+        // We also have stubs for creating, dropping, renaming tables as well as
+        // adding, removing, or renaming columns. This saves the developer
+        // some typing when they making migrations.
+
+        if ($create) {
+            return $this->files->get($this->stubPath().'/create.stub');
         }
 
-        // We also have stubs for creating new tables and modifying existing tables
-        // to save the developer some typing when they are creating a new tables
-        // or modifying existing tables. We'll grab the appropriate stub here.
-        else {
-            $stub = $create ? 'create.stub' : 'update.stub';
-
-            return $this->files->get($this->stubPath()."/{$stub}");
+        if ($this->nameFollowsConvention($name)) {
+            return $this->files->get($this->stubPath().'/'.$this->extractStubFromName($name));
         }
+
+        if (! is_null($table)) {
+            return $this->files->get($this->stubPath().'/update.stub');
+        }
+
+        return $this->files->get($this->stubPath().'/blank.stub');
     }
 
     /**
      * Populate the place-holders in the migration stub.
      *
-     * @param  string  $name
      * @param  string  $stub
-     * @param  string  $table
+     * @param  array  $placeholders
      * @return string
      */
-    protected function populateStub($name, $stub, $table)
+    protected function populateStub($stub, array $placeholders)
     {
-        $stub = str_replace('DummyClass', $this->getClassName($name), $stub);
+        return str_replace(array_keys($placeholders), $placeholders, $stub);
+    }
 
-        // Here we will replace the table place-holders with the table specified by
-        // the developer, which is useful for quickly creating a tables creation
-        // or update migration from the console instead of typing it manually.
-        if (! is_null($table)) {
-            $stub = str_replace('DummyTable', $table, $stub);
+    /**
+     * Determine the place-holders and values for the migration stub.
+     *
+     * @param  string  $name
+     * @param  string  $table
+     * @return array
+     */
+    protected function getPlaceholders($name, $table)
+    {
+        $placeholders = [
+            'DummyClass' => $this->getClassName($name),
+        ];
+
+        if ($this->nameFollowsConvention($name)) {
+            $placeholders += $this->extractPlaceholderValuesFromName($name);
         }
 
-        return $stub;
+        if (! is_null($table)) {
+            $placeholders['DummyTable'] = $table;
+        }
+
+        return $placeholders;
     }
 
     /**
@@ -147,6 +185,66 @@ class MigrationCreator
     protected function getPath($name, $path)
     {
         return $path.'/'.$this->getDatePrefix().'_'.$name.'.php';
+    }
+
+    /**
+     * Does the migration name follow one of the convenient naming conventions.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function nameFollowsConvention($name)
+    {
+        return preg_match('/(create|drop)_\w+/', $name)
+            || preg_match('/(rename|add)_\w+_to_\w+/', $name)
+            || preg_match('/remove_\w+_from_\w+/', $name);
+    }
+
+    /**
+     * Extract the stub file name from the migration name.
+     *
+     * @param  string  $name
+     * @return bool
+     */
+    protected function extractStubFromName($name)
+    {
+        $stub = Str::before($name, '_');
+
+        if ($stub === 'rename') {
+            $stub = Str::contains($name, '_in_') ? 'rename-column' : 'rename-table';
+        }
+
+        return $stub.'.stub';
+    }
+
+    /**
+     * Extract the place-holders from the migration name.
+     *
+     * @param  string  $name
+     * @return array
+     */
+    protected function extractPlaceholderValuesFromName($name)
+    {
+        $patterns = [
+            'create_(?P<DummyTable>\w+)',
+            'drop_(?P<DummyTable>\w+)',
+            'rename_(?P<DummyColumnFrom>\w+)_to_(?P<DummyColumnTo>\w+)_in_(?P<DummyTable>\w+)',
+            'rename_(?P<DummyTableFrom>\w+)_to_(?P<DummyTableTo>\w+)',
+            'add_(?P<DummyColumn>\w+)_to_(?P<DummyTable>\w+)',
+            'remove_(?P<DummyColumn>\w+)_from_(?P<DummyTable>\w+)',
+        ];
+
+        preg_match('/'.implode('|', $patterns).'/J', $name, $matches);
+
+        $placeholders = array_filter($matches, 'is_string', ARRAY_FILTER_USE_KEY);
+
+        array_walk($placeholders, function (&$value, $key) {
+            if (Str::startsWith($key, 'DummyTable') && Str::endsWith($value, '_table')) {
+                $value = Str::replaceLast('_table', '', $value);
+            }
+        });
+
+        return array_filter($placeholders);
     }
 
     /**
