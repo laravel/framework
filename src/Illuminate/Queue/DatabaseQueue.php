@@ -184,18 +184,24 @@ class DatabaseQueue extends Queue implements QueueContract
      *
      * @param  string  $queue
      * @return \Illuminate\Contracts\Queue\Job|null
+     * @throws \Exception|\Throwable
      */
     public function pop($queue = null)
     {
         $queue = $this->getQueue($queue);
 
-        $this->database->beginTransaction();
+        try {
+            $this->database->beginTransaction();
 
-        if ($job = $this->getNextAvailableJob($queue)) {
-            return $this->marshalJob($queue, $job);
+            if ($job = $this->getNextAvailableJob($queue)) {
+                return $this->marshalJob($queue, $job);
+            }
+
+            $this->database->commit();
+        } catch (\Throwable $ex) {
+            $this->database->rollBack();
+            throw $ex;
         }
-
-        $this->database->commit();
     }
 
     /**
@@ -288,16 +294,15 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $queue
      * @param  string  $id
      * @return void
+     * @throws \Exception|\Throwable
      */
     public function deleteReserved($queue, $id)
     {
-        $this->database->beginTransaction();
-
-        if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
-            $this->database->table($this->table)->where('id', $id)->delete();
-        }
-
-        $this->database->commit();
+        $this->database->transaction(function () use ($queue, $id) {
+            if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
+                $this->database->table($this->table)->where('id', $id)->delete();
+            }
+        });
     }
 
     /**
