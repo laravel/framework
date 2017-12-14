@@ -2,11 +2,11 @@
 
 namespace Illuminate\Filesystem;
 
-use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Http\File;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
