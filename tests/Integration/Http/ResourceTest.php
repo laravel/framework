@@ -521,7 +521,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $createdPosts->each(function($post) use ($response) {
+        $createdPosts->each(function ($post) use ($response) {
             $this->assertTrue($response->getOriginalContent()->contains($post));
         });
     }
