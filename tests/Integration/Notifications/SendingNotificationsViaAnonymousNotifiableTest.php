@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Notifications;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 /**
@@ -37,7 +38,9 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
 
     public function test_faking()
     {
-        NotificationFacade::fake();
+        $fake = NotificationFacade::fake();
+
+        $this->assertInstanceOf(NotificationFake::class, $fake);
 
         $notifiable = (new AnonymousNotifiable())
             ->route('testchannel', 'enzo')

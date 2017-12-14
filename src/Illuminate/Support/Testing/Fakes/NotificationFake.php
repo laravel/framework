@@ -6,8 +6,9 @@ use Ramsey\Uuid\Uuid;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 
-class NotificationFake implements NotificationFactory
+class NotificationFake implements NotificationFactory, NotificationDispatcher
 {
     /**
      * All of the notifications that have been sent.
