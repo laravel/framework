@@ -1238,6 +1238,47 @@ class Builder
     }
 
     /**
+     * Adds a where condition using row values.
+     *
+     * This is mostly used with "keyset pagination" aka "seek method".
+     *
+     * @param  array   $columns
+     * @param  string  $operator
+     * @param  array   $values
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereRowValues($columns, $operator, $values, $boolean = 'and')
+    {
+        if (count($columns) != count($values)) {
+            throw new InvalidArgumentException('The number of columns must match the number of values');
+        }
+
+        $type = 'RowValues';
+
+        $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
+
+        $this->addBinding($values);
+
+        return $this;
+    }
+
+    /**
+     * Adds a or where condition using row values.
+     *
+     * This is mostly used with "keyset pagination" aka "seek method".
+     *
+     * @param  array   $columns
+     * @param  string  $operator
+     * @param  array   $values
+     * @return $this
+     */
+    public function orWhereRowValues($columns, $operator, $values)
+    {
+        return $this->whereRowValues($columns, $operator, $values, 'or');
+    }
+
+    /**
      * Handles dynamic "where" clauses to the query.
      *
      * @param  string  $method
