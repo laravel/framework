@@ -3,9 +3,9 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
-use Illuminate\Support\Collection;
 use InvalidArgumentException;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 

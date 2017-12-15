@@ -3,10 +3,10 @@
 namespace Illuminate\Queue;
 
 use DateTimeInterface;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
 use Illuminate\Support\Collection;
+use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
 
 abstract class Queue implements QueueAcceptsMetadata
 {
@@ -226,7 +226,7 @@ abstract class Queue implements QueueAcceptsMetadata
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function setMetadata(Collection $metadata)
     {
