@@ -574,7 +574,7 @@ if (! function_exists('e')) {
             return $value->toHtml();
         }
 
-        if (method_exists($value,  '__toString')) {
+        if (method_exists($value, '__toString')) {
             return $value->__toString();
         }
 
