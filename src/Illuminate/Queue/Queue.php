@@ -4,9 +4,10 @@ namespace Illuminate\Queue;
 
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
 use Illuminate\Support\InteractsWithTime;
 
-abstract class Queue
+abstract class Queue implements QueueAcceptsMetadata
 {
     use InteractsWithTime;
 
@@ -30,6 +31,13 @@ abstract class Queue
      * @var string
      */
     protected $connectionName;
+
+    /**
+     * The metadata that should be added to the queue payload.
+     *
+     * @var array
+     */
+    protected $metadata = [];
 
     /**
      * Push a new job onto the queue.
@@ -104,9 +112,25 @@ abstract class Queue
      */
     protected function createPayloadArray($job, $data = '')
     {
-        return is_object($job)
+        $payload = is_object($job)
                     ? $this->createObjectPayload($job)
                     : $this->createStringPayload($job, $data);
+
+        if (! empty($this->metadata)) {
+            $metadata = [];
+
+            foreach ($this->metadata as $value) {
+                $value = value($value);
+
+                if (! empty($value) && is_array($value)) {
+                    $metadata = array_merge($metadata, $value);
+                }
+            }
+
+            $payload['metadata'] = $metadata;
+        }
+
+        return $payload;
     }
 
     /**
@@ -208,5 +232,13 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function setMetadata($metadata)
+    {
+        $this->metadata = $metadata;
     }
 }

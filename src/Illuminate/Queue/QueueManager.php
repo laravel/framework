@@ -3,6 +3,7 @@
 namespace Illuminate\Queue;
 
 use Closure;
+use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
 use InvalidArgumentException;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
@@ -32,6 +33,13 @@ class QueueManager implements FactoryContract, MonitorContract
      * @var array
      */
     protected $connectors = [];
+
+    /**
+     * The metadata that should be added to the queue payload.
+     *
+     * @var array
+     */
+    protected $metadata = [];
 
     /**
      * Create a new queue manager instance.
@@ -111,6 +119,17 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Add metadata to the payload that will be queued.
+     *
+     * @param  mixed  $metadata
+     * @return void
+     */
+    public function metadata($metadata)
+    {
+        $this->metadata[] = $metadata;
+    }
+
+    /**
      * Determine if the driver is connected.
      *
      * @param  string  $name
@@ -138,6 +157,10 @@ class QueueManager implements FactoryContract, MonitorContract
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);
+
+            if ($this->connections[$name] instanceof QueueAcceptsMetadata) {
+                $this->connections[$name]->setMetadata($this->metadata);
+            }
         }
 
         return $this->connections[$name];

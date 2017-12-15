@@ -24,6 +24,26 @@ class QueueBeanstalkdQueueTest extends TestCase
         $queue->push('foo', ['data']);
     }
 
+    public function testPushProperlyPushesJobWithMetadataOntoBeanstalkd()
+    {
+        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
+        $queue->setMetadata([
+            ['firstname' => 'taylor'],
+            function() {
+                return [
+                    'surname' => 'otwell',
+                ];
+            }
+        ]);
+        $pheanstalk = $queue->getPheanstalk();
+        $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
+        $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'metadata' => ['firstname' => 'taylor', 'surname' => 'otwell']]), 1024, 0, 60);
+
+        $queue->push('foo', ['data'], 'stack');
+        $queue->push('foo', ['data']);
+    }
+
     public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
