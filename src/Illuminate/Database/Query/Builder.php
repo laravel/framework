@@ -1238,6 +1238,30 @@ class Builder
     }
 
     /**
+     * Handles conditional "where" clauses to the query.
+     *
+     * @param  string  $method
+     * @param  string  $parameters
+     * @return $this
+     */
+    public function conditionalWhere($method, $parameters)
+    {
+        // If the condition evaluates as true, proceed with the
+        // standard "where" clause behaviour.
+        if ($parameters[0]) {
+            // Remove the condition argument.
+            array_shift($parameters);
+
+            // Replace If from method name with nothing.
+            $method = preg_replace('/If$/', '', $method);
+
+            return $this->{$method}(...$parameters);
+        }
+
+        return $this;
+    }
+
+    /**
      * Handles dynamic "where" clauses to the query.
      *
      * @param  string  $method
@@ -2454,6 +2478,10 @@ class Builder
             return $this->macroCall($method, $parameters);
         }
 
+        if (Str::endsWith($method, 'If')) {
+            return $this->conditionalWhere($method, $parameters);
+        }
+        
         if (Str::startsWith($method, 'where')) {
             return $this->dynamicWhere($method, $parameters);
         }
