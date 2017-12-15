@@ -574,6 +574,10 @@ if (! function_exists('e')) {
             return $value->toHtml();
         }
 
+        if (method_exists($value, '__toString')) {
+            return $value->__toString();
+        }
+
         return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
     }
 }
