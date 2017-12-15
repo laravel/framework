@@ -27,14 +27,10 @@ class QueueBeanstalkdQueueTest extends TestCase
     public function testPushProperlyPushesJobWithMetadataOntoBeanstalkd()
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
-        $queue->setMetadata([
-            ['firstname' => 'taylor'],
-            function() {
-                return [
-                    'surname' => 'otwell',
-                ];
-            }
-        ]);
+        $queue->setMetadata(new \Illuminate\Support\Collection([
+                'firstname' => 'taylor',
+                'surname' => 'otwell',
+        ]));
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);

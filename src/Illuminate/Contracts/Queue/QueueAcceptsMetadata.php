@@ -2,13 +2,15 @@
 
 namespace Illuminate\Contracts\Queue;
 
+use Illuminate\Support\Collection;
+
 interface QueueAcceptsMetadata
 {
     /**
      * Add metadata to the payload that will be queued.
      *
-     * @param  mixed  $metadata
+     * @param  \Illuminate\Support\Collection  $metadata
      * @return void
      */
-    public function setMetadata($metadata);
+    public function setMetadata(Collection $metadata);
 }

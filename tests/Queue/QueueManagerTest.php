@@ -80,4 +80,25 @@ class QueueManagerTest extends TestCase
 
         $this->assertSame($queue, $manager->connection('null'));
     }
+
+    public function testMetadataIsHandledCorrectly()
+    {
+        $app = [
+            'config' => [
+                'queue.default' => 'null',
+            ],
+            'encrypter' => m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+        ];
+
+        $manager = new QueueManager($app);
+        $collection = $manager->metadata(null);
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection);
+
+        $manager->metadata('foo', 'bar');
+        $this->assertSame(['foo' => 'bar'], $collection->toArray());
+
+        $manager->metadata(['foo' => 'bart', 'bar' => 'foo']);
+        $this->assertSame(['foo' => 'bart', 'bar' => 'foo'], $collection->toArray());
+    }
 }

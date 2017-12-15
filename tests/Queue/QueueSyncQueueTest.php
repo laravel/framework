@@ -34,14 +34,10 @@ class QueueSyncQueueTest extends TestCase
         $sync = new \Illuminate\Queue\SyncQueue;
         $container = new \Illuminate\Container\Container;
         $sync->setContainer($container);
-        $sync->setMetadata([
-            ['firstname' => 'taylor'],
-            function() {
-                return [
-                    'surname' => 'otwell',
-                ];
-            }
-        ]);
+        $sync->setMetadata(new \Illuminate\Support\Collection([
+            'firstname' => 'taylor',
+            'surname' => 'otwell',
+        ]));
         $sync->push('Illuminate\Tests\Queue\SyncQueueTestHandler', ['foo' => 'bar']);
         $this->assertEquals(json_encode(['displayName' => 'Illuminate\\Tests\\Queue\\SyncQueueTestHandler', 'job' => 'Illuminate\\Tests\\Queue\\SyncQueueTestHandler', 'maxTries' => null, 'timeout' => null, 'data' => ['foo' => 'bar'], 'metadata' => ['firstname' => 'taylor', 'surname' => 'otwell']]), $_SERVER['__sync.test'][0]->getRawBody());
     }

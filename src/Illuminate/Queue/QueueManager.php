@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Closure;
 use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
@@ -37,9 +38,9 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * The metadata that should be added to the queue payload.
      *
-     * @var array
+     * @var \Illuminate\Support\Collection
      */
-    protected $metadata = [];
+    protected $metadata;
 
     /**
      * Create a new queue manager instance.
@@ -50,6 +51,7 @@ class QueueManager implements FactoryContract, MonitorContract
     public function __construct($app)
     {
         $this->app = $app;
+        $this->metadata = new Collection();
     }
 
     /**
@@ -121,12 +123,25 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * Add metadata to the payload that will be queued.
      *
-     * @param  mixed  $metadata
-     * @return void
+     * @param  string|array|null  $key
+     * @param  mixed  $value
+     * @return  self|\Illuminate\Support\Collection
      */
-    public function metadata($metadata)
+    public function metadata($key, $value = null)
     {
-        $this->metadata[] = $metadata;
+        if (is_null($key)) {
+            return $this->metadata;
+        }
+
+        if (is_array($key)) {
+            foreach ($key as $itemKey => $itemData) {
+                $this->metadata($itemKey, $itemData);
+            }
+        } else {
+            $this->metadata->put($key, $value);
+        }
+
+        return $this;
     }
 
     /**
