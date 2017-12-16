@@ -342,7 +342,7 @@ class PostgresGrammar extends Grammar
         return sprintf('comment on column %s.%s is %s',
             $this->wrapTable($blueprint),
             $this->wrap($command->column->name),
-            "'".addslashes($command->value)."'"
+            "'".str_replace("'", "''", $command->value)."'"
         );
     }
 
