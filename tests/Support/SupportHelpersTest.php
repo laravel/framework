@@ -774,6 +774,13 @@ class SupportHelpersTest extends TestCase
         })->something());
     }
 
+    public function testOptionalWithArray()
+    {
+        $this->assertNull(optional(null)['missing']);
+
+        $this->assertEquals('here', optional(['present' => 'here'])['present']);
+    }
+
     public function testOptionalIsMacroable()
     {
         Optional::macro('present', function () {
