@@ -5,7 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Symfony\Component\Process\ProcessUtils;
+use Illuminate\Support\ProcessUtils;
 
 class Schedule
 {
