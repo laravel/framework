@@ -40,7 +40,7 @@ class PostgresConnector extends Connector implements ConnectorInterface
         // database. Setting this DB timezone is an optional configuration item.
         $this->configureTimezone($connection, $config);
 
-        $this->configureSchema($connection, $config);
+        $this->configureSearchPath($connection, $config);
 
         // Postgres allows an application_name to be set by the user and this name is
         // used to when monitoring the application with pg_stat_activity. So we'll
@@ -85,34 +85,34 @@ class PostgresConnector extends Connector implements ConnectorInterface
     }
 
     /**
-     * Set the schema on the connection.
+     * Set the search_path on the connection.
      *
      * @param  \PDO  $connection
      * @param  array  $config
      * @return void
      */
-    protected function configureSchema($connection, $config)
+    protected function configureSearchPath($connection, $config)
     {
-        if (isset($config['schema'])) {
-            $schema = $this->formatSchema($config['schema']);
+        if (isset($config['search_path']) || isset($config['schema'])) {
+            $searchPath = $this->formatSearchPath($config['search_path'] ?? $config['schema']);
 
-            $connection->prepare("set search_path to {$schema}")->execute();
+            $connection->prepare("set search_path to {$searchPath}")->execute();
         }
     }
 
     /**
-     * Format the schema for the DSN.
+     * Format the search path for the DSN.
      *
-     * @param  array|string  $schema
+     * @param  array|string  $searchPath
      * @return string
      */
-    protected function formatSchema($schema)
+    protected function formatSearchPath($searchPath)
     {
-        if (is_array($schema)) {
-            return '"'.implode('", "', $schema).'"';
+        if (is_array($searchPath)) {
+            return '"'.implode('", "', $searchPath).'"';
         }
 
-        return '"'.$schema.'"';
+        return '"'.$searchPath.'"';
     }
 
     /**
