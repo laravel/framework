@@ -187,25 +187,17 @@ class SQLiteGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        // SQLite doesn't support dots (table.column) in update columns.
-        // if there is any, We only remove the current table and leave other  
-        // table names as they might be columns that based on a join statement.
         $columns = collect($values)->map(function ($value, $key) use($query) {
             return $this->wrap(Str::after($key, $query->from.'.')).' = '.$this->parameter($value);
         })->implode(', ');
 
-
-        // SQLite doesn't support limits or orders by default in update/delete, 
-        // so we use A workaround sub-query where.
         if (isset($query->joins) || isset($query->limit)) {
             $selectSql = parent::compileSelect($query->select("{$query->from}.rowid"));
 
             return "update {$table} set $columns where {$this->wrap('rowid')} in ({$selectSql})";
         }
 
-        $wheres = $this->compileWheres($query);
-
-        return trim("update {$table} set $columns $wheres");
+        return trim("update {$table} set {$columns} {$this->compileWheres($query)}");
     }
 
     /**
@@ -217,7 +209,7 @@ class SQLiteGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+        $cleanBindings = Arr::except($bindings, ['select', 'join']);
 
         return array_values(
             array_merge($values, $bindings['join'], Arr::flatten($cleanBindings))
