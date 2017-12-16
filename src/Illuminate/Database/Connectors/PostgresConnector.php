@@ -112,7 +112,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
             return '"'.implode('", "', $searchPath).'"';
         }
 
-        return '"'.$searchPath.'"';
+        preg_match_all('/[a-zA-z0-9]{1,}/i', $searchPath, $matches);
+        return '"'.implode('", "', $matches[0]).'"';
     }
 
     /**
