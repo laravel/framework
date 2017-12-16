@@ -3,7 +3,7 @@
 namespace Illuminate\Console\Scheduling;
 
 use Illuminate\Console\Application;
-use Symfony\Component\Process\ProcessUtils;
+use Illuminate\Support\ProcessUtils;
 
 class CommandBuilder
 {
