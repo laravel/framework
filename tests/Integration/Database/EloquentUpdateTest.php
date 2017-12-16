@@ -34,7 +34,7 @@ class EloquentUpdateTest extends TestCase
             $table->string('name')->nullable();
             $table->string('title')->nullable();
         });
-        
+
         Schema::create('test_model2', function ($table) {
             $table->increments('id');
             $table->string('name');
@@ -47,7 +47,7 @@ class EloquentUpdateTest extends TestCase
     public function testBasicUpdate()
     {
         TestUpdateModel1::create([
-            'name' => str_random(), 
+            'name' => str_random(),
             'title' => 'Ms.',
         ]);
 
@@ -58,7 +58,7 @@ class EloquentUpdateTest extends TestCase
 
     public function testUpdateWithLimitsAndOrders()
     {
-        for($i=1; $i <= 10; $i++){
+        for ($i = 1; $i <= 10; $i++) {
             TestUpdateModel1::create();
         }
 
@@ -71,19 +71,19 @@ class EloquentUpdateTest extends TestCase
     public function testUpdatedAtWithJoins()
     {
         TestUpdateModel1::create([
-            'name' => 'Abdul', 
+            'name' => 'Abdul',
             'title' => 'Mr.',
         ]);
 
         TestUpdateModel2::create([
-            'name' => str_random()
+            'name' => str_random(),
         ]);
 
-        TestUpdateModel2::join('test_model1', function($join) {
+        TestUpdateModel2::join('test_model1', function ($join) {
             $join->on('test_model1.id', '=', 'test_model2.id')
                 ->where('test_model1.title', '=', 'Mr.');
         })->update(['test_model2.name' => 'Abdul', 'job'=>'Engineer']);
-      
+
         $record = TestUpdateModel2::find(1);
 
         $this->assertEquals('Engineer: Abdul', $record->job.': '.$record->name);
@@ -92,16 +92,15 @@ class EloquentUpdateTest extends TestCase
     public function testSoftDeleteWithJoins()
     {
         TestUpdateModel1::create([
-            'name' => str_random(), 
+            'name' => str_random(),
             'title' => 'Mr.',
         ]);
 
         TestUpdateModel2::create([
-            'name' => str_random()
+            'name' => str_random(),
         ]);
 
-
-        TestUpdateModel2::join('test_model1', function($join) {
+        TestUpdateModel2::join('test_model1', function ($join) {
             $join->on('test_model1.id', '=', 'test_model2.id')
                 ->where('test_model1.title', '=', 'Mr.');
         })->delete();
@@ -109,7 +108,6 @@ class EloquentUpdateTest extends TestCase
         $this->assertEquals(0, TestUpdateModel2::all()->count());
     }
 }
-
 
 class TestUpdateModel1 extends Model
 {
