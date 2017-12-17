@@ -504,7 +504,7 @@ class ResourceTest extends TestCase
         );
         $this->assertTrue($createdPost->is($response->getOriginalContent()));
     }
-    
+
     public function test_original_on_response_is_collection_of_model_when_collection_resource()
     {
         $createdPosts = collect([
