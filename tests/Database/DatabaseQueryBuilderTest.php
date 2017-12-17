@@ -2375,6 +2375,65 @@ class DatabaseQueryBuilderTest extends TestCase
         ]), $result);
     }
 
+    public function testCommonTableExpression()
+    {
+        // Prepare CTEs
+        $cte1 = $this->getBuilder();
+        $cte1->select(['id'])->from('some_table')->where('id', '>', 1);
+
+        $cte2 = $this->getBuilder();
+        $cte2->select(['id'])->from('another_table');
+
+        // Simple single CTE
+        $builder = $this->getBuilder();
+        $builder->with('cte_table', $cte1);
+        $builder->select(['id'])->from('cte_table');
+        $this->assertEquals('with "cte_table" as (select "id" from "some_table" where "id" > ?) select "id" from "cte_table"', $builder->toSql());
+
+        // CTE with explicit columns
+        $builder = $this->getBuilder();
+        $builder->with('cte_table', $cte1, ['id']);
+        $builder->select(['id'])->from('cte_table');
+        $this->assertEquals('with "cte_table"("id") as (select "id" from "some_table" where "id" > ?) select "id" from "cte_table"', $builder->toSql());
+
+        // Two CTEs, shows how they're concatenated
+        $builder = $this->getBuilder();
+        $builder->with('cte_table1', $cte1);
+        $builder->with('cte_table2', $cte2);
+        $builder->select(['id'])->from('cte_table1')->join('cte_table2', 'cte_table2.id', '=', 'cte_table1.id');
+        $this->assertEquals('with "cte_table1" as (select "id" from "some_table" where "id" > ?), "cte_table2" as (select "id" from "another_table") select "id" from "cte_table1" inner join "cte_table2" on "cte_table2"."id" = "cte_table1"."id"', $builder->toSql());
+
+        // Two CTEs, only the recursive flag of the first one is relevant
+        $builder = $this->getBuilder();
+        $builder->withRecursive('cte_table1', $cte1, ['id']);
+        $builder->withRecursive('cte_table2', $cte2, ['id']);
+        $builder->select(['id'])->from('cte_table1')->join('cte_table2', 'cte_table2.id', '=', 'cte_table1.id');
+        $this->assertEquals('with recursive "cte_table1"("id") as (select "id" from "some_table" where "id" > ?), "cte_table2"("id") as (select "id" from "another_table") select "id" from "cte_table1" inner join "cte_table2" on "cte_table2"."id" = "cte_table1"."id"', $builder->toSql());
+
+        // CTEs work with update and delete too
+
+        // with update
+        $builder = $this->getBuilder();
+        $builder->with('cte_table', $cte1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('with "cte_table" as (select "id" from "some_table" where "id" > ?) update "cte_table" set "col" = ?', [1, 'foo'])->andReturn(true);
+        $result = $builder->from('cte_table')->update(['col' => 'foo']);
+        $this->assertEquals(1, $result);
+
+        // with delete
+        $builder = $this->getBuilder();
+        $builder->with('cte_table', $cte1);
+        $builder->getConnection()->shouldReceive('delete')->once()->with('with "cte_table" as (select "id" from "some_table" where "id" > ?) delete from "some_table" where "cte_table"."id" > ?', [1, 2])->andReturn(1);
+        $result = $builder->from('some_table')->where('cte_table.id', '>', 2)->delete();
+        $this->assertEquals(1, $result);
+
+        // insert however isn't supported; it's ignored
+        $builder = $this->getBuilder();
+        $builder->with('cte_table', $cte1);
+        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email") values (?)', ['foo'])->andReturn(true);
+        $result = $builder->from('users')->insert(['email' => 'foo']);
+        $this->assertTrue($result);
+    }
+
     protected function getBuilder()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;

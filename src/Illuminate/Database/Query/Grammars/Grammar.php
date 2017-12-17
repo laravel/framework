@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Database\Grammar as BaseGrammar;
+use Illuminate\Database\Query\CommonTableExpression;
 
 class Grammar extends BaseGrammar
 {
@@ -22,6 +23,7 @@ class Grammar extends BaseGrammar
      * @var array
      */
     protected $selectComponents = [
+        'commonTables',
         'aggregate',
         'columns',
         'from',
@@ -724,12 +726,18 @@ class Grammar extends BaseGrammar
             $joins = ' '.$this->compileJoins($query, $query->joins);
         }
 
+        $commonTables = '';
+
+        if (isset($query->commonTables)) {
+            $commonTables = $this->compileCommonTables($query, $query->commonTables);
+        }
+
         // Of course, update queries may also be constrained by where clauses so we'll
         // need to compile the where clauses and attach it to the query so only the
         // intended records are updated by the SQL statements we generate to run.
         $wheres = $this->compileWheres($query);
 
-        return trim("update {$table}{$joins} set $columns $wheres");
+        return trim("$commonTables update {$table}{$joins} set $columns $wheres");
     }
 
     /**
@@ -741,10 +749,10 @@ class Grammar extends BaseGrammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
-        $cleanBindings = Arr::except($bindings, ['join', 'select']);
+        $cleanBindings = Arr::except($bindings, ['commonTables', 'join', 'select']);
 
         return array_values(
-            array_merge($bindings['join'], $values, Arr::flatten($cleanBindings))
+            array_merge($bindings['commonTables'], $bindings['join'], $values, Arr::flatten($cleanBindings))
         );
     }
 
@@ -758,7 +766,9 @@ class Grammar extends BaseGrammar
     {
         $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
 
-        return trim("delete from {$this->wrapTable($query->from)} $wheres");
+        $commonTables = is_array($query->commonTables) ? $this->compileCommonTables($query, $query->commonTables) : '';
+
+        return trim("$commonTables delete from {$this->wrapTable($query->from)} $wheres");
     }
 
     /**
@@ -859,5 +869,70 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
+    }
+
+    /**
+     * Compiles all the CTEs down to SQL.
+     *
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param \Illuminate\Database\Query\CommonTableExpression[] $commonTables
+     * @return string
+     */
+    protected function compileCommonTables(Builder $query, array $commonTables)
+    {
+        if (! $commonTables) {
+            return '';
+        }
+
+        $expressions = [];
+        $firstExpression = null;
+
+        foreach ($commonTables as $commonTable) {
+            if (! $firstExpression) {
+                $firstExpression = $commonTable;
+            }
+
+            $expressions[] = $this->compileCommonTable($commonTable);
+        }
+
+        $with = 'with ';
+        // Only the first CTE is relevant determining whether it's recursive or not
+        if ($firstExpression && $firstExpression->recursive) {
+            $with .= 'recursive ';
+        }
+
+        return $with.implode(', ', $expressions);
+    }
+
+    /**
+     * Compile a single CTE to SQL.
+     *
+     * @param \Illuminate\Database\Query\CommonTableExpression $commonTable
+     * @return string
+     */
+    protected function compileCommonTable(CommonTableExpression $commonTable)
+    {
+        $sql = $this->wrapTable($commonTable->name);
+
+        if ($commonTable->columns) {
+            $sql .= '('.$this->compileCommonTableColumnsToString($commonTable->columns).')';
+        }
+
+        $sql .= ' as ('.$commonTable->query->toSql().')';
+
+        return $sql;
+    }
+
+    /**
+     * Compiles the column references to be inserted into the CTE.
+     *
+     * @param string[] $columns
+     * @return string
+     */
+    protected function compileCommonTableColumnsToString(array $columns)
+    {
+        return implode(', ', array_map(function ($column) {
+            return $this->wrap($column);
+        }, $columns));
     }
 }
