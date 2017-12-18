@@ -218,9 +218,9 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('taylor', $c['name']);
         $c['name'] = 'dayle';
         $this->assertEquals('dayle', $c['name']);
-        $this->assertTrue(isset($c['name']));
+        $this->assertArrayHasKey('name', $c);
         unset($c['name']);
-        $this->assertFalse(isset($c['name']));
+        $this->assertArrayNotHasKey('name', $c);
         $c[] = 'jason';
         $this->assertEquals('jason', $c[0]);
     }
@@ -256,33 +256,33 @@ class SupportCollectionTest extends TestCase
         $c = new Collection(['foo', 'bar']);
 
         $c->offsetUnset(1);
-        $this->assertFalse(isset($c[1]));
+        $this->assertArrayNotHasKey(1, $c);
     }
 
     public function testForgetSingleKey()
     {
         $c = new Collection(['foo', 'bar']);
         $c->forget(0);
-        $this->assertFalse(isset($c['foo']));
+        $this->assertArrayNotHasKey('foo', $c);
 
         $c = new Collection(['foo' => 'bar', 'baz' => 'qux']);
         $c->forget('foo');
-        $this->assertFalse(isset($c['foo']));
+        $this->assertArrayNotHasKey('foo', $c);
     }
 
     public function testForgetArrayOfKeys()
     {
         $c = new Collection(['foo', 'bar', 'baz']);
         $c->forget([0, 2]);
-        $this->assertFalse(isset($c[0]));
-        $this->assertFalse(isset($c[2]));
-        $this->assertTrue(isset($c[1]));
+        $this->assertArrayNotHasKey(0, $c);
+        $this->assertArrayNotHasKey(2, $c);
+        $this->assertArrayHasKey(1, $c);
 
         $c = new Collection(['name' => 'taylor', 'foo' => 'bar', 'baz' => 'qux']);
         $c->forget(['foo', 'baz']);
-        $this->assertFalse(isset($c['foo']));
-        $this->assertFalse(isset($c['baz']));
-        $this->assertTrue(isset($c['name']));
+        $this->assertArrayNotHasKey('foo', $c);
+        $this->assertArrayNotHasKey('baz', $c);
+        $this->assertArrayHasKey('name', $c);
     }
 
     public function testCountable()

@@ -67,7 +67,7 @@ class EventsDispatcherTest extends TestCase
             $_SERVER['__event.test'] = $name;
         });
 
-        $this->assertFalse(isset($_SERVER['__event.test']));
+        $this->assertArrayNotHasKey('__event.test', $_SERVER);
         $d->flush('update');
         $this->assertEquals('taylor', $_SERVER['__event.test']);
     }
@@ -114,7 +114,7 @@ class EventsDispatcherTest extends TestCase
         $d->forget('foo');
         $d->fire('foo');
 
-        $this->assertFalse(isset($_SERVER['__event.test']));
+        $this->assertArrayNotHasKey('__event.test', $_SERVER);
     }
 
     public function testWildcardListenersCanBeRemoved()
@@ -127,7 +127,7 @@ class EventsDispatcherTest extends TestCase
         $d->forget('foo.*');
         $d->fire('foo.bar');
 
-        $this->assertFalse(isset($_SERVER['__event.test']));
+        $this->assertArrayNotHasKey('__event.test', $_SERVER);
     }
 
     public function testListenersCanBeFound()

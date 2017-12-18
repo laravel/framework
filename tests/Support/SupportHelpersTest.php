@@ -54,14 +54,14 @@ class SupportHelpersTest extends TestCase
     {
         $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle']];
         Arr::forget($array, 'names.developer');
-        $this->assertFalse(isset($array['names']['developer']));
-        $this->assertTrue(isset($array['names']['otherDeveloper']));
+        $this->assertArrayNotHasKey('developer', $array['names']);
+        $this->assertArrayHasKey('otherDeveloper', $array['names']);
 
         $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle', 'thirdDeveloper' => 'Lucas']];
         Arr::forget($array, ['names.developer', 'names.otherDeveloper']);
-        $this->assertFalse(isset($array['names']['developer']));
-        $this->assertFalse(isset($array['names']['otherDeveloper']));
-        $this->assertTrue(isset($array['names']['thirdDeveloper']));
+        $this->assertArrayNotHasKey('developer', $array['names']);
+        $this->assertArrayNotHasKey('otherDeveloper', $array['names']);
+        $this->assertArrayHasKey('thirdDeveloper', $array['names']);
 
         $array = ['names' => ['developer' => 'taylor', 'otherDeveloper' => 'dayle'], 'otherNames' => ['developer' => 'Lucas', 'otherDeveloper' => 'Graham']];
         Arr::forget($array, ['names.developer', 'otherNames.otherDeveloper']);
