@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.26 (2017-12-18)
 
 ### Added
 - Support passing collections to `Collection::except()` ([#22399](https://github.com/laravel/framework/pull/22399))
