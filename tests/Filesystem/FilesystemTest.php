@@ -406,7 +406,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/foo.txt', $data);
         $filesystem->copy($this->tempDir.'/foo/foo.txt', $this->tempDir.'/foo/foo2.txt');
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
-        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+        $this->assertStringEqualsFile($this->tempDir.'/foo/foo2.txt', $data);
     }
 
     public function testIsFileChecksFilesProperly()
