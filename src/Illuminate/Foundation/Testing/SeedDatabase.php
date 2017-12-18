@@ -71,8 +71,7 @@ trait SeedDatabase
     private function getSeederInstance()
     {
         return
-        new class() extends Seeder
-        {
+        new class() extends Seeder {
             public function run()
             {
             }
