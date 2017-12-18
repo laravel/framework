@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Database\Seeder;
+use Illuminate\Contracts\Console\Kernel;
 
 trait SeedDatabase
 {
@@ -64,19 +64,18 @@ trait SeedDatabase
     }
 
     /**
-     * Builds a quick seeder instance
+     * Builds a quick seeder instance.
      *
      * @return Seeder
      */
     private function getSeederInstance()
     {
-        return (
+        return
         new class() extends Seeder
         {
             public function run()
             {
             }
-        }
-        );
+        };
     }
 }
