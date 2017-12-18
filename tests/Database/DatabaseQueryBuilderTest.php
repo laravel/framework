@@ -293,6 +293,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
     }
 
+    public function testDateBasedWheresExpressionIsNotBound()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'))->where('admin', true);
+        $this->assertEquals([true], $builder->getBindings());
+    }
+
     public function testWhereDayMySql()
     {
         $builder = $this->getMySqlBuilder();

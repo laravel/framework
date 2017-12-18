@@ -1,5 +1,24 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Support passing collections to `Collection::except()` ([#22399](https://github.com/laravel/framework/pull/22399))
+- Made `Command` class macroable ([#22426](https://github.com/laravel/framework/pull/22426), [#22434](https://github.com/laravel/framework/pull/22434))
+- Added `ProcessUtils` class for command argument escaping ([#22448](https://github.com/laravel/framework/pull/22448))
+- Added array support to `Optional` helper class ([#22417](https://github.com/laravel/framework/pull/22417))
+
+### Changed
+- Added "cattle" as an uncountable word ([#22415](https://github.com/laravel/framework/pull/22415))
+- Added `Dispatcher` contract on `NotificationFake` and return fake object from `Notification::fake()` ([#22396](https://github.com/laravel/framework/pull/22396))
+- Only add value as query binding if it isn't an `Expression` ([#22451](https://github.com/laravel/framework/pull/22451))
+
+### Fixed
+- Fixed database queue transactions wrapped in closures ([#22394](https://github.com/laravel/framework/pull/22394))
+- Fixed an issue with multiple `dont-discover` packages ([#22443](https://github.com/laravel/framework/pull/22443))
+- Fixed incorrect description type in `Console/Parser` ([#22449](https://github.com/laravel/framework/pull/22449))
+
+
 ## v5.5.25 (2017-12-11)
 
 ### Added
