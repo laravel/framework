@@ -34,7 +34,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->register($provider);
 
-        $this->assertTrue(in_array($class, $app->getLoadedProviders()));
+        $this->assertContains($class, $app->getLoadedProviders());
     }
 
     public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
@@ -45,7 +45,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->register($provider);
 
-        $this->assertTrue(in_array($class, $app->getLoadedProviders()));
+        $this->assertContains($class, $app->getLoadedProviders());
     }
 
     public function testDeferredServicesMarkedAsBound()

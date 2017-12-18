@@ -23,7 +23,7 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->render('view', []);
 
-        $this->assertTrue(strpos($result, '<html></html>') !== false);
+        $this->assertContains('<html></html>', (string) $result);
     }
 
     public function testRenderFunctionReturnsHtmlWithCustomTheme()
@@ -39,7 +39,7 @@ class MailMarkdownTest extends TestCase
 
         $result = $markdown->render('view', []);
 
-        $this->assertTrue(strpos($result, '<html></html>') !== false);
+        $this->assertContains('<html></html>', (string) $result);
     }
 
     public function testRenderTextReturnsText()

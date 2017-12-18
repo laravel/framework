@@ -103,10 +103,10 @@ class ContainerTest extends TestCase
         $container['something'] = function () {
             return 'foo';
         };
-        $this->assertTrue(isset($container['something']));
+        $this->assertArrayHasKey('something', $container);
         $this->assertEquals('foo', $container['something']);
         unset($container['something']);
-        $this->assertFalse(isset($container['something']));
+        $this->assertArrayNotHasKey('something', $container);
     }
 
     public function testAliases()
@@ -380,8 +380,8 @@ class ContainerTest extends TestCase
         $container->instance('object', new stdClass);
         $container->alias('object', 'alias');
 
-        $this->assertTrue(isset($container['object']));
-        $this->assertTrue(isset($container['alias']));
+        $this->assertArrayHasKey('object', $container);
+        $this->assertArrayHasKey('alias', $container);
     }
 
     public function testReboundListeners()
