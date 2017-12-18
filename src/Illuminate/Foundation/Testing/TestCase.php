@@ -112,6 +112,10 @@ abstract class TestCase extends BaseTestCase
             $this->beginDatabaseTransaction();
         }
 
+        if (isset($uses[SeedDatabaseState::class])) {
+            $this->seedDatabase();
+        }
+
         if (isset($uses[WithoutMiddleware::class])) {
             $this->disableMiddlewareForAllTests();
         }
