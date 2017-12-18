@@ -383,7 +383,7 @@ class FilesystemTest extends TestCase
             $result *= $status;
         }
 
-        $this->assertTrue($result === 1);
+        $this->assertSame(1, $result);
     }
 
     public function testRequireOnceRequiresFileProperly()
