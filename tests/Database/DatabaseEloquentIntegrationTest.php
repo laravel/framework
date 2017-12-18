@@ -678,10 +678,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $query = EloquentTestUser::has('postWithPhotos');
 
-        $bindingsCount = count($query->getBindings());
         $questionMarksCount = substr_count($query->toSql(), '?');
 
-        $this->assertEquals($questionMarksCount, $bindingsCount);
+        $this->assertCount($questionMarksCount, $query->getBindings());
     }
 
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
