@@ -41,7 +41,19 @@ trait InteractsWithContentTypes
      */
     public function expectsJson()
     {
-        return ($this->ajax() && ! $this->pjax()) || $this->wantsJson();
+        return ($this->ajax() && ! $this->pjax() && $this->wantsAnyContentType()) || $this->wantsJson();
+    }
+
+    /**
+     * Determine if the current request is asking for any content type in return.
+     *
+     * @return bool
+     */
+    public function wantsAnyContentType()
+    {
+        $acceptable = $this->getAcceptableContentTypes();
+
+        return isset($acceptable[0]) && ($acceptable[0] === '*/*' || $acceptable[0] === '*');
     }
 
     /**
