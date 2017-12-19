@@ -7,8 +7,12 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\ResourceCollection;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -353,6 +357,54 @@ class TestResponse
         }
 
         return $this;
+    }
+
+    /**
+     * Assert that the response contains the given Eloquent model.
+     *
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return $this
+     */
+    public function assertJsonModel(Model $model)
+    {
+        return $this->assertJsonFragment($model->toArray());
+    }
+
+    /**
+     * Assert that the response contains all of the given Eloquent models.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection  $models
+     * @return $this
+     */
+    public function assertJsonModelCollection(Collection $models)
+    {
+        foreach ($models as $model) {
+            $this->assertJsonModel($model);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response contains the given Json Resource.
+     *
+     * @param  \Illuminate\Http\Resources\Json\Resource  $resource
+     * @return $this
+     */
+    public function assertJsonResource(Resource $resource)
+    {
+        return $this->assertJsonFragment($resource->toArray());
+    }
+
+    /**
+     * Assert that the response contains the given Json Resource Collection.
+     *
+     * @param  \Illuminate\Http\Resources\Json\ResourceCollection  $collection
+     * @return $this
+     */
+    public function assertJsonResourceCollection(ResourceCollection $collection)
+    {
+        return $this->assertJsonFragment($collection->toArray());
     }
 
     /**
