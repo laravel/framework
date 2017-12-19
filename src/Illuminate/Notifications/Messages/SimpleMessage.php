@@ -142,7 +142,7 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  \Illuminate\Notifications\Action|\Illuminate\Contracts\Support\Htmlable|string  $line
+     * @param  mixed  $line
      * @return $this
      */
     public function line($line)
@@ -153,7 +153,7 @@ class SimpleMessage
     /**
      * Add a line of text to the notification.
      *
-     * @param  \Illuminate\Notifications\Action|\Illuminate\Contracts\Support\Htmlable|string|array  $line
+     * @param  mixed  $line
      * @return $this
      */
     public function with($line)
