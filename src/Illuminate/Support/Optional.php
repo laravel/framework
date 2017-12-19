@@ -18,11 +18,12 @@ class Optional implements ArrayAccess
     protected $value;
 
     /**
-     * The default value that should be returned if $value is null
+     * The default value that should be returned if $value is null.
      *
      * @var mixed
      */
     protected $default;
+
     /**
      * Create a new optional instance.
      *
