@@ -1100,6 +1100,12 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([['age' => 18], ['age' => 56]], $c->adults->age->values()->all());
     }
 
+    public function testExplodeMethod()
+    {
+        $collection = Collection::explode(',', 'foo,bar');
+        $this->assertEquals(['foo', 'bar'], $collection->all());
+    }
+
     public function testMakeMethod()
     {
         $collection = Collection::make('foo');
