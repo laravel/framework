@@ -808,12 +808,12 @@ class SupportHelpersTest extends TestCase
 
     public function testOptionalWithDefault()
     {
-        $this->assertEquals('-',optional(null,'-')->something());
+        $this->assertEquals('-', optional(null,'-')->something());
     }
 
     public function testOptionalWithDefaultValueArray()
     {
-        $this->assertEquals('-', optional(['present' => 'here'] ,'-')['not_present']);
+        $this->assertEquals('-', optional(['present' => 'here'],'-')['not_present']);
     }
 
     public function testTransform()
