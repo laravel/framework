@@ -806,6 +806,16 @@ class SupportHelpersTest extends TestCase
         })->present()->something());
     }
 
+    public function testOptionalWithDefault()
+    {
+        $this->assertEquals('-', optional(null, '-')->something());
+    }
+
+    public function testOptionalWithDefaultValueArray()
+    {
+        $this->assertEquals('-', optional(['present' => 'here'], '-')['not_present']);
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
