@@ -49,6 +49,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Create a new collection instance with the result of an explode operation.
+     *
+     * @param  string  $delimiter
+     * @param  string  $string
+     * @param  int  $limit
+     * @return static
+     */
+    public static function explode($delimiter, $string, $limit = PHP_INT_MAX)
+    {
+        return new static(explode(...func_get_args()));
+    }
+
+    /**
      * Create a new collection instance if the value isn't one already.
      *
      * @param  mixed  $items
