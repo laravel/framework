@@ -15,6 +15,7 @@ class MySqlGrammar extends Grammar
      * @var array
      */
     protected $selectComponents = [
+        'commonTables',
         'aggregate',
         'columns',
         'from',

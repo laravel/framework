@@ -51,12 +51,13 @@ class Builder
      * @var array
      */
     public $bindings = [
-        'select' => [],
-        'join'   => [],
-        'where'  => [],
-        'having' => [],
-        'order'  => [],
-        'union'  => [],
+        'commonTables' => [],
+        'select'       => [],
+        'join'         => [],
+        'where'        => [],
+        'having'       => [],
+        'order'        => [],
+        'union'        => [],
     ];
 
     /**
@@ -191,6 +192,13 @@ class Builder
      * @var bool
      */
     public $useWritePdo = false;
+
+    /**
+     * Common table expressions applied to this query.
+     *
+     * @var \Illuminate\Database\Query\CommonTableExpression[]
+     */
+    public $commonTables;
 
     /**
      * Create a new query builder instance.
@@ -2439,6 +2447,44 @@ class Builder
                 $clone->bindings[$type] = [];
             }
         });
+    }
+
+    /**
+     * Add a Common Table Expression (CTE) to the query.
+     *
+     * @param string $name
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param string[] $columns
+     * @param bool $recursive
+     * @return $this
+     */
+    public function with($name, $query, $columns = [], $recursive = false)
+    {
+        if (is_null($this->commonTables)) {
+            $this->commonTables = [];
+        }
+
+        $this->commonTables[] = new CommonTableExpression($name, $query, $columns, $recursive);
+        $this->addBinding($query->getBindings(), 'commonTables');
+
+        return $this;
+    }
+
+    /**
+     * Shorthand to add a recursive Common Table Expression (CTE) to the query.
+     *
+     * Only the first recursive CTE added is significant.
+     *
+     * @param string $name
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param string[] $columns
+     * @return $this
+     */
+    public function withRecursive($name, $query, $columns)
+    {
+        $this->with($name, $query, $columns, true);
+
+        return $this;
     }
 
     /**

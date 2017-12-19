@@ -14,6 +14,7 @@ class SQLiteGrammar extends Grammar
      * @var array
      */
     protected $selectComponents = [
+        'commonTables',
         'aggregate',
         'columns',
         'from',
