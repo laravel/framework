@@ -1174,6 +1174,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['1', true], $builder->getBindings());
     }
 
+    public function testJoinOnlyProvidesTable()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('posts')->join('users');
+        $this->assertEquals('select * from "posts" inner join "users" on "users"."id" = "posts"."user_id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('posts')->join('users')->join('attachments');
+        $this->assertEquals('select * from "posts" inner join "users" on "users"."id" = "posts"."user_id" inner join "attachments" on "attachments"."id" = "posts"."attachment_id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('posts')->join('no_s_at_end');
+        $this->assertEquals('select * from "posts" inner join "no_s_at_end" on "no_s_at_end"."id" = "posts"."no_s_at_end_id"', $builder->toSql());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();

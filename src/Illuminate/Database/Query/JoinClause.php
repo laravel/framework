@@ -58,7 +58,7 @@ class JoinClause extends Builder
      *
      * on `contacts`.`user_id` = `users`.`id`  and `contacts`.`info_id` = `info`.`id`
      *
-     * @param  \Closure|string  $first
+     * @param  \Closure|string|null $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $boolean
@@ -66,10 +66,23 @@ class JoinClause extends Builder
      *
      * @throws \InvalidArgumentException
      */
-    public function on($first, $operator = null, $second = null, $boolean = 'and')
+    public function on($first = null, $operator = null, $second = null, $boolean = 'and')
     {
         if ($first instanceof Closure) {
             return $this->whereNested($first, $boolean);
+        }
+
+        // If no columns are provided, infer them based on these assumptions:
+        // - the primary key of this table is 'id' => 'users.id'
+        // - the foreign key is named singular like this table with '_id' appended => 'user_id'
+        if (! $first && ! $second) {
+            $first = $this->table.'.id';
+
+            $operator = '=';
+
+            // Be pragmatic and only strip of the 's'. If that's not enough
+            // you've to explicitly provide the information.
+            $second = $this->parentQuery->from.'.'.rtrim($this->table, 's').'_id';
         }
 
         return $this->whereColumn($first, $operator, $second, $boolean);

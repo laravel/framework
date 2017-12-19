@@ -333,14 +333,14 @@ class Builder
      * Add a join clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  string|null  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
      * @param  bool    $where
      * @return $this
      */
-    public function join($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    public function join($table, $first = null, $operator = null, $second = null, $type = 'inner', $where = false)
     {
         $join = new JoinClause($this, $type, $table);
 
