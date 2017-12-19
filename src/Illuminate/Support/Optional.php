@@ -18,14 +18,22 @@ class Optional implements ArrayAccess
     protected $value;
 
     /**
+     * The default value that should be returned if $value is null
+     *
+     * @var mixed
+     */
+    protected $default;
+    /**
      * Create a new optional instance.
      *
      * @param  mixed  $value
+     * @param  mixed  $default
      * @return void
      */
-    public function __construct($value)
+    public function __construct($value, $default = null)
     {
         $this->value = $value;
+        $this->default = $default;
     }
 
     /**
@@ -39,6 +47,8 @@ class Optional implements ArrayAccess
         if (is_object($this->value)) {
             return $this->value->{$key};
         }
+
+        return $this->default;
     }
 
     /**
@@ -57,6 +67,8 @@ class Optional implements ArrayAccess
         if (is_object($this->value)) {
             return $this->value->{$method}(...$parameters);
         }
+
+        return $this->default;
     }
 
     /**
@@ -78,7 +90,7 @@ class Optional implements ArrayAccess
      */
     public function offsetGet($key)
     {
-        return Arr::get($this->value, $key);
+        return Arr::get($this->value, $key, $this->default);
     }
 
     /**
