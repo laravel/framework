@@ -292,7 +292,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function merge(array $input)
     {
         $this->getInputSource()->add($input);
-        
+
         return $this;
     }
 
@@ -305,7 +305,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function replace(array $input)
     {
         $this->getInputSource()->replace($input);
-        
+
         return $this;
     }
 
