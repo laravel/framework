@@ -3,11 +3,11 @@
 ## v5.5.27 (2017-12-20)
 
 ### Added
-- Allow HtmlString as line in notifications MailMessage ([#22473](https://github.com/laravel/framework/pull/22473))
-- Allow chaining of the `$request->merge()` method ([#22479](https://github.com/laravel/framework/pull/22479)
+- Allow `HtmlString` as line in `MailMessage` ([#22473](https://github.com/laravel/framework/pull/22473))
+- Allow chaining of the `Request::merge()` calls ([#22479](https://github.com/laravel/framework/pull/22479)
 
 ### Changed
-- Reverted previous change on setting Model's table ([#22478](https://github.com/laravel/framework/pull/22478))
+- Reverted performance improvements of `Model::getTable()` ([#22478](https://github.com/laravel/framework/pull/22478))
 
 
 ## v5.5.26 (2017-12-18)
