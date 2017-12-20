@@ -43,10 +43,10 @@ trait RouteDependencyResolverTrait
 
         foreach ($reflector->getParameters() as $key => $parameter) {
             $instance = $this->transformDependency(
-                $parameter, $parameters
+                $parameter, $parameters, $transformed
             );
 
-            if (! is_null($instance)) {
+            if ($transformed) {
                 $instanceCount++;
 
                 $this->spliceIntoParameters($parameters, $key, $instance);
@@ -64,9 +64,10 @@ trait RouteDependencyResolverTrait
      *
      * @param  \ReflectionParameter  $parameter
      * @param  array  $parameters
+     * @param  bool  $transformed
      * @return mixed
      */
-    protected function transformDependency(ReflectionParameter $parameter, $parameters)
+    protected function transformDependency(ReflectionParameter $parameter, $parameters, &$transformed)
     {
         $class = $parameter->getClass();
 
@@ -74,6 +75,8 @@ trait RouteDependencyResolverTrait
         // the list of parameters. If it is we will just skip it as it is probably a model
         // binding and we do not want to mess with those; otherwise, we resolve it here.
         if ($class && ! $this->alreadyInParameters($class->name, $parameters)) {
+            $transformed = true;
+
             return $parameter->isDefaultValueAvailable()
                 ? $parameter->getDefaultValue()
                 : $this->container->make($class->name);
