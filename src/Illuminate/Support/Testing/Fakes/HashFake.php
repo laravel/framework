@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Hashing\Hasher;
 
 class HashFake implements Hasher
