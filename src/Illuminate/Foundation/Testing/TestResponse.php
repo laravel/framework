@@ -501,7 +501,7 @@ class TestResponse
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key
-     * @return array
+     * @return mixed
      */
     public function decodeResponseJson($key = null)
     {
@@ -522,7 +522,7 @@ class TestResponse
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key
-     * @return array
+     * @return mixed
      */
     public function json($key = null)
     {
