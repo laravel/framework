@@ -233,7 +233,7 @@ class Factory implements ArrayAccess
      *
      * @param  string  $offset
      * @param  callable  $value
-     * @return $this
+     * @return void
      */
     public function offsetSet($offset, $value)
     {
