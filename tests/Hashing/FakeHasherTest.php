@@ -11,7 +11,7 @@ class FakeHasherTest extends TestCase
     {
         Hash::fake();
 
-        $this->assertEquals(crc32('test'), Hash::make('test'));
+        $this->assertEquals(md5('test'), Hash::make('test'));
         $this->assertTrue(Hash::check('test', Hash::make('test')));
         $this->assertFalse(Hash::check('wrong', Hash::make('test')));
         $this->assertTrue(is_array(Hash::info('example')));

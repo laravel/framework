@@ -26,7 +26,7 @@ class HashFake implements Hasher
      */
     public function make($value, array $options = [])
     {
-        return crc32($value);
+        return md5($value);
     }
 
     /**
@@ -39,7 +39,7 @@ class HashFake implements Hasher
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        return crc32($value) == $hashedValue;
+        return md5($value) === $hashedValue;
     }
 
     /**
