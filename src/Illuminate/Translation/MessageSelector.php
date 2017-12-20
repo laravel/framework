@@ -26,7 +26,7 @@ class MessageSelector
 
         $pluralIndex = $this->getPluralIndex($locale, $number);
 
-        if (count($segments) == 1 || ! isset($segments[$pluralIndex])) {
+        if (count($segments) === 1 || ! isset($segments[$pluralIndex])) {
             return $segments[0];
         }
 
@@ -60,7 +60,7 @@ class MessageSelector
     {
         preg_match('/^[\{\[]([^\[\]\{\}]*)[\}\]](.*)/s', $part, $matches);
 
-        if (count($matches) != 3) {
+        if (count($matches) !== 3) {
             return;
         }
 
@@ -71,9 +71,9 @@ class MessageSelector
         if (Str::contains($condition, ',')) {
             list($from, $to) = explode(',', $condition, 2);
 
-            if ($to == '*' && $number >= $from) {
+            if ($to === '*' && $number >= $from) {
                 return $value;
-            } elseif ($from == '*' && $number <= $to) {
+            } elseif ($from === '*' && $number <= $to) {
                 return $value;
             } elseif ($number >= $from && $number <= $to) {
                 return $value;

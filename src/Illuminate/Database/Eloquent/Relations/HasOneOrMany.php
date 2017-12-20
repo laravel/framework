@@ -151,7 +151,7 @@ abstract class HasOneOrMany extends Relation
     {
         $value = $dictionary[$key];
 
-        return $type == 'one' ? reset($value) : $this->related->newCollection($value);
+        return $type === 'one' ? reset($value) : $this->related->newCollection($value);
     }
 
     /**

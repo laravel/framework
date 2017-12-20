@@ -182,7 +182,7 @@ class EventFake implements Dispatcher
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
-     * @return array|null
+     * @return void
      */
     public function dispatch($event, $payload = [], $halt = false)
     {

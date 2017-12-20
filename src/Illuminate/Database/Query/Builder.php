@@ -1228,7 +1228,7 @@ class Builder
     {
         $type = $not ? 'NotExists' : 'Exists';
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+        $this->wheres[] = compact('type', 'query', 'boolean');
 
         $this->addBinding($query->getBindings(), 'where');
 
@@ -1406,7 +1406,7 @@ class Builder
     {
         $this->{$this->unions ? 'unionOrders' : 'orders'}[] = [
             'column' => $column,
-            'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
+            'direction' => strtolower($direction) === 'asc' ? 'asc' : 'desc',
         ];
 
         return $this;

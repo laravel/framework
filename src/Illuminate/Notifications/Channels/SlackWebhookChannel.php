@@ -33,7 +33,7 @@ class SlackWebhookChannel
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
-     * @return \Psr\Http\Message\ResponseInterface
+     * @return void
      */
     public function send($notifiable, Notification $notification)
     {

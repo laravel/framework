@@ -184,7 +184,7 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the Amazon S3 driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function createS3Driver(array $config)
     {
@@ -220,7 +220,7 @@ class FilesystemManager implements FactoryContract
      * Create an instance of the Rackspace driver.
      *
      * @param  array  $config
-     * @return \Illuminate\Contracts\Filesystem\Cloud
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function createRackspaceDriver(array $config)
     {
@@ -256,7 +256,7 @@ class FilesystemManager implements FactoryContract
      *
      * @param  \League\Flysystem\AdapterInterface  $adapter
      * @param  array  $config
-     * @return \League\Flysystem\FlysystemInterface
+     * @return \League\Flysystem\FilesystemInterface
      */
     protected function createFlysystem(AdapterInterface $adapter, array $config)
     {
