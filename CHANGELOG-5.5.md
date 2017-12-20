@@ -4,7 +4,7 @@
 
 ### Added
 - Allow `HtmlString` as line in `MailMessage` ([#22473](https://github.com/laravel/framework/pull/22473))
-- Allow chaining of the `Request::merge()` calls ([#22479](https://github.com/laravel/framework/pull/22479)
+- Allow chaining of the `Request::merge()` calls ([#22479](https://github.com/laravel/framework/pull/22479))
 
 ### Changed
 - Reverted performance improvements of `Model::getTable()` ([#22478](https://github.com/laravel/framework/pull/22478))
