@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Debug\Dumper;
@@ -370,6 +371,20 @@ if (! function_exists('camel_case')) {
     function camel_case($value)
     {
         return Str::camel($value);
+    }
+}
+
+if (! function_exists('carbon')) {
+    /**
+     * Create a new Carbon instance.
+     *
+     * @param  string|null                $time
+     * @param  \DateTimeZone|string|null  $tz
+     * @return \Illuminate\Support\Carbon
+     */
+    function carbon($time = null, $tz = null)
+    {
+        return new Carbon($time, $tz);
     }
 }
 
