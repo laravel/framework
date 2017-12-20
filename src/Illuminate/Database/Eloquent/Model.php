@@ -452,7 +452,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method)
     {
-        $this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
+        $this->{$column} = $this->{$column} + ($method === 'increment' ? $amount : $amount * -1);
 
         $this->forceFill($extra);
 

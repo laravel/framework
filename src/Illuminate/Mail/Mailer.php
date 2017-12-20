@@ -177,7 +177,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array  $view
      * @param  array  $data
-     * @return \Illuminate\View\View
+     * @return string
      */
     public function render($view, array $data = [])
     {
@@ -443,7 +443,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @return int
      */
     protected function sendSwiftMessage($message)
     {

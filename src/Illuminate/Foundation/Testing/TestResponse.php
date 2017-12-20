@@ -610,7 +610,7 @@ class TestResponse
     protected function ensureResponseHasView()
     {
         if (! isset($this->original) || ! $this->original instanceof View) {
-            return PHPUnit::fail('The response is not a view.');
+            PHPUnit::fail('The response is not a view.');
         }
 
         return $this;
