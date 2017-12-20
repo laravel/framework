@@ -2,29 +2,11 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Hashing\Hasher;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Contracts\Hashing\Hasher;
 
 class HashFake implements Hasher
 {
-    /**
-     * The value to be hashed.
-     *
-     * @var string
-     */
-    protected $value;
-
-    /**
-     * Assert if a hash was pushed based on a truth-test callback.
-     *
-     * @param  string  $value
-     * @return void
-     */
-    public function assertValueWasHashed($value)
-    {
-        PHPUnit::assertEquals($this->value, $value, "The expected [{$value}] value was not hashed.");
-    }
-
     /**
      * Get information about the given hashed value.
      *
@@ -45,9 +27,7 @@ class HashFake implements Hasher
      */
     public function make($value, array $options = [])
     {
-        $this->value = $value;
-
-        return $value;
+        return crc32($value);
     }
 
     /**
@@ -60,7 +40,7 @@ class HashFake implements Hasher
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        return $value === $hashedValue;
+        return crc32($value) == $hashedValue;
     }
 
     /**
