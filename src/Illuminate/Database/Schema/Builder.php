@@ -173,8 +173,8 @@ class Builder
      */
     public function drop($table)
     {
-        if(is_array($table)) {
-            foreach($table as $t) {
+        if (is_array($table)) {
+            foreach ($table as $t) {
                 $this->drop($t);
             }
         } else {
@@ -192,8 +192,8 @@ class Builder
      */
     public function dropIfExists($table)
     {
-        if(is_array($table)) {
-            foreach($table as $t) {
+        if (is_array($table)) {
+            foreach ($table as $t) {
                 $this->dropIfExists($t);
             }
         } else {
