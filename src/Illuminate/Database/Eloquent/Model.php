@@ -374,7 +374,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param string $name
      * @param Closure $relation
      */
-    public static function addDynamicRelation($name, Closure $relation) {
+    public static function addDynamicRelation($name, Closure $relation)
+    {
         static::$dynamicRelations[$name] = $relation;
     }
 
@@ -384,7 +385,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param string $name
      * @param Closure $relation
      */
-    public static function removeDynamicRelation($name) {
+    public static function removeDynamicRelation($name)
+    {
         unset(static::$dynamicRelations[$name]);
     }
 
