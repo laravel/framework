@@ -23,7 +23,7 @@ trait CollectsResources
 
         $this->collection = $collects && ! $resource->first() instanceof $collects
             ? $resource->mapInto($collects)
-            $resource->toBase();
+            : $resource->toBase();
 
         return $resource instanceof AbstractPaginator
                     ? $resource->setCollection($this->collection)
