@@ -583,6 +583,30 @@ class HttpRequestTest extends TestCase
         $request->flush();
     }
 
+    public function testExpectsJson()
+    {
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
+        $this->assertTrue($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertTrue($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => '*/*', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'HTTP_X_PJAX' => 'true']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']);
+        $this->assertFalse($request->expectsJson());
+
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'text/html', 'HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest', 'HTTP_X_PJAX' => 'true']);
+        $this->assertFalse($request->expectsJson());
+    }
+
     public function testFormatReturnsAcceptableFormat()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/json']);
