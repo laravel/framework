@@ -168,27 +168,40 @@ class Builder
     /**
      * Drop a table from the schema.
      *
-     * @param  string  $table
+     * @param  mixed  $table
      * @return void
      */
     public function drop($table)
     {
-        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
-            $blueprint->drop();
-        }));
+        if(gettype($table) == 'array') {
+            foreach($table as $t) {
+                $this->dropIfExists($t);
+            }
+        } else {
+            $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+                $blueprint->drop();
+            }));
+        }
     }
 
     /**
      * Drop a table from the schema if it exists.
      *
-     * @param  string  $table
+     * @param  mixed  $table
      * @return void
      */
     public function dropIfExists($table)
     {
-        $this->build(tap($this->createBlueprint($table), function ($blueprint) {
-            $blueprint->dropIfExists();
-        }));
+        if(gettype($table) == 'array') {
+            foreach($table as $t) {
+                $this->dropIfExists($t);
+            }
+        } else {
+            $this->build(tap($this->createBlueprint($table), function ($blueprint) {
+                $blueprint->dropIfExists();
+            }));
+        }
+        
     }
 
     /**
