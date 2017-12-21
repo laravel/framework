@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentModelTest extends TestCase
@@ -1691,6 +1692,21 @@ class DatabaseEloquentModelTest extends TestCase
         $result = $firstInstance->is($secondInstance);
         $this->assertFalse($result);
     }
+
+	public function testDynamicRelations() {
+		EloquentModelStub::addDynamicRelation('items', function ($m) {
+			return $m->hasMany(EloquentModelStub::class, 'item_id');
+		});
+
+		$m = new EloquentModelStub();
+		$r = $m->items();
+		$this->assertInstanceOf(Relations\HasMany::class, $r);
+
+		EloquentModelStub::removeDynamicRelation('items');
+
+		$this->expectException(\BadMethodCallException::class);
+		$m->items();
+	}
 
     protected function addMockConnection($model)
     {

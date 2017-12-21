@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Exception;
+use Closure;
 use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
@@ -116,6 +117,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected static $booted = [];
+
+	/**
+	 * The map of dynamic relations.
+	 *
+	 * @var array
+	 */
+	protected static $dynamicRelations = [];
 
     /**
      * The array of global scopes on the model.
@@ -359,6 +367,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             is_string($relations) ? func_get_args() : $relations
         );
     }
+
+	/**
+	 * Add dynamic relationship to the Model class.
+	 *
+	 * @param string $name
+	 * @param Closure $relation
+	 */
+	public static function addDynamicRelation($name, Closure $relation) {
+		static::$dynamicRelations[$name] = $relation;
+	}
+
+	/**
+	 * Remove dynamic relationship from the Model class.
+	 *
+	 * @param string $name
+	 * @param Closure $relation
+	 */
+	public static function removeDynamicRelation($name) {
+		unset(static::$dynamicRelations[$name]);
+	}
 
     /**
      * Eager load relations on the model.
@@ -1480,6 +1508,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
         }
+
+		if (array_key_exists($method, static::$dynamicRelations)) {
+			$relation = static::$dynamicRelations[$method]; 
+			return $relation($this);
+		}
 
         return $this->newQuery()->$method(...$parameters);
     }
