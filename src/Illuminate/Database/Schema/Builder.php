@@ -192,7 +192,7 @@ class Builder
      */
     public function dropIfExists($table)
     {
-        if (is_array($table)) {
+        if xattr_get(filename, name)(is_array($table)) {
             foreach ($table as $t) {
                 $this->dropIfExists($t);
             }
@@ -201,7 +201,6 @@ class Builder
                 $blueprint->dropIfExists();
             }));
         }
-        
     }
 
     /**
