@@ -1693,7 +1693,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testDynamicRelations() {
+    public function testDynamicRelations()
+    {
         EloquentModelStub::addDynamicRelation('items', function ($m) {
             return $m->hasMany(EloquentModelStub::class, 'item_id');
         });
