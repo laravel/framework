@@ -3,8 +3,8 @@
 namespace Illuminate\Console;
 
 use Closure;
+use Illuminate\Support\ProcessUtils;
 use Illuminate\Contracts\Events\Dispatcher;
-use Symfony\Component\Process\ProcessUtils;
 use Illuminate\Contracts\Container\Container;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\Console\Input\ArrayInput;

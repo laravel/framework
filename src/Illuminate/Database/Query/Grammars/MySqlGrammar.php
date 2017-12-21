@@ -145,9 +145,9 @@ class MySqlGrammar extends Grammar
         return collect($values)->map(function ($value, $key) {
             if ($this->isJsonSelector($key)) {
                 return $this->compileJsonUpdateColumn($key, new JsonExpression($value));
-            } else {
-                return $this->wrap($key).' = '.$this->parameter($value);
             }
+
+            return $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
     }
 
