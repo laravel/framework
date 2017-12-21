@@ -118,12 +118,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected static $booted = [];
 
-	/**
-	 * The map of dynamic relations.
-	 *
-	 * @var array
-	 */
-	protected static $dynamicRelations = [];
+    /**
+     * The map of dynamic relations.
+     *
+     * @var array
+     */
+    protected static $dynamicRelations = [];
 
     /**
      * The array of global scopes on the model.
@@ -1513,6 +1513,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if (array_key_exists($method, static::$dynamicRelations)) {
             $relation = static::$dynamicRelations[$method]; 
+
             return $relation($this);
         }
 
