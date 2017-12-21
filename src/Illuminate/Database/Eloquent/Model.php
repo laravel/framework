@@ -1512,7 +1512,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         if (array_key_exists($method, static::$dynamicRelations)) {
-            $relation = static::$dynamicRelations[$method]; 
+            $relation = static::$dynamicRelations[$method];
 
             return $relation($this);
         }
