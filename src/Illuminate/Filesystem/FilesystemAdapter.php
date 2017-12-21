@@ -2,11 +2,11 @@
 
 namespace Illuminate\Filesystem;
 
-use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Http\File;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
@@ -447,9 +447,9 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         // are really supposed to use. We will remove the public from this path here.
         if (Str::contains($path, '/storage/public/')) {
             return Str::replaceFirst('/public/', '/', $path);
-        } else {
-            return $path;
         }
+
+        return $path;
     }
 
     /**

@@ -385,14 +385,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  mixed|Collection  $keys
+     * @param  \Illuminate\Support\Collection|mixed  $keys
      * @return static
      */
     public function except($keys)
     {
-        if ($keys instanceof Collection) {
-            $keys = $keys->keys()->items;
-        } elseif (!is_array($keys)) {
+        if ($keys instanceof self) {
+            $keys = $keys->keys()->all();
+        } elseif (! is_array($keys)) {
             $keys = func_get_args();
         }
 
@@ -1608,9 +1608,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return json_decode($value->toJson(), true);
             } elseif ($value instanceof Arrayable) {
                 return $value->toArray();
-            } else {
-                return $value;
             }
+
+            return $value;
         }, $this->items);
     }
 

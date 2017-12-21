@@ -287,22 +287,26 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Merge new input into the current request's input array.
      *
      * @param  array  $input
-     * @return void
+     * @return \Illuminate\Http\Request
      */
     public function merge(array $input)
     {
         $this->getInputSource()->add($input);
+
+        return $this;
     }
 
     /**
      * Replace the input for the current request.
      *
      * @param  array  $input
-     * @return void
+     * @return \Illuminate\Http\Request
      */
     public function replace(array $input)
     {
         $this->getInputSource()->replace($input);
+
+        return $this;
     }
 
     /**
