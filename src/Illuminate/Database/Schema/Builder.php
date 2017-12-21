@@ -168,14 +168,14 @@ class Builder
     /**
      * Drop a table from the schema.
      *
-     * @param  mixed  $table
+     * @param  array|string  $table
      * @return void
      */
     public function drop($table)
     {
-        if(gettype($table) == 'array') {
+        if(is_array($table)) {
             foreach($table as $t) {
-                $this->dropIfExists($t);
+                $this->drop($t);
             }
         } else {
             $this->build(tap($this->createBlueprint($table), function ($blueprint) {
@@ -187,12 +187,12 @@ class Builder
     /**
      * Drop a table from the schema if it exists.
      *
-     * @param  mixed  $table
+     * @param  array|string  $table
      * @return void
      */
     public function dropIfExists($table)
     {
-        if(gettype($table) == 'array') {
+        if(is_array($table)) {
             foreach($table as $t) {
                 $this->dropIfExists($t);
             }
