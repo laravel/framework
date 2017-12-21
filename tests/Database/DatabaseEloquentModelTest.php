@@ -1693,20 +1693,20 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
-	public function testDynamicRelations() {
-		EloquentModelStub::addDynamicRelation('items', function ($m) {
-			return $m->hasMany(EloquentModelStub::class, 'item_id');
-		});
+    public function testDynamicRelations() {
+        EloquentModelStub::addDynamicRelation('items', function ($m) {
+            return $m->hasMany(EloquentModelStub::class, 'item_id');
+        });
 
-		$m = new EloquentModelStub();
-		$r = $m->items();
-		$this->assertInstanceOf(Relations\HasMany::class, $r);
+        $m = new EloquentModelStub();
+        $r = $m->items();
+        $this->assertInstanceOf(Relations\HasMany::class, $r);
 
-		EloquentModelStub::removeDynamicRelation('items');
+        EloquentModelStub::removeDynamicRelation('items');
 
-		$this->expectException(\BadMethodCallException::class);
-		$m->items();
-	}
+        $this->expectException(\BadMethodCallException::class);
+        $m->items();
+    }
 
     protected function addMockConnection($model)
     {

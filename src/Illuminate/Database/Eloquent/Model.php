@@ -368,25 +368,25 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         );
     }
 
-	/**
-	 * Add dynamic relationship to the Model class.
-	 *
-	 * @param string $name
-	 * @param Closure $relation
-	 */
-	public static function addDynamicRelation($name, Closure $relation) {
-		static::$dynamicRelations[$name] = $relation;
-	}
+    /**
+     * Add dynamic relationship to the Model class.
+     *
+     * @param string $name
+     * @param Closure $relation
+     */
+    public static function addDynamicRelation($name, Closure $relation) {
+        static::$dynamicRelations[$name] = $relation;
+    }
 
-	/**
-	 * Remove dynamic relationship from the Model class.
-	 *
-	 * @param string $name
-	 * @param Closure $relation
-	 */
-	public static function removeDynamicRelation($name) {
-		unset(static::$dynamicRelations[$name]);
-	}
+    /**
+     * Remove dynamic relationship from the Model class.
+     *
+     * @param string $name
+     * @param Closure $relation
+     */
+    public static function removeDynamicRelation($name) {
+        unset(static::$dynamicRelations[$name]);
+    }
 
     /**
      * Eager load relations on the model.
@@ -1509,10 +1509,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-		if (array_key_exists($method, static::$dynamicRelations)) {
-			$relation = static::$dynamicRelations[$method]; 
-			return $relation($this);
-		}
+        if (array_key_exists($method, static::$dynamicRelations)) {
+            $relation = static::$dynamicRelations[$method]; 
+            return $relation($this);
+        }
 
         return $this->newQuery()->$method(...$parameters);
     }
