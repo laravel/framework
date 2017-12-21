@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Exception;
 use Closure;
+use Exception;
 use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
