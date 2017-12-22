@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
+use BadMethodCallException;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
@@ -123,7 +124,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @var array
      */
-    protected static $dynamicRelations = [];
+    public static $dynamicRelations = [];
 
     /**
      * The array of global scopes on the model.
@@ -369,6 +370,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Check if relation exists in the Model class.
+     *
+     * @param string $name
+     */
+    public static function hasRelation($name)
+    {
+        try {
+            $relation = (new static)->$name(); 
+
+            return $relation instanceof Relations\Relation;
+        } catch (BadMethodCallException $e){
+            return false;
+        }
+    }
+
+    /**
      * Add dynamic relationship to the Model class.
      *
      * @param string $name
@@ -376,7 +393,30 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function addDynamicRelation($name, Closure $relation)
     {
-        static::$dynamicRelations[$name] = $relation;
+        if (static::hasRelation($name)) {
+            throw new RelationExistsException(static::class, $name);
+        }
+
+        if (!array_key_exists(static::class, static::$dynamicRelations)) { 
+            static::$dynamicRelations[static::class] = [];
+        }
+
+        static::$dynamicRelations[static::class][$name] = $relation;
+    }
+
+    /**
+     * Get dynamic relation closure for Model class.
+     *
+     * @param string $name
+     * @return Closure
+     */
+    public static function getDynamicRelation($name)
+    {
+        if (isset(static::$dynamicRelations[static::class]) and isset(static::$dynamicRelations[static::class][$name])) { 
+            return static::$dynamicRelations[static::class][$name];
+        }
+
+        throw RelationNotFoundException::make(new static, $name);
     }
 
     /**
@@ -387,7 +427,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function removeDynamicRelation($name)
     {
-        unset(static::$dynamicRelations[$name]);
+        if (!static::hasRelation($name)) { 
+            throw RelationNotFoundException::make(new static, $name);
+        }
+
+        unset(static::$dynamicRelations[static::class][$name]);
+
+        if (empty(static::$dynamicRelations[static::class])) {
+            unset(static::$dynamicRelations[static::class]);
+        }
     }
 
     /**
@@ -1511,8 +1559,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        if (array_key_exists($method, static::$dynamicRelations)) {
-            $relation = static::$dynamicRelations[$method];
+        if (isset(static::$dynamicRelations[static::class]) and isset(static::$dynamicRelations[static::class][$method])) {
+            $relation = static::getDynamicRelation($method);
 
             return $relation($this);
         }

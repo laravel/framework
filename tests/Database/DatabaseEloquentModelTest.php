@@ -14,6 +14,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\Eloquent\RelationExistsException;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -1695,18 +1696,48 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDynamicRelations()
     {
-        EloquentModelStub::addDynamicRelation('items', function ($m) {
-            return $m->hasMany(EloquentModelStub::class, 'item_id');
+        EloquentModelCamelStub::addDynamicRelation('dates', function ($m) {
+            return $m->hasMany(EloquentDateModelStub::class, 'item_id');
         });
 
-        $m = new EloquentModelStub();
-        $r = $m->items();
+        $this->assertTrue(EloquentModelCamelStub::hasRelation('dates'));
+
+        $m = new EloquentModelCamelStub();
+        $r = $m->dates();
         $this->assertInstanceOf(Relations\HasMany::class, $r);
 
-        EloquentModelStub::removeDynamicRelation('items');
+        EloquentModelCamelStub::removeDynamicRelation('dates');
+
+        $this->assertFalse(EloquentModelCamelStub::hasRelation('dates'));
 
         $this->expectException(\BadMethodCallException::class);
-        $m->items();
+        $m->camels();
+    }
+
+    public function testDynamicRelationLateStaticBinding()
+    {
+        EloquentModelCamelStub::addDynamicRelation('dates', function ($m) {
+            return $m->hasMany(EloquentDateModelStub::class, 'item_id');
+        });
+
+        $this->assertTrue(EloquentModelCamelStub::hasRelation('dates'));
+        $this->assertFalse(EloquentModelStub::hasRelation('dates'));
+
+        EloquentModelCamelStub::removeDynamicRelation('dates');
+        $this->assertFalse(EloquentModelCamelStub::hasRelation('dates'));
+    }
+
+    public function testDuplicateDynamicRelationError()
+    {
+        EloquentModelCamelStub::addDynamicRelation('dates', function ($m) {
+            return $m->hasMany(EloquentDateModelStub::class, 'item_id');
+        });
+
+        $this->expectException(RelationExistsException::class);
+
+        EloquentModelCamelStub::addDynamicRelation('dates', function ($m) {
+            return $m->hasMany(EloquentDateModelStub::class, 'item_id');
+        });
     }
 
     protected function addMockConnection($model)
