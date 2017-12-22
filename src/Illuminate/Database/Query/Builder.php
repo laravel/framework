@@ -958,6 +958,56 @@ class Builder
     }
 
     /**
+     * Add a "where like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereLike($column, $value, $boolean = 'and')
+    {
+        return $this->where($column, 'like', '%'.addcslashes($value, '%').'%', $boolean);
+    }
+
+    /**
+     * Add a "where not like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotLike($column, $value, $boolean = 'and')
+    {
+        return $this->where($column, 'not like', '%'.addcslashes($value, '%').'%', $boolean);
+    }
+
+    /**
+     * Add an "or where like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereLike($column, $value)
+    {
+        return $this->whereLike($column, $value, 'or');
+    }
+
+    /**
+     * Add an "or where not like" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotLike($column, $value)
+    {
+        return $this->whereNotLike($column, $value, 'or');
+    }
+
+    /**
      * Add a "where date" statement to the query.
      *
      * @param  string  $column
