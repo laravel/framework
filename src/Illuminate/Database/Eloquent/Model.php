@@ -124,7 +124,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @var array
      */
-    public static $dynamicRelations = [];
+    protected static $dynamicRelations = [];
 
     /**
      * The array of global scopes on the model.
