@@ -2,9 +2,11 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Closure;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
@@ -116,6 +118,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected static $booted = [];
+
+    /**
+     * The map of dynamic relations.
+     *
+     * @var array
+     */
+    protected static $dynamicRelations = [];
 
     /**
      * The array of global scopes on the model.
@@ -358,6 +367,116 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return (new static)->newQuery()->with(
             is_string($relations) ? func_get_args() : $relations
         );
+    }
+
+    /**
+     * Check if relation exists in the Model class.
+     *
+     * @param string $name
+     */
+    public static function hasRelation($name)
+    {
+        try {
+            $relation = (new static)->$name();
+
+            return $relation instanceof Relations\Relation;
+        } catch (BadMethodCallException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * Add dynamic relationship to the Model class.
+     *
+     * @param string $name
+     * @param Closure $relation
+     */
+    public static function addDynamicRelation($name, Closure $relation)
+    {
+        if (method_exists(new static, $name) or isset(static::$dynamicRelations[static::class][$name])) {
+            throw new InvalidDynamicRelationException(static::class, $name);
+        }
+
+        if (! array_key_exists(static::class, static::$dynamicRelations)) {
+            static::$dynamicRelations[static::class] = [];
+        }
+
+        static::$dynamicRelations[static::class][$name] = $relation;
+    }
+
+    /**
+     * Get dynamic relation closure for Model class.
+     *
+     * @param string $name
+     * @return Closure
+     */
+    public static function getDynamicRelation($name)
+    {
+        $classes = [];
+        $currentClass = static::class;
+
+        while ($currentClass !== self::class) {
+            $classes[] = $currentClass;
+            $currentClass = get_parent_class($currentClass);
+        }
+
+        foreach ($classes as $modelClass) {
+            if (isset(static::$dynamicRelations[$modelClass][$name])) {
+                return static::$dynamicRelations[$modelClass][$name];
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Get all dynamic relations for Model class.
+     *
+     * @return array
+     */
+    public static function getAllDynamicRelations()
+    {
+        $classes = [];
+        $currentClass = static::class;
+
+        while ($currentClass !== self::class) {
+            $classes[] = $currentClass;
+            $currentClass = get_parent_class($currentClass);
+        }
+
+        $relations = [];
+
+        foreach ($classes as $modelClass) {
+            if (isset(static::$dynamicRelations[$modelClass])) {
+                foreach (static::$dynamicRelations[$modelClass] as $name => $relation) {
+                    if (! isset($relations[$name])) {
+                        $relationClass = get_class($relation(new static));
+                        $relations[$name] = $relationClass;
+                    }
+                }
+            }
+        }
+
+        return $relations;
+    }
+
+    /**
+     * Remove dynamic relationship from the Model class.
+     *
+     * @param string $name
+     * @param Closure $relation
+     */
+    public static function removeDynamicRelation($name)
+    {
+        if (! isset(static::$dynamicRelations[static::class][$name])) {
+            throw RelationNotFoundException::make(new static, $name);
+        }
+
+        unset(static::$dynamicRelations[static::class][$name]);
+
+        if (empty(static::$dynamicRelations[static::class])) {
+            unset(static::$dynamicRelations[static::class]);
+        }
     }
 
     /**
@@ -1479,6 +1598,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         if (in_array($method, ['increment', 'decrement'])) {
             return $this->$method(...$parameters);
+        }
+
+        $relation = static::getDynamicRelation($method);
+
+        if ($relation instanceof Closure) {
+            return $relation($this);
         }
 
         return $this->newQuery()->$method(...$parameters);
