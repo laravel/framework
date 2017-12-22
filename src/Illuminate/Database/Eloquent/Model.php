@@ -377,7 +377,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function hasRelation($name)
     {
         try {
-            $relation = (new static)->$name(); 
+            $relation = (new static)->$name();
 
             return $relation instanceof Relations\Relation;
         } catch (BadMethodCallException $e) {
@@ -397,7 +397,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             throw new RelationExistsException(static::class, $name);
         }
 
-        if (! array_key_exists(static::class, static::$dynamicRelations)) { 
+        if (! array_key_exists(static::class, static::$dynamicRelations)) {
             static::$dynamicRelations[static::class] = [];
         }
 
@@ -412,7 +412,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function getDynamicRelation($name)
     {
-        if (isset(static::$dynamicRelations[static::class]) and isset(static::$dynamicRelations[static::class][$name])) { 
+        if (isset(static::$dynamicRelations[static::class]) and isset(static::$dynamicRelations[static::class][$name])) {
             return static::$dynamicRelations[static::class][$name];
         }
 
