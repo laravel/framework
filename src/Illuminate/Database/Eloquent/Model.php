@@ -430,6 +430,37 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get all dynamic relations for Model class.
+     *
+     * @return array
+     */
+    public static function getAllDynamicRelations()
+    {
+        $classes = [];
+        $currentClass = static::class;
+
+        while ($currentClass !== self::class) {
+            $classes[] = $currentClass;
+            $currentClass = get_parent_class($currentClass);
+        }
+
+        $relations = [];
+
+        foreach ($classes as $modelClass) {
+            if (isset(static::$dynamicRelations[$modelClass])) {
+                foreach (static::$dynamicRelations[$modelClass] as $name => $relation) {
+                    if (! isset($relations[$name])) {
+                        $relationClass = get_class($relation(new static));
+                        $relations[$name] = $relationClass;
+                    }
+                }
+            }
+        }
+
+        return $relations;
+    }
+
+    /**
      * Remove dynamic relationship from the Model class.
      *
      * @param string $name

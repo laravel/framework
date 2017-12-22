@@ -1755,6 +1755,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse(EloquentModelCamelStub::hasRelation('dates'));
     }
 
+    public function testGetAllDynamicRelations()
+    {
+        EloquentModelStub::addDynamicRelation('items', function ($m) {
+            return $m->hasMany(EloquentModelStub::class, 'item_id');
+        });
+
+        EloquentModelCamelStub::addDynamicRelation('owner', function ($m) {
+            return $m->belongsTo(EloquentModelStub::class, 'owner_id');
+        });
+
+        $allDynamicRelations = EloquentModelCamelStub::getAllDynamicRelations();
+
+        $this->assertTrue(array_key_exists('items', $allDynamicRelations));
+        $this->assertEquals(Relations\HasMany::class, $allDynamicRelations['items']);
+
+        $this->assertTrue(array_key_exists('owner', $allDynamicRelations));
+        $this->assertEquals(Relations\BelongsTo::class, $allDynamicRelations['owner']);
+
+        EloquentModelStub::removeDynamicRelation('items');
+        EloquentModelCamelStub::removeDynamicRelation('owner');
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
