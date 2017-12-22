@@ -500,9 +500,10 @@ class TestResponse
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return array
+     * @param  string|null  $key
+     * @return mixed
      */
-    public function decodeResponseJson()
+    public function decodeResponseJson($key = null)
     {
         $decodedResponse = json_decode($this->getContent(), true);
 
@@ -514,17 +515,18 @@ class TestResponse
             }
         }
 
-        return $decodedResponse;
+        return data_get($decodedResponse, $key);
     }
 
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return array
+     * @param  string|null  $key
+     * @return mixed
      */
-    public function json()
+    public function json($key = null)
     {
-        return $this->decodeResponseJson();
+        return $this->decodeResponseJson($key);
     }
 
     /**
