@@ -7,7 +7,6 @@ use Exception;
 use ArrayAccess;
 use JsonSerializable;
 use BadMethodCallException;
-use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
