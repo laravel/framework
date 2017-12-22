@@ -14,9 +14,9 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
-use Illuminate\Database\Eloquent\RelationExistsException;
 use Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\RelationExistsException;
 
 class DatabaseEloquentModelTest extends TestCase
 {

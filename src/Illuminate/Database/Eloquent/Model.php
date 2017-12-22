@@ -3,10 +3,10 @@
 namespace Illuminate\Database\Eloquent;
 
 use Closure;
-use BadMethodCallException;
 use Exception;
 use ArrayAccess;
 use JsonSerializable;
+use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
@@ -397,7 +397,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             throw new RelationExistsException(static::class, $name);
         }
 
-        if (!array_key_exists(static::class, static::$dynamicRelations)) { 
+        if (! array_key_exists(static::class, static::$dynamicRelations)) { 
             static::$dynamicRelations[static::class] = [];
         }
 
@@ -427,7 +427,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function removeDynamicRelation($name)
     {
-        if (!static::hasRelation($name)) { 
+        if (! static::hasRelation($name)) { 
             throw RelationNotFoundException::make(new static, $name);
         }
 
