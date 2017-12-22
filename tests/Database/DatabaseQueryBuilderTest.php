@@ -542,6 +542,54 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([], $builder->getBindings());
     }
 
+    public function testWhereLike()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('email', '@');
+        $this->assertEquals('select * from [users] where [email] like ?', $builder->toSql());
+        $this->assertEquals([0 => '%@%'], $builder->getBindings());
+    }
+
+    public function testWhereNotLike()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotLike('email', '@');
+        $this->assertEquals('select * from [users] where [email] not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%@%'], $builder->getBindings());
+    }
+
+    public function testWhereLikeWithPercent()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereLike('email', '%');
+        $this->assertEquals('select * from [users] where [email] like ?', $builder->toSql());
+        $this->assertEquals([0 => '%\%%'], $builder->getBindings());
+    }
+
+    public function testWhereNotLikeWithPercent()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereNotLike('email', '%');
+        $this->assertEquals('select * from [users] where [email] not like ?', $builder->toSql());
+        $this->assertEquals([0 => '%\%%'], $builder->getBindings());
+    }
+
+    public function testOrWhereLike()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereLike('email', '@');
+        $this->assertEquals('select * from [users] where [id] = ? or [email] like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%@%'], $builder->getBindings());
+    }
+
+    public function testOrWhereNotLike()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereNotLike('email', '@');
+        $this->assertEquals('select * from [users] where [id] = ? or [email] not like ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => '%@%'], $builder->getBindings());
+    }
+
     public function testArrayWhereColumn()
     {
         $conditions = [
