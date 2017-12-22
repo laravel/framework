@@ -193,9 +193,12 @@ class Command extends SymfonyCommand
     public function call($command, array $arguments = [])
     {
         $arguments['command'] = $command;
-
+		$input = new ArrayInput($arguments);
+		if($input->hasParameterOption(array('--no-interaction'), true)) {
+			$input->setInteractive(false);
+        }
         return $this->getApplication()->find($command)->run(
-            new ArrayInput($arguments), $this->output
+            $input, $this->output
         );
     }
 
@@ -209,9 +212,12 @@ class Command extends SymfonyCommand
     public function callSilent($command, array $arguments = [])
     {
         $arguments['command'] = $command;
-
+		$input = new ArrayInput($arguments);
+		if($input->hasParameterOption(array('--no-interaction'), true)) {
+			$input->setInteractive(false);
+        }
         return $this->getApplication()->find($command)->run(
-            new ArrayInput($arguments), new NullOutput
+            $input, new NullOutput
         );
     }
 
