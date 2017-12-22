@@ -393,7 +393,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function addDynamicRelation($name, Closure $relation)
     {
-        if (static::hasRelation($name)) {
+        if (isset(static::$dynamicRelations[static::class][$name])) {
             throw new RelationExistsException(static::class, $name);
         }
 
@@ -415,13 +415,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $classes = [];
         $currentClass = static::class;
 
-        while ($currentClass !== Model::class) {
+        while ($currentClass !== self::class) {
             $classes[] = $currentClass;
             $currentClass = get_parent_class($currentClass);
         }
 
         foreach ($classes as $modelClass) {
-            if (isset(static::$dynamicRelations[$modelClass]) and isset(static::$dynamicRelations[$modelClass][$name])) {
+            if (isset(static::$dynamicRelations[$modelClass][$name])) {
                 return static::$dynamicRelations[$modelClass][$name];
             }
         }
@@ -437,7 +437,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function removeDynamicRelation($name)
     {
-        if (! static::hasRelation($name)) {
+        if (! isset(static::$dynamicRelations[static::class][$name])) {
             throw RelationNotFoundException::make(new static, $name);
         }
 
