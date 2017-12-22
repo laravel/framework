@@ -393,7 +393,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function addDynamicRelation($name, Closure $relation)
     {
-        if (isset(static::$dynamicRelations[static::class][$name])) {
+        if (method_exists(new static, $name) or isset(static::$dynamicRelations[static::class][$name])) {
             throw new RelationExistsException(static::class, $name);
         }
 
