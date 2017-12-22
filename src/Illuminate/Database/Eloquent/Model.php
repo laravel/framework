@@ -7,6 +7,7 @@ use Exception;
 use ArrayAccess;
 use JsonSerializable;
 use BadMethodCallException;
+use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
@@ -394,7 +395,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function addDynamicRelation($name, Closure $relation)
     {
         if (method_exists(new static, $name) or isset(static::$dynamicRelations[static::class][$name])) {
-            throw new RelationExistsException(static::class, $name);
+            throw new InvalidDynamicRelationException(static::class, $name);
         }
 
         if (! array_key_exists(static::class, static::$dynamicRelations)) {
