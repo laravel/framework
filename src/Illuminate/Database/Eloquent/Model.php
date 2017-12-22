@@ -427,7 +427,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function removeDynamicRelation($name)
     {
-        if (! static::hasRelation($name)) { 
+        if (! static::hasRelation($name)) {
             throw RelationNotFoundException::make(new static, $name);
         }
 
