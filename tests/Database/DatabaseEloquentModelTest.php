@@ -1727,17 +1727,33 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse(EloquentModelCamelStub::hasRelation('dates'));
     }
 
-    public function testDuplicateDynamicRelationError()
+    public function testDynamicRelationInheritanceBehavior()
     {
+        EloquentModelStub::addDynamicRelation('items', function ($m) {
+            return $m->hasMany(EloquentModelStub::class, 'item_id');
+        });
+
         EloquentModelCamelStub::addDynamicRelation('dates', function ($m) {
             return $m->hasMany(EloquentDateModelStub::class, 'item_id');
         });
 
-        $this->expectException(RelationExistsException::class);
+        $this->assertTrue(EloquentModelStub::hasRelation('items'));
+        $this->assertTrue(EloquentModelCamelStub::hasRelation('items'));
+        $this->assertTrue(EloquentDateModelStub::hasRelation('items'));
 
-        EloquentModelCamelStub::addDynamicRelation('dates', function ($m) {
-            return $m->hasMany(EloquentDateModelStub::class, 'item_id');
-        });
+        $this->assertTrue(EloquentModelCamelStub::hasRelation('dates'));
+        $this->assertFalse(EloquentModelStub::hasRelation('dates'));
+        $this->assertFalse(EloquentDateModelStub::hasRelation('dates'));
+
+        EloquentModelStub::removeDynamicRelation('items');
+
+        $this->assertFalse(EloquentModelStub::hasRelation('items'));
+        $this->assertFalse(EloquentModelCamelStub::hasRelation('items'));
+        $this->assertFalse(EloquentDateModelStub::hasRelation('items'));
+
+        EloquentModelCamelStub::removeDynamicRelation('dates');
+
+        $this->assertFalse(EloquentModelCamelStub::hasRelation('dates'));
     }
 
     protected function addMockConnection($model)
