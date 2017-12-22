@@ -380,7 +380,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $relation = (new static)->$name(); 
 
             return $relation instanceof Relations\Relation;
-        } catch (BadMethodCallException $e){
+        } catch (BadMethodCallException $e) {
             return false;
         }
     }
