@@ -89,13 +89,16 @@ class Markdown
      * Parse the given Markdown text into HTML.
      *
      * @param  string  $text
+     * @param  bool  $line
      * @return \Illuminate\Support\HtmlString
      */
-    public static function parse($text)
+    public static function parse($text, $line = false)
     {
         $parsedown = new Parsedown;
 
-        return new HtmlString($parsedown->text($text));
+        $html = $line ? $parsedown->line($text) : $parsedown->text($text);
+
+        return new HtmlString($html);
     }
 
     /**
