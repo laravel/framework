@@ -65,4 +65,14 @@ class MailMarkdownTest extends TestCase
 
         $this->assertEquals('<h1>Something</h1>', $result);
     }
+
+    public function testParseReturnsParsedMarkdownLine()
+    {
+        $viewFactory = \Mockery::mock('Illuminate\View\Factory');
+        $markdown = new \Illuminate\Mail\Markdown($viewFactory);
+
+        $result = $markdown->parse('Something', $line = true);
+
+        $this->assertEquals('Something', $result);
+    }
 }
