@@ -95,7 +95,7 @@ class Markdown
     public static function parse($text, $line = false)
     {
         $parsedown = new Parsedown;
-        
+
         $html = $line ? $parsedown->line($text) : $parsedown->text($text);
 
         return new HtmlString($html);
