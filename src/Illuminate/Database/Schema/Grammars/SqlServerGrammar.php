@@ -452,14 +452,18 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Create the column definition for an enum type.
+     * Create the column definition for an enumeration type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
      */
     protected function typeEnum(Fluent $column)
     {
-        return 'nvarchar(255)';
+        return sprintf(
+            'nvarchar(255) check ("%s" in (%s))',
+            $column->name,
+            $this->quoteString($column->allowed)
+        );
     }
 
     /**

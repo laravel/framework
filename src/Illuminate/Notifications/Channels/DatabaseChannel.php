@@ -16,7 +16,7 @@ class DatabaseChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        return $notifiable->routeNotificationFor('database')->create([
+        return $notifiable->routeNotificationFor('database', $notification)->create([
             'id' => $notification->id,
             'type' => get_class($notification),
             'data' => $this->getData($notifiable, $notification),

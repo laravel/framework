@@ -63,6 +63,22 @@ class EloquentModelRefreshTest extends TestCase
 
         $this->assertTrue($post->trashed());
     }
+
+    /**
+     * @test
+     */
+    public function it_syncs_original_on_refresh()
+    {
+        $post = Post::create(['title' => 'pat']);
+
+        Post::find($post->id)->update(['title' => 'patrick']);
+
+        $post->refresh();
+
+        $this->assertEmpty($post->getDirty());
+
+        $this->assertEquals('patrick', $post->getOriginal('title'));
+    }
 }
 
 class Post extends Model

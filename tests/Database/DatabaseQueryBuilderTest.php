@@ -332,6 +332,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereTimeOperatorOptionalMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from `users` where time(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereTimeOperatorOptionalPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from "users" where extract(time from "created_at") = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
     public function testWhereDatePostgres()
     {
         $builder = $this->getPostgresBuilder();
@@ -1492,12 +1508,17 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateMethodWithJoinsOnSQLite()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" where "users"."id" > ? order by "id" asc limit 3)', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('users.id', '>', 1)->limit(3)->oldest('id')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" where "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
 
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? set "email" = ?, "name" = ?', [1, 'foo', 'bar'])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
@@ -1585,6 +1606,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->delete(1);
         $this->assertEquals(1, $result);
 
+        $builder = $this->getSqliteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $this->assertEquals(1, $result);
+
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
@@ -1598,6 +1624,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testDeleteWithJoinMethod()
     {
+        $builder = $this->getSqliteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."email" = ? order by "users"."id" asc limit 1)', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->orderBy('users.id')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `email` = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();

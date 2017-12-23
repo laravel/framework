@@ -411,6 +411,16 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Get the relationships of the entities being queued.
+     *
+     * @return array
+     */
+    public function getQueueableRelations()
+    {
+        return $this->isNotEmpty() ? $this->first()->getRelations() : [];
+    }
+
+    /**
      * Get the connection of the entities being queued.
      *
      * @return string|null
