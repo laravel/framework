@@ -25,6 +25,7 @@ services:
   - redis-server
 
 before_install:
+  - test -z "$(find -type f -executable -not -path "./.git/*")" && echo "Execute bits OK."
   - phpenv config-rm xdebug.ini || true
   - echo "extension = memcached.so" >> ~/.phpenv/versions/$(phpenv version-name)/etc/php.ini
   - printf "\n" | pecl install -f redis
