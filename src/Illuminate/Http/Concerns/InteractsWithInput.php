@@ -178,7 +178,7 @@ trait InteractsWithInput
     /**
      * Retrieve an input item from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
      * @return string|array|null
      */
