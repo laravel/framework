@@ -180,7 +180,7 @@ trait InteractsWithInput
      *
      * @param  string  $key
      * @param  string|array|null  $default
-     * @return string|array
+     * @return string|array|null
      */
     public function input($key = null, $default = null)
     {
