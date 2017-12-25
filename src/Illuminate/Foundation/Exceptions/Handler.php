@@ -411,7 +411,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @param  \Symfony\Component\HttpFoundation\Response  $response
      * @param  \Exception  $e
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function toIlluminateResponse($response, Exception $e)
     {
