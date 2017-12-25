@@ -22,6 +22,17 @@ class PresetCommand extends Command
     protected $description = 'Swap the front-end scaffolding for the application';
 
     /**
+     * Create a new console command instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        $this->signature = 'preset { type : The preset type (' . implode(", ", $this->getPresets()) . ') }';
+        parent::__construct();
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
@@ -37,6 +48,15 @@ class PresetCommand extends Command
         }
 
         return $this->{$this->argument('type')}();
+    }
+
+    /**
+     * Get Available Presets
+     * @return array
+     */
+    protected function getPresets()
+    {
+        return array_merge(['none', 'bootstrap', 'vue', 'react'], array_keys(static::$macros));
     }
 
     /**
