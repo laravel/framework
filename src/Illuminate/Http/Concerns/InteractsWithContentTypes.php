@@ -53,6 +53,10 @@ trait InteractsWithContentTypes
     {
         $acceptable = $this->getAcceptableContentTypes();
 
+        if (count($acceptable) === 0) {
+            return true;
+        }
+
         return isset($acceptable[0]) && ($acceptable[0] === '*/*' || $acceptable[0] === '*');
     }
 
