@@ -49,15 +49,26 @@ abstract class GeneratorCommand extends Command
      */
     public function handle()
     {
-        $name = $this->qualifyClass($this->getNameInput());
+        $nameInput = $this->getNameInput();
+
+        $name = $this->qualifyClass($nameInput);
 
         $path = $this->getPath($name);
 
-        // First we will check to see if the class already exists. If it does, we don't want
+        // First we will check to see if the name is keyword. If it does, we don't want
+        // to create the class and overwrite the user's code. So, we will bail out so the
+        // code is untouched. Otherwise, we will continue to exists check.
+        if ($this->isKeyword($nameInput)) {
+            $this->error($nameInput. ' is a keyword!');
+
+            return false;
+        }
+
+        // Next we will check to see if the class already exists. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
-        if ($this->alreadyExists($this->getNameInput())) {
-            $this->error($this->type.' already exists!');
+        if ($this->alreadyExists($nameInput)) {
+            $this->error($this->type. ' already exists!');
 
             return false;
         }
@@ -104,6 +115,21 @@ abstract class GeneratorCommand extends Command
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace;
+    }
+    
+    /**
+     * Determine if the name is keyword.
+     *
+     * @param  string $rawName
+     * @return bool
+     */
+    protected function isKeyword($rawName)
+    {
+        $keywords = [
+            '__halt_compiler', 'abstract', 'and', 'array', 'as', 'break', 'callable', 'case', 'catch', 'class', 'clone', 'const', 'continue', 'declare', 'default', 'die', 'do', 'echo', 'else', 'elseif', 'empty', 'enddeclare', 'endfor', 'endforeach', 'endif', 'endswitch', 'endwhile', 'eval', 'exit', 'extends', 'final', 'for', 'foreach', 'function', 'global', 'goto', 'if', 'implements', 'include', 'include_once', 'instanceof', 'insteadof', 'interface', 'isset', 'list', 'namespace', 'new', 'or', 'print', 'private', 'protected', 'public', 'require', 'require_once', 'return', 'static', 'switch', 'throw', 'trait', 'try', 'unset', 'use', 'var', 'while', 'xor'
+        ];
+
+        return in_array(strtolower($rawName), $keywords);
     }
 
     /**
