@@ -50,11 +50,11 @@ abstract class GeneratorCommand extends Command
     public function handle()
     {
         $nameInput = $this->getNameInput();
-        
+
         $name = $this->qualifyClass($nameInput);
 
         $path = $this->getPath($name);
-        
+
         // First we will check to see if the name is keyword. If it does, we don't want
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue to exists check.
