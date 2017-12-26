@@ -699,27 +699,30 @@ class SupportHelpersTest extends TestCase
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
-        $this->assertTrue([
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
             'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-        ] === class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
+        ],
+        class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
-        $this->assertTrue([
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
             'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-        ] === class_uses_recursive(new SupportTestClassTwo));
+        ],
+        class_uses_recursive(new SupportTestClassTwo));
     }
 
-    public function testClassUsesRecursiveParentFirst()
+    public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
-        $this->assertTrue([
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
             'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
             'Illuminate\Tests\Support\SupportTestTraitThree' => 'Illuminate\Tests\Support\SupportTestTraitThree',
-        ] === class_uses_recursive(SupportTestClassThree::class));
+        ],
+        class_uses_recursive(SupportTestClassThree::class));
     }
 
     public function testArrayAdd()
