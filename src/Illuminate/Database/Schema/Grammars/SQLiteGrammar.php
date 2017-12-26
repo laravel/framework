@@ -553,7 +553,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return 'datetime';
+        return $column->useCurrent ? 'datetime default CURRENT_TIMESTAMP' : 'datetime';
     }
 
     /**
