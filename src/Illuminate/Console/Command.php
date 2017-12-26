@@ -193,13 +193,9 @@ class Command extends SymfonyCommand
     public function call($command, array $arguments = [])
     {
         $arguments['command'] = $command;
-        $input = new ArrayInput($arguments);
-        if ($input->hasParameterOption(['--no-interaction'], true)) {
-            $input->setInteractive(false);
-        }
 
         return $this->getApplication()->find($command)->run(
-            $input, $this->output
+            $this->createInputFromArguments($arguments), $this->output
         );
     }
 
@@ -213,14 +209,25 @@ class Command extends SymfonyCommand
     public function callSilent($command, array $arguments = [])
     {
         $arguments['command'] = $command;
-        $input = new ArrayInput($arguments);
-        if ($input->hasParameterOption(['--no-interaction'], true)) {
-            $input->setInteractive(false);
-        }
 
         return $this->getApplication()->find($command)->run(
-            $input, new NullOutput
+            $this->createInputFromArguments($arguments), new NullOutput
         );
+    }
+
+    /**
+     * Create an input instance from the given arguments.
+     *
+     * @param  array  $arguments
+     * @return \Symfony\Component\Console\Input\ArrayInput
+     */
+    protected function createInputFromArguments(array $arguments)
+    {
+        return tap(new ArrayInput($arguments), function ($input) {
+            if ($input->hasParameterOption(['--no-interaction'], true)) {
+                $input->setInteractive(false);
+            }
+        });
     }
 
     /**
