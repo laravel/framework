@@ -194,10 +194,10 @@ class Command extends SymfonyCommand
     {
         $arguments['command'] = $command;
         $input = new ArrayInput($arguments);
-        if($input->hasParameterOption(array('--no-interaction'), true)) {
+        if ($input->hasParameterOption(['--no-interaction'], true)) {
             $input->setInteractive(false);
         }
-        
+
         return $this->getApplication()->find($command)->run(
             $input, $this->output
         );
@@ -214,10 +214,10 @@ class Command extends SymfonyCommand
     {
         $arguments['command'] = $command;
         $input = new ArrayInput($arguments);
-        if($input->hasParameterOption(array('--no-interaction'), true)) {
+        if ($input->hasParameterOption(['--no-interaction'], true)) {
             $input->setInteractive(false);
         }
-        
+
         return $this->getApplication()->find($command)->run(
             $input, new NullOutput
         );
