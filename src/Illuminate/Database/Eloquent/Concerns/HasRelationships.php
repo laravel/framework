@@ -6,16 +6,16 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
-use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\MorphMany;
-use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 trait HasRelationships
 {
@@ -44,6 +44,23 @@ trait HasRelationships
     ];
 
     /**
+     * Define classes for relations
+     *
+     * @var array
+     */
+    protected static $relationClasses = [
+        'hasOne' => HasOne::class,
+        'morphOne' => MorphOne::class,
+        'belongsTo' => BelongsTo::class,
+        'morphTo' => MorphTo::class,
+        'hasMany' => HasMany::class,
+        'hasManyThrough' => HasManyThrough::class,
+        'morphMany' => MorphMany::class,
+        'belongsToMany' => BelongsToMany::class,
+        'morphToMany' => MorphToMany::class,
+    ];
+
+    /**
      * Define a one-to-one relationship.
      *
      * @param  string  $related
@@ -59,7 +76,9 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        $relationClass = self::$relationClasses['hasOne'];
+
+        return new $relationClass($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
     }
 
     /**
@@ -82,7 +101,9 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new MorphOne($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        $relationClass = self::$relationClasses['morphOne'];
+
+        return new $relationClass($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
 
     /**
@@ -117,7 +138,9 @@ trait HasRelationships
         // actually be responsible for retrieving and hydrating every relations.
         $ownerKey = $ownerKey ?: $instance->getKeyName();
 
-        return new BelongsTo(
+        $relationClass = self::$relationClasses['belongsTo'];
+
+        return new $relationClass(
             $instance->newQuery(), $this, $foreignKey, $ownerKey, $relation
         );
     }
@@ -161,7 +184,9 @@ trait HasRelationships
      */
     protected function morphEagerTo($name, $type, $id, $ownerKey)
     {
-        return new MorphTo(
+        $relationClass = self::$relationClasses['morphTo'];
+
+        return new $relationClass(
             $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name
         );
     }
@@ -182,7 +207,9 @@ trait HasRelationships
             static::getActualClassNameForMorph($target)
         );
 
-        return new MorphTo(
+        $relationClass = self::$relationClasses['morphTo'];
+
+        return new $relationClass(
             $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
         );
     }
@@ -226,7 +253,9 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasMany(
+        $relationClass = self::$relationClasses['hasMany'];
+
+        return new $relationClass(
             $instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey
         );
     }
@@ -256,7 +285,9 @@ trait HasRelationships
 
         $instance = $this->newRelatedInstance($related);
 
-        return new HasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $secondLocalKey);
+        $relationClass = self::$relationClasses['hasManyThrough'];
+
+        return new $relationClass($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 
     /**
@@ -282,7 +313,9 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new MorphMany($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
+        $relationClass = self::$relationClasses['morphMany'];
+
+        return new $relationClass($instance->newQuery(), $this, $table.'.'.$type, $table.'.'.$id, $localKey);
     }
 
     /**
@@ -323,7 +356,9 @@ trait HasRelationships
             $table = $this->joiningTable($related);
         }
 
-        return new BelongsToMany(
+        $relationClass = self::$relationClasses['belongsToMany'];
+
+        return new $relationClass(
             $instance->newQuery(), $this, $table, $foreignPivotKey,
             $relatedPivotKey, $parentKey ?: $this->getKeyName(),
             $relatedKey ?: $instance->getKeyName(), $relation
@@ -363,7 +398,9 @@ trait HasRelationships
         // appropriate query constraints then entirely manages the hydrations.
         $table = $table ?: Str::plural($name);
 
-        return new MorphToMany(
+        $relationClass = self::$relationClasses['morphToMany'];
+
+        return new $relationClass(
             $instance->newQuery(), $this, $name, $table,
             $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
             $relatedKey ?: $instance->getKeyName(), $caller, $inverse
