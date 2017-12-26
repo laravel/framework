@@ -64,6 +64,22 @@ trait FormatsMessages
     }
 
     /**
+     * Get the proper inline error message for standard and size rules.
+     *
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @return string|null
+     */
+    protected function getInlineMessage($attribute, $rule)
+    {
+        $inlineEntry = $this->getFromLocalArray($attribute, Str::snake($rule));
+
+        return is_array($inlineEntry) && in_array($rule, $this->sizeRules)
+                    ? $inlineEntry[$this->getAttributeType($attribute)]
+                    : $inlineEntry;
+    }
+
+    /**
      * Get the inline message for a rule if it exists.
      *
      * @param  string  $attribute
@@ -151,28 +167,6 @@ trait FormatsMessages
         $key = "validation.{$lowerRule}.{$type}";
 
         return $this->translator->trans($key);
-    }
-
-    /**
-     * Get the proper inline error message for standard and size rules.
-     *
-     * @param  string  $attribute
-     * @param  string  $rule
-     * @return string|null
-     */
-    protected function getInlineMessage($attribute, $rule)
-    {
-        $inlineEntry = $this->getFromLocalArray($attribute, Str::snake($rule));
-
-        // If the entry is an array and the rule is a size rule, it is necessary
-        // to extract the message corresponding to the type of the attribute
-        if (is_array($inlineEntry) && in_array($rule, $this->sizeRules)) {
-            $type = $this->getAttributeType($attribute);
-
-            return $inlineEntry[$type];
-        }
-
-        return $inlineEntry;
     }
 
     /**
