@@ -699,20 +699,27 @@ class SupportHelpersTest extends TestCase
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
-        $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        $this->assertTrue([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-        ],
-        class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        ] === class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
-        $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        $this->assertTrue([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-        ],
-        class_uses_recursive(new SupportTestClassTwo));
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        ] === class_uses_recursive(new SupportTestClassTwo));
+    }
+
+    public function testClassUsesRecursiveParentFirst()
+    {
+        $this->assertTrue([
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            'Illuminate\Tests\Support\SupportTestTraitThree' => 'Illuminate\Tests\Support\SupportTestTraitThree',
+        ] === class_uses_recursive(SupportTestClassThree::class));
     }
 
     public function testArrayAdd()
@@ -843,6 +850,15 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
+}
+
+trait SupportTestTraitThree
+{
+}
+
+class SupportTestClassThree extends SupportTestClassTwo
+{
+    use SupportTestTraitThree;
 }
 
 class SupportTestArrayAccess implements ArrayAccess
