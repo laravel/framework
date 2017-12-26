@@ -567,7 +567,13 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return "timestamp($column->precision) without time zone";
+        $definition = "timestamp($column->precision) without time zone";
+
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**
@@ -578,7 +584,13 @@ class PostgresGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return "timestamp($column->precision) with time zone";
+        $definition = "timestamp($column->precision) with time zone";
+
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**
@@ -611,9 +623,13 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = "timestamp($column->precision) without time zone";
+        $definition = "timestamp($column->precision) without time zone";
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**
@@ -624,9 +640,13 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        $columnType = "timestamp($column->precision) with time zone";
+        $definition = "timestamp($column->precision) with time zone";
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**

@@ -507,7 +507,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return $column->precision ? "datetime2($column->precision)" : 'datetime';
+        $definition = $column->precision ? "datetime2($column->precision)" : 'datetime';
+
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**
@@ -518,7 +524,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeDateTimeTz(Fluent $column)
     {
-        return $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        $definition = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**
@@ -551,9 +563,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestamp(Fluent $column)
     {
-        $columnType = $column->precision ? "datetime2($column->precision)" : 'datetime';
+        $definition = $column->precision ? "datetime2($column->precision)" : 'datetime';
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
+        }
+
+        return $definition;
     }
 
     /**
@@ -566,13 +582,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            $columnType = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        $definition = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
 
-            return "$columnType default CURRENT_TIMESTAMP";
+        if ($column->useCurrent) {
+            $definition = "$definition default CURRENT_TIMESTAMP";
         }
 
-        return "datetimeoffset($column->precision)";
+        return $definition;
     }
 
     /**
