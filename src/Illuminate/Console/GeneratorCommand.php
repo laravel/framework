@@ -59,7 +59,7 @@ abstract class GeneratorCommand extends Command
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue to exists check.
         if ($this->isKeyword($nameInput)) {
-            $this->error($nameInput . ' is a keyword!');
+            $this->error($nameInput. ' is a keyword!');
 
             return false;
         }
@@ -68,7 +68,7 @@ abstract class GeneratorCommand extends Command
         // to create the class and overwrite the user's code. So, we will bail out so the
         // code is untouched. Otherwise, we will continue generating this class' files.
         if ($this->alreadyExists($nameInput)) {
-            $this->error($this->type . ' already exists!');
+            $this->error($this->type. ' already exists!');
 
             return false;
         }
