@@ -697,6 +697,7 @@ class SupportHelpersTest extends TestCase
         ],
         class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
     }
+
     public function testClassUsesRecursiveAcceptsObject()
     {
         $this->assertSame([
