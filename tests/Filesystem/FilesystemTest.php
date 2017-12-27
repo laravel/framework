@@ -452,12 +452,12 @@ class FilesystemTest extends TestCase
         $driver = $filesystem->createFtpDriver([
             'host' => 'ftp.example.com',
             'username' => 'admin',
-            'systemType' => 'custom'
+            'permPublic' => 0700
         ]);
 
         /** @var Ftp $adapter */
         $adapter = $driver->getAdapter();
-        $this->assertEquals('custom', $adapter->getSystemType());
+        $this->assertEquals(0700, $adapter->getPermPublic());
         $this->assertEquals('ftp.example.com', $adapter->getHost());
         $this->assertEquals('admin', $adapter->getUsername());
     }
