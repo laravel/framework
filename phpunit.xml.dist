@@ -12,6 +12,7 @@
          stopOnFailure="false"
          syntaxCheck="true"
          verbose="true"
+         printerClass="Codedungeon\PHPUnitPrettyResultPrinter\Printer"
 >
     <testsuites>
         <testsuite name="Laravel Test Suite">

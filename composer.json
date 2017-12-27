@@ -80,7 +80,8 @@
         "phpunit/phpunit": "~6.0",
         "predis/predis": "^1.1.1",
         "symfony/css-selector": "~3.3",
-        "symfony/dom-crawler": "~3.3"
+        "symfony/dom-crawler": "~3.3",
+        "codedungeon/phpunit-result-printer": "~0.1"
     },
     "autoload": {
         "files": [
