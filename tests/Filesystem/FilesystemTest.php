@@ -452,7 +452,8 @@ class FilesystemTest extends TestCase
         $driver = $filesystem->createFtpDriver([
             'host' => 'ftp.example.com',
             'username' => 'admin',
-            'permPublic' => 0700
+            'permPublic' => 0700,
+            'unsopertedParam' => true
         ]);
 
         /** @var Ftp $adapter */
