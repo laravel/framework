@@ -3,6 +3,7 @@
 namespace Illuminate\Validation\Concerns;
 
 use Closure;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
@@ -15,7 +16,7 @@ trait FormatsMessages
      * Get the validation message for an attribute and rule.
      *
      * @param  string  $attribute
-     * @param  string  $rule
+     * @param  string|\Illuminate\Contracts\Validation\Rule  $rule
      * @return string
      */
     protected function getMessage($attribute, $rule)
@@ -29,7 +30,7 @@ trait FormatsMessages
             return $inlineMessage;
         }
 
-        $lowerRule = Str::snake($rule);
+        $lowerRule = $this->getLowerRule($rule);
 
         $customMessage = $this->getCustomMessageFromTranslator(
             $customKey = "validation.custom.{$attribute}.{$lowerRule}"
@@ -58,25 +59,38 @@ trait FormatsMessages
             return $value;
         }
 
-        return $this->getFromLocalArray(
-            $attribute, $lowerRule, $this->fallbackMessages
-        ) ?: $key;
+        if ($default = $this->getFromLocalArray($attribute, $lowerRule, $this->fallbackMessages)) {
+            return $default;
+        }
+
+        return $rule instanceof Rule ? $rule->message() : $key;
     }
 
     /**
      * Get the proper inline error message for standard and size rules.
      *
      * @param  string  $attribute
-     * @param  string  $rule
+     * @param  string|\Illuminate\Contracts\Validation\Rule  $rule
      * @return string|null
      */
     protected function getInlineMessage($attribute, $rule)
     {
-        $inlineEntry = $this->getFromLocalArray($attribute, Str::snake($rule));
+        $inlineEntry = $this->getFromLocalArray($attribute, $this->getLowerRule($rule));
 
         return is_array($inlineEntry) && in_array($rule, $this->sizeRules)
                     ? $inlineEntry[$this->getAttributeType($attribute)]
                     : $inlineEntry;
+    }
+
+    /**
+     * Get the 'lower' version of a rule, i.e. the class name if a custom rule, or the snake case version of a string.
+     *
+     * @param  string|\Illuminate\Contracts\Validation\Rule  $rule
+     * @return string
+     */
+    protected function getLowerRule($rule)
+    {
+        return $rule instanceof Rule ? get_class($rule) : Str::snake($rule);
     }
 
     /**
