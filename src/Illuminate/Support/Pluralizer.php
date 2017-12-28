@@ -2,61 +2,47 @@
 
 namespace Illuminate\Support;
 
-use Doctrine\Common\Inflector\Inflector;
+use Illuminate\Support\Pluralizers\EnglishPluralizer;
+use Illuminate\Support\Pluralizers\PluralizerInterface;
+use UnexpectedValueException;
 
 class Pluralizer
 {
     /**
-     * Uncountable word forms.
+     * The pluralizer locale.
+     *
+     * @var string
+     */
+    protected static $locale = 'en';
+
+    /**
+     * The registered pluralizers.
      *
      * @var array
      */
-    public static $uncountable = [
-        'audio',
-        'bison',
-        'cattle',
-        'chassis',
-        'compensation',
-        'coreopsis',
-        'data',
-        'deer',
-        'education',
-        'emoji',
-        'equipment',
-        'evidence',
-        'feedback',
-        'firmware',
-        'fish',
-        'furniture',
-        'gold',
-        'hardware',
-        'information',
-        'jedi',
-        'kin',
-        'knowledge',
-        'love',
-        'metadata',
-        'money',
-        'moose',
-        'news',
-        'nutrition',
-        'offspring',
-        'plankton',
-        'pokemon',
-        'police',
-        'rain',
-        'rice',
-        'series',
-        'sheep',
-        'software',
-        'species',
-        'swine',
-        'traffic',
-        'wheat',
-    ];
+    protected static $pluralizers  = [];
 
     /**
-     * Get the plural form of an English word.
+     * Register a localized pluralizer.
+     *
+     * @param string $locale
+     * @param string $pluralizer
+     *
+     * @throws \UnexpectedValueException
+     */
+    public static function register($locale, $pluralizer)
+    {
+        $pluralizer = is_object($pluralizer) ? get_class($pluralizer) : $pluralizer;
+
+        if (! in_array(PluralizerInterface::class, class_implements($pluralizer))) {
+            throw new UnexpectedValueException('Pluralizer must implement PluralizerInterface.');
+        }
+
+        static::$pluralizers[$locale] = $pluralizer;
+    }
+
+    /**
+     * Get the plural form of a word.
      *
      * @param  string  $value
      * @param  int     $count
@@ -64,37 +50,26 @@ class Pluralizer
      */
     public static function plural($value, $count = 2)
     {
-        if ((int) $count === 1 || static::uncountable($value)) {
-            return $value;
-        }
+        $pluralizer = static::pluralizer();
 
-        $plural = Inflector::pluralize($value);
+        $plural = $pluralizer::plural($value, $count);
 
         return static::matchCase($plural, $value);
     }
 
     /**
-     * Get the singular form of an English word.
+     * Get the singular form of a word.
      *
      * @param  string  $value
      * @return string
      */
     public static function singular($value)
     {
-        $singular = Inflector::singularize($value);
+        $pluralizer = static::pluralizer();
+
+        $singular = $pluralizer::singular($value);
 
         return static::matchCase($singular, $value);
-    }
-
-    /**
-     * Determine if the given value is uncountable.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected static function uncountable($value)
-    {
-        return in_array(strtolower($value), static::$uncountable);
     }
 
     /**
@@ -115,5 +90,40 @@ class Pluralizer
         }
 
         return $value;
+    }
+
+    /**
+     * Get the current pluralizer class if applicable.
+     *
+     * @return string
+     */
+    protected static function pluralizer()
+    {
+        if (array_key_exists(static::getLocale(), static::$pluralizers)) {
+            return static::$pluralizers[static::$locale];
+        }
+
+        return EnglishPluralizer::class;
+    }
+
+    /**
+     * Get the current pluralizer locale.
+     *
+     * @return string
+     */
+    public static function getLocale()
+    {
+        return static::$locale;
+    }
+
+    /**
+     * Set the current pluralizer locale.
+     *
+     * @param  string  $locale
+     * @return void
+     */
+    public static function setLocale($locale)
+    {
+        static::$locale = $locale;
     }
 }

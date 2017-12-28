@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Support\Pluralizer;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
@@ -24,6 +25,8 @@ class FoundationApplicationTest extends TestCase
         $events->shouldReceive('dispatch')->once()->with(m::type('Illuminate\Foundation\Events\LocaleUpdated'));
 
         $app->setLocale('foo');
+
+        $this->assertEquals('foo', Pluralizer::getLocale());
     }
 
     public function testServiceProvidersAreCorrectlyRegistered()

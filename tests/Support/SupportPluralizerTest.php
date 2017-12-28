@@ -2,8 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Pluralizer;
+use Illuminate\Support\Pluralizers\PluralizerInterface;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use UnexpectedValueException;
 
 class SupportPluralizerTest extends TestCase
 {
@@ -38,4 +41,41 @@ class SupportPluralizerTest extends TestCase
         $this->assertEquals('IndexFields', Str::plural('IndexField'));
         $this->assertEquals('VertexFields', Str::plural('VertexField'));
     }
+
+    public function testSetLocaleSetsLocale()
+    {
+        Pluralizer::setLocale('foo');
+        $this->assertEquals('foo', Pluralizer::getLocale());
+    }
+
+    public function testLocalizedPluralizerIsUsed()
+    {
+        Pluralizer::register('foo', FooPluralizer::class);
+        Pluralizer::setLocale('foo');
+
+        $this->assertEquals('bar', Pluralizer::plural('foo'));
+        $this->assertEquals('baz', Pluralizer::singular('foo'));
+    }
+
+    public function testThrowsExceptionIfPluralizerInterfaceIsNotImplemented()
+    {
+        $this->expectException(UnexpectedValueException::class);
+
+        Pluralizer::register('bar', BarPluralizer::class);
+    }
 }
+
+class FooPluralizer implements PluralizerInterface
+{
+    public static function plural($value, $count)
+    {
+        return 'bar';
+    }
+
+    public static function singular($value)
+    {
+        return 'baz';
+    }
+}
+
+class BarPluralizer {}
