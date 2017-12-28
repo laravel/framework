@@ -231,6 +231,31 @@ class Builder
         return $this;
     }
 
+
+    /**
+     * Find the next record after the given value and column.
+     *
+     * @param  mixed  $value
+     * @param  string  $column
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function next($value, $column)
+    {
+        return $this->where($column , '>', $value)->orderBy($column, 'asc')->first();
+    }
+
+    /**
+     * Find the previous record before the given value and column.
+     *
+     * @param  mixed  $value
+     * @param  string  $column
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    public function prev($value, $column)
+    {
+        return $this->where($column , '<', $value)->orderBy($column, 'desc')->first();
+    }
+
     /**
      * Add an "or where" clause to the query.
      *

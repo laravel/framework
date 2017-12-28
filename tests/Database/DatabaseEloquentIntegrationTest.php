@@ -1123,6 +1123,41 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertNull($freshNotStoredUser);
     }
 
+    public function testNextMethodOnModel()
+    {
+        // emails order is reversed: 4@gmail, 3@gmail..
+        EloquentTestUser::insert([['id' => 1, 'email' => '4@gmail.com'], ['id' => 2, 'email' => '3@gmail.com'] , ['id' => 3, 'email' => '2@gmail.com'], ['id' => 4, 'email'=> '1@gmail.com'],['id'=> 8, 'email'=>'foo@gmail.com']]);
+
+        $thirdUser =  EloquentTestUser::find(3);
+
+        $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $thirdUser->next());
+        $this->assertEquals(4, $thirdUser->next()->id);
+        $this->assertEquals(2, $thirdUser->next('email')->id);
+        $this->assertNull( EloquentTestUser::find(8)->next());
+        $this->assertEquals(8, EloquentTestUser::find(4)->next()->id);
+
+        $notStoredUser = new EloquentTestUser();
+        $this->assertNull( $notStoredUser->next());
+    }
+
+
+    public function testPrevMethodOnModel()
+    {
+        // emails order is reversed: 4@gmail, 3@gmail..
+        EloquentTestUser::insert([['id' => 1, 'email' => '4@gmail.com'], ['id' => 2, 'email' => '3@gmail.com'] , ['id' => 3, 'email' => '2@gmail.com'], ['id' => 4, 'email'=> '1@gmail.com'],['id'=> 8, 'email'=>'foo@gmail.com']]);
+
+        $thirdUser =  EloquentTestUser::find(3);
+
+        $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $thirdUser->prev());
+        $this->assertEquals(2, $thirdUser->prev()->id);
+        $this->assertEquals(4, $thirdUser->prev('email')->id);
+        $this->assertNull(EloquentTestUser::find(1)->prev());
+        $this->assertEquals(4, EloquentTestUser::find(8)->prev()->id);
+
+        $notStoredUser = new EloquentTestUser();
+        $this->assertNull( $notStoredUser->prev());
+    }
+
     public function testFreshMethodOnCollection()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);

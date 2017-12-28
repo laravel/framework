@@ -443,6 +443,46 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Retrieve the next or previous model according to the given column.
+     *
+     * @param  string  $column
+     * @param  string  $method
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function nextOrPrev($column, $method)
+    {
+        $query = $this->newQuery();
+
+        if (! $this->exists) {
+            return null;
+        }
+
+        return $query->{$method}($this->{$column}, $column);
+    }
+
+    /**
+     * Find the next model according to the given column.
+     *
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function next($column = null)
+    {
+        return $this->nextOrPrev($column ?: $this->getKeyName(), 'next');
+    }
+
+    /**
+     * Find the previous model according to the given column.
+     *
+     * @param  string|null  $column
+     * @return \Illuminate\Database\Eloquent\Model|null
+     */
+    protected function prev($column = null)
+    {
+        return $this->nextOrPrev($column ?: $this->getKeyName(), 'prev');
+    }
+
+    /**
      * Increment the underlying attribute value and sync with original.
      *
      * @param  string  $column
@@ -1477,7 +1517,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, ['increment', 'decrement'])) {
+        if (in_array($method, ['increment', 'decrement', 'next', 'prev'])) {
             return $this->$method(...$parameters);
         }
 
