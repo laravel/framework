@@ -971,3 +971,23 @@ if (! function_exists('view')) {
         return $factory->make($view, $data, $mergeData);
     }
 }
+
+if (! function_exists('view_share')) {
+    /**
+     * Add a array of shared data to the environment.
+     *
+     * @param array $share
+     * @return array values
+     */
+    function view_share(array $share)
+    {
+        $values  = [];
+        $factory = app(ViewFactory::class);
+
+        foreach ($share as $key => $value) {
+            $values[] = $factory->share($key, $value);
+        }
+
+        return $values;
+    }
+}
