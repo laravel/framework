@@ -2422,6 +2422,27 @@ class SupportCollectionTest extends TestCase
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
     }
+
+    public function testGetNestedValue()
+    {
+        $collection = new Collection([
+            'foo' => [
+                'bar' => 'baz',
+                'books' => [
+                    'Book 1',
+                    'Book 2',
+                ],
+                'todos' => [
+                    'first' => 'Todo 1',
+                    'second' => 'Todo 2',
+                ],
+            ],
+        ]);
+
+        $this->assertEquals('baz', $collection->get('foo.bar'));
+        $this->assertEquals('Book 1', $collection->get('foo.books.0'));
+        $this->assertEquals('Todo 2', $collection->get('foo.todos.second'));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
