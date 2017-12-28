@@ -2,9 +2,9 @@
 
 namespace Illuminate\Support;
 
+use UnexpectedValueException;
 use Illuminate\Support\Pluralizers\EnglishPluralizer;
 use Illuminate\Support\Pluralizers\PluralizerInterface;
-use UnexpectedValueException;
 
 class Pluralizer
 {
@@ -20,7 +20,7 @@ class Pluralizer
      *
      * @var array
      */
-    protected static $pluralizers  = [];
+    protected static $pluralizers = [];
 
     /**
      * Register a localized pluralizer.

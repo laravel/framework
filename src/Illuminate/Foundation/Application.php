@@ -3,12 +3,12 @@
 namespace Illuminate\Foundation;
 
 use Closure;
-use Illuminate\Support\Pluralizer;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Log\LogServiceProvider;

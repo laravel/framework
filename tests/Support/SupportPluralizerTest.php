@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Support\Str;
+use UnexpectedValueException;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Pluralizer;
 use Illuminate\Support\Pluralizers\PluralizerInterface;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
-use UnexpectedValueException;
 
 class SupportPluralizerTest extends TestCase
 {
@@ -78,4 +78,6 @@ class FooPluralizer implements PluralizerInterface
     }
 }
 
-class BarPluralizer {}
+class BarPluralizer
+{
+}
