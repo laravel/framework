@@ -2437,7 +2437,7 @@ class SupportCollectionTest extends TestCase
                     'second' => 'Todo 2',
                 ],
             ],
-        );
+        ]);
             
         $this->assertEquals('baz', $collection->get('foo.bar'));
         $this->assertEquals('Book 1', $collection->get('foo.books.0'));
