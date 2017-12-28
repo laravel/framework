@@ -171,12 +171,8 @@ class FilesystemManager implements FactoryContract
      */
     public function createFtpDriver(array $config)
     {
-        $ftpConfig = Arr::only($config, [
-            'host', 'username', 'password', 'port', 'root', 'passive', 'ssl', 'timeout',
-        ]);
-
         return $this->adapt($this->createFlysystem(
-            new FtpAdapter($ftpConfig), $config
+            new FtpAdapter($config), $config
         ));
     }
 
