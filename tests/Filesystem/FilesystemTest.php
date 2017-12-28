@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Filesystem;
 
-use Illuminate\Filesystem\FilesystemManager;
-use Illuminate\Foundation\Application;
-use League\Flysystem\Adapter\Ftp;
 use PHPUnit\Framework\TestCase;
+use League\Flysystem\Adapter\Ftp;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Illuminate\Filesystem\FilesystemManager;
 
 class FilesystemTest extends TestCase
 {
@@ -453,7 +453,7 @@ class FilesystemTest extends TestCase
             'host' => 'ftp.example.com',
             'username' => 'admin',
             'permPublic' => 0700,
-            'unsopertedParam' => true
+            'unsopertedParam' => true,
         ]);
 
         /** @var Ftp $adapter */
