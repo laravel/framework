@@ -4,13 +4,14 @@ namespace DummyNamespace;
 
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Contracts\Events\Event;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Broadcasting\PresenceChannel;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Broadcasting\InteractsWithSockets;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
-class DummyClass
+class DummyClass implements Event
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 

@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use DummyFullEvent;
+use Illuminate\Contracts\Events\Event;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -23,10 +23,10 @@ class DummyClass implements ShouldQueue
     /**
      * Handle the event.
      *
-     * @param  DummyEvent  $event
+     * @param  Event  $event
      * @return void
      */
-    public function handle(DummyEvent $event)
+    public function handle(Event $event)
     {
         //
     }
