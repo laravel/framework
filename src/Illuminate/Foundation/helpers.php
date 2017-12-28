@@ -981,7 +981,7 @@ if (! function_exists('view_share')) {
      */
     function view_share(array $share)
     {
-        $values  = [];
+        $values = [];
         $factory = app(ViewFactory::class);
 
         foreach ($share as $key => $value) {
