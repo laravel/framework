@@ -1242,8 +1242,6 @@ class Builder
     /**
      * Adds a where condition using row values.
      *
-     * This is mostly used with "keyset pagination" aka "seek method".
-     *
      * @param  array   $columns
      * @param  string  $operator
      * @param  array   $values
@@ -1267,8 +1265,6 @@ class Builder
 
     /**
      * Adds a or where condition using row values.
-     *
-     * This is mostly used with "keyset pagination" aka "seek method".
      *
      * @param  array   $columns
      * @param  string  $operator
