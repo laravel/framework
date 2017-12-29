@@ -32,13 +32,11 @@ class Pluralizer
      */
     public static function register($locale, $pluralizer)
     {
-        $pluralizer = is_object($pluralizer) ? get_class($pluralizer) : $pluralizer;
-
-        if (! in_array(PluralizerInterface::class, class_implements($pluralizer))) {
+        if (! is_a(PluralizerInterface::class, $pluralizer, true)) {
             throw new UnexpectedValueException('Pluralizer must implement PluralizerInterface.');
         }
 
-        static::$pluralizers[$locale] = $pluralizer;
+        static::$pluralizers[$locale] = is_object($pluralizer) ? get_class($pluralizer) : $pluralizer;
     }
 
     /**
