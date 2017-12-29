@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Pluralizer;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Log\LogServiceProvider;
@@ -1083,6 +1084,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this['config']->set('app.locale', $locale);
 
         $this['translator']->setLocale($locale);
+
+        Pluralizer::setLocale($locale);
 
         $this['events']->dispatch(new Events\LocaleUpdated($locale));
     }
