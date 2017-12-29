@@ -45,7 +45,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Determine if the current request is asking for JSON in return.
+     * Determine if the current request is asking for JSON.
      *
      * @return bool
      */
@@ -119,7 +119,7 @@ trait InteractsWithContentTypes
     }
 
     /**
-     * Determine if the current request accepts any content type in return.
+     * Determine if the current request accepts any content type.
      *
      * @return bool
      */
