@@ -72,7 +72,7 @@
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",
-        "doctrine/dbal": "~2.5",
+        "doctrine/dbal": "~2.6",
         "filp/whoops": "^2.1.4",
         "mockery/mockery": "~1.0",
         "orchestra/testbench-core": "3.6.*",
@@ -108,7 +108,7 @@
         "ext-pcntl": "Required to use all features of the queue worker.",
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (~3.0).",
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.5).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.6).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (~6.0).",
         "laravel/tinker": "Required to use the tinker console command (~1.0).",
