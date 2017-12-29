@@ -1,5 +1,25 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Changed
+- Use `Arr::get()` in `Collection::get()` ([#22554](https://github.com/laravel/framework/pull/22554))
+- Pass entire config to `FtpAdapter` ([#22539](https://github.com/laravel/framework/pull/22539))
+
+
+## v5.5.28 (2017-12-26)
+
+### Added
+- Added `AnonymousNotifiable::notifyNow()` method ([#22530](https://github.com/laravel/framework/pull/22530))
+- Added `EventFake::assertDispatchedTimes()` method ([#22528](https://github.com/laravel/framework/pull/22528))
+
+### Changed
+- Check for `--no-interaction` flag on command calls ([#22515](https://github.com/laravel/framework/pull/22515), [ba5e31d](https://github.com/laravel/framework/commit/ba5e31dde341884b3bf03178d1a529abd55e7886))
+
+### Fixed
+- Fix Validator not handling properly inline messages for `size` rules ([#22518](https://github.com/laravel/framework/pull/22518), [690d9fc](https://github.com/laravel/framework/commit/690d9fcc380252806cd19c164af843ccb3e801d9))
+
+
 ## v5.5.27 (2017-12-20)
 
 ### Added

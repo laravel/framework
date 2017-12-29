@@ -3,7 +3,10 @@
 namespace Illuminate\Tests\Filesystem;
 
 use PHPUnit\Framework\TestCase;
+use League\Flysystem\Adapter\Ftp;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use Illuminate\Filesystem\FilesystemManager;
 
 class FilesystemTest extends TestCase
 {
@@ -440,5 +443,23 @@ class FilesystemTest extends TestCase
         foreach ($files->allFiles($this->tempDir) as $file) {
             $this->assertInstanceOf(\SplFileInfo::class, $file);
         }
+    }
+
+    public function testCreateFtpDriver()
+    {
+        $filesystem = new FilesystemManager(new Application());
+
+        $driver = $filesystem->createFtpDriver([
+            'host' => 'ftp.example.com',
+            'username' => 'admin',
+            'permPublic' => 0700,
+            'unsopertedParam' => true,
+        ]);
+
+        /** @var Ftp $adapter */
+        $adapter = $driver->getAdapter();
+        $this->assertEquals(0700, $adapter->getPermPublic());
+        $this->assertEquals('ftp.example.com', $adapter->getHost());
+        $this->assertEquals('admin', $adapter->getUsername());
     }
 }
