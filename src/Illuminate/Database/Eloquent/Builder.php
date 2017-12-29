@@ -955,7 +955,7 @@ class Builder
      * @param  string  $boolean
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    protected function addHasWhere(Builder $hasQuery, Relation $relation, $operator, $count, $boolean)
+    protected function addHasWhere(self $hasQuery, Relation $relation, $operator, $count, $boolean)
     {
         $hasQuery->mergeModelDefinedRelationConstraints($relation->getQuery());
 
@@ -1006,7 +1006,7 @@ class Builder
      * @param  \Illuminate\Database\Eloquent\Builder  $relation
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function mergeModelDefinedRelationConstraints(Builder $relation)
+    public function mergeModelDefinedRelationConstraints(self $relation)
     {
         $removedScopes = $relation->removedScopes();
 

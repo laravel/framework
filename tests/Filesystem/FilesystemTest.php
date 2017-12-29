@@ -353,7 +353,7 @@ class FilesystemTest extends PHPUnit_Framework_TestCase
         $content = str_repeat('123456', 1000000);
         $result = 1;
 
-        for ($i = 1; $i <= 20; ++$i) {
+        for ($i = 1; $i <= 20; $i++) {
             $pid = pcntl_fork();
 
             if (! $pid) {
