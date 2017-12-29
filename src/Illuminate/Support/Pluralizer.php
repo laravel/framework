@@ -32,7 +32,7 @@ class Pluralizer
      */
     public static function register($locale, $pluralizer)
     {
-        if (! is_a(PluralizerInterface::class, $pluralizer, true)) {
+        if (! is_a($pluralizer, PluralizerInterface::class, true)) {
             throw new UnexpectedValueException('Pluralizer must implement PluralizerInterface.');
         }
 
