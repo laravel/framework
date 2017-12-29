@@ -577,7 +577,7 @@ class Connection implements ConnectionInterface
             // be handled how the developer sees fit for their applications.
             catch (Exception $e) {
                 if ($this->causedByDeadlock($e) && $this->transactions > 1) {
-                    --$this->transactions;
+                    $this->transactions--;
 
                     throw $e;
                 }
@@ -624,7 +624,7 @@ class Connection implements ConnectionInterface
             );
         }
 
-        ++$this->transactions;
+        $this->transactions++;
 
         $this->fireConnectionEvent('beganTransaction');
     }
