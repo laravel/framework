@@ -476,6 +476,16 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $this->routeUrl()->defaults($defaults);
     }
+    
+    /**
+     * get the default named parameters used by the URL generator.
+     *
+     * @return  array  $defaults
+     */
+    public function getDefaultParameters()
+    {
+        return $this->routeUrl()->defaultParameters;
+    }
 
     /**
      * Force the scheme for URLs.
