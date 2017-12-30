@@ -478,9 +478,9 @@ class UrlGenerator implements UrlGeneratorContract
     }
 
     /**
-     * get the default named parameters used by the URL generator.
+     * Get the default named parameters used by the URL generator.
      *
-     * @return  array  $defaults
+     * @return  array
      */
     public function getDefaultParameters()
     {
