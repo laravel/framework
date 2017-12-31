@@ -1,0 +1,26 @@
+<?php
+
+namespace DummyNamespace;
+
+class DummyClass
+{
+    /**
+     * Create a new broadcasting channel instance.
+     *
+     * @return void
+     */
+    public function __construct()
+    {
+        //
+    }
+
+    /**
+     * Authenticates the channel.
+     *
+     * @return mixed
+     */
+    public function join()
+    {
+        //
+    }
+}
