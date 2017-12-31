@@ -396,7 +396,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getQualifiedParentKeyName()
     {
-        return $this->parent->qualify($this->localKey);
+        return $this->parent->qualifyColumn($this->localKey);
     }
 
     /**

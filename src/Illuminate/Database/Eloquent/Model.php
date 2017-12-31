@@ -255,7 +255,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  string  $column
      * @return string
      */
-    public function qualify($column)
+    public function qualifyColumn($column)
     {
         if (Str::contains($column, '.')) {
             return $column;
@@ -1221,7 +1221,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getQualifiedKeyName()
     {
-        return $this->qualify($this->getKeyName());
+        return $this->qualifyColumn($this->getKeyName());
     }
 
     /**

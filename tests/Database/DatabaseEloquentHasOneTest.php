@@ -175,7 +175,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $builder->shouldReceive('getQuery')->once()->andReturn($parentQuery);
 
         $builder->shouldReceive('select')->once()->with(m::type('Illuminate\Database\Query\Expression'))->andReturnSelf();
-        $relation->getParent()->shouldReceive('qualify')->andReturn('table.id');
+        $relation->getParent()->shouldReceive('qualifyColumn')->andReturn('table.id');
         $builder->shouldReceive('whereColumn')->once()->with('table.id', '=', 'table.foreign_key')->andReturn($baseQuery);
         $baseQuery->shouldReceive('setBindings')->once()->with([], 'select');
 

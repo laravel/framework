@@ -866,11 +866,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('bar', $model->age);
     }
 
-    public function testQualify()
+    public function testQualifyColumn()
     {
         $model = new EloquentModelStub;
 
-        $this->assertEquals('stub.column', $model->qualify('column'));
+        $this->assertEquals('stub.column', $model->qualifyColumn('column'));
     }
 
     public function testForceFillMethodFillsGuardedAttributes()

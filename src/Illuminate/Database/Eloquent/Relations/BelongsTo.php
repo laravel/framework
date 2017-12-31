@@ -253,7 +253,7 @@ class BelongsTo extends Relation
         }
 
         return $query->select($columns)->whereColumn(
-            $this->getQualifiedForeignKey(), '=', $query->qualify($this->ownerKey)
+            $this->getQualifiedForeignKey(), '=', $query->qualifyColumn($this->ownerKey)
         );
     }
 
@@ -327,7 +327,7 @@ class BelongsTo extends Relation
      */
     public function getQualifiedForeignKey()
     {
-        return $this->child->qualify($this->foreignKey);
+        return $this->child->qualifyColumn($this->foreignKey);
     }
 
     /**
@@ -347,7 +347,7 @@ class BelongsTo extends Relation
      */
     public function getQualifiedOwnerKeyName()
     {
-        return $this->related->qualify($this->ownerKey);
+        return $this->related->qualifyColumn($this->ownerKey);
     }
 
     /**

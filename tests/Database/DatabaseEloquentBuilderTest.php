@@ -127,14 +127,14 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('bar', $result);
     }
 
-    public function testQualify()
+    public function testQualifyColumn()
     {
         $builder = new Builder(m::mock(BaseBuilder::class));
         $builder->shouldReceive('from')->with('stub');
 
         $builder->setModel(new EloquentModelStub);
 
-        $this->assertEquals('stub.column', $builder->qualify('column'));
+        $this->assertEquals('stub.column', $builder->qualifyColumn('column'));
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()

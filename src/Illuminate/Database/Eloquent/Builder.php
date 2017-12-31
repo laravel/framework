@@ -1228,9 +1228,9 @@ class Builder
      * @param  string  $column
      * @return string
      */
-    public function qualify($column)
+    public function qualifyColumn($column)
     {
-        return $this->model->qualify($column);
+        return $this->model->qualifyColumn($column);
     }
 
     /**
