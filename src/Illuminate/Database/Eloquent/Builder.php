@@ -1223,6 +1223,17 @@ class Builder
     }
 
     /**
+     * Qualify the given column name by the model's table.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualify($column)
+    {
+        return $this->model->qualify($column);
+    }
+
+    /**
      * Get the given macro by name.
      *
      * @param  string  $name
