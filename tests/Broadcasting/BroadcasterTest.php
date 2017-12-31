@@ -80,7 +80,8 @@ class BroadcasterTest extends TestCase
     {
         $broadcaster = new FakeBroadcaster;
 
-        $broadcaster->channel('something', function () {});
+        $broadcaster->channel('something', function () {
+        });
         $broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
     }
 
@@ -161,6 +162,6 @@ class DummyBroadcastingChannel
 {
     public function join($user, BroadcasterTestEloquentModelStub $model, $nonModel)
     {
-
+        //
     }
 }
