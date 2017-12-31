@@ -751,25 +751,30 @@ if (! function_exists('retry')) {
      * @param  int  $times
      * @param  callable  $callback
      * @param  int  $sleep
+     * @param  int  $factor
+     * @param  int  $jitter
      * @return mixed
      *
      * @throws \Exception
      */
-    function retry($times, callable $callback, $sleep = 0)
+    function retry($times, callable $callback, $sleep = 0, $factor = 1, $jitter = 0.0)
     {
-        $times--;
+        $attempts = 0;
 
         beginning:
         try {
             return $callback();
         } catch (Exception $e) {
-            if (! $times) {
+            if (++$attempts >= $times) {
                 throw $e;
             }
 
-            $times--;
-
             if ($sleep) {
+                $j = $jitter * 2 * mt_rand() / mt_getrandmax() - $jitter;
+                $f = $attempts > 1 ? $factor + $j : 1 + abs($j);
+
+                $sleep *= $f;
+
                 usleep($sleep * 1000);
             }
 
