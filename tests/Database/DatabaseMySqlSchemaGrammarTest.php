@@ -28,7 +28,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
+        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment = 1 primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -40,7 +40,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key, add `email` varchar(255) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment = 1 primary key, add `email` varchar(255) not null', $statements[0]);
     }
 
     public function testEngineCreateTable()
@@ -58,11 +58,11 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
+        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment = 1 primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
-        $blueprint->increments('id');
+        $blueprint->increments('id', 100);
         $blueprint->string('email');
 
         $conn = $this->getConnection();
@@ -73,7 +73,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
+        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment = 100 primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
     }
 
     public function testCharsetCollationCreateTable()
@@ -91,7 +91,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate utf8mb4_unicode_ci', $statements[0]);
+        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment = 1 primary key, `email` varchar(255) not null) default character set utf8mb4 collate utf8mb4_unicode_ci', $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -106,7 +106,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
+        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment = 1 primary key, `email` varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
     }
 
     public function testBasicCreateTableWithPrefix()
@@ -124,7 +124,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $grammar);
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+        $this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment = 1 primary key, `email` varchar(255) not null)', $statements[0]);
     }
 
     public function testCreateTemporaryTable()
@@ -141,7 +141,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create temporary table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+        $this->assertEquals('create temporary table `users` (`id` int unsigned not null auto_increment = 1 primary key, `email` varchar(255) not null)', $statements[0]);
     }
 
     public function testDropTable()
@@ -355,7 +355,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `id` int unsigned not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingSmallIncrementingID()
@@ -365,7 +365,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `id` smallint unsigned not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `id` smallint unsigned not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingBigIncrementingID()
@@ -375,7 +375,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `id` bigint unsigned not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `id` bigint unsigned not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingColumnInTableFirst()
@@ -465,7 +465,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` bigint not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` bigint not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingInteger()
@@ -482,7 +482,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` int not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` int not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingMediumInteger()
@@ -499,7 +499,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` mediumint not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` mediumint not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingSmallInteger()
@@ -516,7 +516,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` smallint not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` smallint not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingTinyInteger()
@@ -533,7 +533,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` tinyint not null auto_increment primary key', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` tinyint not null auto_increment = 1 primary key', $statements[0]);
     }
 
     public function testAddingFloat()
