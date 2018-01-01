@@ -7,6 +7,8 @@ use PHPUnit\Framework\Constraint\Constraint;
 
 class SoftDeletedInDatabase extends Constraint
 {
+    use TableInfo;
+
     /**
      * Number of records that will be shown in the console in case of failure.
      *
@@ -66,29 +68,6 @@ class SoftDeletedInDatabase extends Constraint
             "any soft deleted row in the table [%s] matches the attributes %s.\n\n%s",
             $table, $this->toString(), $this->getAdditionalInfo($table)
         );
-    }
-
-    /**
-     * Get additional info about the records found in the database table.
-     *
-     * @param  string  $table
-     * @return string
-     */
-    protected function getAdditionalInfo($table)
-    {
-        $results = $this->database->table($table)->get();
-
-        if ($results->isEmpty()) {
-            return 'The table is empty';
-        }
-
-        $description = 'Found: '.json_encode($results->take($this->show), JSON_PRETTY_PRINT);
-
-        if ($results->count() > $this->show) {
-            $description .= sprintf(' and %s others', $results->count() - $this->show);
-        }
-
-        return $description;
     }
 
     /**
