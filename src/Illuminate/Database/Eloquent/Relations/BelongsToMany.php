@@ -959,7 +959,7 @@ class BelongsToMany extends Relation
      */
     public function getQualifiedParentKeyName()
     {
-        return $this->parent->getTable().'.'.$this->parentKey;
+        return $this->parent->qualifyColumn($this->parentKey);
     }
 
     /**
