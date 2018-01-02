@@ -6,10 +6,12 @@ use Pusher\Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Broadcasting\AuthenticatesBroadcast;
 
 class PusherBroadcaster extends Broadcaster
 {
+    use AuthenticatesBroadcast;
+
     /**
      * The Pusher SDK instance.
      *
@@ -26,29 +28,6 @@ class PusherBroadcaster extends Broadcaster
     public function __construct(Pusher $pusher)
     {
         $this->pusher = $pusher;
-    }
-
-    /**
-     * Authenticate the incoming request for a given channel.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
-    public function auth($request)
-    {
-        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user()) {
-            throw new AccessDeniedHttpException;
-        }
-
-        $channelName = Str::startsWith($request->channel_name, 'private-')
-                            ? Str::replaceFirst('private-', '', $request->channel_name)
-                            : Str::replaceFirst('presence-', '', $request->channel_name);
-
-        return parent::verifyUserCanAccessChannel(
-            $request, $channelName
-        );
     }
 
     /**

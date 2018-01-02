@@ -3,12 +3,13 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\Factory as Redis;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Broadcasting\AuthenticatesBroadcast;
 
 class RedisBroadcaster extends Broadcaster
 {
+    use AuthenticatesBroadcast;
+
     /**
      * The Redis instance.
      *
@@ -34,29 +35,6 @@ class RedisBroadcaster extends Broadcaster
     {
         $this->redis = $redis;
         $this->connection = $connection;
-    }
-
-    /**
-     * Authenticate the incoming request for a given channel.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return mixed
-     * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
-     */
-    public function auth($request)
-    {
-        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user()) {
-            throw new AccessDeniedHttpException;
-        }
-
-        $channelName = Str::startsWith($request->channel_name, 'private-')
-                            ? Str::replaceFirst('private-', '', $request->channel_name)
-                            : Str::replaceFirst('presence-', '', $request->channel_name);
-
-        return parent::verifyUserCanAccessChannel(
-            $request, $channelName
-        );
     }
 
     /**
