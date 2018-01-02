@@ -2,8 +2,8 @@
 
 namespace Illuminate\Cache;
 
-use Closure;
 use InvalidArgumentException;
+use Illuminate\Support\Manager;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Contracts\Cache\Factory as FactoryContract;
 use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
@@ -11,40 +11,8 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 /**
  * @mixin \Illuminate\Contracts\Cache\Repository
  */
-class CacheManager implements FactoryContract
+class CacheManager extends Manager implements FactoryContract
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The array of resolved cache stores.
-     *
-     * @var array
-     */
-    protected $stores = [];
-
-    /**
-     * The registered custom driver creators.
-     *
-     * @var array
-     */
-    protected $customCreators = [];
-
-    /**
-     * Create a new Cache manager instance.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    public function __construct($app)
-    {
-        $this->app = $app;
-    }
-
     /**
      * Get a cache store instance by name.
      *
@@ -53,71 +21,7 @@ class CacheManager implements FactoryContract
      */
     public function store($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
-
-        return $this->stores[$name] = $this->get($name);
-    }
-
-    /**
-     * Get a cache driver instance.
-     *
-     * @param  string  $driver
-     * @return mixed
-     */
-    public function driver($driver = null)
-    {
-        return $this->store($driver);
-    }
-
-    /**
-     * Attempt to get the store from the local cache.
-     *
-     * @param  string  $name
-     * @return \Illuminate\Contracts\Cache\Repository
-     */
-    protected function get($name)
-    {
-        return $this->stores[$name] ?? $this->resolve($name);
-    }
-
-    /**
-     * Resolve the given store.
-     *
-     * @param  string  $name
-     * @return \Illuminate\Contracts\Cache\Repository
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function resolve($name)
-    {
-        $config = $this->getConfig($name);
-
-        if (is_null($config)) {
-            throw new InvalidArgumentException("Cache store [{$name}] is not defined.");
-        }
-
-        if (isset($this->customCreators[$config['driver']])) {
-            return $this->callCustomCreator($config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-            }
-        }
-    }
-
-    /**
-     * Call a custom driver creator.
-     *
-     * @param  array  $config
-     * @return mixed
-     */
-    protected function callCustomCreator(array $config)
-    {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return $this->driver($name);
     }
 
     /**
@@ -254,7 +158,13 @@ class CacheManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["cache.stores.{$name}"];
+        $config = $this->app['config']["cache.stores.{$name}"];
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Cache store [{$name}] is not defined.");
+        }
+
+        return $config;
     }
 
     /**
@@ -276,31 +186,5 @@ class CacheManager implements FactoryContract
     public function setDefaultDriver($name)
     {
         $this->app['config']['cache.default'] = $name;
-    }
-
-    /**
-     * Register a custom driver creator Closure.
-     *
-     * @param  string    $driver
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function extend($driver, Closure $callback)
-    {
-        $this->customCreators[$driver] = $callback->bindTo($this, $this);
-
-        return $this;
-    }
-
-    /**
-     * Dynamically call the default driver instance.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->store()->$method(...$parameters);
     }
 }

@@ -121,14 +121,15 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      * Create a new driver instance.
      *
      * @param  string  $driver
+     * @param  array|null   $config
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    protected function createDriver($driver)
+    protected function createDriver($driver, $config = null)
     {
         try {
-            return parent::createDriver($driver);
+            return parent::createDriver($driver, $config);
         } catch (InvalidArgumentException $e) {
             if (class_exists($driver)) {
                 return $this->app->make($driver);

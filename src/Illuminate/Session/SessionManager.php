@@ -10,11 +10,12 @@ class SessionManager extends Manager
      * Call a custom driver creator.
      *
      * @param  string  $driver
+     * @param  array $config
      * @return mixed
      */
-    protected function callCustomCreator($driver)
+    protected function callCustomCreator($driver, array $config)
     {
-        return $this->buildSession(parent::callCustomCreator($driver));
+        return $this->buildSession(parent::callCustomCreator($driver, $config));
     }
 
     /**

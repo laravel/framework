@@ -4,38 +4,14 @@ namespace Illuminate\Auth\Passwords;
 
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Manager;
 use Illuminate\Contracts\Auth\PasswordBrokerFactory as FactoryContract;
 
 /**
  * @mixin \Illuminate\Contracts\Auth\PasswordBroker
  */
-class PasswordBrokerManager implements FactoryContract
+class PasswordBrokerManager extends Manager implements FactoryContract
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The array of created "drivers".
-     *
-     * @var array
-     */
-    protected $brokers = [];
-
-    /**
-     * Create a new PasswordBroker manager instance.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    public function __construct($app)
-    {
-        $this->app = $app;
-    }
-
     /**
      * Attempt to get the broker from the local cache.
      *
@@ -44,29 +20,17 @@ class PasswordBrokerManager implements FactoryContract
      */
     public function broker($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
-
-        return isset($this->brokers[$name])
-                    ? $this->brokers[$name]
-                    : $this->brokers[$name] = $this->resolve($name);
+        return $this->driver($name);
     }
 
     /**
-     * Resolve the given broker.
+     * Create an instance of the driver.
      *
-     * @param  string  $name
-     * @return \Illuminate\Contracts\Auth\PasswordBroker
-     *
-     * @throws \InvalidArgumentException
+     * @param array $config
+     * @return \Illuminate\Auth\Passwords\PasswordBroker
      */
-    protected function resolve($name)
+    protected function createUsersDriver(array $config)
     {
-        $config = $this->getConfig($name);
-
-        if (is_null($config)) {
-            throw new InvalidArgumentException("Password resetter [{$name}] is not defined.");
-        }
-
         // The password broker uses a token repository to validate tokens and send user
         // password e-mails, as well as validating that password reset process as an
         // aggregate service of sorts providing a convenient interface for resets.
@@ -109,7 +73,13 @@ class PasswordBrokerManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["auth.passwords.{$name}"];
+        $config = $this->app['config']["auth.passwords.{$name}"];
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Password resetter [{$name}] is not defined.");
+        }
+
+        return $config;
     }
 
     /**

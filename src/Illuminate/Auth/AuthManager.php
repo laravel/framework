@@ -4,32 +4,12 @@ namespace Illuminate\Auth;
 
 use Closure;
 use InvalidArgumentException;
+use Illuminate\Support\Manager;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 
-class AuthManager implements FactoryContract
+class AuthManager extends Manager implements FactoryContract
 {
     use CreatesUserProviders;
-
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The registered custom driver creators.
-     *
-     * @var array
-     */
-    protected $customCreators = [];
-
-    /**
-     * The array of created "drivers".
-     *
-     * @var array
-     */
-    protected $guards = [];
 
     /**
      * The user resolver shared by various services.
@@ -48,7 +28,7 @@ class AuthManager implements FactoryContract
      */
     public function __construct($app)
     {
-        $this->app = $app;
+        parent::__construct($app);
 
         $this->userResolver = function ($guard = null) {
             return $this->guard($guard)->user();
@@ -63,64 +43,47 @@ class AuthManager implements FactoryContract
      */
     public function guard($name = null)
     {
-        $name = $name ?: $this->getDefaultDriver();
-
-        return $this->guards[$name] ?? $this->guards[$name] = $this->resolve($name);
+        return $this->driver($name);
     }
 
     /**
-     * Resolve the given guard.
+     * Get a driver instance.
      *
-     * @param  string  $name
-     * @return \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function resolve($name)
-    {
-        $config = $this->getConfig($name);
-
-        if (is_null($config)) {
-            throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
-        }
-
-        if (isset($this->customCreators[$config['driver']])) {
-            return $this->callCustomCreator($name, $config);
-        }
-
-        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-        if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($name, $config);
-        }
-
-        throw new InvalidArgumentException("Auth guard driver [{$name}] is not defined.");
-    }
-
-    /**
-     * Call a custom driver creator.
-     *
-     * @param  string  $name
-     * @param  array  $config
+     * @param  string|null  $driver
+     * @param  array|null   $config
      * @return mixed
      */
-    protected function callCustomCreator($name, array $config)
+    public function driver($driver = null, $config = null)
     {
-        return $this->customCreators[$config['driver']]($this->app, $name, $config);
+        $driver = $driver ?: $this->getDefaultDriver();
+
+        if (is_null($driver)) {
+            throw new InvalidArgumentException('Unable to resolve NULL driver for ['.get_class($this).'].');
+        }
+
+        $config = $config ?: $this->getConfig($driver);
+
+        // If the given driver has not been created before, we will create the instances
+        // here and cache it so we can return it next time very quickly. If there is
+        // already a driver created by this name, we'll just return that instance.
+        if (! isset($this->drivers[$driver])) {
+            $this->drivers[$driver] = $this->createDriver($config['driver'], $config);
+        }
+
+        return $this->drivers[$driver];
     }
 
     /**
      * Create a session based authentication guard.
      *
-     * @param  string  $name
      * @param  array  $config
      * @return \Illuminate\Auth\SessionGuard
      */
-    public function createSessionDriver($name, $config)
+    public function createSessionDriver($config)
     {
         $provider = $this->createUserProvider($config['provider'] ?? null);
 
-        $guard = new SessionGuard($name, $provider, $this->app['session.store']);
+        $guard = new SessionGuard('web', $provider, $this->app['session.store']);
 
         // When using the remember me functionality of the authentication services we
         // will need to be set the encryption instance of the guard, which allows
@@ -143,11 +106,10 @@ class AuthManager implements FactoryContract
     /**
      * Create a token based authentication guard.
      *
-     * @param  string  $name
      * @param  array  $config
      * @return \Illuminate\Auth\TokenGuard
      */
-    public function createTokenDriver($name, $config)
+    public function createTokenDriver($config)
     {
         // The token guard implements a basic API token based guard implementation
         // that takes an API token field from the request and matches it to the
@@ -170,7 +132,13 @@ class AuthManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["auth.guards.{$name}"];
+        $config = $this->app['config']["auth.guards.{$name}"];
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Auth guard [{$name}] is not defined.");
+        }
+
+        return $config;
     }
 
     /**
@@ -253,20 +221,6 @@ class AuthManager implements FactoryContract
     }
 
     /**
-     * Register a custom driver creator Closure.
-     *
-     * @param  string  $driver
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function extend($driver, Closure $callback)
-    {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
      * Register a custom provider creator Closure.
      *
      * @param  string  $name
@@ -278,17 +232,5 @@ class AuthManager implements FactoryContract
         $this->customProviderCreators[$name] = $callback;
 
         return $this;
-    }
-
-    /**
-     * Dynamically call the default driver instance.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->guard()->{$method}(...$parameters);
     }
 }
