@@ -1,10 +1,11 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\EloquentMorphManyTest;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration

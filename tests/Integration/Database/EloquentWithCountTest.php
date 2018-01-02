@@ -1,9 +1,10 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database;
+namespace Illuminate\Tests\Integration\Database\EloquentWithCountTest;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
  * @group integration
