@@ -124,15 +124,13 @@ class CustomPost extends Post
 
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
         $parentKey, $relatedKey, $relationName = null
-    )
-    {
+    ) {
         return new CustomBelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
     }
 
     protected function newHasManyThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey,
         $secondKey, $localKey, $secondLocalKey
-    )
-    {
+    ) {
         return new CustomHasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 }
