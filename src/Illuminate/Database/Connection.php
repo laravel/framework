@@ -340,9 +340,7 @@ class Connection implements ConnectionInterface
                 return [];
             }
 
-            $statement = $this->executeStatement($query, $bindings, $useReadPdo);
-
-            return $statement;
+            return $this->executeStatement($query, $bindings, $useReadPdo);
         });
 
         while ($record = $statement->fetch()) {
