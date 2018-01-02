@@ -1,30 +1,16 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentTouchParentWithGlobalScopeTest;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * @group integration
  */
-class EloquentTouchParentWithGlobalScopeTest extends TestCase
+class EloquentTouchParentWithGlobalScopeTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
     public function setUp()
     {
         parent::setUp();

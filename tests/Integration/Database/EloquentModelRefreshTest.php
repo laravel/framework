@@ -1,8 +1,7 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Database\EloquentModelRefreshTest;
+namespace Illuminate\Tests\Integration\Database;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -11,21 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 /**
  * @group integration
  */
-class EloquentModelRefreshTest extends TestCase
+class EloquentModelRefreshTest extends DatabaseTestCase
 {
-    protected function getEnvironmentSetUp($app)
-    {
-        $app['config']->set('app.debug', 'true');
-
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-    }
-
     public function setUp()
     {
         parent::setUp();
