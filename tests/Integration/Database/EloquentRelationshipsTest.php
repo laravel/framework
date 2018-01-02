@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentRelationshipsTest;
 
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -11,6 +10,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
  * @group integration
@@ -31,6 +32,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(MorphOne::class, $post->owner());
         $this->assertInstanceOf(MorphMany::class, $post->likes());
         $this->assertInstanceOf(BelongsToMany::class, $post->viewers());
+        $this->assertInstanceOf(HasManyThrough::class, $post->lovers());
     }
 
     /**
@@ -47,6 +49,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomMorphOne::class, $post->owner());
         $this->assertInstanceOf(CustomMorphMany::class, $post->likes());
         $this->assertInstanceOf(CustomBelongsToMany::class, $post->viewers());
+        $this->assertInstanceOf(CustomHasManyThrough::class, $post->lovers());
     }
 }
 
@@ -85,6 +88,11 @@ class Post extends Model
     {
         return $this->belongsToMany(FakeRelationship::class);
     }
+
+    public function lovers()
+    {
+        return $this->hasManyThrough(FakeRelationship::class, FakeRelationship::class);
+    }
 }
 
 class CustomPost extends Post
@@ -116,8 +124,16 @@ class CustomPost extends Post
 
     protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
         $parentKey, $relatedKey, $relationName = null
-    ) {
+    )
+    {
         return new CustomBelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+    }
+
+    protected function newHasManyThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey,
+        $secondKey, $localKey, $secondLocalKey
+    )
+    {
+        return new CustomHasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 }
 
@@ -142,5 +158,9 @@ class CustomMorphMany extends MorphMany
 }
 
 class CustomBelongsToMany extends BelongsToMany
+{
+}
+
+class CustomHasManyThrough extends HasManyThrough
 {
 }
