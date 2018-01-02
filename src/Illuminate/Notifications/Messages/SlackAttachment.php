@@ -93,10 +93,31 @@ class SlackAttachment
     public $timestamp;
 
     /**
+     * The attachment's author name.
+     *
+     * @var string
+     */
+    public $authorName;
+
+    /**
+     * The attachment's author link.
+     *
+     * @var string
+     */
+    public $authorLink;
+
+    /**
+     * The attachment's author icon.
+     *
+     * @var string
+     */
+    public $authorIcon;
+
+    /**
      * Set the title of the attachment.
      *
      * @param  string  $title
-     * @param  string  $url
+     * @param  string|null  $url
      * @return $this
      */
     public function title($title, $url = null)
@@ -257,6 +278,23 @@ class SlackAttachment
     public function timestamp($timestamp)
     {
         $this->timestamp = $this->availableAt($timestamp);
+
+        return $this;
+    }
+
+    /**
+     * Set the author.
+     *
+     * @param  string $name
+     * @param  string|null $link
+     * @param  string|null $icon
+     * @return $this
+     */
+    public function author($name, $link = null, $icon = null)
+    {
+        $this->authorName = $name;
+        $this->authorLink = $link;
+        $this->authorIcon = $icon;
 
         return $this;
     }
