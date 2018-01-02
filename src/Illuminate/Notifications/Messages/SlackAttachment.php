@@ -117,7 +117,7 @@ class SlackAttachment
      * Set the title of the attachment.
      *
      * @param  string  $title
-     * @param  string  $url
+     * @param  string|null  $url
      * @return $this
      */
     public function title($title, $url = null)
@@ -286,8 +286,8 @@ class SlackAttachment
      * Set the author.
      *
      * @param  string $name
-     * @param  string $link
-     * @param  string $icon
+     * @param  string|null $link
+     * @param  string|null $icon
      * @return $this
      */
     public function author($name, $link = null, $icon = null)
