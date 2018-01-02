@@ -60,7 +60,21 @@ trait HasRelationships
 
         $localKey = $localKey ?: $this->getKeyName();
 
-        return new HasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+        return $this->newHasOne($instance->newQuery(), $this, $instance->getTable().'.'.$foreignKey, $localKey);
+    }
+
+    /**
+     * Instantiate a new HasOne relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $foreignKey
+     * @param  string  $localKey
+     * @return \Illuminate\Database\Eloquent\Relations\HasOne
+     */
+    protected function newHasOne(Builder $query, Model $parent, $foreignKey, $localKey)
+    {
+        return new HasOne($query, $parent, $foreignKey, $localKey);
     }
 
     /**
@@ -124,7 +138,7 @@ trait HasRelationships
     }
 
     /**
-     * Instantiate a new BelongsTo object.
+     * Instantiate a new BelongsTo relationship.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $child
@@ -246,7 +260,7 @@ trait HasRelationships
     }
 
     /**
-     * Instantiate a new HasMany object.
+     * Instantiate a new HasMany relationship.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $parent
