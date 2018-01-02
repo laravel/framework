@@ -19,7 +19,7 @@ class NullStore extends TaggableStore implements Store
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
-     * @return mixed
+     * @return void
      */
     public function get($key)
     {
@@ -44,7 +44,7 @@ class NullStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return int
+     * @return void
      */
     public function increment($key, $value = 1)
     {
@@ -56,7 +56,7 @@ class NullStore extends TaggableStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return int
+     * @return void
      */
     public function decrement($key, $value = 1)
     {
