@@ -319,15 +319,7 @@ class Connection implements ConnectionInterface
                 return [];
             }
 
-            // For select statements, we'll simply execute the query and return an array
-            // of the database result set. Each element in the array will be a single
-            // row from the database table, and will either be an array or objects.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
-                              ->prepare($query));
-
-            $this->bindValues($statement, $this->prepareBindings($bindings));
-
-            $statement->execute();
+            $statement = $this->executeStatement($query, $bindings, $useReadPdo);
 
             return $statement->fetchAll();
         });
@@ -348,20 +340,7 @@ class Connection implements ConnectionInterface
                 return [];
             }
 
-            // First we will create a statement for the query. Then, we will set the fetch
-            // mode and prepare the bindings for the query. Once that's done we will be
-            // ready to execute the query against the database and return the cursor.
-            $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
-                              ->prepare($query));
-
-            $this->bindValues(
-                $statement, $this->prepareBindings($bindings)
-            );
-
-            // Next, we'll execute the query against the database and return the statement
-            // so we can return the cursor. The cursor will use a PHP generator to give
-            // back one row at a time without using a bunch of memory to render them.
-            $statement->execute();
+            $statement = $this->executeStatement($query, $bindings, $useReadPdo);
 
             return $statement;
         });
@@ -369,6 +348,26 @@ class Connection implements ConnectionInterface
         while ($record = $statement->fetch()) {
             yield $record;
         }
+    }
+
+    /**
+     * Execute statement against the database.
+     *
+     * @param  string  $query
+     * @param  array  $bindings
+     * @param  bool  $useReadPdo
+     * @return \PDOStatement
+     */
+    protected function executeStatement($query, $bindings, $useReadPdo)
+    {
+        $statement = $this->prepared($this->getPdoForSelect($useReadPdo)
+            ->prepare($query));
+
+        $this->bindValues($statement, $this->prepareBindings($bindings));
+
+        $statement->execute();
+
+        return $statement;
     }
 
     /**
