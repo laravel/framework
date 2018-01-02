@@ -39,7 +39,6 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomBelongsTo::class, $post->author());
         $this->assertInstanceOf(CustomHasMany::class, $post->comments());
     }
-
 }
 
 class FakeRelationship extends Model
