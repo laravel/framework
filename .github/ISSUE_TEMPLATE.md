@@ -1,11 +1,14 @@
 <!--
-Please use this issue tracker only for reporting bugs in Laravel.
+Please use this issue tracker for reporting Laravel bugs.
 
-If you have question/seek support, please ask on the forums:
-- You can use https://laracasts.com/discuss or https://laravel.io/forum which are forums with a very large community of developers helping each other.
-- Alternatively you can use Slack https://larachat.co/ or StackOverflow http://stackoverflow.com/questions/tagged/laravel .
+If you have need support, please use on the forums:
 
-If you want to discuss things about Laravel (features, architecture, propose changes), please open an issue at https://github.com/laravel/internals/issues .
+- https://laracasts.com/discuss 
+- https://laravel.io/forum
+
+Alternatively, you may use Slack (https://larachat.co/) or StackOverflow (http://stackoverflow.com/questions/tagged/laravel).
+
+If you would like to propose new Laravel features, please make a pull request or open an issue at https://github.com/laravel/internals/issues.
 -->
 
 - Laravel Version: #.#.#
