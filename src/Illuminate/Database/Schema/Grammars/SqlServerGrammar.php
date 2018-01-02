@@ -218,9 +218,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
     {
-        $index = $this->wrap($command->index);
-
-        return "drop index {$index} on {$this->wrapTable($blueprint)}";
+        return $this->compileDropIndex($blueprint, $command);
     }
 
     /**
