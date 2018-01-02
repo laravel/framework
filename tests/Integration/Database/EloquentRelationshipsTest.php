@@ -44,7 +44,6 @@ class EloquentRelationshipsTest extends TestCase
 
 class FakeRelationship extends Model
 {
-
 }
 
 class Post extends Model
@@ -85,15 +84,12 @@ class CustomPost extends Post
 
 class CustomHasOne extends HasOne
 {
-
 }
 
 class CustomBelongsTo extends BelongsTo
 {
-
 }
 
 class CustomHasMany extends HasMany
 {
-
 }

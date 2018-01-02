@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -147,7 +147,8 @@ trait HasRelationships
      * @param  string  $relation
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
-    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation) {
+    protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
+    {
         return new BelongsTo(
             $query, $child, $foreignKey, $ownerKey, $relation
         );
