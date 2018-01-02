@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphOne;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
@@ -25,6 +27,8 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(HasOne::class, $post->attachment());
         $this->assertInstanceOf(BelongsTo::class, $post->author());
         $this->assertInstanceOf(HasMany::class, $post->comments());
+        $this->assertInstanceOf(MorphOne::class, $post->owner());
+        $this->assertInstanceOf(MorphMany::class, $post->replies());
     }
 
     /**
@@ -38,6 +42,8 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomHasOne::class, $post->attachment());
         $this->assertInstanceOf(CustomBelongsTo::class, $post->author());
         $this->assertInstanceOf(CustomHasMany::class, $post->comments());
+        $this->assertInstanceOf(CustomMorphOne::class, $post->owner());
+        $this->assertInstanceOf(CustomMorphMany::class, $post->replies());
     }
 }
 
@@ -61,6 +67,16 @@ class Post extends Model
     {
         return $this->hasMany(FakeRelationship::class);
     }
+
+    public function replies()
+    {
+        return $this->morphMany(FakeRelationship::class, 'actionable');
+    }
+
+    public function owner()
+    {
+        return $this->morphOne(FakeRelationship::class, 'property');
+    }
 }
 
 class CustomPost extends Post
@@ -79,6 +95,16 @@ class CustomPost extends Post
     {
         return new CustomHasOne($query, $parent, $foreignKey, $localKey);
     }
+
+    protected function newMorphOne(Builder $query, Model $parent, $type, $id, $localKey)
+    {
+        return new CustomMorphOne($query, $parent, $type, $id, $localKey);
+    }
+
+    protected function newMorphMany(Builder $query, Model $parent, $type, $id, $localKey)
+    {
+        return new CustomMorphMany($query, $parent, $type, $id, $localKey);
+    }
 }
 
 class CustomHasOne extends HasOne
@@ -90,5 +116,13 @@ class CustomBelongsTo extends BelongsTo
 }
 
 class CustomHasMany extends HasMany
+{
+}
+
+class CustomMorphOne extends MorphOne
+{
+}
+
+class CustomMorphMany extends MorphMany
 {
 }
