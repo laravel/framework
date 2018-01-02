@@ -17,6 +17,7 @@ class Pluralizer
         'cattle',
         'chassis',
         'compensation',
+        'cookware',
         'coreopsis',
         'data',
         'deer',
