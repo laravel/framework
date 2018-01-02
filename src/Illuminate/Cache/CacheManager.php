@@ -2,7 +2,6 @@
 
 namespace Illuminate\Cache;
 
-use Closure;
 use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use Illuminate\Contracts\Cache\Store;

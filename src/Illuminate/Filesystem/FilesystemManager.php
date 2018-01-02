@@ -2,11 +2,9 @@
 
 namespace Illuminate\Filesystem;
 
-use Closure;
 use Aws\S3\S3Client;
 use OpenCloud\Rackspace;
 use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Support\Manager;
 use League\Flysystem\AdapterInterface;
 use League\Flysystem\FilesystemInterface;
