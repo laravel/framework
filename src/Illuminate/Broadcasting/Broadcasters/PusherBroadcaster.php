@@ -5,8 +5,8 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Pusher\Pusher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Broadcasting\AuthenticatesBroadcast;
 use Illuminate\Broadcasting\BroadcastException;
+use Illuminate\Broadcasting\AuthenticatesBroadcast;
 
 class PusherBroadcaster extends Broadcaster
 {
