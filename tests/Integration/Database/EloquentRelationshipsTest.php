@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentRelationshipsTest;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -28,7 +29,8 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(BelongsTo::class, $post->author());
         $this->assertInstanceOf(HasMany::class, $post->comments());
         $this->assertInstanceOf(MorphOne::class, $post->owner());
-        $this->assertInstanceOf(MorphMany::class, $post->replies());
+        $this->assertInstanceOf(MorphMany::class, $post->likes());
+        $this->assertInstanceOf(BelongsToMany::class, $post->viewers());
     }
 
     /**
@@ -43,7 +45,8 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomBelongsTo::class, $post->author());
         $this->assertInstanceOf(CustomHasMany::class, $post->comments());
         $this->assertInstanceOf(CustomMorphOne::class, $post->owner());
-        $this->assertInstanceOf(CustomMorphMany::class, $post->replies());
+        $this->assertInstanceOf(CustomMorphMany::class, $post->likes());
+        $this->assertInstanceOf(CustomBelongsToMany::class, $post->viewers());
     }
 }
 
@@ -68,7 +71,7 @@ class Post extends Model
         return $this->hasMany(FakeRelationship::class);
     }
 
-    public function replies()
+    public function likes()
     {
         return $this->morphMany(FakeRelationship::class, 'actionable');
     }
@@ -76,6 +79,11 @@ class Post extends Model
     public function owner()
     {
         return $this->morphOne(FakeRelationship::class, 'property');
+    }
+
+    public function viewers()
+    {
+        return $this->belongsToMany(FakeRelationship::class);
     }
 }
 
@@ -105,6 +113,12 @@ class CustomPost extends Post
     {
         return new CustomMorphMany($query, $parent, $type, $id, $localKey);
     }
+
+    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
+        $parentKey, $relatedKey, $relationName = null
+    ) {
+        return new CustomBelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
+    }
 }
 
 class CustomHasOne extends HasOne
@@ -124,5 +138,9 @@ class CustomMorphOne extends MorphOne
 }
 
 class CustomMorphMany extends MorphMany
+{
+}
+
+class CustomBelongsToMany extends BelongsToMany
 {
 }
