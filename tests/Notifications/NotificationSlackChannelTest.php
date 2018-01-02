@@ -57,6 +57,9 @@ class NotificationSlackChannelTest extends TestCase
                             'mrkdwn_in' => ['text'],
                             'footer' => 'Laravel',
                             'footer_icon' => 'https://laravel.com/fake.png',
+                            'author_name' => 'Author',
+                            'author_link' => 'https://laravel.com/fake_author',
+                            'author_icon' => 'https://laravel.com/fake_author.png',
                             'ts' => 1234567890,
                         ],
                     ],
@@ -187,6 +190,7 @@ class NotificationSlackChannelTestNotification extends Notification
                                     ->footer('Laravel')
                                     ->footerIcon('https://laravel.com/fake.png')
                                     ->markdown(['text'])
+                                    ->author('Author', 'https://laravel.com/fake_author', 'https://laravel.com/fake_author.png')
                                     ->timestamp($timestamp);
                     });
     }
