@@ -37,7 +37,6 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(HasManyThrough::class, $post->lovers());
         $this->assertInstanceOf(MorphToMany::class, $post->tags());
         $this->assertInstanceOf(MorphTo::class, $post->postable());
-
     }
 
     /**
