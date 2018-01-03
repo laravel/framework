@@ -83,11 +83,7 @@ class Str
      */
     public static function camel($value)
     {
-        if (isset(static::$camelCache[$value])) {
-            return static::$camelCache[$value];
-        }
-
-        return static::$camelCache[$value] = lcfirst(static::studly($value));
+        return static::$camelCache[$value] ?? static::$camelCache[$value] = lcfirst(static::studly($value));
     }
 
     /**
@@ -530,11 +526,7 @@ class Str
     {
         static $charsArray;
 
-        if (isset($charsArray)) {
-            return $charsArray;
-        }
-
-        return $charsArray = [
+        return $charsArray ?? $charsArray = [
             '0'    => ['°', '₀', '۰', '０'],
             '1'    => ['¹', '₁', '۱', '１'],
             '2'    => ['²', '₂', '۲', '２'],

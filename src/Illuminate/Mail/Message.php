@@ -250,11 +250,7 @@ class Message
      */
     public function embed($file)
     {
-        if (isset($this->embeddedFiles[$file])) {
-            return $this->embeddedFiles[$file];
-        }
-
-        return $this->embeddedFiles[$file] = $this->swift->embed(
+        return $this->embeddedFiles[$file] ?? $this->embeddedFiles[$file] = $this->swift->embed(
             Swift_Image::fromPath($file)
         );
     }

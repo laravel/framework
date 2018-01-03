@@ -402,11 +402,7 @@ class Route
      */
     public function parameterNames()
     {
-        if (isset($this->parameterNames)) {
-            return $this->parameterNames;
-        }
-
-        return $this->parameterNames = $this->compileParameterNames();
+        return $this->parameterNames ?? $this->parameterNames = $this->compileParameterNames();
     }
 
     /**

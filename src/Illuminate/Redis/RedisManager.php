@@ -54,11 +54,7 @@ class RedisManager implements Factory
     {
         $name = $name ?: 'default';
 
-        if (isset($this->connections[$name])) {
-            return $this->connections[$name];
-        }
-
-        return $this->connections[$name] = $this->resolve($name);
+        return $this->connections[$name] ?? $this->connections[$name] = $this->resolve($name);
     }
 
     /**

@@ -152,11 +152,7 @@ abstract class Facade
             return $name;
         }
 
-        if (isset(static::$resolvedInstance[$name])) {
-            return static::$resolvedInstance[$name];
-        }
-
-        return static::$resolvedInstance[$name] = static::$app[$name];
+        return static::$resolvedInstance[$name] ?? static::$resolvedInstance[$name] = static::$app[$name];
     }
 
     /**

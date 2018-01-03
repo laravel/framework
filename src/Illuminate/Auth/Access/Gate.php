@@ -391,11 +391,7 @@ class Gate implements GateContract
             return $callback;
         }
 
-        if (isset($this->abilities[$ability])) {
-            return $this->abilities[$ability];
-        }
-
-        return function () {
+        return $this->abilities[$ability] ?? function () {
             return false;
         };
     }
