@@ -2,6 +2,8 @@
 
 namespace Illuminate\Broadcasting\Broadcasters;
 
+use Exception;
+use ReflectionClass;
 use ReflectionFunction;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
@@ -56,6 +58,7 @@ abstract class Broadcaster implements BroadcasterContract
             }
 
             $parameters = $this->extractAuthParameters($pattern, $channel, $callback);
+
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
             if ($result = $handler($request->user(), ...$parameters)) {
@@ -71,7 +74,7 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $pattern
      * @param  string  $channel
-     * @param  callable  $callback
+     * @param  callable|string  $callback
      * @return array
      */
     protected function extractAuthParameters($pattern, $channel, $callback)
@@ -88,7 +91,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Extracts the parameters out of what the user passed to handle the channel authentication.
      *
-     * @param callable|string $callback
+     * @param  callable|string  $callback
      * @return \ReflectionParameter[]
      * @throws \Exception
      */
@@ -96,15 +99,29 @@ abstract class Broadcaster implements BroadcasterContract
     {
         if (is_callable($callback)) {
             return (new ReflectionFunction($callback))->getParameters();
+        } elseif (is_string($callback)) {
+            return $this->extractParametersFromClass($callback);
         }
 
-        if (is_string($callback)) {
-            return (new \ReflectionClass($callback))
-                ->getMethod('join')
-                ->getParameters();
+        throw new Exception('Given channel handler is an unknown type.');
+    }
+
+    /**
+     * Extracts the parameters out of a class channel's "join" method.
+     *
+     * @param  string  $callback
+     * @return \ReflectionParameter[]
+     * @throws \Exception
+     */
+    protected function extractParametersFromClass($callback)
+    {
+        $reflection = new ReflectionClass($callback);
+
+        if (! $reflection->hasMethod('join')) {
+            throw new Exception('Class based channel must define a "join" method.');
         }
 
-        throw new \Exception('Unknown channel handler type.');
+        return $reflection->getMethod('join')->getParameters();
     }
 
     /**
@@ -226,17 +243,17 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * @param $callback
+     * Normalize the given callback into a callable.
+     *
+     * @param  mixed  $callback
      * @return callable|\Closure
      */
     protected function normalizeChannelHandlerToCallable($callback)
     {
-        return is_callable($callback)
-            ? $callback
-            : function (...$args) use ($callback) {
-                return Container::getInstance()
-                    ->make($callback)
-                    ->join(...$args);
-            };
+        return is_callable($callback) ? $callback : function (...$args) use ($callback) {
+            return Container::getInstance()
+                ->make($callback)
+                ->join(...$args);
+        };
     }
 }

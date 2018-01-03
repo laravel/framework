@@ -67,7 +67,6 @@ class BroadcasterTest extends TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Unknown channel handler type.
      */
     public function testUnknownChannelAuthHandlerTypeThrowsException()
     {
