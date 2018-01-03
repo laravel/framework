@@ -245,17 +245,21 @@ class LogManager implements LogContract, LoggerInterface
      */
     protected function prepareHandler(array $config, HandlerInterface $handler)
     {
-        return $handler->setFormatter($this->getDefaultFormatter($config));
+        return $handler->setFormatter($this->formatter($config));
     }
 
     /**
-     * Get a default Monolog formatter instance.
+     * Get a Monolog formatter instance.
      *
      * @param  array  $config
-     * @return \Monolog\Formatter\LineFormatter
+     * @return \Monolog\Formatter\FormatterInterface
      */
-    protected function getDefaultFormatter(array $config)
+    protected function formatter(array $config)
     {
+        if (isset($config['formatter'])) {
+            return $this->app->make($config['formatter'])->__invoke($config);
+        }
+
         return tap(new LineFormatter(null, null, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
