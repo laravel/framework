@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
@@ -35,6 +36,8 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(BelongsToMany::class, $post->viewers());
         $this->assertInstanceOf(HasManyThrough::class, $post->lovers());
         $this->assertInstanceOf(MorphToMany::class, $post->tags());
+        $this->assertInstanceOf(MorphTo::class, $post->postable());
+
     }
 
     /**
@@ -53,6 +56,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomBelongsToMany::class, $post->viewers());
         $this->assertInstanceOf(CustomHasManyThrough::class, $post->lovers());
         $this->assertInstanceOf(CustomMorphToMany::class, $post->tags());
+        $this->assertInstanceOf(CustomMorphTo::class, $post->postable());
     }
 }
 
@@ -101,6 +105,11 @@ class Post extends Model
     {
         return $this->morphToMany(FakeRelationship::class, 'taggable');
     }
+
+    public function postable()
+    {
+        return $this->morphTo();
+    }
 }
 
 class CustomPost extends Post
@@ -148,6 +157,11 @@ class CustomPost extends Post
         return new CustomMorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
             $relationName, $inverse);
     }
+
+    protected function newMorphTo(Builder $query, Model $parent, $foreignKey, $ownerKey, $type, $relation)
+    {
+        return new CustomMorphTo($query, $parent, $foreignKey, $ownerKey, $type, $relation);
+    }
 }
 
 class CustomHasOne extends HasOne
@@ -179,5 +193,9 @@ class CustomHasManyThrough extends HasManyThrough
 }
 
 class CustomMorphToMany extends MorphToMany
+{
+}
+
+class CustomMorphTo extends MorphTo
 {
 }
