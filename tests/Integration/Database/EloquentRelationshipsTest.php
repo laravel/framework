@@ -178,6 +178,6 @@ class CustomHasManyThrough extends HasManyThrough
 {
 }
 
-class CustomMorphToMany extends MorphMany
+class CustomMorphToMany extends MorphToMany
 {
 }
