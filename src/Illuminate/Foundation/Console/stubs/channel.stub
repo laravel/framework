@@ -2,10 +2,12 @@
 
 namespace DummyNamespace;
 
+use NamespacedDummyUserModel;
+
 class DummyClass
 {
     /**
-     * Create a new broadcasting channel instance.
+     * Create a new channel instance.
      *
      * @return void
      */
@@ -17,9 +19,10 @@ class DummyClass
     /**
      * Authenticates the channel.
      *
-     * @return mixed
+     * @param  \NamespacedDummyUserModel  $user
+     * @return array|bool
      */
-    public function join()
+    public function join(DummyUser $user)
     {
         //
     }

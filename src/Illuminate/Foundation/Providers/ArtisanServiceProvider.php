@@ -249,6 +249,18 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerChannelMakeCommand()
+    {
+        $this->app->singleton('command.channel.make', function ($app) {
+            return new ChannelMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerClearCompiledCommand()
     {
         $this->app->singleton('command.clear-compiled', function () {
@@ -397,18 +409,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.job.make', function ($app) {
             return new JobMakeCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerChannelMakeCommand()
-    {
-        $this->app->singleton('command.channel.make', function ($app) {
-            return new ChannelMakeCommand($app['files']);
         });
     }
 

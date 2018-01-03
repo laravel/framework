@@ -25,7 +25,22 @@ class ChannelMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $type = 'Broadcasting Channel';
+    protected $type = 'Channel';
+
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        return str_replace(
+            'DummyUser',
+            class_basename(config('auth.providers.users.model')),
+            parent::buildClass($name)
+        );
+    }
 
     /**
      * Get the stub file for the generator.
