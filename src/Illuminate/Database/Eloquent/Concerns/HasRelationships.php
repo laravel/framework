@@ -472,11 +472,33 @@ trait HasRelationships
         // appropriate query constraints then entirely manages the hydrations.
         $table = $table ?: Str::plural($name);
 
-        return new MorphToMany(
+        return $this->newMorphToMany(
             $instance->newQuery(), $this, $name, $table,
             $foreignPivotKey, $relatedPivotKey, $parentKey ?: $this->getKeyName(),
             $relatedKey ?: $instance->getKeyName(), $caller, $inverse
         );
+    }
+
+    /**
+     * Instantiate a new HasManyThrough relationship.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  string  $name
+     * @param  string  $table
+     * @param  string  $foreignPivotKey
+     * @param  string  $relatedPivotKey
+     * @param  string  $parentKey
+     * @param  string  $relatedKey
+     * @param  string  $relationName
+     * @param  bool  $inverse
+     * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
+     */
+    protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
+        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
+    {
+        return new MorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
+            $relationName, $inverse);
     }
 
     /**

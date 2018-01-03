@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentRelationshipsTest;
 
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -33,6 +34,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(MorphMany::class, $post->likes());
         $this->assertInstanceOf(BelongsToMany::class, $post->viewers());
         $this->assertInstanceOf(HasManyThrough::class, $post->lovers());
+        $this->assertInstanceOf(MorphToMany::class, $post->tags());
     }
 
     /**
@@ -50,6 +52,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomMorphMany::class, $post->likes());
         $this->assertInstanceOf(CustomBelongsToMany::class, $post->viewers());
         $this->assertInstanceOf(CustomHasManyThrough::class, $post->lovers());
+        $this->assertInstanceOf(CustomMorphToMany::class, $post->tags());
     }
 }
 
@@ -93,6 +96,11 @@ class Post extends Model
     {
         return $this->hasManyThrough(FakeRelationship::class, FakeRelationship::class);
     }
+
+    public function tags()
+    {
+        return $this->morphToMany(FakeRelationship::class, 'taggable');
+    }
 }
 
 class CustomPost extends Post
@@ -133,6 +141,13 @@ class CustomPost extends Post
     ) {
         return new CustomHasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
+
+    protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
+        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
+    {
+        return new CustomMorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
+            $relationName, $inverse);
+    }
 }
 
 class CustomHasOne extends HasOne
@@ -160,5 +175,9 @@ class CustomBelongsToMany extends BelongsToMany
 }
 
 class CustomHasManyThrough extends HasManyThrough
+{
+}
+
+class CustomMorphToMany extends MorphMany
 {
 }
