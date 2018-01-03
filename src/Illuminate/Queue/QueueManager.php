@@ -4,6 +4,8 @@ namespace Illuminate\Queue;
 
 use Closure;
 use InvalidArgumentException;
+use Illuminate\Support\Collection;
+use Illuminate\Contracts\Queue\QueueAcceptsMetadata;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
@@ -34,6 +36,13 @@ class QueueManager implements FactoryContract, MonitorContract
     protected $connectors = [];
 
     /**
+     * The metadata that should be added to the queue payload.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $metadata;
+
+    /**
      * Create a new queue manager instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
@@ -42,6 +51,7 @@ class QueueManager implements FactoryContract, MonitorContract
     public function __construct($app)
     {
         $this->app = $app;
+        $this->metadata = new Collection();
     }
 
     /**
@@ -111,6 +121,30 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Add metadata to the payload that will be queued.
+     *
+     * @param  string|array|null  $key
+     * @param  mixed  $value
+     * @return  self|\Illuminate\Support\Collection
+     */
+    public function metadata($key, $value = null)
+    {
+        if (is_null($key)) {
+            return $this->metadata;
+        }
+
+        if (is_array($key)) {
+            foreach ($key as $itemKey => $itemData) {
+                $this->metadata($itemKey, $itemData);
+            }
+        } else {
+            $this->metadata->put($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the driver is connected.
      *
      * @param  string  $name
@@ -138,6 +172,10 @@ class QueueManager implements FactoryContract, MonitorContract
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);
+
+            if ($this->connections[$name] instanceof QueueAcceptsMetadata) {
+                $this->connections[$name]->setMetadata($this->metadata);
+            }
         }
 
         return $this->connections[$name];
