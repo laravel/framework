@@ -164,9 +164,7 @@ trait HasRelationships
      */
     protected function newBelongsTo(Builder $query, Model $child, $foreignKey, $ownerKey, $relation)
     {
-        return new BelongsTo(
-            $query, $child, $foreignKey, $ownerKey, $relation
-        );
+        return new BelongsTo($query, $child, $foreignKey, $ownerKey, $relation);
     }
 
     /**
@@ -324,13 +322,11 @@ trait HasRelationships
 
         $secondKey = $secondKey ?: $through->getForeignKey();
 
-        $localKey = $localKey ?: $this->getKeyName();
-
-        $secondLocalKey = $secondLocalKey ?: $through->getKeyName();
-
-        $instance = $this->newRelatedInstance($related);
-
-        return $this->newHasManyThrough($instance->newQuery(), $this, $through, $firstKey, $secondKey, $localKey, $secondLocalKey);
+        return $this->newHasManyThrough(
+            $this->newRelatedInstance($related)->newQuery(), $this, $through,
+            $firstKey, $secondKey, $localKey ?: $this->getKeyName(),
+            $secondLocalKey ?: $through->getKeyName()
+        );
     }
 
     /**
@@ -449,8 +445,8 @@ trait HasRelationships
      * @param  string  $relationName
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey,
-        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null)
+    protected function newBelongsToMany(Builder $query, Model $parent, $table, $foreignPivotKey, $relatedPivotKey,
+                                        $parentKey, $relatedKey, $relationName = null)
     {
         return new BelongsToMany($query, $parent, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey, $relationName);
     }
@@ -511,7 +507,8 @@ trait HasRelationships
      * @return \Illuminate\Database\Eloquent\Relations\MorphToMany
      */
     protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
-        $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
+                                      $relatedPivotKey, $parentKey, $relatedKey,
+                                      $relationName = null, $inverse = false)
     {
         return new MorphToMany($query, $parent, $name, $table, $foreignPivotKey, $relatedPivotKey, $parentKey, $relatedKey,
             $relationName, $inverse);
