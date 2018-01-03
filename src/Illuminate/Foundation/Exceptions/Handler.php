@@ -94,6 +94,7 @@ class Handler implements ExceptionHandlerContract
      */
     public function report(Exception $e)
     {
+        dd($e);
         if ($this->shouldntReport($e)) {
             return;
         }
