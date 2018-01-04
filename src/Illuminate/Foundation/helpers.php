@@ -509,7 +509,7 @@ if (! function_exists('logger')) {
      *
      * @param  string  $message
      * @param  array  $context
-     * @return \Illuminate\Contracts\Logging\Log|null
+     * @return \Illuminate\Log\LogManager|null
      */
     function logger($message = null, array $context = [])
     {
@@ -518,6 +518,19 @@ if (! function_exists('logger')) {
         }
 
         return app('log')->debug($message, $context);
+    }
+}
+
+if (! function_exists('logs')) {
+    /**
+     * Get a log driver instance.
+     *
+     * @param  string  $driver
+     * @return \Illuminate\Log\LogManager|\Psr\Log\LoggerInterface
+     */
+    function logs($driver = null)
+    {
+        return $driver ? app('log')->driver($driver) : app('log');
     }
 }
 
