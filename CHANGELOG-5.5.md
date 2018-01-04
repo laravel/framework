@@ -2,9 +2,21 @@
 
 ## [Unreleased]
 
+### Added
+- Added `Model::qualifyColumn()` method ([#22577](https://github.com/laravel/framework/pull/22577))
+- Added support for the `author_*` fields to `SlackAttachment` ([#22610](https://github.com/laravel/framework/pull/22610))
+- Added `UrlGenerator::getDefaultParameters()` method  ([#22572](https://github.com/laravel/framework/pull/22572))
+
 ### Changed
 - Use `Arr::get()` in `Collection::get()` ([#22554](https://github.com/laravel/framework/pull/22554))
 - Pass entire config to `FtpAdapter` ([#22539](https://github.com/laravel/framework/pull/22539))
+- Support extending Eloquent relationships ([#22617](https://github.com/laravel/framework/pull/22617))
+- Changed handling of `VerifyCsrfToken::$except` ([#22619](https://github.com/laravel/framework/pull/22619))
+- Support multiple levels in `Collection::groupBy()` ([#22630](https://github.com/laravel/framework/pull/22630))
+
+### Fixed
+- Close database connection when using `RefreshDatabase` trait ([#22569](https://github.com/laravel/framework/pull/22569))
+- Send status code `500` when using `dd()` ([#22581](https://github.com/laravel/framework/pull/22581))
 
 
 ## v5.5.28 (2017-12-26)
