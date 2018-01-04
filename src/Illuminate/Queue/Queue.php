@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use DateTimeInterface;
 use Illuminate\Container\Container;
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Queue
@@ -30,6 +31,13 @@ abstract class Queue
      * @var string
      */
     protected $connectionName;
+
+    /**
+     * Set the shared data that is needed to be added to the payload.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $shared;
 
     /**
      * Push a new job onto the queue.
@@ -104,9 +112,15 @@ abstract class Queue
      */
     protected function createPayloadArray($job, $data = '')
     {
-        return is_object($job)
+        $payload = is_object($job)
                     ? $this->createObjectPayload($job)
                     : $this->createStringPayload($job, $data);
+
+        if (! is_null($this->shared) && $this->shared->isNotEmpty()) {
+            $payload['shared'] = $this->shared->toArray();
+        }
+
+        return $payload;
     }
 
     /**
@@ -208,5 +222,16 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Set the shared data instance.
+     *
+     * @param  \Illuminate\Support\Collection  $shared
+     * @return void
+     */
+    public function setShared(Collection $shared)
+    {
+        $this->shared = $shared;
     }
 }

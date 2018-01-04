@@ -30,6 +30,26 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->push('foo', ['data']);
     }
 
+    public function testPushProperlyPushesJobWithSharedOntoDatabase()
+    {
+        $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock('Illuminate\Database\Connection'), 'table', 'default'])->getMock();
+        $queue->setShared(new \Illuminate\Support\Collection([
+            'firstname' => 'taylor',
+            'surname' => 'otwell',
+        ]));
+        $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
+        $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('stdClass'));
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+            $this->assertEquals('default', $array['queue']);
+            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'shared' => ['firstname' => 'taylor', 'surname' => 'otwell']]), $array['payload']);
+            $this->assertEquals(0, $array['attempts']);
+            $this->assertNull($array['reserved_at']);
+            $this->assertInternalType('int', $array['available_at']);
+        });
+
+        $queue->push('foo', ['data']);
+    }
+
     public function testDelayedPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder(

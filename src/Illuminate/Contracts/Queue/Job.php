@@ -19,6 +19,15 @@ interface Job
     public function payload();
 
     /**
+     * Get the value from the shared data or return the default.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Collection|mixed
+     */
+    public function shared($key, $default = null);
+
+    /**
      * Fire the job.
      *
      * @return void

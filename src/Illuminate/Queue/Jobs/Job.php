@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
@@ -192,6 +193,24 @@ abstract class Job
     public function payload()
     {
         return json_decode($this->getRawBody(), true);
+    }
+
+    /**
+     * Get the value from the shared data or return the default.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Support\Collection|mixed
+     */
+    public function shared($key, $default = null)
+    {
+        $shared = Collection::make($this->payload()['shared'] ?? []);
+
+        if (is_null($key)) {
+            return $shared;
+        }
+
+        return $shared->get($key, $default);
     }
 
     /**

@@ -4,6 +4,7 @@ namespace Illuminate\Queue;
 
 use Closure;
 use InvalidArgumentException;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
@@ -34,14 +35,23 @@ class QueueManager implements FactoryContract, MonitorContract
     protected $connectors = [];
 
     /**
+     * The shared data that should be added to the queue payload.
+     *
+     * @var \Illuminate\Support\Collection
+     */
+    protected $shared;
+
+    /**
      * Create a new queue manager instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Support\Collection  $shared
      * @return void
      */
-    public function __construct($app)
+    public function __construct($app, Collection $shared = null)
     {
         $this->app = $app;
+        $this->shared = $shared ?? new Collection();
     }
 
     /**
@@ -111,6 +121,30 @@ class QueueManager implements FactoryContract, MonitorContract
     }
 
     /**
+     * Add shared data to the payload that will be queued.
+     *
+     * @param  string|array|null  $key
+     * @param  mixed  $value
+     * @return self|\Illuminate\Support\Collection
+     */
+    public function share($key, $value = null)
+    {
+        if (is_null($key)) {
+            return $this->shared;
+        }
+
+        if (is_array($key)) {
+            foreach ($key as $itemKey => $itemValue) {
+                $this->share($itemKey, $itemValue);
+            }
+        } else {
+            $this->shared->put($key, $value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Determine if the driver is connected.
      *
      * @param  string  $name
@@ -138,6 +172,8 @@ class QueueManager implements FactoryContract, MonitorContract
             $this->connections[$name] = $this->resolve($name);
 
             $this->connections[$name]->setContainer($this->app);
+
+            $this->connections[$name]->setShared($this->shared);
         }
 
         return $this->connections[$name];
