@@ -133,7 +133,7 @@ class LogManager implements LoggerInterface
      */
     protected function createEmergencyLogger()
     {
-        return new Logger(new Monolog('laravel', $this->prepareHandlers([], [new StreamHandler(
+        return new Logger(new Monolog('laravel', $this->prepareHandlers([new StreamHandler(
                 $this->app->storagePath().'/logs/laravel.log', $this->level(['level' => 'debug'])
         )])), $this->app['events']);
     }
