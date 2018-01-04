@@ -13,6 +13,7 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
+use Illuminate\Log\Events\MessageLogged;
 use Monolog\Handler\RotatingFileHandler;
 
 class LogManager implements LoggerInterface
@@ -63,6 +64,17 @@ class LogManager implements LoggerInterface
     public function __construct($app)
     {
         $this->app = $app;
+    }
+
+    /**
+     * Get a log channel instance.
+     *
+     * @param  string  $driver
+     * @return mixed
+     */
+    public function channel($channel = null)
+    {
+        return $this->driver($channel);
     }
 
     /**
@@ -197,7 +209,7 @@ class LogManager implements LoggerInterface
      */
     protected function createSingleDriver(array $config)
     {
-        return new Monolog($this->channel($config), [
+        return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(
                 new StreamHandler($config['path'], $this->level($config))
             ),
@@ -212,7 +224,7 @@ class LogManager implements LoggerInterface
      */
     protected function createDailyDriver(array $config)
     {
-        return new Monolog($this->channel($config), [
+        return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config)
             )),
@@ -227,7 +239,7 @@ class LogManager implements LoggerInterface
      */
     protected function createSyslogDriver(array $config)
     {
-        return new Monolog($this->channel($config), [
+        return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
                 $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
             ),
@@ -242,7 +254,7 @@ class LogManager implements LoggerInterface
      */
     protected function createErrorlogDriver(array $config)
     {
-        return new Monolog($this->channel($config), [
+        return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new ErrorLogHandler(
                 $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
             ),
@@ -288,12 +300,32 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Monitor log messages and execute a callback if a message matches a given truth test.
+     *
+     * @param  callable|string  $watcher
+     * @param  callable  $callback
+     * @return void
+     */
+    public function watch($watcher, $callback)
+    {
+        $watcher = is_callable($watcher) ? $watcher : function ($level, $message) use ($watcher) {
+            return Str::is($watcher, $message);
+        };
+
+        $this->app['events']->listen(MessageLogged::class, function ($event) use ($watcher, $callback) {
+            if ($watcher($event->level, $event->message, $event->context)) {
+                $callback($event->level, $event->message, $event->context);
+            }
+        });
+    }
+
+    /**
      * Extract the log channel from the given configuration.
      *
      * @param  array  $config
      * @return string
      */
-    protected function channel(array $config)
+    protected function parseChannel(array $config)
     {
         if (! isset($config['channel'])) {
             return $this->app->bound('env') ? $this->app->environment() : 'production';
