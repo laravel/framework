@@ -4,6 +4,7 @@ namespace Illuminate\Log;
 
 use Closure;
 use Throwable;
+use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
 use Monolog\Logger as Monolog;
@@ -85,8 +86,8 @@ class LogManager implements LogContract, LoggerInterface
     protected function get($name)
     {
         try {
-            return $this->stores[$name] ?? with($this->resolve($name), function ($monolog) {
-                return new Logger($monolog, $this->app['events']);
+            return $this->stores[$name] ?? with($this->resolve($name), function ($monolog) use ($name) {
+                return $this->tapInto($name, new Logger($monolog, $this->app['events']));
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -95,6 +96,35 @@ class LogManager implements LogContract, LoggerInterface
                 $logger->emergency($e);
             });
         }
+    }
+
+    /**
+     * Apply the configured taps for the logger.
+     *
+     * @param  string  $name
+     * @param  \Illuminate\Log\Logger  $logger
+     * @return \Illuminate\Log\Logger
+     */
+    protected function tapInto($name, Logger $logger)
+    {
+        foreach ($this->getConfig($name)['tap'] ?? [] as $tap) {
+            list($class, $arguments) = $this->parseTap($tap);
+
+            $this->app->make($class)->__invoke($logger, ...explode(',', $arguments));
+        }
+
+        return $logger;
+    }
+
+    /**
+     * Parse the given tap class string into a class name and arguments string.
+     *
+     * @param  string  $tap
+     * @return array
+     */
+    protected function parseTap($tap)
+    {
+        return Str::contains($tap, ':') ? explode(':', $tap, 2) : [$tap, ''];
     }
 
     /**

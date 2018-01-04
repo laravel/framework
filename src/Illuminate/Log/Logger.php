@@ -14,7 +14,7 @@ use Illuminate\Contracts\Logging\Log as LogContract;
 class Logger implements LogContract, LoggerInterface
 {
     /**
-     * The logger implementation.
+     * The underlying logger implementation.
      *
      * @var \Psr\Log\LoggerInterface
      */
