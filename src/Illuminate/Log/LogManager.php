@@ -14,9 +14,8 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
-use Illuminate\Contracts\Logging\Log as LogContract;
 
-class LogManager implements LogContract, LoggerInterface
+class LogManager implements LoggerInterface
 {
     /**
      * The application instance.
@@ -74,7 +73,7 @@ class LogManager implements LogContract, LoggerInterface
      */
     public function driver($driver = null)
     {
-        return $this->get($driver);
+        return $this->get($driver ?? $this->getDefaultDriver());
     }
 
     /**
@@ -134,9 +133,9 @@ class LogManager implements LogContract, LoggerInterface
      */
     protected function createEmergencyLogger()
     {
-        return new Monolog('laravel', $this->prepareHandlers([], [new StreamHandler(
+        return new Logger(new Monolog('laravel', $this->prepareHandlers([], [new StreamHandler(
                 $this->app->storagePath().'/logs/laravel.log', $this->level(['level' => 'debug'])
-        )]));
+        )])), $this->app['events']);
     }
 
     /**

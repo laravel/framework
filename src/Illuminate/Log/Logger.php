@@ -9,9 +9,8 @@ use Illuminate\Log\Events\MessageLogged;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Logging\Log as LogContract;
 
-class Logger implements LogContract, LoggerInterface
+class Logger implements LoggerInterface
 {
     /**
      * The underlying logger implementation.
