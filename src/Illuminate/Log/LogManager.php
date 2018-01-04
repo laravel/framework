@@ -361,7 +361,7 @@ class LogManager implements LoggerInterface
      */
     protected function configurationFor($name)
     {
-        return $this->app['config']["logging.logs.{$name}"];
+        return $this->app['config']["logging.channels.{$name}"];
     }
 
     /**
