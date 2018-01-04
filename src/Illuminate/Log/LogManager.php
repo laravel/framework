@@ -102,9 +102,9 @@ class LogManager implements LoggerInterface
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
-                $logger->emergency('Unable to create configured logger. Using emergency logger.');
-
-                $logger->emergency($e);
+                $logger->emergency('Unable to create configured logger. Using emergency logger.', [
+                    'exception' => $e,
+                ]);
             });
         }
     }
@@ -296,26 +296,6 @@ class LogManager implements LoggerInterface
     {
         return tap(new LineFormatter(null, null, true, true), function ($formatter) {
             $formatter->includeStacktraces();
-        });
-    }
-
-    /**
-     * Monitor log messages and execute a callback if a message matches a given truth test.
-     *
-     * @param  callable|string  $watcher
-     * @param  callable  $callback
-     * @return void
-     */
-    public function watch($watcher, $callback)
-    {
-        $watcher = is_callable($watcher) ? $watcher : function ($level, $message) use ($watcher) {
-            return Str::is($watcher, $message);
-        };
-
-        $this->app['events']->listen(MessageLogged::class, function ($event) use ($watcher, $callback) {
-            if ($watcher($event->level, $event->message, $event->context)) {
-                $callback($event->level, $event->message, $event->context);
-            }
         });
     }
 
