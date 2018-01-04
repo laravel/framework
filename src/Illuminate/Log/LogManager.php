@@ -13,7 +13,6 @@ use Monolog\Handler\SyslogHandler;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
-use Illuminate\Log\Events\MessageLogged;
 use Monolog\Handler\RotatingFileHandler;
 
 class LogManager implements LoggerInterface
