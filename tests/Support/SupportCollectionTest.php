@@ -1614,7 +1614,7 @@ class SupportCollectionTest extends TestCase
             'skilllevel',
             function ($item) {
                 return $item['roles'];
-            }
+            },
         ], true);
 
         $expected_result = [
