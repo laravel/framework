@@ -187,7 +187,7 @@ class LogManager implements LogContract, LoggerInterface
      */
     protected function createCustomDriver(array $config)
     {
-        return $this->app->make($config['factory'])->__invoke($config);
+        return $this->app->make($config['via'])->__invoke($config);
     }
 
     /**
