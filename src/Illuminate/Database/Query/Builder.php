@@ -2024,31 +2024,29 @@ class Builder
      * Retrieve the sum of the values of a given column.
      *
      * @param  string  $column
-     * @return mixed
+     * @return float|int
      */
     public function sum($column)
     {
-        $result = $this->aggregate(__FUNCTION__, [$column]);
-
-        return $result ?: 0;
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Retrieve the average of the values of a given column.
      *
      * @param  string  $column
-     * @return mixed
+     * @return float|int
      */
     public function avg($column)
     {
-        return $this->aggregate(__FUNCTION__, [$column]);
+        return $this->numericAggregate(__FUNCTION__, [$column]);
     }
 
     /**
      * Alias for the "avg" method.
      *
      * @param  string  $column
-     * @return mixed
+     * @return float|int
      */
     public function average($column)
     {
