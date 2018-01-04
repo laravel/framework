@@ -86,7 +86,7 @@ class LogManager implements LogContract, LoggerInterface
     {
         try {
             return $this->stores[$name] ?? with($this->resolve($name), function ($monolog) {
-                return new Writer($monolog, $this->app['events']);
+                return new Logger($monolog, $this->app['events']);
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {

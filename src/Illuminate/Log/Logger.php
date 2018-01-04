@@ -11,7 +11,7 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Logging\Log as LogContract;
 
-class Writer implements LogContract, LoggerInterface
+class Logger implements LogContract, LoggerInterface
 {
     /**
      * The logger implementation.
@@ -263,5 +263,17 @@ class Writer implements LogContract, LoggerInterface
     public function setEventDispatcher(Dispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Dynamically proxy method calls to the underlying logger.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->logger->{$method}(...$parameters);
     }
 }
