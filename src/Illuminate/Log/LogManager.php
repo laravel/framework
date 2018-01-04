@@ -87,7 +87,7 @@ class LogManager implements LogContract, LoggerInterface
     {
         try {
             return $this->stores[$name] ?? with($this->resolve($name), function ($monolog) use ($name) {
-                return $this->tapInto($name, new Logger($monolog, $this->app['events']));
+                return $this->tap($name, new Logger($monolog, $this->app['events']));
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -105,9 +105,9 @@ class LogManager implements LogContract, LoggerInterface
      * @param  \Illuminate\Log\Logger  $logger
      * @return \Illuminate\Log\Logger
      */
-    protected function tapInto($name, Logger $logger)
+    protected function tap($name, Logger $logger)
     {
-        foreach ($this->getConfig($name)['tap'] ?? [] as $tap) {
+        foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
             list($class, $arguments) = $this->parseTap($tap);
 
             $this->app->make($class)->__invoke($logger, ...explode(',', $arguments));
@@ -149,7 +149,7 @@ class LogManager implements LogContract, LoggerInterface
      */
     protected function resolve($name)
     {
-        $config = $this->getConfig($name);
+        $config = $this->configurationFor($name);
 
         if (is_null($config)) {
             throw new InvalidArgumentException("Log [{$name}] is not defined.");
@@ -328,7 +328,7 @@ class LogManager implements LogContract, LoggerInterface
      * @param  string  $name
      * @return array
      */
-    protected function getConfig($name)
+    protected function configurationFor($name)
     {
         return $this->app['config']["logging.logs.{$name}"];
     }
