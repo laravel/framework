@@ -654,6 +654,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
+        if (is_array($groupBy)) {
+            $nextLevelGroups = $groupBy;
+
+            $groupBy = array_shift($nextLevelGroups);
+        }
         $groupBy = $this->valueRetriever($groupBy);
 
         $results = [];
@@ -676,7 +681,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
         }
 
-        return new static($results);
+        $result = new static($results);
+        if (! empty($nextLevelGroups)) {
+            return $result->map->groupBy($nextLevelGroups, $preserveKeys);
+        }
+
+        return $result;
     }
 
     /**
