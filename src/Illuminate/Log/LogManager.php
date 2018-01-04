@@ -200,7 +200,7 @@ class LogManager implements LogContract, LoggerInterface
     {
         return new Monolog($this->channel($config), [
             $this->prepareHandler(
-                $config, new StreamHandler($config['path'], $this->level($config))
+                new StreamHandler($config['path'], $this->level($config))
             ),
         ]);
     }
@@ -214,7 +214,7 @@ class LogManager implements LogContract, LoggerInterface
     protected function createDailyDriver(array $config)
     {
         return new Monolog($this->channel($config), [
-            $this->prepareHandler($config, new RotatingFileHandler(
+            $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config)
             )),
         ]);
@@ -229,7 +229,7 @@ class LogManager implements LogContract, LoggerInterface
     protected function createSyslogDriver(array $config)
     {
         return new Monolog($this->channel($config), [
-            $this->prepareHandler($config, new SyslogHandler(
+            $this->prepareHandler(new SyslogHandler(
                 $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
             ),
         ]);
@@ -244,7 +244,7 @@ class LogManager implements LogContract, LoggerInterface
     protected function createErrorlogDriver(array $config)
     {
         return new Monolog($this->channel($config), [
-            $this->prepareHandler($config, new ErrorLogHandler(
+            $this->prepareHandler(new ErrorLogHandler(
                 $config['type'] ?? ErrorLogHandler::OPERATING_SYSTEM, $this->level($config))
             ),
         ]);
@@ -253,14 +253,13 @@ class LogManager implements LogContract, LoggerInterface
     /**
      * Prepare the handlers for usage by Monolog.
      *
-     * @param  array  $config
      * @param  array  $handlers
      * @return \Monolog\Handler\HandlerInterface
      */
-    protected function prepareHandlers(array $config, array $handlers)
+    protected function prepareHandlers(array $handlers)
     {
         foreach ($handlers as $key => $handler) {
-            $handlers[$key] = $this->prepareHandler($config, $handler);
+            $handlers[$key] = $this->prepareHandler($handler);
         }
 
         return $handlers;
@@ -269,27 +268,21 @@ class LogManager implements LogContract, LoggerInterface
     /**
      * Prepare the handler for usage by Monolog.
      *
-     * @param  array  $config
      * @param  \Monolog\Handler\HandlerInterface  $handler
      * @return \Monolog\Handler\HandlerInterface
      */
-    protected function prepareHandler(array $config, HandlerInterface $handler)
+    protected function prepareHandler(HandlerInterface $handler)
     {
-        return $handler->setFormatter($this->formatter($config));
+        return $handler->setFormatter($this->formatter());
     }
 
     /**
      * Get a Monolog formatter instance.
      *
-     * @param  array  $config
      * @return \Monolog\Formatter\FormatterInterface
      */
-    protected function formatter(array $config)
+    protected function formatter()
     {
-        if (isset($config['formatter'])) {
-            return $this->app->make($config['formatter'])->__invoke($config);
-        }
-
         return tap(new LineFormatter(null, null, true, true), function ($formatter) {
             $formatter->includeStacktraces();
         });
