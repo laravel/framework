@@ -2085,22 +2085,15 @@ class Builder
     {
         $result = $this->aggregate($function, $columns);
 
-        // If there is no result, we can obviously just return 0 here. Next, we will check
-        // if the result is an integer or float. If it is already one of these two data
-        // types we can just return the result as-is, otherwise we will convert this.
+        // If there is no result, we can obviously just return 0 here.
         if (! $result) {
             return 0;
         }
 
-        if (is_int($result) || is_float($result)) {
-            return $result;
-        }
-
-        // If the result doesn't contain a decimal place, we will assume it is an int then
-        // cast it to one. When it does we will cast it to a float since it needs to be
-        // cast to the expected data type for the developers out of pure convenience.
-        return strpos((string) $result, '.') === false
-                ? (int) $result : (float) $result;
+        // PHP automatically tries to coerce $result to a number if you try to add 0 to it.
+        // If the result contain a decimal place, it will be converted to float.
+        // If the result doesn't contain a decimal place, it will be converted to integer.
+        return $result + 0;
     }
 
     /**
