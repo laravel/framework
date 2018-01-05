@@ -199,7 +199,7 @@ class SessionManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['session.driver'];
+        return $this->app['config']['session.default'];
     }
 
     /**
@@ -210,6 +210,6 @@ class SessionManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['session.driver'] = $name;
+        $this->app['config']['session.default'] = $name;
     }
 }
