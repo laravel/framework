@@ -313,7 +313,7 @@ trait InteractsWithPivotTable
     protected function addTimestampsToAttachment(array $record, $exists = false)
     {
         $fresh = $this->parent->freshTimestamp();
-        
+
         if ($this->using) {
             $pivotModel = new $this->using;
             $fresh = $fresh->format($pivotModel::getDateFormat());
