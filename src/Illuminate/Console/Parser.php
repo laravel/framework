@@ -80,7 +80,7 @@ class Parser
      */
     protected static function parseArgument($token)
     {
-        list($token, $description) = static::extractDescription($token);
+        [$token, $description] = static::extractDescription($token);
 
         switch (true) {
             case Str::endsWith($token, '?*'):
@@ -106,7 +106,7 @@ class Parser
      */
     protected static function parseOption($token)
     {
-        list($token, $description) = static::extractDescription($token);
+        [$token, $description] = static::extractDescription($token);
 
         $matches = preg_split('/\s*\|\s*/', $token, 2);
 

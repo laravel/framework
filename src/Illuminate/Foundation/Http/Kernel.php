@@ -210,7 +210,7 @@ class Kernel implements KernelContract
                 continue;
             }
 
-            list($name) = $this->parseMiddleware($middleware);
+            [$name] = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
 
@@ -243,7 +243,7 @@ class Kernel implements KernelContract
      */
     protected function parseMiddleware($middleware)
     {
-        list($name, $parameters) = array_pad(explode(':', $middleware, 2), 2, []);
+        [$name, $parameters] = array_pad(explode(':', $middleware, 2), 2, []);
 
         if (is_string($parameters)) {
             $parameters = explode(',', $parameters);

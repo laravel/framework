@@ -32,7 +32,7 @@ class ViewController extends Controller
      */
     public function __invoke(...$args)
     {
-        list($view, $data) = array_slice($args, -2);
+        [$view, $data] = array_slice($args, -2);
 
         return $this->view->make($view, $data);
     }

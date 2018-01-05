@@ -74,7 +74,7 @@ class NamespacedItemResolver
      */
     protected function parseNamespacedSegments($key)
     {
-        list($namespace, $item) = explode('::', $key);
+        [$namespace, $item] = explode('::', $key);
 
         // First we'll just explode the first segment to get the namespace and group
         // since the item should be in the remaining segments. Once we have these
