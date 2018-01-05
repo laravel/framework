@@ -42,6 +42,18 @@ interface Application extends Container
     public function isDownForMaintenance();
 
     /**
+     * Throw an HttpException with the given data.
+     *
+     * @param  int     $code
+     * @param  string  $message
+     * @param  array   $headers
+     * @return void
+     *
+     * @throws \Symfony\Component\HttpKernel\Exception\HttpException
+     */
+    public function abort($code, $message = '', array $headers = []);
+
+    /**
      * Register all of the configured providers.
      *
      * @return void
