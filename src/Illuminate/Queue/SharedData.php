@@ -113,7 +113,7 @@ class SharedData implements Arrayable, Serializable
      */
     protected function serializing(array $items)
     {
-        return array_map(function($value) {
+        return array_map(function ($value) {
             if (is_array($value)) {
                 return $this->serializing($value);
             }
@@ -130,7 +130,7 @@ class SharedData implements Arrayable, Serializable
      */
     protected function unserializing(array $items)
     {
-        return array_map(function($value) {
+        return array_map(function ($value) {
             if (is_array($value)) {
                 return $this->unserializing($value);
             }

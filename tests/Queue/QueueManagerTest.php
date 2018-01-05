@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Queue\SharedData;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\SharedData;
 use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase

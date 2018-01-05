@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Illuminate\Queue\SharedData;
 use Schema;
+use Illuminate\Queue\SharedData;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
 
