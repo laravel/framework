@@ -456,4 +456,14 @@ class BladeCompiler extends Compiler implements CompilerInterface
     {
         $this->echoFormat = $format;
     }
+
+    /**
+     * Set the echo format to double encode entities.
+     *
+     * @return void
+     */
+    public function doubleEncode()
+    {
+        $this->setEchoFormat('e(%s, true)');
+    }
 }
