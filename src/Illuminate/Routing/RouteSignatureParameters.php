@@ -34,7 +34,7 @@ class RouteSignatureParameters
      */
     protected static function fromClassMethodString($uses)
     {
-        list($class, $method) = Str::parseCallback($uses);
+        [$class, $method] = Str::parseCallback($uses);
 
         if (! method_exists($class, $method) && is_callable($class, $method)) {
             return [];

@@ -878,7 +878,7 @@ class Builder
             // the parameter list is empty, so we will format the scope name and these
             // parameters here. Then, we'll be ready to call the scope on the model.
             if (is_int($scope)) {
-                list($scope, $parameters) = [$parameters, []];
+                [$scope, $parameters] = [$parameters, []];
             }
 
             // Next we'll pass the scope callback to the callScope method which will take
@@ -1083,7 +1083,7 @@ class Builder
             if (is_numeric($name)) {
                 $name = $constraints;
 
-                list($name, $constraints) = Str::contains($name, ':')
+                [$name, $constraints] = Str::contains($name, ':')
                             ? $this->createSelectWithConstraint($name)
                             : [$name, function () {
                                 //

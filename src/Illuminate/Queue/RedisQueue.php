@@ -162,7 +162,7 @@ class RedisQueue extends Queue implements QueueContract
     {
         $this->migrate($prefixed = $this->getQueue($queue));
 
-        list($job, $reserved) = $this->retrieveNextJob($prefixed);
+        [$job, $reserved] = $this->retrieveNextJob($prefixed);
 
         if ($reserved) {
             return new RedisJob(

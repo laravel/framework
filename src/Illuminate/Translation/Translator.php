@@ -112,7 +112,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     public function get($key, array $replace = [], $locale = null, $fallback = true)
     {
-        list($namespace, $group, $item) = $this->parseKey($key);
+        [$namespace, $group, $item] = $this->parseKey($key);
 
         // Here we will get the locale that should be used for the language line. If one
         // was not passed, we will use the default locales which was given to us when
@@ -298,7 +298,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function addLines(array $lines, $locale, $namespace = '*')
     {
         foreach ($lines as $key => $value) {
-            list($group, $item) = explode('.', $key, 2);
+            [$group, $item] = explode('.', $key, 2);
 
             Arr::set($this->loaded, "$namespace.$group.$locale.$item", $value);
         }
