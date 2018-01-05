@@ -68,7 +68,7 @@ class LogManager implements LoggerInterface
     /**
      * Get a log channel instance.
      *
-     * @param  string  $driver
+     * @param  string|null  $channel
      * @return mixed
      */
     public function channel($channel = null)
@@ -79,7 +79,7 @@ class LogManager implements LoggerInterface
     /**
      * Get a log driver instance.
      *
-     * @param  string  $driver
+     * @param  string|null  $driver
      * @return mixed
      */
     public function driver($driver = null)
@@ -167,15 +167,15 @@ class LogManager implements LoggerInterface
 
         if (isset($this->customCreators[$config['driver']])) {
             return $this->callCustomCreator($config);
-        } else {
-            $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
-
-            if (method_exists($this, $driverMethod)) {
-                return $this->{$driverMethod}($config);
-            } else {
-                throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
-            }
         }
+
+        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+
+        if (method_exists($this, $driverMethod)) {
+            return $this->{$driverMethod}($config);
+        }
+
+        throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
     }
 
     /**
@@ -264,7 +264,7 @@ class LogManager implements LoggerInterface
      * Prepare the handlers for usage by Monolog.
      *
      * @param  array  $handlers
-     * @return \Monolog\Handler\HandlerInterface
+     * @return array
      */
     protected function prepareHandlers(array $handlers)
     {
