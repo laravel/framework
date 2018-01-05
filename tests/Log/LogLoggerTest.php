@@ -6,7 +6,7 @@ use Mockery as m;
 use Illuminate\Log\Logger;
 use PHPUnit\Framework\TestCase;
 
-class LogWriterTest extends TestCase
+class LogLoggerTest extends TestCase
 {
     public function tearDown()
     {
@@ -21,7 +21,7 @@ class LogWriterTest extends TestCase
         $writer->error('foo');
     }
 
-    public function testWriterFiresEventsDispatcher()
+    public function testLoggerFiresEventsDispatcher()
     {
         $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = new \Illuminate\Events\Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
