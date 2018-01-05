@@ -40,8 +40,8 @@ interface Application extends Container
      * @return bool
      */
     public function isDownForMaintenance();
-    
-     /**
+
+    /**
      * Throw an HttpException with the given data.
      *
      * @param  int     $code
