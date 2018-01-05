@@ -2091,8 +2091,7 @@ class Builder
         }
 
         // PHP automatically tries to coerce $result to a number if you try to add 0 to it.
-        // If the result contain a decimal place, it will be converted to float.
-        // If the result doesn't contain a decimal place, it will be converted to integer.
+        // If the result contain a decimal place, it will be converted to float, otherwise to integer.
         return $result + 0;
     }
 
