@@ -484,7 +484,7 @@ class Grammar extends BaseGrammar
     {
         $values = $this->parameterize($where['values']);
 
-        return '('.join(', ', $where['columns']).') '.$where['operator'].' ('.$values.')';
+        return '('.implode(', ', $where['columns']).') '.$where['operator'].' ('.$values.')';
     }
 
     /**
