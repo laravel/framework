@@ -6,7 +6,8 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 
 class VerifyCsrfTokenExceptStub extends VerifyCsrfToken
 {
-    public function checkInExceptArray($request){
+    public function checkInExceptArray($request)
+    {
         return $this->inExceptArray($request);
     }
 

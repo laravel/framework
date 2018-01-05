@@ -2,11 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
-use Mockery as m;
-use Illuminate\Encryption\Encrypter;
-use Illuminate\Foundation\Application;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Encryption\Encrypter;
 
 class VerifyCsrfTokenExceptTest extends TestCase
 {
@@ -61,5 +59,4 @@ class VerifyCsrfTokenExceptTest extends TestCase
     {
         return $this->assertMatchingExcept($except, false);
     }
-
 }
