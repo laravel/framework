@@ -66,7 +66,7 @@ trait InteractsWithQueue
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return \Illuminate\Support\Collection|mixed
+     * @return \Illuminate\Queue\SharedData|mixed
      */
     public function shared($key, $default = null)
     {

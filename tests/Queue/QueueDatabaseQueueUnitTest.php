@@ -32,16 +32,18 @@ class QueueDatabaseQueueUnitTest extends TestCase
 
     public function testPushProperlyPushesJobWithSharedOntoDatabase()
     {
-        $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock('Illuminate\Database\Connection'), 'table', 'default'])->getMock();
-        $queue->setShared(new \Illuminate\Support\Collection([
+        $shared = new \Illuminate\Queue\SharedData([
             'firstname' => 'taylor',
             'surname' => 'otwell',
-        ]));
+        ]);
+
+        $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock('Illuminate\Database\Connection'), 'table', 'default'])->getMock();
+        $queue->setShared($shared);
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('stdClass'));
-        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) {
+        $query->shouldReceive('insertGetId')->once()->andReturnUsing(function ($array) use ($shared) {
             $this->assertEquals('default', $array['queue']);
-            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'shared' => ['firstname' => 'taylor', 'surname' => 'otwell']]), $array['payload']);
+            $this->assertEquals(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'shared' => serialize($shared)]), $array['payload']);
             $this->assertEquals(0, $array['attempts']);
             $this->assertNull($array['reserved_at']);
             $this->assertInternalType('int', $array['available_at']);

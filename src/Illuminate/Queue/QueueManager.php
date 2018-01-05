@@ -4,7 +4,6 @@ namespace Illuminate\Queue;
 
 use Closure;
 use InvalidArgumentException;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Queue\Factory as FactoryContract;
 use Illuminate\Contracts\Queue\Monitor as MonitorContract;
 
@@ -37,7 +36,7 @@ class QueueManager implements FactoryContract, MonitorContract
     /**
      * The shared data that should be added to the queue payload.
      *
-     * @var \Illuminate\Support\Collection
+     * @var \Illuminate\Queue\SharedData
      */
     protected $shared;
 
@@ -45,13 +44,13 @@ class QueueManager implements FactoryContract, MonitorContract
      * Create a new queue manager instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
-     * @param  \Illuminate\Support\Collection  $shared
+     * @param  \Illuminate\Queue\SharedData|null  $shared
      * @return void
      */
-    public function __construct($app, Collection $shared = null)
+    public function __construct($app, SharedData $shared = null)
     {
         $this->app = $app;
-        $this->shared = $shared ?? new Collection();
+        $this->shared = $shared ?? new SharedData();
     }
 
     /**
@@ -125,7 +124,7 @@ class QueueManager implements FactoryContract, MonitorContract
      *
      * @param  string|array|null  $key
      * @param  mixed  $value
-     * @return self|\Illuminate\Support\Collection
+     * @return self|\Illuminate\Queue\SharedData
      */
     public function share($key, $value = null)
     {

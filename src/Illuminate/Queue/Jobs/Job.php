@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Support\Collection;
+use Illuminate\Queue\SharedData;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
@@ -55,6 +55,13 @@ abstract class Job
      * @var string
      */
     protected $queue;
+
+    /**
+     * The shared data that was given on the request.
+     *
+     * @var \Illuminate\Queue\SharedData|null
+     */
+    protected $shared;
 
     /**
      * Get the job identifier.
@@ -200,17 +207,25 @@ abstract class Job
      *
      * @param  string|null  $key
      * @param  mixed  $default
-     * @return \Illuminate\Support\Collection|mixed
+     * @return \Illuminate\Queue\SharedData|mixed
      */
     public function shared($key, $default = null)
     {
-        $shared = Collection::make($this->payload()['shared'] ?? []);
+        if (is_null($this->shared)) {
+            $payload = $this->payload();
 
-        if (is_null($key)) {
-            return $shared;
+            if (isset($payload['shared'])) {
+                $this->shared = unserialize($payload['shared']);
+            } else {
+                $this->shared = new SharedData();
+            }
         }
 
-        return $shared->get($key, $default);
+        if (is_null($key)) {
+            return $this->shared;
+        }
+
+        return $this->shared->get($key, $default);
     }
 
     /**

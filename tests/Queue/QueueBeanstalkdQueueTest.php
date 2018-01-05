@@ -26,15 +26,17 @@ class QueueBeanstalkdQueueTest extends TestCase
 
     public function testPushProperlyPushesJobWithSharedOntoBeanstalkd()
     {
-        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
-        $queue->setShared(new \Illuminate\Support\Collection([
+        $shared = new \Illuminate\Queue\SharedData([
             'firstname' => 'taylor',
             'surname' => 'otwell',
-        ]));
+        ]);
+
+        $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
+        $queue->setShared($shared);
         $pheanstalk = $queue->getPheanstalk();
         $pheanstalk->shouldReceive('useTube')->once()->with('stack')->andReturn($pheanstalk);
         $pheanstalk->shouldReceive('useTube')->once()->with('default')->andReturn($pheanstalk);
-        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'shared' => ['firstname' => 'taylor', 'surname' => 'otwell']]), 1024, 0, 60);
+        $pheanstalk->shouldReceive('put')->twice()->with(json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'shared' => serialize($shared)]), 1024, 0, 60);
 
         $queue->push('foo', ['data'], 'stack');
         $queue->push('foo', ['data']);

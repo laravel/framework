@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Queue\SharedData;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Queue\QueueManager;
-use Illuminate\Support\Collection;
 
 class QueueManagerTest extends TestCase
 {
@@ -23,7 +23,7 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
-        $shared = new Collection();
+        $shared = new SharedData();
 
         $manager = new QueueManager($app, $shared);
         $connector = m::mock('stdClass');
@@ -48,7 +48,7 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
-        $shared = new Collection();
+        $shared = new SharedData();
 
         $manager = new QueueManager($app, $shared);
         $connector = m::mock('stdClass');
@@ -72,7 +72,7 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
-        $shared = new Collection();
+        $shared = new SharedData();
 
         $manager = new QueueManager($app, $shared);
         $connector = m::mock('stdClass');
@@ -96,10 +96,10 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
-        $shared = new Collection();
+        $shared = new SharedData();
 
         $manager = new QueueManager($app, $shared);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $manager->share(null));
+        $this->assertInstanceOf(\Illuminate\Queue\SharedData::class, $manager->share(null));
 
         $manager->share('foo', 'bar');
         $this->assertSame(['foo' => 'bar'], $shared->toArray());
