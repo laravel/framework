@@ -8,7 +8,7 @@ use Illuminate\Contracts\Hashing\Hasher;
 class HashManager extends Manager implements Hasher
 {
     /**
-     * Create an instance of the Brycrypt hash Driver.
+     * Create an instance of the Bcrypt hash Driver.
      *
      * @return BcryptHasher
      */
