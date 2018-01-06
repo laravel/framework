@@ -12,7 +12,7 @@ class ArgonHasher implements HasherContract
      *
      * @var int
      */
-    protected $processors = 2;
+    protected $threads = 2;
 
     /**
      * The default memory cost factor.
@@ -51,7 +51,7 @@ class ArgonHasher implements HasherContract
         $hash = password_hash($value, PASSWORD_ARGON2I, [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
-            'threads' => $this->processors($options),
+            'threads' => $this->threads($options),
         ]);
 
         if ($hash === false) {
@@ -90,7 +90,7 @@ class ArgonHasher implements HasherContract
         return password_needs_rehash($hashedValue, PASSWORD_ARGON2I, [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
-            'threads' => $this->processors($options),
+            'threads' => $this->threads($options),
         ]);
     }
 
@@ -101,9 +101,9 @@ class ArgonHasher implements HasherContract
      *
      * @return $this;
      */
-    public function setProcessors(int $threads)
+    public function setThreads(int $threads)
     {
-        $this->processors = $threads;
+        $this->threads = $threads;
 
         return $this;
     }
@@ -164,8 +164,8 @@ class ArgonHasher implements HasherContract
      * @param $options
      * @return int
      */
-    protected function processors($options)
+    protected function threads($options)
     {
-        return $options['processors'] ?? $this->processors;
+        return $options['threads'] ?? $this->threads;
     }
 }
