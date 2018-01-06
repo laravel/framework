@@ -35,4 +35,25 @@ trait CompilesHelpers
     {
         return "<?php echo method_field{$method}; ?>";
     }
+
+    /**
+     * Compile the hasError statements into valid PHP.
+     *
+     * @param  string  $field
+     * @return string
+     */
+    protected function compileHasError($field)
+    {
+        return "<?php if (\$errors->has{$field}): ?>";
+    }
+
+    /**
+     * Compile the end-hasError statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compileEndHasError()
+    {
+        return '<?php endif; ?>';
+    }
 }
