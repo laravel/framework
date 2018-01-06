@@ -49,7 +49,7 @@ abstract class Manager
     /**
      * Get a driver instance.
      *
-     * @param  string  $driver
+     * @param  string|null  $driver
      * @return mixed
      */
     public function driver($driver = null)
@@ -85,13 +85,14 @@ abstract class Manager
         // drivers using their own customized driver creator Closure to create it.
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
-        } else {
-            $method = 'create'.Str::studly($driver).'Driver';
-
-            if (method_exists($this, $method)) {
-                return $this->$method();
-            }
         }
+
+        $method = 'create'.Str::studly($driver).'Driver';
+
+        if (method_exists($this, $method)) {
+            return $this->$method();
+        }
+
         throw new InvalidArgumentException("Driver [$driver] not supported.");
     }
 
