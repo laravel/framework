@@ -22,7 +22,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function setup()
     {
-        parent::setup();
+        parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
