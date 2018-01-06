@@ -152,7 +152,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        return collect($joins)->map(function ($join) use ($query) {
+        return collect($joins)->map(function ($join) {
             $table = $this->wrapTable($join->table);
 
             return trim("{$join->type} join {$table} {$this->compileWheres($join)}");

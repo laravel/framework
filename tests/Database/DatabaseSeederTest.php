@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use Mockery\Mock;
 use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
 
@@ -16,7 +17,7 @@ class TestSeeder extends Seeder
 
 class TestDepsSeeder extends Seeder
 {
-    public function run(Mockery\Mock $someDependency)
+    public function run(Mock $someDependency)
     {
         //
     }
