@@ -16,7 +16,7 @@ class ConcurrentLimiterTest extends TestCase
 
     public function setup()
     {
-        parent::setup();
+        parent::setUp();
 
         $this->setUpRedis();
     }
