@@ -75,7 +75,7 @@
         "doctrine/dbal": "~2.6",
         "filp/whoops": "^2.1.4",
         "mockery/mockery": "~1.0",
-        "orchestra/testbench-core": "3.6.*",
+        "orchestra/testbench-core": "3.7.*",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~6.0",
         "predis/predis": "^1.1.1",
