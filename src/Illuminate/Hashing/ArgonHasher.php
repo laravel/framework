@@ -139,10 +139,10 @@ class ArgonHasher implements HasherContract
     /**
      * Extract the memory cost value from the options array.
      *
-     * @param $options
+     * @param  array  $options
      * @return int
      */
-    protected function memory($options)
+    protected function memory(array $options)
     {
         return $options['memory'] ?? $this->memory;
     }
@@ -150,10 +150,10 @@ class ArgonHasher implements HasherContract
     /**
      * Extract the time cost value from the options array.
      *
-     * @param $options
+     * @param  array  $options
      * @return int
      */
-    protected function time($options)
+    protected function time(array $options)
     {
         return $options['time'] ?? $this->time;
     }
@@ -161,10 +161,10 @@ class ArgonHasher implements HasherContract
     /**
      * Extract the threads value from the options array.
      *
-     * @param $options
+     * @param  array  $options
      * @return int
      */
-    protected function threads($options)
+    protected function threads(array $options)
     {
         return $options['threads'] ?? $this->threads;
     }
