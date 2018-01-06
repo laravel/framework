@@ -2328,7 +2328,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPageResolver(function () use ($path) {
+        Paginator::currentPageResolver(function () {
             return 1;
         });
 
@@ -2359,7 +2359,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldNotReceive('forPage');
         $builder->shouldNotReceive('get');
 
-        Paginator::currentPageResolver(function () use ($path) {
+        Paginator::currentPageResolver(function () {
             return 1;
         });
 
