@@ -157,6 +157,18 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->is('/'));
     }
 
+    public function testFullUrlIsMethod()
+    {
+        $request = Request::create('http://example.com/foo/bar', 'GET');
+
+        $this->assertTrue($request->fullUrlIs('http://example.com/foo/bar'));
+        $this->assertFalse($request->fullUrlIs('example.com*'));
+        $this->assertTrue($request->fullUrlIs('http://*'));
+        $this->assertTrue($request->fullUrlIs('*foo*'));
+        $this->assertTrue($request->fullUrlIs('*bar'));
+        $this->assertTrue($request->fullUrlIs('*'));
+    }
+
     public function testRouteIsMethod()
     {
         $request = Request::create('/foo/bar', 'GET');
