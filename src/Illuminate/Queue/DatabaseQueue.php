@@ -300,7 +300,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     public function deleteReserved($queue, $id)
     {
-        $this->database->transaction(function () use ($queue, $id) {
+        $this->database->transaction(function () use ($id) {
             if ($this->database->table($this->table)->lockForUpdate()->find($id)) {
                 $this->database->table($this->table)->where('id', $id)->delete();
             }
