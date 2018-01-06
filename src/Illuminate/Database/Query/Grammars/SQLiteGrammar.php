@@ -239,7 +239,6 @@ class SQLiteGrammar extends Grammar
      * Prepare the bindings for a delete statement.
      *
      * @param  array  $bindings
-     * @param  array  $values
      * @return array
      */
     public function prepareBindingsForDelete(array $bindings)
