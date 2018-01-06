@@ -103,7 +103,7 @@ class ArgonHasher implements HasherContract
      */
     public function setProcessors(int $threads)
     {
-        $this->threads = $threads;
+        $this->processors = $threads;
 
         return $this;
     }
