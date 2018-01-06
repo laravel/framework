@@ -1,6 +1,10 @@
 <?php
 
+namespace Illuminate\Tests\Database;
+
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 
@@ -24,15 +28,15 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $db->setAsGlobal();
 
-        $container = new Illuminate\Container\Container;
+        $container = new Container;
         $container->instance('db', $db->getDatabaseManager());
-        Illuminate\Support\Facades\Facade::setFacadeApplication($container);
+        Facade::setFacadeApplication($container);
     }
 
     public function tearDown()
     {
-        Illuminate\Support\Facades\Facade::clearResolvedInstances();
-        Illuminate\Support\Facades\Facade::setFacadeApplication(null);
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testRenamingAndChangingColumnsWork()
