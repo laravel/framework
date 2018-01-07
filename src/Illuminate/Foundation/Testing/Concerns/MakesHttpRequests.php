@@ -334,7 +334,7 @@ trait MakesHttpRequests
     {
         $kernel = $this->app->make(HttpKernel::class);
 
-        $files = array_merge($files, $this->extractFilesFromDataArray($parameters));
+        $files = array_merge_recursive($files, $this->extractFilesFromDataArray($parameters));
 
         $symfonyRequest = SymfonyRequest::create(
             $this->prepareUrlForRequest($uri), $method, $parameters,
