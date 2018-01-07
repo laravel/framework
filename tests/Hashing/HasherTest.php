@@ -27,6 +27,6 @@ class HasherTest extends TestCase
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
         $this->assertFalse($hasher->needsRehash($value));
-        $this->assertTrue($hasher->needsRehash($value, ['processors' => 1]));
+        $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
     }
 }
