@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
+use Illuminate\Foundation\Testing\Constraints\HasDatabaseCount;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
 
@@ -20,6 +21,24 @@ trait InteractsWithDatabase
     {
         $this->assertThat(
             $table, new HasInDatabase($this->getConnection($connection), $data)
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given where condition exists a certain number of times in the database.
+     *
+     * @param  int  $count
+     * @param  string  $table
+     * @param  array  $data
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertDatabaseCount($count, $table, array $data, $connection = null)
+    {
+        $this->assertThat(
+            $count, new HasDatabaseCount($table, $this->getConnection($connection), $data)
         );
 
         return $this;

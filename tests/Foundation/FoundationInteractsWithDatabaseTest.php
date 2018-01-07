@@ -6,6 +6,7 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Query\Builder;
+use PHPUnit\Framework\ExpectationFailedException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithDatabase;
 
 class FoundationInteractsWithDatabaseTest extends TestCase
@@ -78,6 +79,25 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         );
 
         $this->assertDatabaseHas($this->table, $this->data);
+    }
+
+    public function testDatabaseCount()
+    {
+        $this->mockCountBuilder(1);
+
+        $this->assertDatabaseCount(1, $this->table, $this->data);
+    }
+
+    public function testDatabaseWrongCount()
+    {
+        $this->expectException(ExpectationFailedException::class);
+        $this->expectExceptionMessage(
+            'Failed asserting that count of 1 rows in table [products] matches the attributes '.json_encode($this->data, JSON_PRETTY_PRINT)
+        );
+
+        $this->mockCountBuilder(2);
+
+        $this->assertDatabaseCount(1, $this->table, $this->data);
     }
 
     public function testDontSeeInDatabaseDoesNotFindResults()
