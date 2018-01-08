@@ -218,7 +218,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storeRawBlock($value)
     {
-        return $this->getRawPlaceHolder(
+        return $this->getRawPlaceholder(
             array_push($this->rawBlocks, $value) - 1
         );
     }
