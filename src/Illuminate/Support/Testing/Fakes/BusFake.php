@@ -40,7 +40,7 @@ class BusFake implements Dispatcher
      * @param  int  $times
      * @return void
      */
-    protected function assertDispatchedTimes($command, $times = 1)
+    public function assertDispatchedTimes($command, $times = 1)
     {
         PHPUnit::assertTrue(
             ($count = $this->dispatched($command)->count()) === $times,
