@@ -96,11 +96,11 @@ class SupportCarbonTest extends TestCase
 
     public function testSetStateReturnsCorrectType()
     {
-        $carbon = Carbon::__set_state(array(
+        $carbon = Carbon::__set_state([
             'date' => '2017-06-27 13:14:15.000000',
             'timezone_type' => 3,
             'timezone' => 'UTC',
-        ));
+        ]);
 
         $this->assertInstanceOf(Carbon::class, $carbon);
     }
