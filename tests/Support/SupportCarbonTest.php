@@ -93,4 +93,15 @@ class SupportCarbonTest extends TestCase
             'timezone' => 'UTC',
         ], $this->now->jsonSerialize());
     }
+
+    public function testSetStateReturnsCorrectType()
+    {
+        $carbon = Carbon::__set_state(array(
+            'date' => '2017-06-27 13:14:15.000000',
+            'timezone_type' => 3,
+            'timezone' => 'UTC',
+        ));
+
+        $this->assertInstanceOf(Carbon::class, $carbon);
+    }
 }
