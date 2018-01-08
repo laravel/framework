@@ -75,7 +75,8 @@ class MailServiceProvider extends ServiceProvider
         $address = Arr::get($config, $type);
 
         if (is_array($address) && isset($address['address'])) {
-            $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
+            $name = isset($address['name']) ? $address['name'] : NULL;
+            $mailer->{'always'.Str::studly($type)}($address['address'], $name);
         }
     }
 
