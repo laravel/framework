@@ -6,6 +6,7 @@ use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class BelongsToMany extends Relation
@@ -264,6 +265,16 @@ class BelongsToMany extends Relation
         }
 
         return $dictionary;
+    }
+
+    /**
+     * Get the class being used for pivot models.
+     *
+     * @return string
+     */
+    public function getPivotClass()
+    {
+        return $this->using ?? Pivot::class;
     }
 
     /**
