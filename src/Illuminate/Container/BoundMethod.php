@@ -111,12 +111,22 @@ class BoundMethod
     protected static function getMethodDependencies($container, $callback, array $parameters = [])
     {
         $dependencies = [];
+        $arguments = [];
 
         foreach (static::getCallReflector($callback)->getParameters() as $parameter) {
             static::addDependencyForCallParameter($container, $parameter, $parameters, $dependencies);
         }
 
-        return array_merge($dependencies, $parameters);
+        // Fill all the missing spots and consume rest of parameters
+        for ($i = 0; $i <= count($parameters) + count($dependencies); $i++) {
+            if (array_key_exists($i, $dependencies)) {
+                $arguments[] = $dependencies[$i];
+            } elseif ($param = array_shift($parameters)) {
+                $arguments[] = $param;
+            }
+        }
+
+        return $arguments;
     }
 
     /**
@@ -139,23 +149,23 @@ class BoundMethod
     /**
      * Get the dependency for the given call parameter.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \ReflectionParameter  $parameter
-     * @param  array  $parameters
-     * @param  array  $dependencies
+     * @param  \Illuminate\Container\Container $container
+     * @param  \ReflectionParameter $parameter
+     * @param  array $parameters
+     * @param  array $dependencies
      * @return mixed
      */
     protected static function addDependencyForCallParameter($container, $parameter,
                                                             array &$parameters, &$dependencies)
     {
         if (array_key_exists($parameter->name, $parameters)) {
-            $dependencies[] = $parameters[$parameter->name];
+            $dependencies[$parameter->getPosition()] = $parameters[$parameter->name];
 
             unset($parameters[$parameter->name]);
         } elseif ($parameter->getClass()) {
-            $dependencies[] = $container->make($parameter->getClass()->name);
+            $dependencies[$parameter->getPosition()] = $container->make($parameter->getClass()->name);
         } elseif ($parameter->isDefaultValueAvailable()) {
-            $dependencies[] = $parameter->getDefaultValue();
+            $dependencies[$parameter->getPosition()] = $parameter->getDefaultValue();
         }
     }
 
