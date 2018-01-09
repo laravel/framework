@@ -530,6 +530,14 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
+    public function testCallParameterOrder()
+    {
+        $container = new Container;
+        $stub = new ContainerTestCallStub;
+        $result = $container->call([$stub, 'order'], ['foo']);
+        $this->assertEquals(['foo', 'default'], $result);
+    }
+
     public function testCallWithStaticMethodNameString()
     {
         $container = new Container;
@@ -1090,6 +1098,11 @@ class ContainerTestCallStub
     }
 
     public function unresolvable($foo, $bar)
+    {
+        return func_get_args();
+    }
+
+    public function order($foo, $bar = 'default')
     {
         return func_get_args();
     }
