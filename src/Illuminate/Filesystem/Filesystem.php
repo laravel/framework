@@ -160,7 +160,7 @@ class Filesystem
      */
     public function chmod($path, $mode = null, $recursive = false)
     {
-        if ($recursive){
+        if ($recursive) {
             return $this->chmod_r($path, $mode);
         }
 
@@ -588,7 +588,7 @@ class Filesystem
 
             if ($item->isDir() && ! $item->isLink()) {
                 $this->chmod_r($item->getPathname(), $mode);
-            }else{
+            } else {
                 $this->chmod($item->getPathname(), $mode);
             }
         }
