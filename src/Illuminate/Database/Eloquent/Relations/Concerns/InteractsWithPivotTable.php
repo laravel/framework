@@ -316,7 +316,8 @@ trait InteractsWithPivotTable
 
         if ($this->using) {
             $pivotModel = new $this->using;
-            $fresh = $fresh->format($pivotModel::getDateFormat());
+
+            $fresh = $fresh->format($pivotModel->getDateFormat());
         }
 
         if (! $exists && $this->hasPivotColumn($this->createdAt())) {
