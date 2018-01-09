@@ -267,6 +267,16 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Get the class being used for pivot models.
+     *
+     * @return string
+     */
+    public function getPivotClass()
+    {
+        return $this->using ?? Pivot::class;
+    }
+
+    /**
      * Specify the custom pivot model to use for the relationship.
      *
      * @param  string  $class
