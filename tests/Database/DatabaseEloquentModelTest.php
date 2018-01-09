@@ -20,7 +20,7 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
-    public function setup()
+    public function setUp()
     {
         parent::setUp();
 
