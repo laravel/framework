@@ -47,7 +47,7 @@ class Carbon extends BaseCarbon implements JsonSerializable
     }
 
     /**
-     * The __set_state handler.
+     * Create a new Carbon instance based on the given state array.
      *
      * @param  array  $array
      * @return static
