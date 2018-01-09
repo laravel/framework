@@ -53,7 +53,7 @@ class FilesystemTest extends TestCase
         $files->makeDirectory($this->tempDir.'/temp2');
         $files->makeDirectory($this->tempDir.'/temp2/temp3');
         $files->put($this->tempDir.'/temp2/file1.txt','recursive1');
-        $files->put($this->tempDir.'/temp2/temp3/file2.txt','recursive2');
+        $files->put($this->tempDir.'/temp2/temp3/file2.txt', 'recursive2');
         $files->chmod($this->tempDir.'/temp2', 0777, true);
         $file1Permission = substr(sprintf('%o', fileperms($this->tempDir.'/temp2/file1.txt')), -4);
         $file2Permission = substr(sprintf('%o', fileperms($this->tempDir.'/temp2/temp3/file2.txt')), -4);
