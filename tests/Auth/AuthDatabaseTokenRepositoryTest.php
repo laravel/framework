@@ -9,7 +9,7 @@ use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    public function setup()
+    public function setUp()
     {
         parent::setUp();
 

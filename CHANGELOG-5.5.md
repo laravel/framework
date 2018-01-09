@@ -6,17 +6,22 @@
 - Added `Model::qualifyColumn()` method ([#22577](https://github.com/laravel/framework/pull/22577))
 - Added support for the `author_*` fields to `SlackAttachment` ([#22610](https://github.com/laravel/framework/pull/22610))
 - Added `UrlGenerator::getDefaultParameters()` method  ([#22572](https://github.com/laravel/framework/pull/22572))
+- Added option to double encode escaped strings ([61f8477](https://github.com/laravel/framework/commit/61f8477fab55a258f39a3d598f67f7cc0ffd6aca))
+- Added `BladeCompiler::doubleEncode()` method ([1cc96a1](https://github.com/laravel/framework/commit/1cc96a120955bc0d901f59dff7be1b99133fc7a1))
 
 ### Changed
 - Use `Arr::get()` in `Collection::get()` ([#22554](https://github.com/laravel/framework/pull/22554))
 - Pass entire config to `FtpAdapter` ([#22539](https://github.com/laravel/framework/pull/22539))
 - Support extending Eloquent relationships ([#22617](https://github.com/laravel/framework/pull/22617))
-- Changed handling of `VerifyCsrfToken::$except` ([#22619](https://github.com/laravel/framework/pull/22619))
+- Improved handling of `VerifyCsrfToken::$except` values ([#22619](https://github.com/laravel/framework/pull/22619), [#22661](https://github.com/laravel/framework/pull/22661))
 - Support multiple levels in `Collection::groupBy()` ([#22630](https://github.com/laravel/framework/pull/22630))
+- Clear user instance in `RequestGuard::setRequest()` ([#22649](https://github.com/laravel/framework/pull/22649))
+- Allow StudlyCase and snake_case migration names ([#22648](https://github.com/laravel/framework/pull/22648))
 
 ### Fixed
 - Close database connection when using `RefreshDatabase` trait ([#22569](https://github.com/laravel/framework/pull/22569))
 - Send status code `500` when using `dd()` ([#22581](https://github.com/laravel/framework/pull/22581))
+- Fixed parameter usage in `RedirectController` ([#22657](https://github.com/laravel/framework/pull/22657))
 
 
 ## v5.5.28 (2017-12-26)
