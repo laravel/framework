@@ -27,6 +27,25 @@ class QueueSyncQueueTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
     }
 
+    public function testPushShouldFireJobInstantlyWithShared()
+    {
+        unset($_SERVER['__sync.test']);
+
+        $shared = new \Illuminate\Queue\SharedData([
+            'firstname' => 'taylor',
+            'surname' => 'otwell',
+        ]);
+
+        $sync = new \Illuminate\Queue\SyncQueue;
+        $container = new \Illuminate\Container\Container;
+        $sync->setContainer($container);
+        $sync->setShared($shared);
+
+        $sync->push('Illuminate\Tests\Queue\SyncQueueTestHandler', ['foo' => 'bar']);
+        $this->assertInstanceOf('Illuminate\Queue\Jobs\SyncJob', $_SERVER['__sync.test'][0]);
+        $this->assertEquals(json_encode(['displayName' => 'Illuminate\\Tests\\Queue\\SyncQueueTestHandler', 'job' => 'Illuminate\\Tests\\Queue\\SyncQueueTestHandler', 'maxTries' => null, 'timeout' => null, 'data' => ['foo' => 'bar'], 'shared' => serialize($shared)]), $_SERVER['__sync.test'][0]->getRawBody());
+    }
+
     public function testFailedJobGetsHandledWhenAnExceptionIsThrown()
     {
         unset($_SERVER['__sync.failed']);

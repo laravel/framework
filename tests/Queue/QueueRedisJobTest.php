@@ -39,13 +39,25 @@ class QueueRedisJobTest extends TestCase
         $job->release(1);
     }
 
+    public function testGetSharedDataFromRedisJob()
+    {
+        $job = $this->getJob();
+
+        $this->assertSame('taylor', $job->shared('name'));
+        $this->assertSame('bar', $job->shared('foo', 'bar'));
+        $this->assertInstanceOf(\Illuminate\Queue\SharedData::class, $job->shared(null));
+        $this->assertSame(['name' => 'taylor'], $job->shared(null)->toArray());
+    }
+
     protected function getJob()
     {
+        $shared = serialize(new \Illuminate\Queue\SharedData(['name' => 'taylor']));
+
         return new \Illuminate\Queue\Jobs\RedisJob(
             m::mock(\Illuminate\Container\Container::class),
             m::mock(\Illuminate\Queue\RedisQueue::class),
-            json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1]),
-            json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2]),
+            json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 1, 'shared' => $shared]),
+            json_encode(['job' => 'foo', 'data' => ['data'], 'attempts' => 2, 'shared' => $shared]),
             'connection-name',
             'default'
         );

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue\Jobs;
 
+use Illuminate\Queue\SharedData;
 use Illuminate\Support\InteractsWithTime;
 
 abstract class Job
@@ -54,6 +55,13 @@ abstract class Job
      * @var string
      */
     protected $queue;
+
+    /**
+     * The shared data that was given on the request.
+     *
+     * @var \Illuminate\Queue\SharedData|null
+     */
+    protected $shared;
 
     /**
      * Get the job identifier.
@@ -192,6 +200,32 @@ abstract class Job
     public function payload()
     {
         return json_decode($this->getRawBody(), true);
+    }
+
+    /**
+     * Get the value from the shared data or return the default.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Queue\SharedData|mixed
+     */
+    public function shared($key, $default = null)
+    {
+        if (is_null($this->shared)) {
+            $payload = $this->payload();
+
+            if (isset($payload['shared'])) {
+                $this->shared = unserialize($payload['shared']);
+            } else {
+                $this->shared = new SharedData();
+            }
+        }
+
+        if (is_null($key)) {
+            return $this->shared;
+        }
+
+        return $this->shared->get($key, $default);
     }
 
     /**

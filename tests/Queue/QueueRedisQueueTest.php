@@ -23,6 +23,23 @@ class QueueRedisQueueTest extends TestCase
         $this->assertEquals('foo', $id);
     }
 
+    public function testPushProperlyPushesJobWithSharedOntoRedis()
+    {
+        $shared = new \Illuminate\Queue\SharedData([
+            'firstname' => 'taylor',
+            'surname' => 'otwell',
+        ]);
+
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue->setShared($shared);
+        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'shared' => serialize($shared), 'id' => 'foo', 'attempts' => 0]));
+
+        $id = $queue->push('foo', ['data']);
+        $this->assertEquals('foo', $id);
+    }
+
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();

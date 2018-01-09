@@ -32,6 +32,13 @@ abstract class Queue
     protected $connectionName;
 
     /**
+     * Set the shared data that is needed to be added to the payload.
+     *
+     * @var \Illuminate\Queue\SharedData
+     */
+    protected $shared;
+
+    /**
      * Push a new job onto the queue.
      *
      * @param  string  $queue
@@ -104,9 +111,15 @@ abstract class Queue
      */
     protected function createPayloadArray($job, $data = '')
     {
-        return is_object($job)
+        $payload = is_object($job)
                     ? $this->createObjectPayload($job)
                     : $this->createStringPayload($job, $data);
+
+        if (! is_null($this->shared) && $this->shared->isNotEmpty()) {
+            $payload['shared'] = serialize(clone $this->shared);
+        }
+
+        return $payload;
     }
 
     /**
@@ -208,5 +221,16 @@ abstract class Queue
     public function setContainer(Container $container)
     {
         $this->container = $container;
+    }
+
+    /**
+     * Set the shared data instance.
+     *
+     * @param  \Illuminate\Queue\SharedData  $shared
+     * @return void
+     */
+    public function setShared(SharedData $shared)
+    {
+        $this->shared = $shared;
     }
 }

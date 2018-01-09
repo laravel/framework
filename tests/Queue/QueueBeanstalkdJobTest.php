@@ -56,6 +56,17 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->bury();
     }
 
+    public function testGetSharedDataFromBeanstalkdJob()
+    {
+        $job = $this->getJob();
+        $job->getPheanstalkJob()->shouldReceive('getData')->andReturn(json_encode(['shared' => serialize(new \Illuminate\Queue\SharedData(['name' => 'taylor']))]));
+
+        $this->assertSame('taylor', $job->shared('name'));
+        $this->assertSame('bar', $job->shared('foo', 'bar'));
+        $this->assertInstanceOf(\Illuminate\Queue\SharedData::class, $job->shared(null));
+        $this->assertSame(['name' => 'taylor'], $job->shared(null)->toArray());
+    }
+
     protected function getJob()
     {
         return new \Illuminate\Queue\Jobs\BeanstalkdJob(

@@ -62,6 +62,20 @@ trait InteractsWithQueue
     }
 
     /**
+     * Get the value from the shared data or return the default.
+     *
+     * @param  string|null  $key
+     * @param  mixed  $default
+     * @return \Illuminate\Queue\SharedData|mixed
+     */
+    public function shared($key, $default = null)
+    {
+        if ($this->job) {
+            return $this->job->shared($key, $default);
+        }
+    }
+
+    /**
      * Set the base queue job instance.
      *
      * @param  \Illuminate\Contracts\Queue\Job  $job

@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Queue\SharedData;
 use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
@@ -22,8 +23,9 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
+        $shared = new SharedData();
 
-        $manager = new QueueManager($app);
+        $manager = new QueueManager($app, $shared);
         $connector = m::mock('stdClass');
         $queue = m::mock('stdClass');
         $queue->shouldReceive('setConnectionName')->once()->with('sync')->andReturnSelf();
@@ -33,6 +35,7 @@ class QueueManagerTest extends TestCase
         });
 
         $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('setShared')->once()->with($shared);
         $this->assertSame($queue, $manager->connection('sync'));
     }
 
@@ -45,8 +48,9 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
+        $shared = new SharedData();
 
-        $manager = new QueueManager($app);
+        $manager = new QueueManager($app, $shared);
         $connector = m::mock('stdClass');
         $queue = m::mock('stdClass');
         $queue->shouldReceive('setConnectionName')->once()->with('foo')->andReturnSelf();
@@ -55,6 +59,7 @@ class QueueManagerTest extends TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('setShared')->once()->with($shared);
 
         $this->assertSame($queue, $manager->connection('foo'));
     }
@@ -67,8 +72,9 @@ class QueueManagerTest extends TestCase
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
+        $shared = new SharedData();
 
-        $manager = new QueueManager($app);
+        $manager = new QueueManager($app, $shared);
         $connector = m::mock('stdClass');
         $queue = m::mock('stdClass');
         $queue->shouldReceive('setConnectionName')->once()->with('null')->andReturnSelf();
@@ -77,7 +83,28 @@ class QueueManagerTest extends TestCase
             return $connector;
         });
         $queue->shouldReceive('setContainer')->once()->with($app);
+        $queue->shouldReceive('setShared')->once()->with($shared);
 
         $this->assertSame($queue, $manager->connection('null'));
+    }
+
+    public function testShareIsHandledCorrectly()
+    {
+        $app = [
+            'config' => [
+                'queue.default' => 'null',
+            ],
+            'encrypter' => m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+        ];
+        $shared = new SharedData();
+
+        $manager = new QueueManager($app, $shared);
+        $this->assertInstanceOf(\Illuminate\Queue\SharedData::class, $manager->share(null));
+
+        $manager->share('foo', 'bar');
+        $this->assertSame(['foo' => 'bar'], $shared->toArray());
+
+        $manager->share(['foo' => 'bart', 'bar' => 'foo']);
+        $this->assertSame(['foo' => 'bart', 'bar' => 'foo'], $shared->toArray());
     }
 }
