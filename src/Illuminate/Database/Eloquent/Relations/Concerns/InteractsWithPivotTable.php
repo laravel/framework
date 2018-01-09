@@ -314,6 +314,11 @@ trait InteractsWithPivotTable
     {
         $fresh = $this->parent->freshTimestamp();
 
+        if ($this->using) {
+            $pivotModel = new $this->using;
+            $fresh = $fresh->format($pivotModel::getDateFormat());
+        }
+
         if (! $exists && $this->hasPivotColumn($this->createdAt())) {
             $record[$this->createdAt()] = $fresh;
         }
