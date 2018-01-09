@@ -47,6 +47,21 @@ class FilesystemTest extends TestCase
         $this->assertEquals('0755', $filePermission);
     }
 
+    public function testSetChmodRecursive()
+    {
+        $files = new Filesystem;
+        $files->makeDirectory($this->tempDir.'/temp2');
+        $files->makeDirectory($this->tempDir.'/temp2/temp3');
+        $files->put($this->tempDir.'/temp2/file1.txt', 'recursive1');
+        $files->put($this->tempDir.'/temp2/temp3/file2.txt', 'recursive2');
+        $files->chmod($this->tempDir.'/temp2', 0777, true);
+        $file1Permission = substr(sprintf('%o', fileperms($this->tempDir.'/temp2/file1.txt')), -4);
+        $file2Permission = substr(sprintf('%o', fileperms($this->tempDir.'/temp2/temp3/file2.txt')), -4);
+
+        $this->assertEquals('0777', $file1Permission);
+        $this->assertEquals('0777', $file2Permission);
+    }
+
     public function testGetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');

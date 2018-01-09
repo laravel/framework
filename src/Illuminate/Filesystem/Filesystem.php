@@ -155,10 +155,15 @@ class Filesystem
      *
      * @param  string  $path
      * @param  int  $mode
+     * @param bool  $recursive
      * @return mixed
      */
-    public function chmod($path, $mode = null)
+    public function chmod($path, $mode = null, $recursive = false)
     {
+        if ($recursive) {
+            return $this->chmod_r($path, $mode);
+        }
+
         if ($mode) {
             return chmod($path, $mode);
         }
@@ -562,5 +567,32 @@ class Filesystem
     public function cleanDirectory($directory)
     {
         return $this->deleteDirectory($directory, true);
+    }
+
+    /**
+     * Assign permissions in recursive mode.
+     *
+     * @param $directory
+     * @param $mode
+     * @return bool
+     */
+    private function chmod_r($directory, $mode)
+    {
+        if(! is_dir($directory)) {
+            return false;
+        }
+
+        $dir = new FilesystemIterator($directory);
+
+        foreach ($dir as $item) {
+
+            if ($item->isDir() && ! $item->isLink()) {
+                $this->chmod_r($item->getPathname(), $mode);
+            } else {
+                $this->chmod($item->getPathname(), $mode);
+            }
+        }
+
+        return true;
     }
 }
