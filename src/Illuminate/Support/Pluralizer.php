@@ -15,13 +15,11 @@ class Pluralizer
      */
     public static function plural($value, $count = 2)
     {
-        if ((int) $count === 1 || static::uncountable($value)) {
+        if ((int) $count === 1) {
             return $value;
         }
 
-        $plural = Inflector::pluralize($value);
-
-        return static::matchCase($plural, $value);
+        return static::matchCase(Inflector::pluralize($value), $value);
     }
 
     /**
@@ -35,17 +33,6 @@ class Pluralizer
         $singular = Inflector::singularize($value);
 
         return static::matchCase($singular, $value);
-    }
-
-    /**
-     * Determine if the given value is uncountable.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected static function uncountable($value)
-    {
-        return Inflector::pluralize($value) === $value;
     }
 
     /**
