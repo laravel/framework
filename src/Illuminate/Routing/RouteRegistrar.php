@@ -72,7 +72,7 @@ class RouteRegistrar
      */
     public function attribute($key, $value)
     {
-        if (! in_array($key, $this->allowedAttributes)) {
+        if (! in_array($key, $this->allowedAttributes, true)) {
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
@@ -163,11 +163,11 @@ class RouteRegistrar
      */
     public function __call($method, $parameters)
     {
-        if (in_array($method, $this->passthru)) {
+        if (in_array($method, $this->passthru, true)) {
             return $this->registerRoute($method, ...$parameters);
         }
 
-        if (in_array($method, $this->allowedAttributes)) {
+        if (in_array($method, $this->allowedAttributes, true)) {
             if ($method == 'middleware') {
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
             }

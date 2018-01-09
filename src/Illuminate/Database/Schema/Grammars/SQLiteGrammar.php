@@ -792,7 +792,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if (in_array($column->type, $this->serials, true) && $column->autoIncrement) {
             return ' primary key autoincrement';
         }
     }

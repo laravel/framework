@@ -182,7 +182,7 @@ class MySqlGrammar extends Grammar
     {
         $values = collect($values)->reject(function ($value, $column) {
             return $this->isJsonSelector($column) &&
-                in_array(gettype($value), ['boolean', 'integer', 'double']);
+                in_array(gettype($value), ['boolean', 'integer', 'double'], true);
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);

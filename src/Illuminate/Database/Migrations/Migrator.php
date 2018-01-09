@@ -108,7 +108,7 @@ class Migrator
     {
         return Collection::make($files)
                 ->reject(function ($file) use ($ran) {
-                    return in_array($this->getMigrationName($file), $ran);
+                    return in_array($this->getMigrationName($file), $ran, true);
                 })->values()->all();
     }
 

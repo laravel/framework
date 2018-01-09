@@ -42,8 +42,8 @@ class SortedMiddleware extends Collection
 
             $stripped = head(explode(':', $middleware));
 
-            if (in_array($stripped, $priorityMap)) {
-                $priorityIndex = array_search($stripped, $priorityMap);
+            if (in_array($stripped, $priorityMap, true)) {
+                $priorityIndex = array_search($stripped, $priorityMap, true);
 
                 // This middleware is in the priority map. If we have encountered another middleware
                 // that was also in the priority map and was at a lower priority than the current

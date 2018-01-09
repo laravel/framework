@@ -550,7 +550,7 @@ trait HasRelationships
     protected function guessBelongsToManyRelation()
     {
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-            return ! in_array($trace['function'], Model::$manyMethods);
+            return ! in_array($trace['function'], Model::$manyMethods, true);
         });
 
         return ! is_null($caller) ? $caller['function'] : null;
@@ -588,7 +588,7 @@ trait HasRelationships
      */
     public function touches($relation)
     {
-        return in_array($relation, $this->touches);
+        return in_array($relation, $this->touches, true);
     }
 
     /**
@@ -635,7 +635,7 @@ trait HasRelationships
     {
         $morphMap = Relation::morphMap();
 
-        if (! empty($morphMap) && in_array(static::class, $morphMap)) {
+        if (! empty($morphMap) && in_array(static::class, $morphMap, true)) {
             return array_search(static::class, $morphMap, true);
         }
 

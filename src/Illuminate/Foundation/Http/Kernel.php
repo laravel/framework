@@ -260,7 +260,7 @@ class Kernel implements KernelContract
      */
     public function hasMiddleware($middleware)
     {
-        return in_array($middleware, $this->middleware);
+        return in_array($middleware, $this->middleware, true);
     }
 
     /**
@@ -271,7 +271,7 @@ class Kernel implements KernelContract
      */
     public function prependMiddleware($middleware)
     {
-        if (array_search($middleware, $this->middleware) === false) {
+        if (array_search($middleware, $this->middleware, true) === false) {
             array_unshift($this->middleware, $middleware);
         }
 
@@ -286,7 +286,7 @@ class Kernel implements KernelContract
      */
     public function pushMiddleware($middleware)
     {
-        if (array_search($middleware, $this->middleware) === false) {
+        if (array_search($middleware, $this->middleware, true) === false) {
             $this->middleware[] = $middleware;
         }
 

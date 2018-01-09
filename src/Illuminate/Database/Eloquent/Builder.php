@@ -679,7 +679,7 @@ class Builder
         // columns are returned as you would expect from these Eloquent models.
         if (! $this->model->hasGetMutator($column) &&
             ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
+            ! in_array($column, $this->model->getDates(), true)) {
             return $results;
         }
 
@@ -1277,7 +1277,7 @@ class Builder
             return $this->callScope([$this->model, $scope], $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
+        if (in_array($method, $this->passthru, true)) {
             return $this->toBase()->{$method}(...$parameters);
         }
 

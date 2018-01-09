@@ -159,6 +159,6 @@ class EncryptCookies
      */
     public function isDisabled($name)
     {
-        return in_array($name, $this->except);
+        return in_array($name, $this->except, true);
     }
 }

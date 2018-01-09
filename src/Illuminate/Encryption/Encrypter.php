@@ -133,7 +133,7 @@ class Encrypter implements EncrypterContract
     {
         $payload = $this->getJsonPayload($payload);
 
-        $iv = base64_decode($payload['iv']);
+        $iv = base64_decode($payload['iv'], true);
 
         // Here we will decrypt the value. If we are able to successfully decrypt it
         // we will then unserialize it and return it out to the caller. If we are
@@ -182,7 +182,7 @@ class Encrypter implements EncrypterContract
      */
     protected function getJsonPayload($payload)
     {
-        $payload = json_decode(base64_decode($payload), true);
+        $payload = json_decode(base64_decode($payload, true), true);
 
         // If the payload is not valid JSON or does not have the proper keys set we will
         // assume it is invalid and bail out of the routine since we will not be able

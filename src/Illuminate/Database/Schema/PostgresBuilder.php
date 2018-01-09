@@ -37,7 +37,7 @@ class PostgresBuilder extends Builder
 
             $table = reset($row);
 
-            if (! in_array($table, $excludedTables)) {
+            if (! in_array($table, $excludedTables, true)) {
                 $tables[] = $table;
             }
         }
@@ -93,7 +93,7 @@ class PostgresBuilder extends Builder
         $table = explode('.', $table);
 
         if (is_array($schema = $this->connection->getConfig('schema'))) {
-            if (in_array($table[0], $schema)) {
+            if (in_array($table[0], $schema, true)) {
                 return [array_shift($table), implode('.', $table)];
             }
 

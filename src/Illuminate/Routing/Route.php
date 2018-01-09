@@ -133,7 +133,7 @@ class Route
         $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
 
-        if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
+        if (in_array('GET', $this->methods, true) && ! in_array('HEAD', $this->methods, true)) {
             $this->methods[] = 'HEAD';
         }
 

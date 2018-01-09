@@ -76,7 +76,7 @@ class StatusCommand extends BaseCommand
                     ->map(function ($migration) use ($ran) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
-                        return in_array($migrationName, $ran)
+                        return in_array($migrationName, $ran, true)
                                 ? ['<info>Y</info>', $migrationName]
                                 : ['<fg=red>N</fg=red>', $migrationName];
                     });

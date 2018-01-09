@@ -223,7 +223,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return $this->first($key, $placeholder) !== $placeholder;
             }
 
-            return in_array($key, $this->items);
+            return in_array($key, $this->items, true);
         }
 
         return $this->contains($this->operatorForWhere(...func_get_args()));
@@ -483,7 +483,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             });
 
             if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
-                return in_array($operator, ['!=', '<>', '!==']);
+                return in_array($operator, ['!=', '<>', '!=='], true);
             }
 
             switch ($operator) {
@@ -1779,7 +1779,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function __get($key)
     {
-        if (! in_array($key, static::$proxies)) {
+        if (! in_array($key, static::$proxies, true)) {
             throw new Exception("Property [{$key}] does not exist on this collection instance.");
         }
 
