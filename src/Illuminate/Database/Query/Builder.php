@@ -605,8 +605,8 @@ class Builder
      */
     protected function invalidOperatorAndValue($operator, $value)
     {
-        return is_null($value) && in_array($operator, $this->operators) &&
-             ! in_array($operator, ['=', '<>', '!=']);
+        return is_null($value) && in_array($operator, $this->operators, true) &&
+             ! in_array($operator, ['=', '<>', '!='], true);
     }
 
     /**

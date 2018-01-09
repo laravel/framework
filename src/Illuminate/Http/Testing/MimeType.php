@@ -811,7 +811,7 @@ class MimeType
      */
     public static function search($mimeType)
     {
-        return array_search($mimeType, self::$mimes) ?: null;
+        return array_search($mimeType, self::$mimes, true) ?: null;
     }
 
     /**

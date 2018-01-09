@@ -228,7 +228,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function addExtension($extension)
     {
-        if (($index = array_search($extension, $this->extensions)) !== false) {
+        if (($index = array_search($extension, $this->extensions, true)) !== false) {
             unset($this->extensions[$index]);
         }
 

@@ -99,7 +99,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         if (isset($session->payload)) {
             $this->exists = true;
 
-            return base64_decode($session->payload);
+            return base64_decode($session->payload, true);
         }
 
         return '';

@@ -3761,7 +3761,7 @@ class ValidationValidatorTest extends TestCase
                 'states.*' => new class implements Rule {
                     public function passes($attribute, $value)
                     {
-                        return in_array($value, ['AK', 'HI']);
+                        return in_array($value, ['AK', 'HI'], true);
                     }
 
                     public function message()

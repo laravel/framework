@@ -304,7 +304,7 @@ class Event
      */
     public function runsInEnvironment($environment)
     {
-        return empty($this->environments) || in_array($environment, $this->environments);
+        return empty($this->environments) || in_array($environment, $this->environments, true);
     }
 
     /**

@@ -84,7 +84,7 @@ class Builder
     public function hasColumn($table, $column)
     {
         return in_array(
-            strtolower($column), array_map('strtolower', $this->getColumnListing($table))
+            strtolower($column), array_map('strtolower', $this->getColumnListing($table)), true
         );
     }
 
@@ -100,7 +100,7 @@ class Builder
         $tableColumns = array_map('strtolower', $this->getColumnListing($table));
 
         foreach ($columns as $column) {
-            if (! in_array(strtolower($column), $tableColumns)) {
+            if (! in_array(strtolower($column), $tableColumns, true)) {
                 return false;
             }
         }

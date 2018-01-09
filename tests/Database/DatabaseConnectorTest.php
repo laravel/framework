@@ -165,7 +165,7 @@ class DatabaseConnectorTest extends TestCase
     {
         extract($config, EXTR_SKIP);
 
-        if (in_array('dblib', PDO::getAvailableDrivers())) {
+        if (in_array('dblib', PDO::getAvailableDrivers(), true)) {
             $port = isset($config['port']) ? ':'.$port : '';
             $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
             $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';

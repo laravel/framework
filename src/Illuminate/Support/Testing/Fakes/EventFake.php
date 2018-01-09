@@ -222,7 +222,7 @@ class EventFake implements Dispatcher
      */
     protected function shouldFakeEvent($eventName)
     {
-        return empty($this->eventsToFake) || in_array($eventName, $this->eventsToFake);
+        return empty($this->eventsToFake) || in_array($eventName, $this->eventsToFake, true);
     }
 
     /**

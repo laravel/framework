@@ -369,7 +369,7 @@ class Validator implements ValidatorContract
      */
     protected function dependsOnOtherFields($rule)
     {
-        return in_array($rule, $this->dependentRules);
+        return in_array($rule, $this->dependentRules, true);
     }
 
     /**
@@ -404,7 +404,7 @@ class Validator implements ValidatorContract
     protected function getPrimaryAttribute($attribute)
     {
         foreach ($this->implicitAttributes as $unparsed => $parsed) {
-            if (in_array($attribute, $parsed)) {
+            if (in_array($attribute, $parsed, true)) {
                 return $unparsed;
             }
         }
@@ -469,7 +469,7 @@ class Validator implements ValidatorContract
     protected function isImplicit($rule)
     {
         return $rule instanceof ImplicitRule ||
-               in_array($rule, $this->implicitRules);
+               in_array($rule, $this->implicitRules, true);
     }
 
     /**
@@ -487,7 +487,7 @@ class Validator implements ValidatorContract
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
         return array_key_exists($attribute, $data)
-                    || in_array($attribute, array_keys($this->data));
+                    || in_array($attribute, array_keys($this->data), true);
     }
 
     /**
@@ -517,7 +517,7 @@ class Validator implements ValidatorContract
      */
     protected function hasNotFailedPreviousRuleIfPresenceRule($rule, $attribute)
     {
-        return in_array($rule, ['Unique', 'Exists']) ? ! $this->messages->has($attribute) : true;
+        return in_array($rule, ['Unique', 'Exists'], true) ? ! $this->messages->has($attribute) : true;
     }
 
     /**
@@ -552,7 +552,7 @@ class Validator implements ValidatorContract
         }
 
         if (isset($this->failedRules[$attribute]) &&
-            in_array('uploaded', array_keys($this->failedRules[$attribute]))) {
+            in_array('uploaded', array_keys($this->failedRules[$attribute]), true)) {
             return true;
         }
 
@@ -699,7 +699,7 @@ class Validator implements ValidatorContract
         foreach ($this->rules[$attribute] as $rule) {
             list($rule, $parameters) = ValidationRuleParser::parse($rule);
 
-            if (in_array($rule, $rules)) {
+            if (in_array($rule, $rules, true)) {
                 return [$rule, $parameters];
             }
         }

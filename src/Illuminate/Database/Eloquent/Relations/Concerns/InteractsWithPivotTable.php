@@ -184,7 +184,7 @@ trait InteractsWithPivotTable
      */
     public function updateExistingPivot($id, array $attributes, $touch = true)
     {
-        if (in_array($this->updatedAt(), $this->pivotColumns)) {
+        if (in_array($this->updatedAt(), $this->pivotColumns, true)) {
             $attributes = $this->addTimestampsToAttachment($attributes, true);
         }
 
@@ -333,7 +333,7 @@ trait InteractsWithPivotTable
      */
     protected function hasPivotColumn($column)
     {
-        return in_array($column, $this->pivotColumns);
+        return in_array($column, $this->pivotColumns, true);
     }
 
     /**

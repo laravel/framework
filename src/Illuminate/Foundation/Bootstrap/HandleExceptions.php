@@ -146,7 +146,7 @@ class HandleExceptions
      */
     protected function isFatal($type)
     {
-        return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE]);
+        return in_array($type, [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE], true);
     }
 
     /**

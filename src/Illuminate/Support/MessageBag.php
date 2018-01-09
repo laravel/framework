@@ -76,7 +76,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     {
         $messages = (array) $this->messages;
 
-        return ! isset($messages[$key]) || ! in_array($message, $messages[$key]);
+        return ! isset($messages[$key]) || ! in_array($message, $messages[$key], true);
     }
 
     /**

@@ -528,11 +528,11 @@ trait ValidatesAttributes
             return $key != $attribute && (bool) preg_match('#^'.$pattern.'\z#u', $key);
         });
 
-        if (in_array('ignore_case', $parameters)) {
+        if (in_array('ignore_case', $parameters, true)) {
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data));
+        return ! in_array($value, array_values($data), true);
     }
 
     /**
@@ -726,7 +726,7 @@ trait ValidatesAttributes
      */
     public function guessColumnForQuery($attribute)
     {
-        if (in_array($attribute, Arr::collapse($this->implicitAttributes))
+        if (in_array($attribute, Arr::collapse($this->implicitAttributes), true)
                 && ! is_numeric($last = last(explode('.', $attribute)))) {
             return $last;
         }
@@ -813,7 +813,7 @@ trait ValidatesAttributes
             return count(array_diff($value, $parameters)) == 0;
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return ! is_array($value) && in_array((string) $value, $parameters, true);
     }
 
     /**
@@ -836,7 +836,7 @@ trait ValidatesAttributes
             return Str::is($parameters[0], $key);
         });
 
-        return in_array($value, $otherValues);
+        return in_array($value, $otherValues, true);
     }
 
     /**
@@ -942,7 +942,7 @@ trait ValidatesAttributes
             return false;
         }
 
-        return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters);
+        return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters, true);
     }
 
     /**
@@ -964,8 +964,8 @@ trait ValidatesAttributes
         }
 
         return $value->getPath() !== '' &&
-                (in_array($value->getMimeType(), $parameters) ||
-                 in_array(explode('/', $value->getMimeType())[0].'/*', $parameters));
+                (in_array($value->getMimeType(), $parameters, true) ||
+                 in_array(explode('/', $value->getMimeType())[0].'/*', $parameters, true));
     }
 
     /**
@@ -977,7 +977,7 @@ trait ValidatesAttributes
      */
     protected function shouldBlockPhpUpload($value, $parameters)
     {
-        if (in_array('php', $parameters)) {
+        if (in_array('php', $parameters, true)) {
             return false;
         }
 
@@ -1111,7 +1111,7 @@ trait ValidatesAttributes
             $values = $this->convertValuesToBoolean($values);
         }
 
-        if (in_array($other, $values)) {
+        if (in_array($other, $values, true)) {
             return $this->validateRequired($attribute, $value);
         }
 
@@ -1153,7 +1153,7 @@ trait ValidatesAttributes
 
         $values = array_slice($parameters, 1);
 
-        if (! in_array($data, $values)) {
+        if (! in_array($data, $values, true)) {
             return $this->validateRequired($attribute, $value);
         }
 

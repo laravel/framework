@@ -466,7 +466,7 @@ if (! function_exists('data_get')) {
 
                 $result = Arr::pluck($target, $key);
 
-                return in_array('*', $key) ? Arr::collapse($result) : $result;
+                return in_array('*', $key, true) ? Arr::collapse($result) : $result;
             }
 
             if (Arr::accessible($target) && Arr::exists($target, $segment)) {

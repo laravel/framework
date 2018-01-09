@@ -114,7 +114,7 @@ class ChangeColumn
     {
         $options = ['type' => static::getDoctrineColumnType($fluent['type'])];
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
+        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'], true)) {
             $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
         }
 

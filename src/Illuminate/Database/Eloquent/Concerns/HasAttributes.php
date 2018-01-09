@@ -171,7 +171,7 @@ trait HasAttributes
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
         foreach ($this->getCasts() as $key => $value) {
-            if (! array_key_exists($key, $attributes) || in_array($key, $mutatedAttributes)) {
+            if (! array_key_exists($key, $attributes) || in_array($key, $mutatedAttributes, true)) {
                 continue;
             }
 
@@ -350,7 +350,7 @@ trait HasAttributes
         // If the attribute is listed as a date, we will convert it to a DateTime
         // instance on retrieval, which makes it quite convenient to work with
         // date fields without having to create a mutator for each property.
-        if (in_array($key, $this->getDates()) &&
+        if (in_array($key, $this->getDates(), true) &&
             ! is_null($value)) {
             return $this->asDateTime($value);
         }
@@ -567,7 +567,7 @@ trait HasAttributes
      */
     protected function isDateAttribute($key)
     {
-        return in_array($key, $this->getDates()) ||
+        return in_array($key, $this->getDates(), true) ||
                                     $this->isDateCastable($key);
     }
 

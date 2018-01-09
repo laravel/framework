@@ -223,7 +223,7 @@ class StartSession
     {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! in_array($config['driver'], [null, 'array']);
+        return ! in_array($config['driver'], [null, 'array'], true);
     }
 
     /**
