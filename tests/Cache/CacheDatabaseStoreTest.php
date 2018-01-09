@@ -9,7 +9,7 @@ use Illuminate\Cache\DatabaseStore;
 
 class CacheDatabaseStoreTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

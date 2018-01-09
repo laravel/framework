@@ -10,7 +10,7 @@ use Illuminate\Contracts\Notifications\Dispatcher;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Mockery::close();
     }

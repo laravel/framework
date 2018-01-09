@@ -12,7 +12,7 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

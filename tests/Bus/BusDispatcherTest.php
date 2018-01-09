@@ -10,7 +10,7 @@ use Illuminate\Config\Repository as Config;
 
 class BusDispatcherTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

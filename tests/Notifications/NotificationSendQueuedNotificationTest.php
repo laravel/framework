@@ -8,7 +8,7 @@ use Illuminate\Notifications\SendQueuedNotifications;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Mockery::close();
     }

@@ -10,7 +10,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class HttpRequestTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

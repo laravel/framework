@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\SlackMessage;
 
 class NotificationSlackChannelTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Mockery::close();
     }

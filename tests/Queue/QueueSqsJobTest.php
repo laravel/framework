@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsJobTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
@@ -45,7 +45,7 @@ class QueueSqsJobTest extends TestCase
         ];
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

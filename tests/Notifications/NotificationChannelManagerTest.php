@@ -12,7 +12,7 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Mockery::close();
     }

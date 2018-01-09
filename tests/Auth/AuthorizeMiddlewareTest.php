@@ -21,12 +21,12 @@ class AuthorizeMiddlewareTest extends TestCase
     protected $container;
     protected $user;
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

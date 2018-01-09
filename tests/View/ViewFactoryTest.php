@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ViewFactoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

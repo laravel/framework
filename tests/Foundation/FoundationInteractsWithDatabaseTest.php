@@ -18,12 +18,12 @@ class FoundationInteractsWithDatabaseTest extends TestCase
 
     protected $connection;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->connection = m::mock(Connection::class);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

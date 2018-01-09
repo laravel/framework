@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConsoleApplicationTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

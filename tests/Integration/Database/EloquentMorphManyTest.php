@@ -12,7 +12,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentMorphManyTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

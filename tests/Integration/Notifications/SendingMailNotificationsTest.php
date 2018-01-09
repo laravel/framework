@@ -21,7 +21,7 @@ class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 
@@ -52,7 +52,7 @@ class SendingMailNotificationsTest extends TestCase
         });
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

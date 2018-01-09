@@ -24,7 +24,7 @@ class EloquentDeleteTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
