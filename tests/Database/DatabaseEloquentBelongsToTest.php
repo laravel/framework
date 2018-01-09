@@ -13,7 +13,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     protected $related;
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

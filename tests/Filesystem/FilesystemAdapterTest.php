@@ -12,12 +12,12 @@ class FilesystemAdapterTest extends TestCase
 {
     private $filesystem;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->filesystem = new Filesystem(new Local(__DIR__.'/tmp'));
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         $filesystem = new Filesystem(new Local(__DIR__));
         $filesystem->deleteDir('tmp');

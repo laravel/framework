@@ -9,13 +9,13 @@ use PHPUnit\Framework\TestCase;
 
 class SupportFacadeTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         \Illuminate\Support\Facades\Facade::clearResolvedInstances();
         FacadeStub::setFacadeApplication(null);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

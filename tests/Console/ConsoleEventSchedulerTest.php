@@ -8,7 +8,7 @@ use Illuminate\Console\Scheduling\Schedule;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -23,7 +23,7 @@ class ConsoleEventSchedulerTest extends TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

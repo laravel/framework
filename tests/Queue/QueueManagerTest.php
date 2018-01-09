@@ -8,7 +8,7 @@ use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

@@ -13,7 +13,7 @@ use Illuminate\Routing\Middleware\ThrottleRequests;
  */
 class ThrottleRequestsTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         Carbon::setTestNow(null);

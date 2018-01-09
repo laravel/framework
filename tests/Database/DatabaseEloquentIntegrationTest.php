@@ -21,7 +21,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    protected function setUp()
     {
         $db = new DB;
 
@@ -114,7 +114,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown()
     {
         foreach (['default', 'second_connection'] as $connection) {
             $this->schema($connection)->drop('users');

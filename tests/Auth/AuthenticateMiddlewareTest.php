@@ -18,12 +18,12 @@ class AuthenticateMiddlewareTest extends TestCase
 {
     protected $auth;
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function setUp()
+    protected function setUp()
     {
         $container = Container::setInstance(new Container);
 

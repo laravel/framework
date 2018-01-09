@@ -8,7 +8,7 @@ use Illuminate\Cache\CacheManager;
 
 class CacheManagerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
