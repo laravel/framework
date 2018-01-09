@@ -43,6 +43,22 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertEquals($mockUser, $user);
     }
 
+    public function testRetrieveByTokenReturnsNullWhenRememberTokenReturnsTrue()
+    {
+        $mockUser = m::mock('stdClass');
+        $mockUser->shouldReceive('getRememberToken')->once()->andReturn(true);
+
+        $provider = $this->getProviderMock();
+        $mock = m::mock('stdClass');
+        $mock->shouldReceive('getAuthIdentifierName')->once()->andReturn('id');
+        $mock->shouldReceive('where')->once()->with('id', 1)->andReturn($mock);
+        $mock->shouldReceive('first')->once()->andReturn($mockUser);
+        $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
+        $user = $provider->retrieveByToken(1, 'a');
+
+        $this->assertNull($user);
+    }
+
     public function testRetrieveTokenWithBadIdentifierReturnsNull()
     {
         $provider = $this->getProviderMock();

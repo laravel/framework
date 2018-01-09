@@ -68,7 +68,7 @@ class EloquentUserProvider implements UserProvider
             return null;
         }
 
-        $rememberToken = $model->getRememberToken();
+        $rememberToken = (string) $model->getRememberToken();
 
         return $rememberToken && hash_equals($rememberToken, $token) ? $model : null;
     }
