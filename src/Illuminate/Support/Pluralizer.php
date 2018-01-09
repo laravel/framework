@@ -7,55 +7,6 @@ use Doctrine\Common\Inflector\Inflector;
 class Pluralizer
 {
     /**
-     * Uncountable word forms.
-     *
-     * @var array
-     */
-    public static $uncountable = [
-        'audio',
-        'bison',
-        'cattle',
-        'chassis',
-        'compensation',
-        'coreopsis',
-        'data',
-        'deer',
-        'education',
-        'emoji',
-        'equipment',
-        'evidence',
-        'feedback',
-        'firmware',
-        'fish',
-        'furniture',
-        'gold',
-        'hardware',
-        'information',
-        'jedi',
-        'kin',
-        'knowledge',
-        'love',
-        'metadata',
-        'money',
-        'moose',
-        'news',
-        'nutrition',
-        'offspring',
-        'plankton',
-        'pokemon',
-        'police',
-        'rain',
-        'rice',
-        'series',
-        'sheep',
-        'software',
-        'species',
-        'swine',
-        'traffic',
-        'wheat',
-    ];
-
-    /**
      * Get the plural form of an English word.
      *
      * @param  string  $value
@@ -94,7 +45,7 @@ class Pluralizer
      */
     protected static function uncountable($value)
     {
-        return in_array(strtolower($value), static::$uncountable);
+        return Inflector::pluralize($value) === $value;
     }
 
     /**
