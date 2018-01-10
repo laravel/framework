@@ -3,9 +3,12 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Concerns\SetsOppositeRelations;
 
 class HasMany extends HasOneOrMany
 {
+    use SetsOppositeRelations;
+    
     /**
      * Get the results of the relationship.
      *
@@ -13,7 +16,11 @@ class HasMany extends HasOneOrMany
      */
     public function getResults()
     {
-        return $this->query->get();
+        $model = $this->query->get();
+
+        $this->setOppositeRelation($model);
+
+        return $model;
     }
 
     /**

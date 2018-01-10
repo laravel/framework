@@ -383,6 +383,7 @@ trait HasAttributes
         // relationship has already been loaded, so we'll just return it out of
         // here because there is no need to query within the relations twice.
         if ($this->relationLoaded($key)) {
+            $this->$key()->setOppositeRelation($this->relations[$key]);
             return $this->relations[$key];
         }
 
