@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Illuminate\Foundation\Auth\User;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Auth\User;
 
 class AuthenticatableTest extends TestCase
 {
@@ -13,7 +13,7 @@ class AuthenticatableTest extends TestCase
         $user->setRememberToken('sample_token');
         $this->assertSame('sample_token', $user->getRememberToken());
     }
-    
+
     public function testItReturnsStringAsRememberTokenWhenItWasSetToTrue()
     {
         $user = new User();
