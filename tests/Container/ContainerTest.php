@@ -44,6 +44,19 @@ class ContainerTest extends TestCase
         $this->assertEquals('Taylor', $container->make('name'));
     }
 
+    public function testBindIfDoesRegisterIfServiceNotRegisteredYet()
+    {
+        $container = new Container;
+        $container->bind('surname', function () {
+            return 'Taylor';
+        });
+        $container->bindIf('name', function () {
+            return 'Dayle';
+        });
+
+        $this->assertEquals('Dayle', $container->make('name'));
+    }
+
     public function testSharedClosureResolution()
     {
         $container = new Container;
@@ -820,6 +833,17 @@ class ContainerTest extends TestCase
         $this->assertEquals($container->getAlias('foo'), 'ConcreteStub');
     }
 
+    public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
+    {
+        $container = new Container;
+        $container->alias('name', 'name');
+
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('[name] is aliased to itself.');
+
+        $container->getAlias('name');
+    }
+
     public function testContainerCanInjectSimpleVariable()
     {
         $container = new Container;
@@ -999,6 +1023,15 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->bind('Taylor', stdClass::class);
         $this->assertInstanceOf(stdClass::class, $container->get('Taylor'));
+    }
+
+    public function testContainerCanDynamicallySetService()
+    {
+        $container = new Container;
+        $this->assertFalse(isset($container['name']));
+        $container['name'] = 'Taylor';
+        $this->assertTrue(isset($container['name']));
+        $this->assertSame('Taylor', $container['name']);
     }
 
     /**
