@@ -1708,10 +1708,7 @@ class DatabaseEloquentModelTest extends TestCase
         $modelWithoutDates->exists = true;
         $this->assertEquals('stub/1', $modelWithoutDates->cacheKey());
 
-        $modelWithDates = new class([
-            'id' => 1,
-            'updated_at' => Carbon::now(),
-        ]) extends EloquentDateModelStub {
+        $modelWithDates = new class(['id' => 1, 'updated_at' => Carbon::now()]) extends EloquentDateModelStub {
             public function getDateFormat()
             {
                 return 'Y-m-d H:i:s';
@@ -1719,7 +1716,7 @@ class DatabaseEloquentModelTest extends TestCase
         };
 
         $modelWithDates->exists = true;
-        $this->assertEquals('stub/1-' . Carbon::now()->timestamp, $modelWithDates->cacheKey());
+        $this->assertEquals('stub/1-'.Carbon::now()->timestamp, $modelWithDates->cacheKey());
     }
 
     protected function addMockConnection($model)
