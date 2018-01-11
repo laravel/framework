@@ -18,5 +18,5 @@ interface SetsOppositeRelations
      *
      * @param \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|null $models
      */
-    public function setOppositeRelation($models);    
+    public function setOppositeRelation($models);
 }

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Contracts\Database\Eloquent\Relations\SetsOppositeRelations as SetsOppositeRelationsContract;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -12,6 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Contracts\Database\Eloquent\Relations\SetsOppositeRelations as SetsOppositeRelationsContract;
 
 trait HasAttributes
 {
@@ -403,7 +403,7 @@ trait HasAttributes
      * @param  string  $relation
      * @return void
      */
-    protected function setOppositeRelation($relation) 
+    protected function setOppositeRelation($relation)
     {
         if (method_exists($this, $relation) && $this->$relation() instanceof SetsOppositeRelationsContract) {
             $this->$relation()->setOppositeRelation($this->relations[$relation]);

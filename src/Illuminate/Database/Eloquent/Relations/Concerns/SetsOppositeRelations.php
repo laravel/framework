@@ -38,8 +38,8 @@ trait SetsOppositeRelations
     public function setOppositeRelation($models)
     {
         $parent = $this->getParent();
-        
-        if ($this->oppositeRelationLoaded || !$this->oppositeRelationName || !$parent->exists) {
+
+        if ($this->oppositeRelationLoaded || ! $this->oppositeRelationName || ! $parent->exists) {
             return;
         }
 
@@ -47,6 +47,7 @@ trait SetsOppositeRelations
 
         if ($models instanceof Model) {
             $models->setRelation($this->oppositeRelationName, $parent);
+
             return;
         }
 
