@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Contracts\Database\Eloquent\Relations\SetsOppositeRelations as SetsOppositeRelationsContract;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -383,7 +384,8 @@ trait HasAttributes
         // relationship has already been loaded, so we'll just return it out of
         // here because there is no need to query within the relations twice.
         if ($this->relationLoaded($key)) {
-            $this->$key()->setOppositeRelation($this->relations[$key]);
+            $this->setOppositeRelation($key);
+
             return $this->relations[$key];
         }
 
@@ -392,6 +394,19 @@ trait HasAttributes
         // and hydrate the relationship's value on the "relationships" array.
         if (method_exists($this, $key)) {
             return $this->getRelationshipFromMethod($key);
+        }
+    }
+
+    /**
+     * Set an opposite relationship.
+     *
+     * @param  string  $relation
+     * @return void
+     */
+    protected function setOppositeRelation($relation) 
+    {
+        if ($this->$relation() instanceof SetsOppositeRelationsContract) {
+            $this->$relation()->setOppositeRelation($this->relations[$relation]);
         }
     }
 

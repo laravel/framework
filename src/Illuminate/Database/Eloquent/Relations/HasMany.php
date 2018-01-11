@@ -2,13 +2,14 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Contracts\Database\Eloquent\Relations\SetsOppositeRelations as SetsOppositeRelationsContract;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\Concerns\SetsOppositeRelations;
 
-class HasMany extends HasOneOrMany
+class HasMany extends HasOneOrMany implements SetsOppositeRelationsContract
 {
     use SetsOppositeRelations;
-    
+
     /**
      * Get the results of the relationship.
      *

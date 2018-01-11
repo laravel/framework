@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
+use Illuminate\Contracts\Database\Eloquent\Relations\SetsOppositeRelations as SetsOppositeRelationsContract;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -11,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class BelongsTo extends Relation
+class BelongsTo extends Relation implements SetsOppositeRelationsContract
 {
     use SupportsDefaultModels, SetsOppositeRelations;
 
@@ -83,7 +84,7 @@ class BelongsTo extends Relation
 
         $this->setOppositeRelation($model);
 
-        return $model;        
+        return $model;
     }
 
     /**
