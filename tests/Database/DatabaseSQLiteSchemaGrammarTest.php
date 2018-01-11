@@ -696,6 +696,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $grammar = new \Illuminate\Database\Schema\Grammars\SQLiteGrammar;
         $grammar->setTablePrefix('prefix_');
+
         return $grammar;
     }
 }
