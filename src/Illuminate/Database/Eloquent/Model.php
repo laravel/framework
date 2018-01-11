@@ -1373,7 +1373,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Returns a stable cache key that can be used to identify the record
+     * Returns a stable cache key that can be used to identify the record.
      *
      * @return string
      */
