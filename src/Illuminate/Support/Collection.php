@@ -1374,11 +1374,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Sort the collection items by key.
+     * Sort the collection items by their keys.
      *
      * @return static
      */
-    public function ksort()
+    public function sortByKeys()
     {
         $items = $this->items;
 
