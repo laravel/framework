@@ -148,7 +148,6 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonCount(4);
     }
 
-
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
