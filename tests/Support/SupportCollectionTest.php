@@ -1318,10 +1318,18 @@ class SupportCollectionTest extends TestCase
             ['name' => 'taylor', 'hobbies' => ['programming', 'basketball']],
             ['name' => 'adam', 'hobbies' => ['music', 'powerlifting']],
         ]);
-        $data = $data->flatMap(function ($person) {
+
+        // Test with a callback
+        $hobbies = $data->flatMap(function ($person) {
             return $person['hobbies'];
         });
-        $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $data->all());
+
+        $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $hobbies->all());
+
+        // Test with a string key
+        $hobbies = $data->flatMap('hobbies');
+
+        $this->assertEquals(['programming', 'basketball', 'music', 'powerlifting'], $hobbies->all());
     }
 
     public function testMapToDictionary()

@@ -932,12 +932,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Map a collection and flatten the result by a single level.
      *
-     * @param  callable  $callback
+     * @param  callable|string  $callback
      * @return static
      */
-    public function flatMap(callable $callback)
+    public function flatMap($callback)
     {
-        return $this->map($callback)->collapse();
+        if ($this->useAsCallable($callback)) {
+            return $this->map($callback)->collapse();
+        } else {
+            return $this->pluck($callback)->collapse();
+        }
     }
 
     /**
