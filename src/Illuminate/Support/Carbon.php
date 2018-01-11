@@ -45,4 +45,18 @@ class Carbon extends BaseCarbon implements JsonSerializable
     {
         static::$serializer = $callback;
     }
+
+    /**
+     * When a Carbon instance is exported using var_export() and reinstated using __set_state(),
+     * make sure it is reconstructed as a Carbon object instead of a DateTime object.
+     *
+     * @param  array  $properties
+     * @return static
+     */
+    public static function __set_state(array $properties)
+    {
+        return static::instance(
+            parent::__set_state($properties)
+        );
+    }
 }
