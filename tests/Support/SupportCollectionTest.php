@@ -887,6 +887,15 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 'dayle', 0 => 'taylor'], $data->all());
     }
 
+    public function testSortByKey()
+    {
+        $data = new Collection(['foo' => 1, 'bar' => 2, 'baz' => 3, 'qux' => 4, 'quux' => 5, 'corge' => 6, 'grault' => 7, 'garply' => 8, 'waldo' => 9, 'fred' => 10, 'plugh' => 11, 'xyzzy' => 12, 'thud' => 13]);
+
+        $data = $data->sortByKeys();
+
+        $this->assertEquals(['bar' => 2, 'baz' => 3, 'corge' => 6, 'foo' => 1, 'fred' => 10, 'garply' => 8, 'grault' => 7, 'plugh' => 11, 'quux' => 5, 'qux' => 4, 'thud' => 13, 'waldo' => 9, 'xyzzy' => 12], $data->all());
+    }
+
     public function testReverse()
     {
         $data = new Collection(['zaeed', 'alan']);
