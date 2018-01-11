@@ -893,7 +893,7 @@ class SupportCollectionTest extends TestCase
 
         $data = $data->ksort();
 
-        $this->assertEquals(["bar" => 2, "baz" => 3, "corge" => 6, "foo" => 1, "fred" => 10, "garply" => 8, "grault" => 7, "plugh" => 11, "quux" => 5, "qux" => 4, "thud" => 13, "waldo" => 9, "xyzzy" => 12], $data->all());
+        $this->assertEquals(['bar' => 2, 'baz' => 3, 'corge' => 6, 'foo' => 1, 'fred' => 10, 'garply' => 8, 'grault' => 7, 'plugh' => 11, 'quux' => 5, 'qux' => 4, 'thud' => 13, 'waldo' => 9, 'xyzzy' => 12], $data->all());
     }
 
     public function testReverse()
