@@ -132,6 +132,22 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertJsonCount()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // With simple key
+        $response->assertJsonCount(3, 'bars');
+
+        // With nested key
+        $response->assertJsonCount(2, 'baz.*.bar');
+
+        // Without structure
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertJsonCount(4);
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
