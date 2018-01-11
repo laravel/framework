@@ -405,7 +405,7 @@ trait HasAttributes
      */
     protected function setOppositeRelation($relation) 
     {
-        if ($this->$relation() instanceof SetsOppositeRelationsContract) {
+        if (method_exists($this, $relation) && $this->$relation() instanceof SetsOppositeRelationsContract) {
             $this->$relation()->setOppositeRelation($this->relations[$relation]);
         }
     }
