@@ -474,6 +474,20 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a where row values condition.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereRowValues(Builder $query, $where)
+    {
+        $values = $this->parameterize($where['values']);
+
+        return '('.implode(', ', $where['columns']).') '.$where['operator'].' ('.$values.')';
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

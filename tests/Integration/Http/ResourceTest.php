@@ -492,4 +492,33 @@ class ResourceTest extends TestCase
             ],
         ]);
     }
+
+    public function test_original_on_response_is_model_when_single_resource()
+    {
+        $createdPost = new Post(['id' => 5, 'title' => 'Test Title']);
+        Route::get('/', function () use ($createdPost) {
+            return new ReallyEmptyPostResource($createdPost);
+        });
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+        $this->assertTrue($createdPost->is($response->getOriginalContent()));
+    }
+
+    public function test_original_on_response_is_collection_of_model_when_collection_resource()
+    {
+        $createdPosts = collect([
+            new Post(['id' => 5, 'title' => 'Test Title']),
+            new Post(['id' => 6, 'title' => 'Test Title 2']),
+        ]);
+        Route::get('/', function () use ($createdPosts) {
+            return new EmptyPostCollectionResource(new LengthAwarePaginator($createdPosts, 10, 15, 1));
+        });
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+        $createdPosts->each(function ($post) use ($response) {
+            $this->assertTrue($response->getOriginalContent()->contains($post));
+        });
+    }
 }

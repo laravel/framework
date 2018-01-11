@@ -158,6 +158,17 @@ class FoundationTestResponseTest extends TestCase
 
         $files->deleteDirectory($tempDir);
     }
+
+    public function testJsonHelper()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->assertEquals('foo', $response->json('foobar.foobar_foo'));
+        $this->assertEquals(
+            json_decode($response->getContent(), true),
+            $response->json()
+        );
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable

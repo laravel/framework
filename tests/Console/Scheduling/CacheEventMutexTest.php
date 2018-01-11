@@ -5,14 +5,19 @@ namespace Illuminate\Tests\Console\Scheduling;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\CacheMutex;
+use Illuminate\Console\Scheduling\CacheEventMutex;
 
-class CacheMutexTest extends TestCase
+class CacheEventMutexTest extends TestCase
 {
     /**
-     * @var CacheMutex
+     * @var CacheEventMutex
      */
     protected $cacheMutex;
+
+    /**
+     * @var Event
+     */
+    protected $event;
 
     /**
      * @var \Illuminate\Contracts\Cache\Repository
@@ -24,61 +29,42 @@ class CacheMutexTest extends TestCase
         parent::setUp();
 
         $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
-        $this->cacheMutex = new CacheMutex($this->cacheRepository);
+        $this->cacheMutex = new CacheEventMutex($this->cacheRepository);
+        $this->event = new Event($this->cacheMutex, 'command');
     }
 
     public function testPreventOverlap()
     {
-        $cacheMutex = $this->cacheMutex;
-
         $this->cacheRepository->shouldReceive('add');
 
-        $event = new Event($this->cacheMutex, 'command');
-
-        $cacheMutex->create($event);
+        $this->cacheMutex->create($this->event);
     }
 
     public function testPreventOverlapFails()
     {
-        $cacheMutex = $this->cacheMutex;
-
         $this->cacheRepository->shouldReceive('add')->andReturn(false);
 
-        $event = new Event($this->cacheMutex, 'command');
-
-        $this->assertFalse($cacheMutex->create($event));
+        $this->assertFalse($this->cacheMutex->create($this->event));
     }
 
     public function testOverlapsForNonRunningTask()
     {
-        $cacheMutex = $this->cacheMutex;
-
         $this->cacheRepository->shouldReceive('has')->andReturn(false);
 
-        $event = new Event($this->cacheMutex, 'command');
-
-        $this->assertFalse($cacheMutex->exists($event));
+        $this->assertFalse($this->cacheMutex->exists($this->event));
     }
 
     public function testOverlapsForRunningTask()
     {
-        $cacheMutex = $this->cacheMutex;
-
         $this->cacheRepository->shouldReceive('has')->andReturn(true);
 
-        $event = new Event($this->cacheMutex, 'command');
-
-        $this->assertTrue($cacheMutex->exists($event));
+        $this->assertTrue($this->cacheMutex->exists($this->event));
     }
 
     public function testResetOverlap()
     {
-        $cacheMutex = $this->cacheMutex;
-
         $this->cacheRepository->shouldReceive('forget');
 
-        $event = new Event($this->cacheMutex, 'command');
-
-        $cacheMutex->forget($event);
+        $this->cacheMutex->forget($this->event);
     }
 }

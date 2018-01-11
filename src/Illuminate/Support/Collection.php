@@ -1082,14 +1082,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Partition the collection into two arrays using the given callback or key.
      *
-     * @param  callable|string  $callback
+     * @param  callable|string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return static
      */
-    public function partition($callback)
+    public function partition($key, $operator = null, $value = null)
     {
         $partitions = [new static, new static];
 
-        $callback = $this->valueRetriever($callback);
+        $callback = func_num_args() == 1
+                ? $this->valueRetriever($key)
+                : $this->operatorForWhere(...func_get_args());
 
         foreach ($this->items as $key => $item) {
             $partitions[(int) ! $callback($item, $key)][$key] = $item;
@@ -1501,10 +1505,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unique($key = null, $strict = false)
     {
-        if (is_null($key)) {
-            return new static(array_unique($this->items, SORT_REGULAR));
-        }
-
         $callback = $this->valueRetriever($key);
 
         $exists = [];

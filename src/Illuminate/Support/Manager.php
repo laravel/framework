@@ -56,6 +56,10 @@ abstract class Manager
     {
         $driver = $driver ?: $this->getDefaultDriver();
 
+        if (is_null($driver)) {
+            throw new InvalidArgumentException('Unable to resolve NULL driver for ['.get_class($this).'].');
+        }
+
         // If the given driver has not been created before, we will create the instances
         // here and cache it so we can return it next time very quickly. If there is
         // already a driver created by this name, we'll just return that instance.
