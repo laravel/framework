@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Routing;
 
 use Illuminate\Http\Request;
-use Illuminate\Routing\NestedBinding;
 use Illuminate\Routing\Route;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;

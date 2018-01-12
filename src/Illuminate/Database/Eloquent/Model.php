@@ -7,6 +7,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Routing\NestedBinding;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -15,7 +16,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Routing\NestedBinding;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -1364,7 +1364,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $query = $this->where($this->getRouteKeyName(), $value);
 
         if (! is_null($nestedBinding)) {
-            $query = $query->whereHas($nestedBinding->getRelation(), function ($queryRelation) use ($nestedBinding){
+            $query = $query->whereHas($nestedBinding->getRelation(), function ($queryRelation) use ($nestedBinding) {
                 $routeKeyName = $nestedBinding->getRelatedInstance()->getRouteKeyName();
 
                 return $queryRelation->where($routeKeyName, $nestedBinding->getRelatedInstance()->{$routeKeyName});

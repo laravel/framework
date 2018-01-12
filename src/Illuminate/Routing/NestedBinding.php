@@ -73,6 +73,6 @@ class NestedBinding
         // the $nestedBindings array by one which is the independent parameter which is the first element in the $parameters array.
         $pointer--;
 
-        return (new static($nestedBindings[$pointer], $route->parameter($parameters[$pointer]->name)));
+        return new static($nestedBindings[$pointer], $route->parameter($parameters[$pointer]->name));
     }
 }
