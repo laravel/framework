@@ -11,9 +11,10 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
+        Carbon::setTestNow();
     }
 
     public function testGetReturnsValueFromCache()
@@ -91,8 +92,6 @@ class CacheRepositoryTest extends TestCase
             return 'qux';
         });
         $this->assertEquals('qux', $result);
-
-        Carbon::setTestNow();
     }
 
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
@@ -149,10 +148,12 @@ class CacheRepositoryTest extends TestCase
 
     public function dataProviderTestGetMinutes()
     {
+        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
+
         return [
             [Carbon::now()->addMinutes(5)],
-            [(new DateTime('2030-07-25 12:13:14 UTC'))->modify('+5 minutes')],
-            [(new DateTimeImmutable('2030-07-25 12:13:14 UTC'))->modify('+5 minutes')],
+            [(new DateTime($this->getTestDate()))->modify('+5 minutes')],
+            [(new DateTimeImmutable($this->getTestDate()))->modify('+5 minutes')],
             [new DateInterval('PT5M')],
             [5],
         ];
@@ -164,13 +165,11 @@ class CacheRepositoryTest extends TestCase
      */
     public function testGetMinutes($duration)
     {
-        Carbon::setTestNow(Carbon::parse('2030-07-25 12:13:14 UTC'));
+        Carbon::setTestNow(Carbon::parse($this->getTestDate()));
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 5);
+        $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 5);
         $repo->put($key, $value, $duration);
-
-        Carbon::setTestNow();
     }
 
     public function testRegisterMacroWithNonStaticCall()
@@ -237,5 +236,10 @@ class CacheRepositoryTest extends TestCase
         $repository->setEventDispatcher($dispatcher);
 
         return $repository;
+    }
+
+    protected function getTestDate()
+    {
+        return '2030-07-25 12:13:14 UTC';
     }
 }
