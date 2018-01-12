@@ -361,6 +361,7 @@ class Migrator
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
+            && $migration->withinTransaction
                     ? $connection->transaction($callback)
                     : $callback();
     }
