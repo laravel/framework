@@ -466,7 +466,7 @@ class RoutableInterfaceStub implements UrlRoutable
         return 'key';
     }
 
-    public function resolveRouteBinding($routeKey)
+    public function resolveRouteBinding($routeKey, \Illuminate\Routing\NestedBinding $nestedBinding = null)
     {
         //
     }

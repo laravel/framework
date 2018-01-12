@@ -886,6 +886,29 @@ class Route
     }
 
     /**
+     * Get or set the relationship methods between the related parameters.
+     *
+     * @param  array  $nestedtedBindings
+     * @return $this
+     */
+    public function nestedBindings($nestedtedBindings = null)
+    {
+        if (is_null($nestedtedBindings)) {
+            return (array) ($this->action['nestedtedBindings'] ?? []);
+        }
+
+        if (is_string($nestedtedBindings)) {
+            $nestedtedBindings = func_get_args();
+        }
+
+        $this->action['nestedtedBindings'] = array_merge(
+            (array) ($this->action['nestedtedBindings'] ?? []), $nestedtedBindings
+        );
+
+        return $this;
+    }
+
+    /**
      * Dynamically access route parameters.
      *
      * @param  string  $key

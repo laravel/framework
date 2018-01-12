@@ -19,10 +19,12 @@ class ImplicitRouteBinding
     {
         $parameters = $route->parameters();
 
-        foreach ($route->signatureParameters(UrlRoutable::class) as $parameter) {
+        foreach ($signatureParameters = $route->signatureParameters(UrlRoutable::class) as $index => $parameter) {
             if (! $parameterName = static::getParameterName($parameter->name, $parameters)) {
                 continue;
             }
+
+            $nestedBinding = NestedBinding::setRelationshipForImplicitBinding($route, $signatureParameters, $index);
 
             $parameterValue = $parameters[$parameterName];
 
@@ -32,7 +34,7 @@ class ImplicitRouteBinding
 
             $instance = $container->make($parameter->getClass()->name);
 
-            if (! $model = $instance->resolveRouteBinding($parameterValue)) {
+            if (! $model = $instance->resolveRouteBinding($parameterValue, $nestedBinding)) {
                 throw (new ModelNotFoundException)->setModel(get_class($instance));
             }
 
