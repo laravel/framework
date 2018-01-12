@@ -1701,21 +1701,45 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testCacheKey()
     {
+        // New model
         $new = new EloquentDateModelStub();
         $this->assertEquals('stub/new', $new->cacheKey());
 
-        $withoutDates = new EloquentModelStub(['id' => 1]);
-        $withoutDates->exists = true;
-        $this->assertEquals('stub/1', $withoutDates->cacheKey());
+        // A model that doesn't use timestamps
+        $withoutTimestamps = new EloquentModelStub(['id' => 1]);
+        $withoutTimestamps->exists = true;
+        $withoutTimestamps->timestamps = false;
+        $this->assertEquals('stub/1', $withoutTimestamps->cacheKey());
 
-        $withDates = new class(['id' => 1, 'updated_at' => Carbon::now()]) extends EloquentDateModelStub {
+        // Null timestamp
+        $nullTimestamp = new EloquentModelStub(['id' => 2, 'updated_at' => null]);
+        $nullTimestamp->exists = true;
+        $this->assertEquals('stub/2', $nullTimestamp->cacheKey());
+
+        // Default model with an updated_at column
+        $withTimestamps = new class(['id' => 3, 'updated' => Carbon::now()]) extends EloquentDateModelStub {
+            const UPDATED_AT = 'updated';
+
             public function getDateFormat()
             {
                 return 'Y-m-d H:i:s';
             }
         };
-        $withDates->exists = true;
-        $this->assertEquals('stub/1-'.Carbon::now()->timestamp, $withDates->cacheKey());
+        $withTimestamps->exists = true;
+        $this->assertEquals('stub/3-'.Carbon::now()->timestamp, $withTimestamps->cacheKey());
+
+        // Custom updated_at column
+        $customUpdatedAt = new class(['id' => 4, 'updated' => Carbon::now()]) extends EloquentDateModelStub {
+            const UPDATED_AT = 'updated';
+
+            public function getDateFormat()
+            {
+                return 'Y-m-d H:i:s';
+            }
+        };
+
+        $customUpdatedAt->exists = true;
+        $this->assertEquals('stub/4-'.Carbon::now()->timestamp, $customUpdatedAt->cacheKey());
     }
 
     protected function addMockConnection($model)

@@ -1383,11 +1383,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->getTable().'/new';
         }
 
-        if (! $this->getAttribute('updated_at')) {
-            return $this->getTable().'/'.$this->getKey();
+        $updatedAt = $this->getAttribute($this->getUpdatedAtColumn());
+
+        if ($this->usesTimestamps() && ! is_null($updatedAt)) {
+            return $this->getTable().'/'.$this->getKey().'-'.$updatedAt->timestamp;
         }
 
-        return $this->getTable().'/'.$this->getKey().'-'.$this->updated_at->timestamp;
+        return $this->getTable().'/'.$this->getKey();
     }
 
     /**
