@@ -36,7 +36,7 @@
         "symfony/process": "~4.0",
         "symfony/routing": "~4.0",
         "symfony/var-dumper": "~4.0",
-        "tijsverkoyen/css-to-inline-styles": "dev-master",
+        "tijsverkoyen/css-to-inline-styles": "^2.2.1",
         "vlucas/phpdotenv": "~2.2"
     },
     "replace": {

@@ -21,7 +21,7 @@
         "illuminate/support": "5.7.*",
         "psr/log": "~1.0",
         "swiftmailer/swiftmailer": "~6.0",
-        "tijsverkoyen/css-to-inline-styles": "dev-master"
+        "tijsverkoyen/css-to-inline-styles": "^2.2.1"
     },
     "autoload": {
         "psr-4": {
