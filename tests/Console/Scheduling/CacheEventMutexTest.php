@@ -35,35 +35,35 @@ class CacheEventMutexTest extends TestCase
 
     public function testPreventOverlap()
     {
-        $this->cacheRepository->shouldReceive('add');
+        $this->cacheRepository->shouldReceive('add')->once();
 
         $this->cacheMutex->create($this->event);
     }
 
     public function testPreventOverlapFails()
     {
-        $this->cacheRepository->shouldReceive('add')->andReturn(false);
+        $this->cacheRepository->shouldReceive('add')->once()->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->create($this->event));
     }
 
     public function testOverlapsForNonRunningTask()
     {
-        $this->cacheRepository->shouldReceive('has')->andReturn(false);
+        $this->cacheRepository->shouldReceive('has')->once()->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->exists($this->event));
     }
 
     public function testOverlapsForRunningTask()
     {
-        $this->cacheRepository->shouldReceive('has')->andReturn(true);
+        $this->cacheRepository->shouldReceive('has')->once()->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->exists($this->event));
     }
 
     public function testResetOverlap()
     {
-        $this->cacheRepository->shouldReceive('forget');
+        $this->cacheRepository->shouldReceive('forget')->once();
 
         $this->cacheMutex->forget($this->event);
     }

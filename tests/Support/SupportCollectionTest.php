@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
+use Exception;
 use ArrayAccess;
 use Mockery as m;
 use ReflectionClass;
@@ -2518,6 +2519,35 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('baz', $collection->get('foo.bar'));
         $this->assertEquals('Book 1', $collection->get('foo.books.0'));
         $this->assertEquals('Todo 2', $collection->get('foo.todos.second'));
+    }
+
+    public function testHasReturnsValidResults()
+    {
+        $collection = new Collection(['foo' => 'one', 'bar' => 'two', 1 => 'three']);
+        $this->assertTrue($collection->has('foo'));
+        $this->assertTrue($collection->has('foo', 'bar', 1));
+        $this->assertFalse($collection->has('foo', 'bar', 1, 'baz'));
+        $this->assertFalse($collection->has('baz'));
+    }
+
+    public function testPutAddsItemToCollection()
+    {
+        $collection = new Collection();
+        $this->assertSame([], $collection->toArray());
+        $collection->put('foo', 1);
+        $this->assertSame(['foo' => 1], $collection->toArray());
+        $collection->put('bar', ['nested' => 'two']);
+        $this->assertSame(['foo' => 1, 'bar' => ['nested' => 'two']], $collection->toArray());
+        $collection->put('foo', 3);
+        $this->assertSame(['foo' => 3, 'bar' => ['nested' => 'two']], $collection->toArray());
+    }
+
+    public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty()
+    {
+        $collection = new Collection();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
+        $collection->foo;
     }
 }
 
