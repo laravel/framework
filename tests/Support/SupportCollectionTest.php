@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
-use ArrayAccess;
 use Exception;
+use ArrayAccess;
 use Mockery as m;
 use ReflectionClass;
 use JsonSerializable;
