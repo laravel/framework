@@ -2,6 +2,8 @@
 
 namespace Illuminate\Contracts\Routing;
 
+use Illuminate\Routing\NestedBinding;
+
 interface UrlRoutable
 {
     /**
@@ -22,7 +24,8 @@ interface UrlRoutable
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
+     * @param  NestedBinding|null  $nestedBinding
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value);
+    public function resolveRouteBinding($value, NestedBinding $nestedBinding = null);
 }

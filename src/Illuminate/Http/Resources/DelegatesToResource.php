@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Resources;
 
 use Exception;
+use Illuminate\Routing\NestedBinding;
 
 trait DelegatesToResource
 {
@@ -29,11 +30,12 @@ trait DelegatesToResource
     /**
      * Retrieve the model for a bound value.
      *
-     * @param  mixed  $value
+     * @param  mixed $value
+     * @param NestedBinding|null $nestedBinding
      * @return void
-     * @throws \Exception
+     * @throws Exception
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, NestedBinding $nestedBinding = null)
     {
         throw new Exception('Resources may not be implicitly resolved from route bindings.');
     }

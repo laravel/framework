@@ -15,6 +15,7 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Routing\NestedBinding;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -1355,11 +1356,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Retrieve the model for a bound value.
      *
      * @param  mixed  $value
+     * @param  NestedBinding|null  $nestedBinding
      * @return \Illuminate\Database\Eloquent\Model|null
      */
-    public function resolveRouteBinding($value)
+    public function resolveRouteBinding($value, NestedBinding $nestedBinding = null)
     {
-        return $this->where($this->getRouteKeyName(), $value)->first();
+        $query = $this->where($this->getRouteKeyName(), $value);
+
+        if (! is_null($nestedBinding)) {
+            $query = $query->whereHas($nestedBinding->getRelation(), function ($queryRelation) use ($nestedBinding){
+                $routeKeyName = $nestedBinding->getRelatedInstance()->getRouteKeyName();
+
+                return $queryRelation->where($routeKeyName, $nestedBinding->getRelatedInstance()->{$routeKeyName});
+            });
+        }
+
+        return $query->first();
     }
 
     /**
