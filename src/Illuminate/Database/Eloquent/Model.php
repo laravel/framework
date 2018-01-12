@@ -1373,6 +1373,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Returns a stable cache key that can be used to identify the record.
+     *
+     * @return string
+     */
+    public function cacheKey()
+    {
+        if (! $this->exists) {
+            return $this->getTable().'/new';
+        }
+
+        if (! $this->getAttribute('updated_at')) {
+            return $this->getTable().'/'.$this->getKey();
+        }
+
+        return $this->getTable().'/'.$this->getKey().'-'.$this->updated_at->timestamp;
+    }
+
+    /**
      * Get the number of models to return per page.
      *
      * @return int

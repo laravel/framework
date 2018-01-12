@@ -1699,6 +1699,25 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testCacheKey()
+    {
+        $new = new EloquentDateModelStub();
+        $this->assertEquals('stub/new', $new->cacheKey());
+
+        $withoutDates = new EloquentModelStub(['id' => 1]);
+        $withoutDates->exists = true;
+        $this->assertEquals('stub/1', $withoutDates->cacheKey());
+
+        $withDates = new class(['id' => 1, 'updated_at' => Carbon::now()]) extends EloquentDateModelStub {
+            public function getDateFormat()
+            {
+                return 'Y-m-d H:i:s';
+            }
+        };
+        $withDates->exists = true;
+        $this->assertEquals('stub/1-'.Carbon::now()->timestamp, $withDates->cacheKey());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
