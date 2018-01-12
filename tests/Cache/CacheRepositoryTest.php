@@ -40,7 +40,7 @@ class CacheRepositoryTest extends TestCase
     public function testDefaultValueIsReturned()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->andReturn(null);
+        $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
         $this->assertEquals('bar', $repo->get('foo', 'bar'));
         $this->assertEquals('baz', $repo->get('boom', function () {
             return 'baz';
@@ -67,7 +67,7 @@ class CacheRepositoryTest extends TestCase
     public function testRememberMethodCallsPutAndReturnsDefault()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->andReturn(null);
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 10);
         $result = $repo->remember('foo', 10, function () {
             return 'bar';
@@ -80,7 +80,7 @@ class CacheRepositoryTest extends TestCase
         Carbon::setTestNow(Carbon::now());
 
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->andReturn(null);
+        $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
         $repo->getStore()->shouldReceive('put')->once()->with('foo', 'bar', 602 / 60);
         $repo->getStore()->shouldReceive('put')->once()->with('baz', 'qux', 598 / 60);
         $result = $repo->remember('foo', Carbon::now()->addMinutes(10)->addSeconds(2), function () {
@@ -98,7 +98,7 @@ class CacheRepositoryTest extends TestCase
     public function testRememberForeverMethodCallsForeverAndReturnsDefault()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('get')->andReturn(null);
+        $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
         $repo->getStore()->shouldReceive('forever')->once()->with('foo', 'bar');
         $result = $repo->rememberForever('foo', function () {
             return 'bar';
