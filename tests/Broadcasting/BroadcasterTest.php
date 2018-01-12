@@ -46,7 +46,7 @@ class BroadcasterTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
-        $binder->shouldReceive('getBindingCallback')->with('model')->andReturn(function () {
+        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
