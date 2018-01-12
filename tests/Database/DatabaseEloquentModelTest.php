@@ -1717,9 +1717,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('stub/2', $nullTimestamp->cacheKey());
 
         // Default model with an updated_at column
-        $withTimestamps = new class(['id' => 3, 'updated' => Carbon::now()]) extends EloquentDateModelStub {
-            const UPDATED_AT = 'updated';
-
+        $withTimestamps = new class(['id' => 3, 'updated_at' => Carbon::now()]) extends EloquentDateModelStub {
             public function getDateFormat()
             {
                 return 'Y-m-d H:i:s';
