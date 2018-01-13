@@ -791,6 +791,43 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('here', optional(['present' => 'here'])['present']);
     }
 
+    public function testOptionalReturnsObjectPropertyOrNull()
+    {
+        $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
+        $this->assertNull(optional(['foo' => 'bar'])->foo);
+    }
+
+    public function testOptionalDeterminesWhetherKeyIsSet()
+    {
+        $this->assertTrue(isset(optional(['foo' => 'bar'])['foo']));
+        $this->assertFalse(isset(optional(['foo' => 'bar'])['bar']));
+        $this->assertFalse(isset(optional()['bar']));
+    }
+
+    public function testOptionalAllowsToSetKey()
+    {
+        $optional = optional([]);
+        $optional['foo'] = 'bar';
+        $this->assertSame('bar', $optional['foo']);
+
+        $optional = optional(null);
+        $optional['foo'] = 'bar';
+        $this->assertFalse(isset($optional['foo']));
+    }
+
+    public function testOptionalAllowToUnsetKey()
+    {
+        $optional = optional(['foo' => 'bar']);
+        $this->assertTrue(isset($optional['foo']));
+        unset($optional['foo']);
+        $this->assertFalse(isset($optional['foo']));
+
+        $optional = optional((object) ['foo' => 'bar']);
+        $this->assertFalse(isset($optional['foo']));
+        $optional['foo'] = 'bar';
+        $this->assertFalse(isset($optional['foo']));
+    }
+
     public function testOptionalIsMacroable()
     {
         Optional::macro('present', function () {
