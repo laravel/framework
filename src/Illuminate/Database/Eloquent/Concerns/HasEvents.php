@@ -103,6 +103,16 @@ trait HasEvents
     }
 
     /**
+     * Get the dispatches events.
+     *
+     * @return array
+     */
+    public function getDispatchesEvents()
+    {
+        return $this->dispatchesEvents;
+    }
+
+    /**
      * Register a model event with the dispatcher.
      *
      * @param  string  $event
@@ -158,11 +168,12 @@ trait HasEvents
      */
     protected function fireCustomModelEvent($event, $method)
     {
-        if (! isset($this->dispatchesEvents[$event])) {
+        if (! isset($this->getDispatchesEvents()[$event])) {
             return;
         }
 
-        $result = static::$dispatcher->$method(new $this->dispatchesEvents[$event]($this));
+        $eventClass = $this->getDispatchesEvents()[$event];
+        $result = static::$dispatcher->$method(new $eventClass($this));
 
         if (! is_null($result)) {
             return $result;
@@ -302,7 +313,7 @@ trait HasEvents
             static::$dispatcher->forget("eloquent.{$event}: ".static::class);
         }
 
-        foreach (array_values($instance->dispatchesEvents) as $event) {
+        foreach (array_values($instance->getDispatchesEvents()) as $event) {
             static::$dispatcher->forget($event);
         }
     }
