@@ -138,11 +138,20 @@ class FileLoader implements Loader
     {
         return collect(array_merge($this->jsonPaths, [$this->path]))
             ->reduce(function ($output, $path) use ($locale) {
-                if ($this->files->exists($full = "{$path}/{$locale}.json")) {
-                    $decoded = json_decode($this->files->get($full), true);
+                $localePath = "{$path}/{$locale}";
+
+                $files = [];
+                if ($this->files->exists($full = "{$localePath}.json")) {
+                    $files = [$full];
+                } elseif ($this->files->exists($localePath)) {
+                    $files = $this->files->glob($localePath . "/*.json");
+                }
+
+                foreach ($files as $file) {
+                    $decoded = json_decode($this->files->get($file), true);
 
                     if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
-                        throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
+                        throw new RuntimeException("Translation file [{$file}] contains an invalid JSON structure.");
                     }
 
                     $output = array_merge($output, $decoded);
