@@ -13,6 +13,36 @@ class TranslationFileLoaderTest extends TestCase
         m::close();
     }
 
+    public function testLoadMethodForJSONWillGetAllJsonFilesUnderDirectory()
+    {
+        $loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en.json')->andReturn(false);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en')->andReturn(true);
+        $files->shouldReceive('glob')->once()->with(__DIR__.'/en/*.json')->andReturn([
+            __DIR__.'/en/general.json',
+            __DIR__.'/en/users.json',
+        ]);
+        $files->shouldReceive('get')->twice()
+            ->andReturn('{"foo":"bar"}', '{"user":"test"}'); // Loads both
+
+        $this->assertEquals(['foo' => 'bar', 'user' => 'test'], $loader->load('en', '*', '*'));
+    }
+
+    public function testLoadMethodForJSONWillGetJsonFilesUnderDirectory()
+    {
+        $loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en.json')->andReturn(false);
+        $files->shouldReceive('exists')->once()->with(__DIR__.'/en')->andReturn(true);
+        $files->shouldReceive('glob')->once()->with(__DIR__.'/en/*.json')->andReturn([
+            __DIR__.'/en/general.json',
+        ]);
+        $files->shouldReceive('get')->once()
+            ->with(__DIR__.'/en/general.json')
+            ->andReturn('{"foo":"bar"}');
+
+        $this->assertEquals(['foo' => 'bar'], $loader->load('en', '*', '*'));
+    }
+
     public function testLoadMethodWithoutNamespacesProperlyCallsLoader()
     {
         $loader = new FileLoader($files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
