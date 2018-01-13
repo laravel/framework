@@ -494,6 +494,10 @@ class Gate implements GateContract
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
+        if (property_exists($policy, 'skipBefore') && in_array($ability, $policy->skipBefore)) {
+            return null;
+        }
+
         if (method_exists($policy, 'before')) {
             return $policy->before($user, $ability, ...$arguments);
         }
