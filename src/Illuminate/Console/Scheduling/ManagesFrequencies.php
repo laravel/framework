@@ -52,6 +52,10 @@ trait ManagesFrequencies
      */
     private function inTimeInterval($startTime, $endTime)
     {
+        if ($this->endTimeGreater($startTime, $endTime)) {
+            $endTime .= ' +1 day';
+        }
+
         return function () use ($startTime, $endTime) {
             return Carbon::now($this->timezone)->between(
                 Carbon::parse($startTime, $this->timezone),
@@ -59,6 +63,18 @@ trait ManagesFrequencies
                 true
             );
         };
+    }
+
+    /**
+     * Check if endTime is considered greater for humans.
+     *
+     * @param string $startTime
+     * @param string $endTime
+     * @return bool
+     */
+    private function endTimeGreater($startTime, $endTime)
+    {
+        return explode(':', $startTime)[0] > explode(':', $endTime)[0];
     }
 
     /**
