@@ -812,7 +812,7 @@ class SupportHelpersTest extends TestCase
 
         $optional = optional(null);
         $optional['foo'] = 'bar';
-        $this->assertFalse(isset($optional['foo']));        
+        $this->assertFalse(isset($optional['foo']));
     }
 
     public function testOptionalAllowToUnsetKey()
