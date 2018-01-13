@@ -90,6 +90,31 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
+    public function testDropColumn()
+    {
+        if (! class_exists('Doctrine\DBAL\Schema\SqliteSchemaManager')) {
+            $this->markTestSkipped('Doctrine should be installed to run dropColumn tests');
+        }
+
+        $db = new \Illuminate\Database\Capsule\Manager;
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => 'prefix_',
+        ]);
+
+        $schema_builder = $db->getConnection()->getSchemaBuilder();
+
+        $schema_builder->create('users', function (Blueprint $table) {
+            $table->string('email');
+            $table->string('name');
+        });
+
+        $schema_builder->table('users', function (Blueprint $table) {
+            $table->dropColumn('name');
+        });
+    }
+
     /**
      * @expectedException \RuntimeException
      * @expectedExceptionMessage The database driver in use does not support spatial indexes.
