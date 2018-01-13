@@ -97,20 +97,23 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         }
 
         $db = new \Illuminate\Database\Capsule\Manager;
+
         $db->addConnection([
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => 'prefix_',
         ]);
 
-        $schema_builder = $db->getConnection()->getSchemaBuilder();
+        $schema = $db->getConnection()->getSchemaBuilder();
 
-        $schema_builder->create('users', function (Blueprint $table) {
+        $schema->create('users', function (Blueprint $table) {
             $table->string('email');
             $table->string('name');
         });
 
-        $schema_builder->table('users', function (Blueprint $table) {
+        $this->assertTrue($schema->hasTable('users'));
+
+        $schema->table('users', function (Blueprint $table) {
             $table->dropColumn('name');
         });
     }

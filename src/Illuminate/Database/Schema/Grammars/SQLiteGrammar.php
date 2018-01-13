@@ -245,9 +245,9 @@ class SQLiteGrammar extends Grammar
         );
 
         foreach ($command->columns as $name) {
-            $column = $connection->getDoctrineColumn($this->getTablePrefix().$blueprint->getTable(), $name);
-
-            $tableDiff->removedColumns[$name] = $column;
+            $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
+                $this->getTablePrefix().$blueprint->getTable(), $name
+            );
         }
 
         return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);
