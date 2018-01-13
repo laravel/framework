@@ -144,7 +144,7 @@ class FileLoader implements Loader
                 if ($this->files->exists($full = "{$localePath}.json")) {
                     $files = [$full];
                 } elseif ($this->files->exists($localePath)) {
-                    $files = $this->files->glob($localePath . "/*.json");
+                    $files = $this->files->glob("{$localePath}/*.json");
                 }
 
                 foreach ($files as $file) {
