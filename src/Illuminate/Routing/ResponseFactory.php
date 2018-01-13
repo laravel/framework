@@ -112,6 +112,33 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Return a new streamed response as a file download from the application.
+     *
+     * @param  \Closure  $callback
+     * @param  string  $name
+     * @param  int  $status
+     * @param  array  $headers
+     * @param  string|null  $disposition
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
+    public function streamDownload($callback, $name = null, $status = 200, array $headers = [], $disposition = 'attachment')
+    {
+        $response = new StreamedResponse($callback, $status, $headers);
+
+        if (! is_null($name)) {
+            $disposition = $response->headers->makeDisposition(
+                $disposition,
+                $name,
+                $this->fallbackName($name)
+            );
+
+            $response->headers->set('Content-Disposition', $disposition);
+        }
+
+        return $response;
+    }
+
+    /**
      * Create a new file download response.
      *
      * @param  \SplFileInfo|string  $file
@@ -125,10 +152,21 @@ class ResponseFactory implements FactoryContract
         $response = new BinaryFileResponse($file, 200, $headers, true, $disposition);
 
         if (! is_null($name)) {
-            return $response->setContentDisposition($disposition, $name, str_replace('%', '', Str::ascii($name)));
+            return $response->setContentDisposition($disposition, $name, $this->fallbackName($name));
         }
 
         return $response;
+    }
+
+    /**
+     * Returns a string containing only ASCII characters that is semantically equivalent to $name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function fallbackName($name)
+    {
+        return str_replace('%', '', Str::ascii($name));
     }
 
     /**
