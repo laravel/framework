@@ -20,7 +20,7 @@ class TranslationFileLoaderTest extends TestCase
         $files->shouldReceive('exists')->once()->with(__DIR__.'/en')->andReturn(true);
         $files->shouldReceive('glob')->once()->with(__DIR__.'/en/*.json')->andReturn([
             __DIR__.'/en/general.json',
-            __DIR__.'/en/users.json'
+            __DIR__.'/en/users.json',
         ]);
         $files->shouldReceive('get')->twice()
             ->andReturn('{"foo":"bar"}', '{"user":"test"}'); // Loads both
