@@ -31,7 +31,7 @@ class CacheSchedulingMutexTest extends TestCase
      */
     protected $cacheRepository;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -64,7 +64,7 @@ class CacheSchedulingMutexTest extends TestCase
 
     public function testChecksForAlreadyRunSchedule()
     {
-        $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(true);
+        $this->cacheRepository->shouldReceive('has')->once()->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->exists($this->event, $this->time));
     }

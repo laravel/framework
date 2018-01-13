@@ -199,14 +199,14 @@ class CacheRepositoryTest extends TestCase
     public function testSettingCache()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1);
+        $repo->getStore()->shouldReceive('put')->once()->with($key = 'foo', $value = 'bar', 1);
         $repo->set($key, $value, 1);
     }
 
     public function testClearingWholeCache()
     {
         $repo = $this->getRepository();
-        $repo->getStore()->shouldReceive('flush')->andReturn(true);
+        $repo->getStore()->shouldReceive('flush')->once()->andReturn(true);
         $repo->clear();
     }
 
