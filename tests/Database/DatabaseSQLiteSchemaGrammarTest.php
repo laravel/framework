@@ -112,10 +112,13 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         });
 
         $this->assertTrue($schema->hasTable('users'));
+        $this->assertTrue($schema->hasColumn('users', 'name'));
 
         $schema->table('users', function (Blueprint $table) {
             $table->dropColumn('name');
         });
+
+        $this->assertFalse($schema->hasColumn('users', 'name'));
     }
 
     /**
