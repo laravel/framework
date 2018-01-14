@@ -48,7 +48,6 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         });
     }
 
-
     public function test_pivot_can_be_serialized_and_restored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
@@ -65,7 +64,6 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
 
         $class->pivot->save();
     }
-
 
     public function test_morph_pivot_can_be_serialized_and_restored()
     {
@@ -85,7 +83,6 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $class->pivot->save();
     }
 
-
     public function test_collection_of_pivots_can_be_serialized_and_restored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
@@ -103,7 +100,6 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $this->assertEquals($project->collaborators[0]->pivot->user_id, $class->pivots[0]->user_id);
         $this->assertEquals($project->collaborators[1]->pivot->project_id, $class->pivots[1]->project_id);
     }
-
 
     public function test_collection_of_morph_pivots_can_be_serialized_and_restored()
     {
@@ -129,7 +125,6 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
     }
 }
 
-
 class PivotSerializationTestClass
 {
     use SerializesModels;
@@ -141,7 +136,6 @@ class PivotSerializationTestClass
         $this->pivot = $pivot;
     }
 }
-
 
 class PivotSerializationTestCollectionClass
 {
@@ -155,12 +149,10 @@ class PivotSerializationTestCollectionClass
     }
 }
 
-
 class PivotSerializationTestUser extends Model
 {
     public $table = 'users';
 }
-
 
 class PivotSerializationTestProject extends Model
 {
@@ -180,7 +172,6 @@ class PivotSerializationTestProject extends Model
     }
 }
 
-
 class PivotSerializationTestTag extends Model
 {
     public $table = 'tags';
@@ -191,7 +182,6 @@ class PivotSerializationTestTag extends Model
                     ->using(PivotSerializationTestTagAttachment::class);
     }
 }
-
 
 class PivotSerializationTestCollaborator extends Pivot
 {
