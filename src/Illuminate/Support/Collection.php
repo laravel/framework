@@ -882,11 +882,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapToDictionary(callable $callback)
     {
-        $dictionary = $this->map($callback)->reduce(function ($groups, $pair) {
-            $groups[key($pair)][] = reset($pair);
+        $dictionary = [];
 
-            return $groups;
-        }, []);
+        $this->each(function ($item, $key) use (&$dictionary, $callback) {
+            $pair = $callback($item, $key);
+            $key = key($pair);
+            $value = reset($pair);
+
+            if (! isset($dictionary[$key])) {
+                $dictionary[$key] = [];
+            }
+            $dictionary[$key][] = $value;
+        });
 
         return new static($dictionary);
     }
