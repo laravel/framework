@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use LogicException;
 use Illuminate\Support\Arr;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -22,7 +23,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $key = $key->getKey();
         }
 
-        if ($key instanceof BaseCollection) {
+        if ($key instanceof Arrayable) {
             $key = $key->toArray();
         }
 
