@@ -22,6 +22,10 @@ class Collection extends BaseCollection implements QueueableCollection
             $key = $key->getKey();
         }
 
+        if($key instanceof BaseCollection) {
+            $key = $key->toArray();
+        }
+
         if (is_array($key)) {
             if ($this->isEmpty()) {
                 return new static;
