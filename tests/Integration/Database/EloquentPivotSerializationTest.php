@@ -6,6 +6,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\Collection as DatabaseCollection;
 
 /**
  * @group integration
@@ -51,6 +52,9 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
     }
 
 
+    /**
+     * @group wow
+     */
     public function test_collection_of_pivots_can_be_serialized_and_restored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
@@ -62,7 +66,7 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
 
         $project = $project->fresh();
 
-        $class = new PivotSerializationTestCollectionClass($project->collaborators->map->pivot);
+        $class = new PivotSerializationTestCollectionClass(DatabaseCollection::make($project->collaborators->map->pivot));
         $class = unserialize(serialize($class));
 
         $this->assertEquals($project->collaborators[0]->pivot->user_id, $class->collaborators[0]->user_id);
