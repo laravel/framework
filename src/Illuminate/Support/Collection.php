@@ -884,16 +884,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $dictionary = [];
 
-        $this->each(function ($item, $key) use (&$dictionary, $callback) {
+        foreach ($this->items as $key => $item) {
             $pair = $callback($item, $key);
+
             $key = key($pair);
+
             $value = reset($pair);
 
             if (! isset($dictionary[$key])) {
                 $dictionary[$key] = [];
             }
+
             $dictionary[$key][] = $value;
-        });
+        }
 
         return new static($dictionary);
     }
