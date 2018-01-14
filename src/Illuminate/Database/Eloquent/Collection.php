@@ -412,11 +412,9 @@ class Collection extends BaseCollection implements QueueableCollection
             return [];
         }
 
-        if ($this->first() instanceof Pivot) {
-            return $this->map->getQueueableId()->all();
-        }
-
-        return $this->modelKeys();
+        return $this->first() instanceof Pivot
+                    ? $this->map->getQueueableId()->all()
+                    : $this->modelKeys();
     }
 
     /**
