@@ -52,9 +52,6 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
     }
 
 
-    /**
-     * @group wow
-     */
     public function test_collection_of_pivots_can_be_serialized_and_restored()
     {
         $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
