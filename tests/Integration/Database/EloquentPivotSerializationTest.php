@@ -49,6 +49,25 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $this->assertEquals($project->collaborators->first()->pivot->user_id, $class->collaborator->user_id);
         $this->assertEquals($project->collaborators->first()->pivot->project_id, $class->collaborator->project_id);
     }
+
+
+    public function test_collection_of_pivots_can_be_serialized_and_restored()
+    {
+        $user = PivotSerializationTestUser::forceCreate(['email' => 'taylor@laravel.com']);
+        $user2 = PivotSerializationTestUser::forceCreate(['email' => 'mohamed@laravel.com']);
+        $project = PivotSerializationTestProject::forceCreate(['name' => 'Test Project']);
+
+        $project->collaborators()->attach($user);
+        $project->collaborators()->attach($user2);
+
+        $project = $project->fresh();
+
+        $class = new PivotSerializationTestCollectionClass($project->collaborators->map->pivot);
+        $class = unserialize(serialize($class));
+
+        $this->assertEquals($project->collaborators[0]->pivot->user_id, $class->collaborators[0]->user_id);
+        $this->assertEquals($project->collaborators[1]->pivot->project_id, $class->collaborators[1]->project_id);
+    }
 }
 
 
@@ -61,6 +80,19 @@ class PivotSerializationTestClass
     public function __construct($collaborator)
     {
         $this->collaborator = $collaborator;
+    }
+}
+
+
+class PivotSerializationTestCollectionClass
+{
+    use SerializesModels;
+
+    public $collaborators;
+
+    public function __construct($collaborators)
+    {
+        $this->collaborators = $collaborators;
     }
 }
 
