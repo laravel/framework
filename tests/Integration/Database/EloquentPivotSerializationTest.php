@@ -62,6 +62,8 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
 
         $this->assertEquals($project->collaborators->first()->pivot->user_id, $class->pivot->user_id);
         $this->assertEquals($project->collaborators->first()->pivot->project_id, $class->pivot->project_id);
+
+        $class->pivot->save();
     }
 
 
@@ -79,6 +81,8 @@ class EloquentPivotSerializationTest extends DatabaseTestCase
         $this->assertEquals($project->tags->first()->pivot->tag_id, $class->pivot->tag_id);
         $this->assertEquals($project->tags->first()->pivot->taggable_id, $class->pivot->taggable_id);
         $this->assertEquals($project->tags->first()->pivot->taggable_type, $class->pivot->taggable_type);
+
+        $class->pivot->save();
     }
 
 
