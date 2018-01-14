@@ -22,7 +22,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $key = $key->getKey();
         }
 
-        if($key instanceof BaseCollection) {
+        if ($key instanceof BaseCollection) {
             $key = $key->toArray();
         }
 
