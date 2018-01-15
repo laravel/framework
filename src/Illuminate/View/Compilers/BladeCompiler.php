@@ -425,7 +425,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Register a component alias.
+     * Register a component alias directive.
      *
      * @param  string  $path
      * @param  string  $alias
@@ -436,11 +436,9 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $alias = $alias ?: array_last(explode('.', $path));
 
         $this->directive($alias, function ($expression) use ($path) {
-            if ($expression) {
-                return "<?php \$__env->startComponent('{$path}', {$expression}); ?>";
-            } else {
-                return "<?php \$__env->startComponent('{$path}'); ?>";
-            }
+            return $expression
+                        ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
+                        : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
         $this->directive('end'.$alias, function ($expression) use ($path) {
