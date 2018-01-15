@@ -937,12 +937,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('bar', $model->foo);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\MassAssignmentException
-     * @expectedExceptionMessage name
-     */
     public function testGlobalGuarded()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\MassAssignmentException::class);
+        $this->expectExceptionMessage('name');
+
         $model = new EloquentModelStub;
         $model->guard(['*']);
         $model->fill(['name' => 'foo', 'age' => 'bar', 'votes' => 'baz']);
@@ -1315,12 +1314,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNotContains('bar', $class->getObservableEvents());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Illuminate\Tests\Database\EloquentModelStub::incorrectRelationStub must return a relationship instance.
-     */
     public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Illuminate\\Tests\\Database\\EloquentModelStub::incorrectRelationStub must return a relationship instance.');
+
         $model = new EloquentModelStub;
         $relation = $model->incorrectRelationStub;
     }
@@ -1562,12 +1560,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['timestampAttribute']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\JsonEncodingException
-     * @expectedExceptionMessage Unable to encode attribute [objectAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.
-     */
     public function testModelAttributeCastingFailsOnUnencodableData()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\JsonEncodingException::class);
+        $this->expectExceptionMessage('Unable to encode attribute [objectAttribute] for model [Illuminate\\Tests\\Database\\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.');
+
         $model = new EloquentModelCastingStub;
         $model->objectAttribute = ['foo' => "b\xF8r"];
         $obj = new stdClass;

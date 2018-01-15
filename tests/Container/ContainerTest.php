@@ -443,32 +443,29 @@ class ContainerTest extends TestCase
         $this->assertFalse($_SERVER['__test.rebind']);
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\Tests\Container\ContainerMixedPrimitiveStub
-     */
     public function testInternalClassWithDefaultParameters()
     {
+        $this->expectException(\Illuminate\Contracts\Container\BindingResolutionException::class);
+        $this->expectExceptionMessage('Unresolvable dependency resolving [Parameter #0 [ <required> $first ]] in class Illuminate\\Tests\\Container\\ContainerMixedPrimitiveStub');
+
         $container = new Container;
         $container->make('Illuminate\Tests\Container\ContainerMixedPrimitiveStub', []);
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable.
-     */
     public function testBindingResolutionExceptionMessage()
     {
+        $this->expectException(\Illuminate\Contracts\Container\BindingResolutionException::class);
+        $this->expectExceptionMessage('Target [Illuminate\\Tests\\Container\\IContainerContractStub] is not instantiable.');
+
         $container = new Container;
         $container->make('Illuminate\Tests\Container\IContainerContractStub', []);
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Container\BindingResolutionException
-     * @expectedExceptionMessage Target [Illuminate\Tests\Container\IContainerContractStub] is not instantiable while building [Illuminate\Tests\Container\ContainerTestContextInjectOne].
-     */
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {
+        $this->expectException(\Illuminate\Contracts\Container\BindingResolutionException::class);
+        $this->expectExceptionMessage('Target [Illuminate\\Tests\\Container\\IContainerContractStub] is not instantiable while building [Illuminate\\Tests\\Container\\ContainerTestContextInjectOne].');
+
         $container = new Container;
         $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne', []);
     }
@@ -504,12 +501,11 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $result[1]);
     }
 
-    /**
-     * @expectedException \ReflectionException
-     * @expectedExceptionMessage Function ContainerTestCallStub() does not exist
-     */
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
+        $this->expectException(\ReflectionException::class);
+        $this->expectExceptionMessage('Function ContainerTestCallStub() does not exist');
+
         $container = new Container;
         $result = $container->call('ContainerTestCallStub');
     }
@@ -1034,11 +1030,10 @@ class ContainerTest extends TestCase
         $this->assertSame('Taylor', $container['name']);
     }
 
-    /**
-     * @expectedException \Illuminate\Container\EntryNotFoundException
-     */
     public function testUnknownEntryThrowsException()
     {
+        $this->expectException(\Illuminate\Container\EntryNotFoundException::class);
+
         $container = new Container;
         $container->get('Taylor');
     }

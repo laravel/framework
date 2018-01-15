@@ -54,12 +54,11 @@ class AuthorizeMiddlewareTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
     public function testSimpleAbilityUnauthorized()
     {
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $this->gate()->define('view-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
 
@@ -94,12 +93,11 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
     public function testModelTypeUnauthorized()
     {
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $this->gate()->define('create', function ($user, $model) {
             $this->assertEquals($model, 'App\User');
 
@@ -136,12 +134,11 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
     public function testModelUnauthorized()
     {
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $post = new stdClass;
 
         $this->router->bind('post', function () use ($post) {

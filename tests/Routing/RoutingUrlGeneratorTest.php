@@ -386,11 +386,10 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    /**
-     * @expectedException \Illuminate\Routing\Exceptions\UrlGenerationException
-     */
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
+        $this->expectException(\Illuminate\Routing\Exceptions\UrlGenerationException::class);
+
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com:8080/')

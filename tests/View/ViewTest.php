@@ -163,12 +163,11 @@ class ViewTest extends TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [badMethodCall] does not exist on view.
-     */
     public function testViewBadMethod()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method [badMethodCall] does not exist on view.');
+
         $view = $this->getView();
         $view->badMethodCall();
     }

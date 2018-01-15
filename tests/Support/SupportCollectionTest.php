@@ -2102,11 +2102,10 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $data = new Collection([1, 2, 3]);
         $data->random(4);
     }

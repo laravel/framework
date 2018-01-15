@@ -405,21 +405,19 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $multiple[1]);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1
-     */
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\\Tests\\Database\\EloquentTestUser] 1');
+
         EloquentTestUser::findOrFail(1);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2
-     */
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\\Tests\\Database\\EloquentTestUser] 1, 2');
+
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::findOrFail([1, 2]);
     }
@@ -869,12 +867,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals(['x' => 0, 'y' => 1, 'a' => ['b' => 3]], $model->json);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage SQLSTATE[23000]:
-     */
     public function testSaveOrFailWithDuplicatedEntry()
     {
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectExceptionMessage('SQLSTATE[23000]:');
+
         $date = '1970-01-01';
         EloquentTestPost::create([
             'id' => 1, 'user_id' => 1, 'name' => 'Post', 'created_at' => $date, 'updated_at' => $date,
@@ -1196,11 +1193,10 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $model = new EloquentTestUser;
         $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
         $model->setRawAttributes([

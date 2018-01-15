@@ -59,11 +59,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Model', $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailMethodThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
@@ -71,11 +70,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->findOrFail('bar', ['column']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
@@ -83,11 +81,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $result = $builder->findOrFail([1, 2], ['column']);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
@@ -489,11 +486,10 @@ class DatabaseEloquentBuilderTest extends TestCase
         $relation = $builder->getRelation('ordersGroups');
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\RelationNotFoundException
-     */
     public function testGetRelationThrowsException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\RelationNotFoundException::class);
+
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
 

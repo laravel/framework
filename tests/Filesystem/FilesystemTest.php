@@ -195,11 +195,10 @@ class FilesystemTest extends TestCase
         $this->assertDirectoryNotExists($this->tempDir.'/tmp');
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
     public function testGetThrowsExceptionNonexisitingFile()
     {
+        $this->expectException(\Illuminate\Contracts\Filesystem\FileNotFoundException::class);
+
         $files = new Filesystem;
         $files->get($this->tempDir.'/unknown-file.txt');
     }
@@ -211,11 +210,10 @@ class FilesystemTest extends TestCase
         $this->assertEquals('Howdy?', $files->getRequire($this->tempDir.'/file.php'));
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
-     */
     public function testGetRequireThrowsExceptionNonexisitingFile()
     {
+        $this->expectException(\Illuminate\Contracts\Filesystem\FileNotFoundException::class);
+
         $files = new Filesystem;
         $files->getRequire($this->tempDir.'/file.php');
     }

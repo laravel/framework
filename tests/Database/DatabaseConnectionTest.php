@@ -223,12 +223,11 @@ class DatabaseConnectionTest extends TestCase
         $this->assertEquals($mock, $result);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage Deadlock found when trying to get lock (SQL: )
-     */
     public function testTransactionMethodRetriesOnDeadlock()
     {
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectExceptionMessage('Deadlock found when trying to get lock (SQL: )');
+
         $pdo = $this->getMockBuilder('Illuminate\Tests\Database\DatabaseConnectionTestMockPDO')->setMethods(['beginTransaction', 'commit', 'rollBack'])->getMock();
         $mock = $this->getMockConnection([], $pdo);
         $pdo->expects($this->exactly(3))->method('beginTransaction');
@@ -255,12 +254,11 @@ class DatabaseConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage server has gone away (SQL: foo)
-     */
     public function testOnLostConnectionPDOIsNotSwappedWithinATransaction()
     {
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectExceptionMessage('server has gone away (SQL: foo)');
+
         $pdo = m::mock(\PDO::class);
         $pdo->shouldReceive('beginTransaction')->once();
         $statement = m::mock(\PDOStatement::class);
@@ -309,12 +307,11 @@ class DatabaseConnectionTest extends TestCase
         }]);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\QueryException
-     * @expectedExceptionMessage  (SQL: ) (SQL: )
-     */
     public function testRunMethodNeverRetriesIfWithinTransaction()
     {
+        $this->expectException(\Illuminate\Database\QueryException::class);
+        $this->expectExceptionMessage('(SQL: ) (SQL: )');
+
         $method = (new \ReflectionClass('Illuminate\Database\Connection'))->getMethod('run');
         $method->setAccessible(true);
 
