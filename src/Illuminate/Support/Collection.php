@@ -271,6 +271,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function dd(...$args)
     {
+        http_response_code(500);
+
         call_user_func_array([$this, 'dump'], $args);
 
         die(1);
