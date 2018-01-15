@@ -57,11 +57,10 @@ class BroadcasterTest extends TestCase
         Container::setInstance(new Container);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testNotFoundThrowsHttpException()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+
         $broadcaster = new FakeBroadcaster;
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
         };

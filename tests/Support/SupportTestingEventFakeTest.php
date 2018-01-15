@@ -22,12 +22,11 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatched(EventStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.
-     */
     public function testAssertDispatchedWithCallbackInt()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The expected [Illuminate\\Tests\\Support\\EventStub] event was dispatched 2 times instead of 1 times.');
+
         $this->fake->dispatch(EventStub::class);
         $this->fake->dispatch(EventStub::class);
 
@@ -35,12 +34,11 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatched(EventStub::class, 1);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\EventStub] event was dispatched 2 times instead of 1 times.
-     */
     public function testAssertDispatchedTimes()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The expected [Illuminate\\Tests\\Support\\EventStub] event was dispatched 2 times instead of 1 times.');
+
         $this->fake->dispatch(EventStub::class);
         $this->fake->dispatch(EventStub::class);
 
@@ -48,12 +46,11 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(EventStub::class, 1);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The unexpected [Illuminate\Tests\Support\EventStub] event was dispatched.
-     */
     public function testAssertNotDispatched()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The unexpected [Illuminate\\Tests\\Support\\EventStub] event was dispatched.');
+
         $this->fake->dispatch(EventStub::class);
 
         $this->fake->assertNotDispatched(EventStub::class);

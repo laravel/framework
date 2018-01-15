@@ -131,12 +131,11 @@ class PipelineTest extends TestCase
         $this->assertEquals('data', $result);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A container instance has not been passed to the Pipeline.
-     */
     public function testPipelineThrowsExceptionOnResolveWithoutContainer()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('A container instance has not been passed to the Pipeline.');
+
         (new Pipeline)->send('data')
             ->through('Illuminate\Tests\Pipeline\PipelineTestPipeOne')
             ->then(function ($piped) {

@@ -244,10 +244,11 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     /**
      * @test
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function firstOrFail_method()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $post = Post::create(['title' => str_random()]);
 
         $post->tags()->firstOrFail(['id' => 10]);
@@ -271,10 +272,11 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     /**
      * @test
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function findOrFail_method()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $post = Post::create(['title' => str_random()]);
 
         $tag = Tag::create(['name' => str_random()]);

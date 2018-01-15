@@ -84,11 +84,10 @@ class CacheLockTest extends TestCase
         }));
     }
 
-    /**
-     * @expectedException \Illuminate\Contracts\Cache\LockTimeoutException
-     */
     public function test_locks_throw_timeout_if_block_expires()
     {
+        $this->expectException(\Illuminate\Contracts\Cache\LockTimeoutException::class);
+
         Carbon::setTestNow();
 
         Cache::store('memcached')->lock('foo')->release();

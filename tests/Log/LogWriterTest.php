@@ -65,12 +65,11 @@ class LogWriterTest extends TestCase
         unset($_SERVER['__log.context']);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Events dispatcher has not been set.
-     */
     public function testListenShortcutFailsWithNoDispatcher()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Events dispatcher has not been set.');
+
         $writer = new Writer($monolog = m::mock('Monolog\Logger'));
         $writer->listen(function () {
         });

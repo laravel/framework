@@ -40,11 +40,10 @@ class AuthGuardTest extends TestCase
         $guard->basic('email');
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
-     */
     public function testBasicReturnsResponseOnFailure()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException::class);
+
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
         $guard->shouldReceive('check')->once()->andReturn(false);
@@ -166,12 +165,11 @@ class AuthGuardTest extends TestCase
         $guard->setUser($user);
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
     public function testAuthenticateThrowsWhenUserIsNull()
     {
+        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $guard = $this->getGuard();
         $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
 

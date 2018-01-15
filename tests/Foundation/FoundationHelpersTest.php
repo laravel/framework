@@ -34,12 +34,11 @@ class FoundationHelpersTest extends TestCase
         $this->assertEquals('default', cache('baz', 'default'));
     }
 
-    /**
-     * @expectedException \Exception
-     * @expectedExceptionMessage You must specify an expiration time when setting a value in the cache.
-     */
     public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
     {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('You must specify an expiration time when setting a value in the cache.');
+
         cache(['foo' => 'bar']);
     }
 

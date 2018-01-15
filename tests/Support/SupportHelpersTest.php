@@ -740,11 +740,10 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals($mock, tap($mock)->foo());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testThrow()
     {
+        $this->expectException(\RuntimeException::class);
+
         throw_if(true, new RuntimeException);
     }
 
@@ -753,12 +752,11 @@ class SupportHelpersTest extends TestCase
         $this->assertSame('foo', throw_unless('foo', new RuntimeException));
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage Test Message
-     */
     public function testThrowWithString()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('Test Message');
+
         throw_if(true, RuntimeException::class, 'Test Message');
     }
 
