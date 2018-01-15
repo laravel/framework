@@ -2,4 +2,8 @@
 
 @section('title', 'Service Unavailable')
 
-@section('message', 'Be right back.')
+@if ($message = $exception->getMessage())
+    @section('message', $message)
+@else
+    @section('message', 'Be right back.')
+@endif
