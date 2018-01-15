@@ -425,6 +425,30 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register a component alias.
+     *
+     * @param  string  $path
+     * @param  string  $alias
+     * @return void
+     */
+    public function component($path, $alias = null)
+    {
+        $alias = $alias ?: array_last(explode('.', $path));
+
+        $this->directive($alias, function ($expression) use ($path) {
+            if ($expression) {
+                return "<?php \$__env->startComponent('{$path}', {$expression}); ?>";
+            } else {
+                return "<?php \$__env->startComponent('{$path}'); ?>";
+            }
+        });
+
+        $this->directive('end'.$alias, function ($expression) use ($path) {
+            return '<?php echo $__env->renderComponent(); ?>';
+        });
+    }
+
+    /**
      * Register a handler for custom directives.
      *
      * @param  string  $name
