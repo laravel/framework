@@ -41,7 +41,7 @@ class SQLiteGrammar extends Grammar
      */
     public function compileColumnListing($table)
     {
-        return 'pragma table_info('.str_replace('.', '__', $table).')';
+        return 'pragma table_info('.$this->wrap(str_replace('.', '__', $table)).')';
     }
 
     /**
@@ -245,9 +245,9 @@ class SQLiteGrammar extends Grammar
         );
 
         foreach ($command->columns as $name) {
-            $column = $connection->getDoctrineColumn($blueprint->getTable(), $name);
-
-            $tableDiff->removedColumns[$name] = $column;
+            $tableDiff->removedColumns[$name] = $connection->getDoctrineColumn(
+                $this->getTablePrefix().$blueprint->getTable(), $name
+            );
         }
 
         return (array) $schema->getDatabasePlatform()->getAlterTableSQL($tableDiff);

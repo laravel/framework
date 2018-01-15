@@ -8,6 +8,9 @@
 - Added `UrlGenerator::getDefaultParameters()` method  ([#22572](https://github.com/laravel/framework/pull/22572))
 - Added option to double encode escaped strings ([61f8477](https://github.com/laravel/framework/commit/61f8477fab55a258f39a3d598f67f7cc0ffd6aca))
 - Added `BladeCompiler::doubleEncode()` method ([1cc96a1](https://github.com/laravel/framework/commit/1cc96a120955bc0d901f59dff7be1b99133fc7a1))
+- Added support for nested keys to `TestResponse::assertJsonCount()` ([#22740](https://github.com/laravel/framework/pull/22740))
+- Added `s3://` to protocol to URL validation ([#22752](https://github.com/laravel/framework/pull/22752))
+- Added option to disable wrapping migrations in transaction ([#22757](https://github.com/laravel/framework/pull/22757))
 
 ### Changed
 - Use `Arr::get()` in `Collection::get()` ([#22554](https://github.com/laravel/framework/pull/22554))
@@ -17,12 +20,16 @@
 - Support multiple levels in `Collection::groupBy()` ([#22630](https://github.com/laravel/framework/pull/22630))
 - Clear user instance in `RequestGuard::setRequest()` ([#22649](https://github.com/laravel/framework/pull/22649))
 - Allow StudlyCase and snake_case migration names ([#22648](https://github.com/laravel/framework/pull/22648))
+- Set `null` as default value for `optional()` helper ([#22699](https://github.com/laravel/framework/pull/22699))
+- Make sure `getRememberToken()` returns a string ([#22724](https://github.com/laravel/framework/pull/22724))
+- Updated Vue preset version ([#22732](https://github.com/laravel/framework/pull/22732))
 
 ### Fixed
 - Close database connection when using `RefreshDatabase` trait ([#22569](https://github.com/laravel/framework/pull/22569))
 - Send status code `500` when using `dd()` ([#22581](https://github.com/laravel/framework/pull/22581))
 - Fixed parameter usage in `RedirectController` ([#22657](https://github.com/laravel/framework/pull/22657))
-
+- Added `__set_state()` method to `Support/Carbon` ([#22689](https://github.com/laravel/framework/pull/22689))
+- Do not continue checking `APP_ENV` if environment file path being set successfully with `--env` option ([#22753](https://github.com/laravel/framework/pull/22753))
 
 ## v5.5.28 (2017-12-26)
 
