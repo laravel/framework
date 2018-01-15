@@ -1309,7 +1309,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             srand($seed);
 
             usort($items, function () {
-                return rand(-1, 1);
+                return random_int(-1, 1);
             });
         }
 
