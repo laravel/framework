@@ -811,7 +811,7 @@ class HttpRequestTest extends TestCase
         // Parameter 'empty' is '', then it ISSET and is EMPTY.
         $this->assertEquals($request->empty, '');
         $this->assertTrue(isset($request->empty));
-        $this->assertTrue(empty($request->empty));
+        $this->assertEmpty($request->empty);
 
         // Parameter 'undefined' is undefined/null, then it NOT ISSET and is EMPTY.
         $this->assertEquals($request->undefined, null);
