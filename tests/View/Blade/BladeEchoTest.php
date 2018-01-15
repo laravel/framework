@@ -49,13 +49,16 @@ class BladeEchoTest extends AbstractBladeTestCase
             $age or 90
         }}'));
 
-        $this->assertEquals('<?php echo e("Hello world or foo"); ?>',
-            $this->compiler->compileString('{{ "Hello world or foo" }}'));
-        $this->assertEquals('<?php echo e("Hello world or foo"); ?>',
-            $this->compiler->compileString('{{"Hello world or foo"}}'));
-        $this->assertEquals('<?php echo e($foo + $or + $baz); ?>', $this->compiler->compileString('{{$foo + $or + $baz}}'));
-        $this->assertEquals('<?php echo e("Hello world or foo"); ?>', $this->compiler->compileString('{{
-            "Hello world or foo"
+        $this->assertEquals('<?php echo e($object->method(\'foo or bar\')); ?>', $this->compiler->compileString('{{ $object->method(\'foo or bar\') }}'));
+        $this->assertEquals('<?php echo e($object->method(\'foo or bar\')); ?>', $this->compiler->compileString('{{$object->method(\'foo or bar\')}}'));
+        $this->assertEquals('<?php echo e($object->method(\'foo or bar\')); ?>', $this->compiler->compileString('{{
+            $object->method(\'foo or bar\')
+        }}'));
+
+        $this->assertEquals('<?php echo e($callback(\'foo or bar\')); ?>', $this->compiler->compileString('{{ $callback(\'foo or bar\') }}'));
+        $this->assertEquals('<?php echo e($callback(\'foo or bar\')); ?>', $this->compiler->compileString('{{$callback(\'foo or bar\')}}'));
+        $this->assertEquals('<?php echo e($callback(\'foo or bar\')); ?>', $this->compiler->compileString('{{
+            $callback(\'foo or bar\')
         }}'));
 
         $this->assertEquals('<?php echo e(\'Hello world or foo\'); ?>',
