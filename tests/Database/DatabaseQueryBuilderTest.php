@@ -1894,11 +1894,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertCount(2, $builder->wheres);
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
+        $this->expectException(\BadMethodCallException::class);
+
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select');
         $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);

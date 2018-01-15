@@ -199,12 +199,11 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('api.users', $this->getRoute()->getName());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [missing] does not exist.
-     */
     public function testRegisteringNonApprovedAttributesThrows()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method [missing] does not exist.');
+
         $this->router->domain('foo')->missing('bar')->group(function ($router) {
             //
         });

@@ -11,12 +11,11 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class GateTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Callback must be a callable or a 'Class@method'
-     */
     public function test_gate_throws_exception_on_invalid_callback_type()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Callback must be a callable or a \'Class@method\'');
+
         $this->getBasicGate()->define('foo', 'foo');
     }
 
@@ -274,12 +273,11 @@ class GateTest extends TestCase
         $this->assertTrue($gate->forUser((object) ['id' => 2])->check('foo'));
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage You are not an admin.
-     */
     public function test_authorize_throws_unauthorized_exception()
     {
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->expectExceptionMessage('You are not an admin.');
+
         $gate = $this->getBasicGate();
 
         $gate->policy(AccessGateTestDummy::class, AccessGateTestPolicy::class);

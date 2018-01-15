@@ -34,12 +34,11 @@ class AuthenticateMiddlewareTest extends TestCase
         });
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
     public function testDefaultUnauthenticatedThrows()
     {
+        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $this->registerAuthDriver('default', false);
 
         $this->authenticate();
@@ -80,12 +79,11 @@ class AuthenticateMiddlewareTest extends TestCase
         $this->assertSame($secondary, $this->auth->guard());
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\AuthenticationException
-     * @expectedExceptionMessage Unauthenticated.
-     */
     public function testMultipleDriversUnauthenticatedThrows()
     {
+        $this->expectException(\Illuminate\Auth\AuthenticationException::class);
+        $this->expectExceptionMessage('Unauthenticated.');
+
         $this->registerAuthDriver('default', false);
 
         $this->registerAuthDriver('secondary', false);

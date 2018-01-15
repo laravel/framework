@@ -74,12 +74,11 @@ class HttpJsonResponseTest extends TestCase
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Type is not supported
-     */
     public function testJsonErrorResource()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Type is not supported');
+
         $resource = tmpfile();
         $response = new \Illuminate\Http\JsonResponse(['resource' => $resource]);
     }

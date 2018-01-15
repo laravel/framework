@@ -668,12 +668,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add constraint "users_parent_id_foreign" foreign key ("parent_id") references "parents" ("id") on delete cascade deferrable initially deferred', $statements[0]);
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The database driver in use does not support the Geometry spatial column type.
-     */
     public function testAddingGeometry()
     {
+        $this->expectException(\RuntimeException::class);
+        $this->expectExceptionMessage('The database driver in use does not support the Geometry spatial column type.');
+
         $blueprint = new Blueprint('geo');
         $blueprint->geometry('coordinates');
         $blueprint->toSql($this->getConnection(), $this->getGrammar());

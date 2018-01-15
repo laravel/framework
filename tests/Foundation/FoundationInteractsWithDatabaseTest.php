@@ -35,12 +35,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The table is empty.
-     */
     public function testSeeInDatabaseDoesNotFindResults()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The table is empty.');
+
         $builder = $this->mockCountBuilder(0);
 
         $builder->shouldReceive('get')->andReturn(collect());
@@ -48,11 +47,10 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\ExpectationFailedException
-     */
     public function testSeeInDatabaseFindsNotMatchingResults()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+
         $this->expectExceptionMessage('Found: '.json_encode([['title' => 'Forge']], JSON_PRETTY_PRINT));
 
         $builder = $this->mockCountBuilder(0);
@@ -63,11 +61,10 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseHas($this->table, $this->data);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\ExpectationFailedException
-     */
     public function testSeeInDatabaseFindsManyNotMatchingResults()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+
         $this->expectExceptionMessage('Found: '.json_encode(['data', 'data', 'data'], JSON_PRETTY_PRINT).' and 2 others.');
 
         $builder = $this->mockCountBuilder(0);
@@ -87,11 +84,10 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertDatabaseMissing($this->table, $this->data);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\ExpectationFailedException
-     */
     public function testDontSeeInDatabaseFindsResults()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+
         $builder = $this->mockCountBuilder(1);
 
         $builder->shouldReceive('take')->andReturnSelf();
@@ -107,12 +103,11 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted($this->table, $this->data);
     }
 
-    /**
-     * @expectedException \PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The table is empty.
-     */
     public function testSeeSoftDeletedInDatabaseDoesNotFindResults()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The table is empty.');
+
         $builder = $this->mockCountBuilder(0);
 
         $builder->shouldReceive('get')->andReturn(collect());

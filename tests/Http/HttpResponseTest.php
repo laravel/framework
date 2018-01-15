@@ -187,12 +187,11 @@ class HttpResponseTest extends TestCase
         $response->withFoo('bar');
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [doesNotExist] does not exist on Redirect.
-     */
     public function testMagicCallException()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method [doesNotExist] does not exist on Redirect.');
+
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }

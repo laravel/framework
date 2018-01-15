@@ -20,12 +20,11 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Please provide a valid cache path.
-     */
     public function testCannotConstructWithBadCachePath()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Please provide a valid cache path.');
+
         new BladeCompiler($this->getFiles(), null);
     }
 
