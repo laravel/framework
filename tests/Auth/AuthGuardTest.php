@@ -42,7 +42,6 @@ class AuthGuardTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
-     * @expectedExceptionMessage
      */
     public function testBasicReturnsResponseOnFailure()
     {
