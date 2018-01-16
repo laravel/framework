@@ -153,7 +153,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($firstRandom, $secondRandom);
     }
 
-
     public function testGetArrayableItems()
     {
         $collection = new Collection;
