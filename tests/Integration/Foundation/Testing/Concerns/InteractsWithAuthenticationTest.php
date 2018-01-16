@@ -64,7 +64,7 @@ class InteractsWithAuthenticationTest extends TestCase
             return 'Hello '.$request->user()->username;
         })->middleware(['auth:api']);
 
-        Auth::viaRequest('basic', function ($request) {
+        Auth::viaRequest('api', function ($request) {
             return $request->user();
         });
 
