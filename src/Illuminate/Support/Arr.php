@@ -605,6 +605,6 @@ class Arr
      */
     public static function wrap($value)
     {
-        return ! is_array($value) ? [$value] : $value;
+        return (array) $value;
     }
 }
