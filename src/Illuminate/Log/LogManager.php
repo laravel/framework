@@ -96,8 +96,8 @@ class LogManager implements LoggerInterface
     protected function get($name)
     {
         try {
-            return $this->stores[$name] ?? with($this->resolve($name), function ($monolog) use ($name) {
-                return $this->tap($name, new Logger($monolog, $this->app['events']));
+            return $this->stores[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
+                return $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -198,6 +198,21 @@ class LogManager implements LoggerInterface
     protected function createCustomDriver(array $config)
     {
         return $this->app->make($config['via'])->__invoke($config);
+    }
+
+    /**
+     * Create a aggregate log driver instance.
+     *
+     * @param  array  $config
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function createAggregateDriver(array $config)
+    {
+        $handlers = collect($config['channels'])->flatMap(function ($channel) {
+            return $this->channel($channel)->getHandlers();
+        })->all();
+
+        return new Monolog($this->parseChannel($config), $handlers);
     }
 
     /**

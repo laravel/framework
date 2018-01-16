@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.29 (2018-01-15)
 
 ### Added
 - Added `Model::qualifyColumn()` method ([#22577](https://github.com/laravel/framework/pull/22577))
@@ -23,6 +23,7 @@
 - Set `null` as default value for `optional()` helper ([#22699](https://github.com/laravel/framework/pull/22699))
 - Make sure `getRememberToken()` returns a string ([#22724](https://github.com/laravel/framework/pull/22724))
 - Updated Vue preset version ([#22732](https://github.com/laravel/framework/pull/22732))
+- Accept `Arrayable` items in `Collection::find()` ([#22787](https://github.com/laravel/framework/pull/22787))
 
 ### Fixed
 - Close database connection when using `RefreshDatabase` trait ([#22569](https://github.com/laravel/framework/pull/22569))
@@ -30,6 +31,9 @@
 - Fixed parameter usage in `RedirectController` ([#22657](https://github.com/laravel/framework/pull/22657))
 - Added `__set_state()` method to `Support/Carbon` ([#22689](https://github.com/laravel/framework/pull/22689))
 - Do not continue checking `APP_ENV` if environment file path being set successfully with `--env` option ([#22753](https://github.com/laravel/framework/pull/22753))
+- Fixed missing table prefix in `SQLiteGrammar::compileDropColumn()` ([#22745](https://github.com/laravel/framework/pull/22745), [c13322c](https://github.com/laravel/framework/commit/c13322c54a20de1417d7bf53e348a601c526bf54))
+- Fixed prefixing in `SQLiteGrammar::compileColumnListing()` ([#22781](https://github.com/laravel/framework/pull/22781))
+
 
 ## v5.5.28 (2017-12-26)
 

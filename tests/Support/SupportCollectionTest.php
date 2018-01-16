@@ -143,6 +143,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEmpty($collection->all());
     }
 
+    public function testCollectionShuffleWithSeed()
+    {
+        $collection = new Collection((range(0, 100, 10)));
+
+        $firstRandom = $collection->shuffle(1234);
+        $secondRandom = $collection->shuffle(1234);
+
+        $this->assertEquals($firstRandom, $secondRandom);
+    }
+
     public function testGetArrayableItems()
     {
         $collection = new Collection;
@@ -974,11 +984,10 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(['first' => 'Taylor'], $data->except(['last', 'email', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->except('last', 'email', 'missing')->all());
-        $this->assertEquals(['first' => 'Taylor'], $data->except(collect(['last' => 'Otwell', 'email' => 'taylorotwell@gmail.com', 'missing']))->all());
 
+        $this->assertEquals(['first' => 'Taylor'], $data->except(collect(['last', 'email', 'missing']))->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(['last'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except('last')->all());
-        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(collect(['last' => 'Otwell']))->all());
     }
 
     public function testPluckWithArrayAndObjectValues()
@@ -1971,9 +1980,11 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals($data->all(), $data->only(null)->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only(['first', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->only('first', 'missing')->all());
+        $this->assertEquals(['first' => 'Taylor'], $data->only(collect(['first', 'missing']))->all());
 
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(['first', 'email'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only('first', 'email')->all());
+        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->only(collect(['first', 'email']))->all());
     }
 
     public function testGettingAvgItemsFromCollection()
