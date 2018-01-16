@@ -51,6 +51,18 @@ class CookieTest extends TestCase
         $this->assertEquals('lax', $c->getSameSite());
     }
 
+    public function testCookiesCanSetSecureOptionUsingDefaultPathAndDomain()
+    {
+        $cookie = $this->getCreator();
+        $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
+        $c = $cookie->make('color', 'blue', 10, null, null, false);
+        $this->assertEquals('blue', $c->getValue());
+        $this->assertFalse($c->isSecure());
+        $this->assertEquals('/domain', $c->getDomain());
+        $this->assertEquals('/path', $c->getPath());
+        $this->assertEquals('lax', $c->getSameSite());
+    }
+
     public function testQueuedCookies()
     {
         $cookie = $this->getCreator();
