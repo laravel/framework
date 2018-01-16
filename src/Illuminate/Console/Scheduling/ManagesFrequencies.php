@@ -52,7 +52,7 @@ trait ManagesFrequencies
      */
     private function inTimeInterval($startTime, $endTime)
     {
-        if ($this->endTimeGreater($startTime, $endTime)) {
+        if ($this->isMidnightBetween($startTime, $endTime)) {
             $endTime .= ' +1 day';
         }
 
@@ -66,15 +66,15 @@ trait ManagesFrequencies
     }
 
     /**
-     * Check if endTime is considered greater for humans.
+     * Check if startTime and endTime are before and after midnight
      *
      * @param string $startTime
      * @param string $endTime
      * @return bool
      */
-    private function endTimeGreater($startTime, $endTime)
+    private function isMidnightBetween($startTime, $endTime)
     {
-        return explode(':', $startTime)[0] > explode(':', $endTime)[0];
+        return strtotime($startTime) > strtotime($endTime);
     }
 
     /**
