@@ -54,11 +54,10 @@ class ClearCommandTest extends TestCase
         $this->runCommand($command, ['store' => 'foo']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testClearWithInvalidStoreArgument()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
             $files = m::mock('Illuminate\Filesystem\Filesystem')

@@ -17,12 +17,11 @@ class NotificationFakeTest extends TestCase
         $this->user = new UserStub;
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.
-     */
     public function testAssertSentTo()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The expected [Illuminate\\Tests\\Support\\NotificationStub] notification was not sent.');
+
         $this->fake->assertSentTo($this->user, NotificationStub::class);
 
         $this->fake->send($this->user, new NotificationStub);
@@ -30,12 +29,11 @@ class NotificationFakeTest extends TestCase
         $this->fake->assertSentTo($this->user, NotificationStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.
-     */
     public function testAssertNotSentTo()
     {
+        $this->expectException(\PHPUnit\Framework\ExpectationFailedException::class);
+        $this->expectExceptionMessage('The unexpected [Illuminate\\Tests\\Support\\NotificationStub] notification was sent.');
+
         $this->fake->assertNotSentTo($this->user, NotificationStub::class);
 
         $this->fake->send($this->user, new NotificationStub);

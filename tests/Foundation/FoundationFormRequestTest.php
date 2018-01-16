@@ -34,11 +34,10 @@ class FoundationFormRequestTest extends TestCase
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
 
-    /**
-     * @expectedException \Illuminate\Validation\ValidationException
-     */
     public function test_validate_throws_when_validation_fails()
     {
+        $this->expectException(\Illuminate\Validation\ValidationException::class);
+
         $request = $this->createRequest(['no' => 'name']);
 
         $this->mocks['redirect']->shouldReceive('withInput->withErrors');
@@ -46,12 +45,11 @@ class FoundationFormRequestTest extends TestCase
         $request->validateResolved();
     }
 
-    /**
-     * @expectedException \Illuminate\Auth\Access\AuthorizationException
-     * @expectedExceptionMessage This action is unauthorized.
-     */
     public function test_validate_method_throws_when_authorization_fails()
     {
+        $this->expectException(\Illuminate\Auth\Access\AuthorizationException::class);
+        $this->expectExceptionMessage('This action is unauthorized.');
+
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 

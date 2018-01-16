@@ -211,12 +211,11 @@ class RoutingRouteTest extends TestCase
         );
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Route for [foo/bar] has no action.
-     */
     public function testFluentRouting()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Route for [foo/bar] has no action.');
+
         $router = $this->getRouter();
         $router->get('foo/bar')->uses(function () {
             return 'hello';
@@ -524,11 +523,10 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo/bar/baz', $router->dispatch(Request::create('/foo/bar/baz', 'GET'))->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRoutesDontMatchNonMatchingPathsWithLeadingOptionals()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+
         $router = $this->getRouter();
         $router->get('{baz?}', function ($age = 25) {
             return $age;
@@ -536,11 +534,10 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('25', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     */
     public function testRoutesDontMatchNonMatchingDomain()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\NotFoundHttpException::class);
+
         $router = $this->getRouter();
         $router->get('foo/bar', ['domain' => 'api.foo.bar', function () {
             return 'hello';
@@ -776,12 +773,11 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].
-     */
     public function testModelBindingWithNullReturn()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\\Tests\\Routing\\RouteModelBindingNullStub].');
+
         $router = $this->getRouter();
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
@@ -1048,12 +1044,11 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('Namespace\\Controller@action', $action['controller']);
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage Invalid route action: [Illuminate\Tests\Routing\RouteTestControllerStub].
-     */
     public function testInvalidActionException()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('Invalid route action: [Illuminate\\Tests\\Routing\\RouteTestControllerStub].');
+
         $router = $this->getRouter();
         $router->get('/', ['uses' => 'Illuminate\Tests\Routing\RouteTestControllerStub']);
 
@@ -1364,11 +1359,10 @@ class RoutingRouteTest extends TestCase
         $router->dispatch(Request::create('foo', 'GET'))->getContent();
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+
         $phpunit = $this;
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [

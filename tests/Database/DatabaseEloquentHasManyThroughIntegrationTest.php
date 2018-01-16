@@ -119,24 +119,22 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertCount(1, $country);
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
-     */
     public function testFirstOrFailThrowsAnException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\\Tests\\Database\\HasManyThroughTestPost].');
+
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
             ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 
         HasManyThroughTestCountry::first()->posts()->firstOrFail();
     }
 
-    /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
-     */
     public function testFindOrFailThrowsAnException()
     {
+        $this->expectException(\Illuminate\Database\Eloquent\ModelNotFoundException::class);
+        $this->expectExceptionMessage('No query results for model [Illuminate\\Tests\\Database\\HasManyThroughTestPost].');
+
         HasManyThroughTestCountry::create(['id' => 1, 'name' => 'United States of America', 'shortname' => 'us'])
                                  ->users()->create(['id' => 1, 'email' => 'taylorotwell@gmail.com', 'country_short' => 'us']);
 

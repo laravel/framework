@@ -23,12 +23,11 @@ class AuthPasswordBrokerTest extends TestCase
         $this->assertEquals(PasswordBroker::INVALID_USER, $broker->sendResetLink(['credentials']));
     }
 
-    /**
-     * @expectedException \UnexpectedValueException
-     * @expectedExceptionMessage User must implement CanResetPassword interface.
-     */
     public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
     {
+        $this->expectException(\UnexpectedValueException::class);
+        $this->expectExceptionMessage('User must implement CanResetPassword interface.');
+
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn('bar');
 

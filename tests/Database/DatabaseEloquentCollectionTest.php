@@ -351,12 +351,11 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(TestEloquentCollectionModel::class, $c->getQueueableClass());
     }
 
-    /**
-     * @expectedException \LogicException
-     * @expectedExceptionMessage Queueing collections with multiple model types is not supported.
-     */
     public function testQueueableCollectionImplementationThrowsExceptionOnMultipleModelTypes()
     {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Queueing collections with multiple model types is not supported.');
+
         $c = new Collection([new TestEloquentCollectionModel, (object) ['id' => 'something']]);
         $c->getQueueableClass();
     }

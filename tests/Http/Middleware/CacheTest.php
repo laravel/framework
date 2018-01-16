@@ -73,11 +73,10 @@ class CacheTest extends TestCase
         $this->assertSame(304, $response->getStatusCode());
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
     public function testInvalidOption()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         (new Cache())->handle(new Request(), function () {
             return new Response('some content');
         }, 'invalid');

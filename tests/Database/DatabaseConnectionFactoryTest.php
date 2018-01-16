@@ -71,22 +71,20 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A driver must be specified.
-     */
     public function testIfDriverIsntSetExceptionIsThrown()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('A driver must be specified.');
+
         $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $factory->createConnector(['foo']);
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Unsupported driver [foo]
-     */
     public function testExceptionIsThrownOnUnsupportedDriver()
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unsupported driver [foo]');
+
         $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);

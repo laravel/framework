@@ -56,21 +56,19 @@ class SupportCarbonTest extends TestCase
         $this->assertSame('2017-06-25 12:00:00', Carbon::twoDaysAgoAtNoon()->toDateTimeString());
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method nonExistingStaticMacro does not exist.
-     */
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method nonExistingStaticMacro does not exist.');
+
         Carbon::nonExistingStaticMacro();
     }
 
-    /**
-     * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method nonExistingMacro does not exist.
-     */
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
+        $this->expectException(\BadMethodCallException::class);
+        $this->expectExceptionMessage('Method nonExistingMacro does not exist.');
+
         Carbon::now()->nonExistingMacro();
     }
 

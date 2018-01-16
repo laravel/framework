@@ -65,11 +65,10 @@ class BroadcasterTest extends TestCase
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
     }
 
-    /**
-     * @expectedException \Exception
-     */
     public function testUnknownChannelAuthHandlerTypeThrowsException()
     {
+        $this->expectException(\Exception::class);
+
         $broadcaster = new FakeBroadcaster;
 
         $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
@@ -84,11 +83,10 @@ class BroadcasterTest extends TestCase
         $broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
     }
 
-    /**
-     * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     */
     public function testNotFoundThrowsHttpException()
     {
+        $this->expectException(\Symfony\Component\HttpKernel\Exception\HttpException::class);
+
         $broadcaster = new FakeBroadcaster;
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
         };
