@@ -149,7 +149,7 @@ class ResourceRegistrar
         if (isset($options['only'])) {
             $defaults = array_intersect($defaults, (array) $options['only']);
         }
-        
+
         if (isset($options['except'])) {
             $defaults = array_diff($defaults, (array) $options['except']);
         }
