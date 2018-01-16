@@ -143,6 +143,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEmpty($collection->all());
     }
 
+    public function testCollectionShuffleWithSeed()
+    {
+        $collection = new Collection((range(0, 100, 10)));
+
+        $firstRandom = $collection->shuffle(1234);
+        $secondRandom = $collection->shuffle(1234);
+
+        $this->assertEquals($firstRandom, $secondRandom);
+    }
+
     public function testGetArrayableItems()
     {
         $collection = new Collection;
