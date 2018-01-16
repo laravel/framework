@@ -45,6 +45,20 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
+    public function test_acting_as_is_properly_handled_for_session_auth()
+    {
+        Route::get('me', function (Request $request) {
+            return 'Hello '.$request->user()->username;
+        })->middleware(['auth']);
+
+        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+
+        $this->actingAs($user)
+            ->get('/me')
+            ->assertSuccessful()
+            ->assertSeeText('Hello taylorotwell');
+    }
+
     public function test_acting_as_is_properly_handled_for_auth_via_request()
     {
         Route::get('me', function (Request $request) {
