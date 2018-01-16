@@ -52,6 +52,10 @@ trait ManagesFrequencies
      */
     private function inTimeInterval($startTime, $endTime)
     {
+        if ($this->isMidnightBetween($startTime, $endTime)) {
+            $endTime .= ' +1 day';
+        }
+
         return function () use ($startTime, $endTime) {
             return Carbon::now($this->timezone)->between(
                 Carbon::parse($startTime, $this->timezone),
@@ -59,6 +63,18 @@ trait ManagesFrequencies
                 true
             );
         };
+    }
+
+    /**
+     * Check if startTime and endTime are before and after midnight.
+     *
+     * @param string $startTime
+     * @param string $endTime
+     * @return bool
+     */
+    private function isMidnightBetween($startTime, $endTime)
+    {
+        return strtotime($startTime) > strtotime($endTime);
     }
 
     /**

@@ -105,4 +105,22 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
         $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
     }
+
+    public function testTimeBetweenBeforeAndAfterMidnight()
+    {
+        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app->shouldReceive('isDownForMaintenance')->andReturn(false);
+        $app->shouldReceive('environment')->andReturn('production');
+        Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(22));
+
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
+        $event->timezone('UTC');
+
+        $this->assertTrue($event->between('21:00', '01:00')->filtersPass($app));
+        $this->assertFalse($event->between('01:00', '21:00')->filtersPass($app));
+        $this->assertFalse($event->between('23:00', '01:00')->filtersPass($app));
+
+        $this->assertFalse($event->unlessBetween('21:00', '01:00')->filtersPass($app));
+        $this->assertTrue($event->unlessBetween('23:00', '01:00')->isDue($app));
+    }
 }
