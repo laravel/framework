@@ -7,7 +7,6 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 class InteractsWithAuthenticationTest extends TestCase
