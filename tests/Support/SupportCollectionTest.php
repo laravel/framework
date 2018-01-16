@@ -984,11 +984,10 @@ class SupportCollectionTest extends TestCase
 
         $this->assertEquals(['first' => 'Taylor'], $data->except(['last', 'email', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->except('last', 'email', 'missing')->all());
-        $this->assertEquals(['first' => 'Taylor'], $data->except(collect(['last', 'email', 'missing']))->all());
 
+        $this->assertEquals(['first' => 'Taylor'], $data->except(collect(['last', 'email', 'missing']))->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(['last'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except('last')->all());
-        $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(collect(['last']))->all());
     }
 
     public function testPluckWithArrayAndObjectValues()
