@@ -66,7 +66,7 @@ trait ManagesFrequencies
     }
 
     /**
-     * Check if startTime and endTime are before and after midnight
+     * Check if startTime and endTime are before and after midnight.
      *
      * @param string $startTime
      * @param string $endTime
