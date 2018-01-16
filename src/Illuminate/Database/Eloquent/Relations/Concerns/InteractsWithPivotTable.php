@@ -300,6 +300,12 @@ trait InteractsWithPivotTable
             $record = $this->addTimestampsToAttachment($record);
         }
 
+        // Adding the default pivot values (if there is any) to the record.
+        foreach ($this->pivotValues as $value) {
+            list ($name, $value) = $value;
+            $record[$name] = $value;
+        }
+
         return $record;
     }
 
