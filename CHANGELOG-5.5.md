@@ -1,5 +1,21 @@
 # Release Notes for 5.5.x
 
+## v5.5.31 (2018-01-16)
+
+### Fixed
+- Reverted [#22804](https://github.com/laravel/framework/pull/22804) ([d8a8368](https://github.com/laravel/framework/commit/d8a8368e15e73de50b91b903f6b933c7d05b0e28), [f34926c](https://github.com/laravel/framework/commit/f34926c52ba282ff67f4be3e9afc8d0ddc885c3f), [#22817](https://github.com/laravel/framework/pull/22817))
+
+
+## v5.5.30 (2018-01-16)
+
+### Changed
+- Accept collection of keys on `Collection::only()` ([#22804](https://github.com/laravel/framework/pull/22804))
+
+### Fixed
+- Reverted [#22649](https://github.com/laravel/framework/pull/22649) ([#22815](https://github.com/laravel/framework/pull/22815))
+- Send status code `500` when using `Collection::dd()` ([#22803](https://github.com/laravel/framework/pull/22803))
+
+
 ## v5.5.29 (2018-01-15)
 
 ### Added

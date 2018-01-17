@@ -2560,6 +2560,12 @@ class SupportCollectionTest extends TestCase
         $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
         $collection->foo;
     }
+
+    public function testGetWithNullReturnsNull()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertNull($collection->get(null));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
