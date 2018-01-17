@@ -194,7 +194,10 @@ class Mailable implements MailableContract, Renderable
     protected function buildView()
     {
         if (isset($this->html)) {
-            return ['html' => new HtmlString($this->html)];
+            return array_filter([
+                'html' => new HtmlString($this->html),
+                'text' => isset($this->textView) ? $this->textView : null
+            ]);
         }
         if (isset($this->markdown)) {
             return $this->buildMarkdownView();
