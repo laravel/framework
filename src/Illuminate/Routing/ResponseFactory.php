@@ -125,13 +125,11 @@ class ResponseFactory implements FactoryContract
         $response = new StreamedResponse($callback, 200, $headers);
 
         if (! is_null($name)) {
-            $dispositionHeader = $response->headers->makeDisposition(
+            $response->headers->set('Content-Disposition', $response->headers->makeDisposition(
                 $disposition,
                 $name,
                 $this->fallbackName($name)
-            );
-
-            $response->headers->set('Content-Disposition', $dispositionHeader);
+            ));
         }
 
         return $response;
@@ -158,7 +156,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Returns a string containing only ASCII characters that is semantically equivalent to $name.
+     * Conver the string to ASCII characters that are equivalent to the given name.
      *
      * @param  string  $name
      * @return string
