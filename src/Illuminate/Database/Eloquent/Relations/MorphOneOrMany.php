@@ -47,19 +47,11 @@ abstract class MorphOneOrMany extends HasOneOrMany
      */
     public function addConstraints()
     {
-        if (! static::$constraints) {
-            return;
+        if (static::$constraints) {
+            parent::addConstraints();
+
+            $this->query->where($this->morphType, $this->morphClass);
         }
-
-        $this->query = tap($this->query, function ($query) {
-            $this->query->where(function ($query) {
-                $this->query = $query;
-
-                parent::addConstraints();
-
-                $this->query->where($this->morphType, $this->morphClass);
-            });
-        });
     }
 
     /**
