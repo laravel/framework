@@ -74,7 +74,7 @@ trait BuildsQueries
 
         $results->setFetchMode(\PDO::FETCH_CLASS, get_class($this->getModel()));
         while ($row = $results->fetch()) {
-            if ($callback($row, 1) === false) {
+            if ($callback($row, 0) === false) {
                 return false;
             }
         }
