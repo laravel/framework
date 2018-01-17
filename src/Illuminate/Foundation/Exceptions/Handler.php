@@ -393,14 +393,20 @@ class Handler implements ExceptionHandlerContract
     {
         $status = $e->getStatusCode();
 
-        $paths = collect(config('view.paths'));
-
-        view()->replaceNamespace('errors', $paths->map(function ($path) {
+        $customErrorPaths = array_map(function ($path) {
             return "{$path}/errors";
-        })->push(__DIR__.'/views')->all());
+        }, config('view.paths'));
 
-        if (view()->exists($view = "errors::{$status}")) {
-            return response()->view($view, ['exception' => $e], $status, $e->getHeaders());
+        $laravelErrorPaths = [__DIR__.'/views'];
+
+        $errorNamespaces = [$customErrorPaths, $laravelErrorPaths];
+
+        foreach ($errorNamespaces as $errorNamespace) {
+            view()->replaceNamespace('errors', $errorNamespace);
+
+            if (view()->exists($view = "errors::{$status}") || view()->exists($view = 'errors::default')) {
+                return response()->view($view, ['exception' => $e], $status, $e->getHeaders());
+            }
         }
 
         return $this->convertExceptionToResponse($e);
