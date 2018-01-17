@@ -6,8 +6,8 @@ use ReflectionClass;
 use ReflectionProperty;
 use BadMethodCallException;
 use Illuminate\Support\Str;
-use Illuminate\Support\HtmlString;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
@@ -196,7 +196,7 @@ class Mailable implements MailableContract, Renderable
         if (isset($this->html)) {
             return array_filter([
                 'html' => new HtmlString($this->html),
-                'text' => isset($this->textView) ? $this->textView : null
+                'text' => isset($this->textView) ? $this->textView : null,
             ]);
         }
         if (isset($this->markdown)) {
