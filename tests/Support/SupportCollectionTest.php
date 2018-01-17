@@ -2485,6 +2485,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('Book 1', $collection->get('foo.books.0'));
         $this->assertEquals('Todo 2', $collection->get('foo.todos.second'));
     }
+
+    public function testGetWithNullReturnsNull()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertNull($collection->get(null));
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
