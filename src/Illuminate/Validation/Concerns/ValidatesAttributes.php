@@ -1390,11 +1390,11 @@ trait ValidatesAttributes
     public function validateArrayContains($attribute, $value, $parameters)
     {
         $this->requireParameterCount(1, $parameters, 'array_contains');
-        
+
         if (! in_array($parameters[0], ['email', 'file', 'image'])) {
             return false;
         }
-        
+
         $methodName = 'validate'.ucfirst(strtolower($parameters[0]));
 
         foreach ($value as $actualValue) {
