@@ -78,6 +78,7 @@ trait BuildsQueries
                 return false;
             }
         }
+
         return true;
     }
 
