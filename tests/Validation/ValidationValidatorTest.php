@@ -3842,7 +3842,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['files' => [
                 $file,
-                $file2
+                $file2,
             ]],
             ['files' => 'array_contains:file']
         );
