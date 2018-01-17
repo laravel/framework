@@ -57,13 +57,29 @@ trait BuildsQueries
      */
     public function each(callable $callback, $count = 1000)
     {
-        return $this->chunk($count, function ($results) use ($callback) {
-            foreach ($results as $key => $value) {
-                if ($callback($value, $key) === false) {
-                    return false;
+        if ($count > 1) {
+            return $this->chunk($count, function ($results) use ($callback) {
+                foreach ($results as $key => $value) {
+                    if ($callback($value, $key) === false) {
+                        return false;
+                    }
                 }
+            });
+        }
+
+        $results = app('db')->getPdo()->query($this->toSql());
+        if ($results === false) {
+            return false;
+        }
+
+        $results->setFetchMode(\PDO::FETCH_CLASS, get_class($this->getModel()));
+        while ($row = $results->fetch()) {
+            if ($callback($row, 0) === false) {
+                return false;
             }
-        });
+        }
+
+        return true;
     }
 
     /**
