@@ -1402,7 +1402,7 @@ trait ValidatesAttributes
                 return false;
             }
         }
-        
+
         return true;
     }
 
