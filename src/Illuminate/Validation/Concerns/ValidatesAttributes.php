@@ -1380,6 +1380,33 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that each value of an array is of a specific type.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateArrayContains($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'array_contains');
+        
+        if (!in_array($parameters[0], ['email', 'file', 'image'])) {
+            return false;
+        }
+        
+        $methodName = 'validate' . ucfirst(strtolower($parameters[0]));
+
+        foreach ($value as $actualValue) {
+            if (!call_user_func_array([$this, $methodName], [$attribute, $actualValue])) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+
+    /**
      * Get the size of an attribute.
      *
      * @param  string  $attribute

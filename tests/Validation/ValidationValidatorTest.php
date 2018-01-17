@@ -3827,6 +3827,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($rule->called);
     }
 
+    public function testArrayContainsValidation()
+    {
+        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file->expects($this->any())->method('guessExtension')->will($this->returnValue('png'));
+        $file->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('png'));
+
+        $file2 = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
+        $file2->expects($this->any())->method('guessExtension')->will($this->returnValue('jpeg'));
+        $file2->expects($this->any())->method('getClientOriginalExtension')->will($this->returnValue('jpeg'));
+
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['files' => [
+                $file,
+                $file2
+            ]],
+            ['files' => 'array_contains:file']
+        );
+
+        $this->assertTrue($v->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');
