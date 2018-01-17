@@ -399,7 +399,7 @@ class Handler implements ExceptionHandlerContract
             return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
 
-        if (view()->exists($view = "errors::{$status}")) {
+        if (view()->exists($view = "errors::{$status}") || (! config('app.debug') && view()->exists($view = "errors::unhandled"))) {
             return response()->view($view, ['exception' => $e], $status, $e->getHeaders());
         }
 
