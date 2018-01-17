@@ -2,7 +2,11 @@
 
 namespace Illuminate\Support;
 
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidFactory;
 use Illuminate\Support\Traits\Macroable;
+use Ramsey\Uuid\Generator\CombGenerator;
+use Ramsey\Uuid\Codec\TimestampFirstCombCodec;
 
 class Str
 {
@@ -515,6 +519,37 @@ class Str
     public static function ucfirst($string)
     {
         return static::upper(static::substr($string, 0, 1)).static::substr($string, 1);
+    }
+
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\Uuid
+     */
+    public static function uuid()
+    {
+        return Uuid::uuid4();
+    }
+
+    /**
+     * Generate a time-ordered UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\Uuid
+     */
+    public static function orderedUuid()
+    {
+        $factory = new UuidFactory;
+
+        $factory->setRandomGenerator(new CombGenerator(
+            $factory->getRandomGenerator(),
+            $factory->getNumberConverter()
+        ));
+
+        $factory->setCodec(new TimestampFirstCombCodec(
+            $factory->getUuidBuilder()
+        ));
+
+        return $factory->uuid4();
     }
 
     /**
