@@ -5,14 +5,16 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Relations\Concerns\SetsOppositeRelations;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
+use Illuminate\Contracts\Database\Eloquent\Relations\SetsOppositeRelations as SetsOppositeRelationsContract;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
-class BelongsTo extends Relation
+class BelongsTo extends Relation implements SetsOppositeRelationsContract
 {
-    use SupportsDefaultModels;
+    use SupportsDefaultModels, SetsOppositeRelations;
 
     /**
      * The child model instance of the relation.
@@ -78,7 +80,11 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        return $this->query->first() ?: $this->getDefaultFor($this->parent);
+        $model = $this->query->first() ?: $this->getDefaultFor($this->parent);
+
+        $this->setOppositeRelation($model);
+
+        return $model;
     }
 
     /**
