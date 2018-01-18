@@ -1951,7 +1951,7 @@ class Builder
      *
      * @return bool
      */
-    public function notExists()
+    public function doesntExist()
     {
         return ! $this->exists();
     }
