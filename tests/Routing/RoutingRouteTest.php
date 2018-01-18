@@ -218,7 +218,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $router->get('foo/bar', [
-            'uses' => function() {
+            'uses' => function () {
                 return 'hello';
             },
             'handler' => 'Illuminate\Tests\Routing\RouteTestHandler',
@@ -1788,9 +1788,9 @@ class ActionStub
     }
 }
 
-class RouteTestHandler extends Handler 
+class RouteTestHandler extends Handler
 {
-    public function __construct() 
+    public function __construct()
     {
     }
 

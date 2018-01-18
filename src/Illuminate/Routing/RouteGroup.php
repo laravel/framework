@@ -105,6 +105,4 @@ class RouteGroup
     {
         return isset($new['handler']) ? $new['handler'] : (isset($old['handler']) ? $old['handler'] : null);
     }
-
-
 }
