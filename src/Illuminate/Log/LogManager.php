@@ -75,7 +75,7 @@ class LogManager implements LoggerInterface
     public function stack(array $channels, $channel = null)
     {
         return new Logger(
-            $this->createAggregateDriver(compact('channels', 'channel')),
+            $this->createStackDriver(compact('channels', 'channel')),
             $this->app['events']
         );
     }
@@ -216,12 +216,12 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Create a aggregate log driver instance.
+     * Create an aggregate log driver instance.
      *
      * @param  array  $config
      * @return \Psr\Log\LoggerInterface
      */
-    protected function createAggregateDriver(array $config)
+    protected function createStackDriver(array $config)
     {
         $handlers = collect($config['channels'])->flatMap(function ($channel) {
             return $this->channel($channel)->getHandlers();
