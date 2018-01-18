@@ -23,10 +23,11 @@ class RouteGroup
             'namespace' => static::formatNamespace($new, $old),
             'prefix' => static::formatPrefix($new, $old),
             'where' => static::formatWhere($new, $old),
+            'handler' => static::formatHandler($new, $old),
         ]);
 
         return array_merge_recursive(Arr::except(
-            $old, ['namespace', 'prefix', 'where', 'as']
+            $old, ['namespace', 'prefix', 'where', 'handler', 'as']
         ), $new);
     }
 
@@ -92,4 +93,18 @@ class RouteGroup
 
         return $new;
     }
+
+    /**
+     * Format the "handler" clause of the new group attributes.
+     *
+     * @param  array  $new
+     * @param  array  $old
+     * @return string|null
+     */
+    protected static function formatHandler($new, $old)
+    {
+        return isset($new['handler']) ? $new['handler'] : (isset($old['handler']) ? $old['handler'] : null);
+    }
+
+
 }

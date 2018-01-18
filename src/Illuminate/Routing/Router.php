@@ -630,6 +630,11 @@ class Router implements RegistrarContract, BindingRegistrar
             return $route;
         });
 
+        $routeExceptionHandler = $route->getHandler();
+        if(!is_null($routeExceptionHandler)) {
+            app()->singleton('Illuminate\Contracts\Debug\ExceptionHandler', $routeExceptionHandler);
+        }
+
         $this->events->dispatch(new Events\RouteMatched($route, $request));
 
         return $this->prepareResponse($request,
