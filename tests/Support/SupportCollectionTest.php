@@ -2486,10 +2486,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('Todo 2', $collection->get('foo.todos.second'));
     }
 
-    public function testGetWithNullReturnsNull()
+    public function testGetWithNullReturnsNullOrDefault()
     {
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
+        $this->assertSame('default', $collection->get(null, 'default'));
+        $this->assertSame('default', $collection->get(null, function () {
+            return 'default';
+        }));
     }
 }
 
