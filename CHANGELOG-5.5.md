@@ -1,9 +1,14 @@
 # Release Notes for 5.5.x
 
+## v5.5.32 (2018-01-18)
+
+- Reverted `Collection::get()` changes [#22554](https://github.com/laravel/framework/pull/22554) ([6197e56](https://github.com/laravel/framework/commit/6197e563fab8511ce8bf9a006444fee26f015d3a), [af36f26](https://github.com/laravel/framework/commit/af36f26dad805a8d866555c979e92a9e0e1fa8ea))
+
+
 ## v5.5.31 (2018-01-16)
 
 ### Fixed
-- Reverted [#22804](https://github.com/laravel/framework/pull/22804) ([d8a8368](https://github.com/laravel/framework/commit/d8a8368e15e73de50b91b903f6b933c7d05b0e28), [f34926c](https://github.com/laravel/framework/commit/f34926c52ba282ff67f4be3e9afc8d0ddc885c3f), [#22817](https://github.com/laravel/framework/pull/22817))
+- Reverted [#22804](https://github.com/laravel/framework/pull/22804) ([d8a8368](https://github.com/laravel/framework/commit/d8a8368e15e73de50b91b903f6b933c7d05b0e28), [f34926c](https://github.com/laravel/framework/commit/f34926c52ba282ff67f4be3e9afc8d0ddc885c3f))
 
 
 ## v5.5.30 (2018-01-16)
