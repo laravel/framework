@@ -1947,6 +1947,16 @@ class Builder
     }
 
     /**
+     * Determine if no rows exist for the current query.
+     *
+     * @return bool
+     */
+    public function notExists()
+    {
+        return ! $this->exists();
+    }
+
+    /**
      * Retrieve the "count" result of the query.
      *
      * @param  string  $columns
