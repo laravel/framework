@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use DateTime;
 use stdClass;
+use Exception;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
@@ -18,6 +19,7 @@ use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Foundation\Exceptions\Handler;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
@@ -208,6 +210,24 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(
             'index-foo-middleware-controller-closure',
             $router->dispatch(Request::create('foo/bar', 'GET'))->getContent()
+        );
+    }
+
+    public function testHandler()
+    {
+        $router = $this->getRouter();
+        $router->get('foo/bar', [
+            'uses' => function () {
+                return 'hello';
+            },
+            'handler' => 'Illuminate\Tests\Routing\RouteTestHandler',
+        ]);
+
+        $router->dispatch(Request::create('foo/bar', 'GET'))->getContent();
+
+        $this->assertInstanceOf(
+            'Illuminate\Tests\Routing\RouteTestHandler',
+            app('Illuminate\Contracts\Debug\ExceptionHandler')
         );
     }
 
@@ -847,23 +867,26 @@ class RoutingRouteTest extends TestCase
     public function testGroupMerging()
     {
         $old = ['prefix' => 'foo/bar/'];
-        $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => []], RouteGroup::merge(['prefix' => 'baz'], $old));
+        $this->assertEquals(['prefix' => 'foo/bar/baz', 'namespace' => null, 'where' => [], 'handler' => null], RouteGroup::merge(['prefix' => 'baz'], $old));
 
         $old = ['domain' => 'foo'];
-        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['domain' => 'baz'], $old));
+        $this->assertEquals(['domain' => 'baz', 'prefix' => null, 'namespace' => null, 'where' => [], 'handler' => null], RouteGroup::merge(['domain' => 'baz'], $old));
 
         $old = ['as' => 'foo.'];
-        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => []], RouteGroup::merge(['as' => 'bar'], $old));
+        $this->assertEquals(['as' => 'foo.bar', 'prefix' => null, 'namespace' => null, 'where' => [], 'handler' => null], RouteGroup::merge(['as' => 'bar'], $old));
 
         $old = ['where' => ['var1' => 'foo', 'var2' => 'bar']];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'baz', 'var3' => 'qux',
-        ]], RouteGroup::merge(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
+        ], 'handler' => null], RouteGroup::merge(['where' => ['var2' => 'baz', 'var3' => 'qux']], $old));
 
         $old = [];
         $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [
             'var1' => 'foo', 'var2' => 'bar',
-        ]], RouteGroup::merge(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
+        ], 'handler' => null], RouteGroup::merge(['where' => ['var1' => 'foo', 'var2' => 'bar']], $old));
+
+        $old = [];
+        $this->assertEquals(['prefix' => null, 'namespace' => null, 'where' => [], 'handler' => 'FooHandler'], RouteGroup::merge(['handler' => 'FooHandler'], $old));
     }
 
     public function testRouteGrouping()
@@ -1761,5 +1784,17 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+class RouteTestHandler extends Handler
+{
+    public function __construct()
+    {
+    }
+
+    public function render($request, Exception $exception)
+    {
+        return 'handled!';
     }
 }

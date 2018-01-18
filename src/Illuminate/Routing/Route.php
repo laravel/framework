@@ -643,6 +643,16 @@ class Route
     }
 
     /**
+     * Get the handler class name of the route instance.
+     *
+     * @return string
+     */
+    public function getHandler()
+    {
+        return $this->action['handler'] ?? null;
+    }
+
+    /**
      * Determine whether the route's name matches the given patterns.
      *
      * @param  dynamic  $patterns
