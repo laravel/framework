@@ -14,6 +14,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\SlackWebhookHandler;
 
 class LogManager implements LoggerInterface
 {
@@ -256,6 +257,28 @@ class LogManager implements LoggerInterface
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config)
+            )),
+        ]);
+    }
+
+    /**
+     * Create an instance of the Slack log driver.
+     *
+     * @param  array  $config
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function createSlackDriver(array $config)
+    {
+        return new Monolog($this->parseChannel($config), [
+            $this->prepareHandler(new SlackWebhookHandler(
+                $config['url'],
+                $config['channel'] ?? null,
+                $config['username'] ?? 'Laravel',
+                $config['attachment'] ?? true,
+                $config['emoji'] ?? ':boom:',
+                $config['short'] ?? false,
+                $config['context'] ?? true,
+                $this->level($config)
             )),
         ]);
     }
