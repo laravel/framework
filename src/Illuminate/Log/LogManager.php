@@ -66,6 +66,21 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Create a new, on-demand aggregate logger instance.
+     *
+     * @param  array  $channels
+     * @param  string|null  $channel
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function stack(array $channels, $channel = null)
+    {
+        return new Logger(
+            $this->createAggregateDriver(compact('channels', 'channel')),
+            $this->app['events']
+        );
+    }
+
+    /**
      * Get a log channel instance.
      *
      * @param  string|null  $channel
