@@ -23,7 +23,6 @@ use Illuminate\Foundation\Exceptions\Handler;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 
-
 class RoutingRouteTest extends TestCase
 {
     public function testBasicDispatchingOfRoutes()

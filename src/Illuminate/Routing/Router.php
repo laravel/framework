@@ -631,7 +631,7 @@ class Router implements RegistrarContract, BindingRegistrar
         });
 
         $routeExceptionHandler = $route->getHandler();
-        if (!is_null($routeExceptionHandler)) {
+        if (! is_null($routeExceptionHandler)) {
             app()->singleton('Illuminate\Contracts\Debug\ExceptionHandler', $routeExceptionHandler);
         }
 
