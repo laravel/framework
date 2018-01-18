@@ -644,7 +644,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function get($key, $default = null)
     {
-        return is_null($key) ? null : Arr::get($this->items, $key, $default);
+        if ($this->offsetExists($key)) {
+            return $this->items[$key];
+        }
+
+        return value($default);
     }
 
     /**
