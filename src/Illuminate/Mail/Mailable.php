@@ -199,6 +199,7 @@ class Mailable implements MailableContract, Renderable
                 'text' => isset($this->textView) ? $this->textView : null,
             ]);
         }
+
         if (isset($this->markdown)) {
             return $this->buildMarkdownView();
         }
@@ -600,19 +601,6 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
-     * Set the HTML content for the message.
-     *
-     * @param  string $html
-     * @return $this
-     */
-    public function html($html)
-    {
-        $this->html = $html;
-
-        return $this;
-    }
-
-    /**
      * Set the view and view data for the message.
      *
      * @param  string  $view
@@ -623,6 +611,19 @@ class Mailable implements MailableContract, Renderable
     {
         $this->view = $view;
         $this->viewData = array_merge($this->viewData, $data);
+
+        return $this;
+    }
+
+    /**
+     * Set the rendered HTML content for the message.
+     *
+     * @param  string  $html
+     * @return $this
+     */
+    public function html($html)
+    {
+        $this->html = $html;
 
         return $this;
     }

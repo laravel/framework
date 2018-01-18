@@ -149,6 +149,18 @@ class Mailer implements MailerContract, MailQueueContract
     }
 
     /**
+     * Send a new message with only an HTML part.
+     *
+     * @param  string  $html
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function html($html, $callback)
+    {
+        return $this->send(['html' => new HtmlString($html)], [], $callback);
+    }
+
+    /**
      * Send a new message when only a raw text part.
      *
      * @param  string  $text
@@ -158,18 +170,6 @@ class Mailer implements MailerContract, MailQueueContract
     public function raw($text, $callback)
     {
         return $this->send(['raw' => $text], [], $callback);
-    }
-
-    /**
-     * Send a new message when only a html part.
-     *
-     * @param  string  $html
-     * @param  mixed  $callback
-     * @return void
-     */
-    public function html($html, $callback)
-    {
-        return $this->send(['html' => new HtmlString($html)], [], $callback);
     }
 
     /**
