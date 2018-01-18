@@ -7,6 +7,7 @@ use ReflectionProperty;
 use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
@@ -63,6 +64,13 @@ class Mailable implements MailableContract, Renderable
      * @var string
      */
     protected $markdown;
+
+    /**
+     * The HTML to use for the message.
+     *
+     * @var string
+     */
+    protected $html;
 
     /**
      * The view to use for the message.
@@ -185,6 +193,12 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildView()
     {
+        if (isset($this->html)) {
+            return array_filter([
+                'html' => new HtmlString($this->html),
+                'text' => isset($this->textView) ? $this->textView : null,
+            ]);
+        }
         if (isset($this->markdown)) {
             return $this->buildMarkdownView();
         }
@@ -581,6 +595,19 @@ class Mailable implements MailableContract, Renderable
     {
         $this->markdown = $view;
         $this->viewData = array_merge($this->viewData, $data);
+
+        return $this;
+    }
+
+    /**
+     * Set the HTML content for the message.
+     *
+     * @param  string $html
+     * @return $this
+     */
+    public function html($html)
+    {
+        $this->html = $html;
 
         return $this;
     }
