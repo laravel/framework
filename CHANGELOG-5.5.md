@@ -3,7 +3,7 @@
 ## v5.5.31 (2018-01-16)
 
 ### Fixed
-- Reverted [#22804](https://github.com/laravel/framework/pull/22804) ([d8a8368](https://github.com/laravel/framework/commit/d8a8368e15e73de50b91b903f6b933c7d05b0e28), [f34926c](https://github.com/laravel/framework/commit/f34926c52ba282ff67f4be3e9afc8d0ddc885c3f), [#22817](https://github.com/laravel/framework/pull/22817))
+- Reverted [#22804](https://github.com/laravel/framework/pull/22804) ([d8a8368](https://github.com/laravel/framework/commit/d8a8368e15e73de50b91b903f6b933c7d05b0e28), [f34926c](https://github.com/laravel/framework/commit/f34926c52ba282ff67f4be3e9afc8d0ddc885c3f))
 
 
 ## v5.5.30 (2018-01-16)
