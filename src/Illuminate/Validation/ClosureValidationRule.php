@@ -2,9 +2,9 @@
 
 namespace Illuminate\Validation;
 
-use Illuminate\Contracts\Validation\Rule as RuleContract;
+use Illuminate\Validation\Rules\Rule;
 
-class ClosureValidationRule implements RuleContract
+class ClosureValidationRule extends Rule
 {
     /**
      * The callback that validates the attribute.
@@ -49,10 +49,12 @@ class ClosureValidationRule implements RuleContract
     {
         $this->failed = false;
 
-        $this->callback->__invoke($attribute, $value, function ($message) {
+        $this->callback->__invoke($attribute, $value, function ($message, $rule = '') {
             $this->failed = true;
 
             $this->message = $message;
+            
+            $this->rule = $rule;
         });
 
         return ! $this->failed;
