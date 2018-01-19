@@ -193,6 +193,17 @@ class Builder
     public $useWritePdo = false;
 
     /**
+     * All of the available escapable clause operators.
+     *
+     * @var array
+     */
+    protected $escapableOperators = [
+        'like', 'like binary', 'not like',
+        'ilike',  'rlike', 'similar to',
+        'not similar to', 'not ilike',
+    ];
+
+    /**
      * Create a new query builder instance.
      *
      * @param  \Illuminate\Database\ConnectionInterface  $connection
@@ -541,9 +552,15 @@ class Builder
         // will be bound to each SQL statements when it is finally executed.
         $type = 'Basic';
 
-        $this->wheres[] = compact(
+        $where = compact(
             'type', 'column', 'operator', 'value', 'boolean'
         );
+
+        if (in_array($operator, $this->escapableOperators, true)) {
+            $where['escape'] = true;
+        }
+
+        $this->wheres[] = $where;
 
         if (! $value instanceof Expression) {
             $this->addBinding($value, 'where');
@@ -1156,9 +1173,15 @@ class Builder
         // in the array of where clauses for the "main" parent query instance.
         call_user_func($callback, $query = $this->forSubQuery());
 
-        $this->wheres[] = compact(
+        $where = compact(
             'type', 'column', 'operator', 'query', 'boolean'
         );
+
+        if (in_array($operator, $this->escapableOperators, true)) {
+            $where['escape'] = true;
+        }
+
+        $this->wheres[] = $where;
 
         $this->addBinding($query->getBindings(), 'where');
 

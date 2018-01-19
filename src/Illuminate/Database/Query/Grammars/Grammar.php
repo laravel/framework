@@ -234,7 +234,13 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        $result = $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+
+        if ($where['escape'] ?? false) {
+            $result .= ' escape "\"';
+        }
+
+        return $result;
     }
 
     /**
@@ -446,7 +452,13 @@ class Grammar extends BaseGrammar
     {
         $select = $this->compileSelect($where['query']);
 
-        return $this->wrap($where['column']).' '.$where['operator']." ($select)";
+        $result = $this->wrap($where['column']).' '.$where['operator']." ($select)";
+
+        if ($where['escape'] ?? false) {
+            $result .= ' escape "\"';
+        }
+
+        return $result;
     }
 
     /**
