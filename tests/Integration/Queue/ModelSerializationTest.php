@@ -15,14 +15,6 @@ class ModelSerializationTest extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         $app['config']->set('database.connections.custom', [
             'driver' => 'sqlite',
             'database' => ':memory:',
@@ -76,16 +68,16 @@ class ModelSerializationTest extends TestCase
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertEquals('testbench', $unSerialized->user->getConnectionName());
+        $this->assertEquals('testing', $unSerialized->user->getConnectionName());
         $this->assertEquals('mohamed@laravel.com', $unSerialized->user->email);
 
-        $serialized = serialize(new ModelSerializationTestClass(ModelSerializationTestUser::on('testbench')->get()));
+        $serialized = serialize(new ModelSerializationTestClass(ModelSerializationTestUser::on('testing')->get()));
 
         $unSerialized = unserialize($serialized);
 
-        $this->assertEquals('testbench', $unSerialized->user[0]->getConnectionName());
+        $this->assertEquals('testing', $unSerialized->user[0]->getConnectionName());
         $this->assertEquals('mohamed@laravel.com', $unSerialized->user[0]->email);
-        $this->assertEquals('testbench', $unSerialized->user[1]->getConnectionName());
+        $this->assertEquals('testing', $unSerialized->user[1]->getConnectionName());
         $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
