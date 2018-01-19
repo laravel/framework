@@ -131,7 +131,7 @@ class TestResponse
      * @param  string  $headerName
      * @return $this
      */
-    protected function assertHeaderMissing($headerName)
+    public function assertHeaderMissing($headerName)
     {
         PHPUnit::assertFalse(
             $this->headers->has($headerName), "Unexpected header [{$headerName}] is present on response."
