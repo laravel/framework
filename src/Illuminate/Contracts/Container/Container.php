@@ -36,7 +36,7 @@ interface Container extends ContainerInterface
     /**
      * Resolve all of the bindings for a given tag.
      *
-     * @param  array  $tag
+     * @param  string  $tag
      * @return array
      */
     public function tagged($tag);
