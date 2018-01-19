@@ -27,10 +27,9 @@
         </whitelist>
     </filter>
     <php>
-        <env name="DB_CONNECTION" value="testing" />
-        <!--
-        <env name="REDIS_HOST" value="127.0.0.1" />
-        <env name="REDIS_PORT" value="6379" />
-        -->
+      <!--
+      <env name="REDIS_HOST" value="127.0.0.1" />
+      <env name="REDIS_PORT" value="6379" />
+      -->
     </php>
 </phpunit>

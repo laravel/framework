@@ -18,6 +18,8 @@ class JobChainingTest extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
+        $app['config']->set('database.default', 'testbench');
+
         $app['config']->set('queue.connections.sync1', [
             'driver' => 'sync',
         ]);
