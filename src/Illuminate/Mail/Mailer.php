@@ -4,6 +4,7 @@ namespace Illuminate\Mail;
 
 use Swift_Mailer;
 use InvalidArgumentException;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\View\Factory;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Htmlable;
@@ -145,6 +146,18 @@ class Mailer implements MailerContract, MailQueueContract
     public function bcc($users)
     {
         return (new PendingMail($this))->bcc($users);
+    }
+
+    /**
+     * Send a new message with only an HTML part.
+     *
+     * @param  string  $html
+     * @param  mixed  $callback
+     * @return void
+     */
+    public function html($html, $callback)
+    {
+        return $this->send(['html' => new HtmlString($html)], [], $callback);
     }
 
     /**

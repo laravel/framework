@@ -138,6 +138,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals(2, EloquentTestUser::count());
 
+        $this->assertFalse(EloquentTestUser::where('email', 'taylorotwell@gmail.com')->doesntExist());
+        $this->assertTrue(EloquentTestUser::where('email', 'mohamed@laravel.com')->doesntExist());
+
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
         $this->assertEquals('taylorotwell@gmail.com', $model->email);
         $this->assertTrue(isset($model->email));
