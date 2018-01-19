@@ -14,9 +14,16 @@ interface Rule
     public function passes($attribute, $value);
 
     /**
-     * Get the validation error message.
+     * Get the default validation error message.
      *
      * @return string
      */
     public function message();
+
+    /**
+     * Get the validation rule's name.
+     *
+     * @return string
+     */
+    public function name();
 }

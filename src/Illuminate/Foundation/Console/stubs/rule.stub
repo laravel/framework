@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Rules\Rule;
 
 class DummyClass implements Rule
 {
@@ -29,7 +29,7 @@ class DummyClass implements Rule
     }
 
     /**
-     * Get the validation error message.
+     * Get the fallback validation error message.
      *
      * @return string
      */
