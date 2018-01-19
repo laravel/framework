@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Rules\Rule;
 
 class DummyClass implements Rule
 {

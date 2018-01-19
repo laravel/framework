@@ -19,4 +19,11 @@ interface Rule
      * @return string
      */
     public function message();
+    
+    /**
+     * Get the validation rule's name.
+     * 
+     * @return string
+     */
+    public function name();
 }
