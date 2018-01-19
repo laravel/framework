@@ -263,7 +263,7 @@ class TestResponse
 
         return $this;
     }
-    
+
     /**
      * Assert that the given string is contained within the response text.
      *
