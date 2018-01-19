@@ -9,11 +9,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
+use Illuminate\Validation\Rules\Rule;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
-use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Rules\ImplicitRule;
 use Symfony\Component\HttpFoundation\File\File;
-use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -3699,7 +3699,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
-            ['name' => new class implements Rule {
+            ['name' => new class extends Rule {
+                protected $rule = 'must_be_taylor';
+
                 public function passes($attribute, $value)
                 {
                     return $value === 'taylor';
@@ -3718,7 +3720,9 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'adam'],
-            ['name' => [new class implements Rule {
+            ['name' => [new class extends Rule {
+                protected $rule = 'must_be_taylor';
+
                 public function passes($attribute, $value)
                 {
                     return $value === 'taylor';
@@ -3740,7 +3744,7 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'taylor'],
             ['name.*' => function ($attribute, $value, $fail) {
                 if ($value !== 'taylor') {
-                    $fail(':attribute was '.$value.' instead of taylor');
+                    $fail(':attribute was '.$value.' instead of taylor', 'must_be_taylor');
                 }
             }]
         );
@@ -3753,7 +3757,7 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'adam'],
             ['name' => function ($attribute, $value, $fail) {
                 if ($value !== 'taylor') {
-                    $fail(':attribute was '.$value.' instead of taylor');
+                    $fail(':attribute was '.$value.' instead of taylor', 'must_be_taylor');
                 }
             }]
         );
@@ -3766,7 +3770,9 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
-                'states.*' => new class implements Rule {
+                'states.*' => new class extends Rule {
+                    protected $rule = 'must_be_ar_or_tx';
+
                     public function passes($attribute, $value)
                     {
                         return in_array($value, ['AK', 'HI']);
@@ -3779,7 +3785,7 @@ class ValidationValidatorTest extends TestCase
                 },
                 'name' => function ($attribute, $value, $fail) {
                     if ($value !== 'taylor') {
-                        $fail(':attribute must be taylor');
+                        $fail(':attribute must be taylor', 'must_be_taylor');
                     }
                 },
                 'number' => [
@@ -3787,7 +3793,7 @@ class ValidationValidatorTest extends TestCase
                     'integer',
                     function ($attribute, $value, $fail) {
                         if ($value % 4 !== 0) {
-                            $fail(':attribute must be divisible by 4');
+                            $fail(':attribute must be divisible by 4', 'must_be_divisible_by_4');
                         }
                     },
                 ],
@@ -3806,7 +3812,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => ''],
-            ['name' => $rule = new class implements ImplicitRule {
+            ['name' => $rule = new class extends ImplicitRule {
                 public $called = false;
 
                 public function passes($attribute, $value)
