@@ -13,8 +13,8 @@ abstract class Rule implements RuleContract
     protected $rule;
 
     /**
-     * Get the validation rule's name.
-     * 
+     * Get the default validation rule's name.
+     *
      * @return string
      */
     public function name()

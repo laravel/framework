@@ -29,7 +29,7 @@ class DummyClass implements Rule
     }
 
     /**
-     * Get the validation error message.
+     * Get the fallback validation error message.
      *
      * @return string
      */
