@@ -14,6 +14,13 @@ class InteractsWithAuthenticationTest extends TestCase
     protected function getEnvironmentSetUp($app)
     {
         $app['config']->set('auth.providers.users.model', AuthenticationTestUser::class);
+
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
     }
 
     public function setUp()

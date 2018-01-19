@@ -17,6 +17,12 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
+        $app['config']->set('database.default', 'testbench');
+        $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
         $app['config']->set('database.connections.alternative-connection', [
             'driver' => 'sqlite',
             'database' => ':memory:',
