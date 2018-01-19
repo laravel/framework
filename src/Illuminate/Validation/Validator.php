@@ -531,11 +531,11 @@ class Validator implements ValidatorContract
     protected function validateUsingCustomRule($attribute, $value, $rule)
     {
         if (! $rule->passes($attribute, $value)) {
-            $this->fallbackMessages[] = $rule->message();
-            $this->failedRules[$attribute][get_class($rule)] = [];
+            $this->fallbackMessages[$rule->name()] = $rule->message();
+            $this->failedRules[$attribute][$rule->name()] = [];
 
             $this->messages->add($attribute, $this->makeReplacements(
-                $this->getMessage($attribute, $rule->name()), $attribute, get_class($rule), []
+                $this->getMessage($attribute, $rule->name()), $attribute, $rule->name(), []
             ));
         }
     }
