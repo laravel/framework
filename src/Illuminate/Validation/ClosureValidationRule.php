@@ -52,9 +52,8 @@ class ClosureValidationRule extends Rule
         $this->callback->__invoke($attribute, $value, function ($message, $rule = '') {
             $this->failed = true;
 
-            $this->message = $message;
-            
             $this->rule = $rule;
+            $this->message = $message;
         });
 
         return ! $this->failed;
