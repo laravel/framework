@@ -32,14 +32,6 @@ class SendingMailNotificationsTest extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
-        $app['config']->set('database.default', 'testbench');
-
-        $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => '',
-        ]);
-
         $this->mailer = Mockery::mock(Mailer::class);
         $this->markdown = Mockery::mock(Markdown::class);
 
