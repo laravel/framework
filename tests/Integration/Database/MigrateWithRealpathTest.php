@@ -2,9 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Contracts\Console\Kernel as ConsoleKernel;
 
 class MigrateWithRealpathTest extends DatabaseTestCase
 {
