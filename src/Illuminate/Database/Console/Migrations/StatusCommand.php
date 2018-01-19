@@ -106,6 +106,8 @@ class StatusCommand extends BaseCommand
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to use.'],
+
+            ['realpath', null, InputOption::VALUE_NONE, 'Mark the given migration path(s) as realpath.'],
         ];
     }
 }

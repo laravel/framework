@@ -13,12 +13,14 @@ class BaseCommand extends Command
      */
     protected function getMigrationPaths()
     {
+        $realpath = $this->input->hasOption('realpath') && $this->option('realpath');
+
         // Here, we will check to see if a path option has been defined. If it has we will
         // use the path relative to the root of the installation folder so our database
         // migrations may be run for any customized path from within the application.
         if ($this->input->hasOption('path') && $this->option('path')) {
-            return collect($this->option('path'))->map(function ($path) {
-                return $this->laravel->basePath().'/'.$path;
+            return collect($this->option('path'))->map(function ($path) use ($realpath) {
+                return $realpath ? $path : $this->laravel->basePath().'/'.$path;
             })->all();
         }
 

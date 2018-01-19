@@ -104,6 +104,8 @@ class FreshCommand extends Command
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
 
+            ['realpath', null, InputOption::VALUE_NONE, 'Mark the given migration path(s) as realpath.'],
+
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run.'],
 
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder.'],
