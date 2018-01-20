@@ -14,6 +14,7 @@ use Monolog\Formatter\LineFormatter;
 use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
+use Monolog\Handler\SlackWebhookHandler;
 
 class LogManager implements LoggerInterface
 {
@@ -63,6 +64,21 @@ class LogManager implements LoggerInterface
     public function __construct($app)
     {
         $this->app = $app;
+    }
+
+    /**
+     * Create a new, on-demand aggregate logger instance.
+     *
+     * @param  array  $channels
+     * @param  string|null  $channel
+     * @return \Psr\Log\LoggerInterface
+     */
+    public function stack(array $channels, $channel = null)
+    {
+        return new Logger(
+            $this->createStackDriver(compact('channels', 'channel')),
+            $this->app['events']
+        );
     }
 
     /**
@@ -201,12 +217,12 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Create a aggregate log driver instance.
+     * Create an aggregate log driver instance.
      *
      * @param  array  $config
      * @return \Psr\Log\LoggerInterface
      */
-    protected function createAggregateDriver(array $config)
+    protected function createStackDriver(array $config)
     {
         $handlers = collect($config['channels'])->flatMap(function ($channel) {
             return $this->channel($channel)->getHandlers();
@@ -241,6 +257,28 @@ class LogManager implements LoggerInterface
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new RotatingFileHandler(
                 $config['path'], $config['days'] ?? 7, $this->level($config)
+            )),
+        ]);
+    }
+
+    /**
+     * Create an instance of the Slack log driver.
+     *
+     * @param  array  $config
+     * @return \Psr\Log\LoggerInterface
+     */
+    protected function createSlackDriver(array $config)
+    {
+        return new Monolog($this->parseChannel($config), [
+            $this->prepareHandler(new SlackWebhookHandler(
+                $config['url'],
+                $config['channel'] ?? null,
+                $config['username'] ?? 'Laravel',
+                $config['attachment'] ?? true,
+                $config['emoji'] ?? ':boom:',
+                $config['short'] ?? false,
+                $config['context'] ?? true,
+                $this->level($config)
             )),
         ]);
     }
