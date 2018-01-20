@@ -76,6 +76,13 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
+     * Default values for the pivot columns.
+     *
+     * @var array
+     */
+    protected $pivotValues = [];
+
+    /**
      * Indicates if timestamps are available on the pivot table.
      *
      * @var bool
@@ -345,6 +352,32 @@ class BelongsToMany extends Relation
     public function orWherePivot($column, $operator = null, $value = null)
     {
         return $this->wherePivot($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Sets default value when querying or creating a new row in the pivot table.
+     *
+     * @param  string  $column
+     * @param  mixed   $value
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function withPivotValues($column, $value = null)
+    {
+        if (is_array($column)) {
+            foreach ($column as $name => $value) {
+                $this->withPivotValues($name, $value);
+            }
+
+            return $this;
+        }
+
+        if (is_null($value)) {
+            throw new \InvalidArgumentException('$value cannot be null.');
+        }
+
+        $this->pivotValues[] = func_get_args();
+
+        return $this->wherePivot($column, '=', $value);
     }
 
     /**
