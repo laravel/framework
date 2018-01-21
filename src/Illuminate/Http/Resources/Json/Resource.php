@@ -30,6 +30,13 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public $with = [];
 
+	/**
+	 * The callback which will be called when resolving.
+	 *
+	 * @var string | default 'toArray'
+	 */
+	protected $callback;
+
     /**
      * The additional meta data that should be added to the resource response.
      *
@@ -46,15 +53,16 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public static $wrap = 'data';
 
-    /**
-     * Create a new resource instance.
-     *
-     * @param  mixed  $resource
-     * @return void
-     */
-    public function __construct($resource)
+	/**
+	 * Create a new resource instance.
+	 *
+	 * @param  mixed $resource
+	 * @param string $callback
+	 */
+    public function __construct($resource, $callback = 'toArray')
     {
         $this->resource = $resource;
+        $this->callback = $callback;
     }
 
     /**
@@ -87,7 +95,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
      */
     public function resolve($request = null)
     {
-        $data = $this->toArray(
+        $data = $this->{$this->callback}(
             $request = $request ?: Container::getInstance()->make('request')
         );
 

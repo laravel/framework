@@ -24,15 +24,15 @@ class ResourceCollection extends Resource implements IteratorAggregate
      */
     public $collection;
 
-    /**
-     * Create a new resource instance.
-     *
-     * @param  mixed  $resource
-     * @return void
-     */
-    public function __construct($resource)
+	/**
+	 * Create a new resource instance.
+	 *
+	 * @param  mixed $resource
+	 * @param string $callback
+	 */
+    public function __construct($resource, $callback = 'toArray')
     {
-        parent::__construct($resource);
+        parent::__construct($resource, $callback);
 
         $this->resource = $this->collectResource($resource);
     }
