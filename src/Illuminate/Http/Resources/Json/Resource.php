@@ -35,7 +35,7 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
 	 *
 	 * @var string | default 'toArray'
 	 */
-	protected $callback;
+	protected $callback = "toArray";
 
     /**
      * The additional meta data that should be added to the resource response.
@@ -62,7 +62,9 @@ class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutabl
     public function __construct($resource, $callback = 'toArray')
     {
         $this->resource = $resource;
-        $this->callback = $callback;
+        if(is_string($callback)){
+            $this->callback = $callback;
+        }
     }
 
     /**
