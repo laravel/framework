@@ -36,7 +36,7 @@ interface Container extends ContainerInterface
     /**
      * Resolve all of the bindings for a given tag.
      *
-     * @param  array  $tag
+     * @param  string  $tag
      * @return array
      */
     public function tagged($tag);
@@ -44,7 +44,7 @@ interface Container extends ContainerInterface
     /**
      * Register a binding with the container.
      *
-     * @param  string|array  $abstract
+     * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
@@ -64,7 +64,7 @@ interface Container extends ContainerInterface
     /**
      * Register a shared binding in the container.
      *
-     * @param  string|array  $abstract
+     * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -136,7 +136,7 @@ interface Container extends ContainerInterface
     /**
      * Register a new resolving callback.
      *
-     * @param  string    $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
@@ -145,7 +145,7 @@ interface Container extends ContainerInterface
     /**
      * Register a new after resolving callback.
      *
-     * @param  string    $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|null  $callback
      * @return void
      */

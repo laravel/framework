@@ -570,6 +570,12 @@ if (! function_exists('mix')) {
         }
 
         if (file_exists(public_path($manifestDirectory.'/hot'))) {
+            $url = file_get_contents(public_path($manifestDirectory.'/hot'));
+
+            if (Str::startsWith($url, ['http://', 'https://'])) {
+                return new HtmlString(Str::after($url, ':').$path);
+            }
+
             return new HtmlString("//localhost:8080{$path}");
         }
 
