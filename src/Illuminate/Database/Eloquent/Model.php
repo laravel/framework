@@ -590,7 +590,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $this->fireModelEvent('saved', false);
 
-        if ($this->isDirty() && ($options['touch'] ?? true)) {
+        if (($options['touch'] ?? true) && $this->isDirty()) {
             $this->touchOwners();
         }
 

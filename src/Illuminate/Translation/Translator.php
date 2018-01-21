@@ -121,9 +121,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
                              : [$locale ?: $this->locale];
 
         foreach ($locales as $locale) {
-            if (! is_null($line = $this->getLine(
-                $namespace, $group, $locale, $item, $replace
-            ))) {
+            if (null !== $line = $this->getLine(
+                    $namespace, $group, $locale, $item, $replace
+                )) {
                 break;
             }
         }
@@ -243,9 +243,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
-        } elseif (is_array($line) && count($line) > 0) {
+        }
+
+        if (is_array($line) && count($line) > 0) {
             return $line;
         }
+
+        return null;
     }
 
     /**
@@ -372,7 +376,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $segments = parent::parseKey($key);
 
-        if (is_null($segments[0])) {
+        if (null === $segments[0]) {
             $segments[0] = '*';
         }
 

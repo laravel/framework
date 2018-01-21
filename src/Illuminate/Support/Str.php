@@ -52,7 +52,7 @@ class Str
     {
         $languageSpecific = static::languageSpecificCharsArray($language);
 
-        if (! is_null($languageSpecific)) {
+        if (null !== $languageSpecific) {
             $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
         }
 
@@ -324,7 +324,7 @@ class Str
      */
     public static function replaceFirst($search, $replace, $subject)
     {
-        if ($search == '') {
+        if ($search === '') {
             return $subject;
         }
 
@@ -416,7 +416,7 @@ class Str
         $title = static::ascii($title, $language);
 
         // Convert all dashes/underscores into separator
-        $flip = $separator == '-' ? '_' : '-';
+        $flip = $separator === '-' ? '_' : '-';
 
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 
