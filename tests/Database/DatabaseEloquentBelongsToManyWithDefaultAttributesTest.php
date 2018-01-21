@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Query\Builder;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
