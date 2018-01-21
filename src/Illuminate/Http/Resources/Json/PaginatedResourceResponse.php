@@ -37,12 +37,24 @@ class PaginatedResourceResponse extends ResourceResponse
      */
     protected function paginationInformation($request)
     {
-        $paginated = $this->resource->resource->toArray();
+        $paginatedResource = $this->resource;
+        if (method_exists($paginatedResource, 'links')) {
+            $paginationLinks = $paginatedResource->links($request);
+        } else {
+            $paginationLinks = $this->paginationLinks($this->resource->resource->toArray());
+        }
+        $information['links'] = $paginationLinks;
 
-        return [
-            'links' => $this->paginationLinks($paginated),
-            'meta' => $this->meta($paginated),
-        ];
+        if (method_exists($paginatedResource, 'meta')) {
+            // do not include meta if user returns null from "meta" method
+            if (!is_null($paginatedResource->meta)) {
+                $information['meta'] = $paginatedResource->meta;
+            }
+        } else {
+            $information['meta'] = $this->meta($this->resource->resource->toArray());
+        }
+
+        return $information;
     }
 
     /**
