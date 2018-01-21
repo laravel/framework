@@ -64,10 +64,26 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertHeader('Location', '/bar');
+            $this->fail('No exception was thrown');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
             $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
         }
+    }
+
+    /**
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage Unexpected header [Location] is present on response.
+     */
+    public function testAssertHeaderMissing()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Location', '/foo');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderMissing('Location');
     }
 
     public function testAssertJsonWithArray()

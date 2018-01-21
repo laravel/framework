@@ -87,14 +87,14 @@ abstract class AbstractPaginator implements Htmlable
      *
      * @var string
      */
-    public static $defaultView = 'pagination::default';
+    public static $defaultView = 'pagination::bootstrap-4';
 
     /**
      * The default "simple" pagination view.
      *
      * @var string
      */
-    public static $defaultSimpleView = 'pagination::simple-default';
+    public static $defaultSimpleView = 'pagination::simple-bootstrap-4';
 
     /**
      * Determine if the given value is a valid page number.
