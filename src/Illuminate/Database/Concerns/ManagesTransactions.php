@@ -61,8 +61,7 @@ trait ManagesTransactions
         // On a deadlock, MySQL rolls back the entire transaction so we can't just
         // retry the query. We have to throw this exception all the way out and
         // let the developer handle it in another way. We will decrement too.
-        if ($this->causedByDeadlock($e) &&
-            $this->transactions > 1) {
+        if ($this->transactions > 1 && $this->causedByDeadlock($e)) {
             $this->transactions--;
 
             throw $e;
@@ -73,8 +72,7 @@ trait ManagesTransactions
         // if we haven't we will return and try this query again in our loop.
         $this->rollBack();
 
-        if ($this->causedByDeadlock($e) &&
-            $currentAttempt < $maxAttempts) {
+        if ($currentAttempt < $maxAttempts && $this->causedByDeadlock($e)) {
             return;
         }
 
@@ -103,7 +101,7 @@ trait ManagesTransactions
      */
     protected function createTransaction()
     {
-        if ($this->transactions == 0) {
+        if ($this->transactions === 0) {
             try {
                 $this->getPdo()->beginTransaction();
             } catch (Exception $e) {
@@ -152,7 +150,7 @@ trait ManagesTransactions
      */
     public function commit()
     {
-        if ($this->transactions == 1) {
+        if ($this->transactions === 1) {
             $this->getPdo()->commit();
         }
 
@@ -172,7 +170,7 @@ trait ManagesTransactions
         // We allow developers to rollback to a certain transaction level. We will verify
         // that this given transaction level is valid before attempting to rollback to
         // that level. If it's not we will just return out and not attempt anything.
-        $toLevel = is_null($toLevel)
+        $toLevel = null === $toLevel
                     ? $this->transactions - 1
                     : $toLevel;
 
@@ -198,7 +196,7 @@ trait ManagesTransactions
      */
     protected function performRollBack($toLevel)
     {
-        if ($toLevel == 0) {
+        if ($toLevel === 0) {
             $this->getPdo()->rollBack();
         } elseif ($this->queryGrammar->supportsSavepoints()) {
             $this->getPdo()->exec(

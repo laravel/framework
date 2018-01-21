@@ -29,7 +29,7 @@ trait BuildsQueries
 
             $countResults = $results->count();
 
-            if ($countResults == 0) {
+            if ($countResults === 0) {
                 break;
             }
 
@@ -43,7 +43,7 @@ trait BuildsQueries
             unset($results);
 
             $page++;
-        } while ($countResults == $count);
+        } while ($countResults === $count);
 
         return true;
     }
@@ -89,7 +89,9 @@ trait BuildsQueries
     {
         if ($value) {
             return $callback($this, $value) ?: $this;
-        } elseif ($default) {
+        }
+
+        if ($default) {
             return $default($this, $value) ?: $this;
         }
 
@@ -119,7 +121,9 @@ trait BuildsQueries
     {
         if (! $value) {
             return $callback($this, $value) ?: $this;
-        } elseif ($default) {
+        }
+
+        if ($default) {
             return $default($this, $value) ?: $this;
         }
 

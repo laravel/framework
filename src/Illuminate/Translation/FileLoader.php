@@ -59,11 +59,11 @@ class FileLoader implements Loader
      */
     public function load($locale, $group, $namespace = null)
     {
-        if ($group == '*' && $namespace == '*') {
+        if ($group === '*' && $namespace === '*') {
             return $this->loadJsonPaths($locale);
         }
 
-        if (is_null($namespace) || $namespace == '*') {
+        if (null === $namespace || $namespace === '*') {
             return $this->loadPath($this->path, $locale, $group);
         }
 
@@ -141,7 +141,7 @@ class FileLoader implements Loader
                 if ($this->files->exists($full = "{$path}/{$locale}.json")) {
                     $decoded = json_decode($this->files->get($full), true);
 
-                    if (is_null($decoded) || json_last_error() !== JSON_ERROR_NONE) {
+                    if (null === $decoded || json_last_error() !== JSON_ERROR_NONE) {
                         throw new RuntimeException("Translation file [{$full}] contains an invalid JSON structure.");
                     }
 

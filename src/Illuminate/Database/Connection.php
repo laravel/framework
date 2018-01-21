@@ -247,7 +247,7 @@ class Connection implements ConnectionInterface
      */
     public function getSchemaBuilder()
     {
-        if (is_null($this->schemaGrammar)) {
+        if (null === $this->schemaGrammar) {
             $this->useDefaultSchemaGrammar();
         }
 
@@ -763,7 +763,7 @@ class Connection implements ConnectionInterface
      */
     protected function reconnectIfMissingConnection()
     {
-        if (is_null($this->pdo)) {
+        if (null === $this->pdo) {
             $this->reconnect();
         }
     }

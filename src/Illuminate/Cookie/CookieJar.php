@@ -64,7 +64,7 @@ class CookieJar implements JarContract
     {
         list($path, $domain, $secure, $sameSite) = $this->getPathAndDomain($path, $domain, $secure, $sameSite);
 
-        $time = ($minutes == 0) ? 0 : $this->availableAt($minutes * 60);
+        $time = ($minutes === 0) ? 0 : $this->availableAt($minutes * 60);
 
         return new Cookie($name, $value, $time, $path, $domain, $secure, $httpOnly, $raw, $sameSite);
     }
@@ -108,7 +108,7 @@ class CookieJar implements JarContract
      */
     public function hasQueued($key)
     {
-        return ! is_null($this->queued($key));
+        return null !== $this->queued($key);
     }
 
     /**

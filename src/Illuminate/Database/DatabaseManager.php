@@ -136,7 +136,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
+        if (null === $config = Arr::get($connections, $name)) {
             throw new InvalidArgumentException("Database [$name] not configured.");
         }
 
@@ -180,9 +180,9 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     protected function setPdoForType(Connection $connection, $type = null)
     {
-        if ($type == 'read') {
+        if ($type === 'read') {
             $connection->setPdo($connection->getReadPdo());
-        } elseif ($type == 'write') {
+        } elseif ($type === 'write') {
             $connection->setReadPdo($connection->getPdo());
         }
 

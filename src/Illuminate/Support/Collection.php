@@ -96,7 +96,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static;
         }
 
-        if (is_null($callback)) {
+        if (null === $callback) {
             return new static(range(1, $number));
         }
 
@@ -147,7 +147,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $count = $this->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             return;
         }
 
@@ -175,7 +175,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $count = $this->count();
 
-        if ($count == 0) {
+        if ($count === 0) {
             return;
         }
 
@@ -216,7 +216,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
 
@@ -238,14 +238,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function containsStrict($key, $value = null)
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             return $this->contains(function ($item) use ($key, $value) {
                 return data_get($item, $key) === $value;
             });
         }
 
         if ($this->useAsCallable($key)) {
-            return ! is_null($this->first($key));
+            return null !== $this->first($key);
         }
 
         return in_array($key, $this->items, true);
@@ -369,7 +369,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function every($key, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             $callback = $this->valueRetriever($key);
 
             foreach ($this->items as $k => $v) {
@@ -428,7 +428,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($value) {
             return $callback($this, $value);
-        } elseif ($default) {
+        }
+
+        if ($default) {
             return $default($this, $value);
         }
 
@@ -471,7 +473,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function operatorForWhere($key, $operator, $value = null)
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';
@@ -970,11 +972,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $callback = $this->valueRetriever($callback);
 
         return $this->filter(function ($value) {
-            return ! is_null($value);
+            return null !== $value;
         })->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
-            return is_null($result) || $value > $result ? $value : $result;
+            return null === $result || $value > $result ? $value : $result;
         });
     }
 
@@ -1022,11 +1024,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $callback = $this->valueRetriever($callback);
 
         return $this->filter(function ($value) {
-            return ! is_null($value);
+            return null !== $value;
         })->reduce(function ($result, $item) use ($callback) {
             $value = $callback($item);
 
-            return is_null($result) || $value < $result ? $value : $result;
+            return null === $result || $value < $result ? $value : $result;
         });
     }
 
@@ -1062,7 +1064,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function only($keys)
     {
-        if (is_null($keys)) {
+        if (null === $keys) {
             return new static($this->items);
         }
 
@@ -1209,7 +1211,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function random($number = null)
     {
-        if (is_null($number)) {
+        if (null === $number) {
             return Arr::random($this->items);
         }
 
@@ -1299,13 +1301,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $items = $this->items;
 
-        if (is_null($seed)) {
+        if (null === $seed) {
             shuffle($items);
         } else {
-            srand($seed);
+            mt_srand($seed);
 
             usort($items, function () {
-                return rand(-1, 1);
+                return mt_rand(-1, 1);
             });
         }
 
@@ -1435,7 +1437,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function splice($offset, $length = null, $replacement = [])
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             return new static(array_splice($this->items, $offset));
         }
 
@@ -1450,7 +1452,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function sum($callback = null)
     {
-        if (is_null($callback)) {
+        if (null === $callback) {
             return array_sum($this->items);
         }
 
@@ -1511,7 +1513,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function unique($key = null, $strict = false)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             return new static(array_unique($this->items, SORT_REGULAR));
         }
 
@@ -1622,9 +1624,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof Jsonable) {
+            }
+
+            if ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof Arrayable) {
+            }
+
+            if ($value instanceof Arrayable) {
                 return $value->toArray();
             }
 
@@ -1715,7 +1721,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function offsetSet($key, $value)
     {
-        if (is_null($key)) {
+        if (null === $key) {
             $this->items[] = $value;
         } else {
             $this->items[$key] = $value;
