@@ -45,7 +45,7 @@ trait FormatsMessages
         // If the rule being validated is a "size" rule, we will need to gather the
         // specific error message for the type of attribute being validated such
         // as a number, file or string which all have different message types.
-        elseif (in_array($rule, $this->sizeRules)) {
+        if (in_array($rule, $this->sizeRules)) {
             return $this->getSizeMessage($attribute, $rule);
         }
 
