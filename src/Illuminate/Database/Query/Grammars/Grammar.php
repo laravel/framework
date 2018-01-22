@@ -234,13 +234,7 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        $result = $this->wrap($where['column']).' '.$where['operator'].' '.$value;
-
-        if ($where['escape'] ?? false) {
-            $result .= ' escape "\"';
-        }
-
-        return $result;
+        return $this->escapeIfRequired($this->wrap($where['column']).' '.$where['operator'].' '.$value, $where);
     }
 
     /**
@@ -452,13 +446,7 @@ class Grammar extends BaseGrammar
     {
         $select = $this->compileSelect($where['query']);
 
-        $result = $this->wrap($where['column']).' '.$where['operator']." ($select)";
-
-        if ($where['escape'] ?? false) {
-            $result .= ' escape "\"';
-        }
-
-        return $result;
+        return $this->escapeIfRequired($this->wrap($where['column']).' '.$where['operator']." ($select)", $where);
     }
 
     /**
@@ -885,5 +873,22 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
+    }
+
+    /**
+     * Add an ESCAPE statement to SQL if required.
+     *
+     * @param  string  $sql
+     * @param  array  $where
+     *
+     * @return string
+     */
+    protected function escapeIfRequired(string $sql, array $where): string
+    {
+        if ($where['escape'] ?? false) {
+            return $sql.' escape "\"';
+        }
+
+        return $sql;
     }
 }

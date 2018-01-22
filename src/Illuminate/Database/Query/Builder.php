@@ -552,15 +552,11 @@ class Builder
         // will be bound to each SQL statements when it is finally executed.
         $type = 'Basic';
 
-        $where = compact(
-            'type', 'column', 'operator', 'value', 'boolean'
+        $escape = in_array($operator, $this->escapableOperators, true);
+
+        $this->wheres[] = compact(
+            'type', 'column', 'operator', 'value', 'boolean', 'escape'
         );
-
-        if (in_array($operator, $this->escapableOperators, true)) {
-            $where['escape'] = true;
-        }
-
-        $this->wheres[] = $where;
 
         if (! $value instanceof Expression) {
             $this->addBinding($value, 'where');
@@ -1173,15 +1169,11 @@ class Builder
         // in the array of where clauses for the "main" parent query instance.
         call_user_func($callback, $query = $this->forSubQuery());
 
-        $where = compact(
-            'type', 'column', 'operator', 'query', 'boolean'
+        $escape = in_array($operator, $this->escapableOperators, true);
+
+        $this->wheres[] = compact(
+            'type', 'column', 'operator', 'query', 'boolean', 'escape'
         );
-
-        if (in_array($operator, $this->escapableOperators, true)) {
-            $where['escape'] = true;
-        }
-
-        $this->wheres[] = $where;
 
         $this->addBinding($query->getBindings(), 'where');
 
