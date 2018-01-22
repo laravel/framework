@@ -234,7 +234,10 @@ class Grammar extends BaseGrammar
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        return $this->escapeIf(
+            $this->wrap($where['column']).' '.$where['operator'].' '.$value,
+            $where['escape'] ?? false
+        );
     }
 
     /**
@@ -446,7 +449,10 @@ class Grammar extends BaseGrammar
     {
         $select = $this->compileSelect($where['query']);
 
-        return $this->wrap($where['column']).' '.$where['operator']." ($select)";
+        return $this->escapeIf(
+            $this->wrap($where['column']).' '.$where['operator']." ($select)",
+            $where['escape'] ?? false
+        );
     }
 
     /**
@@ -873,5 +879,22 @@ class Grammar extends BaseGrammar
     public function getOperators()
     {
         return $this->operators;
+    }
+
+    /**
+     * Add an ESCAPE clause to SQL.
+     *
+     * @param  string  $sql
+     * @param  bool  $bool
+     *
+     * @return string
+     */
+    protected function escapeIf($sql, $bool)
+    {
+        if ($bool) {
+            return $sql.' escape "\"';
+        }
+
+        return $sql;
     }
 }

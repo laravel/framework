@@ -2400,6 +2400,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }
 
+    public function testEscapableOperatorsAreEscaped()
+    {
+        $operators = [
+            'like', 'like binary', 'not like',
+            'ilike',  'rlike', 'similar to',
+            'not similar to', 'not ilike',
+        ];
+
+        foreach ($operators as $operator) {
+            $builder = $this->getBuilder();
+            $builder->select('*')->from('foo')->where('bar', $operator, 'baz');
+            $this->assertEquals('select * from "foo" where "bar" '.$operator.' ? escape "\"', $builder->toSql());
+
+            $builder = $this->getBuilder();
+            $builder->select('*')->from('foo')->where('bar', $operator, function (Builder $q) {
+                $q->select('baz')->from('qux');
+            });
+            $this->assertEquals('select * from "foo" where "bar" '.$operator.' (select "baz" from "qux") escape "\"', $builder->toSql());
+        }
+    }
+
     protected function getBuilder()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
