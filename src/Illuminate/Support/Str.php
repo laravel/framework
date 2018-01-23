@@ -95,12 +95,15 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|array  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $caseSensitive = true)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
+            $method = $caseSensitive ? 'mb_strpos' : 'mb_stripos';
+            
+            if ($needle !== '' && $method($haystack, $needle) !== false) {
                 return true;
             }
         }
