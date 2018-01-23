@@ -12,16 +12,16 @@ class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
         m::close();
     }
 
-    public function testWithPivotValuesMethodSetsWhereConditionsForFetching()
+    public function testwithPivotValueMethodSetsWhereConditionsForFetching()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $relation->withPivotValues(['is_admin' => 1]);
+        $relation->withPivotValue(['is_admin' => 1]);
     }
 
-    public function testWithPivotValuesMethodSetsDefaultArgumentsForInsertion()
+    public function testwithPivotValueMethodSetsDefaultArgumentsForInsertion()
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
-        $relation->withPivotValues(['is_admin' => 1]);
+        $relation->withPivotValue(['is_admin' => 1]);
 
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('club_user')->andReturn($query);

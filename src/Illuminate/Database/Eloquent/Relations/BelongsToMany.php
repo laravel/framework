@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Support\Str;
+use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
@@ -76,7 +77,7 @@ class BelongsToMany extends Relation
     protected $pivotWhereIns = [];
 
     /**
-     * Default values for the pivot columns.
+     * The default values for the pivot columns.
      *
      * @var array
      */
@@ -355,27 +356,29 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Sets default value when querying or creating a new row in the pivot table.
+     * Set a where clause for a pivot table column.
+     *
+     * In addition, new pivot records will receive this value.
      *
      * @param  string  $column
-     * @param  mixed   $value
+     * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
      */
-    public function withPivotValues($column, $value = null)
+    public function withPivotValue($column, $value = null)
     {
         if (is_array($column)) {
             foreach ($column as $name => $value) {
-                $this->withPivotValues($name, $value);
+                $this->withPivotValue($name, $value);
             }
 
             return $this;
         }
 
         if (is_null($value)) {
-            throw new \InvalidArgumentException('$value cannot be null.');
+            throw new InvalidArgumentException('The provided value may not be null.');
         }
 
-        $this->pivotValues[] = func_get_args();
+        $this->pivotValues[] = compact('column', 'value');
 
         return $this->wherePivot($column, '=', $value);
     }
