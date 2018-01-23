@@ -1109,8 +1109,10 @@ class Builder
      */
     protected function createSelectWithConstraint($name)
     {
-        return [explode(':', $name)[0], function ($query) use ($name) {
-            $query->select(explode(',', explode(':', $name)[1]));
+        list($relation, $columns) = explode(':', $name);
+
+        return [$relation, function ($query) use ($columns) {
+            $query->select(explode(',', $columns));
         }];
     }
 
