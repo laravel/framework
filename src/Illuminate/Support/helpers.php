@@ -843,9 +843,9 @@ if (! function_exists('str_contains')) {
      * @param  string|array  $needles
      * @return bool
      */
-    function str_contains($haystack, $needles)
+    function str_contains($haystack, $needles, $caseSensitive=true)
     {
-        return Str::contains($haystack, $needles);
+        return Str::contains($haystack, $needles, $caseSensitive);
     }
 }
 
