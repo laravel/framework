@@ -643,7 +643,7 @@ class MySqlGrammar extends Grammar
         } elseif ($column->useCurrentUpdate) {
             return "$columnType default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
         }
-        
+
         return $columnType;
     }
 
