@@ -11,6 +11,7 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class FilesystemAdapterTest extends TestCase
 {
+    private $tempDir;
     private $filesystem;
 
     public function setUp()
@@ -98,5 +99,50 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->append('file.txt', 'Moon');
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nMoon");
+    }
+
+    public function testDelete()
+    {
+        file_put_contents($this->tempDir.'/file.txt', 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $this->assertTrue($filesystemAdapter->delete('file.txt'));
+        $this->assertFalse(file_exists($this->tempDir.'/file.txt'));
+    }
+
+    public function testDeleteReturnsFalseWhenFileNotFound()
+    {
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $this->assertFalse($filesystemAdapter->delete('file.txt'));
+    }
+
+    public function testCopy()
+    {
+        $data = '33232';
+        mkdir($this->tempDir.'/foo');
+        file_put_contents($this->tempDir.'/foo/foo.txt', $data);
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->copy('/foo/foo.txt', '/foo/foo2.txt');
+
+        $this->assertFileExists($this->tempDir.'/foo/foo.txt');
+        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo.txt'));
+
+        $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
+        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+    }
+
+    public function testMove()
+    {
+        $data = '33232';
+        mkdir($this->tempDir.'/foo');
+        file_put_contents($this->tempDir.'/foo/foo.txt', $data);
+
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->move('/foo/foo.txt', '/foo/foo2.txt');
+
+        $this->assertFileNotExists($this->tempDir.'/foo/foo.txt');
+
+        $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
+        $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 }
