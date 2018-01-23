@@ -83,7 +83,7 @@ class SoftDeletingScope implements Scope
     protected function addWithTrashed(Builder $builder)
     {
         $builder->macro('withTrashed', function (Builder $builder, $withTrashed = true) {
-            if (!$withTrashed) {
+            if (! $withTrashed) {
                 return $builder->withoutTrashed();
             }
 
