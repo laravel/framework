@@ -638,8 +638,12 @@ class MySqlGrammar extends Grammar
     protected function typeTimestamp(Fluent $column)
     {
         $columnType = $column->precision ? "timestamp($column->precision)" : 'timestamp';
-
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        if ($column->useCurrent) {
+            return "$columnType default CURRENT_TIMESTAMP";
+        } elseif ($column->useCurrentUpdate) {
+            return "$columnType default CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP";
+        }
+        return $columnType;
     }
 
     /**
