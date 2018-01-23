@@ -1006,6 +1006,15 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $data->pluck('email')->all());
     }
 
+    public function testHas()
+    {
+        $data = new Collection(['id' => 1, 'first' => 'Hello', 'second' => 'World']);
+        $this->assertTrue($data->has('first'));
+        $this->assertFalse($data->has('third'));
+        $this->assertTrue($data->has(['first', 'second']));
+        $this->assertFalse($data->has(['third', 'first']));
+    }
+
     public function testImplode()
     {
         $data = new Collection([['name' => 'taylor', 'email' => 'foo'], ['name' => 'dayle', 'email' => 'bar']]);
