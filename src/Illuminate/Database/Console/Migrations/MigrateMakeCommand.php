@@ -16,7 +16,8 @@ class MigrateMakeCommand extends BaseCommand
     protected $signature = 'make:migration {name : The name of the migration.}
         {--create= : The table to be created.}
         {--table= : The table to migrate.}
-        {--path= : The location where the migration file should be created.}';
+        {--path= : The location where the migration file should be created.}
+        {--realpath : Mark the given migration path as realpath.}';
 
     /**
      * The console command description.
@@ -123,7 +124,9 @@ class MigrateMakeCommand extends BaseCommand
     protected function getMigrationPath()
     {
         if (! is_null($targetPath = $this->input->getOption('path'))) {
-            return $this->laravel->basePath().'/'.$targetPath;
+            $realpath = $this->input->hasOption('realpath') && $this->option('realpath');
+
+            return $realpath ? $targetPath : $this->laravel->basePath().'/'.$targetPath;
         }
 
         return parent::getMigrationPath();

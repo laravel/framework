@@ -86,6 +86,8 @@ class RollbackCommand extends BaseCommand
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path of migrations files to be executed.'],
 
+            ['realpath', null, InputOption::VALUE_NONE, 'Mark the given migration path(s) as realpath.'],
+
             ['pretend', null, InputOption::VALUE_NONE, 'Dump the SQL queries that would be run.'],
 
             ['step', null, InputOption::VALUE_OPTIONAL, 'The number of migrations to be reverted.'],
