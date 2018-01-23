@@ -371,7 +371,7 @@ class Command extends SymfonyCommand
 
         $validator = function ($value) use ($optional) {
             if (! $optional) {
-                if (!is_array($value) && !is_bool($value) && 0 === strlen($value)) {
+                if (! is_array($value) && ! is_bool($value) && 0 === strlen($value)) {
                     throw new LogicException('A value is required.');
                 }
             }
