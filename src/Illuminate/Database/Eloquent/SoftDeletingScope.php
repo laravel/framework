@@ -9,7 +9,14 @@ class SoftDeletingScope implements Scope
      *
      * @var array
      */
-    protected $extensions = ['Restore', 'WithTrashed', 'WithoutTrashed', 'OnlyTrashed'];
+    protected $extensions = [
+        'Restore',
+        'WithTrashed',
+        'WithTrashedIf',
+        'WithoutTrashed',
+        'OnlyTrashed',
+        'OnlyTrashedIf'
+    ];
 
     /**
      * Apply the scope to a given Eloquent query builder.
@@ -82,12 +89,21 @@ class SoftDeletingScope implements Scope
      */
     protected function addWithTrashed(Builder $builder)
     {
-        $builder->macro('withTrashed', function (Builder $builder, $withTrashed = true) {
-            if (! $withTrashed) {
-                return $builder->withoutTrashed();
-            }
-
+        $builder->macro('withTrashed', function (Builder $builder) {
             return $builder->withoutGlobalScope($this);
+        });
+    }
+
+    /**
+     * Add the with-trashed extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function addWithTrashedIf(Builder $builder)
+    {
+        $builder->macro('withTrashedIf', function (Builder $builder, $condition) {
+            return $condition ? $builder->withTrashed() : $builder->withoutTrashed();
         });
     }
 
@@ -126,6 +142,19 @@ class SoftDeletingScope implements Scope
             );
 
             return $builder;
+        });
+    }
+
+    /**
+     * Add the with-trashed extension to the builder.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $builder
+     * @return void
+     */
+    protected function addOnlyTrashedIf(Builder $builder)
+    {
+        $builder->macro('onlyTrashedIf', function (Builder $builder, $condition) {
+            return $condition ? $builder->onlyTrashed() : $builder->withoutTrashed();
         });
     }
 }

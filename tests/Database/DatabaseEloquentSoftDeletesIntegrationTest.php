@@ -150,12 +150,12 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, SoftDeletesTestUser::withTrashed()->find(1));
     }
 
-    public function testWithTrashedAcceptsAnArgument()
+    public function testWithTrashedIfFetchesTrashedRecordsUnderCondition()
     {
         $this->createUsers();
 
-        $this->assertCount(1, SoftDeletesTestUser::withTrashed(false)->get());
-        $this->assertCount(2, SoftDeletesTestUser::withTrashed(true)->get());
+        $this->assertCount(1, SoftDeletesTestUser::withTrashedIf(false)->get());
+        $this->assertCount(2, SoftDeletesTestUser::withTrashedIf(true)->get());
     }
 
     public function testDeleteSetsDeletedColumn()
