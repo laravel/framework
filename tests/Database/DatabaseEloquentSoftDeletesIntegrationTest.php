@@ -203,6 +203,21 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals(1, $users->first()->id);
     }
 
+    public function testOnlyTrashedIfOnlyReturnsTrashedRecordsUnderCondition()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::onlyTrashedIf(true)->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(1, $users->first()->id);
+
+        $users = SoftDeletesTestUser::onlyTrashedIf(false)->get();
+
+        $this->assertCount(1, $users);
+        $this->assertEquals(2, $users->first()->id);
+    }
+
     public function testOnlyWithoutTrashedOnlyReturnsTrashedRecords()
     {
         $this->createUsers();
