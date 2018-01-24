@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Console;
 use Mockery as m;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Console\Scheduling\Event;
 
 class ConsoleScheduledEventTest extends TestCase
@@ -104,5 +105,33 @@ class ConsoleScheduledEventTest extends TestCase
 
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
         $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
+    }
+
+    public function testBeforeCallbackHaveEventAsParameter()
+    {
+        $container = new Container();
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
+
+        $closure = function ($e) use ($event) {
+            $this->assertEquals($event, $e);
+        };
+
+        $event->before($closure);
+
+        $event->callBeforeCallbacks($container);
+    }
+
+    public function testAfterCallbackHaveEventAsParameter()
+    {
+        $container = new Container();
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\Mutex'), 'php foo');
+
+        $closure = function ($e) use ($event) {
+            $this->assertEquals($event, $e);
+        };
+
+        $event->after($closure);
+
+        $event->callAfterCallbacks($container);
     }
 }
