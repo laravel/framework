@@ -15,7 +15,7 @@ class SoftDeletingScope implements Scope
         'WithTrashedIf',
         'WithoutTrashed',
         'OnlyTrashed',
-        'OnlyTrashedIf'
+        'OnlyTrashedIf',
     ];
 
     /**
