@@ -227,7 +227,7 @@ class Event
     public function callBeforeCallbacks(Container $container)
     {
         foreach ($this->beforeCallbacks as $callback) {
-            $container->call($callback);
+            $container->call($callback, [$this]);
         }
     }
 
@@ -240,7 +240,7 @@ class Event
     public function callAfterCallbacks(Container $container)
     {
         foreach ($this->afterCallbacks as $callback) {
-            $container->call($callback);
+            $container->call($callback, [$this]);
         }
     }
 
