@@ -41,6 +41,7 @@ class Pluralizer
         'news',
         'nutrition',
         'offspring',
+        'pasta',
         'plankton',
         'pokemon',
         'police',
@@ -52,6 +53,7 @@ class Pluralizer
         'species',
         'swine',
         'traffic',
+        'veggies',
         'wheat',
     ];
 
