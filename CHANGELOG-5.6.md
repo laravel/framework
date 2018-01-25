@@ -14,6 +14,9 @@
 - Show job id in `queue:work` output ([#21204](https://github.com/laravel/framework/pull/21204))
 - Show batch number in `migrate:status` output ([#21391](https://github.com/laravel/framework/pull/21391))
 
+### Blade Templates
+- Added `@csrf` and `@method` directives ([5f19844](https://github.com/laravel/framework/commit/5f1984421af096ef21b7d2011949a233849d4ee3))
+
 ### Database
 - ⚠️ Swap the index order of morph type and id ([#21693](https://github.com/laravel/framework/pull/21693))
 
