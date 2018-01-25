@@ -175,6 +175,8 @@ class ControllerMakeCommand extends GeneratorCommand
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
 
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
+
+            ['api', 'a', InputOption::VALUE_OPTIONAL, 'Generate a api resource controller class.'],
         ];
     }
 }
