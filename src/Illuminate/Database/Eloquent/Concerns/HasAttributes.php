@@ -481,6 +481,7 @@ trait HasAttributes
             case 'object':
                 return $this->fromJson($value, true);
             case 'array':
+                return $this->fromArray($value);
             case 'json':
                 return $this->fromJson($value);
             case 'collection':
@@ -645,6 +646,17 @@ trait HasAttributes
     protected function asJson($value)
     {
         return json_encode($value);
+    }
+
+    /**
+     * Alias for fromJson
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    public function fromArray($value)
+    {
+        return $this->fromJson($value, false);
     }
 
     /**
