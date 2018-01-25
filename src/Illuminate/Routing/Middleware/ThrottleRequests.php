@@ -3,7 +3,6 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\InteractsWithTime;
@@ -83,7 +82,6 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
-     * @throws \RuntimeException
      */
     protected function resolveRequestSignature($request)
     {
