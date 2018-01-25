@@ -254,6 +254,32 @@ class TestResponse
     }
 
     /**
+     * Assert that the given strings are contained in order within the response.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeInOrder(array $values)
+    {
+        $position = -1;
+
+        foreach ($values as $value) {
+            $valuePosition = mb_strpos($this->getContent(), $value);
+
+            if ($valuePosition === false || $valuePosition < $position) {
+                PHPUnit::fail(
+                    'Failed asserting that \''.$this->getContent().
+                    '\' contains "'.$value.'" in specified order.'
+                );
+            }
+
+            $position = $valuePosition;
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string is contained within the response text.
      *
      * @param  string  $value
@@ -262,6 +288,32 @@ class TestResponse
     public function assertSeeText($value)
     {
         PHPUnit::assertContains($value, strip_tags($this->getContent()));
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given strings are contained in order within the response text.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeTextInOrder(array $values)
+    {
+        $position = -1;
+
+        foreach ($values as $value) {
+            $valuePosition = mb_strpos(strip_tags($this->getContent()), $value);
+
+            if ($valuePosition === false || $valuePosition < $position) {
+                PHPUnit::fail(
+                    'Failed asserting that \''.strip_tags($this->getContent()).
+                    '\' contains "'.$value.'" in specified order.'
+                );
+            }
+
+            $position = $valuePosition;
+        }
 
         return $this;
     }
