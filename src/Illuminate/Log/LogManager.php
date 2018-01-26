@@ -359,11 +359,11 @@ class LogManager implements LoggerInterface
      */
     protected function parseChannel(array $config)
     {
-        if (! isset($config['channel'])) {
+        if (! isset($config['name'])) {
             return $this->app->bound('env') ? $this->app->environment() : 'production';
         }
 
-        return $config['channel'];
+        return $config['name'];
     }
 
     /**
