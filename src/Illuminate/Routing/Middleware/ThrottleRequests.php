@@ -3,7 +3,6 @@
 namespace Illuminate\Routing\Middleware;
 
 use Closure;
-use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Support\InteractsWithTime;
@@ -83,21 +82,10 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
-     * @throws \RuntimeException
      */
     protected function resolveRequestSignature($request)
     {
-        if ($user = $request->user()) {
-            return sha1($user->getAuthIdentifier());
-        }
-
-        if ($route = $request->route()) {
-            return sha1($route->getDomain().'|'.$request->ip());
-        }
-
-        throw new RuntimeException(
-            'Unable to generate the request signature. Route unavailable.'
-        );
+        return $request->fingerprint();
     }
 
     /**
