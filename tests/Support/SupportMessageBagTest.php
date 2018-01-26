@@ -35,6 +35,16 @@ class SupportMessageBagTest extends TestCase
         $this->assertEquals(['bust'], $messages['boom']);
     }
 
+    public function testKeys()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo', 'baz');
+        $container->add('boom', 'bust');
+        $this->assertEquals(['foo', 'boom'], $container->keys());
+    }
+
     public function testMessagesMayBeMerged()
     {
         $container = new MessageBag(['username' => ['foo']]);
@@ -114,6 +124,14 @@ class SupportMessageBagTest extends TestCase
         $this->assertFalse($container->has('bar'));
     }
 
+    public function testHasWithKeyNull()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $this->assertTrue($container->has(null));
+    }
+
     public function testHasAnyIndicatesExistence()
     {
         $container = new MessageBag;
@@ -176,6 +194,16 @@ class SupportMessageBagTest extends TestCase
         $this->assertEquals('foo bar', $container->first('foo'));
     }
 
+    public function testUnique()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo2', 'bar');
+        $container->add('boom', 'baz');
+        $this->assertEquals([0 => 'bar', 2 => 'baz'], $container->unique());
+    }
+
     public function testMessageBagReturnsCorrectArray()
     {
         $container = new MessageBag;
@@ -211,7 +239,6 @@ class SupportMessageBagTest extends TestCase
     public function testCountable()
     {
         $container = new MessageBag;
-
         $container->add('foo', 'bar');
         $container->add('boom', 'baz');
 
@@ -229,7 +256,46 @@ class SupportMessageBagTest extends TestCase
         $container = new MessageBag;
         $container->setFormat(':message');
         $container->add('foo.bar', 'baz');
-        $messages = $container->getMessages();
         $this->assertEquals('baz', $container->first('foo.*'));
+    }
+
+    public function testIsEmptyTrue()
+    {
+        $container = new MessageBag;
+        $this->assertTrue($container->isEmpty());
+    }
+
+    public function testIsEmptyFalse()
+    {
+        $container = new MessageBag;
+        $container->add('foo.bar', 'baz');
+        $this->assertFalse($container->isEmpty());
+    }
+
+    public function testIsNotEmptyTrue()
+    {
+        $container = new MessageBag;
+        $container->add('foo.bar', 'baz');
+        $this->assertTrue($container->isNotEmpty());
+    }
+
+    public function testIsNotEmptyFalse()
+    {
+        $container = new MessageBag;
+        $this->assertFalse($container->isNotEmpty());
+    }
+
+    public function testToString()
+    {
+        $container = new MessageBag;
+        $container->add('foo.bar', 'baz');
+        $this->assertEquals('{"foo.bar":["baz"]}', (string) $container);
+    }
+
+    public function testGetFormat()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $this->assertEquals(':message', $container->getFormat());
     }
 }
