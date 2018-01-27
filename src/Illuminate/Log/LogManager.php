@@ -112,7 +112,7 @@ class LogManager implements LoggerInterface
     protected function get($name)
     {
         try {
-            return $this->stores[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
+            return $this->logs[$name] = $this->logs[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
                 return $this->tap(new Logger($logger, $this->app['events']), $name);
             });
         } catch (Throwable $e) {
