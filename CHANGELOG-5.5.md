@@ -1,5 +1,19 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Added
+- Added `notExists()` method to query builder ([#22836](https://github.com/laravel/framework/pull/22836), [9d2a7ca](https://github.com/laravel/framework/commit/9d2a7ca049e71d39e453ba8c34addb657b71b237))
+- Added `assertHeaderMissing()` assertion ([#22849](https://github.com/laravel/framework/pull/22849), [#22866](https://github.com/laravel/framework/pull/22866))
+- Added support for higher order unique ([#22851](https://github.com/laravel/framework/pull/22851))
+- Added boolean toggle to `withTrashed()` ([#22888](https://github.com/laravel/framework/pull/22888))
+
+### Changed
+- Support Mix HMR with different host/port ([#22826](https://github.com/laravel/framework/pull/22826), [24897d6](https://github.com/laravel/framework/commit/24897d6afbfed70a7383561f31c01bc48927cbda))
+- Make route filtering by method case-insensitive ([#22856](https://github.com/laravel/framework/pull/22856))
+- Added missing PostgreSQL operator for array overlap ([#22903](https://github.com/laravel/framework/pull/22903))
+
+
 ## v5.5.32 (2018-01-18)
 
 ### Fixed
