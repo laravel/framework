@@ -441,7 +441,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
                         : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
-        $this->directive('end'.$alias, function ($expression) use ($path) {
+        $this->directive('end'.$alias, function ($expression) {
             return '<?php echo $__env->renderComponent(); ?>';
         });
     }
