@@ -3,12 +3,9 @@
 namespace Illuminate\Database\Eloquent;
 
 use Exception;
-use ArrayAccess;
-use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Model as BaseModel;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -16,15 +13,12 @@ use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model extends BaseModel implements QueueableEntity, UrlRoutable
 {
-    use Concerns\HasAttributes,
-        Concerns\HasEvents,
+    use Concerns\HasEvents,
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,
-        Concerns\HasTimestamps,
-        Concerns\HidesAttributes,
-        Concerns\GuardsAttributes;
+        Concerns\HasTimestamps;
 
     /**
      * The connection name for the model.
