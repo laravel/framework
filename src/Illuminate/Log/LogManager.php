@@ -26,11 +26,11 @@ class LogManager implements LoggerInterface
     protected $app;
 
     /**
-     * The array of resolved logs.
+     * The array of resolved channels.
      *
      * @var array
      */
-    protected $logs = [];
+    protected $channels = [];
 
     /**
      * The registered custom driver creators.
@@ -112,7 +112,7 @@ class LogManager implements LoggerInterface
     protected function get($name)
     {
         try {
-            return $this->stores[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
+            return $this->channels[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
                 return $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
