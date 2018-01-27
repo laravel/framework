@@ -113,7 +113,7 @@ class LogManager implements LoggerInterface
     {
         try {
             return $this->stores[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
-                return $this->tap($name, new Logger($logger, $this->app['events']));
+                return $this->tap(new Logger($logger, $this->app['events']), $name);
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -127,11 +127,11 @@ class LogManager implements LoggerInterface
     /**
      * Apply the configured taps for the logger.
      *
-     * @param  string  $name
      * @param  \Illuminate\Log\Logger  $logger
+     * @param  string  $name
      * @return \Illuminate\Log\Logger
      */
-    protected function tap($name, Logger $logger)
+    protected function tap(Logger $logger, $name)
     {
         foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
             list($class, $arguments) = $this->parseTap($tap);
