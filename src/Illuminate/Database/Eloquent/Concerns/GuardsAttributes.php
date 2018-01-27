@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Support\Concerns;
+namespace Illuminate\Database\Eloquent\Concerns;
 
 use Illuminate\Support\Str;
 

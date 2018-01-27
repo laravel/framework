@@ -18,7 +18,8 @@ abstract class Model extends BaseModel implements QueueableEntity, UrlRoutable
     use Concerns\HasEvents,
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,
-        Concerns\HasTimestamps;
+        Concerns\HasTimestamps,
+        Concerns\GuardsAttributes;
 
     /**
      * The connection name for the model.
