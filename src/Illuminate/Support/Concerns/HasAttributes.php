@@ -669,11 +669,7 @@ trait HasAttributes
      */
     public function getDates()
     {
-        $defaults = [static::CREATED_AT, static::UPDATED_AT];
-
-        return $this->usesTimestamps()
-                    ? array_unique(array_merge($this->dates, $defaults))
-                    : $this->dates;
+        return $this->dates;
     }
 
     /**
@@ -683,7 +679,7 @@ trait HasAttributes
      */
     public function getDateFormat()
     {
-        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+        return $this->dateFormat ?: 'Y-m-d H:i:s';
     }
 
     /**
@@ -722,10 +718,6 @@ trait HasAttributes
      */
     public function getCasts()
     {
-        if ($this->getIncrementing()) {
-            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
-        }
-
         return $this->casts;
     }
 

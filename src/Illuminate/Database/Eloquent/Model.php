@@ -232,6 +232,30 @@ abstract class Model extends BaseModel implements QueueableEntity, UrlRoutable
     }
 
     /**
+     * Get the attributes that should be converted to dates.
+     *
+     * @return array
+     */
+    public function getDates()
+    {
+        $defaults = [static::CREATED_AT, static::UPDATED_AT];
+
+        return $this->usesTimestamps()
+            ? array_unique(array_merge($this->dates, $defaults))
+            : $this->dates;
+    }
+
+    /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+    }
+
+    /**
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
@@ -272,6 +296,20 @@ abstract class Model extends BaseModel implements QueueableEntity, UrlRoutable
         return static::unguarded(function () use ($attributes) {
             return $this->fill($attributes);
         });
+    }
+
+    /**
+     * Get the casts array.
+     *
+     * @return array
+     */
+    public function getCasts()
+    {
+        if ($this->getIncrementing()) {
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+        }
+
+        return $this->casts;
     }
 
     /**
