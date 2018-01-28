@@ -51,10 +51,7 @@ class AuthMakeCommand extends Command
         $this->exportViews();
 
         if (! $this->option('views')) {
-            file_put_contents(
-                app_path('Http/Controllers/HomeController.php'),
-                $this->compileControllerStub()
-            );
+            $this->exportControllers();
 
             file_put_contents(
                 base_path('routes/web.php'),
@@ -80,6 +77,25 @@ class AuthMakeCommand extends Command
         if (! is_dir($directory = resource_path('views/auth/passwords'))) {
             mkdir($directory, 0755, true);
         }
+    }
+
+    /**
+     * Export the controllers
+     *
+     * @return void
+     */
+    protected function exportControllers()
+    {
+        if (file_exists(app_path('Http/Controllers/HomeController.php'))) {
+            if (! $this->confirm("The [HomeController] controller already exists. Do you want to replace it?")) {
+                return;
+            }
+        }
+
+        file_put_contents(
+            app_path('Http/Controllers/HomeController.php'),
+            $this->compileControllerStub()
+        );
     }
 
     /**
