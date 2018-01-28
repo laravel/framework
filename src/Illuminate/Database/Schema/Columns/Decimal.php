@@ -9,7 +9,6 @@ namespace Illuminate\Database\Schema\Columns;
  * @property-read int|null $places
  * @property-read bool $unsigned
  * @method Decimal after(string $column)
- * @method Decimal collation(string $value)
  * @method Decimal comment(string $comment)
  * @method Decimal default(mixed $default)
  * @method Decimal first()

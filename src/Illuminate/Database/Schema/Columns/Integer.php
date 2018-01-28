@@ -8,7 +8,6 @@ namespace Illuminate\Database\Schema\Columns;
  * @property-read bool $autoIncrement
  * @property-read bool $unsigned
  * @method \Illuminate\Database\Schema\Columns\Integer after(string $column)
- * @method \Illuminate\Database\Schema\Columns\Integer collation(string $value)
  * @method \Illuminate\Database\Schema\Columns\Integer comment(string $comment)
  * @method \Illuminate\Database\Schema\Columns\Integer default(mixed $default)
  * @method \Illuminate\Database\Schema\Columns\Integer first()
