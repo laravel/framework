@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Schema\Columns\Column;
 use RuntimeException;
 use Doctrine\DBAL\Types\Type;
 use Illuminate\Support\Fluent;
@@ -23,6 +24,7 @@ class ChangeColumn
      * @return array
      *
      * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public static function compile($grammar, Blueprint $blueprint, Fluent $command, Connection $connection)
     {
@@ -67,6 +69,7 @@ class ChangeColumn
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Doctrine\DBAL\Schema\Table  $table
      * @return \Doctrine\DBAL\Schema\Table
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
     protected static function getTableWithColumnChanges(Blueprint $blueprint, Table $table)
     {
@@ -93,29 +96,30 @@ class ChangeColumn
     /**
      * Get the Doctrine column instance for a column change.
      *
-     * @param  \Doctrine\DBAL\Schema\Table  $table
-     * @param  \Illuminate\Support\Fluent  $fluent
+     * @param  \Doctrine\DBAL\Schema\Table $table
+     * @param  Column $column
      * @return \Doctrine\DBAL\Schema\Column
+     * @throws \Doctrine\DBAL\Schema\SchemaException
      */
-    protected static function getDoctrineColumn(Table $table, Fluent $fluent)
+    protected static function getDoctrineColumn(Table $table, Column $column)
     {
         return $table->changeColumn(
-            $fluent['name'], static::getDoctrineColumnChangeOptions($fluent)
-        )->getColumn($fluent['name']);
+            $column->name, static::getDoctrineColumnChangeOptions($column)
+        )->getColumn($column->name);
     }
 
     /**
      * Get the Doctrine column change options.
      *
-     * @param  \Illuminate\Support\Fluent  $fluent
+     * @param  Column  $column
      * @return array
      */
-    protected static function getDoctrineColumnChangeOptions(Fluent $fluent)
+    protected static function getDoctrineColumnChangeOptions(Column $column)
     {
-        $options = ['type' => static::getDoctrineColumnType($fluent['type'])];
+        $options = ['type' => static::getDoctrineColumnType($column->type)];
 
-        if (in_array($fluent['type'], ['text', 'mediumText', 'longText'])) {
-            $options['length'] = static::calculateDoctrineTextLength($fluent['type']);
+        if (in_array($column->type, ['text', 'mediumText', 'longText'])) {
+            $options['length'] = static::calculateDoctrineTextLength($column->type);
         }
 
         return $options;

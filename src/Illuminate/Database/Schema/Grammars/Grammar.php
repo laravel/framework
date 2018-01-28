@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Schema\Columns\Column;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
@@ -108,7 +109,7 @@ abstract class Grammar extends BaseGrammar
             // Each of the column types have their own compiler functions which are tasked
             // with turning the column definition into its SQL format for this platform
             // used by the connection. The column's modifiers are compiled and added.
-            $sql = $this->wrap($column).' '.$this->getType($column);
+            $sql = $this->wrap($column->name).' '.$this->getType($column);
 
             $columns[] = $this->addModifiers($sql, $blueprint, $column);
         }
@@ -119,10 +120,10 @@ abstract class Grammar extends BaseGrammar
     /**
      * Get the SQL for the column data type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  Column  $column
      * @return string
      */
-    protected function getType(Fluent $column)
+    protected function getType(Column $column)
     {
         return $this->{'type'.ucfirst($column->type)}($column);
     }
@@ -132,10 +133,10 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  string  $sql
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  Column  $column
      * @return string
      */
-    protected function addModifiers($sql, Blueprint $blueprint, Fluent $column)
+    protected function addModifiers($sql, Blueprint $blueprint, Column $column)
     {
         foreach ($this->modifiers as $modifier) {
             if (method_exists($this, $method = "modify{$modifier}")) {

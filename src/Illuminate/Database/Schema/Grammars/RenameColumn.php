@@ -19,6 +19,7 @@ class RenameColumn
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
      * @return array
+     * @throws \Doctrine\DBAL\DBALException
      */
     public static function compile(Grammar $grammar, Blueprint $blueprint, Fluent $command, Connection $connection)
     {
