@@ -50,6 +50,8 @@ class Integer extends Column
     }
 
     /**
+     * Set INTEGER columns as auto-increment (primary key)
+     *
      * @return \Illuminate\Database\Schema\Columns\Integer
      */
     public function autoIncrement(): \Illuminate\Database\Schema\Columns\Integer
@@ -59,6 +61,8 @@ class Integer extends Column
     }
 
     /**
+     * Set INTEGER columns as UNSIGNED (MySQL)
+     *
      * @return \Illuminate\Database\Schema\Columns\Integer
      */
     public function unsigned(): \Illuminate\Database\Schema\Columns\Integer

@@ -56,6 +56,8 @@ class Decimal extends Column
     }
 
     /**
+     * Set INTEGER columns as UNSIGNED (MySQL)
+     *
      * @return Decimal
      */
     public function unsigned(): Decimal

@@ -15,6 +15,8 @@ class Timestamp extends Time
     protected $useCurrent = false;
 
     /**
+     * Set TIMESTAMP columns to use CURRENT_TIMESTAMP as default value
+     *
      * @return Timestamp
      */
     public function useCurrent(): Timestamp

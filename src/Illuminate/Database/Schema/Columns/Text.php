@@ -33,6 +33,8 @@ class Text extends Column
     private $collation;
 
     /**
+     * Specify a character set for the column (MySQL)
+     *
      * @param string $charset
      * @return Text
      */
@@ -43,6 +45,8 @@ class Text extends Column
     }
 
     /**
+     * Specify a collation for the column (MySQL/SQL Server)
+     *
      * @param string $value
      * @return Text
      */

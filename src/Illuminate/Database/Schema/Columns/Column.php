@@ -140,6 +140,8 @@ class Column
     }
 
     /**
+     * Place the column "after" another column (MySQL)
+     *
      * @param string $column
      * @return Column
      */
@@ -150,6 +152,8 @@ class Column
     }
 
     /**
+     * Add a comment to a column (MySQL)
+     *
      * @param string $comment
      * @return Column
      */
@@ -160,6 +164,8 @@ class Column
     }
 
     /**
+     * Specify a "default" value for the column
+     *
      * @param mixed $default
      * @return Column
      */
@@ -170,6 +176,8 @@ class Column
     }
 
     /**
+     * Place the column "first" in the table (MySQL)
+     *
      * @return Column
      */
     public function first(): Column
@@ -179,6 +187,8 @@ class Column
     }
 
     /**
+     * Allows (by default) NULL values to be inserted into the column
+     *
      * @param bool $value
      * @return Column
      */
@@ -189,6 +199,8 @@ class Column
     }
 
     /**
+     * Create a stored generated column (MySQL)
+     *
      * @param string $expression
      * @return Column
      */
@@ -199,6 +211,8 @@ class Column
     }
 
     /**
+     * Create a virtual generated column (MySQL)
+     *
      * @param string $expression
      * @return Column
      */
@@ -209,6 +223,11 @@ class Column
     }
 
     /**
+     * The change method allows you to modify some existing column types to a new type or modify the column's attributes
+     * Only the following column types can be "changed":
+     * bigInteger, binary, boolean, date, dateTime, dateTimeTz, decimal, integer, json, longText, mediumText,
+     * smallInteger, string, text, time, unsignedBigInteger, unsignedInteger and unsignedSmallInteger.
+     *
      * @return Column
      */
     public function change(): Column
@@ -218,6 +237,8 @@ class Column
     }
 
     /**
+     * Adds a primary key.
+     *
      * @param null|string $name
      * @return Column
      */
@@ -228,6 +249,8 @@ class Column
     }
 
     /**
+     * Adds a unique index.
+     *
      * @param null|string $name
      * @return Column
      */
@@ -238,6 +261,8 @@ class Column
     }
 
     /**
+     * Adds a plain index.
+     *
      * @param null|string $name
      * @return Column
      */
@@ -248,6 +273,8 @@ class Column
     }
 
     /**
+     * Adds a spatial index. (except SQLite)
+     *
      * @param null|string $name
      * @return Column
      */
