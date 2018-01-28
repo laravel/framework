@@ -3,12 +3,9 @@
 namespace Illuminate\Database\Eloquent;
 
 use Exception;
-use ArrayAccess;
-use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Model as BaseModel;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -16,14 +13,12 @@ use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model extends BaseModel implements QueueableEntity, UrlRoutable
 {
-    use Concerns\HasAttributes,
-        Concerns\HasEvents,
+    use Concerns\HasEvents,
         Concerns\HasGlobalScopes,
         Concerns\HasRelationships,
         Concerns\HasTimestamps,
-        Concerns\HidesAttributes,
         Concerns\GuardsAttributes;
 
     /**
@@ -97,6 +92,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates whether attributes are snake cased on arrays.
+     *
+     * @var bool
+     */
+    public static $snakeAttributes = true;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
@@ -148,9 +150,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $this->bootIfNotBooted();
 
-        $this->syncOriginal();
-
-        $this->fill($attributes);
+        parent::__construct($attributes);
     }
 
     /**
@@ -210,6 +210,59 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Get an attribute or relation from the model.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function getAttribute($key)
+    {
+        if (! $key) {
+            return;
+        }
+
+        // If the attribute exists in the attribute array or has a "get" mutator we will
+        // get the attribute's value. Otherwise, we will proceed as if the developers
+        // are asking for a relationship's value. This covers both types of values.
+        if ($this->hasAttribute($key)) {
+            return $this->getAttributeValue($key);
+        }
+
+        // Here we will determine if the model base class itself contains this given key
+        // since we don't want to treat any of those methods as relationships because
+        // they are all intended as helper methods and none of these are relations.
+        if (method_exists(self::class, $key)) {
+            return;
+        }
+
+        return $this->getRelationValue($key);
+    }
+
+    /**
+     * Get the attributes that should be converted to dates.
+     *
+     * @return array
+     */
+    public function getDates()
+    {
+        $defaults = [static::CREATED_AT, static::UPDATED_AT];
+
+        return $this->usesTimestamps()
+            ? array_unique(array_merge($this->dates, $defaults))
+            : $this->dates;
+    }
+
+    /**
+     * Get the format for database stored dates.
+     *
+     * @return string
+     */
+    public function getDateFormat()
+    {
+        return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
+    }
+
+    /**
      * Fill the model with an array of attributes.
      *
      * @param  array  $attributes
@@ -250,6 +303,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return static::unguarded(function () use ($attributes) {
             return $this->fill($attributes);
         });
+    }
+
+    /**
+     * Get the casts array.
+     *
+     * @return array
+     */
+    public function getCasts()
+    {
+        if ($this->getIncrementing()) {
+            return array_merge([$this->getKeyName() => $this->getKeyType()], $this->casts);
+        }
+
+        return $this->casts;
     }
 
     /**
@@ -968,36 +1035,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function toArray()
     {
-        return array_merge($this->attributesToArray(), $this->relationsToArray());
-    }
-
-    /**
-     * Convert the model instance to JSON.
-     *
-     * @param  int  $options
-     * @return string
-     *
-     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
-     */
-    public function toJson($options = 0)
-    {
-        $json = json_encode($this->jsonSerialize(), $options);
-
-        if (JSON_ERROR_NONE !== json_last_error()) {
-            throw JsonEncodingException::forModel($this, json_last_error_msg());
-        }
-
-        return $json;
-    }
-
-    /**
-     * Convert the object into something JSON serializable.
-     *
-     * @return array
-     */
-    public function jsonSerialize()
-    {
-        return $this->toArray();
+        return array_merge(parent::toArray(), $this->relationsToArray());
     }
 
     /**
@@ -1396,60 +1434,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Dynamically retrieve attributes on the model.
-     *
-     * @param  string  $key
-     * @return mixed
+     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
      */
-    public function __get($key)
+    protected function throwJsonEncodingException()
     {
-        return $this->getAttribute($key);
-    }
-
-    /**
-     * Dynamically set attributes on the model.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return void
-     */
-    public function __set($key, $value)
-    {
-        $this->setAttribute($key, $value);
-    }
-
-    /**
-     * Determine if the given attribute exists.
-     *
-     * @param  mixed  $offset
-     * @return bool
-     */
-    public function offsetExists($offset)
-    {
-        return ! is_null($this->getAttribute($offset));
-    }
-
-    /**
-     * Get the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @return mixed
-     */
-    public function offsetGet($offset)
-    {
-        return $this->getAttribute($offset);
-    }
-
-    /**
-     * Set the value for a given offset.
-     *
-     * @param  mixed  $offset
-     * @param  mixed  $value
-     * @return void
-     */
-    public function offsetSet($offset, $value)
-    {
-        $this->setAttribute($offset, $value);
+        throw JsonEncodingException::forModel($this, json_last_error_msg());
     }
 
     /**
@@ -1460,29 +1449,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function offsetUnset($offset)
     {
-        unset($this->attributes[$offset], $this->relations[$offset]);
-    }
+        parent::offsetUnset($offset);
 
-    /**
-     * Determine if an attribute or relation exists on the model.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function __isset($key)
-    {
-        return $this->offsetExists($key);
-    }
-
-    /**
-     * Unset an attribute on the model.
-     *
-     * @param  string  $key
-     * @return void
-     */
-    public function __unset($key)
-    {
-        $this->offsetUnset($key);
+        unset($this->relations[$offset]);
     }
 
     /**
@@ -1511,16 +1480,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function __callStatic($method, $parameters)
     {
         return (new static)->$method(...$parameters);
-    }
-
-    /**
-     * Convert the model to its string representation.
-     *
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->toJson();
     }
 
     /**

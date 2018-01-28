@@ -1563,7 +1563,7 @@ class DatabaseEloquentModelTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\JsonEncodingException
+     * @expectedException \Illuminate\Support\JsonEncodingException
      * @expectedExceptionMessage Unable to encode attribute [objectAttribute] for model [Illuminate\Tests\Database\EloquentModelCastingStub] to JSON: Malformed UTF-8 characters, possibly incorrectly encoded.
      */
     public function testModelAttributeCastingFailsOnUnencodableData()
