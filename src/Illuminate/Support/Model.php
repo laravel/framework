@@ -4,8 +4,8 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use JsonSerializable;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable
 {

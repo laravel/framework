@@ -7,8 +7,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Support\JsonEncodingException;
+use Illuminate\Support\Collection as BaseCollection;
 
 trait HasAttributes
 {
@@ -260,7 +260,7 @@ trait HasAttributes
      */
     public function hasAttribute($key)
     {
-        if(! $key) {
+        if (! $key) {
             return false;
         }
 
@@ -268,7 +268,7 @@ trait HasAttributes
     }
 
     /**
-     * Get a plain attribute
+     * Get a plain attribute.
      *
      * @param  string  $key
      * @return mixed

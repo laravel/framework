@@ -7,8 +7,8 @@ use stdClass;
 use Mockery as m;
 use DateTimeImmutable;
 use DateTimeInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Model;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\InteractsWithTime;
 
