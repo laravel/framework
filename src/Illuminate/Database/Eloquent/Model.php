@@ -92,6 +92,13 @@ abstract class Model extends BaseModel implements QueueableEntity, UrlRoutable
     public $wasRecentlyCreated = false;
 
     /**
+     * Indicates whether attributes are snake cased on arrays.
+     *
+     * @var bool
+     */
+    public static $snakeAttributes = true;
+
+    /**
      * The connection resolver instance.
      *
      * @var \Illuminate\Database\ConnectionResolverInterface
