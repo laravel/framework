@@ -419,6 +419,16 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store|null
+     */
+    public function getSession()
+    {
+        return $this->session;
+    }
+
+    /**
      * Set the session instance on the request.
      *
      * @param  \Illuminate\Contracts\Session\Session  $session
