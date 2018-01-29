@@ -15,10 +15,10 @@ namespace Illuminate\Database\Schema\Columns;
  * @method \Illuminate\Database\Schema\Columns\Text storedAs(string $expression)
  * @method \Illuminate\Database\Schema\Columns\Text virtualAs(string $expression)
  * @method \Illuminate\Database\Schema\Columns\Text change()
- * @method \Illuminate\Database\Schema\Columns\Text primary(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Text unique(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Text index(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Text spatialIndex(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text primary(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text unique(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text index(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text spatialIndex(string $name = null)
  */
 class Text extends Column
 {

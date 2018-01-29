@@ -15,10 +15,10 @@ namespace Illuminate\Database\Schema\Columns;
  * @method \Illuminate\Database\Schema\Columns\Integer storedAs(string $expression)
  * @method \Illuminate\Database\Schema\Columns\Integer virtualAs(string $expression)
  * @method \Illuminate\Database\Schema\Columns\Integer change()
- * @method \Illuminate\Database\Schema\Columns\Integer primary(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Integer unique(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Integer index(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Integer spatialIndex(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Integer primary(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Integer unique(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Integer index(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Integer spatialIndex(string $name = null)
  */
 class Integer extends Column
 {

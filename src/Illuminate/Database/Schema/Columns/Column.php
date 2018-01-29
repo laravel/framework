@@ -239,10 +239,10 @@ class Column
     /**
      * Adds a primary key.
      *
-     * @param null|string $name
+     * @param string $name
      * @return \Illuminate\Database\Schema\Columns\Column
      */
-    public function primary(?string $name = null): Column
+    public function primary(string $name = null): Column
     {
         $this->primary = is_null($name) ? true : $name;
         return $this;
@@ -251,10 +251,10 @@ class Column
     /**
      * Adds a unique index.
      *
-     * @param null|string $name
+     * @param string $name
      * @return \Illuminate\Database\Schema\Columns\Column
      */
-    public function unique(?string $name = null): Column
+    public function unique(string $name = null): Column
     {
         $this->unique = is_null($name) ? true : $name;
         return $this;
@@ -263,10 +263,10 @@ class Column
     /**
      * Adds a plain index.
      *
-     * @param null|string $name
+     * @param string $name
      * @return \Illuminate\Database\Schema\Columns\Column
      */
-    public function index(?string $name = null): Column
+    public function index(string $name = null): Column
     {
         $this->index = is_null($name) ? true : $name;
         return $this;
@@ -275,10 +275,10 @@ class Column
     /**
      * Adds a spatial index. (except SQLite)
      *
-     * @param null|string $name
+     * @param string $name
      * @return \Illuminate\Database\Schema\Columns\Column
      */
-    public function spatialIndex(?string $name = null): Column
+    public function spatialIndex(string $name = null): Column
     {
         $this->spatialIndex = is_null($name) ? true : $name;
         return $this;

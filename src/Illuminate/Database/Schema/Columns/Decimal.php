@@ -16,10 +16,10 @@ namespace Illuminate\Database\Schema\Columns;
  * @method \Illuminate\Database\Schema\Columns\Decimal storedAs(string $expression)
  * @method \Illuminate\Database\Schema\Columns\Decimal virtualAs(string $expression)
  * @method \Illuminate\Database\Schema\Columns\Decimal change()
- * @method \Illuminate\Database\Schema\Columns\Decimal primary(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Decimal unique(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Decimal index(?string $name = null)
- * @method \Illuminate\Database\Schema\Columns\Decimal spatialIndex(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal primary(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal unique(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal index(string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal spatialIndex(string $name = null)
  */
 class Decimal extends Column
 {
@@ -43,10 +43,10 @@ class Decimal extends Column
      *
      * @param string $type
      * @param string $name
-     * @param int|null $total
-     * @param int|null $places
+     * @param int $total
+     * @param int $places
      */
-    public function __construct(string $type, string $name, ?int $total = null, ?int $places = null)
+    public function __construct(string $type, string $name, int $total = null, int $places = null)
     {
         parent::__construct($type, $name);
 
