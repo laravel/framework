@@ -2,6 +2,14 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Schema\Columns\VariableLength;
+use Illuminate\Database\Schema\Columns\Column;
+use Illuminate\Database\Schema\Columns\Decimal;
+use Illuminate\Database\Schema\Columns\Enum;
+use Illuminate\Database\Schema\Columns\Integer;
+use Illuminate\Database\Schema\Columns\Text;
+use Illuminate\Database\Schema\Columns\Time;
+use Illuminate\Database\Schema\Columns\Timestamp;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
 
@@ -300,10 +308,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a char type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\VariableLength  $column
      * @return string
      */
-    protected function typeChar(Fluent $column)
+    protected function typeChar(VariableLength $column)
     {
         return "nchar({$column->length})";
     }
@@ -311,10 +319,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a string type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\VariableLength  $column
      * @return string
      */
-    protected function typeString(Fluent $column)
+    protected function typeString(VariableLength $column)
     {
         return "nvarchar({$column->length})";
     }
@@ -322,10 +330,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
-    protected function typeText(Fluent $column)
+    protected function typeText(Text $column)
     {
         return 'nvarchar(max)';
     }
@@ -333,10 +341,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a medium text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
-    protected function typeMediumText(Fluent $column)
+    protected function typeMediumText(Text $column)
     {
         return 'nvarchar(max)';
     }
@@ -344,10 +352,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a long text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
-    protected function typeLongText(Fluent $column)
+    protected function typeLongText(Text $column)
     {
         return 'nvarchar(max)';
     }
@@ -355,10 +363,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for an integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeInteger(Fluent $column)
+    protected function typeInteger(Integer $column)
     {
         return 'int';
     }
@@ -366,10 +374,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a big integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeBigInteger(Fluent $column)
+    protected function typeBigInteger(Integer $column)
     {
         return 'bigint';
     }
@@ -377,10 +385,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a medium integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeMediumInteger(Fluent $column)
+    protected function typeMediumInteger(Integer $column)
     {
         return 'int';
     }
@@ -388,10 +396,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a tiny integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeTinyInteger(Fluent $column)
+    protected function typeTinyInteger(Integer $column)
     {
         return 'tinyint';
     }
@@ -399,10 +407,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a small integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeSmallInteger(Fluent $column)
+    protected function typeSmallInteger(Integer $column)
     {
         return 'smallint';
     }
@@ -410,10 +418,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a float type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
-    protected function typeFloat(Fluent $column)
+    protected function typeFloat(Decimal $column)
     {
         return 'float';
     }
@@ -421,10 +429,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a double type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
-    protected function typeDouble(Fluent $column)
+    protected function typeDouble(Decimal $column)
     {
         return 'float';
     }
@@ -432,10 +440,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a decimal type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
-    protected function typeDecimal(Fluent $column)
+    protected function typeDecimal(Decimal $column)
     {
         return "decimal({$column->total}, {$column->places})";
     }
@@ -443,10 +451,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a boolean type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeBoolean(Fluent $column)
+    protected function typeBoolean(Column $column)
     {
         return 'bit';
     }
@@ -454,10 +462,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for an enumeration type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Enum  $column
      * @return string
      */
-    protected function typeEnum(Fluent $column)
+    protected function typeEnum(Enum $column)
     {
         return sprintf(
             'nvarchar(255) check ("%s" in (%s))',
@@ -469,10 +477,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a json type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeJson(Fluent $column)
+    protected function typeJson(Column $column)
     {
         return 'nvarchar(max)';
     }
@@ -480,10 +488,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a jsonb type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeJsonb(Fluent $column)
+    protected function typeJsonb(Column $column)
     {
         return 'nvarchar(max)';
     }
@@ -491,10 +499,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeDate(Fluent $column)
+    protected function typeDate(Column $column)
     {
         return 'date';
     }
@@ -502,10 +510,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a date-time type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeDateTime(Fluent $column)
+    protected function typeDateTime(Time $column)
     {
         return $column->precision ? "datetime2($column->precision)" : 'datetime';
     }
@@ -513,10 +521,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a date-time (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeDateTimeTz(Fluent $column)
+    protected function typeDateTimeTz(Time $column)
     {
         return $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
     }
@@ -524,10 +532,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a time type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeTime(Fluent $column)
+    protected function typeTime(Time $column)
     {
         return $column->precision ? "time($column->precision)" : 'time';
     }
@@ -535,10 +543,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a time (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeTimeTz(Fluent $column)
+    protected function typeTimeTz(Time $column)
     {
         return $this->typeTime($column);
     }
@@ -546,10 +554,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a timestamp type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Timestamp  $column
      * @return string
      */
-    protected function typeTimestamp(Fluent $column)
+    protected function typeTimestamp(Timestamp $column)
     {
         $columnType = $column->precision ? "datetime2($column->precision)" : 'datetime';
 
@@ -561,10 +569,10 @@ class SqlServerGrammar extends Grammar
      *
      * @link https://msdn.microsoft.com/en-us/library/bb630289(v=sql.120).aspx
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Timestamp  $column
      * @return string
      */
-    protected function typeTimestampTz(Fluent $column)
+    protected function typeTimestampTz(Timestamp $column)
     {
         if ($column->useCurrent) {
             $columnType = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
@@ -578,21 +586,21 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a year type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeYear(Fluent $column)
+    protected function typeYear(Column $column)
     {
-        return $this->typeInteger($column);
+        return 'int';
     }
 
     /**
      * Create the column definition for a binary type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeBinary(Fluent $column)
+    protected function typeBinary(Column $column)
     {
         return 'varbinary(max)';
     }
@@ -600,10 +608,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a uuid type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeUuid(Fluent $column)
+    protected function typeUuid(Column $column)
     {
         return 'uniqueidentifier';
     }
@@ -611,10 +619,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for an IP address type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeIpAddress(Fluent $column)
+    protected function typeIpAddress(Column $column)
     {
         return 'nvarchar(45)';
     }
@@ -622,10 +630,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a MAC address type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeMacAddress(Fluent $column)
+    protected function typeMacAddress(Column $column)
     {
         return 'nvarchar(17)';
     }
@@ -633,10 +641,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial Geometry type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeGeometry(Fluent $column)
+    public function typeGeometry(Column $column)
     {
         return 'geography';
     }
@@ -644,10 +652,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial Point type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typePoint(Fluent $column)
+    public function typePoint(Column $column)
     {
         return 'geography';
     }
@@ -655,10 +663,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial LineString type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeLineString(Fluent $column)
+    public function typeLineString(Column $column)
     {
         return 'geography';
     }
@@ -666,10 +674,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial Polygon type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typePolygon(Fluent $column)
+    public function typePolygon(Column $column)
     {
         return 'geography';
     }
@@ -677,10 +685,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial GeometryCollection type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeGeometryCollection(Fluent $column)
+    public function typeGeometryCollection(Column $column)
     {
         return 'geography';
     }
@@ -688,10 +696,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPoint type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeMultiPoint(Fluent $column)
+    public function typeMultiPoint(Column $column)
     {
         return 'geography';
     }
@@ -699,10 +707,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiLineString type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeMultiLineString(Fluent $column)
+    public function typeMultiLineString(Column $column)
     {
         return 'geography';
     }
@@ -710,10 +718,10 @@ class SqlServerGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPolygon type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeMultiPolygon(Fluent $column)
+    public function typeMultiPolygon(Column $column)
     {
         return 'geography';
     }
@@ -722,12 +730,12 @@ class SqlServerGrammar extends Grammar
      * Get the SQL for a collation column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+    protected function modifyCollate(Blueprint $blueprint, Column $column)
     {
-        if (! is_null($column->collation)) {
+        if ($column instanceof Text && ! is_null($column->collation)) {
             return ' collate '.$column->collation;
         }
     }
@@ -736,10 +744,10 @@ class SqlServerGrammar extends Grammar
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyNullable(Blueprint $blueprint, Fluent $column)
+    protected function modifyNullable(Blueprint $blueprint, Column $column)
     {
         return $column->nullable ? ' null' : ' not null';
     }
@@ -748,10 +756,10 @@ class SqlServerGrammar extends Grammar
      * Get the SQL for a default column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyDefault(Blueprint $blueprint, Fluent $column)
+    protected function modifyDefault(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
@@ -762,12 +770,12 @@ class SqlServerGrammar extends Grammar
      * Get the SQL for an auto-increment column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
+    protected function modifyIncrement(Blueprint $blueprint, Column $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if ($this->isColumnSerial($column) && $column->autoIncrement) {
             return ' identity primary key';
         }
     }

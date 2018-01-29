@@ -2,6 +2,14 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
+use Illuminate\Database\Schema\Columns\VariableLength;
+use Illuminate\Database\Schema\Columns\Column;
+use Illuminate\Database\Schema\Columns\Decimal;
+use Illuminate\Database\Schema\Columns\Enum;
+use Illuminate\Database\Schema\Columns\Integer;
+use Illuminate\Database\Schema\Columns\Text;
+use Illuminate\Database\Schema\Columns\Time;
+use Illuminate\Database\Schema\Columns\Timestamp;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
@@ -386,10 +394,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a char type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\VariableLength  $column
      * @return string
      */
-    protected function typeChar(Fluent $column)
+    protected function typeChar(VariableLength $column)
     {
         return "char({$column->length})";
     }
@@ -397,10 +405,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a string type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\VariableLength  $column
      * @return string
      */
-    protected function typeString(Fluent $column)
+    protected function typeString(VariableLength $column)
     {
         return "varchar({$column->length})";
     }
@@ -408,10 +416,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
-    protected function typeText(Fluent $column)
+    protected function typeText(Text $column)
     {
         return 'text';
     }
@@ -419,10 +427,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a medium text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
-    protected function typeMediumText(Fluent $column)
+    protected function typeMediumText(Text $column)
     {
         return 'mediumtext';
     }
@@ -430,10 +438,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a long text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
-    protected function typeLongText(Fluent $column)
+    protected function typeLongText(Text $column)
     {
         return 'longtext';
     }
@@ -441,10 +449,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a big integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeBigInteger(Fluent $column)
+    protected function typeBigInteger(Integer $column)
     {
         return 'bigint';
     }
@@ -452,10 +460,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for an integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeInteger(Fluent $column)
+    protected function typeInteger(Integer $column)
     {
         return 'int';
     }
@@ -463,10 +471,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a medium integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeMediumInteger(Fluent $column)
+    protected function typeMediumInteger(Integer $column)
     {
         return 'mediumint';
     }
@@ -474,10 +482,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a tiny integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeTinyInteger(Fluent $column)
+    protected function typeTinyInteger(Integer $column)
     {
         return 'tinyint';
     }
@@ -485,10 +493,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a small integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeSmallInteger(Fluent $column)
+    protected function typeSmallInteger(Integer $column)
     {
         return 'smallint';
     }
@@ -496,10 +504,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a float type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
-    protected function typeFloat(Fluent $column)
+    protected function typeFloat(Decimal $column)
     {
         return $this->typeDouble($column);
     }
@@ -507,10 +515,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a double type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
-    protected function typeDouble(Fluent $column)
+    protected function typeDouble(Decimal $column)
     {
         if ($column->total && $column->places) {
             return "double({$column->total}, {$column->places})";
@@ -522,10 +530,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a decimal type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
-    protected function typeDecimal(Fluent $column)
+    protected function typeDecimal(Decimal $column)
     {
         return "decimal({$column->total}, {$column->places})";
     }
@@ -533,10 +541,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a boolean type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeBoolean(Fluent $column)
+    protected function typeBoolean(Column $column)
     {
         return 'tinyint(1)';
     }
@@ -544,10 +552,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for an enumeration type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Enum  $column
      * @return string
      */
-    protected function typeEnum(Fluent $column)
+    protected function typeEnum(Enum $column)
     {
         return sprintf('enum(%s)', $this->quoteString($column->allowed));
     }
@@ -555,10 +563,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a json type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeJson(Fluent $column)
+    protected function typeJson(Column $column)
     {
         return 'json';
     }
@@ -566,10 +574,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a jsonb type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeJsonb(Fluent $column)
+    protected function typeJsonb(Column $column)
     {
         return 'json';
     }
@@ -577,10 +585,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeDate(Fluent $column)
+    protected function typeDate(Column $column)
     {
         return 'date';
     }
@@ -588,10 +596,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a date-time type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeDateTime(Fluent $column)
+    protected function typeDateTime(Time $column)
     {
         return $column->precision ? "datetime($column->precision)" : 'datetime';
     }
@@ -599,10 +607,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a date-time (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeDateTimeTz(Fluent $column)
+    protected function typeDateTimeTz(Time $column)
     {
         return $this->typeDateTime($column);
     }
@@ -610,10 +618,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a time type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeTime(Fluent $column)
+    protected function typeTime(Time $column)
     {
         return $column->precision ? "time($column->precision)" : 'time';
     }
@@ -621,10 +629,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a time (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
-    protected function typeTimeTz(Fluent $column)
+    protected function typeTimeTz(Time $column)
     {
         return $this->typeTime($column);
     }
@@ -632,10 +640,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a timestamp type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Timestamp  $column
      * @return string
      */
-    protected function typeTimestamp(Fluent $column)
+    protected function typeTimestamp(Timestamp $column)
     {
         $columnType = $column->precision ? "timestamp($column->precision)" : 'timestamp';
 
@@ -645,10 +653,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a timestamp (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Timestamp  $column
      * @return string
      */
-    protected function typeTimestampTz(Fluent $column)
+    protected function typeTimestampTz(Timestamp $column)
     {
         return $this->typeTimestamp($column);
     }
@@ -656,10 +664,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a year type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeYear(Fluent $column)
+    protected function typeYear(Column $column)
     {
         return 'year';
     }
@@ -667,10 +675,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a binary type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeBinary(Fluent $column)
+    protected function typeBinary(Column $column)
     {
         return 'blob';
     }
@@ -678,10 +686,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a uuid type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeUuid(Fluent $column)
+    protected function typeUuid(Column $column)
     {
         return 'char(36)';
     }
@@ -689,10 +697,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for an IP address type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeIpAddress(Fluent $column)
+    protected function typeIpAddress(Column $column)
     {
         return 'varchar(45)';
     }
@@ -700,10 +708,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a MAC address type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    protected function typeMacAddress(Fluent $column)
+    protected function typeMacAddress(Column $column)
     {
         return 'varchar(17)';
     }
@@ -711,10 +719,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial Geometry type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeGeometry(Fluent $column)
+    public function typeGeometry(Column $column)
     {
         return 'geometry';
     }
@@ -722,10 +730,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial Point type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typePoint(Fluent $column)
+    public function typePoint(Column $column)
     {
         return 'point';
     }
@@ -733,10 +741,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial LineString type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeLineString(Fluent $column)
+    public function typeLineString(Column $column)
     {
         return 'linestring';
     }
@@ -744,10 +752,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial Polygon type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typePolygon(Fluent $column)
+    public function typePolygon(Column $column)
     {
         return 'polygon';
     }
@@ -755,10 +763,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial GeometryCollection type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeGeometryCollection(Fluent $column)
+    public function typeGeometryCollection(Column $column)
     {
         return 'geometrycollection';
     }
@@ -766,10 +774,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPoint type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeMultiPoint(Fluent $column)
+    public function typeMultiPoint(Column $column)
     {
         return 'multipoint';
     }
@@ -777,10 +785,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiLineString type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeMultiLineString(Fluent $column)
+    public function typeMultiLineString(Column $column)
     {
         return 'multilinestring';
     }
@@ -788,10 +796,10 @@ class MySqlGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPolygon type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
-    public function typeMultiPolygon(Fluent $column)
+    public function typeMultiPolygon(Column $column)
     {
         return 'multipolygon';
     }
@@ -800,10 +808,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a generated virtual column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyVirtualAs(Blueprint $blueprint, Fluent $column)
+    protected function modifyVirtualAs(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->virtualAs)) {
             return " as ({$column->virtualAs})";
@@ -814,10 +822,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a generated stored column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyStoredAs(Blueprint $blueprint, Fluent $column)
+    protected function modifyStoredAs(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->storedAs)) {
             return " as ({$column->storedAs}) stored";
@@ -828,12 +836,13 @@ class MySqlGrammar extends Grammar
      * Get the SQL for an unsigned column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer|\Illuminate\Database\Schema\Columns\Decimal|\Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyUnsigned(Blueprint $blueprint, Fluent $column)
+    protected function modifyUnsigned(Blueprint $blueprint, Column $column)
     {
-        if ($column->unsigned) {
+        $isNumeric = ($column instanceof Decimal) || ($column instanceof Integer);
+        if ($isNumeric && $column->unsigned) {
             return ' unsigned';
         }
     }
@@ -842,12 +851,12 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a character set column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyCharset(Blueprint $blueprint, Fluent $column)
+    protected function modifyCharset(Blueprint $blueprint, Column $column)
     {
-        if (! is_null($column->charset)) {
+        if ($column instanceof Text && ! is_null($column->charset)) {
             return ' character set '.$column->charset;
         }
     }
@@ -856,12 +865,12 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a collation column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyCollate(Blueprint $blueprint, Fluent $column)
+    protected function modifyCollate(Blueprint $blueprint, Column $column)
     {
-        if (! is_null($column->collation)) {
+        if ($column instanceof Text && ! is_null($column->collation)) {
             return ' collate '.$column->collation;
         }
     }
@@ -870,10 +879,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyNullable(Blueprint $blueprint, Fluent $column)
+    protected function modifyNullable(Blueprint $blueprint, Column $column)
     {
         if (is_null($column->virtualAs) && is_null($column->storedAs)) {
             return $column->nullable ? ' null' : ' not null';
@@ -884,10 +893,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a default column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyDefault(Blueprint $blueprint, Fluent $column)
+    protected function modifyDefault(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
@@ -898,12 +907,12 @@ class MySqlGrammar extends Grammar
      * Get the SQL for an auto-increment column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
+    protected function modifyIncrement(Blueprint $blueprint, Column $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if ($this->isColumnSerial($column) && $column->autoIncrement) {
             return ' auto_increment primary key';
         }
     }
@@ -912,10 +921,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a "first" column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyFirst(Blueprint $blueprint, Fluent $column)
+    protected function modifyFirst(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->first)) {
             return ' first';
@@ -926,10 +935,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for an "after" column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyAfter(Blueprint $blueprint, Fluent $column)
+    protected function modifyAfter(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->after)) {
             return ' after '.$this->wrap($column->after);
@@ -940,10 +949,10 @@ class MySqlGrammar extends Grammar
      * Get the SQL for a "comment" column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyComment(Blueprint $blueprint, Fluent $column)
+    protected function modifyComment(Blueprint $blueprint, Column $column)
     {
         if (! is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
