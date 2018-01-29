@@ -404,8 +404,6 @@ class PhpRedisConnection extends Connection
      */
     public function __call($method, $parameters)
     {
-        $method = strtolower($method);
-
-        return parent::__call($method, $parameters);
+        return parent::__call(strtolower($method), $parameters);
     }
 }
