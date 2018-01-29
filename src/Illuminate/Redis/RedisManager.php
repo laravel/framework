@@ -11,6 +11,13 @@ use Illuminate\Contracts\Redis\Factory;
 class RedisManager implements Factory
 {
     /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
      * The name of the default driver.
      *
      * @var string
@@ -34,12 +41,14 @@ class RedisManager implements Factory
     /**
      * Create a new Redis manager instance.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  string  $driver
      * @param  array  $config
      * @return void
      */
-    public function __construct($driver, array $config)
+    public function __construct($app, $driver, array $config)
     {
+        $this->app = $app;
         $this->driver = $driver;
         $this->config = $config;
     }
