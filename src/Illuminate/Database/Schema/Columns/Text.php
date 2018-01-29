@@ -30,7 +30,7 @@ class Text extends Column
     /**
      * @var string
      */
-    private $collation;
+    protected $collation;
 
     /**
      * Specify a character set for the column (MySQL)

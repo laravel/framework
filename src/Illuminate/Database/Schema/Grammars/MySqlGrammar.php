@@ -841,7 +841,8 @@ class MySqlGrammar extends Grammar
      */
     protected function modifyUnsigned(Blueprint $blueprint, Column $column)
     {
-        if ($column->unsigned) {
+        $isNumeric = ($column instanceof Decimal) || ($column instanceof Integer);
+        if ($isNumeric && $column->unsigned) {
             return ' unsigned';
         }
     }

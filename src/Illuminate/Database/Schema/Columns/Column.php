@@ -49,12 +49,12 @@ class Column
     /**
      * @var bool
      */
-    private $first = false;
+    private $first;
 
     /**
      * @var bool
      */
-    private $nullable = false;
+    private $nullable;
 
     /**
      * @var string
@@ -69,7 +69,7 @@ class Column
     /**
      * @var bool
      */
-    private $change = false;
+    private $change;
 
     /**
      * @var string|true
