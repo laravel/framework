@@ -80,14 +80,14 @@ class AuthMakeCommand extends Command
     }
 
     /**
-     * Export the controllers
+     * Export the controllers.
      *
      * @return void
      */
     protected function exportControllers()
     {
         if (file_exists(app_path('Http/Controllers/HomeController.php'))) {
-            if (! $this->confirm("The [HomeController] controller already exists. Do you want to replace it?")) {
+            if (! $this->confirm('The [HomeController] controller already exists. Do you want to replace it?')) {
                 return;
             }
         }
