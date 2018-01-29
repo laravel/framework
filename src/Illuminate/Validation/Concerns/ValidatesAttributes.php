@@ -361,6 +361,13 @@ trait ValidatesAttributes
         $format = $parameters[0];
 
         $date = DateTime::createFromFormat('!'.$format, $value);
+        
+        /*
+         * RFC3339 date format fix.
+         */
+        if ($format == \DateTime::RFC3339 && substr($value, -1) == 'Z') {
+            $value = str_replace('Z', '+00:00', $value);
+        }
 
         return $date && $date->format($format) == $value;
     }
