@@ -94,11 +94,13 @@ trait InteractsWithInput
     /**
      * Determine if the request contains any of the given inputs.
      *
-     * @param  dynamic  $key
+     * @param  string|array  $key
      * @return bool
      */
-    public function hasAny(...$keys)
+    public function hasAny($keys)
     {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
         $input = $this->all();
 
         foreach ($keys as $key) {
