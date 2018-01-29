@@ -3,6 +3,8 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
+use Illuminate\Redis\Events\QueryExecuted;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 
@@ -17,6 +19,13 @@ abstract class Connection
      * @var \Predis\Client
      */
     protected $client;
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
 
     /**
      * The Redis connection name.
@@ -101,6 +110,33 @@ abstract class Connection
     public function command($method, array $parameters = [])
     {
         return $this->client->{$method}(...$parameters);
+
+    /**
+     * Fire the given event if possible.
+     *
+     * @param  mixed  $event
+     * @return void
+     */
+    protected function event($event)
+    {
+        if (isset($this->events)) {
+            $this->events->dispatch($event);
+        }
+    }
+
+    /**
+     * Register a Redis query listener with the connection.
+     *
+     * @param  \Closure  $callback
+     * @return void
+     */
+    public function listen(Closure $callback)
+    {
+        if (isset($this->events)) {
+            $this->events->listen(QueryExecuted::class, $callback);
+        }
+    }
+
     /**
      * Get the connection name.
      *
@@ -122,6 +158,25 @@ abstract class Connection
         $this->name = $name;
     }
 
+    /**
+     * Get the event dispatcher used by the connection.
+     *
+     * @return \Illuminate\Contracts\Events\Dispatcher
+     */
+    public function getEventDispatcher()
+    {
+        return $this->events;
+    }
+
+    /**
+     * Set the event dispatcher instance on the connection.
+     *
+     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @return void
+     */
+    public function setEventDispatcher(Dispatcher $events)
+    {
+        $this->events = $events;
     }
 
     /**

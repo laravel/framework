@@ -141,6 +141,10 @@ class RedisManager implements Factory
     {
         $connection->setName($name);
 
+        if ($this->app->bound('events')) {
+            $connection->setEventDispatcher($this->app['events']);
+        }
+
         return $connection;
     }
 
