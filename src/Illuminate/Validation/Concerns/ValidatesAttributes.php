@@ -361,7 +361,7 @@ trait ValidatesAttributes
         $format = $parameters[0];
 
         $date = DateTime::createFromFormat('!'.$format, $value);
-        
+
         /*
          * RFC3339 date format fix.
          */
