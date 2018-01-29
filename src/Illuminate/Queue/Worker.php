@@ -284,7 +284,7 @@ class Worker
     /**
      * Stop the worker if we have lost connection to a database.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      */
     protected function stopWorkerIfLostConnection($e)
