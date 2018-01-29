@@ -37,6 +37,7 @@ use Illuminate\Foundation\Console\RequestMakeCommand;
 use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
+use Illuminate\Foundation\Console\CpanelCreateCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
@@ -131,6 +132,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ChannelMake' => 'command.channel.make',
         'ConsoleMake' => 'command.console.make',
         'ControllerMake' => 'command.controller.make',
+        'CpanelCreate' => 'command.cpanel.create',
         'EventGenerate' => 'command.event.generate',
         'EventMake' => 'command.event.make',
         'ExceptionMake' => 'command.exception.make',
@@ -325,6 +327,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.controller.make', function ($app) {
             return new ControllerMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerCpanelCreateCommand()
+    {
+        $this->app->singleton('command.cpanel.create', function ($app) {
+            return new CpanelCreateCommand;
         });
     }
 
