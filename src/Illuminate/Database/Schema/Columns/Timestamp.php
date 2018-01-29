@@ -17,7 +17,7 @@ class Timestamp extends Time
     /**
      * Set TIMESTAMP columns to use CURRENT_TIMESTAMP as default value
      *
-     * @return Timestamp
+     * @return \Illuminate\Database\Schema\Columns\Timestamp
      */
     public function useCurrent(): Timestamp
     {

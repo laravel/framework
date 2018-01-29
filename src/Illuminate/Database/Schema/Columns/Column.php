@@ -143,7 +143,7 @@ class Column
      * Place the column "after" another column (MySQL)
      *
      * @param string $column
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function after(string $column): Column
     {
@@ -155,7 +155,7 @@ class Column
      * Add a comment to a column (MySQL)
      *
      * @param string $comment
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function comment(string $comment): Column
     {
@@ -167,7 +167,7 @@ class Column
      * Specify a "default" value for the column
      *
      * @param mixed $default
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function default($default): Column
     {
@@ -178,7 +178,7 @@ class Column
     /**
      * Place the column "first" in the table (MySQL)
      *
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function first(): Column
     {
@@ -190,7 +190,7 @@ class Column
      * Allows (by default) NULL values to be inserted into the column
      *
      * @param bool $value
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function nullable(bool $value = true): Column
     {
@@ -202,7 +202,7 @@ class Column
      * Create a stored generated column (MySQL)
      *
      * @param string $expression
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function storedAs(string $expression): Column
     {
@@ -214,7 +214,7 @@ class Column
      * Create a virtual generated column (MySQL)
      *
      * @param string $expression
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function virtualAs(string $expression): Column
     {
@@ -228,7 +228,7 @@ class Column
      * bigInteger, binary, boolean, date, dateTime, dateTimeTz, decimal, integer, json, longText, mediumText,
      * smallInteger, string, text, time, unsignedBigInteger, unsignedInteger and unsignedSmallInteger.
      *
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function change(): Column
     {
@@ -240,7 +240,7 @@ class Column
      * Adds a primary key.
      *
      * @param null|string $name
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function primary(?string $name = null): Column
     {
@@ -252,7 +252,7 @@ class Column
      * Adds a unique index.
      *
      * @param null|string $name
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function unique(?string $name = null): Column
     {
@@ -264,7 +264,7 @@ class Column
      * Adds a plain index.
      *
      * @param null|string $name
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function index(?string $name = null): Column
     {
@@ -276,7 +276,7 @@ class Column
      * Adds a spatial index. (except SQLite)
      *
      * @param null|string $name
-     * @return Column
+     * @return \Illuminate\Database\Schema\Columns\Column
      */
     public function spatialIndex(?string $name = null): Column
     {

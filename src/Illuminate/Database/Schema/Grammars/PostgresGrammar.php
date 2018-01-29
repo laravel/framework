@@ -2,11 +2,11 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Database\Schema\Columns\CharString;
+use Illuminate\Database\Schema\Columns\VariableLength;
 use Illuminate\Database\Schema\Columns\Column;
 use Illuminate\Database\Schema\Columns\Decimal;
 use Illuminate\Database\Schema\Columns\Enum;
-use Illuminate\Database\Schema\Columns\Integer as ColumnInteger;
+use Illuminate\Database\Schema\Columns\Integer;
 use Illuminate\Database\Schema\Columns\Text;
 use Illuminate\Database\Schema\Columns\Time;
 use Illuminate\Database\Schema\Columns\Timestamp;
@@ -357,10 +357,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a char type.
      *
-     * @param  CharString  $column
+     * @param  \Illuminate\Database\Schema\Columns\VariableLength  $column
      * @return string
      */
-    protected function typeChar(CharString $column)
+    protected function typeChar(VariableLength $column)
     {
         return "char({$column->length})";
     }
@@ -368,10 +368,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a string type.
      *
-     * @param  CharString  $column
+     * @param  \Illuminate\Database\Schema\Columns\VariableLength  $column
      * @return string
      */
-    protected function typeString(CharString $column)
+    protected function typeString(VariableLength $column)
     {
         return "varchar({$column->length})";
     }
@@ -379,7 +379,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a text type.
      *
-     * @param  Text  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
     protected function typeText(Text $column)
@@ -390,7 +390,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a medium text type.
      *
-     * @param  Text  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
     protected function typeMediumText(Text $column)
@@ -401,7 +401,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a long text type.
      *
-     * @param  Text  $column
+     * @param  \Illuminate\Database\Schema\Columns\Text  $column
      * @return string
      */
     protected function typeLongText(Text $column)
@@ -412,10 +412,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for an integer type.
      *
-     * @param  ColumnInteger  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeInteger(ColumnInteger $column)
+    protected function typeInteger(Integer $column)
     {
         return $column->autoIncrement ? 'serial' : 'integer';
     }
@@ -423,10 +423,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a big integer type.
      *
-     * @param  ColumnInteger  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeBigInteger(ColumnInteger $column)
+    protected function typeBigInteger(Integer $column)
     {
         return $column->autoIncrement ? 'bigserial' : 'bigint';
     }
@@ -434,10 +434,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a medium integer type.
      *
-     * @param  ColumnInteger  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeMediumInteger(ColumnInteger $column)
+    protected function typeMediumInteger(Integer $column)
     {
         return $column->autoIncrement ? 'serial' : 'integer';
     }
@@ -445,10 +445,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a tiny integer type.
      *
-     * @param  ColumnInteger  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeTinyInteger(ColumnInteger $column)
+    protected function typeTinyInteger(Integer $column)
     {
         return $column->autoIncrement ? 'smallserial' : 'smallint';
     }
@@ -456,10 +456,10 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a small integer type.
      *
-     * @param  ColumnInteger  $column
+     * @param  \Illuminate\Database\Schema\Columns\Integer  $column
      * @return string
      */
-    protected function typeSmallInteger(ColumnInteger $column)
+    protected function typeSmallInteger(Integer $column)
     {
         return $column->autoIncrement ? 'smallserial' : 'smallint';
     }
@@ -467,7 +467,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a float type.
      *
-     * @param  Decimal  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
     protected function typeFloat(Decimal $column)
@@ -478,7 +478,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a double type.
      *
-     * @param  Decimal  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
     protected function typeDouble(Decimal $column)
@@ -489,7 +489,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a real type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeReal(Column $column)
@@ -500,7 +500,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a decimal type.
      *
-     * @param  Decimal  $column
+     * @param  \Illuminate\Database\Schema\Columns\Decimal  $column
      * @return string
      */
     protected function typeDecimal(Decimal $column)
@@ -511,7 +511,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a boolean type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeBoolean(Column $column)
@@ -522,7 +522,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for an enumeration type.
      *
-     * @param  Enum  $column
+     * @param  \Illuminate\Database\Schema\Columns\Enum  $column
      * @return string
      */
     protected function typeEnum(Enum $column)
@@ -537,7 +537,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a json type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeJson(Column $column)
@@ -548,7 +548,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a jsonb type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeJsonb(Column $column)
@@ -559,7 +559,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeDate(Column $column)
@@ -570,7 +570,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date-time type.
      *
-     * @param  Time  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
     protected function typeDateTime(Time $column)
@@ -581,7 +581,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date-time (with time zone) type.
      *
-     * @param  Time  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
     protected function typeDateTimeTz(Time $column)
@@ -592,7 +592,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a time type.
      *
-     * @param  Time  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
     protected function typeTime(Time $column)
@@ -603,7 +603,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a time (with time zone) type.
      *
-     * @param  Time  $column
+     * @param  \Illuminate\Database\Schema\Columns\Time  $column
      * @return string
      */
     protected function typeTimeTz(Time $column)
@@ -614,7 +614,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a timestamp type.
      *
-     * @param  Timestamp  $column
+     * @param  \Illuminate\Database\Schema\Columns\Timestamp  $column
      * @return string
      */
     protected function typeTimestamp(Timestamp $column)
@@ -627,7 +627,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a timestamp (with time zone) type.
      *
-     * @param  Timestamp  $column
+     * @param  \Illuminate\Database\Schema\Columns\Timestamp  $column
      * @return string
      */
     protected function typeTimestampTz(Timestamp $column)
@@ -640,7 +640,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a year type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeYear(Column $column)
@@ -651,7 +651,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a binary type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeBinary(Column $column)
@@ -662,7 +662,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a uuid type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeUuid(Column $column)
@@ -673,7 +673,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for an IP address type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeIpAddress(Column $column)
@@ -684,7 +684,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a MAC address type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeMacAddress(Column $column)
@@ -695,7 +695,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial Geometry type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @throws \RuntimeException
      */
     protected function typeGeometry(Column $column)
@@ -706,7 +706,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial Point type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typePoint(Column $column)
@@ -717,7 +717,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial LineString type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeLineString(Column $column)
@@ -728,7 +728,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial Polygon type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typePolygon(Column $column)
@@ -739,7 +739,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial GeometryCollection type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeGeometryCollection(Column $column)
@@ -750,7 +750,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPoint type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeMultiPoint(Column $column)
@@ -761,7 +761,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiLineString type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     public function typeMultiLineString(Column $column)
@@ -772,7 +772,7 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPolygon type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function typeMultiPolygon(Column $column)
@@ -795,7 +795,7 @@ class PostgresGrammar extends Grammar
      * Get the SQL for a nullable column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
     protected function modifyNullable(Blueprint $blueprint, Column $column)
@@ -807,7 +807,7 @@ class PostgresGrammar extends Grammar
      * Get the SQL for a default column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
     protected function modifyDefault(Blueprint $blueprint, Column $column)
@@ -821,12 +821,12 @@ class PostgresGrammar extends Grammar
      * Get the SQL for an auto-increment column modifier.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  ColumnInteger  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string|null
      */
-    protected function modifyIncrement(Blueprint $blueprint, ColumnInteger $column)
+    protected function modifyIncrement(Blueprint $blueprint, Column $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if ($this->isColumnSerial($column) && $column->autoIncrement) {
             return ' primary key';
         }
     }

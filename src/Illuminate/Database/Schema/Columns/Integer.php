@@ -53,7 +53,7 @@ class Integer extends Column
      *
      * @return \Illuminate\Database\Schema\Columns\Integer
      */
-    public function autoIncrement(): \Illuminate\Database\Schema\Columns\Integer
+    public function autoIncrement(): Integer
     {
         $this->autoIncrement = true;
         return $this;
@@ -64,7 +64,7 @@ class Integer extends Column
      *
      * @return \Illuminate\Database\Schema\Columns\Integer
      */
-    public function unsigned(): \Illuminate\Database\Schema\Columns\Integer
+    public function unsigned(): Integer
     {
         $this->unsigned = true;
         return $this;

@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use Illuminate\Database\Schema\Columns\Column;
+use Illuminate\Database\Schema\Columns\Integer;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\TableDiff;
 use Illuminate\Database\Connection;
@@ -28,12 +29,20 @@ abstract class Grammar extends BaseGrammar
     protected $fluentCommands = [];
 
     /**
+     * The possible column serials.
+     *
+     * @var string[]
+     */
+    protected $serials = [];
+
+    /**
      * Compile a rename column command.
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
      * @param  \Illuminate\Database\Connection  $connection
      * @return array
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function compileRenameColumn(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
@@ -45,10 +54,11 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
      * @param  \Illuminate\Support\Fluent  $command
-     * @param  \Illuminate\Database\Connection $connection
+     * @param  \Illuminate\Database\Connection  $connection
      * @return array
      *
      * @throws \RuntimeException
+     * @throws \Doctrine\DBAL\DBALException
      */
     public function compileChange(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
@@ -120,7 +130,7 @@ abstract class Grammar extends BaseGrammar
     /**
      * Get the SQL for the column data type.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function getType(Column $column)
@@ -133,7 +143,7 @@ abstract class Grammar extends BaseGrammar
      *
      * @param  string  $sql
      * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return string
      */
     protected function addModifiers($sql, Blueprint $blueprint, Column $column)
@@ -233,6 +243,15 @@ abstract class Grammar extends BaseGrammar
         return is_bool($value)
                     ? "'".(int) $value."'"
                     : "'".(string) $value."'";
+    }
+
+    /**
+     * @param \Illuminate\Database\Schema\Columns\Column $column
+     * @return bool
+     */
+    protected function isColumnSerial(Column $column): bool
+    {
+        return $column instanceof Integer && in_array($column->type, $this->serials);
     }
 
     /**

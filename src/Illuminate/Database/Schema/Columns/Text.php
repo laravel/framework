@@ -7,18 +7,18 @@ namespace Illuminate\Database\Schema\Columns;
  *
  * @property-read string $charset
  * @property-read string $collation
- * @method Text after(string $column)
- * @method Text comment(string $comment)
- * @method Text default(mixed $default)
- * @method Text first()
- * @method Text nullable(bool $value = true)
- * @method Text storedAs(string $expression)
- * @method Text virtualAs(string $expression)
- * @method Text change()
- * @method Text primary(?string $name = null)
- * @method Text unique(?string $name = null)
- * @method Text index(?string $name = null)
- * @method Text spatialIndex(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text after(string $column)
+ * @method \Illuminate\Database\Schema\Columns\Text comment(string $comment)
+ * @method \Illuminate\Database\Schema\Columns\Text default(mixed $default)
+ * @method \Illuminate\Database\Schema\Columns\Text first()
+ * @method \Illuminate\Database\Schema\Columns\Text nullable(bool $value = true)
+ * @method \Illuminate\Database\Schema\Columns\Text storedAs(string $expression)
+ * @method \Illuminate\Database\Schema\Columns\Text virtualAs(string $expression)
+ * @method \Illuminate\Database\Schema\Columns\Text change()
+ * @method \Illuminate\Database\Schema\Columns\Text primary(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text unique(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text index(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Text spatialIndex(?string $name = null)
  */
 class Text extends Column
 {
@@ -36,7 +36,7 @@ class Text extends Column
      * Specify a character set for the column (MySQL)
      *
      * @param string $charset
-     * @return Text
+     * @return \Illuminate\Database\Schema\Columns\Text
      */
     public function charset(string $charset): Text
     {
@@ -48,7 +48,7 @@ class Text extends Column
      * Specify a collation for the column (MySQL/SQL Server)
      *
      * @param string $value
-     * @return Text
+     * @return \Illuminate\Database\Schema\Columns\Text
      */
     public function collation(string $value): Text
     {

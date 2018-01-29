@@ -97,7 +97,7 @@ class ChangeColumn
      * Get the Doctrine column instance for a column change.
      *
      * @param  \Doctrine\DBAL\Schema\Table $table
-     * @param  Column $column
+     * @param  \Illuminate\Database\Schema\Columns\Column $column
      * @return \Doctrine\DBAL\Schema\Column
      * @throws \Doctrine\DBAL\Schema\SchemaException
      */
@@ -111,7 +111,7 @@ class ChangeColumn
     /**
      * Get the Doctrine column change options.
      *
-     * @param  Column  $column
+     * @param  \Illuminate\Database\Schema\Columns\Column  $column
      * @return array
      */
     protected static function getDoctrineColumnChangeOptions(Column $column)

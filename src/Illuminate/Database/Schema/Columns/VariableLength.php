@@ -3,11 +3,12 @@
 namespace Illuminate\Database\Schema\Columns;
 
 /**
- * Class CharString
+ * Class VariableLength
  *
+ * This class is used to store params of columns created by Blueprint::char and Blueprint::string methods
  * @property-read int $length
  */
-class CharString extends Text
+class VariableLength extends Text
 {
     /**
      * @var int
@@ -15,7 +16,7 @@ class CharString extends Text
     protected $length;
 
     /**
-     * CharString constructor.
+     * VariableLength constructor.
      *
      * @param string $type
      * @param string $name

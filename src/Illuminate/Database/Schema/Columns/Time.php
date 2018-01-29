@@ -5,6 +5,8 @@ namespace Illuminate\Database\Schema\Columns;
 /**
  * Class Time
  *
+ * This class is used to store params of columns containing time and created by
+ * Blueprint::time, Blueprint::timeTz, Blueprint::dateTime, Blueprint::dateTimeTz methods
  * @property-read int $precision
  */
 class Time extends Column

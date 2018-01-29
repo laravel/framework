@@ -8,18 +8,18 @@ namespace Illuminate\Database\Schema\Columns;
  * @property-read int|null $total
  * @property-read int|null $places
  * @property-read bool $unsigned
- * @method Decimal after(string $column)
- * @method Decimal comment(string $comment)
- * @method Decimal default(mixed $default)
- * @method Decimal first()
- * @method Decimal nullable(bool $value = true)
- * @method Decimal storedAs(string $expression)
- * @method Decimal virtualAs(string $expression)
- * @method Decimal change()
- * @method Decimal primary(?string $name = null)
- * @method Decimal unique(?string $name = null)
- * @method Decimal index(?string $name = null)
- * @method Decimal spatialIndex(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal after(string $column)
+ * @method \Illuminate\Database\Schema\Columns\Decimal comment(string $comment)
+ * @method \Illuminate\Database\Schema\Columns\Decimal default(mixed $default)
+ * @method \Illuminate\Database\Schema\Columns\Decimal first()
+ * @method \Illuminate\Database\Schema\Columns\Decimal nullable(bool $value = true)
+ * @method \Illuminate\Database\Schema\Columns\Decimal storedAs(string $expression)
+ * @method \Illuminate\Database\Schema\Columns\Decimal virtualAs(string $expression)
+ * @method \Illuminate\Database\Schema\Columns\Decimal change()
+ * @method \Illuminate\Database\Schema\Columns\Decimal primary(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal unique(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal index(?string $name = null)
+ * @method \Illuminate\Database\Schema\Columns\Decimal spatialIndex(?string $name = null)
  */
 class Decimal extends Column
 {
@@ -57,7 +57,7 @@ class Decimal extends Column
     /**
      * Set INTEGER columns as UNSIGNED (MySQL)
      *
-     * @return Decimal
+     * @return \Illuminate\Database\Schema\Columns\Decimal
      */
     public function unsigned(): Decimal
     {
