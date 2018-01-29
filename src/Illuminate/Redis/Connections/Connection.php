@@ -109,7 +109,14 @@ abstract class Connection
      */
     public function command($method, array $parameters = [])
     {
-        return $this->client->{$method}(...$parameters);
+        $start = microtime(true);
+        $result = $this->client->{$method}(...$parameters);
+        $time = round((microtime(true) - $start) * 1000, 2);
+
+        $this->event(new QueryExecuted($method, $parameters, $time, $this));
+
+        return $result;
+    }
 
     /**
      * Fire the given event if possible.
