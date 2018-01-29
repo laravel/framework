@@ -4,6 +4,7 @@ namespace Illuminate\Redis;
 
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\Connection;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -67,7 +68,9 @@ class RedisManager implements Factory
             return $this->connections[$name];
         }
 
-        return $this->connections[$name] = $this->resolve($name);
+        return $this->connections[$name] = $this->configure(
+            $this->resolve($name), $name
+        );
     }
 
     /**
@@ -125,6 +128,20 @@ class RedisManager implements Factory
             case 'phpredis':
                 return new Connectors\PhpRedisConnector;
         }
+    }
+
+    /**
+     * Get the connector instance for the current driver.
+     *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @param  string  $name
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function configure(Connection $connection, $name)
+    {
+        $connection->setName($name);
+
+        return $connection;
     }
 
     /**
