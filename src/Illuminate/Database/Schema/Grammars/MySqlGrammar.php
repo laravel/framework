@@ -215,6 +215,10 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
+        if (strlen($command->index) > 64) {
+            $command->index = substr($command->index, 0, 64);
+        }
+
         return sprintf('alter table %s add %s %s%s(%s)',
             $this->wrapTable($blueprint),
             $type,
