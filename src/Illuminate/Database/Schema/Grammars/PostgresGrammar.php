@@ -126,6 +126,10 @@ class PostgresGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
+        if (strlen($command->index) > 63) {
+            $command->index = substr($command->index, 0, 63);
+        }
+
         return sprintf('create index %s on %s%s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
