@@ -177,7 +177,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $parent = new EloquentBelongsToModelStub();
         $parent->_relation = $this->getRelation($parent, false);
-        $this->related->shouldReceive('getKey')->andReturn('another.foreign.value');
+        $this->related->shouldReceive('getAttribute')->with('id')->andReturn('another.foreign.value');
         $parent->relation = $this->related;
 
         $this->assertEquals('another.foreign.value', $parent->getAttribute('foreign_key'));

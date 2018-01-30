@@ -563,10 +563,6 @@ trait HasAttributes
      */
     public function setRelationValue($key, $value)
     {
-        if ($value instanceof Model) {
-            $value = $value->getKey();
-        }
-
         $relation = $this->$key();
 
         if (! $relation instanceof BelongsTo) {
@@ -574,7 +570,7 @@ trait HasAttributes
             throw new LogicException(get_class($this).'::'.$key.' must return a \'belongs-to\'relationship instance.');
         }
 
-        $this->setAttribute($relation->getForeignKey(), $value);
+        $relation->associate($value);
 
         return $this;
     }
