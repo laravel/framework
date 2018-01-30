@@ -32,7 +32,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
         $this->ifRedisAvailable(function () {
             Carbon::setTestNow(null);
 
-            resolve('redis')->flushAll();
+            $this->app['redis']->flushAll();
 
             Route::get('/', function () {
                 return 'yes';
