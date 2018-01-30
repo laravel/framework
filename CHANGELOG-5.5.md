@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.33 (2018-01-30)
 
 ### Added
 - Added `notExists()` method to query builder ([#22836](https://github.com/laravel/framework/pull/22836), [9d2a7ca](https://github.com/laravel/framework/commit/9d2a7ca049e71d39e453ba8c34addb657b71b237))
