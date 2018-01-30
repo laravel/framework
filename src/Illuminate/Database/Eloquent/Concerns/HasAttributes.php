@@ -80,6 +80,13 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
+     * Caches the keys that have been already checked for a relationship
+     *
+     * @var array
+     */
+    private $dontSetRelationValue = [];
+
+    /**
      * Convert the model's attributes to an array.
      *
      * @return array
@@ -534,8 +541,14 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
-        if (method_exists($this, $key)) {
-            return $this->setRelationValue($key, $value);
+        if (! in_array($key, $this->dontSetRelationValue) && method_exists($this, $key)) {
+            $this->dontSetRelationValue[] = $key;
+
+            try {
+                return $this->setRelationValue($key, $value);
+            } catch (LogicException $e) {
+                // ignore.
+            }
         }
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
@@ -557,6 +570,8 @@ trait HasAttributes
     /**
      * Set a given foreign model by mapping it's primary key to this model's foreign key.
      *
+     * This only works to "belongs-to" and "morphs-to" relationships.
+     *
      * @param  string  $key
      * @param  Model|mixed  $value
      * @return $this
@@ -566,7 +581,6 @@ trait HasAttributes
         $relation = $this->$key();
 
         if (! $relation instanceof BelongsTo) {
-            // maybe just ignore the value or continue the parent call?
             throw new LogicException(get_class($this).'::'.$key.' must return a \'belongs-to\'relationship instance.');
         }
 
