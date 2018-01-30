@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\RedisManager;
 use Illuminate\Foundation\Application;
@@ -571,6 +572,29 @@ class RedisConnectionTest extends TestCase
             );
 
             $redis->flushall();
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function it_dispatches_query_event()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+
+            $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
+                $this->assertEquals('get', $event->command);
+                $this->assertEquals(['foobar'], $event->parameters);
+                $this->assertEquals('default', $event->connectionName);
+                $this->assertInstanceOf('\Illuminate\Redis\Connections\Connection', $event->connection);
+
+                return true;
+            }));
+
+            $redis->get('foobar');
+
+            $redis->unsetEventDispatcher();
         }
     }
 

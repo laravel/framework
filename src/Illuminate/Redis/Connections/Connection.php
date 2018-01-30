@@ -187,6 +187,16 @@ abstract class Connection
     }
 
     /**
+     * Unset the event dispatcher instance on the connection.
+     *
+     * @return void
+     */
+    public function unsetEventDispatcher()
+    {
+        $this->events = null;
+    }
+
+    /**
      * Pass other method calls down to the underlying client.
      *
      * @param  string  $method
