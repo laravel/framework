@@ -175,7 +175,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     public function testModelKeyDirectlyMapsToOwnersForeignKey()
     {
-        $parent = new EloquentBelongsToModelStub();
+        $parent = new EloquentBelongsToModelStubWithRelation();
         $parent->_relation = $this->getRelation($parent, false);
         $this->related->shouldReceive('getAttribute')->with('id')->andReturn('another.foreign.value');
         $parent->relation = $this->related;
@@ -203,13 +203,6 @@ class DatabaseEloquentBelongsToTest extends TestCase
 class EloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model
 {
     public $foreign_key = 'foreign.value';
-
-    public $_relation;
-
-    public function relation()
-    {
-        return $this->_relation;
-    }
 }
 
 class AnotherEloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model
@@ -225,4 +218,18 @@ class EloquentBelongsToModelStubWithZeroId extends \Illuminate\Database\Eloquent
 class MissingEloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model
 {
     public $foreign_key;
+}
+
+class EloquentBelongsToModelStubWithRelation extends \Illuminate\Database\Eloquent\Model
+{
+    public $_relation;
+
+    protected $attributes = [
+        'foreign_key' => 'foreign.value',
+    ];
+
+    public function relation()
+    {
+        return $this->_relation;
+    }
 }
