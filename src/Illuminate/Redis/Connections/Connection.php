@@ -113,7 +113,9 @@ abstract class Connection
         $result = $this->client->{$method}(...$parameters);
         $time = round((microtime(true) - $start) * 1000, 2);
 
-        $this->event(new QueryExecuted($method, $parameters, $time, $this));
+        if (isset($this->events)) {
+            $this->event(new QueryExecuted($method, $parameters, $time, $this));
+        }
 
         return $result;
     }
