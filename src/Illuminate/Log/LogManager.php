@@ -557,7 +557,7 @@ class LogManager implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        return $this->driver()->log($message, $context);
+        return $this->driver()->log($level, $message, $context);
     }
 
     /**
