@@ -215,7 +215,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
-        if ($type === 'index' && strlen($command->index) > 64) {
+        if (strlen($command->index) > 64) {
             $command->index = substr($command->index, 0, 64);
         }
 
