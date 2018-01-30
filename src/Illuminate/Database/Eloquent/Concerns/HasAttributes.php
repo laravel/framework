@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -532,6 +534,10 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
+        if (method_exists($this, $key)) {
+            return $this->setRelationValue($key, $value);
+        }
+
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
@@ -544,6 +550,31 @@ trait HasAttributes
         }
 
         $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set a given foreign model by mapping it's primary key to this model's foreign key.
+     *
+     * @param  string  $key
+     * @param  Model|mixed  $value
+     * @return $this
+     */
+    public function setRelationValue($key, $value)
+    {
+        if ($value instanceof Model) {
+            $value = $value->getKey();
+        }
+
+        $relation = $this->$key();
+
+        if (! $relation instanceof BelongsTo) {
+            // maybe just ignore the value or continue the parent call?
+            throw new LogicException(get_class($this).'::'.$key.' must return a \'belongs-to\'relationship instance.');
+        }
+
+        $this->setAttribute($relation->getForeignKey(), $value);
 
         return $this;
     }
