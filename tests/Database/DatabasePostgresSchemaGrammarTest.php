@@ -213,6 +213,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
+    public function testAddingLongIndex()
+    {
+        $this->expectException(\RuntimeException::class);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar', 'baz', 'quux', 'thud', 'grunt', 'fum', 'corge', 'grault', 'flarp', 'zxc', 'spqr', 'wombat']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(0, $statements);
+    }
+
     public function testAddingIndexWithAlgorithm()
     {
         $blueprint = new Blueprint('users');
