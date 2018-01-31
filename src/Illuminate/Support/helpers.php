@@ -563,6 +563,22 @@ if (! function_exists('dd')) {
     }
 }
 
+if (! function_exists('dd_if')) {
+    /**
+     * Dump the passed variables and end the script  if the given condition is true.
+     *
+     * @param  bool   $boolean
+     * @param  mixed  $args
+     * @return void
+     */
+    function dd_if($boolean, ...$args)
+    {
+        if ($boolean) {
+            dd(...$args);
+        }
+    }
+}
+
 if (! function_exists('e')) {
     /**
      * Escape HTML special characters in a string.
