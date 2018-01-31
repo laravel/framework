@@ -544,13 +544,18 @@ trait HasAttributes
         if (empty($this->dontSetRelationValue[$key]) && method_exists($this, $key)) {
             $this->dontSetRelationValue[$key] = true;
 
-            try {
-                $this->setRelationValue($key, $value);
-                $this->dontSetRelationValue[$key] = false;
+            // Here we will determine if the model base class itself contains this given key
+            // since we don't want to treat any of those methods as relationships because
+            // they are all intended as helper methods and none of these are relations.
+            if (! method_exists(self::class, $key)) {
+                try {
+                    $this->setRelationValue($key, $value);
+                    $this->dontSetRelationValue[$key] = false;
 
-                return $this;
-            } catch (LogicException $e) {
-                // ignore.
+                    return $this;
+                } catch (LogicException $e) {
+                    // ignore.
+                }
             }
         }
 
@@ -581,13 +586,6 @@ trait HasAttributes
      */
     public function setRelationValue($key, $value)
     {
-        // Here we will determine if the model base class itself contains this given key
-        // since we don't want to treat any of those methods as relationships because
-        // they are all intended as helper methods and none of these are relations.
-        if (method_exists(self::class, $key)) {
-            return $this;
-        }
-
         $relation = $this->$key();
 
         if (! $relation instanceof BelongsTo) {
