@@ -7,7 +7,6 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
@@ -578,10 +577,10 @@ trait HasAttributes
     /**
      * Set a given foreign model by mapping it's primary key to this model's foreign key.
      *
-     * This only works to "belongs-to" and "morphs-to" relationships.
+     * This only works with "belongs-to" and "morphs-to" relationships.
      *
      * @param  string  $key
-     * @param  Model|mixed  $value
+     * @param  mixed  $value
      * @return $this
      */
     public function setRelationValue($key, $value)
