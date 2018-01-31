@@ -131,6 +131,10 @@ class ContainerTest extends TestCase
         $this->assertEquals('bar', $container->make('foo'));
         $this->assertEquals('bar', $container->make('baz'));
         $this->assertEquals('bar', $container->make('bat'));
+
+        $container->alias('foo', ['foo1', 'foo2']);
+        $this->assertEquals('bar', $container->make('foo1'));
+        $this->assertEquals('bar', $container->make('foo2'));
     }
 
     public function testAliasesWithArrayOfParameters()

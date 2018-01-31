@@ -19,10 +19,10 @@ interface Container extends ContainerInterface
      * Alias a type to a different name.
      *
      * @param  string  $abstract
-     * @param  string  $alias
+     * @param  string|array  $aliases
      * @return void
      */
-    public function alias($abstract, $alias);
+    public function alias($abstract, $aliases);
 
     /**
      * Assign a set of tags to a given binding.
