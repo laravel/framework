@@ -320,12 +320,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function testAddingLongIndex()
     {
+        $this->expectException(\RuntimeException::class);
+
         $blueprint = new Blueprint('users');
         $blueprint->index(['foo', 'bar', 'baz', 'quux', 'thud', 'grunt', 'fum', 'corge', 'grault', 'flarp', 'zxc', 'spqr', 'wombat']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add index `users_foo_bar_baz_quux_thud_grunt_fum_corge_grault_flarp_zxc_spq`(`foo`, `bar`, `baz`, `quux`, `thud`, `grunt`, `fum`, `corge`, `grault`, `flarp`, `zxc`, `spqr`, `wombat`)', $statements[0]);
+        $this->assertCount(0, $statements);
     }
 
     public function testAddingSpatialIndex()

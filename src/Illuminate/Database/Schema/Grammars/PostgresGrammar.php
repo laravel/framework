@@ -127,7 +127,7 @@ class PostgresGrammar extends Grammar
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
         if (strlen($command->index) > 63) {
-            $command->index = substr($command->index, 0, 63);
+            throw new \RunTimeException("Generated index names longer than 63 characters are not supported. Please provide a name for this index.");
         }
 
         return sprintf('create index %s on %s%s (%s)',
