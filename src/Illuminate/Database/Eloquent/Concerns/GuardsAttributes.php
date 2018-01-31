@@ -144,11 +144,6 @@ trait GuardsAttributes
             return true;
         }
 
-        // If there's a method, chances are it's a relationship.
-        if (method_exists($this, $key)) {
-            return true;
-        }
-
         // If the attribute is explicitly listed in the "guarded" array then we can
         // return false immediately. This means this attribute is definitely not
         // fillable and there is no point in going any further in this method.
