@@ -215,6 +215,10 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
+        if (strlen($command->index) > 64) {
+            throw new \RunTimeException("Index names longer than 64 characters are not supported by MySQL.");
+        }
+
         return sprintf('alter table %s add %s %s%s(%s)',
             $this->wrapTable($blueprint),
             $type,

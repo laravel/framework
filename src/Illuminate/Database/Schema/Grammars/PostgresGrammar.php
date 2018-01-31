@@ -126,6 +126,10 @@ class PostgresGrammar extends Grammar
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
     {
+        if (strlen($command->index) > 63) {
+            throw new \RunTimeException("Index names longer than 63 characters are not supported by Postgres.");
+        }
+
         return sprintf('create index %s on %s%s (%s)',
             $this->wrap($command->index),
             $this->wrapTable($blueprint),
