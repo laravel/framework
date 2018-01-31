@@ -466,14 +466,16 @@ class Container implements ArrayAccess, ContainerContract
      * Alias a type to a different name.
      *
      * @param  string  $abstract
-     * @param  string  $alias
+     * @param  string|array  $aliases
      * @return void
      */
-    public function alias($abstract, $alias)
+    public function alias($abstract, $aliases)
     {
-        $this->aliases[$alias] = $abstract;
+        foreach ((array) $aliases as $alias) {
+            $this->aliases[$alias] = $abstract;
 
-        $this->abstractAliases[$abstract][] = $alias;
+            $this->abstractAliases[$abstract][] = $alias;
+        }
     }
 
     /**
