@@ -2,16 +2,16 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
@@ -80,7 +80,7 @@ trait HasAttributes
     protected static $mutatorCache = [];
 
     /**
-     * Caches the keys that have been already checked for a relationship
+     * Caches the keys that have been already checked for a relationship.
      *
      * @var array
      */
@@ -541,11 +541,14 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
-        if (! in_array($key, $this->dontSetRelationValue) && method_exists($this, $key)) {
-            $this->dontSetRelationValue[] = $key;
+        if (empty($this->dontSetRelationValue[$key]) && method_exists($this, $key)) {
+            $this->dontSetRelationValue[$key] = true;
 
             try {
-                return $this->setRelationValue($key, $value);
+                $this->setRelationValue($key, $value);
+                $this->dontSetRelationValue[$key] = false;
+
+                return $this;
             } catch (LogicException $e) {
                 // ignore.
             }
