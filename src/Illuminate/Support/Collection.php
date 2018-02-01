@@ -428,7 +428,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($value) {
             return $callback($this, $value);
-        } elseif ($default) {
+        }
+        
+        if ($default) {
             return $default($this, $value);
         }
 
@@ -1622,9 +1624,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return array_map(function ($value) {
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
-            } elseif ($value instanceof Jsonable) {
+            }
+            
+            if ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
-            } elseif ($value instanceof Arrayable) {
+            }
+            
+            if ($value instanceof Arrayable) {
                 return $value->toArray();
             }
 
@@ -1753,15 +1759,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (is_array($items)) {
             return $items;
-        } elseif ($items instanceof self) {
+        }
+        
+        if ($items instanceof self) {
             return $items->all();
-        } elseif ($items instanceof Arrayable) {
+        }
+        
+        if ($items instanceof Arrayable) {
             return $items->toArray();
-        } elseif ($items instanceof Jsonable) {
+        }
+        
+        if ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
-        } elseif ($items instanceof JsonSerializable) {
+        }
+        
+        if ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
-        } elseif ($items instanceof Traversable) {
+        }
+        
+        if ($items instanceof Traversable) {
             return iterator_to_array($items);
         }
 

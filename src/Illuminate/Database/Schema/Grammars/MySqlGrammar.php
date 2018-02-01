@@ -134,7 +134,9 @@ class MySqlGrammar extends Grammar
     {
         if (isset($blueprint->engine)) {
             return $sql.' engine = '.$blueprint->engine;
-        } elseif (! is_null($engine = $connection->getConfig('engine'))) {
+        }
+
+        if (! is_null($engine = $connection->getConfig('engine'))) {
             return $sql.' engine = '.$engine;
         }
 

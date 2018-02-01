@@ -182,9 +182,13 @@ trait FormatsMessages
         // list doesn't have it we'll just consider it a string by elimination.
         if ($this->hasRule($attribute, $this->numericRules)) {
             return 'numeric';
-        } elseif ($this->hasRule($attribute, ['Array'])) {
+        }
+
+        if ($this->hasRule($attribute, ['Array'])) {
             return 'array';
-        } elseif ($this->getValue($attribute) instanceof UploadedFile) {
+        }
+
+        if ($this->getValue($attribute) instanceof UploadedFile) {
             return 'file';
         }
 
@@ -210,7 +214,9 @@ trait FormatsMessages
 
         if (isset($this->replacers[Str::snake($rule)])) {
             return $this->callReplacer($message, $attribute, Str::snake($rule), $parameters, $this);
-        } elseif (method_exists($this, $replacer = "replace{$rule}")) {
+        }
+
+        if (method_exists($this, $replacer = "replace{$rule}")) {
             return $this->$replacer($message, $attribute, $rule, $parameters);
         }
 
@@ -359,7 +365,9 @@ trait FormatsMessages
 
         if ($callback instanceof Closure) {
             return call_user_func_array($callback, func_get_args());
-        } elseif (is_string($callback)) {
+        }
+
+        if (is_string($callback)) {
             return $this->callClassBasedReplacer($callback, $message, $attribute, $rule, $parameters, $validator);
         }
     }

@@ -77,7 +77,9 @@ trait ManagesEvents
             $this->addEventListener($prefix.$view, $callback);
 
             return $callback;
-        } elseif (is_string($callback)) {
+        }
+
+        if (is_string($callback)) {
             return $this->addClassEvent($view, $callback, $prefix);
         }
     }

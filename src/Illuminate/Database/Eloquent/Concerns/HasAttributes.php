@@ -1055,12 +1055,18 @@ trait HasAttributes
 
         if ($current === $original) {
             return true;
-        } elseif (is_null($current)) {
+        }
+
+        if (is_null($current)) {
             return false;
-        } elseif ($this->isDateAttribute($key)) {
+        }
+
+        if ($this->isDateAttribute($key)) {
             return $this->fromDateTime($current) ===
                    $this->fromDateTime($original);
-        } elseif ($this->hasCast($key)) {
+        }
+
+        if ($this->hasCast($key)) {
             return $this->castAttribute($key, $current) ===
                    $this->castAttribute($key, $original);
         }

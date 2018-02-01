@@ -73,9 +73,13 @@ class MessageSelector
 
             if ($to == '*' && $number >= $from) {
                 return $value;
-            } elseif ($from == '*' && $number <= $to) {
+            }
+
+            if ($from == '*' && $number <= $to) {
                 return $value;
-            } elseif ($number >= $from && $number <= $to) {
+            }
+
+            if ($number >= $from && $number <= $to) {
                 return $value;
             }
         }

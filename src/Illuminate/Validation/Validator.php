@@ -1101,7 +1101,9 @@ class Validator implements ValidatorContract
 
         if (is_callable($callback)) {
             return call_user_func_array($callback, $parameters);
-        } elseif (is_string($callback)) {
+        }
+        
+        if (is_string($callback)) {
             return $this->callClassBasedExtension($callback, $parameters);
         }
     }

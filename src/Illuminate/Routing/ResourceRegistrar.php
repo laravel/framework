@@ -148,7 +148,9 @@ class ResourceRegistrar
     {
         if (isset($options['only'])) {
             return array_intersect($defaults, (array) $options['only']);
-        } elseif (isset($options['except'])) {
+        }
+
+        if (isset($options['except'])) {
             return array_diff($defaults, (array) $options['except']);
         }
 
@@ -433,8 +435,8 @@ class ResourceRegistrar
     {
         if (empty($verbs)) {
             return static::$verbs;
-        } else {
-            static::$verbs = array_merge(static::$verbs, $verbs);
         }
+
+        static::$verbs = array_merge(static::$verbs, $verbs);
     }
 }

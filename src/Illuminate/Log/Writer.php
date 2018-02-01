@@ -306,9 +306,13 @@ class Writer implements LogContract, PsrLoggerInterface
     {
         if (is_array($message)) {
             return var_export($message, true);
-        } elseif ($message instanceof Jsonable) {
+        }
+
+        if ($message instanceof Jsonable) {
             return $message->toJson();
-        } elseif ($message instanceof Arrayable) {
+        }
+
+        if ($message instanceof Arrayable) {
             return var_export($message->toArray(), true);
         }
 

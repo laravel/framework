@@ -1080,11 +1080,17 @@ trait ValidatesAttributes
     {
         if (is_null($value)) {
             return false;
-        } elseif (is_string($value) && trim($value) === '') {
+        }
+        
+        if (is_string($value) && trim($value) === '') {
             return false;
-        } elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
+        }
+        
+        if ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
             return false;
-        } elseif ($value instanceof File) {
+        }
+        
+        if ($value instanceof File) {
             return (string) $value->getPath() !== '';
         }
 
@@ -1129,7 +1135,9 @@ trait ValidatesAttributes
         return array_map(function ($value) {
             if ($value === 'true') {
                 return true;
-            } elseif ($value === 'false') {
+            }
+            
+            if ($value === 'false') {
                 return false;
             }
 
@@ -1392,9 +1400,13 @@ trait ValidatesAttributes
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
             return $value;
-        } elseif (is_array($value)) {
+        }
+        
+        if (is_array($value)) {
             return count($value);
-        } elseif ($value instanceof File) {
+        }
+        
+        if ($value instanceof File) {
             return $value->getSize() / 1024;
         }
 
