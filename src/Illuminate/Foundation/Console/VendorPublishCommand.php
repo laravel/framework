@@ -186,7 +186,9 @@ class VendorPublishCommand extends Command
     {
         if ($this->files->isFile($from)) {
             return $this->publishFile($from, $to);
-        } elseif ($this->files->isDirectory($from)) {
+        }
+
+        if ($this->files->isDirectory($from)) {
             return $this->publishDirectory($from, $to);
         }
 

@@ -282,11 +282,13 @@ class Builder
             $query->columns = [$query->columns[0]];
 
             return [$query->toSql(), $query->getBindings()];
-        } elseif (is_string($query)) {
-            return [$query, []];
-        } else {
-            throw new InvalidArgumentException;
         }
+
+        if (is_string($query)) {
+            return [$query, []];
+        }
+
+        throw new InvalidArgumentException;
     }
 
     /**
@@ -587,7 +589,9 @@ class Builder
     {
         if ($useDefault) {
             return [$operator, '='];
-        } elseif ($this->invalidOperatorAndValue($operator, $value)) {
+        }
+
+        if ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
 
@@ -1769,9 +1773,13 @@ class Builder
         // just return the count of the entire results set since that will be correct.
         if (isset($this->groups)) {
             return count($results);
-        } elseif (! isset($results[0])) {
+        }
+
+        if (! isset($results[0])) {
             return 0;
-        } elseif (is_object($results[0])) {
+        }
+
+        if (is_object($results[0])) {
             return (int) $results[0]->aggregate;
         }
 

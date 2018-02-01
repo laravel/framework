@@ -208,11 +208,17 @@ abstract class ServiceProvider
     {
         if ($provider && $group) {
             return static::pathsForProviderAndGroup($provider, $group);
-        } elseif ($group && array_key_exists($group, static::$publishGroups)) {
+        }
+
+        if ($group && array_key_exists($group, static::$publishGroups)) {
             return static::$publishGroups[$group];
-        } elseif ($provider && array_key_exists($provider, static::$publishes)) {
+        }
+
+        if ($provider && array_key_exists($provider, static::$publishes)) {
             return static::$publishes[$provider];
-        } elseif ($group || $provider) {
+        }
+
+        if ($group || $provider) {
             return [];
         }
     }

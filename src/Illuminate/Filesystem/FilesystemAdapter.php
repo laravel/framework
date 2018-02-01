@@ -379,15 +379,21 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsUrl($adapter, $path);
-        } elseif ($adapter instanceof RackspaceAdapter) {
-            return $this->getRackspaceUrl($adapter, $path);
-        } elseif ($adapter instanceof LocalAdapter) {
-            return $this->getLocalUrl($path);
-        } else {
-            throw new RuntimeException('This driver does not support retrieving URLs.');
         }
+
+        if ($adapter instanceof AwsS3Adapter) {
+            return $this->getAwsUrl($adapter, $path);
+        }
+
+        if ($adapter instanceof RackspaceAdapter) {
+            return $this->getRackspaceUrl($adapter, $path);
+        }
+
+        if ($adapter instanceof LocalAdapter) {
+            return $this->getLocalUrl($path);
+        }
+
+        throw new RuntimeException('This driver does not support retrieving URLs.');
     }
 
     /**
@@ -470,13 +476,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif ($adapter instanceof AwsS3Adapter) {
-            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
-        } elseif ($adapter instanceof RackspaceAdapter) {
-            return $this->getRackspaceTemporaryUrl($adapter, $path, $expiration, $options);
-        } else {
-            throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
+
+        if ($adapter instanceof AwsS3Adapter) {
+            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
+        }
+
+        if ($adapter instanceof RackspaceAdapter) {
+            return $this->getRackspaceTemporaryUrl($adapter, $path, $expiration, $options);
+        }
+
+        throw new RuntimeException('This driver does not support creating temporary URLs.');
     }
 
     /**
