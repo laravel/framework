@@ -12,7 +12,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Http\Resources\DelegatesToResource;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 
-class Resource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
+class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRoutable
 {
     use ConditionallyLoadsAttributes, DelegatesToResource;
 
