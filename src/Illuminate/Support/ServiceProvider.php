@@ -209,15 +209,15 @@ abstract class ServiceProvider
         if ($provider && $group) {
             return static::pathsForProviderAndGroup($provider, $group);
         }
-        
+
         if ($group && array_key_exists($group, static::$publishGroups)) {
             return static::$publishGroups[$group];
         }
-        
+
         if ($provider && array_key_exists($provider, static::$publishes)) {
             return static::$publishes[$provider];
         }
-        
+
         if ($group || $provider) {
             return [];
         }

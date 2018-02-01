@@ -90,7 +90,7 @@ trait BuildsQueries
         if ($value) {
             return $callback($this, $value) ?: $this;
         }
-        
+
         if ($default) {
             return $default($this, $value) ?: $this;
         }
@@ -122,7 +122,7 @@ trait BuildsQueries
         if (! $value) {
             return $callback($this, $value) ?: $this;
         }
-        
+
         if ($default) {
             return $default($this, $value) ?: $this;
         }

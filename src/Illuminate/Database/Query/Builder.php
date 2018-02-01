@@ -283,11 +283,11 @@ class Builder
 
             return [$query->toSql(), $query->getBindings()];
         }
-        
+
         if (is_string($query)) {
             return [$query, []];
         }
-        
+
         throw new InvalidArgumentException;
     }
 
@@ -590,7 +590,7 @@ class Builder
         if ($useDefault) {
             return [$operator, '='];
         }
-        
+
         if ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }

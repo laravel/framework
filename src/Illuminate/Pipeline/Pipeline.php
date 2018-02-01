@@ -129,8 +129,8 @@ class Pipeline implements PipelineContract
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
-                } 
-                
+                }
+
                 if (! is_object($pipe)) {
                     list($name, $parameters) = $this->parsePipeString($pipe);
 

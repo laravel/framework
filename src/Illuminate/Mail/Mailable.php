@@ -192,7 +192,7 @@ class Mailable implements MailableContract, Renderable
         if (isset($this->view, $this->textView)) {
             return [$this->view, $this->textView];
         }
-        
+
         if (isset($this->textView)) {
             return ['text' => $this->textView];
         }
@@ -525,7 +525,7 @@ class Mailable implements MailableContract, Renderable
         if (is_array($recipient)) {
             return (object) $recipient;
         }
-        
+
         if (is_string($recipient)) {
             return (object) ['email' => $recipient];
         }

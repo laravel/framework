@@ -429,7 +429,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         if ($value) {
             return $callback($this, $value);
         }
-        
+
         if ($default) {
             return $default($this, $value);
         }
@@ -1625,11 +1625,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             if ($value instanceof JsonSerializable) {
                 return $value->jsonSerialize();
             }
-            
+
             if ($value instanceof Jsonable) {
                 return json_decode($value->toJson(), true);
             }
-            
+
             if ($value instanceof Arrayable) {
                 return $value->toArray();
             }
@@ -1760,23 +1760,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         if (is_array($items)) {
             return $items;
         }
-        
+
         if ($items instanceof self) {
             return $items->all();
         }
-        
+
         if ($items instanceof Arrayable) {
             return $items->toArray();
         }
-        
+
         if ($items instanceof Jsonable) {
             return json_decode($items->toJson(), true);
         }
-        
+
         if ($items instanceof JsonSerializable) {
             return $items->jsonSerialize();
         }
-        
+
         if ($items instanceof Traversable) {
             return iterator_to_array($items);
         }

@@ -46,7 +46,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         if (in_array('dblib', $this->getAvailableDrivers())) {
             return $this->getDblibDsn($config);
         }
-        
+
         if ($this->prefersOdbc($config)) {
             return $this->getOdbcDsn($config);
         }
@@ -169,7 +169,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         if (isset($config['port']) && ! empty($config['port'])) {
             return $config['host'].$separator.$config['port'];
         }
-        
+
         return $config['host'];
     }
 

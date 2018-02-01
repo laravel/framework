@@ -40,11 +40,11 @@ class ControllerMakeCommand extends GeneratorCommand
         if ($this->option('parent')) {
             return __DIR__.'/stubs/controller.nested.stub';
         }
-        
+
         if ($this->option('model')) {
             return __DIR__.'/stubs/controller.model.stub';
-        } 
-        
+        }
+
         if ($this->option('resource')) {
             return __DIR__.'/stubs/controller.stub';
         }

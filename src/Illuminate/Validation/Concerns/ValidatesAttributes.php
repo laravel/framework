@@ -1081,15 +1081,15 @@ trait ValidatesAttributes
         if (is_null($value)) {
             return false;
         }
-        
+
         if (is_string($value) && trim($value) === '') {
             return false;
         }
-        
+
         if ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
             return false;
         }
-        
+
         if ($value instanceof File) {
             return (string) $value->getPath() !== '';
         }
@@ -1136,7 +1136,7 @@ trait ValidatesAttributes
             if ($value === 'true') {
                 return true;
             }
-            
+
             if ($value === 'false') {
                 return false;
             }
@@ -1401,11 +1401,11 @@ trait ValidatesAttributes
         if (is_numeric($value) && $hasNumeric) {
             return $value;
         }
-        
+
         if (is_array($value)) {
             return count($value);
         }
-        
+
         if ($value instanceof File) {
             return $value->getSize() / 1024;
         }
