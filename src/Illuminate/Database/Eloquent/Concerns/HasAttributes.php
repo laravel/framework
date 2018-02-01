@@ -190,7 +190,7 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if ($attributes[$key] && Str::startsWith($value, 'date:')) {
+            if ($attributes[$key] && Str::startsWith($value, ['date:', 'datetime:'])) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
         }
@@ -509,7 +509,7 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        if (Str::startsWith($this->getCasts()[$key], 'date:')) {
+        if (Str::startsWith($this->getCasts()[$key], ['date:', 'datetime:'])) {
             return 'custom_datetime';
         }
 
