@@ -107,6 +107,34 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Auth\EloquentProviderUserStub', $model);
     }
 
+    public function testUpdateRememberToken()
+    {
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->exists = true;
+        $user->timestamps = true;
+        $user->shouldReceive('setRememberToken')->with('token')->once();
+        $user->shouldReceive('save')->once();
+        $provider = new EloquentUserProvider($hasher, 'foo');
+
+        $provider->updateRememberToken($user, 'token');
+
+        $this->assertTrue($user->timestamps);
+    }
+
+    public function testUpdateRememberTokenDoesntSaveUserIfItDoesntExist()
+    {
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->exists = false;
+        $user->timestamps = true;
+        $user->shouldReceive('setRememberToken')->with('token')->once();
+        $user->shouldNotReceive('save');
+        $provider = new EloquentUserProvider($hasher, 'foo');
+
+        $provider->updateRememberToken($user, 'token');
+    }
+
     protected function getProviderMock()
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
