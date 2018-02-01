@@ -173,6 +173,16 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
+    public function testModelKeyDirectlyMapsToOwnersForeignKey()
+    {
+        $parent = new EloquentBelongsToModelStubWithRelation();
+        $parent->_relation = $this->getRelation($parent, false);
+        $this->related->shouldReceive('getAttribute')->with('id')->andReturn('another.foreign.value');
+        $parent->relation = $this->related;
+
+        $this->assertEquals('another.foreign.value', $parent->getAttribute('foreign_key'));
+    }
+
     protected function getRelation($parent = null, $incrementing = true, $keyType = 'int')
     {
         $this->builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -208,4 +218,18 @@ class EloquentBelongsToModelStubWithZeroId extends \Illuminate\Database\Eloquent
 class MissingEloquentBelongsToModelStub extends \Illuminate\Database\Eloquent\Model
 {
     public $foreign_key;
+}
+
+class EloquentBelongsToModelStubWithRelation extends \Illuminate\Database\Eloquent\Model
+{
+    public $_relation;
+
+    protected $attributes = [
+        'foreign_key' => 'foreign.value',
+    ];
+
+    public function relation()
+    {
+        return $this->_relation;
+    }
 }

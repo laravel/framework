@@ -10,6 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
@@ -76,6 +77,13 @@ trait HasAttributes
      * @var array
      */
     protected static $mutatorCache = [];
+
+    /**
+     * Caches the keys that have been already checked for a relationship.
+     *
+     * @var array
+     */
+    private $dontSetRelationValue = [];
 
     /**
      * Convert the model's attributes to an array.
@@ -532,6 +540,24 @@ trait HasAttributes
             $value = $this->fromDateTime($value);
         }
 
+        if (empty($this->dontSetRelationValue[$key]) && method_exists($this, $key)) {
+            $this->dontSetRelationValue[$key] = true;
+
+            // Here we will determine if the model base class itself contains this given key
+            // since we don't want to treat any of those methods as relationships because
+            // they are all intended as helper methods and none of these are relations.
+            if (! method_exists(self::class, $key)) {
+                try {
+                    $this->setRelationValue($key, $value);
+                    $this->dontSetRelationValue[$key] = false;
+
+                    return $this;
+                } catch (LogicException $e) {
+                    // ignore.
+                }
+            }
+        }
+
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
         }
@@ -544,6 +570,28 @@ trait HasAttributes
         }
 
         $this->attributes[$key] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Set a given foreign model by mapping it's primary key to this model's foreign key.
+     *
+     * This only works with "belongs-to" and "morphs-to" relationships.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function setRelationValue($key, $value)
+    {
+        $relation = $this->$key();
+
+        if (! $relation instanceof BelongsTo) {
+            throw new LogicException(get_class($this).'::'.$key.' must return a \'belongs-to\'relationship instance.');
+        }
+
+        $relation->associate($value);
 
         return $this;
     }
