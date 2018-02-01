@@ -269,7 +269,7 @@ class Worker
     protected function runJob($job, $connectionName, WorkerOptions $options)
     {
         try {
-            return $this->process($connectionName, $job, $options);
+            $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
@@ -432,7 +432,7 @@ class Worker
      */
     protected function failJob($connectionName, $job, $e)
     {
-        return FailingJob::handle($connectionName, $job, $e);
+        FailingJob::handle($connectionName, $job, $e);
     }
 
     /**

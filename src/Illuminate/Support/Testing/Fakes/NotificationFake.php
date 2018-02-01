@@ -157,7 +157,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function send($notifiables, $notification)
     {
-        return $this->sendNow($notifiables, $notification);
+        $this->sendNow($notifiables, $notification);
     }
 
     /**

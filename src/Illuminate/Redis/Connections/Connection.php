@@ -69,7 +69,7 @@ abstract class Connection
      */
     public function subscribe($channels, Closure $callback)
     {
-        return $this->createSubscription($channels, $callback, __FUNCTION__);
+        $this->createSubscription($channels, $callback, __FUNCTION__);
     }
 
     /**
@@ -81,7 +81,7 @@ abstract class Connection
      */
     public function psubscribe($channels, Closure $callback)
     {
-        return $this->createSubscription($channels, $callback, __FUNCTION__);
+        $this->createSubscription($channels, $callback, __FUNCTION__);
     }
 
     /**

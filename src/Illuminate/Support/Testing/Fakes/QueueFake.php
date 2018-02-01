@@ -59,7 +59,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushedOn($queue, $job, $callback = null)
     {
-        return $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
+        $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if ($pushedQueue !== $queue) {
                 return false;
             }

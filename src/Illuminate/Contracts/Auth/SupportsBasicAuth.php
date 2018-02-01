@@ -9,7 +9,7 @@ interface SupportsBasicAuth
      *
      * @param  string  $field
      * @param  array  $extraConditions
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return null
      */
     public function basic($field = 'email', $extraConditions = []);
 
@@ -18,7 +18,7 @@ interface SupportsBasicAuth
      *
      * @param  string  $field
      * @param  array  $extraConditions
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return void
      */
     public function onceBasic($field = 'email', $extraConditions = []);
 }
