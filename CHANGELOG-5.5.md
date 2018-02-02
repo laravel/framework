@@ -1,9 +1,9 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.33 (2018-01-30)
 
 ### Added
-- Added `notExists()` method to query builder ([#22836](https://github.com/laravel/framework/pull/22836), [9d2a7ca](https://github.com/laravel/framework/commit/9d2a7ca049e71d39e453ba8c34addb657b71b237))
+- Added `doesntExist()` method to query builder ([#22836](https://github.com/laravel/framework/pull/22836), [9d2a7ca](https://github.com/laravel/framework/commit/9d2a7ca049e71d39e453ba8c34addb657b71b237))
 - Added `assertHeaderMissing()` assertion ([#22849](https://github.com/laravel/framework/pull/22849), [#22866](https://github.com/laravel/framework/pull/22866))
 - Added support for higher order unique ([#22851](https://github.com/laravel/framework/pull/22851))
 - Added boolean toggle to `withTrashed()` ([#22888](https://github.com/laravel/framework/pull/22888))
