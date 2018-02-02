@@ -2,13 +2,17 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use BadMethodCallException;
 use Faker\Generator as Faker;
+use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
 
 class FactoryBuilder
 {
-    use Macroable;
+    use Macroable {
+        __call as macroCall;
+    }
 
     /**
      * The model definitions in the container.
@@ -107,6 +111,19 @@ class FactoryBuilder
     public function states($states)
     {
         $this->activeStates = is_array($states) ? $states : func_get_args();
+
+        return $this;
+    }
+
+    /**
+     * Adds the sate to be applied to the model.
+     *
+     * @param string $state
+     * @return $this
+     */
+    public function withState(string $state)
+    {
+        $this->activeStates[] = $state;
 
         return $this;
     }
@@ -328,4 +345,21 @@ class FactoryBuilder
 
         return $attributes;
     }
+
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if (Str::startsWith($method, 'with')) {
+            return $this->withState(Str::camel(Str::after($method, 'with')));
+        }
+
+        $className = static::class;
+
+        throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
+    }
+
+
 }

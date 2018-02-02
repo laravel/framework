@@ -153,6 +153,32 @@ class EloquentFactoryBuilderTest extends TestCase
     /**
      * @test
      */
+    public function creating_models_with_method_states()
+    {
+        $server = factory(FactoryBuildableServer::class)->create();
+
+        $inlineServer = factory(FactoryBuildableServer::class)->withInline()->create();
+
+        $callableServer = \factory(FactoryBuildableServer::class)->withInline()->withCallable()->create();
+
+        $this->assertEquals('active', $server->status);
+        $this->assertEquals('inline', $inlineServer->status);
+        $this->assertEquals('callable', $callableServer->status);
+    }
+
+    /**
+     * @test
+     */
+    public function fails_if_state_does_not_exist()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        factory(FactoryBuildableServer::class)->withUnknown()->create();
+    }
+
+    /**
+     * @test
+     */
     public function creating_models_with_relationships()
     {
         factory(FactoryBuildableUser::class, 2)
