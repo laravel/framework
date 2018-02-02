@@ -56,6 +56,8 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
+        $factory->state(FactoryBuildableServer::class, 'mainServer', ['name' => 'main']);
+
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
         });
@@ -148,6 +150,43 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $this->assertEquals('active', $server->status);
         $this->assertEquals('inline', $inlineServer->status);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_with_method_states()
+    {
+        $server = factory(FactoryBuildableServer::class)->create();
+
+        $inlineServer = factory(FactoryBuildableServer::class)->inline()->create();
+
+        $callableServer = \factory(FactoryBuildableServer::class)->inline()->callable()->create();
+
+        $this->assertEquals('active', $server->status);
+        $this->assertEquals('inline', $inlineServer->status);
+        $this->assertEquals('callable', $callableServer->status);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_with_multiple_method_states()
+    {
+        $server = \factory(FactoryBuildableServer::class)->callable()->mainServer()->create();
+
+        $this->assertEquals('callable', $server->status);
+        $this->assertEquals('main', $server->name);
+    }
+
+    /**
+     * @test
+     */
+    public function fails_if_state_does_not_exist()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+
+        factory(FactoryBuildableServer::class)->unknown()->create();
     }
 
     /**
