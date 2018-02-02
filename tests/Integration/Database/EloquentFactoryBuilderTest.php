@@ -56,6 +56,8 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
+        $factory->state(FactoryBuildableServer::class, 'mainServer', ['name' => 'main']);
+
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
         });
@@ -164,6 +166,17 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertEquals('active', $server->status);
         $this->assertEquals('inline', $inlineServer->status);
         $this->assertEquals('callable', $callableServer->status);
+    }
+
+    /**
+     * @test
+     */
+    public function creating_models_with_multiple_method_states()
+    {
+        $server = \factory(FactoryBuildableServer::class)->withCallable()->withMainServer()->create();
+
+        $this->assertEquals('callable', $server->status);
+        $this->assertEquals('main', $server->name);
     }
 
     /**
