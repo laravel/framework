@@ -23,7 +23,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         });
     }
 
-    public function test_user_can_update_nullable_date()
+    public function test_dates_are_custom_castable()
     {
         $user = TestModel1::create([
             'date_field' => '2019-10-01',

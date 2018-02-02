@@ -190,7 +190,7 @@ trait HasAttributes
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
 
-            if ($attributes[$key] && Str::startsWith($value, ['date:', 'datetime:'])) {
+            if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
         }
@@ -509,11 +509,23 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
-        if (Str::startsWith($this->getCasts()[$key], ['date:', 'datetime:'])) {
+        if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
             return 'custom_datetime';
         }
 
         return trim(strtolower($this->getCasts()[$key]));
+    }
+
+    /**
+     * Determine if the cast type is a custom date time cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isCustomDateTimeCast($cast)
+    {
+        return strncmp($cast, 'date:', 5) === 0 ||
+               strncmp($cast, 'datetime:', 9) === 0;
     }
 
     /**
