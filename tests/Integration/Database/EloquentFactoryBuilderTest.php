@@ -159,9 +159,9 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         $server = factory(FactoryBuildableServer::class)->create();
 
-        $inlineServer = factory(FactoryBuildableServer::class)->withInline()->create();
+        $inlineServer = factory(FactoryBuildableServer::class)->inline()->create();
 
-        $callableServer = \factory(FactoryBuildableServer::class)->withInline()->withCallable()->create();
+        $callableServer = \factory(FactoryBuildableServer::class)->inline()->callable()->create();
 
         $this->assertEquals('active', $server->status);
         $this->assertEquals('inline', $inlineServer->status);
@@ -173,7 +173,7 @@ class EloquentFactoryBuilderTest extends TestCase
      */
     public function creating_models_with_multiple_method_states()
     {
-        $server = \factory(FactoryBuildableServer::class)->withCallable()->withMainServer()->create();
+        $server = \factory(FactoryBuildableServer::class)->callable()->mainServer()->create();
 
         $this->assertEquals('callable', $server->status);
         $this->assertEquals('main', $server->name);
@@ -186,7 +186,7 @@ class EloquentFactoryBuilderTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        factory(FactoryBuildableServer::class)->withUnknown()->create();
+        factory(FactoryBuildableServer::class)->unknown()->create();
     }
 
     /**

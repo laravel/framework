@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use BadMethodCallException;
 use Faker\Generator as Faker;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -352,14 +351,6 @@ class FactoryBuilder
             return $this->macroCall($method, $parameters);
         }
 
-        if (Str::startsWith($method, 'with')) {
-            return $this->withState(Str::camel(Str::after($method, 'with')));
-        }
-
-        $className = static::class;
-
-        throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
+        return $this->withState(Str::camel($method));
     }
-
-
 }
