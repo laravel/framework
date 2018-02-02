@@ -47,6 +47,16 @@ trait QueriesRelationships
             $hasQuery->callScope($callback);
         }
 
+        // When query connection and subquery connection are not equals concat connection to query from
+        if ($this->getConnection() instanceof QueryBuilder && $hasQuery->getConnection() instanceof QueryBuilder) {
+            $subqueryConnection = $hasQuery->getConnection()->getDatabaseName();
+            $queryConnection = $this->getConnection()->getDatabaseName();
+            if ($queryConnection != $subqueryConnection) {
+                $queryFrom = $hasQuery->getQuery()->from.'|'.$subqueryConnection;
+                $hasQuery->from($queryFrom);
+            }
+        }
+
         return $this->addHasWhere(
             $hasQuery, $relation, $operator, $count, $boolean
         );
