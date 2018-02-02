@@ -145,7 +145,7 @@ class Grammar extends BaseGrammar
             list($table, $database) = explode('|', $table);
             return 'from '.$this->wrap($database).'.'.$this->wrapTable($table);
         }
-        
+
         return 'from '.$this->wrapTable($table);
     }
 
