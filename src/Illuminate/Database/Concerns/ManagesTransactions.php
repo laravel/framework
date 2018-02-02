@@ -129,7 +129,7 @@ trait ManagesTransactions
     /**
      * Handle an exception from a transaction beginning.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return void
      *
      * @throws \Exception

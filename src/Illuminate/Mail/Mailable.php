@@ -128,8 +128,8 @@ class Mailable implements MailableContract, Renderable
             $this->buildFrom($message)
                  ->buildRecipients($message)
                  ->buildSubject($message)
-                 ->buildAttachments($message)
-                 ->runCallbacks($message);
+                 ->runCallbacks($message)
+                 ->buildAttachments($message);
         });
     }
 

@@ -1138,6 +1138,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             'filesystem.disk'      => [\Illuminate\Contracts\Filesystem\Filesystem::class],
             'filesystem.cloud'     => [\Illuminate\Contracts\Filesystem\Cloud::class],
             'hash'                 => [\Illuminate\Hashing\HashManager::class],
+            'hash.driver'          => [\Illuminate\Contracts\Hashing\Hasher::class],
             'translator'           => [\Illuminate\Translation\Translator::class, \Illuminate\Contracts\Translation\Translator::class],
             'log'                  => [\Illuminate\Log\LogManager::class, \Psr\Log\LoggerInterface::class],
             'mailer'               => [\Illuminate\Mail\Mailer::class, \Illuminate\Contracts\Mail\Mailer::class, \Illuminate\Contracts\Mail\MailQueue::class],

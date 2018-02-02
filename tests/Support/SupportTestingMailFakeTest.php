@@ -6,6 +6,8 @@ use Illuminate\Mail\Mailable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Testing\Fakes\MailFake;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class MailFakeTest extends TestCase
 {
@@ -16,94 +18,104 @@ class MailFakeTest extends TestCase
         $this->mailable = new MailableStub;
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent.
-     */
     public function testAssertSent()
     {
-        $this->fake->assertSent(MailableStub::class);
+        try {
+            $this->fake->assertSent(MailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\MailableStub] mailable was not sent.'));
+        }
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
         $this->fake->assertSent(MailableStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The unexpected [Illuminate\Tests\Support\MailableStub] mailable was sent.
-     */
     public function testAssertNotSent()
     {
         $this->fake->assertNotSent(MailableStub::class);
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertNotSent(MailableStub::class);
+        try {
+            $this->fake->assertNotSent(MailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\MailableStub] mailable was sent.'));
+        }
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 times.
-     */
     public function testAssertSentTimes()
     {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertSent(MailableStub::class, 1);
+        try {
+            $this->fake->assertSent(MailableStub::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\MailableStub] mailable was sent 2 times instead of 1 times.'));
+        }
+
         $this->fake->assertSent(MailableStub::class, 2);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued.
-     */
     public function testAssertQueued()
     {
-        $this->fake->assertQueued(MailableStub::class);
+        try {
+            $this->fake->assertQueued(MailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\MailableStub] mailable was not queued.'));
+        }
 
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
         $this->fake->assertQueued(MailableStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 times.
-     */
     public function testAssertQueuedTimes()
     {
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
 
-        $this->fake->assertQueued(MailableStub::class, 1);
+        try {
+            $this->fake->assertQueued(MailableStub::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\MailableStub] mailable was queued 2 times instead of 1 times.'));
+        }
+
         $this->fake->assertQueued(MailableStub::class, 2);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\QueueableMailableStub] mailable was not sent.
-     */
     public function testSendQueuesAMailableThatShouldBeQueued()
     {
         $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub);
 
-        $this->fake->assertSent(QueueableMailableStub::class);
         $this->fake->assertQueued(QueueableMailableStub::class);
+
+        try {
+            $this->fake->assertSent(QueueableMailableStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\QueueableMailableStub] mailable was not sent.'));
+        }
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage Mailables were sent unexpectedly.
-     */
     public function testAssertNothingSent()
     {
         $this->fake->assertNothingSent();
 
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
 
-        $this->fake->assertNothingSent();
+        try {
+            $this->fake->assertNothingSent();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Mailables were sent unexpectedly.'));
+        }
     }
 }
 

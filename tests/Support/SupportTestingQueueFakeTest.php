@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Support;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class QueueFakeTest extends TestCase
 {
@@ -15,70 +17,75 @@ class QueueFakeTest extends TestCase
         $this->job = new JobStub;
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
-     */
     public function testAssertPushed()
     {
-        $this->fake->assertPushed(JobStub::class);
+        try {
+            $this->fake->assertPushed(JobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+        }
 
         $this->fake->push($this->job);
 
         $this->fake->assertPushed(JobStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.
-     */
     public function testAssertNotPushed()
     {
         $this->fake->assertNotPushed(JobStub::class);
 
         $this->fake->push($this->job);
 
-        $this->fake->assertNotPushed(JobStub::class);
+        try {
+            $this->fake->assertNotPushed(JobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\JobStub] job was pushed.'));
+        }
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\JobStub] job was not pushed.
-     */
     public function testAssertPushedOn()
     {
         $this->fake->push($this->job, '', 'foo');
 
-        $this->fake->assertPushedOn('bar', JobStub::class);
+        try {
+            $this->fake->assertPushedOn('bar', JobStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was not pushed.'));
+        }
 
         $this->fake->assertPushedOn('foo', JobStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.
-     */
     public function testAssertPushedTimes()
     {
         $this->fake->push($this->job);
         $this->fake->push($this->job);
 
-        $this->fake->assertPushed(JobStub::class, 1);
+        try {
+            $this->fake->assertPushed(JobStub::class, 1);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobStub] job was pushed 2 times instead of 1 times.'));
+        }
 
         $this->fake->assertPushed(JobStub::class, 2);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage Jobs were pushed unexpectedly.
-     */
     public function testAssertNothingPushed()
     {
         $this->fake->assertNothingPushed();
 
         $this->fake->push($this->job);
 
-        $this->fake->assertNothingPushed();
+        try {
+            $this->fake->assertNothingPushed();
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('Jobs were pushed unexpectedly.'));
+        }
     }
 }
 

@@ -415,7 +415,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->getSession();
+        return $this->session;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store|null
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     /**
