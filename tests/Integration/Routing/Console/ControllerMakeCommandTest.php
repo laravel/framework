@@ -114,4 +114,24 @@ class ControllerMakeCommandTest extends TestCase
 		$this->fs->delete($assertingFile);
 	}
 
+	/**
+	 * @test
+	 */
+	public function test_parent_api_resource_controller_make_command ()
+	{
+		$assertingFile = $this->controllerPath . '/ParentAPIResourceController.php';
+		$assertingAgainst = __DIR__ . '/Assertions/ParentAPIResourceController.php.assertion';
+
+		$this->artisan('make:controller', [
+			'name' => 'ParentAPIResourceController',
+			'--resource' => TRUE,
+			'--api' => TRUE,
+			'--parent' => 'BasicController',
+			'--no-interaction' => TRUE
+		]);
+
+		$this->assertFileContents($assertingFile, $assertingAgainst);
+		$this->fs->delete($assertingFile);
+	}
+
 }

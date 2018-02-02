@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use DummyFullModelClass;
+use App\BasicController;
+use Illuminate\Http\Request;
+
+class ParentAPIResourceController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @param  \App\BasicController  $basicController
+     * @return \Illuminate\Http\Response
+     */
+    public function index(BasicController $basicController)
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\BasicController  $basicController
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request, BasicController $basicController)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \App\BasicController  $basicController
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function show(BasicController $basicController, DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\BasicController  $basicController
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, BasicController $basicController, DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \App\BasicController  $basicController
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(BasicController $basicController, DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+}
