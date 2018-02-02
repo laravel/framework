@@ -396,7 +396,7 @@ class Handler implements ExceptionHandlerContract
         $paths = collect(config('view.paths'));
 
         view()->replaceNamespace('errors', $paths->map(function ($path) {
-            return "{$path}/errors";
+            return $this->errorsPath($path);
         })->push(__DIR__.'/views')->all());
 
         if (view()->exists($view = "errors::{$status}")) {
@@ -404,6 +404,17 @@ class Handler implements ExceptionHandlerContract
         }
 
         return $this->convertExceptionToResponse($e);
+    }
+
+    /**
+     * Determine the directory containing error views for a given path.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function errorsPath($path)
+    {
+        return "{$path}/errors";
     }
 
     /**
