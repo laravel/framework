@@ -143,6 +143,7 @@ class Grammar extends BaseGrammar
         // if table contains | means that we must specify the database
         if (strpos($table, '|') !== false) {
             list($table, $database) = explode('|', $table);
+
             return 'from '.$this->wrap($database).'.'.$this->wrapTable($table);
         }
 
