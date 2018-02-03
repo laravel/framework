@@ -53,7 +53,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
         $stub = $stub ?? '/stubs/controller.plain.stub';
 
-        return __DIR__ . $stub;
+        return __DIR__.$stub;
     }
 
     /**
