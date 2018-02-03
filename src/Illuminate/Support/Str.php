@@ -267,8 +267,8 @@ class Str
     /**
      * Get the plural form of an English word.
      *
-     * @param  string  $value
-     * @param  int     $count
+     * @param  string    $value
+     * @param  int|float $count
      * @return string
      */
     public static function plural($value, $count = 2)
