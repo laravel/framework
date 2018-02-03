@@ -765,9 +765,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $items
      * @return static
      */
-    public function intersect($items)
+    public function intersect(...$items)
     {
-        return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+        $items = array_map(function($items) {
+            return $this->getArrayableItems($items);
+        }, $items);
+
+        return new static(array_intersect($this->items, ...$items));
     }
 
     /**
@@ -778,8 +782,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function intersectByKeys($items)
     {
+        $items = array_map(function($items) {
+            return $this->getArrayableItems($items);
+        }, $items);
+
         return new static(array_intersect_key(
-            $this->items, $this->getArrayableItems($items)
+            $this->items, ...$items
         ));
     }
 
