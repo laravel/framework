@@ -47,8 +47,10 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = '/stubs/controller.stub';
         }
 
-        if ($this->option('api') && $stub !== null) {
-            $stub = substr_replace($stub, '.api', -5, 0);
+        if ($this->option('api') && is_null($stub)) {
+            $stub = '/stubs/controller.api.stub';
+        } elseif ($this->option('api') && ! is_null($stub)) {
+            $stub = str_replace('.stub', '.api.stub', $stub);
         }
 
         $stub = $stub ?? '/stubs/controller.plain.stub';
@@ -176,7 +178,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
 
-            ['api', 'a', InputOption::VALUE_NONE, 'Generate api resource methods only for a controller class.'],
+            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
         ];
     }
 }
