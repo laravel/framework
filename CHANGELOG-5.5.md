@@ -1,5 +1,11 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Changed
+- Use path helpers in console commands ([#22971](https://github.com/laravel/framework/pull/22971))
+
+
 ## v5.5.33 (2018-01-30)
 
 ### Added
