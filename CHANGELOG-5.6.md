@@ -60,7 +60,7 @@
 
 ### Responses
 - Added missing `$raw` and `$sameSite` parameters to `Cookie\Factory` methods ([#21553](https://github.com/laravel/framework/pull/21553))
-- ⚠️ Return `201` status of Model was recently created ([#21625](https://github.com/laravel/framework/pull/21625))
+- ⚠️ Return `201` status if Model was recently created ([#21625](https://github.com/laravel/framework/pull/21625))
 
 ### Service Container
 - Support bulk binding in service providers during registration ([#21961](https://github.com/laravel/framework/pull/21961), [81e29b1](https://github.com/laravel/framework/commit/81e29b1f09af7095df219efd18185f0818f5b698))
@@ -72,6 +72,7 @@
 - ⚠️ Multi server scheduling cron support ([#22216](https://github.com/laravel/framework/pull/22216), [6563ba6](https://github.com/laravel/framework/commit/6563ba65b65106198095f1d61f91e0ec542e98dd))
 
 ### Testing
+- Added assertions to verify the order of strings in a response ([#22915](https://github.com/laravel/framework/pull/22915))
 - ⚠️ Switched to PHPUnit 7 ([#23005](https://github.com/laravel/framework/pull/23005))
 
 ### Validation
