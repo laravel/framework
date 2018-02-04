@@ -23,7 +23,7 @@ class ProcessUtils
         // @see https://bugs.php.net/bug.php?id=49446
         if ('\\' === DIRECTORY_SEPARATOR) {
             if ('' === $argument) {
-                return escapeshellarg($argument);
+                return '""';
             }
 
             $escapedArgument = '';
