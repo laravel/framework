@@ -8,7 +8,7 @@ use Illuminate\Database\Query\Processors\PostgresProcessor;
 use Illuminate\Database\Query\Grammars\PostgresGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar as SchemaGrammar;
 
-class PostgresConnection extends Connection
+class PostgresConnection extends Connection implements CanCrossDatabaseShazaamInterface
 {
     /**
      * Get the default query grammar instance.

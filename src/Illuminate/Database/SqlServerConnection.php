@@ -11,7 +11,7 @@ use Illuminate\Database\Query\Processors\SqlServerProcessor;
 use Illuminate\Database\Query\Grammars\SqlServerGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar as SchemaGrammar;
 
-class SqlServerConnection extends Connection
+class SqlServerConnection extends Connection implements CanCrossDatabaseShazaamInterface
 {
     /**
      * Execute a Closure within a transaction.

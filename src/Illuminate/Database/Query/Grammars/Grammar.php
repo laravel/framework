@@ -140,9 +140,9 @@ class Grammar extends BaseGrammar
      */
     protected function compileFrom(Builder $query, $table)
     {
-        // if table contains | means that we must specify the database
-        if (strpos($table, '|') !== false) {
-            list($table, $database) = explode('|', $table);
+        // Check for cross database query to attach database name
+        if (strpos($table, '<-->') !== false) {
+            list($table, $database) = explode('<-->', $table);
 
             return 'from '.$this->wrap($database).'.'.$this->wrapTable($table);
         }
