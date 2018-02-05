@@ -64,7 +64,7 @@ trait QueriesRelationships
 
     protected function hasCanCrossDatabase($hasQuery)
     {
-        foreach (['MySqlConnection','PostgresConnection','SqlServerConnection'] as $connector) {
+        foreach (['MySqlConnection', 'PostgresConnection', 'SqlServerConnection'] as $connector) {
             if (is_a($this->getConnection(), '\Illuminate\Database\\'.$connector) && is_a($hasQuery->getConnection(), '\Illuminate\Database\\'.$connector)) {
                 return true;
             }

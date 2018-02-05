@@ -8,28 +8,6 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentSubqueriesCrossDatabaseTest extends TestCase
 {
-    protected $driversTestCompatible = [
-        'mysql' => [
-            'crossDatabase' => 'select * from `users` where exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id`)',
-            'sameDatabase' => 'select * from `users` where exists (select * from `posts` where `users`.`id` = `posts`.`user_id`)'
-        ],
-        'pgsql' => [
-            'crossDatabase' => 'select * from "users" where exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id")',
-            'sameDatabase' => 'select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id")'
-        ],
-        'sqlsrv' => [
-            'crossDatabase' => 'select * from [users] where exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id])',
-            'sameDatabase' => 'select * from [users] where exists (select * from [posts] where [users].[id] = [posts].[user_id])'
-        ]
-    ];
-
-    protected $driversTestNotCompatible = [
-        'sqlite' => [
-            'crossDatabase' => 'select * from "users" where exists (select * from "orders" where "users"."id" = "orders"."user_id")',
-            'sameDatabase' => 'select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id")'
-        ]
-    ];
-
     /**
      * Setup the database schema.
      *
