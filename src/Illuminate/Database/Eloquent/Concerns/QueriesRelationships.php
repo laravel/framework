@@ -47,9 +47,30 @@ trait QueriesRelationships
             $hasQuery->callScope($callback);
         }
 
+        // When query connection and subquery connection are not equals concat connection to query from
+        if ($this->hasCanCrossDatabase($hasQuery)) {
+            $subqueryConnection = $hasQuery->getConnection()->getDatabaseName();
+            $queryConnection = $this->getConnection()->getDatabaseName();
+            if ($queryConnection != $subqueryConnection) {
+                $queryFrom = $hasQuery->getQuery()->from.'|'.$subqueryConnection;
+                $hasQuery->from($queryFrom);
+            }
+        }
+
         return $this->addHasWhere(
             $hasQuery, $relation, $operator, $count, $boolean
         );
+    }
+
+    protected function hasCanCrossDatabase($hasQuery)
+    {
+        foreach (['MySqlConnection', 'PostgresConnection', 'SqlServerConnection'] as $connector) {
+            if (is_a($this->getConnection(), '\Illuminate\Database\\'.$connector) && is_a($hasQuery->getConnection(), '\Illuminate\Database\\'.$connector)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
