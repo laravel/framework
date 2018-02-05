@@ -104,7 +104,7 @@ class Pivot extends Model
         ));
 
         return $query->where($this->relatedKey, $this->getOriginal(
-            $this->relatedKey, $this->getAttribute($this->foreignKey)
+            $this->relatedKey, $this->getAttribute($this->relatedKey)
         ));
     }
 
