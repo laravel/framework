@@ -129,8 +129,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tagsWithCustomPivot()->attach($tag->id);
 
-        $post->tagsWithCustomAccessor()->attach($tag->id);
-
         $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivot[0]->pivot);
         $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->getAttributes()['created_at']);
 
@@ -138,6 +136,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             'post_id' => '1',
             'tag_id' => '1',
         ], $post->tagsWithCustomAccessor[0]->tag->toArray());
+
+        $pivot = $post->tagsWithCustomPivot[0]->pivot;
+        $pivot->tag_id = 2;
+        $pivot->save();
+
+        $this->assertEquals(1, CustomPivot::count());
+        $this->assertEquals(1, CustomPivot::first()->post_id);
+        $this->assertEquals(2, CustomPivot::first()->tag_id);
     }
 
     /**
@@ -655,5 +661,6 @@ class TagWithCustomPivot extends Model
 
 class CustomPivot extends Pivot
 {
+    protected $table = 'posts_tags';
     protected $dateFormat = 'U';
 }

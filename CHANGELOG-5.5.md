@@ -4,6 +4,8 @@
 
 ### Changed
 - Use path helpers in console commands ([#22971](https://github.com/laravel/framework/pull/22971))
+- Remove unnecessary `escapeshellarg()` call ([#23025](https://github.com/laravel/framework/pull/23025))
+- Use original attribute values in pivot where clauses ([#23031](https://github.com/laravel/framework/pull/23031), [#23035](https://github.com/laravel/framework/pull/23035))
 
 
 ## v5.5.33 (2018-01-30)
