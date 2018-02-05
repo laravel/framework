@@ -901,6 +901,24 @@ trait HasAttributes
     }
 
     /**
+     * Sync the array of model attributes merging them. No checking is done.
+     *
+     * @param  array  $attributes
+     * @param  bool  $sync
+     * @return $this
+     */
+    public function syncRawAttributes(array $attributes, $sync = false)
+    {
+        $this->attributes = array_merge($this->attributes, $attributes);
+
+        if ($sync) {
+            $this->syncOriginal();
+        }
+
+        return $this;
+    }
+
+    /**
      * Get the model's original attribute values.
      *
      * @param  string|null  $key
