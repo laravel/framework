@@ -39,37 +39,83 @@ class DatabaseEloquentSubqueriesCrossDatabaseTest extends TestCase
     {
         $db = new DB;
 
-        foreach (array_keys($this->driversTestCompatible) as $driver) {
-            $db->addConnection([
-                'driver' => $driver,
-                'host' => '127.0.0.1',
-                'port' => '3306',
-                'database' => $driver.'1',
-                'username' => 'test',
-                'password' => 'test',
-                'unix_socket' => '',
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => true,
-                'engine' => null,
-            ], $driver.'1');
+        $db->addConnection([
+            'driver' => 'mysql',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'mysql1',
+            'username' => 'test',
+            'password' => 'test',
+            'unix_socket' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ], 'mysql1');
 
-            $db->addConnection([
-                'driver' => $driver,
-                'host' => '127.0.0.1',
-                'port' => '3306',
-                'database' => $driver.'2',
-                'username' => 'test',
-                'password' => 'test',
-                'unix_socket' => '',
-                'charset' => 'utf8mb4',
-                'collation' => 'utf8mb4_unicode_ci',
-                'prefix' => '',
-                'strict' => true,
-                'engine' => null,
-            ], $driver.'2');
-        }
+        $db->addConnection([
+            'driver' => 'mysql',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'mysql2',
+            'username' => 'test',
+            'password' => 'test',
+            'unix_socket' => '',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ], 'mysql2');
+
+        $db->addConnection([
+            'driver' => 'pgsql',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'pgsql1',
+            'username' => 'test',
+            'password' => 'test',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ], 'pgsql1');
+
+        $db->addConnection([
+            'driver' => 'pgsql',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'pgsql2',
+            'username' => 'test',
+            'password' => 'test',
+            'charset' => 'utf8',
+            'prefix' => '',
+            'schema' => 'public',
+            'sslmode' => 'prefer',
+        ], 'pgsql2');
+
+        $db->addConnection([
+            'driver' => 'sqlsrv',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'sqlsrv1',
+            'username' => 'test',
+            'password' => 'test',
+            'charset' => 'utf8',
+            'prefix' => '',
+        ], 'sqlsrv1');
+
+        $db->addConnection([
+            'driver' => 'sqlsrv',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'database' => 'sqlsrv2',
+            'username' => 'test',
+            'password' => 'test',
+            'charset' => 'utf8',
+            'prefix' => '',
+        ], 'sqlsrv2');
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -99,29 +145,175 @@ class DatabaseEloquentSubqueriesCrossDatabaseTest extends TestCase
 
     public function testWhereHasAcrossDatabaseConnection()
     {
-        // Test compatible / not compatible cross database contains database in subquery
-        foreach ($this->driversTestCompatible as $driver => $expextedSql) {
-            //Test cross database
-            $query = call_user_func_array('Illuminate\Tests\Database\EloquentTestCrossDatabaseUser'.ucFirst($driver).'::whereHas', ['orders']);
-            $this->assertEquals($expextedSql['crossDatabase'], $query->toSql());
+        // Test MySQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::whereHas('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from `users` where exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id` and `name` like ?)', $query->toSql());
 
-            //Test same database
-            $query = call_user_func_array('Illuminate\Tests\Database\EloquentTestCrossDatabaseUser'.ucFirst($driver).'::whereHas', ['posts']);
-            $this->assertEquals($expextedSql['sameDatabase'], $query->toSql());
-        }
+        // Test MySQL same database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::whereHas('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from `users` where exists (select * from `posts` where `users`.`id` = `posts`.`user_id` and `name` like ?)', $query->toSql());
 
-        // Test no compatible cross database not contains database in subquery
-        foreach ($this->driversTestNotCompatible as $driver => $expextedSql) {
-            //Test cross database
-            $query = call_user_func_array('Illuminate\Tests\Database\EloquentTestCrossDatabaseUser'.ucFirst($driver).'::whereHas', ['orders']);
-            $this->assertEquals($expextedSql['crossDatabase'], $query->toSql());
+        // Test PostgreSQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::whereHas('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
 
-            //Test same database
-            $query = call_user_func_array('Illuminate\Tests\Database\EloquentTestCrossDatabaseUser'.ucFirst($driver).'::whereHas', ['posts']);
-            $this->assertEquals($expextedSql['sameDatabase'], $query->toSql());
-        }
+        // Test PostgreSQL same database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::whereHas('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereHas('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from [users] where exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id] and [name] like ?)', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereHas('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from [users] where exists (select * from [posts] where [users].[id] = [posts].[user_id] and [name] like ?)', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::whereHas('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where exists (select * from "orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::whereHas('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
     }
 
+    public function testHasAcrossDatabaseConnection()
+    {
+        // Test MySQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::has('orders');
+        $this->assertEquals('select * from `users` where exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id`)', $query->toSql());
+
+        // Test MySQL same database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::has('posts');
+        $this->assertEquals('select * from `users` where exists (select * from `posts` where `users`.`id` = `posts`.`user_id`)', $query->toSql());
+
+        // Test PostgreSQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::has('orders');
+        $this->assertEquals('select * from "users" where exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id")', $query->toSql());
+
+        // Test PostgreSQL same database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::has('posts');
+        $this->assertEquals('select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id")', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::has('orders');
+        $this->assertEquals('select * from [users] where exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id])', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::has('posts');
+        $this->assertEquals('select * from [users] where exists (select * from [posts] where [users].[id] = [posts].[user_id])', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::has('orders');
+        $this->assertEquals('select * from "users" where exists (select * from "orders" where "users"."id" = "orders"."user_id")', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::has('posts');
+        $this->assertEquals('select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id")', $query->toSql());
+    }
+
+    public function testDoesntHasAcrossDatabaseConnection()
+    {
+        // Test MySQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::doesntHave('orders');
+        $this->assertEquals('select * from `users` where not exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id`)', $query->toSql());
+
+        // Test MySQL same database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::doesntHave('posts');
+        $this->assertEquals('select * from `users` where not exists (select * from `posts` where `users`.`id` = `posts`.`user_id`)', $query->toSql());
+
+        // Test PostgreSQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::doesntHave('orders');
+        $this->assertEquals('select * from "users" where not exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id")', $query->toSql());
+
+        // Test PostgreSQL same database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::doesntHave('posts');
+        $this->assertEquals('select * from "users" where not exists (select * from "posts" where "users"."id" = "posts"."user_id")', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::doesntHave('orders');
+        $this->assertEquals('select * from [users] where not exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id])', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::doesntHave('posts');
+        $this->assertEquals('select * from [users] where not exists (select * from [posts] where [users].[id] = [posts].[user_id])', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::doesntHave('orders');
+        $this->assertEquals('select * from "users" where not exists (select * from "orders" where "users"."id" = "orders"."user_id")', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::doesntHave('posts');
+        $this->assertEquals('select * from "users" where not exists (select * from "posts" where "users"."id" = "posts"."user_id")', $query->toSql());
+    }
+
+    public function testWhereDoesntHaveAcrossDatabaseConnection()
+    {
+        // Test MySQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::whereDoesntHave('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from `users` where not exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id` and `name` like ?)', $query->toSql());
+
+        // Test MySQL same database subquery
+        $query = EloquentTestCrossDatabaseUserMysql::whereDoesntHave('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from `users` where not exists (select * from `posts` where `users`.`id` = `posts`.`user_id` and `name` like ?)', $query->toSql());
+
+        // Test PostgreSQL cross database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::whereDoesntHave('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where not exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
+
+        // Test PostgreSQL same database subquery
+        $query = EloquentTestCrossDatabaseUserPgsql::whereDoesntHave('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where not exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereDoesntHave('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from [users] where not exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id] and [name] like ?)', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereDoesntHave('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from [users] where not exists (select * from [posts] where [users].[id] = [posts].[user_id] and [name] like ?)', $query->toSql());
+
+        // Test SQL Server cross database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::whereDoesntHave('orders', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where not exists (select * from "orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
+
+        // Test SQL Server same database subquery
+        $query = EloquentTestCrossDatabaseUserSqlite::whereDoesntHave('posts', function($query) {
+            $query->where('name', 'like', '%a%');
+        });
+        $this->assertEquals('select * from "users" where not exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
+    }
 }
 
 class EloquentTestCrossDatabaseUserMysql extends EloquentTestUser
