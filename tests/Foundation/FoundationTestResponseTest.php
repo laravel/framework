@@ -98,7 +98,7 @@ class FoundationTestResponseTest extends TestCase
             TestCase::fail('Assertion was expected to fail.');
         } catch (\PHPUnit\Framework\AssertionFailedError $e) {
         }
-        
+
         try {
             $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
             TestCase::fail('Assertion was expected to fail.');
