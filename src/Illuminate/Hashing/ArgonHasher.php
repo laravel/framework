@@ -8,13 +8,6 @@ use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 class ArgonHasher implements HasherContract
 {
     /**
-     * The default threads factor.
-     *
-     * @var int
-     */
-    protected $threads = 2;
-
-    /**
      * The default memory cost factor.
      *
      * @var int
@@ -27,6 +20,13 @@ class ArgonHasher implements HasherContract
      * @var int
      */
     protected $time = 2;
+
+    /**
+     * The default threads factor.
+     *
+     * @var int
+     */
+    protected $threads = 2;
 
     /**
      * Get information about the given hashed value.
@@ -95,24 +95,9 @@ class ArgonHasher implements HasherContract
     }
 
     /**
-     * Set the default password threads factor.
-     *
-     * @param int $threads
-     *
-     * @return $this;
-     */
-    public function setThreads(int $threads)
-    {
-        $this->threads = $threads;
-
-        return $this;
-    }
-
-    /**
      * Set the default password memory factor.
      *
-     * @param int $memory
-     *
+     * @param  int  $memory
      * @return $this
      */
     public function setMemory(int $memory)
@@ -125,13 +110,25 @@ class ArgonHasher implements HasherContract
     /**
      * Set the default password timing factor.
      *
-     * @param int $time
-     *
+     * @param  int  $time
      * @return $this
      */
     public function setTime(int $time)
     {
         $this->time = $time;
+
+        return $this;
+    }
+
+    /**
+     * Set the default password threads factor.
+     *
+     * @param  int  $threads
+     * @return $this
+     */
+    public function setThreads(int $threads)
+    {
+        $this->threads = $threads;
 
         return $this;
     }

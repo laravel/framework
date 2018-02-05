@@ -5,6 +5,8 @@ namespace Illuminate\Tests\Support;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\Notification;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 class NotificationFakeTest extends TestCase
@@ -17,30 +19,32 @@ class NotificationFakeTest extends TestCase
         $this->user = new UserStub;
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.
-     */
     public function testAssertSentTo()
     {
-        $this->fake->assertSentTo($this->user, NotificationStub::class);
+        try {
+            $this->fake->assertSentTo($this->user, NotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.'));
+        }
 
         $this->fake->send($this->user, new NotificationStub);
 
         $this->fake->assertSentTo($this->user, NotificationStub::class);
     }
 
-    /**
-     * @expectedException PHPUnit\Framework\ExpectationFailedException
-     * @expectedExceptionMessage The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.
-     */
     public function testAssertNotSentTo()
     {
         $this->fake->assertNotSentTo($this->user, NotificationStub::class);
 
         $this->fake->send($this->user, new NotificationStub);
 
-        $this->fake->assertNotSentTo($this->user, NotificationStub::class);
+        try {
+            $this->fake->assertNotSentTo($this->user, NotificationStub::class);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
+        }
     }
 }
 
