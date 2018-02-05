@@ -124,49 +124,49 @@ class DatabaseEloquentSubqueriesCrossDatabaseTest extends TestCase
     public function testWhereHasAcrossDatabaseConnection()
     {
         // Test MySQL cross database subquery
-        $query = EloquentTestCrossDatabaseUserMysql::whereHas('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserMysql::whereHas('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from `users` where exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id` and `name` like ?)', $query->toSql());
 
         // Test MySQL same database subquery
-        $query = EloquentTestCrossDatabaseUserMysql::whereHas('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserMysql::whereHas('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from `users` where exists (select * from `posts` where `users`.`id` = `posts`.`user_id` and `name` like ?)', $query->toSql());
 
         // Test PostgreSQL cross database subquery
-        $query = EloquentTestCrossDatabaseUserPgsql::whereHas('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserPgsql::whereHas('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
 
         // Test PostgreSQL same database subquery
-        $query = EloquentTestCrossDatabaseUserPgsql::whereHas('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserPgsql::whereHas('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
 
         // Test SQL Server cross database subquery
-        $query = EloquentTestCrossDatabaseUserSqlsrv::whereHas('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereHas('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from [users] where exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id] and [name] like ?)', $query->toSql());
 
         // Test SQL Server same database subquery
-        $query = EloquentTestCrossDatabaseUserSqlsrv::whereHas('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereHas('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from [users] where exists (select * from [posts] where [users].[id] = [posts].[user_id] and [name] like ?)', $query->toSql());
 
         // Test SQL Server cross database subquery
-        $query = EloquentTestCrossDatabaseUserSqlite::whereHas('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlite::whereHas('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where exists (select * from "orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
 
         // Test SQL Server same database subquery
-        $query = EloquentTestCrossDatabaseUserSqlite::whereHas('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlite::whereHas('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
@@ -245,49 +245,49 @@ class DatabaseEloquentSubqueriesCrossDatabaseTest extends TestCase
     public function testWhereDoesntHaveAcrossDatabaseConnection()
     {
         // Test MySQL cross database subquery
-        $query = EloquentTestCrossDatabaseUserMysql::whereDoesntHave('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserMysql::whereDoesntHave('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from `users` where not exists (select * from `mysql2`.`orders` where `users`.`id` = `orders`.`user_id` and `name` like ?)', $query->toSql());
 
         // Test MySQL same database subquery
-        $query = EloquentTestCrossDatabaseUserMysql::whereDoesntHave('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserMysql::whereDoesntHave('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from `users` where not exists (select * from `posts` where `users`.`id` = `posts`.`user_id` and `name` like ?)', $query->toSql());
 
         // Test PostgreSQL cross database subquery
-        $query = EloquentTestCrossDatabaseUserPgsql::whereDoesntHave('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserPgsql::whereDoesntHave('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where not exists (select * from "pgsql2"."orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
 
         // Test PostgreSQL same database subquery
-        $query = EloquentTestCrossDatabaseUserPgsql::whereDoesntHave('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserPgsql::whereDoesntHave('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where not exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
 
         // Test SQL Server cross database subquery
-        $query = EloquentTestCrossDatabaseUserSqlsrv::whereDoesntHave('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereDoesntHave('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from [users] where not exists (select * from [sqlsrv2].[orders] where [users].[id] = [orders].[user_id] and [name] like ?)', $query->toSql());
 
         // Test SQL Server same database subquery
-        $query = EloquentTestCrossDatabaseUserSqlsrv::whereDoesntHave('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlsrv::whereDoesntHave('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from [users] where not exists (select * from [posts] where [users].[id] = [posts].[user_id] and [name] like ?)', $query->toSql());
 
         // Test SQL Server cross database subquery
-        $query = EloquentTestCrossDatabaseUserSqlite::whereDoesntHave('orders', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlite::whereDoesntHave('orders', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where not exists (select * from "orders" where "users"."id" = "orders"."user_id" and "name" like ?)', $query->toSql());
 
         // Test SQL Server same database subquery
-        $query = EloquentTestCrossDatabaseUserSqlite::whereDoesntHave('posts', function($query) {
+        $query = EloquentTestCrossDatabaseUserSqlite::whereDoesntHave('posts', function ($query) {
             $query->where('name', 'like', '%a%');
         });
         $this->assertEquals('select * from "users" where not exists (select * from "posts" where "users"."id" = "posts"."user_id" and "name" like ?)', $query->toSql());
