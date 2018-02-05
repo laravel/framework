@@ -99,9 +99,13 @@ class Pivot extends Model
             return parent::setKeysForSaveQuery($query);
         }
 
-        $query->where($this->foreignKey, $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)));
+        $query->where($this->foreignKey, $this->getOriginal(
+            $this->foreignKey, $this->getAttribute($this->foreignKey)
+        ));
 
-        return $query->where($this->relatedKey, $this->getOriginal($this->relatedKey, $this->getAttribute($this->foreignKey)));
+        return $query->where($this->relatedKey, $this->getOriginal(
+            $this->relatedKey, $this->getAttribute($this->foreignKey)
+        ));
     }
 
     /**
@@ -127,7 +131,7 @@ class Pivot extends Model
     {
         return $this->newQuery()->where([
             $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
-            $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->foreignKey)),
+            $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
         ]);
     }
 
