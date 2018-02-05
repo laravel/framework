@@ -49,7 +49,7 @@ trait QueriesRelationships
         }
 
         // If connection implements CanCrossDatabaseShazaamInterface we must attach database
-        // connection name in from to be used by grammar when query compiled 
+        // connection name in from to be used by grammar when query compiled
         if ($this->getConnection() instanceof CanCrossDatabaseShazaamInterface) {
             $subqueryConnection = $hasQuery->getConnection()->getDatabaseName();
             $queryConnection = $this->getConnection()->getDatabaseName();
