@@ -9,7 +9,7 @@ use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
 
-class MySqlConnection extends Connection
+class MySqlConnection extends Connection implements CanCrossDatabaseShazaamInterface
 {
     /**
      * Get the default query grammar instance.

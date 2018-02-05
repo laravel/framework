@@ -8,6 +8,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\CanCrossDatabaseShazaamInterface;
 
 trait QueriesRelationships
 {
@@ -45,6 +46,17 @@ trait QueriesRelationships
         // builder. Then, we will be ready to finalize and return this query instance.
         if ($callback) {
             $hasQuery->callScope($callback);
+        }
+
+        // If connection implements CanCrossDatabaseShazaamInterface we must attach database
+        // connection name in from to be used by grammar when query compiled
+        if ($this->getConnection() instanceof CanCrossDatabaseShazaamInterface) {
+            $subqueryConnection = $hasQuery->getConnection()->getDatabaseName();
+            $queryConnection = $this->getConnection()->getDatabaseName();
+            if ($queryConnection != $subqueryConnection) {
+                $queryFrom = $hasQuery->getQuery()->from.'<-->'.$subqueryConnection;
+                $hasQuery->from($queryFrom);
+            }
         }
 
         return $this->addHasWhere(

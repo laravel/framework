@@ -140,6 +140,13 @@ class Grammar extends BaseGrammar
      */
     protected function compileFrom(Builder $query, $table)
     {
+        // Check for cross database query to attach database name
+        if (strpos($table, '<-->') !== false) {
+            list($table, $database) = explode('<-->', $table);
+
+            return 'from '.$this->wrap($database).'.'.$this->wrapTable($table);
+        }
+
         return 'from '.$this->wrapTable($table);
     }
 
