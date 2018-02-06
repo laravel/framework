@@ -261,10 +261,10 @@ class TestResponse
      */
     public function assertSeeInOrder(array $values)
     {
-        $position = -1;
+        $position = 0;
 
         foreach ($values as $value) {
-            $valuePosition = mb_strpos($this->getContent(), $value);
+            $valuePosition = mb_strpos($this->getContent(), $value, $position);
 
             if ($valuePosition === false || $valuePosition < $position) {
                 PHPUnit::fail(
@@ -273,7 +273,7 @@ class TestResponse
                 );
             }
 
-            $position = $valuePosition;
+            $position = $valuePosition + mb_strlen($value);
         }
 
         return $this;
@@ -300,10 +300,10 @@ class TestResponse
      */
     public function assertSeeTextInOrder(array $values)
     {
-        $position = -1;
+        $position = 0;
 
         foreach ($values as $value) {
-            $valuePosition = mb_strpos(strip_tags($this->getContent()), $value);
+            $valuePosition = mb_strpos(strip_tags($this->getContent()), $value, $position);
 
             if ($valuePosition === false || $valuePosition < $position) {
                 PHPUnit::fail(
@@ -312,7 +312,7 @@ class TestResponse
                 );
             }
 
-            $position = $valuePosition;
+            $position = $valuePosition + mb_strlen($value);
         }
 
         return $this;

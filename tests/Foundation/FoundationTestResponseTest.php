@@ -45,22 +45,26 @@ class FoundationTestResponseTest extends TestCase
     {
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(\Mockery::mock(View::class, [
-                'render' => '<ul><li>foo</li><li>bar</li><li>baz</li></ul>',
+                'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
             ]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $response->assertSeeInOrder(['foo', 'bar', 'baz']);
+        $response->assertSeeInOrder(['foo', 'bar', 'baz', 'foo']);
 
         try {
             $response->assertSeeInOrder(['baz', 'bar', 'foo']);
-            $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
         } catch (\PHPUnit\Framework\AssertionFailedError $e) {
-            return;
         }
 
-        TestCase::fail('Assertion was expected to fail.');
+        try {
+            $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
     }
 
     public function testAssertSeeText()
@@ -80,22 +84,26 @@ class FoundationTestResponseTest extends TestCase
     {
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'foo<strong>bar</strong> baz',
+                'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
             ]));
         });
 
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $response->assertSeeTextInOrder(['foobar', 'baz']);
+        $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
 
         try {
             $response->assertSeeTextInOrder(['baz', 'foobar']);
-            $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
         } catch (\PHPUnit\Framework\AssertionFailedError $e) {
-            return;
         }
 
-        TestCase::fail('Assertion was expected to fail.');
+        try {
+            $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
     }
 
     public function testAssertHeader()
