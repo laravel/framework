@@ -96,7 +96,7 @@ class Listener
     {
         return defined('ARTISAN_BINARY')
                         ? ProcessUtils::escapeArgument(ARTISAN_BINARY)
-                        : 'artisan';
+                        : "'artisan'";
     }
 
     /**
