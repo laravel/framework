@@ -41,6 +41,7 @@ class Pluralizer
         'news',
         'nutrition',
         'offspring',
+        'payroll',
         'plankton',
         'pokemon',
         'police',
