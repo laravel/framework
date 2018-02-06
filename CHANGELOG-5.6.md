@@ -122,7 +122,6 @@
 ### Testing
 - ⚠️ Switched to PHPUnit 7 ([#23005](https://github.com/laravel/framework/pull/23005))
 - Support fetching specific key when using json helpers ([#22489](https://github.com/laravel/framework/pull/22489))
-- Added assertions to verify the order of strings in a response ([#22915](https://github.com/laravel/framework/pull/22915))
 - Use `DatabaseTransactions` trait in `RefreshDatabase` ([#22596](https://github.com/laravel/framework/pull/22596))
 - Added `assertSeeInOrder()` and `assertSeeTextInOrder()` methods ([#22915](https://github.com/laravel/framework/pull/22915))
 
