@@ -51,6 +51,7 @@ use Illuminate\Database\Console\Migrations\MigrateCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
 use Illuminate\Database\Console\Factories\FactoryMakeCommand;
 use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
+use Illuminate\Queue\Console\PoolCommand as QueuePoolCommand;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
 use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
@@ -109,6 +110,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'QueueRestart' => 'command.queue.restart',
         'QueueRetry' => 'command.queue.retry',
         'QueueWork' => 'command.queue.work',
+        'QueuePool' => 'command.queue.pool',
         'RouteCache' => 'command.route.cache',
         'RouteClear' => 'command.route.clear',
         'RouteList' => 'command.route.list',
@@ -704,6 +706,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.queue.work', function ($app) {
             return new QueueWorkCommand($app['queue.worker']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerQueuePoolCommand()
+    {
+        $this->app->singleton('command.queue.pool', function ($app) {
+            return new QueuePoolCommand($app['queue.pool']);
         });
     }
 
