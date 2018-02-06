@@ -37,6 +37,8 @@ class QueueServiceProvider extends ServiceProvider
 
         $this->registerListener();
 
+        $this->registerPool();
+
         $this->registerFailedJobServices();
     }
 
@@ -187,6 +189,18 @@ class QueueServiceProvider extends ServiceProvider
     }
 
     /**
+     * Register the queue listener.
+     *
+     * @return void
+     */
+    protected function registerPool()
+    {
+        $this->app->singleton('queue.pool', function () {
+            return new Pool($this->app->basePath());
+        });
+    }
+
+    /**
      * Register the failed job services.
      *
      * @return void
@@ -223,7 +237,8 @@ class QueueServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'queue', 'queue.worker', 'queue.listener',
+            'queue', 'queue.worker',
+            'queue.listener', 'queue.pool',
             'queue.failer', 'queue.connection',
         ];
     }
