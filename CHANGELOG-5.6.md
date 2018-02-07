@@ -1,6 +1,6 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.0 (2018-02-07)
 
 ### General
 - ⚠️ Upgraded to Symfony 4 ([#22450](https://github.com/laravel/framework/pull/22450))
@@ -123,7 +123,7 @@
 - ⚠️ Switched to PHPUnit 7 ([#23005](https://github.com/laravel/framework/pull/23005))
 - Support fetching specific key when using json helpers ([#22489](https://github.com/laravel/framework/pull/22489))
 - Use `DatabaseTransactions` trait in `RefreshDatabase` ([#22596](https://github.com/laravel/framework/pull/22596))
-- Added `assertSeeInOrder()` and `assertSeeTextInOrder()` methods ([#22915](https://github.com/laravel/framework/pull/22915))
+- Added `assertSeeInOrder()` and `assertSeeTextInOrder()` methods ([#22915](https://github.com/laravel/framework/pull/22915), [#23038](https://github.com/laravel/framework/pull/23038))
 
 ### Validation
 - ⚠️ Ignore SVGs in `validateDimensions()` ([#21390](https://github.com/laravel/framework/pull/21390))
