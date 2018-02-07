@@ -91,7 +91,7 @@
 
 ### Requests
 - ⚠️ Return `false` from `expectsJson()` when requested content type isn't explicit ([#22506](https://github.com/laravel/framework/pull/22506), [3624d27](https://github.com/laravel/framework/commit/3624d2702c783d13bd23b852ce35662bee9a8fea))
-- Added `Request::getSession()` method ([e546a5b](https://github.com/laravel/framework/commit/e546a5b83aa9fb5bbcb8e80db0c263c09b5d5dd6), [e546a5b](https://github.com/laravel/framework/commit/e546a5b83aa9fb5bbcb8e80db0c263c09b5d5dd6))
+- Added `Request::getSession()` method ([e546a5b](https://github.com/laravel/framework/commit/e546a5b83aa9fb5bbcb8e80db0c263c09b5d5dd6))
 - Accept array of keys on `Request::hasAny()` ([#22952](https://github.com/laravel/framework/pull/22952))
 
 ### Responses
