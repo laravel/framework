@@ -692,11 +692,7 @@ class TestResponse
         $errors = app('session.store')->get('errors')->getBag($errorBag);
 
         foreach ($keys as $key => $value) {
-            if (is_int($key)) {
-                PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
-            } else {
-                PHPUnit::assertContains($value, $errors->get($key, $format));
-            }
+            PHPUnit::assertContains($value, $errors->get($key, $format));
         }
 
         return $this;
