@@ -8,15 +8,16 @@ class LuaScripts
      * Get the Lua script for computing the size of queue.
      *
      * KEYS[1] - The name of the primary queue
-     * KEYS[2] - The name of the "delayed" queue
-     * KEYS[3] - The name of the "reserved" queue
+     * KEYS[2] - The name of the "front" queue
+     * KEYS[3] - The name of the "delayed" queue
+     * KEYS[4] - The name of the "reserved" queue
      *
      * @return string
      */
     public static function size()
     {
         return <<<'LUA'
-return redis.call('llen', KEYS[1]) + redis.call('zcard', KEYS[2]) + redis.call('zcard', KEYS[3])
+return redis.call('llen', KEYS[1]) + redis.call('llen', KEYS[2]) + redis.call('zcard', KEYS[3]) + redis.call('zcard', KEYS[4])
 LUA;
     }
 
@@ -24,7 +25,8 @@ LUA;
      * Get the Lua script for popping the next job off of the queue.
      *
      * KEYS[1] - The queue to pop jobs from, for example: queues:foo
-     * KEYS[2] - The queue to place reserved jobs on, for example: queues:foo:reserved
+     * KEYS[2] - The front of the queue to pop jobs from, for example: queue:foo:front
+     * KEYS[3] - The queue to place reserved jobs on, for example: queues:foo:reserved
      * ARGV[1] - The time at which the reserved job will expire
      *
      * @return string
@@ -33,7 +35,10 @@ LUA;
     {
         return <<<'LUA'
 -- Pop the first job off of the queue...
-local job = redis.call('lpop', KEYS[1])
+local job = redis.call('rpop', KEYS[2])
+if(job == false) then
+    job = redis.call('rpop', KEYS[1])
+end
 local reserved = false
 
 if(job ~= false) then
@@ -41,7 +46,7 @@ if(job ~= false) then
     reserved = cjson.decode(job)
     reserved['attempts'] = reserved['attempts'] + 1
     reserved = cjson.encode(reserved)
-    redis.call('zadd', KEYS[2], ARGV[1], reserved)
+    redis.call('zadd', KEYS[3], ARGV[1], reserved)
 end
 
 return {job, reserved}
@@ -83,18 +88,15 @@ LUA;
     public static function migrateExpiredJobs()
     {
         return <<<'LUA'
--- Get all of the jobs with an expired "score"...
-local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1])
+-- Get up to 100 jobs with an expired "score".
+local val = redis.call('zrangebyscore', KEYS[1], '-inf', ARGV[1], 'LIMIT', 0, 100)
 
 -- If we have values in the array, we will remove them from the first queue
--- and add them onto the destination queue in chunks of 100, which moves
--- all of the appropriate jobs onto the destination queue very safely.
+-- and add them onto the destination queue.
 if(next(val) ~= nil) then
     redis.call('zremrangebyrank', KEYS[1], 0, #val - 1)
 
-    for i = 1, #val, 100 do
-        redis.call('rpush', KEYS[2], unpack(val, i, math.min(i+99, #val)))
-    end
+    redis.call('lpush', KEYS[2], unpack(val))
 end
 
 return val
