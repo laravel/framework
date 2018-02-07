@@ -59,6 +59,6 @@ class TestModel1 extends Model
     public $casts = [
         'date_field' => 'date:Y-m',
         'datetime_field' => 'datetime:Y-m H:i',
-        'datetime_diff_field' => 'datetime:diff',
+        'datetime_diff_field' => 'datetime:diff_for_humans',
     ];
 }
