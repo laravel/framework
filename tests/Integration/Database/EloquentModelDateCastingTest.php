@@ -20,6 +20,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
             $table->increments('id');
             $table->date('date_field')->nullable();
             $table->datetime('datetime_field')->nullable();
+            $table->datetime('datetime_diff_field')->nullable();
         });
     }
 
@@ -35,6 +36,17 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         $this->assertInstanceOf(Carbon::class, $user->date_field);
         $this->assertInstanceOf(Carbon::class, $user->datetime_field);
     }
+
+    public function test_dates_are_diff_castable()
+    {
+        $user = TestModel1::create([
+            'datetime_diff_field' => '2019-10-01 10:15:20',
+        ]);
+
+        Carbon::setTestNow(Carbon::parse('2019-10-01 10:16:20'));
+
+        $this->assertEquals('1 minute ago', $user->toArray()['datetime_diff_field']);
+    }
 }
 
 class TestModel1 extends Model
@@ -47,5 +59,6 @@ class TestModel1 extends Model
     public $casts = [
         'date_field' => 'date:Y-m',
         'datetime_field' => 'datetime:Y-m H:i',
+        'datetime_diff_field' => 'datetime:diff',
     ];
 }

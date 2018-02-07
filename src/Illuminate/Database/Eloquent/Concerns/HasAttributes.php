@@ -191,7 +191,11 @@ trait HasAttributes
             }
 
             if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
-                $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
+                $format = explode(':', $value, 2)[1];
+
+                $attributes[$key] = $format === 'diff' ?
+                    $attributes[$key]->diffForHumans() :
+                    $attributes[$key]->format($format);
             }
         }
 
