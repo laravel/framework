@@ -1,5 +1,30 @@
 # Release Notes for 5.6.x
 
+## v5.6.2 (2018-02-08)
+
+### Changed
+- Support customization of schedule mutex cache store ([20e2919](https://github.com/laravel/framework/commit/20e29199365a11b31e35179bbfe3e83485e05a03))
+
+### Fixed
+- Reverted changes to `TestResponse::assertSessionHasErrors()` [#23055](https://github.com/laravel/framework/pull/23055) ([0362a90](https://github.com/laravel/framework/commit/0362a90fca47de6c283d8ef8c68affefc7b410cf))
+
+
+## v5.6.1 (2018-02-08)
+
+### Added
+- Added Slack attachment pretext attribute ([#23075](https://github.com/laravel/framework/pull/23075))
+
+### Changed
+- Added missing nested joins in `Grammar::compileJoins()` ([#23059](https://github.com/laravel/framework/pull/23059))
+- Improved session errors assertions in `TestResponse::assertSessionHasErrors()` ([#23055](https://github.com/laravel/framework/pull/23055))
+
+### Fixed
+- Fixed `BelongsToMany` pivot relation wakeup ([#23081](https://github.com/laravel/framework/pull/23081))
+
+### Removed
+- Removed monolog configurator ([#23078](https://github.com/laravel/framework/pull/23078))
+
+
 ## v5.6.0 (2018-02-07)
 
 ### General
