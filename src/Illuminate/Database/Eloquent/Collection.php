@@ -429,7 +429,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getQueueableRelations()
     {
-        return $this->isNotEmpty() ? $this->first()->getRelations() : [];
+        return $this->isNotEmpty() ? $this->first()->getQueueableRelations() : [];
     }
 
     /**
