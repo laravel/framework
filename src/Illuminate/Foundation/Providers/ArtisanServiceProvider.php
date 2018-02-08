@@ -38,6 +38,7 @@ use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\ObserverMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -143,6 +144,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ModelMake' => 'command.model.make',
         'NotificationMake' => 'command.notification.make',
         'NotificationTable' => 'command.notification.table',
+        'ObserverMake' => 'command.observer.make',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
@@ -572,6 +574,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.notification.make', function ($app) {
             return new NotificationMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerObserverMakeCommand()
+    {
+        $this->app->singleton('command.observer.make', function ($app) {
+            return new ObserverMakeCommand($app['files']);
         });
     }
 
