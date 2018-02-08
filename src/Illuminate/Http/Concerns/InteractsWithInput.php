@@ -372,6 +372,6 @@ trait InteractsWithInput
             return $this->$source->all();
         }
 
-        return $this->$source->get($key, $default);
+        return $this->$source->get($key) ?? $default;
     }
 }
