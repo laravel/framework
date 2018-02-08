@@ -85,6 +85,7 @@ class SlackWebhookChannel
                 'author_icon' => $attachment->authorIcon,
                 'author_link' => $attachment->authorLink,
                 'author_name' => $attachment->authorName,
+                'pretext' => $attachment->pretext,
                 'color' => $attachment->color ?: $message->color(),
                 'fallback' => $attachment->fallback,
                 'fields' => $this->fields($attachment),
