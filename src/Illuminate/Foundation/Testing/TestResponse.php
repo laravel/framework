@@ -748,7 +748,7 @@ class TestResponse
         foreach ($keys as $key => $value) {
             if (is_array($value)) {
                 PHPUnit::assertArraySubset($value, $errors->get($key, $format));
-            } else if (is_int($key)) {
+            } elseif (is_int($key)) {
 				PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
 			} else {
                 PHPUnit::assertContains($value, $errors->get($key, $format));
