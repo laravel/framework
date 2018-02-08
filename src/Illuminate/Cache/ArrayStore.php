@@ -16,7 +16,7 @@ class ArrayStore extends TaggableStore implements Store
     protected $storage = [];
 
     /**
-     * Retrieve an item from the cache by key.
+     * Retrieve an item (by value) from the cache by key.
      *
      * @param  string|array  $key
      * @return mixed
@@ -24,7 +24,7 @@ class ArrayStore extends TaggableStore implements Store
     public function get($key)
     {
         if (array_key_exists($key, $this->storage)) {
-            return $this->storage[$key];
+            return unserialize(serialize($this->storage[$key]));
         }
     }
 
