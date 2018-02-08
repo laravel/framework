@@ -154,6 +154,7 @@ class Grammar extends BaseGrammar
     {
         return collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
+
             $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
 
             return trim("{$join->type} join {$table}{$nestedJoins} {$this->compileWheres($join)}");
