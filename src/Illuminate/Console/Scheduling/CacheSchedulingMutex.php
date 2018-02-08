@@ -3,21 +3,28 @@
 namespace Illuminate\Console\Scheduling;
 
 use DateTimeInterface;
-use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Cache\Factory as Cache;
 
 class CacheSchedulingMutex implements SchedulingMutex
 {
     /**
-     * The cache repository implementation.
+     * The cache factory implementation.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Factory
      */
     public $cache;
 
     /**
+     * The cache store that should be used.
+     *
+     * @var string|null
+     */
+    public $store;
+
+    /**
      * Create a new overlapping strategy.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @return void
      */
     public function __construct(Cache $cache)
@@ -34,7 +41,9 @@ class CacheSchedulingMutex implements SchedulingMutex
      */
     public function create(Event $event, DateTimeInterface $time)
     {
-        return $this->cache->add($event->mutexName().$time->format('Hi'), true, 60);
+        return $this->cache->store($this->store)->add(
+            $event->mutexName().$time->format('Hi'), true, 60
+        );
     }
 
     /**
@@ -46,6 +55,21 @@ class CacheSchedulingMutex implements SchedulingMutex
      */
     public function exists(Event $event, DateTimeInterface $time)
     {
-        return $this->cache->has($event->mutexName().$time->format('Hi'));
+        return $this->cache->store($this->store)->has(
+            $event->mutexName().$time->format('Hi')
+        );
+    }
+
+    /**
+     * Specify the cache store that should be used.
+     *
+     * @param  string  $store
+     * @return $this
+     */
+    public function useStore($store)
+    {
+        $this->store = $store;
+
+        return $this;
     }
 }

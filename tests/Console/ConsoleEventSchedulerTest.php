@@ -4,7 +4,10 @@ namespace Illuminate\Tests\Console;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\SchedulingMutex;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
@@ -12,7 +15,7 @@ class ConsoleEventSchedulerTest extends TestCase
     {
         parent::setUp();
 
-        $container = \Illuminate\Container\Container::getInstance();
+        $container = Container::getInstance();
 
         $container->instance('Illuminate\Console\Scheduling\EventMutex', m::mock('Illuminate\Console\Scheduling\CacheEventMutex'));
 
@@ -26,6 +29,14 @@ class ConsoleEventSchedulerTest extends TestCase
     public function tearDown()
     {
         m::close();
+    }
+
+    public function testMutexCanReceiveCustomStore()
+    {
+        Container::getInstance()->make(EventMutex::class)->shouldReceive('useStore')->once()->with('test');
+        Container::getInstance()->make(SchedulingMutex::class)->shouldReceive('useStore')->once()->with('test');
+
+        $this->schedule->useCache('test');
     }
 
     public function testExecCreatesNewCommand()
