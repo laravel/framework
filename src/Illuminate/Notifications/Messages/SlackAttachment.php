@@ -30,6 +30,13 @@ class SlackAttachment
     public $content;
 
     /**
+     * The attachment's pre-text.
+     *
+     * @var string
+     */
+    public $pretext;
+
+    /**
      * A plain-text summary of the attachment.
      *
      * @var string
@@ -137,6 +144,19 @@ class SlackAttachment
     public function content($content)
     {
         $this->content = $content;
+
+        return $this;
+    }
+
+    /**
+     * Set the Pre-text of the attachment.
+     *
+     * @param  string  $pretext
+     * @return $this
+     */
+    public function pretext($pretext)
+    {
+        $this->pretext = $pretext;
 
         return $this;
     }
