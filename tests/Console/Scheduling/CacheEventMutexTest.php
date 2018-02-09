@@ -20,6 +20,11 @@ class CacheEventMutexTest extends TestCase
     protected $event;
 
     /**
+     * @var \Illuminate\Contracts\Cache\Factory
+     */
+    protected $cacheFactory;
+
+    /**
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cacheRepository;
@@ -28,14 +33,25 @@ class CacheEventMutexTest extends TestCase
     {
         parent::setUp();
 
+        $this->cacheFactory = m::mock('Illuminate\Contracts\Cache\Factory');
         $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
-        $this->cacheMutex = new CacheEventMutex($this->cacheRepository);
+        $this->cacheFactory->shouldReceive('store')->andReturn($this->cacheRepository);
+        $this->cacheMutex = new CacheEventMutex($this->cacheFactory);
         $this->event = new Event($this->cacheMutex, 'command');
     }
 
     public function testPreventOverlap()
     {
         $this->cacheRepository->shouldReceive('add')->once();
+
+        $this->cacheMutex->create($this->event);
+    }
+
+    public function testCustomConnection()
+    {
+        $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('add')->once();
+        $this->cacheMutex->useStore('test');
 
         $this->cacheMutex->create($this->event);
     }

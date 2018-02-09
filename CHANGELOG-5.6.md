@@ -1,6 +1,38 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.3 (2018-02-09)
+
+### Fixed
+- Fixed an issue in `TestResponse::assertSessionHasErrors()` ([#23093](https://github.com/laravel/framework/pull/23093))
+- Update Vue and React presets to Bootstrap v4 ([8a9c5c4](https://github.com/laravel/framework/commit/8a9c5c45388fda18aaa5564be131a3144c38b9ce))
+
+
+## v5.6.2 (2018-02-08)
+
+### Changed
+- Support customization of schedule mutex cache store ([20e2919](https://github.com/laravel/framework/commit/20e29199365a11b31e35179bbfe3e83485e05a03))
+
+### Fixed
+- Reverted changes to `TestResponse::assertSessionHasErrors()` [#23055](https://github.com/laravel/framework/pull/23055) ([0362a90](https://github.com/laravel/framework/commit/0362a90fca47de6c283d8ef8c68affefc7b410cf))
+
+
+## v5.6.1 (2018-02-08)
+
+### Added
+- Added Slack attachment pretext attribute ([#23075](https://github.com/laravel/framework/pull/23075))
+
+### Changed
+- Added missing nested joins in `Grammar::compileJoins()` ([#23059](https://github.com/laravel/framework/pull/23059))
+- Improved session errors assertions in `TestResponse::assertSessionHasErrors()` ([#23055](https://github.com/laravel/framework/pull/23055))
+
+### Fixed
+- Fixed `BelongsToMany` pivot relation wakeup ([#23081](https://github.com/laravel/framework/pull/23081))
+
+### Removed
+- Removed monolog configurator ([#23078](https://github.com/laravel/framework/pull/23078))
+
+
+## v5.6.0 (2018-02-07)
 
 ### General
 - ⚠️ Upgraded to Symfony 4 ([#22450](https://github.com/laravel/framework/pull/22450))
@@ -91,7 +123,7 @@
 
 ### Requests
 - ⚠️ Return `false` from `expectsJson()` when requested content type isn't explicit ([#22506](https://github.com/laravel/framework/pull/22506), [3624d27](https://github.com/laravel/framework/commit/3624d2702c783d13bd23b852ce35662bee9a8fea))
-- Added `Request::getSession()` method ([e546a5b](https://github.com/laravel/framework/commit/e546a5b83aa9fb5bbcb8e80db0c263c09b5d5dd6), [e546a5b](https://github.com/laravel/framework/commit/e546a5b83aa9fb5bbcb8e80db0c263c09b5d5dd6))
+- Added `Request::getSession()` method ([e546a5b](https://github.com/laravel/framework/commit/e546a5b83aa9fb5bbcb8e80db0c263c09b5d5dd6))
 - Accept array of keys on `Request::hasAny()` ([#22952](https://github.com/laravel/framework/pull/22952))
 
 ### Responses
@@ -123,7 +155,7 @@
 - ⚠️ Switched to PHPUnit 7 ([#23005](https://github.com/laravel/framework/pull/23005))
 - Support fetching specific key when using json helpers ([#22489](https://github.com/laravel/framework/pull/22489))
 - Use `DatabaseTransactions` trait in `RefreshDatabase` ([#22596](https://github.com/laravel/framework/pull/22596))
-- Added `assertSeeInOrder()` and `assertSeeTextInOrder()` methods ([#22915](https://github.com/laravel/framework/pull/22915))
+- Added `assertSeeInOrder()` and `assertSeeTextInOrder()` methods ([#22915](https://github.com/laravel/framework/pull/22915), [#23038](https://github.com/laravel/framework/pull/23038))
 
 ### Validation
 - ⚠️ Ignore SVGs in `validateDimensions()` ([#21390](https://github.com/laravel/framework/pull/21390))

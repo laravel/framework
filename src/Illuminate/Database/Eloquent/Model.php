@@ -1303,11 +1303,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $relations = [];
 
         foreach ($this->getRelations() as $key => $relation) {
-            $relations[] = $key;
+            if (method_exists($this, $key)) {
+                $relations[] = $key;
+            }
 
             if ($relation instanceof QueueableCollection) {
-                foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
-                    $relations[] = $key.'.'.$collectionKey;
+                foreach ($relation->getQueueableRelations() as $collectionValue) {
+                    $relations[] = $key.'.'.$collectionValue;
                 }
             }
 

@@ -174,4 +174,23 @@ class Schedule
     {
         return $this->events;
     }
+
+    /**
+     * Specify the cache store that should be used to store mutexes.
+     *
+     * @param  string  $store
+     * @return $this
+     */
+    public function useCache($store)
+    {
+        if ($this->eventMutex instanceof CacheEventMutex) {
+            $this->eventMutex->useStore($store);
+        }
+
+        if ($this->schedulingMutex instanceof CacheSchedulingMutex) {
+            $this->schedulingMutex->useStore($store);
+        }
+
+        return $this;
+    }
 }

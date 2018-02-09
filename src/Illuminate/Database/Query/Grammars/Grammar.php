@@ -152,10 +152,12 @@ class Grammar extends BaseGrammar
      */
     protected function compileJoins(Builder $query, $joins)
     {
-        return collect($joins)->map(function ($join) {
+        return collect($joins)->map(function ($join) use ($query) {
             $table = $this->wrapTable($join->table);
 
-            return trim("{$join->type} join {$table} {$this->compileWheres($join)}");
+            $nestedJoins = is_null($join->joins) ? '' : ' '.$this->compileJoins($query, $join->joins);
+
+            return trim("{$join->type} join {$table}{$nestedJoins} {$this->compileWheres($join)}");
         })->implode(' ');
     }
 

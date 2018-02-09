@@ -2,21 +2,28 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Contracts\Cache\Repository as Cache;
+use Illuminate\Contracts\Cache\Factory as Cache;
 
 class CacheEventMutex implements EventMutex
 {
     /**
      * The cache repository implementation.
      *
-     * @var \Illuminate\Contracts\Cache\Repository
+     * @var \Illuminate\Contracts\Cache\Factory
      */
     public $cache;
 
     /**
+     * The cache store that should be used.
+     *
+     * @var string|null
+     */
+    public $store;
+
+    /**
      * Create a new overlapping strategy.
      *
-     * @param  \Illuminate\Contracts\Cache\Repository  $cache
+     * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @return void
      */
     public function __construct(Cache $cache)
@@ -32,7 +39,7 @@ class CacheEventMutex implements EventMutex
      */
     public function create(Event $event)
     {
-        return $this->cache->add(
+        return $this->cache->store($this->store)->add(
             $event->mutexName(), true, $event->expiresAt
         );
     }
@@ -45,7 +52,7 @@ class CacheEventMutex implements EventMutex
      */
     public function exists(Event $event)
     {
-        return $this->cache->has($event->mutexName());
+        return $this->cache->store($this->store)->has($event->mutexName());
     }
 
     /**
@@ -56,6 +63,19 @@ class CacheEventMutex implements EventMutex
      */
     public function forget(Event $event)
     {
-        $this->cache->forget($event->mutexName());
+        $this->cache->store($this->store)->forget($event->mutexName());
+    }
+
+    /**
+     * Specify the cache store that should be used.
+     *
+     * @param  string  $store
+     * @return $this
+     */
+    public function useStore($store)
+    {
+        $this->store = $store;
+
+        return $this;
     }
 }

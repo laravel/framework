@@ -23,6 +23,13 @@ class SlackAttachment
     public $url;
 
     /**
+     * The attachment's pretext.
+     *
+     * @var string
+     */
+    public $pretext;
+
+    /**
      * The attachment's text content.
      *
      * @var string
@@ -124,6 +131,19 @@ class SlackAttachment
     {
         $this->title = $title;
         $this->url = $url;
+
+        return $this;
+    }
+
+    /**
+     * Set the pretext of the attachment.
+     *
+     * @param  string  $pretext
+     * @return $this
+     */
+    public function pretext($pretext)
+    {
+        $this->pretext = $pretext;
 
         return $this;
     }
