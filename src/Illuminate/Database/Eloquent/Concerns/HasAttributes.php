@@ -955,7 +955,7 @@ trait HasAttributes
     }
 
     /**
-     * Sync the changed attributes.
+     * Sync the changed attributes after updating the model in the database.
      *
      * @return $this
      */
@@ -991,7 +991,7 @@ trait HasAttributes
     }
 
     /**
-     * Determine if the model or given attribute(s) have been modified.
+     * Determine what was changed to the model or given attribute(s) when it was persisted.
      *
      * @param  array|string|null  $attributes
      * @return bool
@@ -1050,7 +1050,7 @@ trait HasAttributes
     }
 
     /**
-     * Get the attributes that were changed.
+     * Get the attributes that were changed when the model was last persisted.
      *
      * @return array
      */
