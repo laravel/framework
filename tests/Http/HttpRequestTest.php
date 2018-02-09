@@ -364,27 +364,30 @@ class HttpRequestTest extends TestCase
 
     public function testQueryMethod()
     {
-        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'weapon' => null]);
         $this->assertEquals('Taylor', $request->query('name'));
         $this->assertEquals('Bob', $request->query('foo', 'Bob'));
+        $this->assertEquals('Lance', $request->query('weapon', 'Lance'));
         $all = $request->query(null);
         $this->assertEquals('Taylor', $all['name']);
     }
 
     public function testPostMethod()
     {
-        $request = Request::create('/', 'POST', ['name' => 'Taylor']);
+        $request = Request::create('/', 'POST', ['name' => 'Taylor', 'weapon' => null]);
         $this->assertEquals('Taylor', $request->post('name'));
         $this->assertEquals('Bob', $request->post('foo', 'Bob'));
+        $this->assertEquals('Lance', $request->post('weapon', 'Lance'));
         $all = $request->post(null);
         $this->assertEquals('Taylor', $all['name']);
     }
 
     public function testCookieMethod()
     {
-        $request = Request::create('/', 'GET', [], ['name' => 'Taylor']);
+        $request = Request::create('/', 'GET', [], ['name' => 'Taylor', 'weapon' => null]);
         $this->assertEquals('Taylor', $request->cookie('name'));
         $this->assertEquals('Bob', $request->cookie('foo', 'Bob'));
+        $this->assertEquals('Lance', $request->cookie('weapon', 'Lance'));
         $all = $request->cookie(null);
         $this->assertEquals('Taylor', $all['name']);
     }
@@ -431,9 +434,10 @@ class HttpRequestTest extends TestCase
 
     public function testServerMethod()
     {
-        $request = Request::create('/', 'GET', [], [], [], ['foo' => 'bar']);
+        $request = Request::create('/', 'GET', [], [], [], ['foo' => 'bar', 'moo' => null]);
         $this->assertEquals('bar', $request->server('foo'));
         $this->assertEquals('bar', $request->server('foo.doesnt.exist', 'bar'));
+        $this->assertEquals('far', $request->server('moo', 'far'));
         $all = $request->server(null);
         $this->assertEquals('bar', $all['foo']);
     }
@@ -458,8 +462,9 @@ class HttpRequestTest extends TestCase
 
     public function testHeaderMethod()
     {
-        $request = Request::create('/', 'GET', [], [], [], ['HTTP_DO_THIS' => 'foo']);
+        $request = Request::create('/', 'GET', [], [], [], ['HTTP_DO_THIS' => 'foo', 'HTTP_NO_WAY' => null]);
         $this->assertEquals('foo', $request->header('do-this'));
+        $this->assertEquals('possible', $request->header('no-way', 'possible'));
         $all = $request->header(null);
         $this->assertEquals('foo', $all['do-this'][0]);
     }
