@@ -391,8 +391,6 @@ class Handler implements ExceptionHandlerContract
      */
     protected function renderHttpException(HttpException $e)
     {
-        $status = $e->getStatusCode();
-
         $paths = collect(config('view.paths'));
 
         view()->replaceNamespace('errors', $paths->map(function ($path) {
@@ -400,7 +398,7 @@ class Handler implements ExceptionHandlerContract
         })->push(__DIR__.'/views')->all());
 
         if (view()->exists($view = "errors::{$status}")) {
-            return response()->view($view, ['exception' => $e], $status, $e->getHeaders());
+            return response()->view($view, ['exception' => $e], $e->getStatusCode(), $e->getHeaders());
         }
 
         return $this->convertExceptionToResponse($e);
