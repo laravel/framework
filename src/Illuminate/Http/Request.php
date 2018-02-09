@@ -350,7 +350,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * @param  \Illuminate\Http\Request|null  $to
      * @return static
      */
-    public static function createFrom(Request $from, $to = null)
+    public static function createFrom(self $from, $to = null)
     {
         $request = $to ?: new static;
 
