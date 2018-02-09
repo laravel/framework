@@ -1,5 +1,12 @@
 # Release Notes for 5.6.x
 
+## v5.6.3 (2018-02-09)
+
+### Fixed
+- Fixed an issue in `TestResponse::assertSessionHasErrors()` ([#23093](https://github.com/laravel/framework/pull/23093))
+- Update Vue and React presets to Bootstrap v4 ([8a9c5c4](https://github.com/laravel/framework/commit/8a9c5c45388fda18aaa5564be131a3144c38b9ce))
+
+
 ## v5.6.2 (2018-02-08)
 
 ### Changed
