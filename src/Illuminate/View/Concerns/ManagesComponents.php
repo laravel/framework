@@ -77,7 +77,7 @@ trait ManagesComponents
     public function renderComponent()
     {
         $name = array_pop($this->componentStack);
-        
+
         return $this->make($name, $this->componentData($name))->render();
     }
 
