@@ -35,6 +35,23 @@ trait ManagesComponents
     protected $slotStack = [];
 
     /**
+     * The component aliases.
+     */
+    protected $componentAliases = [];
+
+    /**
+     * Set a component alias.
+     *
+     * @param  string  $path
+     * @param  string  $alias
+     * @return void
+     */
+    public function setComponentAlias($path, $alias)
+    {
+        $this->componentAliases[$alias] = $path;
+    }
+
+    /**
      * Start a component rendering process.
      *
      * @param  string  $name
@@ -44,7 +61,7 @@ trait ManagesComponents
     public function startComponent($name, array $data = [])
     {
         if (ob_start()) {
-            $this->componentStack[] = $name;
+            $this->componentStack[] = $this->componentAliases[$name] ?? $name;
 
             $this->componentData[$this->currentComponent()] = $data;
 

@@ -336,6 +336,23 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('title<hr> component Taylor laravel.com', $contents);
     }
 
+    public function testComponentHandlingWithAlias()
+    {
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->with('component-path')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new \Illuminate\View\Engines\PhpEngine);
+        $factory->getDispatcher()->shouldReceive('dispatch');
+        $factory->setComponentAlias('component-path', 'component-alias');
+        $factory->startComponent('component-alias', ['name' => 'Taylor']);
+        $factory->slot('title');
+        $factory->slot('website', 'laravel.com');
+        echo 'title<hr>';
+        $factory->endSlot();
+        echo 'component';
+        $contents = $factory->renderComponent();
+        $this->assertEquals('title<hr> component Taylor laravel.com', $contents);
+    }
+
     public function testTranslation()
     {
         $container = new \Illuminate\Container\Container;
