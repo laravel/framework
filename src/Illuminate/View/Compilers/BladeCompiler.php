@@ -4,6 +4,7 @@ namespace Illuminate\View\Compilers;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\View;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
@@ -434,6 +435,8 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function component($path, $alias = null)
     {
         $alias = $alias ?: array_last(explode('.', $path));
+
+        View::setComponentAlias($path, $alias);
 
         $this->directive($alias, function ($expression) use ($path) {
             return $expression

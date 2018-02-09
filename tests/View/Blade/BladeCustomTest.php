@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\View\Blade;
 
+use Illuminate\Support\Facades\View;
+
 class BladeCustomTest extends AbstractBladeTestCase
 {
     public function testCustomPhpCodeIsCorrectlyHandled()
@@ -93,6 +95,8 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponents()
     {
+        $this->viewFactory->shouldReceive('setComponentAlias')->with('app.components.alert', 'alert');
+
         $this->compiler->component('app.components.alert', 'alert');
 
         $string = '@alert
@@ -104,6 +108,8 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponentsWithSlots()
     {
+        $this->viewFactory->shouldReceive('setComponentAlias')->with('app.components.alert', 'alert');
+
         $this->compiler->component('app.components.alert', 'alert');
 
         $string = '@alert([\'type\' => \'danger\'])
@@ -115,6 +121,8 @@ class BladeCustomTest extends AbstractBladeTestCase
 
     public function testCustomComponentsDefaultAlias()
     {
+        $this->viewFactory->shouldReceive('setComponentAlias')->with('app.components.alert', 'alert');
+
         $this->compiler->component('app.components.alert');
 
         $string = '@alert
