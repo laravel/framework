@@ -40,14 +40,24 @@ trait SendsPasswordResetEmails
     }
 
     /**
-     * Validate the email for the given request.
+     * Validate the email for the given request and the provided set of rules.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
      */
     protected function validateEmail(Request $request)
     {
-        $this->validate($request, ['email' => 'required|email']);
+        $this->validate($request, $this->rules());
+    }
+
+    /**
+     * Get the password reset requests validation rules.
+     *
+     * @return array
+     */
+    protected function rules()
+    {
+        return ['email' => 'required|email'];
     }
 
     /**
