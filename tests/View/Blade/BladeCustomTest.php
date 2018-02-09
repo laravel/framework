@@ -2,8 +2,6 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-use Illuminate\Support\Facades\View;
-
 class BladeCustomTest extends AbstractBladeTestCase
 {
     public function testCustomPhpCodeIsCorrectlyHandled()
