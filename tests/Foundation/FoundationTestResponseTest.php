@@ -253,6 +253,20 @@ class FoundationTestResponseTest extends TestCase
             $response->json()
         );
     }
+    
+    public function testGetViewData()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'hello world',
+                'getData' => ['foo' => 'bar'],
+            ]));
+        });
+    
+        $response = TestResponse::fromBaseResponse($baseResponse);
+    
+        $this->assertEquals(['foo' => 'bar'], $response->getViewData());
+    }
 }
 
 class JsonSerializableMixedResourcesStub implements JsonSerializable
