@@ -40,9 +40,9 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * The maximum number of seconds to block for a job.
      *
-     * @var int|null
+     * @var int
      */
-    protected $blockFor = null;
+    private $blockFor = 0;
 
     /**
      * Create a new Redis queue instance.
@@ -51,10 +51,10 @@ class RedisQueue extends Queue implements QueueContract
      * @param  string  $default
      * @param  string  $connection
      * @param  int  $retryAfter
-     * @param  int|null  $blockFor
+     * @param  int  $blockFor
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
+    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = 0)
     {
         $this->redis = $redis;
         $this->default = $default;
@@ -209,7 +209,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     protected function retrieveNextJob($queue)
     {
-        if (! is_null($this->blockFor)) {
+        if ($this->blockFor >= 1) {
             return $this->blockingPop($queue);
         }
 
