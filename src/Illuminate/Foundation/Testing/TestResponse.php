@@ -818,6 +818,14 @@ class TestResponse
 
         dd($content);
     }
+    
+    /**
+     * @return array
+     */
+    public function getViewData()
+    {
+        return $this->getOriginalContent()->getData();
+    }
 
     /**
      * Dynamically access base response parameters.
