@@ -22,7 +22,7 @@ class CacheSchedulingMutex implements SchedulingMutex
     public $store;
 
     /**
-     * Create a new overlapping strategy.
+     * Create a new scheduling strategy.
      *
      * @param  \Illuminate\Contracts\Cache\Factory  $cache
      * @return void
