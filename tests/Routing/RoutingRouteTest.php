@@ -1773,7 +1773,6 @@ class ActionStub
     }
 }
 
-
 class StringableObject
 {
     private $value;
