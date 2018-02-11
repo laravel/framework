@@ -662,7 +662,7 @@ if (! function_exists('head')) {
 
 if (! function_exists('is_stringable')) {
     /**
-     * Return true if the param is a string or an object that maybe treated as string
+     * Return true if the param is a string or an object that maybe treated as string.
      * @param $value
      * @return bool
      */
