@@ -17,7 +17,7 @@ class Carbon extends BaseCarbon implements JsonSerializable
      */
     protected static $serializer;
 
-     /**
+    /**
      * Create a new Carbon instance.
      *
      * @param string|int|null           $time
