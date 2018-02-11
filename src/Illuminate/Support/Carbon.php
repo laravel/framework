@@ -17,6 +17,22 @@ class Carbon extends BaseCarbon implements JsonSerializable
      */
     protected static $serializer;
 
+     /**
+     * Create a new Carbon instance.
+     *
+     * @param string|int|null           $time
+     * @param \DateTimeZone|string|null $tz
+     */
+    public function __construct($time = null, $tz = null)
+    {
+        // Convert timestamp to date string
+        if (is_int($time)) {
+            $time = date('Y-m-d H:i:s', $time);
+        }
+
+        parent::__construct($time, $tz);
+    }
+
     /**
      * Prepare the object for JSON serialization.
      *
