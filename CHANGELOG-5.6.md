@@ -1,5 +1,15 @@
 # Release Notes for 5.6.x
 
+## [Unreleased]
+
+### Changed
+- Moved clone logic from `FormRequestServiceProvider` to `Request` ([b0c2459](https://github.com/laravel/framework/commit/b0c2459d7e55519d1c61927ab526e489a3a52eaf))
+
+### Fixed
+- Returns same `Logger` instance from `LogManager` ([#23118](https://github.com/laravel/framework/pull/23118))
+- Register missing `hash.driver` DI ([#23114](https://github.com/laravel/framework/pull/23114))
+
+
 ## v5.6.3 (2018-02-09)
 
 ### Fixed
