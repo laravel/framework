@@ -108,7 +108,7 @@ abstract class TestCase extends BaseTestCase
             $this->runDatabaseMigrations();
         }
 
-        if (isset($uses[DatabaseTransactions::class])) {
+        if (isset($uses[DatabaseTransactions::class]) && !isset($uses[RefreshDatabase::class])) {
             $this->beginDatabaseTransaction();
         }
 
