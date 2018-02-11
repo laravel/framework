@@ -660,6 +660,19 @@ if (! function_exists('head')) {
     }
 }
 
+if (! function_exists('is_stringable')) {
+    /**
+     * Return true if the param is a string or an object that maybe treated as string
+     * @param $value
+     * @return bool
+     */
+    function is_stringable($value)
+    {
+        return Str::isStringable($value);
+    }
+
+}
+
 if (! function_exists('kebab_case')) {
     /**
      * Convert a string to kebab case.

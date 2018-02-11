@@ -460,13 +460,13 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Determine if the action is routing to a controller.
      *
-     * @param  array  $action
+     * @param  \Closure|array|string|object $action
      * @return bool
      */
     protected function actionReferencesController($action)
     {
         if (! $action instanceof Closure) {
-            return is_string($action) || (isset($action['uses']) && is_string($action['uses']));
+            return is_stringable($action) || (isset($action['uses']) && is_stringable($action['uses']));
         }
 
         return false;
@@ -480,7 +480,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     protected function convertToControllerAction($action)
     {
-        if (is_string($action)) {
+        if (is_stringable($action)) {
             $action = ['uses' => $action];
         }
 

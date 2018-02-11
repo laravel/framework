@@ -532,6 +532,16 @@ class Str
     }
 
     /**
+     * Return true if the param is a string, or an object that maybe treated as string
+     * @param $value
+     * @return bool
+     */
+    public static function isStringable($value) {
+        return is_string($value) ||
+            (is_object($value) && is_callable([$value, '__toString']));
+    }
+
+    /**
      * Generate a time-ordered UUID (version 4).
      *
      * @return \Ramsey\Uuid\Uuid
