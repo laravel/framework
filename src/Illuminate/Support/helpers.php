@@ -670,7 +670,6 @@ if (! function_exists('is_stringable')) {
     {
         return Str::isStringable($value);
     }
-
 }
 
 if (! function_exists('kebab_case')) {
