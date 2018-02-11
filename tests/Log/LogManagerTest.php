@@ -14,6 +14,6 @@ class LogManagerTest extends TestCase
         $logger1 = $manager->channel('single')->getLogger();
         $logger2 = $manager->channel('single')->getLogger();
 
-        $this->assertEquals(spl_object_id($logger1), spl_object_id($logger2));
+        $this->assertSame($logger1, $logger2);
     }
 }
