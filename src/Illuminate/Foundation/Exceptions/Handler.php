@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ViewErrorBag;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Http\RedirectResponse;
 use Whoops\Handler\PrettyPageHandler;
@@ -31,7 +32,6 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
-use Illuminate\Support\ViewErrorBag;
 
 class Handler implements ExceptionHandlerContract
 {
