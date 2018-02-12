@@ -249,6 +249,15 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('App\\Illuminate\Tests\Routing\RouteTestControllerStub@index', $action['controller']);
     }
 
+    public function testActionSpecifiedByAStringableObject()
+    {
+        $router = $this->getRouter();
+        $actionObject = new StringableObject('App\\Illuminate\Tests\Routing\RouteTestControllerStub@index');
+        $router->get('foo/bar')->uses($actionObject);
+        $action = $router->getRoutes()->getRoutes()[0]->getAction();
+        $this->assertEquals('App\\Illuminate\Tests\Routing\RouteTestControllerStub@index', $action['controller']);
+    }
+
     public function testMiddlewareGroups()
     {
         unset($_SERVER['__middleware.group']);
@@ -1761,5 +1770,20 @@ class ActionStub
     public function __invoke()
     {
         return 'hello';
+    }
+}
+
+class StringableObject
+{
+    private $value;
+
+    public function __construct($value)
+    {
+        $this->value = $value;
+    }
+
+    public function __toString()
+    {
+        return $this->value;
     }
 }
