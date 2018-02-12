@@ -1,10 +1,17 @@
 @if ($paginator->hasPages())
     <div class="ui pagination menu">
+        {{-- First Page Link --}}
+        @if ($paginator->onFirstPage())
+            <a class="icon item disabled"> <i class="left double angle icon"></i> </a>
+        @else
+            <a class="icon item" href="{{ $paginator->url(1) }}" rel="first"> <i class="left double angle icon"></i> </a>
+        @endif
+
         {{-- Previous Page Link --}}
         @if ($paginator->onFirstPage())
-            <a class="icon item disabled"> <i class="left chevron icon"></i> </a>
+            <a class="icon item disabled"> <i class="left angle icon"></i> </a>
         @else
-            <a class="icon item" href="{{ $paginator->previousPageUrl() }}" rel="prev"> <i class="left chevron icon"></i> </a>
+            <a class="icon item" href="{{ $paginator->previousPageUrl() }}" rel="prev"> <i class="left angle icon"></i> </a>
         @endif
 
         {{-- Pagination Elements --}}
@@ -28,9 +35,16 @@
 
         {{-- Next Page Link --}}
         @if ($paginator->hasMorePages())
-            <a class="icon item" href="{{ $paginator->nextPageUrl() }}" rel="next"> <i class="right chevron icon"></i> </a>
+            <a class="icon item" href="{{ $paginator->nextPageUrl() }}" rel="next"> <i class="right angle icon"></i> </a>
         @else
-            <a class="icon item disabled"> <i class="right chevron icon"></i> </a>
+            <a class="icon item disabled"> <i class="right angle icon"></i> </a>
+        @endif
+
+        {{-- Last Page Link --}}
+        @if ($paginator->hasMorePages())
+            <a class="icon item" href="{{ $paginator->url($paginator->lastPage()) }}" rel="last"> <i class="right double angle icon"></i> </a>
+        @else
+            <a class="icon item disabled"> <i class="right double angle icon"></i> </a>
         @endif
     </div>
 @endif
