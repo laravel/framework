@@ -131,6 +131,8 @@ class Handler implements ExceptionHandlerContract
             $e = new NotFoundHttpException($e->getMessage(), $e);
         } elseif ($e instanceof AuthorizationException) {
             $e = new HttpException(403, $e->getMessage());
+        } elseif ($e instanceof TokenMismatchException) {
+            $e = new HttpException(419, $e->getMessage());
         }
 
         return $e;
