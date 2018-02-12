@@ -76,7 +76,7 @@ class Str
      */
     public static function before($subject, $search)
     {
-        return $search === '' ? $subject : explode($search, $subject)[0];
+        return $search === '' ? $subject : explode($search, $subject, 2)[0];
     }
 
     /**
