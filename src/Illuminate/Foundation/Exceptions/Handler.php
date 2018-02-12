@@ -31,6 +31,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
 use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
+use Illuminate\Support\ViewErrorBag;
 
 class Handler implements ExceptionHandlerContract
 {
@@ -400,7 +401,7 @@ class Handler implements ExceptionHandlerContract
         })->push(__DIR__.'/views')->all());
 
         if (view()->exists($view = "errors::{$status}")) {
-            return response()->view($view, ['exception' => $e], $status, $e->getHeaders());
+            return response()->view($view, ['exception' => $e, 'errors' => new ViewErrorBag], $status, $e->getHeaders());
         }
 
         return $this->convertExceptionToResponse($e);
