@@ -1008,6 +1008,28 @@ if (! function_exists('str_start')) {
     }
 }
 
+if(! function_exists('str_uuid')) {
+    /**
+     * Generate a UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\Uuid
+     */
+    function str_uuid() {
+        return Str::uuid();
+    }
+}
+
+if(! function_exists('str_ordered_uuid')) {
+    /**
+     * Generate a time-ordered UUID (version 4).
+     *
+     * @return \Ramsey\Uuid\Uuid
+     */
+    function str_ordered_uuid() {
+        return Str::orderedUuid();
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
