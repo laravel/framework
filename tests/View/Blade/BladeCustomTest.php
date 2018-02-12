@@ -73,4 +73,54 @@ class BladeCustomTest extends AbstractBladeTestCase
 <?php endif; ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testCustomIfElseConditions()
+    {
+        $this->compiler->if('custom', function ($anything) {
+            return true;
+        });
+
+        $string = '@custom($user)
+@elsecustom($product)
+@else
+@endcustom';
+        $expected = '<?php if (\Illuminate\Support\Facades\Blade::check(\'custom\', $user)): ?>
+<?php elseif (\Illuminate\Support\Facades\Blade::check(\'custom\', $product)): ?>
+<?php else: ?>
+<?php endif; ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomComponents()
+    {
+        $this->compiler->component('app.components.alert', 'alert');
+
+        $string = '@alert
+@endalert';
+        $expected = '<?php $__env->startComponent(\'app.components.alert\'); ?>
+<?php echo $__env->renderComponent(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomComponentsWithSlots()
+    {
+        $this->compiler->component('app.components.alert', 'alert');
+
+        $string = '@alert([\'type\' => \'danger\'])
+@endalert';
+        $expected = '<?php $__env->startComponent(\'app.components.alert\', [\'type\' => \'danger\']); ?>
+<?php echo $__env->renderComponent(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomComponentsDefaultAlias()
+    {
+        $this->compiler->component('app.components.alert');
+
+        $string = '@alert
+@endalert';
+        $expected = '<?php $__env->startComponent(\'app.components.alert\'); ?>
+<?php echo $__env->renderComponent(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }

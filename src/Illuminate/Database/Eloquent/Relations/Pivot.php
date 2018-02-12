@@ -95,9 +95,17 @@ class Pivot extends Model
      */
     protected function setKeysForSaveQuery(Builder $query)
     {
-        $query->where($this->foreignKey, $this->getAttribute($this->foreignKey));
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return parent::setKeysForSaveQuery($query);
+        }
 
-        return $query->where($this->relatedKey, $this->getAttribute($this->relatedKey));
+        $query->where($this->foreignKey, $this->getOriginal(
+            $this->foreignKey, $this->getAttribute($this->foreignKey)
+        ));
+
+        return $query->where($this->relatedKey, $this->getOriginal(
+            $this->relatedKey, $this->getAttribute($this->relatedKey)
+        ));
     }
 
     /**
@@ -107,6 +115,10 @@ class Pivot extends Model
      */
     public function delete()
     {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return parent::delete();
+        }
+
         return $this->getDeleteQuery()->delete();
     }
 
@@ -118,8 +130,8 @@ class Pivot extends Model
     protected function getDeleteQuery()
     {
         return $this->newQuery()->where([
-            $this->foreignKey => $this->getAttribute($this->foreignKey),
-            $this->relatedKey => $this->getAttribute($this->relatedKey),
+            $this->foreignKey => $this->getOriginal($this->foreignKey, $this->getAttribute($this->foreignKey)),
+            $this->relatedKey => $this->getOriginal($this->relatedKey, $this->getAttribute($this->relatedKey)),
         ]);
     }
 
@@ -213,5 +225,72 @@ class Pivot extends Model
     public function getUpdatedAtColumn()
     {
         return $this->pivotParent->getUpdatedAtColumn();
+    }
+
+    /**
+     * Get the queueable identity for the entity.
+     *
+     * @return mixed
+     */
+    public function getQueueableId()
+    {
+        if (isset($this->attributes[$this->getKeyName()])) {
+            return $this->getKey();
+        }
+
+        return sprintf(
+            '%s:%s:%s:%s',
+            $this->foreignKey, $this->getAttribute($this->foreignKey),
+            $this->relatedKey, $this->getAttribute($this->relatedKey)
+        );
+    }
+
+    /**
+     * Get a new query to restore one or more models by their queueable IDs.
+     *
+     * @param  array|int  $ids
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function newQueryForRestoration($ids)
+    {
+        if (is_array($ids)) {
+            return $this->newQueryForCollectionRestoration($ids);
+        }
+
+        if (! Str::contains($ids, ':')) {
+            return parent::newQueryForRestoration($ids);
+        }
+
+        $segments = explode(':', $ids);
+
+        return $this->newQueryWithoutScopes()
+                        ->where($segments[0], $segments[1])
+                        ->where($segments[2], $segments[3]);
+    }
+
+    /**
+     * Get a new query to restore multiple models by their queueable IDs.
+     *
+     * @param  array|int  $ids
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function newQueryForCollectionRestoration(array $ids)
+    {
+        if (! Str::contains($ids[0], ':')) {
+            return parent::newQueryForRestoration($ids);
+        }
+
+        $query = $this->newQueryWithoutScopes();
+
+        foreach ($ids as $id) {
+            $segments = explode(':', $id);
+
+            $query->orWhere(function ($query) use ($segments) {
+                return $query->where($segments[0], $segments[1])
+                             ->where($segments[2], $segments[3]);
+            });
+        }
+
+        return $query;
     }
 }

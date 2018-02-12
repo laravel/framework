@@ -76,19 +76,31 @@ class PolicyMakeCommand extends GeneratorCommand
     {
         $model = str_replace('/', '\\', $model);
 
+        $namespaceModel = $this->laravel->getNamespace().$model;
+
         if (Str::startsWith($model, '\\')) {
             $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
         } else {
-            $stub = str_replace('NamespacedDummyModel', $this->laravel->getNamespace().$model, $stub);
+            $stub = str_replace('NamespacedDummyModel', $namespaceModel, $stub);
         }
+
+        $stub = str_replace(
+            "use {$namespaceModel};\nuse {$namespaceModel};", "use {$namespaceModel};", $stub
+        );
 
         $model = class_basename(trim($model, '\\'));
 
+        $dummyUser = class_basename(config('auth.providers.users.model'));
+
+        $dummyModel = Str::camel($model) === 'user' ? 'model' : Str::camel($model);
+
         $stub = str_replace('DummyModel', $model, $stub);
 
-        $stub = str_replace('dummyModel', Str::camel($model), $stub);
+        $stub = str_replace('dummyModel', $dummyModel, $stub);
 
-        return str_replace('dummyPluralModel', Str::plural(Str::camel($model)), $stub);
+        $stub = str_replace('DummyUser', $dummyUser, $stub);
+
+        return str_replace('dummyPluralModel', Str::plural($dummyModel), $stub);
     }
 
     /**

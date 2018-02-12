@@ -21,8 +21,9 @@ class WorkCommand extends Command
     protected $signature = 'queue:work
                             {connection? : The name of the queue connection to work}
                             {--queue= : The names of the queues to work}
+                            {--daemon : Run the worker in daemon mode (Deprecated)}
                             {--once : Only process the next job on the queue}
-                            {--delay=0 : Amount of time to delay failed jobs}
+                            {--delay=0 : The number of seconds to delay failed jobs}
                             {--force : Force the worker to run even in maintenance mode}
                             {--memory=128 : The memory limit in megabytes}
                             {--sleep=3 : Number of seconds to sleep when no job is available}
@@ -54,8 +55,6 @@ class WorkCommand extends Command
         parent::__construct();
 
         $this->worker = $worker;
-
-        $this->ignoreValidationErrors();
     }
 
     /**
@@ -169,8 +168,9 @@ class WorkCommand extends Command
     protected function writeStatus(Job $job, $status, $type)
     {
         $this->output->writeln(sprintf(
-            "<{$type}>[%s] %s</{$type}> %s",
+            "<{$type}>[%s][%s] %s</{$type}> %s",
             Carbon::now()->format('Y-m-d H:i:s'),
+            $job->getJobId(),
             str_pad("{$status}:", 11), $job->resolveName()
         ));
     }
@@ -178,7 +178,7 @@ class WorkCommand extends Command
     /**
      * Store a failed job event.
      *
-     * @param  JobFailed  $event
+     * @param  \Illuminate\Queue\Events\JobFailed  $event
      * @return void
      */
     protected function logFailedJob(JobFailed $event)

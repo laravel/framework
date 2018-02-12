@@ -94,11 +94,13 @@ trait InteractsWithInput
     /**
      * Determine if the request contains any of the given inputs.
      *
-     * @param  dynamic  $key
+     * @param  string|array  $key
      * @return bool
      */
-    public function hasAny(...$keys)
+    public function hasAny($keys)
     {
+        $keys = is_array($keys) ? $keys : func_get_args();
+
         $input = $this->all();
 
         foreach ($keys as $key) {
@@ -143,6 +145,16 @@ trait InteractsWithInput
     }
 
     /**
+     * Get the keys for all of the input and files.
+     *
+     * @return array
+     */
+    public function keys()
+    {
+        return array_merge(array_keys($this->input()), $this->files->keys());
+    }
+
+    /**
      * Get all of the input and files for the request.
      *
      * @param  array|mixed  $keys
@@ -168,9 +180,9 @@ trait InteractsWithInput
     /**
      * Retrieve an input item from the request.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string|array|null  $default
-     * @return string|array
+     * @return string|array|null
      */
     public function input($key = null, $default = null)
     {

@@ -9,6 +9,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Optional;
 
 class SupportHelpersTest extends TestCase
 {
@@ -123,7 +124,7 @@ class SupportHelpersTest extends TestCase
     {
         $array = ['name' => 'taylor', 'age' => 26];
         $this->assertEquals(['name' => 'taylor'], Arr::only($array, ['name']));
-        $this->assertSame([], Arr::only($array, ['nonExistingKey']));
+        $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
     }
 
     public function testArrayCollapse()
@@ -287,6 +288,13 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('test/string/', Str::finish('test/string', '/'));
         $this->assertEquals('test/string/', Str::finish('test/string/', '/'));
         $this->assertEquals('test/string/', Str::finish('test/string//', '/'));
+    }
+
+    public function testStrStart()
+    {
+        $this->assertEquals('/test/string', Str::start('test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('/test/string', '/'));
+        $this->assertEquals('/test/string', Str::start('//test/string', '/'));
     }
 
     public function testSnakeCase()
@@ -691,20 +699,30 @@ class SupportHelpersTest extends TestCase
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
-        $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
         ],
         class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
-        $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
         ],
         class_uses_recursive(new SupportTestClassTwo));
+    }
+
+    public function testClassUsesRecursiveReturnParentTraitsFirst()
+    {
+        $this->assertSame([
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            'Illuminate\Tests\Support\SupportTestTraitThree' => 'Illuminate\Tests\Support\SupportTestTraitThree',
+        ],
+        class_uses_recursive(SupportTestClassThree::class));
     }
 
     public function testArrayAdd()
@@ -740,6 +758,11 @@ class SupportHelpersTest extends TestCase
         throw_if(true, new RuntimeException);
     }
 
+    public function testThrowReturnIfNotThrown()
+    {
+        $this->assertSame('foo', throw_unless('foo', new RuntimeException));
+    }
+
     /**
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Test Message
@@ -747,6 +770,107 @@ class SupportHelpersTest extends TestCase
     public function testThrowWithString()
     {
         throw_if(true, RuntimeException::class, 'Test Message');
+    }
+
+    public function testOptional()
+    {
+        $this->assertNull(optional(null)->something());
+
+        $this->assertEquals(10, optional(new class {
+            public function something()
+            {
+                return 10;
+            }
+        })->something());
+    }
+
+    public function testOptionalWithArray()
+    {
+        $this->assertNull(optional(null)['missing']);
+
+        $this->assertEquals('here', optional(['present' => 'here'])['present']);
+    }
+
+    public function testOptionalReturnsObjectPropertyOrNull()
+    {
+        $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
+        $this->assertNull(optional(['foo' => 'bar'])->foo);
+    }
+
+    public function testOptionalDeterminesWhetherKeyIsSet()
+    {
+        $this->assertTrue(isset(optional(['foo' => 'bar'])['foo']));
+        $this->assertFalse(isset(optional(['foo' => 'bar'])['bar']));
+        $this->assertFalse(isset(optional()['bar']));
+    }
+
+    public function testOptionalAllowsToSetKey()
+    {
+        $optional = optional([]);
+        $optional['foo'] = 'bar';
+        $this->assertSame('bar', $optional['foo']);
+
+        $optional = optional(null);
+        $optional['foo'] = 'bar';
+        $this->assertFalse(isset($optional['foo']));
+    }
+
+    public function testOptionalAllowToUnsetKey()
+    {
+        $optional = optional(['foo' => 'bar']);
+        $this->assertTrue(isset($optional['foo']));
+        unset($optional['foo']);
+        $this->assertFalse(isset($optional['foo']));
+
+        $optional = optional((object) ['foo' => 'bar']);
+        $this->assertFalse(isset($optional['foo']));
+        $optional['foo'] = 'bar';
+        $this->assertFalse(isset($optional['foo']));
+    }
+
+    public function testOptionalIsMacroable()
+    {
+        Optional::macro('present', function () {
+            if (is_object($this->value)) {
+                return $this->value->present();
+            }
+
+            return new Optional(null);
+        });
+
+        $this->assertNull(optional(null)->present()->something());
+
+        $this->assertEquals('$10.00', optional(new class {
+            public function present()
+            {
+                return new class {
+                    public function something()
+                    {
+                        return '$10.00';
+                    }
+                };
+            }
+        })->present()->something());
+    }
+
+    public function testTransform()
+    {
+        $this->assertEquals(10, transform(5, function ($value) {
+            return $value * 2;
+        }));
+
+        $this->assertNull(transform(null, function () {
+            return 10;
+        }));
+    }
+
+    public function testWith()
+    {
+        $this->assertEquals(10, with(10));
+
+        $this->assertEquals(10, with(5, function ($five) {
+            return $five + 5;
+        }));
     }
 }
 
@@ -766,6 +890,15 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
+}
+
+trait SupportTestTraitThree
+{
+}
+
+class SupportTestClassThree extends SupportTestClassTwo
+{
+    use SupportTestTraitThree;
 }
 
 class SupportTestArrayAccess implements ArrayAccess

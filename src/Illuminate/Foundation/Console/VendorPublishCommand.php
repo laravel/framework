@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use League\Flysystem\MountManager;
 use Illuminate\Filesystem\Filesystem;
@@ -110,7 +111,7 @@ class VendorPublishCommand extends Command
             $choices = $this->publishableChoices()
         );
 
-        if ($choice == $choices[0]) {
+        if ($choice == $choices[0] || is_null($choice)) {
             return;
         }
 
@@ -126,15 +127,15 @@ class VendorPublishCommand extends Command
     {
         return array_merge(
             ['<comment>Publish files from all providers and tags listed below</comment>'],
-            preg_filter('/^/', '<comment>Provider: </comment>', ServiceProvider::publishableProviders()),
-            preg_filter('/^/', '<comment>Tag: </comment>', ServiceProvider::publishableGroups())
+            preg_filter('/^/', '<comment>Provider: </comment>', Arr::sort(ServiceProvider::publishableProviders())),
+            preg_filter('/^/', '<comment>Tag: </comment>', Arr::sort(ServiceProvider::publishableGroups()))
         );
     }
 
     /**
      * Parse the answer that was given via the prompt.
      *
-     * @param string $choice
+     * @param  string  $choice
      * @return void
      */
     protected function parseChoice($choice)

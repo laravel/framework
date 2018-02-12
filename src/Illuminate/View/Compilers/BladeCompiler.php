@@ -12,8 +12,10 @@ class BladeCompiler extends Compiler implements CompilerInterface
         Concerns\CompilesComponents,
         Concerns\CompilesConditionals,
         Concerns\CompilesEchos,
+        Concerns\CompilesHelpers,
         Concerns\CompilesIncludes,
         Concerns\CompilesInjections,
+        Concerns\CompilesJson,
         Concerns\CompilesLayouts,
         Concerns\CompilesLoops,
         Concerns\CompilesRawPhp,
@@ -94,13 +96,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      * @var array
      */
     protected $footer = [];
-
-    /**
-     * Placeholder to temporary mark the position of raw blocks.
-     *
-     * @var string
-     */
-    protected $rawPlaceholder = '@__raw-block__@';
 
     /**
      * Array to temporary store the raw blocks found in the template.
@@ -199,9 +194,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storeVerbatimBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@verbatim(.*?)@endverbatim/s', function ($matches) {
-            $this->rawBlocks[] = $matches[1];
-
-            return $this->rawPlaceholder;
+            return $this->storeRawBlock($matches[1]);
         }, $value);
     }
 
@@ -214,10 +207,21 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected function storePhpBlocks($value)
     {
         return preg_replace_callback('/(?<!@)@php(.*?)@endphp/s', function ($matches) {
-            $this->rawBlocks[] = "<?php{$matches[1]}?>";
-
-            return $this->rawPlaceholder;
+            return $this->storeRawBlock("<?php{$matches[1]}?>");
         }, $value);
+    }
+
+    /**
+     * Store a raw block and return a unique raw placeholder.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function storeRawBlock($value)
+    {
+        return $this->getRawPlaceholder(
+            array_push($this->rawBlocks, $value) - 1
+        );
     }
 
     /**
@@ -228,13 +232,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function restoreRawContent($result)
     {
-        $result = preg_replace_callback('/'.preg_quote($this->rawPlaceholder).'/', function () {
-            return array_shift($this->rawBlocks);
+        $result = preg_replace_callback('/'.$this->getRawPlaceholder('(\d+)').'/', function ($matches) {
+            return $this->rawBlocks[$matches[1]];
         }, $result);
 
         $this->rawBlocks = [];
 
         return $result;
+    }
+
+    /**
+     * Get a placeholder to temporary mark the position of raw blocks.
+     *
+     * @param  int|string  $replace
+     * @return string
+     */
+    protected function getRawPlaceholder($replace)
+    {
+        return str_replace('#', $replace, '@__raw_block_#__@');
     }
 
     /**
@@ -386,6 +401,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
                     : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
+        $this->directive('else'.$name, function ($expression) use ($name) {
+            return $expression
+                ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
+                : "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
+        });
+
         $this->directive('end'.$name, function () {
             return '<?php endif; ?>';
         });
@@ -401,6 +422,28 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function check($name, ...$parameters)
     {
         return call_user_func($this->conditions[$name], ...$parameters);
+    }
+
+    /**
+     * Register a component alias directive.
+     *
+     * @param  string  $path
+     * @param  string  $alias
+     * @return void
+     */
+    public function component($path, $alias = null)
+    {
+        $alias = $alias ?: array_last(explode('.', $path));
+
+        $this->directive($alias, function ($expression) use ($path) {
+            return $expression
+                        ? "<?php \$__env->startComponent('{$path}', {$expression}); ?>"
+                        : "<?php \$__env->startComponent('{$path}'); ?>";
+        });
+
+        $this->directive('end'.$alias, function ($expression) {
+            return '<?php echo $__env->renderComponent(); ?>';
+        });
     }
 
     /**
@@ -434,5 +477,25 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setEchoFormat($format)
     {
         $this->echoFormat = $format;
+    }
+
+    /**
+     * Set the "echo" format to double encode entities.
+     *
+     * @return void
+     */
+    public function withDoubleEncoding()
+    {
+        $this->setEchoFormat('e(%s, true)');
+    }
+
+    /**
+     * Set the "echo" format to not double encode entities.
+     *
+     * @return void
+     */
+    public function withoutDoubleEncoding()
+    {
+        $this->setEchoFormat('e(%s, false)');
     }
 }

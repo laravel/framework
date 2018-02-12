@@ -70,7 +70,7 @@ class ViewTest extends TestCase
     {
         $view = m::mock('Illuminate\View\View[render]', [
             m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
+            m::mock(\Illuminate\Contracts\View\Engine::class),
             'view',
             'path',
             [],
@@ -224,7 +224,7 @@ class ViewTest extends TestCase
     {
         return new View(
             m::mock('Illuminate\View\Factory'),
-            m::mock('Illuminate\View\Engines\EngineInterface'),
+            m::mock(\Illuminate\Contracts\View\Engine::class),
             'view',
             'path',
             $data

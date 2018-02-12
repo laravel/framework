@@ -28,11 +28,18 @@ interface Application extends Container
     public function environment();
 
     /**
-     * Determine if we are running in the console.
+     * Determine if the application is running in the console.
      *
      * @return bool
      */
     public function runningInConsole();
+
+    /**
+     * Determine if the application is running unit tests.
+     *
+     * @return bool
+     */
+    public function runningUnitTests();
 
     /**
      * Determine if the application is currently down for maintenance.
@@ -62,7 +69,7 @@ interface Application extends Container
      * Register a deferred provider and service.
      *
      * @param  string  $provider
-     * @param  string  $service
+     * @param  string|null  $service
      * @return void
      */
     public function registerDeferredProvider($provider, $service = null);

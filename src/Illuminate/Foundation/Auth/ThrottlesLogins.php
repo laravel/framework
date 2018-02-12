@@ -20,7 +20,7 @@ trait ThrottlesLogins
     protected function hasTooManyLoginAttempts(Request $request)
     {
         return $this->limiter()->tooManyAttempts(
-            $this->throttleKey($request), $this->maxAttempts(), $this->decayMinutes()
+            $this->throttleKey($request), $this->maxAttempts()
         );
     }
 
@@ -32,14 +32,17 @@ trait ThrottlesLogins
      */
     protected function incrementLoginAttempts(Request $request)
     {
-        $this->limiter()->hit($this->throttleKey($request));
+        $this->limiter()->hit(
+            $this->throttleKey($request), $this->decayMinutes()
+        );
     }
 
     /**
      * Redirect the user after determining they are locked out.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return void
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendLockoutResponse(Request $request)
     {

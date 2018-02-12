@@ -47,9 +47,9 @@ class SqlServerConnector extends Connector implements ConnectorInterface
             return $this->getDblibDsn($config);
         } elseif ($this->prefersOdbc($config)) {
             return $this->getOdbcDsn($config);
-        } else {
-            return $this->getSqlSrvDsn($config);
         }
+
+        return $this->getSqlSrvDsn($config);
     }
 
     /**
@@ -75,7 +75,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         return $this->buildConnectString('dblib', array_merge([
             'host' => $this->buildHostString($config, ':'),
             'dbname' => $config['database'],
-        ], Arr::only($config, ['appname', 'charset'])));
+        ], Arr::only($config, ['appname', 'charset', 'version'])));
     }
 
     /**
@@ -128,6 +128,14 @@ class SqlServerConnector extends Connector implements ConnectorInterface
 
         if (isset($config['multiple_active_result_sets']) && $config['multiple_active_result_sets'] === false) {
             $arguments['MultipleActiveResultSets'] = 'false';
+        }
+
+        if (isset($config['transaction_isolation'])) {
+            $arguments['TransactionIsolation'] = $config['transaction_isolation'];
+        }
+
+        if (isset($config['multi_subnet_failover'])) {
+            $arguments['MultiSubnetFailover'] = $config['multi_subnet_failover'];
         }
 
         return $this->buildConnectString('sqlsrv', $arguments);

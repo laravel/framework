@@ -296,6 +296,20 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo.bar', $router->currentRouteName());
     }
 
+    public function testRouteGetAction()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo', function () {
+            return 'foo';
+        })->name('foo');
+
+        $this->assertInternalType('array', $route->getAction());
+        $this->assertArrayHasKey('as', $route->getAction());
+        $this->assertEquals('foo', $route->getAction('as'));
+        $this->assertNull($route->getAction('unknown_property'));
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
@@ -307,6 +321,25 @@ class RoutingRouteTest extends TestCase
         $router->webhook();
         $this->assertEquals('OK', $router->dispatch(Request::create('webhook', 'GET'))->getContent());
         $this->assertEquals('OK', $router->dispatch(Request::create('webhook', 'POST'))->getContent());
+    }
+
+    public function testRouteMacro()
+    {
+        $router = $this->getRouter();
+
+        Route::macro('breadcrumb', function ($breadcrumb) {
+            $this->action['breadcrumb'] = $breadcrumb;
+
+            return $this;
+        });
+
+        $router->get('foo', function () {
+            return 'bar';
+        })->breadcrumb('fooBreadcrumb')->name('foo');
+
+        $router->getRoutes()->refreshNameLookups();
+
+        $this->assertEquals('fooBreadcrumb', $router->getRoutes()->getByName('foo')->getAction()['breadcrumb']);
     }
 
     public function testClassesCanBeInjectedIntoRoutes()
@@ -493,7 +526,6 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage
      */
     public function testRoutesDontMatchNonMatchingPathsWithLeadingOptionals()
     {
@@ -506,7 +538,6 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage
      */
     public function testRoutesDontMatchNonMatchingDomain()
     {
@@ -790,9 +821,6 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('12345', $router->dispatch(Request::create('foo-bar/12345', 'GET'))->getContent());
     }
 
-    /**
-     * @group shit
-     */
     public function testModelBindingWithCompoundParameterNameAndRouteBinding()
     {
         $router = $this->getRouter();
@@ -1118,7 +1146,7 @@ class RoutingRouteTest extends TestCase
 
         $router = $this->getRouter();
         $router->resource('foos', 'FooController', ['parameters' => 'singular']);
-        $router->resource('foos.bars', 'FooController', ['parameters' => 'singular']);
+        $router->resource('foos.bars', 'FooController')->parameters('singular');
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
@@ -1127,6 +1155,13 @@ class RoutingRouteTest extends TestCase
 
         $router = $this->getRouter();
         $router->resource('foos.bars', 'FooController', ['parameters' => ['foos' => 'foo', 'bars' => 'bar']]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('foos/{foo}/bars/{bar}', $routes[3]->uri());
+
+        $router = $this->getRouter();
+        $router->resource('foos.bars', 'FooController')->parameter('foos', 'foo')->parameter('bars', 'bar');
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
 
@@ -1331,7 +1366,6 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage
      */
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
     {
@@ -1593,7 +1627,7 @@ class RouteBindingStub
     }
 }
 
-class RouteModelBindingStub
+class RouteModelBindingStub extends Model
 {
     public function getRouteKeyName()
     {
@@ -1613,7 +1647,7 @@ class RouteModelBindingStub
     }
 }
 
-class RouteModelBindingNullStub
+class RouteModelBindingNullStub extends Model
 {
     public function getRouteKeyName()
     {

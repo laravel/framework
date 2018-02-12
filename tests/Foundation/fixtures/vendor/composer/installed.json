@@ -11,7 +11,10 @@
         "providers": "foo",
         "aliases": {
           "Foo": "Foo\\Facade"
-        }
+        },
+        "dont-discover": [
+            "vendor_a/package_d"
+        ]
       }
     }
   },
@@ -22,6 +25,9 @@
         "providers": [
           "bar",
           "baz"
+        ],
+        "dont-discover": [
+            "vendor_a/package_e"
         ]
       }
     }
@@ -29,5 +35,25 @@
   {
     "name": "vendor_a/package_c",
     "type": "library"
+  },
+  {
+    "name": "vendor_a/package_d",
+    "extra": {
+      "laravel": {
+        "providers": [
+          "bazinga"
+        ]
+      }
+    }
+  },
+  {
+    "name": "vendor_a/package_e",
+    "extra": {
+      "laravel": {
+        "providers": [
+          "pennypennypenny"
+        ]
+      }
+    }
   }
 ]

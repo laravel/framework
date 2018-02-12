@@ -2,6 +2,7 @@
 
 namespace Illuminate\Queue;
 
+use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
 
@@ -47,7 +48,7 @@ abstract class Queue
      * Push a new job onto the queue after a delay.
      *
      * @param  string  $queue
-     * @param  \DateTime|int  $delay
+     * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  string  $job
      * @param  mixed   $data
      * @return mixed
@@ -121,6 +122,7 @@ abstract class Queue
             'job' => 'Illuminate\Queue\CallQueuedHandler@call',
             'maxTries' => $job->tries ?? null,
             'timeout' => $job->timeout ?? null,
+            'timeoutAt' => $this->getJobExpiration($job),
             'data' => [
                 'commandName' => get_class($job),
                 'command' => serialize(clone $job),
@@ -138,6 +140,24 @@ abstract class Queue
     {
         return method_exists($job, 'displayName')
                         ? $job->displayName() : get_class($job);
+    }
+
+    /**
+     * Get the expiration timestamp for an object-based queue handler.
+     *
+     * @param  mixed  $job
+     * @return mixed
+     */
+    public function getJobExpiration($job)
+    {
+        if (! method_exists($job, 'retryUntil') && ! isset($job->timeoutAt)) {
+            return;
+        }
+
+        $expiration = $job->timeoutAt ?? $job->retryUntil();
+
+        return $expiration instanceof DateTimeInterface
+                        ? $expiration->getTimestamp() : $expiration;
     }
 
     /**

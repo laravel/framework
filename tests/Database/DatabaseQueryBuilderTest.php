@@ -293,6 +293,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
     }
 
+    public function testDateBasedWheresExpressionIsNotBound()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'))->where('admin', true);
+        $this->assertEquals([true], $builder->getBindings());
+    }
+
     public function testWhereDayMySql()
     {
         $builder = $this->getMySqlBuilder();
@@ -322,6 +329,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
         $this->assertEquals('select * from `users` where time(`created_at`) >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereTimeOperatorOptionalMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from `users` where time(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereTimeOperatorOptionalPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from "users" where extract(time from "created_at") = ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
@@ -1045,6 +1068,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([48, 'baz', null], $builder->getBindings());
     }
 
+    public function testJoinWhereInSubquery()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
+            $q = $this->getBuilder();
+            $q->select('name')->from('contacts')->where('name', 'baz');
+            $j->on('users.id', '=', 'contacts.id')->whereIn('contacts.name', $q);
+        });
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" and "contacts"."name" in (select "name" from "contacts" where "name" = ?)', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->join('contacts', function ($j) {
+            $q = $this->getBuilder();
+            $q->select('name')->from('contacts')->where('name', 'baz');
+            $j->on('users.id', '=', 'contacts.id')->orWhereIn('contacts.name', $q);
+        });
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "contacts"."name" in (select "name" from "contacts" where "name" = ?)', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+    }
+
     public function testJoinWhereNotIn()
     {
         $builder = $this->getBuilder();
@@ -1099,6 +1143,99 @@ class DatabaseQueryBuilderTest extends TestCase
         });
         $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and ("role" = ? or "contacts"."disabled" is null or year(contacts.created_at) = 2016)', $builder->toSql());
         $this->assertEquals(['admin'], $builder->getBindings());
+    }
+
+    public function testJoinsWithSubqueryCondition()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->whereIn('contact_type_id', function ($q) {
+                $q->select('id')->from('contact_types')
+                    ->where('category_id', '1')
+                    ->whereNull('deleted_at');
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and "contact_type_id" in (select "id" from "contact_types" where "category_id" = ? and "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals(['1'], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->whereExists(function ($q) {
+                $q->selectRaw('1')->from('contact_types')
+                    ->whereRaw('contact_types.id = contacts.contact_type_id')
+                    ->where('category_id', '1')
+                    ->whereNull('deleted_at');
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and exists (select 1 from "contact_types" where contact_types.id = contacts.contact_type_id and "category_id" = ? and "deleted_at" is null)', $builder->toSql());
+        $this->assertEquals(['1'], $builder->getBindings());
+    }
+
+    public function testJoinsWithAdvancedSubqueryCondition()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->whereExists(function ($q) {
+                $q->selectRaw('1')->from('contact_types')
+                    ->whereRaw('contact_types.id = contacts.contact_type_id')
+                    ->where('category_id', '1')
+                    ->whereNull('deleted_at')
+                    ->whereIn('level_id', function ($q) {
+                        $q->select('id')->from('levels')
+                            ->where('is_active', true);
+                    });
+            });
+        });
+        $this->assertEquals('select * from "users" left join "contacts" on "users"."id" = "contacts"."id" and exists (select 1 from "contact_types" where contact_types.id = contacts.contact_type_id and "category_id" = ? and "deleted_at" is null and "level_id" in (select "id" from "levels" where "is_active" = ?))', $builder->toSql());
+        $this->assertEquals(['1', true], $builder->getBindings());
+    }
+
+    public function testJoinsWithNestedJoins()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id');
+        });
+        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join "contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" on "users"."id" = "contacts"."id"', $builder->toSql());
+    }
+
+    public function testJoinsWithMultipleNestedJoins()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('users.id', 'contacts.id', 'contact_types.id', 'countrys.id', 'planets.id')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')
+                ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
+                ->leftJoin('countrys', function ($q) {
+                    $q->on('contacts.country', '=', 'countrys.country')
+                        ->join('planets', function ($q) {
+                            $q->on('countrys.planet_id', '=', 'planet.id')
+                                ->where('planet.is_settled', '=', 1)
+                                ->where('planet.population', '>=', 10000);
+                        });
+                });
+        });
+        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id", "countrys"."id", "planets"."id" from "users" left join "contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" left join "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? and "planet"."population" >= ? on "contacts"."country" = "countrys"."country" on "users"."id" = "contacts"."id"', $builder->toSql());
+        $this->assertEquals(['1', 10000], $builder->getBindings());
+    }
+
+    public function testJoinsWithNestedJoinWithAdvancedSubqueryCondition()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('users.id', 'contacts.id', 'contact_types.id')->from('users')->leftJoin('contacts', function ($j) {
+            $j->on('users.id', 'contacts.id')
+                ->join('contact_types', 'contacts.contact_type_id', '=', 'contact_types.id')
+                ->whereExists(function ($q) {
+                    $q->select('*')->from('countrys')
+                        ->whereColumn('contacts.country', '=', 'countrys.country')
+                        ->join('planets', function ($q) {
+                            $q->on('countrys.planet_id', '=', 'planet.id')
+                                ->where('planet.is_settled', '=', 1);
+                        })
+                        ->where('planet.population', '>=', 10000);
+                });
+        });
+        $this->assertEquals('select "users"."id", "contacts"."id", "contact_types"."id" from "users" left join "contacts" inner join "contact_types" on "contacts"."contact_type_id" = "contact_types"."id" on "users"."id" = "contacts"."id" and exists (select * from "countrys" inner join "planets" on "countrys"."planet_id" = "planet"."id" and "planet"."is_settled" = ? where "contacts"."country" = "countrys"."country" and "planet"."population" >= ?)', $builder->toSql());
+        $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
     public function testRawExpressionsInSelect()
@@ -1192,6 +1329,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->with('select exists(select * from "users") as "exists"', [], true)->andReturn([['exists' => 1]]);
         $results = $builder->from('users')->exists();
+        $this->assertTrue($results);
+
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select exists(select * from "users") as "exists"', [], true)->andReturn([['exists' => 0]]);
+        $results = $builder->from('users')->doesntExist();
         $this->assertTrue($results);
 
         $builder = $this->getBuilder();
@@ -1419,12 +1561,17 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testUpdateMethodWithJoinsOnSQLite()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" set "email" = ?, "name" = ? where "users"."id" = ?', ['foo', 'bar', 1])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" where "users"."id" > ? order by "id" asc limit 3)', ['foo', 'bar', 1])->andReturn(1);
+        $result = $builder->from('users')->where('users.id', '>', 1)->limit(3)->oldest('id')->update(['email' => 'foo', 'name' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" where "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', 'users.id', '=', 'orders.user_id')->where('users.id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
 
         $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ? set "email" = ?, "name" = ?', [1, 'foo', 'bar'])->andReturn(1);
+        $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "rowid" in (select "users"."rowid" from "users" inner join "orders" on "users"."id" = "orders"."user_id" and "users"."id" = ?)', ['foo', 'bar', 1])->andReturn(1);
         $result = $builder->from('users')->join('orders', function ($join) {
             $join->on('users.id', '=', 'orders.user_id')
                 ->where('users.id', '=', 1);
@@ -1512,6 +1659,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->delete(1);
         $this->assertEquals(1, $result);
 
+        $builder = $this->getSqliteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" where "email" = ? order by "id" asc limit 1)', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
+        $this->assertEquals(1, $result);
+
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete from `users` where `email` = ? order by `id` asc limit 1', ['foo'])->andReturn(1);
         $result = $builder->from('users')->where('email', '=', 'foo')->orderBy('id')->take(1)->delete();
@@ -1525,6 +1677,11 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testDeleteWithJoinMethod()
     {
+        $builder = $this->getSqliteBuilder();
+        $builder->getConnection()->shouldReceive('delete')->once()->with('delete from "users" where "rowid" in (select "users"."rowid" from "users" inner join "contacts" on "users"."id" = "contacts"."id" where "users"."email" = ? order by "users"."id" asc limit 1)', ['foo'])->andReturn(1);
+        $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('users.email', '=', 'foo')->orderBy('users.id')->limit(1)->delete();
+        $this->assertEquals(1, $result);
+
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('delete')->once()->with('delete `users` from `users` inner join `contacts` on `users`.`id` = `contacts`.`id` where `email` = ?', ['foo'])->andReturn(1);
         $result = $builder->from('users')->join('contacts', 'users.id', '=', 'contacts.id')->where('email', '=', 'foo')->orderBy('id')->limit(1)->delete();
@@ -1610,13 +1767,31 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
-                        'update `users` set `name` = json_set(`name`, "$.first_name", ?), `name` = json_set(`name`, "$.last_name", ?) where `active` = ?',
+                        'update `users` set `name` = json_set(`name`, \'$."first_name"\', ?), `name` = json_set(`name`, \'$."last_name"\', ?) where `active` = ?',
                         ['John', 'Doe', 1]
                     );
 
         $builder = new Builder($connection, $grammar, $processor);
 
         $result = $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
+    }
+
+    public function testMySqlUpdateWrappingNestedJson()
+    {
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+        $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
+        $connection->expects($this->once())
+                    ->method('update')
+                    ->with(
+                        'update `users` set `meta` = json_set(`meta`, \'$."name"."first_name"\', ?), `meta` = json_set(`meta`, \'$."name"."last_name"\', ?) where `active` = ?',
+                        ['John', 'Doe', 1]
+                    );
+
+        $builder = new Builder($connection, $grammar, $processor);
+
+        $result = $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
     }
 
     public function testMySqlUpdateWithJsonRemovesBindingsCorrectly()
@@ -1628,7 +1803,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
                     ->once()
                     ->with(
-                        'update `users` set `options` = json_set(`options`, "$.enable", false), `updated_at` = ? where `id` = ?',
+                        'update `users` set `options` = json_set(`options`, \'$."enable"\', false), `updated_at` = ? where `id` = ?',
                         ['2015-05-26 22:02:06', 0]
                     );
         $builder = new Builder($connection, $grammar, $processor);
@@ -1637,7 +1812,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
             ->once()
             ->with(
-                'update `users` set `options` = json_set(`options`, "$.size", 45), `updated_at` = ? where `id` = ?',
+                'update `users` set `options` = json_set(`options`, \'$."size"\', 45), `updated_at` = ? where `id` = ?',
                 ['2015-05-26 22:02:06', 0]
             );
         $builder = new Builder($connection, $grammar, $processor);
@@ -1684,8 +1859,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testMySqlWrappingJson()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereRaw('items->"$.price" = 1');
-        $this->assertEquals('select * from `users` where items->"$.price" = 1', $builder->toSql());
+        $builder->select('*')->from('users')->whereRaw('items->\'$."price"\' = 1');
+        $this->assertEquals('select * from `users` where items->\'$."price"\' = 1', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
@@ -1805,11 +1980,12 @@ class DatabaseQueryBuilderTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Query\Builder::noValidMethodHere()
      */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
         $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select');
+        $builder->getProcessor()->shouldReceive('processSelect')->andReturn([]);
 
         $builder->noValidMethodHere();
     }
@@ -2205,7 +2381,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with($page, $perPage)->andReturnSelf();
         $builder->shouldReceive('get')->once()->andReturn($results);
 
-        Paginator::currentPageResolver(function () use ($path) {
+        Paginator::currentPageResolver(function () {
             return 1;
         });
 
@@ -2236,7 +2412,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldNotReceive('forPage');
         $builder->shouldNotReceive('get');
 
-        Paginator::currentPageResolver(function () use ($path) {
+        Paginator::currentPageResolver(function () {
             return 1;
         });
 
@@ -2250,6 +2426,26 @@ class DatabaseQueryBuilderTest extends TestCase
             'path' => $path,
             'pageName' => $pageName,
         ]), $result);
+    }
+
+    public function testWhereRowValues()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereRowValues(['last_update', 'order_number'], '<', [1, 2]);
+        $this->assertEquals('select * from "orders" where (last_update, order_number) < (?, ?)', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where('company_id', 1)->orWhereRowValues(['last_update', 'order_number'], '<', [1, 2]);
+        $this->assertEquals('select * from "orders" where "company_id" = ? or (last_update, order_number) < (?, ?)', $builder->toSql());
+    }
+
+    public function testWhereRowValuesArityMismatch()
+    {
+        $this->expectException('InvalidArgumentException');
+        $this->expectExceptionMessage('The number of columns must match the number of values');
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }
 
     protected function getBuilder()

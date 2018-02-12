@@ -122,7 +122,7 @@ class Arr
     }
 
     /**
-     * Get all of the given array except for a specified array of items.
+     * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
      * @param  array|string  $keys
@@ -206,17 +206,21 @@ class Arr
      */
     public static function flatten($array, $depth = INF)
     {
-        return array_reduce($array, function ($result, $item) use ($depth) {
+        $result = [];
+
+        foreach ($array as $item) {
             $item = $item instanceof Collection ? $item->all() : $item;
 
             if (! is_array($item)) {
-                return array_merge($result, [$item]);
+                $result[] = $item;
             } elseif ($depth === 1) {
-                return array_merge($result, array_values($item));
+                $result = array_merge($result, array_values($item));
             } else {
-                return array_merge($result, static::flatten($item, $depth - 1));
+                $result = array_merge($result, static::flatten($item, $depth - 1));
             }
-        }, []);
+        }
+
+        return $result;
     }
 
     /**
@@ -458,27 +462,35 @@ class Arr
     }
 
     /**
-     * Get a random value from an array.
+     * Get one or a specified number of random values from an array.
      *
      * @param  array  $array
-     * @param  int|null  $amount
+     * @param  int|null  $number
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    public static function random($array, $amount = null)
+    public static function random($array, $number = null)
     {
-        if (($requested = $amount ?: 1) > ($count = count($array))) {
+        $requested = is_null($number) ? 1 : $number;
+
+        $count = count($array);
+
+        if ($requested > $count) {
             throw new InvalidArgumentException(
-                "You requested {$requested} items, but there are only {$count} items in the array."
+                "You requested {$requested} items, but there are only {$count} items available."
             );
         }
 
-        if (is_null($amount)) {
+        if (is_null($number)) {
             return $array[array_rand($array)];
         }
 
-        $keys = array_rand($array, $amount);
+        if ((int) $number === 0) {
+            return [];
+        }
+
+        $keys = array_rand($array, $number);
 
         $results = [];
 
@@ -542,10 +554,10 @@ class Arr
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
-     * @param  callable|string  $callback
+     * @param  callable|string|null  $callback
      * @return array
      */
-    public static function sort($array, $callback)
+    public static function sort($array, $callback = null)
     {
         return Collection::make($array)->sortBy($callback)->all();
     }
@@ -586,13 +598,17 @@ class Arr
     }
 
     /**
-     * If the given value is not an array, wrap it in one.
+     * If the given value is not an array and not null, wrap it in one.
      *
      * @param  mixed  $value
      * @return array
      */
     public static function wrap($value)
     {
+        if (is_null($value)) {
+            return [];
+        }
+
         return ! is_array($value) ? [$value] : $value;
     }
 }

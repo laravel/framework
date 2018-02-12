@@ -332,7 +332,7 @@ class Dispatcher implements DispatcherContract
     /**
      * Register an event listener with the dispatcher.
      *
-     * @param  string|\Closure  $listener
+     * @param  \Closure|string  $listener
      * @param  bool  $wildcard
      * @return \Closure
      */
@@ -345,9 +345,9 @@ class Dispatcher implements DispatcherContract
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return $listener($event, $payload);
-            } else {
-                return $listener(...array_values($payload));
             }
+
+            return $listener(...array_values($payload));
         };
     }
 
@@ -363,11 +363,11 @@ class Dispatcher implements DispatcherContract
         return function ($event, $payload) use ($listener, $wildcard) {
             if ($wildcard) {
                 return call_user_func($this->createClassCallable($listener), $event, $payload);
-            } else {
-                return call_user_func_array(
-                    $this->createClassCallable($listener), $payload
-                );
             }
+
+            return call_user_func_array(
+                $this->createClassCallable($listener), $payload
+            );
         };
     }
 
@@ -383,9 +383,9 @@ class Dispatcher implements DispatcherContract
 
         if ($this->handlerShouldBeQueued($class)) {
             return $this->createQueuedHandlerCallable($class, $method);
-        } else {
-            return [$this->container->make($class), $method];
         }
+
+        return [$this->container->make($class), $method];
     }
 
     /**
@@ -504,6 +504,8 @@ class Dispatcher implements DispatcherContract
         return tap($job, function ($job) use ($listener) {
             $job->tries = $listener->tries ?? null;
             $job->timeout = $listener->timeout ?? null;
+            $job->timeoutAt = method_exists($listener, 'retryUntil')
+                                ? $listener->retryUntil() : null;
         });
     }
 

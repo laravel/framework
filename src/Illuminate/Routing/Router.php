@@ -11,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -209,17 +210,30 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function any($uri, $action = null)
     {
-        $verbs = ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE'];
+        return $this->addRoute(self::$verbs, $uri, $action);
+    }
 
-        return $this->addRoute($verbs, $uri, $action);
+    /**
+     * Register a new Fallback route with the router.
+     *
+     * @param  \Closure|array|string|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function fallback($action)
+    {
+        $placeholder = 'fallbackPlaceholder';
+
+        return $this->addRoute(
+            'GET', "{{$placeholder}}", $action
+        )->where($placeholder, '.*')->fallback();
     }
 
     /**
      * Create a redirect from one URI to another.
      *
-     * @param string  $uri
-     * @param string  $destination
-     * @param int  $status
+     * @param  string  $uri
+     * @param  string  $destination
+     * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
     public function redirect($uri, $destination, $status = 301)
@@ -239,7 +253,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function view($uri, $view, $data = [])
     {
-        return $this->get($uri, '\Illuminate\Routing\ViewController')
+        return $this->match(['GET', 'HEAD'], $uri, '\Illuminate\Routing\ViewController')
                 ->defaults('view', $view)
                 ->defaults('data', $data);
     }
@@ -292,7 +306,20 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Route an api resource to a controller.
+     * Register an array of API resource controllers.
+     *
+     * @param  array  $resources
+     * @return void
+     */
+    public function apiResources(array $resources)
+    {
+        foreach ($resources as $name => $controller) {
+            $this->apiResource($name, $controller);
+        }
+    }
+
+    /**
+     * Route an API resource to a controller.
      *
      * @param  string  $name
      * @param  string  $controller
@@ -539,6 +566,19 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Return the response returned by the given route.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function respondWithRoute($name)
+    {
+        $route = tap($this->routes->getByName($name))->bind($this->currentRequest);
+
+        return $this->runRoute($this->currentRequest, $route);
+    }
+
+    /**
      * Dispatch the request to the application.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -559,20 +599,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function dispatchToRoute(Request $request)
     {
-        // First we will find a route that matches this request. We will also set the
-        // route resolver on the request so middlewares assigned to the route will
-        // receive access to this route instance for checking of the parameters.
-        $route = $this->findRoute($request);
-
-        $request->setRouteResolver(function () use ($route) {
-            return $route;
-        });
-
-        $this->events->dispatch(new Events\RouteMatched($route, $request));
-
-        $response = $this->runRouteWithinStack($route, $request);
-
-        return $this->prepareResponse($request, $response);
+        return $this->runRoute($request, $this->findRoute($request));
     }
 
     /**
@@ -588,6 +615,26 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->container->instance(Route::class, $route);
 
         return $route;
+    }
+
+    /**
+     * Return the response for the given route.
+     *
+     * @param  Route  $route
+     * @param  Request  $request
+     * @return mixed
+     */
+    protected function runRoute(Request $request, Route $route)
+    {
+        $request->setRouteResolver(function () use ($route) {
+            return $route;
+        });
+
+        $this->events->dispatch(new Events\RouteMatched($route, $request));
+
+        return $this->prepareResponse($request,
+            $this->runRouteWithinStack($route, $request)
+        );
     }
 
     /**
@@ -647,7 +694,19 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  mixed  $response
      * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    public static function prepareResponse($request, $response)
+    public function prepareResponse($request, $response)
+    {
+        return static::toResponse($request, $response);
+    }
+
+    /**
+     * Static version of prepareResponse.
+     *
+     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  mixed  $response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     */
+    public static function toResponse($request, $response)
     {
         if ($response instanceof Responsable) {
             $response = $response->toResponse($request);
@@ -655,6 +714,8 @@ class Router implements RegistrarContract, BindingRegistrar
 
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
+        } elseif ($response instanceof Model && $response->wasRecentlyCreated) {
+            $response = new JsonResponse($response, 201);
         } elseif (! $response instanceof SymfonyResponse &&
                    ($response instanceof Arrayable ||
                     $response instanceof Jsonable ||
@@ -1148,6 +1209,10 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if ($method == 'middleware') {
+            return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
         return (new RouteRegistrar($this))->attribute($method, $parameters[0]);

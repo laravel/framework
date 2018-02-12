@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
+use ReflectionObject;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -124,6 +125,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
 
         Relation::morphMap([], false);
+        Eloquent::unsetConnectionResolver();
     }
 
     /**
@@ -135,6 +137,9 @@ class DatabaseEloquentIntegrationTest extends TestCase
         EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $this->assertEquals(2, EloquentTestUser::count());
+
+        $this->assertFalse(EloquentTestUser::where('email', 'taylorotwell@gmail.com')->doesntExist());
+        $this->assertTrue(EloquentTestUser::where('email', 'mohamed@laravel.com')->doesntExist());
 
         $model = EloquentTestUser::where('email', 'taylorotwell@gmail.com')->first();
         $this->assertEquals('taylorotwell@gmail.com', $model->email);
@@ -1138,6 +1143,76 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 
+    public function testTimestampsUsingDefaultDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s'); // Default MySQL/PostgreSQL/SQLite date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19', $model->fromDateTime($model->getAttribute('created_at')));
+    }
+
+    public function testTimestampsUsingDefaultSqlServerDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.v'); // Default SQL Server date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.000',
+            'updated_at' => '2017-11-14 08:23:19.734',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734000', $this->getRawDateTimeString($model->getAttribute('updated_at')));
+        $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734', $model->fromDateTime($model->getAttribute('updated_at')));
+    }
+
+    public function testTimestampsUsingCustomDateFormat()
+    {
+        // Simulating using custom precisions with timestamps(4)
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.u'); // Custom date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.0000',
+            'updated_at' => '2017-11-14 08:23:19.7348',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734800', $this->getRawDateTimeString($model->getAttribute('updated_at')));
+        // Note: when storing databases would truncate the value to the given precision
+        $this->assertEquals('2017-11-14 08:23:19.000000', $model->fromDateTime($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.734800', $model->fromDateTime($model->getAttribute('updated_at')));
+    }
+
+    public function testTimestampsUsingOldSqlServerDateFormat()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
+        $model->setRawAttributes([
+            'created_at' => '2017-11-14 08:23:19.000',
+        ]);
+
+        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
+        $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
+    {
+        $model = new EloquentTestUser;
+        $model->setDateFormat('Y-m-d H:i:s.000'); // Old SQL Server date format
+        $model->setRawAttributes([
+            'updated_at' => '2017-11-14 08:23:19.734',
+        ]);
+
+        $attribute = $model->fromDateTime($model->getAttribute('updated_at'));
+    }
+
     /**
      * Helpers...
      */
@@ -1160,6 +1235,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
+    }
+
+    protected function getRawDateTimeString($object)
+    {
+        return (new ReflectionObject($object))->getProperty('date')->getValue($object);
     }
 }
 

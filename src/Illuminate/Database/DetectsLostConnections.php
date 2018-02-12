@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database;
 
-use Exception;
+use Throwable;
 use Illuminate\Support\Str;
 
 trait DetectsLostConnections
@@ -10,10 +10,10 @@ trait DetectsLostConnections
     /**
      * Determine if the given exception was caused by a lost connection.
      *
-     * @param  \Exception  $e
+     * @param  \Throwable  $e
      * @return bool
      */
-    protected function causedByLostConnection(Exception $e)
+    protected function causedByLostConnection(Throwable $e)
     {
         $message = $e->getMessage();
 
@@ -29,6 +29,9 @@ trait DetectsLostConnections
             'Error writing data to the connection',
             'Resource deadlock avoided',
             'Transaction() on null',
+            'child connection forced to terminate due to client_idle_limit',
+            'query_wait_timeout',
+            'reset by peer',
         ]);
     }
 }

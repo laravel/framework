@@ -26,7 +26,7 @@ class UploadedFile extends SymfonyUploadedFile
      * Store the uploaded file on a filesystem disk.
      *
      * @param  string  $path
-     * @param  array  $options
+     * @param  array|string  $options
      * @return string|false
      */
     public function store($path, $options = [])
@@ -38,7 +38,7 @@ class UploadedFile extends SymfonyUploadedFile
      * Store the uploaded file on a filesystem disk with public visibility.
      *
      * @param  string  $path
-     * @param  array  $options
+     * @param  array|string  $options
      * @return string|false
      */
     public function storePublicly($path, $options = [])
@@ -55,7 +55,7 @@ class UploadedFile extends SymfonyUploadedFile
      *
      * @param  string  $path
      * @param  string  $name
-     * @param  array  $options
+     * @param  array|string  $options
      * @return string|false
      */
     public function storePubliclyAs($path, $name, $options = [])
@@ -72,7 +72,7 @@ class UploadedFile extends SymfonyUploadedFile
      *
      * @param  string  $path
      * @param  string  $name
-     * @param  array  $options
+     * @param  array|string  $options
      * @return string|false
      */
     public function storeAs($path, $name, $options = [])

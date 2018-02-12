@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -221,9 +220,15 @@ class FactoryBuilder
      *
      * @param  array  $attributes
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getRawAttributes(array $attributes = [])
     {
+        if (! isset($this->definitions[$this->class][$this->name])) {
+            throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
+        }
+
         $definition = call_user_func(
             $this->definitions[$this->class][$this->name],
             $this->faker, $attributes
@@ -239,16 +244,10 @@ class FactoryBuilder
      *
      * @param  array  $attributes
      * @return \Illuminate\Database\Eloquent\Model
-     *
-     * @throws \InvalidArgumentException
      */
     protected function makeInstance(array $attributes = [])
     {
         return Model::unguarded(function () use ($attributes) {
-            if (! isset($this->definitions[$this->class][$this->name])) {
-                throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
-            }
-
             $instance = new $this->class(
                 $this->getRawAttributes($attributes)
             );
@@ -287,8 +286,8 @@ class FactoryBuilder
     /**
      * Get the state attributes.
      *
-     * @param string $state
-     * @param array $attributes
+     * @param  string  $state
+     * @param  array  $attributes
      * @return array
      */
     protected function stateAttributes($state, array $attributes)
@@ -314,7 +313,7 @@ class FactoryBuilder
     protected function expandAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
-            if ($attribute instanceof Closure) {
+            if (is_callable($attribute) && ! is_string($attribute)) {
                 $attribute = $attribute($attributes);
             }
 

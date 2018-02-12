@@ -48,7 +48,7 @@ class ThrottleRequests
 
         $maxAttempts = $this->resolveMaxAttempts($request, $maxAttempts);
 
-        if ($this->limiter->tooManyAttempts($key, $maxAttempts, $decayMinutes)) {
+        if ($this->limiter->tooManyAttempts($key, $maxAttempts)) {
             throw $this->buildException($key, $maxAttempts);
         }
 
@@ -73,6 +73,10 @@ class ThrottleRequests
     {
         if (Str::contains($maxAttempts, '|')) {
             $maxAttempts = explode('|', $maxAttempts, 2)[$request->user() ? 1 : 0];
+        }
+
+        if (! is_numeric($maxAttempts) && $request->user()) {
+            $maxAttempts = $request->user()->{$maxAttempts};
         }
 
         return (int) $maxAttempts;
@@ -109,7 +113,7 @@ class ThrottleRequests
      */
     protected function buildException($key, $maxAttempts)
     {
-        $retryAfter = $this->limiter->availableIn($key);
+        $retryAfter = $this->getTimeUntilNextRetry($key);
 
         $headers = $this->getHeaders(
             $maxAttempts,
@@ -120,6 +124,17 @@ class ThrottleRequests
         return new HttpException(
             429, 'Too Many Attempts.', null, $headers
         );
+    }
+
+    /**
+     * Get the number of seconds until the next retry.
+     *
+     * @param  string  $key
+     * @return int
+     */
+    protected function getTimeUntilNextRetry($key)
+    {
+        return $this->limiter->availableIn($key);
     }
 
     /**

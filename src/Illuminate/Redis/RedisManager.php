@@ -36,6 +36,7 @@ class RedisManager implements Factory
      *
      * @param  string  $driver
      * @param  array  $config
+     * @return void
      */
     public function __construct($driver, array $config)
     {
@@ -115,6 +116,16 @@ class RedisManager implements Factory
             case 'phpredis':
                 return new Connectors\PhpRedisConnector;
         }
+    }
+
+    /**
+     * Return all of the created connections.
+     *
+     * @return array
+     */
+    public function connections()
+    {
+        return $this->connections;
     }
 
     /**

@@ -87,9 +87,9 @@ class ValidationRuleParser
             return explode('|', $rule);
         } elseif (is_object($rule)) {
             return [$this->prepareRule($rule)];
-        } else {
-            return array_map([$this, 'prepareRule'], $rule);
         }
+
+        return array_map([$this, 'prepareRule'], $rule);
     }
 
     /**
@@ -111,7 +111,7 @@ class ValidationRuleParser
             return $rule;
         }
 
-        return strval($rule);
+        return (string) $rule;
     }
 
     /**

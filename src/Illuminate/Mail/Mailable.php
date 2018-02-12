@@ -7,6 +7,7 @@ use ReflectionProperty;
 use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
@@ -65,6 +66,13 @@ class Mailable implements MailableContract, Renderable
     protected $markdown;
 
     /**
+     * The HTML to use for the message.
+     *
+     * @var string
+     */
+    protected $html;
+
+    /**
      * The view to use for the message.
      *
      * @var string
@@ -120,8 +128,8 @@ class Mailable implements MailableContract, Renderable
             $this->buildFrom($message)
                  ->buildRecipients($message)
                  ->buildSubject($message)
-                 ->buildAttachments($message)
-                 ->runCallbacks($message);
+                 ->runCallbacks($message)
+                 ->buildAttachments($message);
         });
     }
 
@@ -133,6 +141,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function queue(Queue $queue)
     {
+        if (property_exists($this, 'delay')) {
+            return $this->later($this->delay, $queue);
+        }
+
         $connection = property_exists($this, 'connection') ? $this->connection : null;
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
@@ -146,7 +158,7 @@ class Mailable implements MailableContract, Renderable
      * Deliver the queued message after the given delay.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  Queue  $queue
+     * @param  \Illuminate\Contracts\Queue\Factory  $queue
      * @return mixed
      */
     public function later($delay, Queue $queue)
@@ -181,6 +193,13 @@ class Mailable implements MailableContract, Renderable
      */
     protected function buildView()
     {
+        if (isset($this->html)) {
+            return array_filter([
+                'html' => new HtmlString($this->html),
+                'text' => isset($this->textView) ? $this->textView : null,
+            ]);
+        }
+
         if (isset($this->markdown)) {
             return $this->buildMarkdownView();
         }
@@ -457,6 +476,18 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Determine if the given recipient is set on the mailable.
+     *
+     * @param  object|array|string  $address
+     * @param  string|null  $name
+     * @return bool
+     */
+    public function hasReplyTo($address, $name = null)
+    {
+        return $this->hasRecipient($address, $name, 'replyTo');
+    }
+
+    /**
      * Set the recipients of the message.
      *
      * All recipients are stored internally as [['name' => ?, 'address' => ?]]
@@ -535,9 +566,9 @@ class Mailable implements MailableContract, Renderable
         return collect($this->{$property})->contains(function ($actual) use ($expected) {
             if (! isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
-            } else {
-                return $actual == $expected;
             }
+
+            return $actual == $expected;
         });
     }
 
@@ -580,6 +611,19 @@ class Mailable implements MailableContract, Renderable
     {
         $this->view = $view;
         $this->viewData = array_merge($this->viewData, $data);
+
+        return $this;
+    }
+
+    /**
+     * Set the rendered HTML content for the message.
+     *
+     * @param  string  $html
+     * @return $this
+     */
+    public function html($html)
+    {
+        $this->html = $html;
 
         return $this;
     }

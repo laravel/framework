@@ -15,8 +15,8 @@ class Preset
     {
         $filesystem = new Filesystem;
 
-        if (! $filesystem->isDirectory(resource_path('assets/js/components'))) {
-            $filesystem->makeDirectory(resource_path('assets/js/components'), 0755, true);
+        if (! $filesystem->isDirectory($directory = resource_path('assets/js/components'))) {
+            $filesystem->makeDirectory($directory, 0755, true);
         }
     }
 

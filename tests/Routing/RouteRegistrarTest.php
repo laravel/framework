@@ -28,6 +28,37 @@ class RouteRegistrarTest extends TestCase
         m::close();
     }
 
+    public function testMiddlewareFluentRegistration()
+    {
+        $this->router->middleware(['one', 'two'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
+
+        $this->router->middleware('three', 'four')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['three', 'four'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware('five', 'six');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['five', 'six'], $this->getRoute()->middleware());
+
+        $this->router->middleware('seven')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['seven'], $this->getRoute()->middleware());
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
@@ -223,6 +254,9 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanNameRoutesOnRegisteredResource()
     {
+        $this->router->resource('comments', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->only('create', 'store')->names('reply');
+
         $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
                      ->only('create', 'store')->names([
                          'create' => 'user.build',
@@ -234,6 +268,8 @@ class RouteRegistrarTest extends TestCase
                     ->name('create', 'posts.make')
                     ->name('destroy', 'posts.remove');
 
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('reply.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('reply.store'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.build'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('user.save'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('posts.make'));

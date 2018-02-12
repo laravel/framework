@@ -6,7 +6,7 @@ use Memcached;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Tests\Redis\InteractsWithRedis;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 /**
  * @group integration
@@ -15,7 +15,7 @@ class CacheLockTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setup()
+    public function setUp()
     {
         parent::setUp();
 
@@ -86,7 +86,6 @@ class CacheLockTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Contracts\Cache\LockTimeoutException
-     * @expectedExceptionMessage
      */
     public function test_locks_throw_timeout_if_block_expires()
     {

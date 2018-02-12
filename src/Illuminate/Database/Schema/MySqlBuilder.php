@@ -43,12 +43,36 @@ class MySqlBuilder extends Builder
      */
     public function dropAllTables()
     {
-        $this->disableForeignKeyConstraints();
+        $tables = [];
 
-        foreach ($this->connection->select('SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'') as $table) {
-            $this->drop(get_object_vars($table)[key($table)]);
+        foreach ($this->getAllTables() as $row) {
+            $row = (array) $row;
+
+            $tables[] = reset($row);
         }
 
+        if (empty($tables)) {
+            return;
+        }
+
+        $this->disableForeignKeyConstraints();
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllTables($tables)
+        );
+
         $this->enableForeignKeyConstraints();
+    }
+
+    /**
+     * Get all of the table names for the database.
+     *
+     * @return array
+     */
+    protected function getAllTables()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllTables()
+        );
     }
 }

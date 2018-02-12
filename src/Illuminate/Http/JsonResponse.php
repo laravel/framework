@@ -4,13 +4,16 @@ namespace Illuminate\Http;
 
 use JsonSerializable;
 use InvalidArgumentException;
+use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\JsonResponse as BaseJsonResponse;
 
 class JsonResponse extends BaseJsonResponse
 {
-    use ResponseTrait;
+    use ResponseTrait, Macroable {
+        Macroable::__call as macroCall;
+    }
 
     /**
      * Constructor.
@@ -19,6 +22,7 @@ class JsonResponse extends BaseJsonResponse
      * @param  int    $status
      * @param  array  $headers
      * @param  int    $options
+     * @return void
      */
     public function __construct($data = null, $status = 200, $headers = [], $options = 0)
     {
@@ -57,12 +61,12 @@ class JsonResponse extends BaseJsonResponse
     {
         $this->original = $data;
 
-        if ($data instanceof Arrayable) {
-            $this->data = json_encode($data->toArray(), $this->encodingOptions);
-        } elseif ($data instanceof Jsonable) {
+        if ($data instanceof Jsonable) {
             $this->data = $data->toJson($this->encodingOptions);
         } elseif ($data instanceof JsonSerializable) {
             $this->data = json_encode($data->jsonSerialize(), $this->encodingOptions);
+        } elseif ($data instanceof Arrayable) {
+            $this->data = json_encode($data->toArray(), $this->encodingOptions);
         } else {
             $this->data = json_encode($data, $this->encodingOptions);
         }

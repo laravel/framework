@@ -12,10 +12,14 @@ class ValidationNotInRuleTest extends TestCase
     {
         $rule = new NotIn(['Laravel', 'Framework', 'PHP']);
 
-        $this->assertEquals('not_in:Laravel,Framework,PHP', (string) $rule);
+        $this->assertEquals('not_in:"Laravel","Framework","PHP"', (string) $rule);
 
         $rule = Rule::notIn([1, 2, 3, 4]);
 
-        $this->assertEquals('not_in:1,2,3,4', (string) $rule);
+        $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::notIn('1', '2', '3', '4');
+
+        $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);
     }
 }

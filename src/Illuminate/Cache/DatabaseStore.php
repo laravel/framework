@@ -4,7 +4,6 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Database\ConnectionInterface;

@@ -55,7 +55,7 @@ class React extends Preset
     protected static function updateComponent()
     {
         (new Filesystem)->delete(
-            resource_path('assets/js/components/Example.vue')
+            resource_path('assets/js/components/ExampleComponent.vue')
         );
 
         copy(

@@ -5,3 +5,4 @@ composer.lock
 Thumbs.db
 /phpunit.xml
 /.idea
+/.vscode

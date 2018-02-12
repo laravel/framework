@@ -127,6 +127,23 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('create table `prefix_users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
     }
 
+    public function testCreateTemporaryTable()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->temporary();
+        $blueprint->increments('id');
+        $blueprint->string('email');
+
+        $conn = $this->getConnection();
+        $conn->shouldReceive('getConfig')->andReturn(null);
+
+        $statements = $blueprint->toSql($conn, $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('create temporary table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null)', $statements[0]);
+    }
+
     public function testDropTable()
     {
         $blueprint = new Blueprint('users');
@@ -199,6 +216,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` drop index `foo`', $statements[0]);
+    }
+
+    public function testDropSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` drop index `geo_coordinates_spatialindex`', $statements[0]);
     }
 
     public function testDropForeign()
@@ -289,6 +316,26 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
+    }
+
+    public function testAddingSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add spatial index `geo_coordinates_spatialindex`(`coordinates`)', $statements[0]);
+    }
+
+    public function testAddingFluentSpatialIndex()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates')->spatialIndex();
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `geo` add spatial index `geo_coordinates_spatialindex`(`coordinates`)', $statements[1]);
     }
 
     public function testAddingForeignKey()
@@ -542,11 +589,11 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
     public function testAddingEnum()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->enum('foo', ['bar', 'baz']);
+        $blueprint->enum('role', ['member', 'admin']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` enum(\'bar\', \'baz\') not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `role` enum(\'member\', \'admin\') not null', $statements[0]);
     }
 
     public function testAddingJson()
@@ -579,104 +626,151 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `foo` date not null', $statements[0]);
     }
 
+    public function testAddingYear()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->year('birth_year');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `birth_year` year not null', $statements[0]);
+    }
+
     public function testAddingDateTime()
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTime('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` datetime(0) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
+        $blueprint->dateTime('foo', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` datetime(1) not null', $statements[0]);
     }
 
     public function testAddingDateTimeTz()
     {
         $blueprint = new Blueprint('users');
+        $blueprint->dateTimeTz('foo', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `foo` datetime(1) not null', $statements[0]);
+
+        $blueprint = new Blueprint('users');
         $blueprint->dateTimeTz('foo');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` datetime(0) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `foo` datetime not null', $statements[0]);
     }
 
     public function testAddingTime()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->time('foo');
+        $blueprint->time('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` time not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` time not null', $statements[0]);
+    }
+
+    public function testAddingTimeWithPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->time('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` time(1) not null', $statements[0]);
     }
 
     public function testAddingTimeTz()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timeTz('foo');
+        $blueprint->timeTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` time not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` time not null', $statements[0]);
     }
 
-    public function testAddingTimeStamp()
+    public function testAddingTimeTzWithPrecision()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo');
+        $blueprint->timeTz('created_at', 1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` time(1) not null', $statements[0]);
     }
 
-    public function testAddingTimeStampWithDefault()
+    public function testAddingTimestamp()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestamp('foo')->default('2015-07-22 11:43:17');
+        $blueprint->timestamp('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp not null', $statements[0]);
     }
 
-    public function testAddingTimeStampTz()
+    public function testAddingTimestampWithPrecision()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo');
+        $blueprint->timestamp('created_at', 1);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) not null', $statements[0]);
+    }
+
+    public function testAddingTimestampWithDefault()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamp('created_at')->default('2015-07-22 11:43:17');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
+    }
+
+    public function testAddingTimestampTz()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('created_at');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` timestamp not null', $statements[0]);
+    }
+
+    public function testAddingTimestampTzWithPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampTz('created_at', 1);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add `created_at` timestamp(1) not null', $statements[0]);
     }
 
     public function testAddingTimeStampTzWithDefault()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->timestampTz('foo')->default('2015-07-22 11:43:17');
+        $blueprint->timestampTz('created_at')->default('2015-07-22 11:43:17');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `foo` timestamp(0) not null default \'2015-07-22 11:43:17\'', $statements[0]);
+        $this->assertEquals("alter table `users` add `created_at` timestamp not null default '2015-07-22 11:43:17'", $statements[0]);
     }
 
-    public function testAddingTimeStamps()
+    public function testAddingTimestamps()
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `created_at` timestamp(0) null, add `updated_at` timestamp(0) null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
     }
 
-    public function testAddingTimeStampsTz()
+    public function testAddingTimestampsTz()
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
-
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table `users` add `created_at` timestamp(0) null, add `updated_at` timestamp(0) null', $statements[0]);
+        $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
     }
 
     public function testAddingRememberToken()
@@ -729,6 +823,86 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `foo` varchar(17) not null', $statements[0]);
     }
 
+    public function testAddingGeometry()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->geometry('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` geometry not null', $statements[0]);
+    }
+
+    public function testAddingPoint()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->point('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` point not null', $statements[0]);
+    }
+
+    public function testAddingLineString()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->linestring('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` linestring not null', $statements[0]);
+    }
+
+    public function testAddingPolygon()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->polygon('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` polygon not null', $statements[0]);
+    }
+
+    public function testAddingGeometryCollection()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->geometrycollection('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` geometrycollection not null', $statements[0]);
+    }
+
+    public function testAddingMultiPoint()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->multipoint('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` multipoint not null', $statements[0]);
+    }
+
+    public function testAddingMultiLineString()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->multilinestring('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` multilinestring not null', $statements[0]);
+    }
+
+    public function testAddingMultiPolygon()
+    {
+        $blueprint = new Blueprint('geo');
+        $blueprint->multipolygon('coordinates');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `geo` add `coordinates` multipolygon not null', $statements[0]);
+    }
+
     public function testAddingComment()
     {
         $blueprint = new Blueprint('users');
@@ -737,6 +911,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
+    }
+
+    public function testDropAllTables()
+    {
+        $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop table `alpha`,`beta`,`gamma`', $statement);
     }
 
     protected function getConnection()

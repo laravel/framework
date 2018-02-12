@@ -18,14 +18,33 @@ class BusFake implements Dispatcher
      * Assert if a job was dispatched based on a truth-test callback.
      *
      * @param  string  $command
-     * @param  callable|null  $callback
+     * @param  callable|int|null  $callback
      * @return void
      */
     public function assertDispatched($command, $callback = null)
     {
+        if (is_numeric($callback)) {
+            return $this->assertDispatchedTimes($command, $callback);
+        }
+
         PHPUnit::assertTrue(
             $this->dispatched($command, $callback)->count() > 0,
             "The expected [{$command}] job was not dispatched."
+        );
+    }
+
+    /**
+     * Assert if a job was pushed a number of times.
+     *
+     * @param  string  $command
+     * @param  int  $times
+     * @return void
+     */
+    protected function assertDispatchedTimes($command, $times = 1)
+    {
+        PHPUnit::assertTrue(
+            ($count = $this->dispatched($command)->count()) === $times,
+            "The expected [{$command}] job was pushed {$count} times instead of {$times} times."
         );
     }
 
@@ -109,5 +128,38 @@ class BusFake implements Dispatcher
     public function pipeThrough(array $pipes)
     {
         //
+    }
+
+    /**
+     * Determine if the given command has a handler.
+     *
+     * @param  mixed  $command
+     * @return bool
+     */
+    public function hasCommandHandler($command)
+    {
+        return false;
+    }
+
+    /**
+     * Retrieve the handler for a command.
+     *
+     * @param  mixed  $command
+     * @return mixed
+     */
+    public function getCommandHandler($command)
+    {
+        return false;
+    }
+
+    /**
+     * Map a command to a handler.
+     *
+     * @param  array  $map
+     * @return $this
+     */
+    public function map(array $map)
+    {
+        return $this;
     }
 }

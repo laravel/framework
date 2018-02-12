@@ -55,9 +55,9 @@ trait HasEvents
     {
         return array_merge(
             [
-                'creating', 'created', 'updating', 'updated',
-                'deleting', 'deleted', 'saving', 'saved',
-                'restoring', 'restored',
+                'retrieved', 'creating', 'created', 'updating', 'updated',
+                'saving', 'saved', 'restoring', 'restored',
+                'deleting', 'deleted', 'forceDeleted',
             ],
             $this->observables
         );
@@ -187,6 +187,17 @@ trait HasEvents
     }
 
     /**
+     * Register a retrieved model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function retrieved($callback)
+    {
+        static::registerModelEvent('retrieved', $callback);
+    }
+
+    /**
      * Register a saving model event with the dispatcher.
      *
      * @param  \Closure|string  $callback
@@ -289,6 +300,10 @@ trait HasEvents
 
         foreach ($instance->getObservableEvents() as $event) {
             static::$dispatcher->forget("eloquent.{$event}: ".static::class);
+        }
+
+        foreach (array_values($instance->dispatchesEvents) as $event) {
+            static::$dispatcher->forget($event);
         }
     }
 

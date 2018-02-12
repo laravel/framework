@@ -44,6 +44,19 @@ class ContainerTest extends TestCase
         $this->assertEquals('Taylor', $container->make('name'));
     }
 
+    public function testBindIfDoesRegisterIfServiceNotRegisteredYet()
+    {
+        $container = new Container;
+        $container->bind('surname', function () {
+            return 'Taylor';
+        });
+        $container->bindIf('name', function () {
+            return 'Dayle';
+        });
+
+        $this->assertEquals('Dayle', $container->make('name'));
+    }
+
     public function testSharedClosureResolution()
     {
         $container = new Container;
@@ -563,6 +576,23 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
+    public function testBindMethodAcceptsAnArray()
+    {
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable');
+        $this->assertEquals(['foo', 'bar'], $result);
+
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+        $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
+        $this->assertEquals(['foo', 'bar'], $result);
+    }
+
     public function testContainerCanInjectDifferentImplementationsDependingOnContext()
     {
         $container = new Container;
@@ -803,6 +833,17 @@ class ContainerTest extends TestCase
         $this->assertEquals($container->getAlias('foo'), 'ConcreteStub');
     }
 
+    public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
+    {
+        $container = new Container;
+        $container->alias('name', 'name');
+
+        $this->expectException('LogicException');
+        $this->expectExceptionMessage('[name] is aliased to itself.');
+
+        $container->getAlias('name');
+    }
+
     public function testContainerCanInjectSimpleVariable()
     {
         $container = new Container;
@@ -984,9 +1025,17 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $container->get('Taylor'));
     }
 
+    public function testContainerCanDynamicallySetService()
+    {
+        $container = new Container;
+        $this->assertFalse(isset($container['name']));
+        $container['name'] = 'Taylor';
+        $this->assertTrue(isset($container['name']));
+        $this->assertSame('Taylor', $container['name']);
+    }
+
     /**
      * @expectedException \Illuminate\Container\EntryNotFoundException
-     * @expectedExceptionMessage
      */
     public function testUnknownEntryThrowsException()
     {

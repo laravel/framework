@@ -77,7 +77,7 @@ class MigrationCreator
     protected function ensureMigrationDoesntAlreadyExist($name)
     {
         if (class_exists($className = $this->getClassName($name))) {
-            throw new InvalidArgumentException("A {$className} migration already exists.");
+            throw new InvalidArgumentException("A {$className} class already exists.");
         }
     }
 
@@ -97,11 +97,9 @@ class MigrationCreator
         // We also have stubs for creating new tables and modifying existing tables
         // to save the developer some typing when they are creating a new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
-        else {
-            $stub = $create ? 'create.stub' : 'update.stub';
+        $stub = $create ? 'create.stub' : 'update.stub';
 
-            return $this->files->get($this->stubPath()."/{$stub}");
-        }
+        return $this->files->get($this->stubPath()."/{$stub}");
     }
 
     /**

@@ -4,12 +4,9 @@ namespace Illuminate\Foundation\Console;
 
 use InvalidArgumentException;
 use Illuminate\Console\Command;
-use Illuminate\Support\Traits\Macroable;
 
 class PresetCommand extends Command
 {
-    use Macroable;
-
     /**
      * The console command signature.
      *
@@ -55,7 +52,7 @@ class PresetCommand extends Command
     }
 
     /**
-     * Install the "fresh" preset.
+     * Install the "bootstrap" preset.
      *
      * @return void
      */
@@ -72,7 +69,7 @@ class PresetCommand extends Command
      *
      * @return void
      */
-    public function vue()
+    protected function vue()
     {
         Presets\Vue::install();
 
@@ -85,7 +82,7 @@ class PresetCommand extends Command
      *
      * @return void
      */
-    public function react()
+    protected function react()
     {
         Presets\React::install();
 

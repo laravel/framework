@@ -54,6 +54,53 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
     }
 
+    public function testMailableSetsReplyToCorrectly()
+    {
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo('taylor@laravel.com');
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo('taylor@laravel.com', 'Taylor Otwell');
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo(['taylor@laravel.com']);
+        $this->assertEquals([['name' => null, 'address' => 'taylor@laravel.com']], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+        $this->assertFalse($mailable->hasReplyTo('taylor@laravel.com', 'Taylor Otwell'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo([['name' => 'Taylor Otwell', 'email' => 'taylor@laravel.com']]);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com', 'Taylor Otwell'));
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo(new MailableTestUserStub);
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo(collect([new MailableTestUserStub]));
+        $this->assertEquals([['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com']], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+
+        $mailable = new WelcomeMailableStub;
+        $mailable->replyTo(collect([new MailableTestUserStub, new MailableTestUserStub]));
+        $this->assertEquals([
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+            ['name' => 'Taylor Otwell', 'address' => 'taylor@laravel.com'],
+        ], $mailable->replyTo);
+        $this->assertTrue($mailable->hasReplyTo(new MailableTestUserStub));
+        $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
+    }
+
     public function testMailableBuildsViewData()
     {
         $mailable = new WelcomeMailableStub;

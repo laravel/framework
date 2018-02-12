@@ -11,7 +11,7 @@ class RouteUrlGenerator
     /**
      * The URL generator instance.
      *
-     * @param  \Illuminate\Routing\UrlGenerator
+     * @var \Illuminate\Routing\UrlGenerator
      */
     protected $url;
 
@@ -140,9 +140,9 @@ class RouteUrlGenerator
             return 'http://';
         } elseif ($route->httpsOnly()) {
             return 'https://';
-        } else {
-            return $this->url->formatScheme(null);
         }
+
+        return $this->url->formatScheme(null);
     }
 
     /**
@@ -212,9 +212,9 @@ class RouteUrlGenerator
                 return Arr::pull($parameters, $m[1]);
             } elseif (isset($this->defaultParameters[$m[1]])) {
                 return $this->defaultParameters[$m[1]];
-            } else {
-                return $m[0];
             }
+
+            return $m[0];
         }, $path);
     }
 

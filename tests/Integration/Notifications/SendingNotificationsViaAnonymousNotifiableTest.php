@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Notifications;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\AnonymousNotifiable;
+use Illuminate\Support\Testing\Fakes\NotificationFake;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 /**
@@ -33,6 +34,28 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
         $this->assertEquals([
             'enzo', 'enzo@deepblue.com',
         ], $_SERVER['__notifiable.route']);
+    }
+
+    public function test_faking()
+    {
+        $fake = NotificationFacade::fake();
+
+        $this->assertInstanceOf(NotificationFake::class, $fake);
+
+        $notifiable = (new AnonymousNotifiable())
+            ->route('testchannel', 'enzo')
+            ->route('anothertestchannel', 'enzo@deepblue.com');
+
+        NotificationFacade::send(
+            $notifiable,
+            new TestMailNotificationForAnonymousNotifiable()
+        );
+
+        NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class,
+            function ($notification, $channels, $notifiable) {
+                return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
+            }
+        );
     }
 }
 

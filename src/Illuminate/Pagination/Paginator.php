@@ -114,12 +114,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Manually indicate that the paginator does have more pages.
      *
-     * @param  bool  $value
+     * @param  bool  $hasMore
      * @return $this
      */
-    public function hasMorePagesWhen($value = true)
+    public function hasMorePagesWhen($hasMore = true)
     {
-        $this->hasMore = $value;
+        $this->hasMore = $hasMore;
 
         return $this;
     }
@@ -144,6 +144,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         return [
             'current_page' => $this->currentPage(),
             'data' => $this->items->toArray(),
+            'first_page_url' => $this->url(1),
             'from' => $this->firstItem(),
             'next_page_url' => $this->nextPageUrl(),
             'path' => $this->path,

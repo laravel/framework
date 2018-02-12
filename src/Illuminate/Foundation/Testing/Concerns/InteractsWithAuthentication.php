@@ -74,13 +74,15 @@ trait InteractsWithAuthentication
     /**
      * Assert that the user is authenticated as the given user.
      *
-     * @param  $user
+     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string|null  $guard
      * @return $this
      */
     public function assertAuthenticatedAs($user, $guard = null)
     {
         $expected = $this->app->make('auth')->guard($guard)->user();
+
+        $this->assertNotNull($expected, 'The current user is not authenticated.');
 
         $this->assertInstanceOf(
             get_class($expected), $user,

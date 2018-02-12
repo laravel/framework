@@ -150,6 +150,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertInstanceOf(Eloquent::class, SoftDeletesTestUser::withTrashed()->find(1));
     }
 
+    public function testWithTrashedAcceptsAnArgument()
+    {
+        $this->createUsers();
+
+        $this->assertCount(1, SoftDeletesTestUser::withTrashed(false)->get());
+        $this->assertCount(2, SoftDeletesTestUser::withTrashed(true)->get());
+    }
+
     public function testDeleteSetsDeletedColumn()
     {
         $this->createUsers();
@@ -425,9 +433,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(0, $users);
     }
 
-    /**
-     * @group test
-     */
     public function testWhereHasWithNestedDeletedRelationshipAndOnlyTrashedCondition()
     {
         $this->createUsers();
@@ -450,9 +455,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
     }
 
-    /**
-     * @group test
-     */
     public function testWhereHasWithNestedDeletedRelationship()
     {
         $this->createUsers();
@@ -469,9 +471,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
     }
 
-    /**
-     * @group test
-     */
     public function testWhereHasWithNestedDeletedRelationshipAndWithTrashedCondition()
     {
         $this->createUsers();
@@ -484,9 +483,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
     }
 
-    /**
-     * @group test
-     */
     public function testWithCountWithNestedDeletedRelationshipAndOnlyTrashedCondition()
     {
         $this->createUsers();
@@ -564,7 +560,6 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Query\Builder::thisMethodDoesNotExist()
      */
     public function testMorphToWithBadMethodCall()
     {

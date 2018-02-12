@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -124,6 +125,16 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->first();
         $this->assertEquals('bar', $result);
+    }
+
+    public function testQualifyColumn()
+    {
+        $builder = new Builder(m::mock(BaseBuilder::class));
+        $builder->shouldReceive('from')->with('stub');
+
+        $builder->setModel(new EloquentModelStub);
+
+        $this->assertEquals('stub.column', $builder->qualifyColumn('column'));
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
@@ -366,7 +377,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
-        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+        $builder = new Builder(new BaseBuilder(
             m::mock('Illuminate\Database\ConnectionInterface'),
             m::mock('Illuminate\Database\Query\Grammars\Grammar'),
             m::mock('Illuminate\Database\Query\Processors\Processor')
@@ -389,7 +400,12 @@ class DatabaseEloquentBuilderTest extends TestCase
             return $bar;
         });
 
-        $this->assertEquals($this->getBuilder()->foo('bar'), 'bar');
+        Builder::macro('bam', [Builder::class, 'getQuery']);
+
+        $builder = $this->getBuilder();
+
+        $this->assertEquals($builder->foo('bar'), 'bar');
+        $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
     public function testGetModelsProperlyHydratesModels()
@@ -475,7 +491,6 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\RelationNotFoundException
-     * @expectedExceptionMessage Call to undefined relationship [invalid] on model [Mockery_18_Illuminate_Database_Eloquent_Model].
      */
     public function testGetRelationThrowsException()
     {
@@ -833,6 +848,49 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
     }
 
+    public function testDoesntHave()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->doesntHave('foo');
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id")', $builder->toSql());
+    }
+
+    public function testOrDoesntHave()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('bar', 'baz')->orDoesntHave('foo');
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id")', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+    }
+
+    public function testWhereDoesntHave()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->whereDoesntHave('foo', function ($query) {
+            $query->where('bar', 'baz');
+        });
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "bar" = ?)', $builder->toSql());
+        $this->assertEquals(['baz'], $builder->getBindings());
+    }
+
+    public function testOrWhereDoesntHave()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->where('bar', 'baz')->orWhereDoesntHave('foo', function ($query) {
+            $query->where('qux', 'quux');
+        });
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "bar" = ? or not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "qux" = ?)', $builder->toSql());
+        $this->assertEquals(['baz', 'quux'], $builder->getBindings());
+    }
+
     public function testWhereKeyMethodWithInt()
     {
         $model = $this->getMockModel();
@@ -872,6 +930,45 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKey($collection);
     }
 
+    public function testWhereKeyNotMethodWithInt()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $int = 1;
+
+        $builder->getQuery()->shouldReceive('where')->once()->with($keyName, '!=', $int);
+
+        $builder->whereKeyNot($int);
+    }
+
+    public function testWhereKeyNotMethodWithArray()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $array = [1, 2, 3];
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $array);
+
+        $builder->whereKeyNot($array);
+    }
+
+    public function testWhereKeyNotMethodWithCollection()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+        $keyName = $model->getQualifiedKeyName();
+
+        $collection = new Collection([1, 2, 3]);
+
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $collection);
+
+        $builder->whereKeyNot($collection);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -901,7 +998,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockQueryBuilder()
     {
-        $query = m::mock('Illuminate\Database\Query\Builder');
+        $query = m::mock(BaseBuilder::class);
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;

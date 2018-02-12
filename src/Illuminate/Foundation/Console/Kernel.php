@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Console;
 use Closure;
 use Exception;
 use Throwable;
+use ReflectionClass;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
@@ -13,7 +14,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
@@ -97,9 +97,11 @@ class Kernel implements KernelContract
      */
     protected function defineConsoleSchedule()
     {
-        $this->app->instance(
-            Schedule::class, $schedule = new Schedule($this->app[Cache::class])
-        );
+        $this->app->singleton(Schedule::class, function ($app) {
+            return new Schedule;
+        });
+
+        $schedule = $this->app->make(Schedule::class);
 
         $this->schedule($schedule);
     }
@@ -115,12 +117,6 @@ class Kernel implements KernelContract
     {
         try {
             $this->bootstrap();
-
-            if (! $this->commandsLoaded) {
-                $this->commands();
-
-                $this->commandsLoaded = true;
-            }
 
             return $this->getArtisan()->run($input, $output);
         } catch (Exception $e) {
@@ -177,7 +173,7 @@ class Kernel implements KernelContract
      * Register a Closure based command with the application.
      *
      * @param  string  $signature
-     * @param  Closure  $callback
+     * @param  \Closure  $callback
      * @return \Illuminate\Foundation\Console\ClosureCommand
      */
     public function command($signature, Closure $callback)
@@ -215,10 +211,11 @@ class Kernel implements KernelContract
             $command = $namespace.str_replace(
                 ['/', '.php'],
                 ['\\', ''],
-                Str::after($command->getPathname(), app_path().'/')
+                Str::after($command->getPathname(), app_path().DIRECTORY_SEPARATOR)
             );
 
-            if (is_subclass_of($command, Command::class)) {
+            if (is_subclass_of($command, Command::class) &&
+                ! (new ReflectionClass($command))->isAbstract()) {
                 Artisan::starting(function ($artisan) use ($command) {
                     $artisan->resolve($command);
                 });
@@ -248,12 +245,6 @@ class Kernel implements KernelContract
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
         $this->bootstrap();
-
-        if (! $this->commandsLoaded) {
-            $this->commands();
-
-            $this->commandsLoaded = true;
-        }
 
         return $this->getArtisan()->call($command, $parameters, $outputBuffer);
     }
@@ -305,10 +296,13 @@ class Kernel implements KernelContract
             $this->app->bootstrapWith($this->bootstrappers());
         }
 
-        // If we are calling an arbitrary command from within the application, we'll load
-        // all of the available deferred providers which will make all of the commands
-        // available to an application. Otherwise the command will not be available.
         $this->app->loadDeferredProviders();
+
+        if (! $this->commandsLoaded) {
+            $this->commands();
+
+            $this->commandsLoaded = true;
+        }
     }
 
     /**

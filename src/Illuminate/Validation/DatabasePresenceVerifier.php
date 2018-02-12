@@ -39,9 +39,9 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
      * @param  string  $collection
      * @param  string  $column
      * @param  string  $value
-     * @param  int     $excludeId
-     * @param  string  $idColumn
-     * @param  array   $extra
+     * @param  int|null  $excludeId
+     * @param  string|null  $idColumn
+     * @param  array  $extra
      * @return int
      */
     public function getCount($collection, $column, $value, $excludeId = null, $idColumn = null, array $extra = [])

@@ -52,7 +52,7 @@ class DatabaseMigrationCreatorTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage A MigrationCreatorFakeMigration migration already exists.
+     * @expectedExceptionMessage A MigrationCreatorFakeMigration class already exists.
      */
     public function testTableUpdateMigrationWontCreateDuplicateClass()
     {

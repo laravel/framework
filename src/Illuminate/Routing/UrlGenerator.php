@@ -142,9 +142,9 @@ class UrlGenerator implements UrlGeneratorContract
             return $url;
         } elseif ($fallback) {
             return $this->to($fallback);
-        } else {
-            return $this->to('/');
         }
+
+        return $this->to('/');
     }
 
     /**
@@ -475,6 +475,16 @@ class UrlGenerator implements UrlGeneratorContract
     public function defaults(array $defaults)
     {
         $this->routeUrl()->defaults($defaults);
+    }
+
+    /**
+     * Get the default named parameters used by the URL generator.
+     *
+     * @return array
+     */
+    public function getDefaultParameters()
+    {
+        return $this->routeUrl()->defaultParameters;
     }
 
     /**
