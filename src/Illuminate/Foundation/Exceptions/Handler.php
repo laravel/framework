@@ -401,7 +401,9 @@ class Handler implements ExceptionHandlerContract
         })->push(__DIR__.'/views')->all());
 
         if (view()->exists($view = "errors::{$status}")) {
-            return response()->view($view, ['exception' => $e, 'errors' => new ViewErrorBag], $status, $e->getHeaders());
+            return response()->view($view, [
+                'exception' => $e, 'errors' => new ViewErrorBag
+            ], $status, $e->getHeaders());
         }
 
         return $this->convertExceptionToResponse($e);
