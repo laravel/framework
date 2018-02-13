@@ -26,8 +26,10 @@ class LoadEnvironmentVariables
 
         try {
             (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
-        } catch (InvalidPathException | InvalidFileException $e) {
+        } catch (InvalidPathException $e) {
             //
+        } catch (InvalidFileException $e) {
+            dd('Fatal Error: Values in .env containing spaces must be surrounded by quotes.');
         }
     }
 
