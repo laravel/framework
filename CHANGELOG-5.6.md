@@ -4,10 +4,18 @@
 
 ### Changed
 - Moved clone logic from `FormRequestServiceProvider` to `Request` ([b0c2459](https://github.com/laravel/framework/commit/b0c2459d7e55519d1c61927ab526e489a3a52eaf))
+- Changed pagination arrow symbols ([#23127](https://github.com/laravel/framework/pull/23127))
+- Update React version in preset ([#23134](https://github.com/laravel/framework/pull/23134))
+- Added an empty error bag when rendering HTTP exception views ([#23139](https://github.com/laravel/framework/pull/23139))
 
 ### Fixed
 - Returns same `Logger` instance from `LogManager` ([#23118](https://github.com/laravel/framework/pull/23118))
 - Register missing `hash.driver` DI ([#23114](https://github.com/laravel/framework/pull/23114))
+- Fixed an issue with starting two database transactions in tests ([#23132](https://github.com/laravel/framework/pull/23132))
+- Don't replace `tightenco/collect` ([#23147](https://github.com/laravel/framework/pull/23147))
+
+### Removed
+- Removed unnecessary `.card-default` classes from views ([#23129](https://github.com/laravel/framework/pull/23129))
 
 
 ## v5.6.3 (2018-02-09)
