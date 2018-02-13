@@ -22,6 +22,23 @@ class PostgresBuilder extends Builder
     }
 
     /**
+     * Determine if the given view exists.
+     *
+     * @param  string  $view
+     * @return bool
+     */
+    public function hasView($view)
+    {
+        list($schema, $view) = $this->parseSchemaAndTable($view);
+
+        $view = $this->connection->getTablePrefix().$view;
+
+        return count($this->connection->select(
+            $this->grammar->compileTableExists(), [$schema, $view]
+        )) > 0;
+    }
+
+    /**
      * Drop all tables from the database.
      *
      * @return void
