@@ -75,6 +75,21 @@ class Builder
     }
 
     /**
+     * Determine if the given view exists.
+     *
+     * @param  string  $view
+     * @return bool
+     */
+    public function hasView($view)
+    {
+        $view = $this->connection->getTablePrefix().$view;
+
+        return count($this->connection->select(
+            $this->grammar->compileViewExists(), [$view]
+        )) > 0;
+    }
+
+    /**
      * Determine if the given table has a given column.
      *
      * @param  string  $table

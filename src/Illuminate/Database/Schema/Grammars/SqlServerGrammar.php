@@ -39,6 +39,16 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if a view exists.
+     *
+     * @return string
+     */
+    public function compileViewExists()
+    {
+        return "select * from sysobjects where type = 'V' and name = ?";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @param  string  $table

@@ -20,6 +20,21 @@ class MySqlBuilder extends Builder
     }
 
     /**
+     * Determine if the given view exists.
+     *
+     * @param  string  $view
+     * @return bool
+     */
+    public function hasView($view)
+    {
+        $view = $this->connection->getTablePrefix().$view;
+
+        return count($this->connection->select(
+            $this->grammar->compileViewExists(), [$this->connection->getDatabaseName(), $view]
+        )) > 0;
+    }
+
+    /**
      * Get the column listing for a given table.
      *
      * @param  string  $table

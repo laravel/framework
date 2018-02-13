@@ -36,6 +36,16 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if a view exists.
+     *
+     * @return string
+     */
+    public function compileViewExists()
+    {
+        return $this->compileTableExists();
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @return string

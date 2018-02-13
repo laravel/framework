@@ -26,6 +26,19 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->assertTrue($builder->hasTable('table'));
     }
 
+    public function testHasViewCorrectlyCallsGrammar()
+    {
+        $connection = m::mock('Illuminate\Database\Connection');
+        $grammar = m::mock('stdClass');
+        $connection->shouldReceive('getSchemaGrammar')->andReturn($grammar);
+        $builder = new Builder($connection);
+        $grammar->shouldReceive('compileViewExists')->once()->andReturn('sql');
+        $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
+        $connection->shouldReceive('select')->once()->with('sql', ['prefix_view'])->andReturn(['prefix_view']);
+
+        $this->assertTrue($builder->hasView('view'));
+    }
+
     public function testTableHasColumns()
     {
         $connection = m::mock('Illuminate\Database\Connection');

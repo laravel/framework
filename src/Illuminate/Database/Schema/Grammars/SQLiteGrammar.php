@@ -34,6 +34,16 @@ class SQLiteGrammar extends Grammar
     }
 
     /**
+     * Compile the query to determine if a view exists.
+     *
+     * @return string
+     */
+    public function compileViewExists()
+    {
+        return "select * from sqlite_master where type = 'view' and name = ?";
+    }
+
+    /**
      * Compile the query to determine the list of columns.
      *
      * @param  string  $table
