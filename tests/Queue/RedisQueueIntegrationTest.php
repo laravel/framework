@@ -68,7 +68,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param $driver
+     * @param  string  $driver
      */
     public function testMigrateMoreThan100Jobs($driver)
     {
@@ -86,7 +86,7 @@ class RedisQueueIntegrationTest extends TestCase
     /**
      * @dataProvider redisDriverProvider
      *
-     * @param $driver
+     * @param  string  $driver
      *
      * @throws \Exception
      */

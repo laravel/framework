@@ -224,7 +224,7 @@ class RedisQueue extends Queue implements QueueContract
     /**
      * Retrieve the next job without blocking.
      *
-     * @param $queue
+     * @param  string  $queue
      * @return mixed
      */
     protected function nonBlockingPop($queue)
