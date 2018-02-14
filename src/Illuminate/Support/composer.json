@@ -21,7 +21,7 @@
         "nesbot/carbon": "^1.20"
     },
     "replace": {
-        "tightenco/collect": "self.version"
+        "tightenco/collect": "<5.5.33"
     },
     "autoload": {
         "psr-4": {
