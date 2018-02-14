@@ -68,7 +68,7 @@ class ModelMakeCommand extends GeneratorCommand
     protected function createFactory()
     {
         $this->call('make:factory', [
-            'name' => $this->argument('name').'Factory',
+            'name' => Str::singular(Str::studly(class_basename($this->argument('name')))).'Factory',
             '--model' => $this->argument('name'),
         ]);
     }
