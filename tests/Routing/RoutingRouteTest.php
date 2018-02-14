@@ -882,6 +882,25 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo', $routes[0]->getPrefix());
     }
 
+    public function testRouteGroupingOutsideOfInheritedNamespace()
+    {
+        $router = $this->getRouter();
+
+        $router->group(['namespace' => 'App\Http\Controllers'], function ($router) {
+            $router->group(['namespace' => '\Foo\Bar'], function ($router) {
+                $router->get('users', 'UsersController@index');
+            });
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals(
+            'Foo\Bar\UsersController@index',
+            $routes[0]->getAction()['uses']
+        );
+    }
+
     public function testCurrentRouteUses()
     {
         $router = $this->getRouter();
