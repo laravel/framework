@@ -29,7 +29,7 @@ class LoadEnvironmentVariables
         } catch (InvalidPathException $e) {
             //
         } catch (InvalidFileException $e) {
-            dd('Fatal Error: Values in .env containing spaces must be surrounded by quotes.');
+            die('The environment file is invalid: '.$e->getMessage());
         }
     }
 
