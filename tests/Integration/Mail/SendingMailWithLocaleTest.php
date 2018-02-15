@@ -2,12 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Mail\SendingMailWithLocale;
 
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\View;
 use Mockery;
 use Illuminate\Mail\Mailable;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Translation\Translator;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\View;
 
 /**
  * @group integration
@@ -36,8 +35,8 @@ class SendingMailWithLocaleTest extends TestCase
                 '*' => [
                     'en' => ['nom' => 'name'],
                     'ar' => ['nom' => 'esm'],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 
