@@ -17,7 +17,7 @@ class RepositoryTest extends TestCase
      */
     protected $config;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->repository = new Repository($this->config = [
             'foo' => 'bar',
@@ -141,5 +141,21 @@ class RepositoryTest extends TestCase
     {
         $this->repository->push('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.2'));
+    }
+
+    public function testAll()
+    {
+        $this->assertSame($this->config, $this->repository->all());
+    }
+
+    public function testOffsetUnset()
+    {
+        $this->assertArrayHasKey('associate', $this->repository->all());
+        $this->assertSame($this->config['associate'], $this->repository->get('associate'));
+
+        unset($this->repository['associate']);
+
+        $this->assertArrayHasKey('associate', $this->repository->all());
+        $this->assertNull($this->repository->get('associate'));
     }
 }

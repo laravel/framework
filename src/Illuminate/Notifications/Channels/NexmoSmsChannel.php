@@ -44,7 +44,7 @@ class NexmoSmsChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $to = $notifiable->routeNotificationFor('nexmo')) {
+        if (! $to = $notifiable->routeNotificationFor('nexmo', $notification)) {
             return;
         }
 

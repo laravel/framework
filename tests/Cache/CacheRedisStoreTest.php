@@ -71,9 +71,9 @@ class CacheRedisStoreTest extends TestCase
         $connection = $redis->getRedis();
         $connection->shouldReceive('connection')->with('default')->andReturn($redis->getRedis());
         $connection->shouldReceive('multi')->once();
-        $redis->getRedis()->shouldReceive('setex')->with('prefix:foo', 60 * 60, serialize('bar'));
-        $redis->getRedis()->shouldReceive('setex')->with('prefix:baz', 60 * 60, serialize('qux'));
-        $redis->getRedis()->shouldReceive('setex')->with('prefix:bar', 60 * 60, serialize('norf'));
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:foo', 60 * 60, serialize('bar'));
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:baz', 60 * 60, serialize('qux'));
+        $redis->getRedis()->shouldReceive('setex')->once()->with('prefix:bar', 60 * 60, serialize('norf'));
         $connection->shouldReceive('exec')->once();
 
         $redis->putMany([

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
+use Exception;
 use ArrayAccess;
 use Mockery as m;
 use ReflectionClass;
@@ -140,6 +141,16 @@ class SupportCollectionTest extends TestCase
 
         $collection = new Collection;
         $this->assertEmpty($collection->all());
+    }
+
+    public function testCollectionShuffleWithSeed()
+    {
+        $collection = new Collection((range(0, 100, 10)));
+
+        $firstRandom = $collection->shuffle(1234);
+        $secondRandom = $collection->shuffle(1234);
+
+        $this->assertEquals($firstRandom, $secondRandom);
     }
 
     public function testGetArrayableItems()
@@ -984,6 +995,7 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first' => 'Taylor'], $data->except(['last', 'email', 'missing'])->all());
         $this->assertEquals(['first' => 'Taylor'], $data->except('last', 'email', 'missing')->all());
 
+        $this->assertEquals(['first' => 'Taylor'], $data->except(collect(['last', 'email', 'missing']))->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except(['last'])->all());
         $this->assertEquals(['first' => 'Taylor', 'email' => 'taylorotwell@gmail.com'], $data->except('last')->all());
     }
@@ -2392,6 +2404,40 @@ class SupportCollectionTest extends TestCase
         $this->assertSame([['free' => false, 'title' => 'Premium']], $premium->values()->toArray());
     }
 
+    public function testPartitionWithOperators()
+    {
+        $collection = new Collection([
+            ['name' => 'Tim', 'age' => 17],
+            ['name' => 'Agatha', 'age' => 62],
+            ['name' => 'Kristina', 'age' => 33],
+            ['name' => 'Tim', 'age' => 41],
+        ]);
+
+        list($tims, $others) = $collection->partition('name', 'Tim');
+
+        $this->assertEquals($tims->values()->all(), [
+            ['name' => 'Tim', 'age' => 17],
+            ['name' => 'Tim', 'age' => 41],
+        ]);
+
+        $this->assertEquals($others->values()->all(), [
+            ['name' => 'Agatha', 'age' => 62],
+            ['name' => 'Kristina', 'age' => 33],
+        ]);
+
+        list($adults, $minors) = $collection->partition('age', '>=', 18);
+
+        $this->assertEquals($adults->values()->all(), [
+            ['name' => 'Agatha', 'age' => 62],
+            ['name' => 'Kristina', 'age' => 33],
+            ['name' => 'Tim', 'age' => 41],
+        ]);
+
+        $this->assertEquals($minors->values()->all(), [
+            ['name' => 'Tim', 'age' => 17],
+        ]);
+    }
+
     public function testPartitionPreservesKeys()
     {
         $courses = new Collection([
@@ -2502,6 +2548,35 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame(['michael', 'tom', 'taylor'], $collection->toArray());
+    }
+
+    public function testHasReturnsValidResults()
+    {
+        $collection = new Collection(['foo' => 'one', 'bar' => 'two', 1 => 'three']);
+        $this->assertTrue($collection->has('foo'));
+        $this->assertTrue($collection->has('foo', 'bar', 1));
+        $this->assertFalse($collection->has('foo', 'bar', 1, 'baz'));
+        $this->assertFalse($collection->has('baz'));
+    }
+
+    public function testPutAddsItemToCollection()
+    {
+        $collection = new Collection();
+        $this->assertSame([], $collection->toArray());
+        $collection->put('foo', 1);
+        $this->assertSame(['foo' => 1], $collection->toArray());
+        $collection->put('bar', ['nested' => 'two']);
+        $this->assertSame(['foo' => 1, 'bar' => ['nested' => 'two']], $collection->toArray());
+        $collection->put('foo', 3);
+        $this->assertSame(['foo' => 3, 'bar' => ['nested' => 'two']], $collection->toArray());
+    }
+
+    public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty()
+    {
+        $collection = new Collection();
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
+        $collection->foo;
     }
 
     public function testGetWithNullReturnsNull()

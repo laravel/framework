@@ -29,7 +29,7 @@ class FoundationFormRequestTest extends TestCase
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
 
-        $request->validate();
+        $request->validateResolved();
 
         $this->assertEquals(['name' => 'specified'], $request->validated());
     }
@@ -43,7 +43,7 @@ class FoundationFormRequestTest extends TestCase
 
         $this->mocks['redirect']->shouldReceive('withInput->withErrors');
 
-        $request->validate();
+        $request->validateResolved();
     }
 
     /**
@@ -52,12 +52,12 @@ class FoundationFormRequestTest extends TestCase
      */
     public function test_validate_method_throws_when_authorization_fails()
     {
-        $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validate();
+        $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 
     public function test_prepare_for_validation_runs_before_validation()
     {
-        $this->createRequest([], FoundationTestFormRequestHooks::class)->validate();
+        $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
     }
 
     /**

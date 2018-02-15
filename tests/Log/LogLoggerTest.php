@@ -3,48 +3,27 @@
 namespace Illuminate\Tests\Log;
 
 use Mockery as m;
-use Illuminate\Log\Writer;
+use Illuminate\Log\Logger;
 use PHPUnit\Framework\TestCase;
 
-class LogWriterTest extends TestCase
+class LogLoggerTest extends TestCase
 {
     public function tearDown()
     {
         m::close();
     }
 
-    public function testFileHandlerCanBeAdded()
-    {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
-        $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\StreamHandler'));
-        $writer->useFiles(__DIR__);
-    }
-
-    public function testRotatingFileHandlerCanBeAdded()
-    {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
-        $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\RotatingFileHandler'));
-        $writer->useDailyFiles(__DIR__, 5);
-    }
-
-    public function testErrorLogHandlerCanBeAdded()
-    {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
-        $monolog->shouldReceive('pushHandler')->once()->with(m::type('Monolog\Handler\ErrorLogHandler'));
-        $writer->useErrorLog();
-    }
-
     public function testMethodsPassErrorAdditionsToMonolog()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
+        $writer = new Logger($monolog = m::mock('Monolog\Logger'));
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $writer->error('foo');
     }
 
-    public function testWriterFiresEventsDispatcher()
+    public function testLoggerFiresEventsDispatcher()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = new \Illuminate\Events\Dispatcher);
+        $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = new \Illuminate\Events\Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
 
         $events->listen(\Illuminate\Log\Events\MessageLogged::class, function ($event) {
@@ -71,14 +50,14 @@ class LogWriterTest extends TestCase
      */
     public function testListenShortcutFailsWithNoDispatcher()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'));
+        $writer = new Logger($monolog = m::mock('Monolog\Logger'));
         $writer->listen(function () {
         });
     }
 
     public function testListenShortcut()
     {
-        $writer = new Writer($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 
         $callback = function () {
             return 'success';
