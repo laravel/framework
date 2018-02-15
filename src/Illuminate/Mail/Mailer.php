@@ -14,6 +14,7 @@ use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Queue\Factory as QueueContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Mail\MailQueue as MailQueueContract;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class Mailer implements MailerContract, MailQueueContract
 {
@@ -67,6 +68,13 @@ class Mailer implements MailerContract, MailQueueContract
      * @var \Illuminate\Contracts\Queue\Queue
      */
     protected $queue;
+
+    /**
+     * The translator implementation.
+     *
+     * @var \Illuminate\Contracts\Translation\Translator
+     */
+    public $translator;
 
     /**
      * Array of failed recipients.
@@ -146,6 +154,17 @@ class Mailer implements MailerContract, MailQueueContract
     public function bcc($users)
     {
         return (new PendingMail($this))->bcc($users);
+    }
+
+    /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  string  $locale
+     * @return \Illuminate\Mail\PendingMail
+     */
+    public function locale($locale)
+    {
+        return (new PendingMail($this))->locale($locale);
     }
 
     /**
@@ -563,6 +582,19 @@ class Mailer implements MailerContract, MailQueueContract
     public function setQueue(QueueContract $queue)
     {
         $this->queue = $queue;
+
+        return $this;
+    }
+
+    /**
+     * Set the translator instance.
+     *
+     * @param  \Illuminate\Contracts\Translation\Translator  $translator
+     * @return $this
+     */
+    public function setTranslator(TranslatorContract $translator)
+    {
+        $this->translator = $translator;
 
         return $this;
     }

@@ -51,6 +51,10 @@ class MailServiceProvider extends ServiceProvider
                 $mailer->setQueue($app['queue']);
             }
 
+            if ($app->bound('translator')) {
+                $mailer->setTranslator($app['translator']);
+            }
+
             // Next we will set all of the global addresses on this mailer, which allows
             // for easy unification of all "from" addresses as well as easy debugging
             // of sent messages since they get be sent into a single email address.

@@ -52,6 +52,13 @@ class Mailable implements MailableContract, Renderable
     public $replyTo = [];
 
     /**
+     * The locale of the message.
+     *
+     * @var string
+     */
+    public $locale;
+
+    /**
      * The subject of the message.
      *
      * @var string
@@ -122,15 +129,27 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
-        Container::getInstance()->call([$this, 'build']);
+        $currentLocale = $mailer->translator ? $mailer->translator->getLocale() : null;
 
-        $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
-            $this->buildFrom($message)
-                 ->buildRecipients($message)
-                 ->buildSubject($message)
-                 ->runCallbacks($message)
-                 ->buildAttachments($message);
-        });
+        try {
+            if ($mailer->translator && $this->locale) {
+                $mailer->translator->setLocale($this->locale);
+            }
+
+            Container::getInstance()->call([$this, 'build']);
+
+            $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
+                $this->buildFrom($message)
+                    ->buildRecipients($message)
+                    ->buildSubject($message)
+                    ->runCallbacks($message)
+                    ->buildAttachments($message);
+            });
+        } finally {
+            if ($mailer->translator) {
+                $mailer->translator->setLocale($currentLocale);
+            }
+        }
     }
 
     /**
@@ -570,6 +589,19 @@ class Mailable implements MailableContract, Renderable
 
             return $actual == $expected;
         });
+    }
+
+    /**
+     * Set the locale of the message.
+     *
+     * @param  string  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     /**
