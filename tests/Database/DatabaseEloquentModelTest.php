@@ -11,6 +11,9 @@ use DateTimeImmutable;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
@@ -1439,6 +1442,10 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testModelAttributesAreCastedWhenPresentInCastsArray()
     {
+        $container = new Container;
+        $container->instance('encrypter', $encrypter = new Encrypter(str_repeat('a', 16)));
+        Facade::setFacadeApplication($container);
+
         $model = new EloquentModelCastingStub;
         $model->setDateFormat('Y-m-d H:i:s');
         $model->intAttribute = '3';
@@ -1454,6 +1461,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->encryptedAttribute = 'encrypted value';
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1463,6 +1471,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInternalType('object', $model->objectAttribute);
         $this->assertInternalType('array', $model->arrayAttribute);
         $this->assertInternalType('array', $model->jsonAttribute);
+        $this->assertInternalType('string', $model->encryptedAttribute);
         $this->assertTrue($model->boolAttribute);
         $this->assertFalse($model->booleanAttribute);
         $this->assertEquals($obj, $model->objectAttribute);
@@ -1474,6 +1483,8 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertEquals('encrypted value', $model->encryptedAttribute);
+        $this->assertEquals('encrypted value', $encrypter->decrypt($model->encryptedAttributeValue()));
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['intAttribute']);
@@ -1484,6 +1495,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertInternalType('object', $arr['objectAttribute']);
         $this->assertInternalType('array', $arr['arrayAttribute']);
         $this->assertInternalType('array', $arr['jsonAttribute']);
+        $this->assertInternalType('string', $arr['encryptedAttribute']);
         $this->assertTrue($arr['boolAttribute']);
         $this->assertFalse($arr['booleanAttribute']);
         $this->assertEquals($obj, $arr['objectAttribute']);
@@ -1492,6 +1504,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
+        $this->assertEquals('encrypted value', $arr['encryptedAttribute']);
+
+        Facade::clearResolvedInstances();
+        Facade::setFacadeApplication(null);
     }
 
     public function testModelDateAttributeCastingResetsTime()
@@ -2008,11 +2024,17 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'encryptedAttribute' => 'encrypted',
     ];
 
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+
+    public function encryptedAttributeValue()
+    {
+        return $this->attributes['encryptedAttribute'];
     }
 }
 

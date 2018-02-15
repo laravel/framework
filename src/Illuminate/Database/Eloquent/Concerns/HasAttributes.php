@@ -7,6 +7,7 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
@@ -496,6 +497,8 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'encrypted':
+                return Crypt::decrypt($value);
             default:
                 return $value;
         }
@@ -555,6 +558,10 @@ trait HasAttributes
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
+        }
+
+        if ($this->hasCast($key, 'encrypted') && ! is_null($value)) {
+            $value = Crypt::encrypt($value);
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
