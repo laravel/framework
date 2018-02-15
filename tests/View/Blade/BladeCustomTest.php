@@ -123,4 +123,31 @@ class BladeCustomTest extends AbstractBladeTestCase
 <?php echo $__env->renderComponent(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testCustomIncludes()
+    {
+        $this->compiler->include('app.includes.input', 'input');
+
+        $string = '@input';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomIncludesWithData()
+    {
+        $this->compiler->include('app.includes.input', 'input');
+
+        $string = '@input([\'type\' => \'email\'])';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomIncludesDefaultAlias()
+    {
+        $this->compiler->include('app.includes.input');
+
+        $string = '@input';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
 }
