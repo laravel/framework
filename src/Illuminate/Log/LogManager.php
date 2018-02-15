@@ -213,7 +213,9 @@ class LogManager implements LoggerInterface
      */
     protected function createCustomDriver(array $config)
     {
-        return $this->app->make($config['via'])->__invoke($config);
+        $f = is_callable($via = $config['via']) ? $via : $this->app->make($via);
+
+        return $f($config);
     }
 
     /**
