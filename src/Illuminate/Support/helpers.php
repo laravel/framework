@@ -427,6 +427,7 @@ if (! function_exists('collect')) {
                 return is_array($item) ? collect($item, true) : $item;
             });
         }
+        
         return $collection;
     }
 }
