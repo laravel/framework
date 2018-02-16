@@ -314,7 +314,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @return static
      */
-    public function udiff($items, callable $callback)
+    public function diffUsing($items, callable $callback)
     {
         return new static(array_udiff($this->items, $this->getArrayableItems($items),$callback));
     }
@@ -338,7 +338,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @return static
      */
-    public function diffUAssoc($items, callable $callback)
+    public function diffAssocUsing($items, callable $callback)
     {
         return new static(array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback));
     }
@@ -363,7 +363,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      *
      * @return static
      */
-    public function diffUKeys($items, callable $callback)
+    public function diffKeysUsing($items, callable $callback)
     {
         return new static(array_diff_ukey($this->items, $this->getArrayableItems($items), $callback));
     }

@@ -629,18 +629,18 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['id' => 1], $c->diff(new Collection(['first_word' => 'Hello', 'last_word' => 'World']))->all());
     }
 
-    public function testUDiffCollection()
+    public function testDiffUsingWithCollection()
     {
         $c = new Collection(['en_GB', 'fr', 'HR']);
         // demonstrate that diffKeys wont support case insensitivity
         $this->assertEquals(['en_GB', 'fr', 'HR'], $c->diff(new Collection(['en_gb' , 'hr']))->values()->toArray());
         // allow for case insensitive difference
-        $this->assertEquals(['fr'], $c->udiff(new Collection(['en_gb' , 'hr']), 'strcasecmp')->values()->toArray());
+        $this->assertEquals(['fr'], $c->diffUsing(new Collection(['en_gb' , 'hr']), 'strcasecmp')->values()->toArray());
     }
-    public function testUDiffNull()
+    public function testDiffUsingWithNull()
     {
         $c = new Collection(['en_GB', 'fr', 'HR']);
-        $this->assertEquals(['en_GB', 'fr', 'HR'], $c->udiff(null, 'strcasecmp')->values()->toArray());
+        $this->assertEquals(['en_GB', 'fr', 'HR'], $c->diffUsing(null, 'strcasecmp')->values()->toArray());
     }
 
     public function testDiffNull()
@@ -656,14 +656,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeys($c2)->all());
     }
 
-    public function testDiffUKeys()
+    public function testDiffKeysUsing()
     {
         $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $c2 = new Collection(['ID' => 123, 'foo_bar' => 'Hello']);
         // demonstrate that diffKeys wont support case insensitivity
         $this->assertEquals(['id'=>1, 'first_word'=> 'Hello'], $c1->diffKeys($c2)->all());
         // allow for case insensitive difference
-        $this->assertEquals(['first_word' => 'Hello'], $c1->diffUKeys($c2, 'strcasecmp')->all());
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeysUsing($c2, 'strcasecmp')->all());
     }
 
     public function testDiffAssoc()
@@ -673,14 +673,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c1->diffAssoc($c2)->all());
     }
 
-    public function testDiffUAssoc()
+    public function testDiffAssocUsing()
     {
         $c1 = new Collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
         $c2 = new Collection(['A' => 'green', 'yellow', 'red']);
         // demonstrate that the case of the keys will affect the output when diffAssoc is used
         $this->assertEquals(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssoc($c2)->all());
         // allow for case insensitive difference
-        $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffUAssoc($c2, 'strcasecmp')->all());
+        $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssocUsing($c2, 'strcasecmp')->all());
     }
 
     public function testEach()
