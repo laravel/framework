@@ -416,11 +416,18 @@ if (! function_exists('collect')) {
      * Create a collection from the given value.
      *
      * @param  mixed  $value
+     * @param bool $nested
      * @return \Illuminate\Support\Collection
      */
-    function collect($value = null)
+    function collect($value = null, $nested=false)
     {
-        return new Collection($value);
+        $collection = new Collection($value);
+        if ($value && $nested) {
+            $collection->transform(function ($item) {
+                return is_array($item) ? collect($item,true) : $item;
+            });
+        }
+        return $collection;
     }
 }
 
