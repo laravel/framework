@@ -422,12 +422,13 @@ if (! function_exists('collect')) {
     function collect($value = null, $nested = false)
     {
         $collection = new Collection($value);
+
         if ($value && $nested) {
             $collection->transform(function ($item) {
                 return is_array($item) ? collect($item, true) : $item;
             });
         }
-        
+
         return $collection;
     }
 }
