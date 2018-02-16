@@ -93,10 +93,10 @@ class MailServiceProvider extends ServiceProvider
         // mailer instance, passing in the transport instances, which allows us to
         // override this transporter instances during app start-up if necessary.
         $this->app->singleton('swift.mailer', function ($app) {
-            if ($mailDomain = $app->make('config')->get('mail.domain')) {
+            if ($domain = $app->make('config')->get('mail.domain')) {
                 Swift_DependencyContainer::getInstance()
                                 ->register('mime.idgenerator.idright')
-                                ->asValue($mailDomain);
+                                ->asValue($domain);
             }
 
             return new Swift_Mailer($app['swift.transport']->driver());
