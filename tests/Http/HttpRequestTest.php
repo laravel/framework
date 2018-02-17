@@ -187,6 +187,23 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->routeIs('foo.foo'));
     }
 
+    public function testRouteMethod()
+    {
+        $request = Request::create('/foo/bar', 'GET');
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/{required}/{optional?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertEquals('bar', $request->route('required'));
+        $this->assertEquals('bar', $request->route('required', 'default'));
+        $this->assertNull($request->route('optional'));
+        $this->assertEquals('default', $request->route('optional', 'default'));
+    }
+
     public function testAjaxMethod()
     {
         $request = Request::create('/', 'GET');
