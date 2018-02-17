@@ -71,6 +71,17 @@ class Encrypter implements EncrypterContract
     }
 
     /**
+     * Create a new encrypter instance with custom key.
+     * 
+     * @param  string  $key
+     * @return self
+     */
+    public function key($key)
+    {
+        return new self($key, $this->cipher);
+    }
+
+    /**
      * Encrypt the given value.
      *
      * @param  mixed  $value

@@ -15,6 +15,14 @@ class EncrypterTest extends TestCase
         $this->assertEquals('foo', $e->decrypt($encrypted));
     }
 
+    public function testEncryptionWithCustomKey()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $encrypted = $e->key(str_repeat('b', 16))->encrypt('foo');
+        $this->assertNotEquals('foo', $encrypted);
+        $this->assertEquals('foo', $e->key(str_repeat('b', 16))->decrypt($encrypted));
+    }
+
     public function testRawStringEncryption()
     {
         $e = new Encrypter(str_repeat('a', 16));
