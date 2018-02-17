@@ -1456,7 +1456,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $rightArr[$key] = $value;
             }
         }
-        
+
         return array_merge(
             $this->quickSort($leftArr, $predicate),
             [$pivotKey => $pivotValue],
