@@ -72,7 +72,7 @@ class Encrypter implements EncrypterContract
 
     /**
      * Create a new encrypter instance with custom key.
-     * 
+     *
      * @param  string  $key
      * @return self
      */
