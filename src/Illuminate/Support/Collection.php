@@ -1436,6 +1436,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function sortByPredicate($predicate)
     {
         $results = $this->items;
+
         return new static($this->quickSort($results, $predicate));
     }
 
@@ -1448,13 +1449,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $rightArr = [];
         $pivotKey = key($arr);
         $pivotValue = array_shift($arr);
-        foreach( $arr as $key => $value ) {
+        foreach ($arr as $key => $value) {
             if ($predicate($value, $pivotValue, $key, $pivotKey)) {
                 $leftArr[$key] = $value;
             } else {
                 $rightArr[$key] = $value;
             }
         }
+        
         return array_merge(
             $this->quickSort($leftArr, $predicate),
             [$pivotKey => $pivotValue],
