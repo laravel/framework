@@ -1439,23 +1439,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return new static($this->quickSort($results, $predicate));
     }
 
-    protected function quickSort($arr, $predicate) 
+    protected function quickSort($arr, $predicate)
     {
-        if(sizeof($arr) < 2) return $arr;
+        if (sizeof($arr) < 2) {
+            return $arr;
+        }
         $leftArr = [];
         $rightArr = [];
-        $pivotKey  = key($arr);
+        $pivotKey = key($arr);
         $pivotValue = array_shift($arr);
         foreach( $arr as $key => $value ) {
-            if($predicate($value, $pivotValue, $key, $pivotKey)) {
+            if ($predicate($value, $pivotValue, $key, $pivotKey)) {
                 $leftArr[$key] = $value;
             } else {
                 $rightArr[$key] = $value;
             }
         }
         return array_merge(
-            $this->quickSort($leftArr, $predicate), 
-            [$pivotKey => $pivotValue], 
+            $this->quickSort($leftArr, $predicate),
+            [$pivotKey => $pivotValue],
             $this->quickSort($rightArr, $predicate)
         );
     }

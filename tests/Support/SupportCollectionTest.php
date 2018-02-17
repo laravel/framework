@@ -884,26 +884,26 @@ class SupportCollectionTest extends TestCase
             'a' => [
                 'name' => 'a',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-18")
+                'endTime' => strtotime("2018-02-18"),
             ], 
             'b' => [
                 'name' => 'b',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ],
             'c' => [
                 'name' => 'c',
                 'startTime' => strtotime("2018-02-12"),
-                'endTime' => strtotime("2018-02-13")
+                'endTime' => strtotime("2018-02-13"),
             ],
             'd' => [
                 'name' => 'd',
                 'startTime' => strtotime("2018-02-10"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ]
         ]);
         $data = $data->sortByPredicate(function ($value, $pivotValue) {
-            return $value['startTime'] != $pivotValue['startTime'] ? 
+            return $value['startTime'] != $pivotValue['startTime'] ?
                 $value['startTime'] < $pivotValue['startTime'] : 
                 $value['endTime'] < $pivotValue['endTime'];
         });
@@ -911,22 +911,22 @@ class SupportCollectionTest extends TestCase
             0 => [
                 'name' => 'd',
                 'startTime' => strtotime("2018-02-10"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ],
             1 => [
                 'name' => 'c',
                 'startTime' => strtotime("2018-02-12"),
-                'endTime' => strtotime("2018-02-13")
+                'endTime' => strtotime("2018-02-13"),
             ],
             2 => [
                 'name' => 'b',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ],
             3 => [
                 'name' => 'a',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-18")
+                'endTime' => strtotime("2018-02-18"),
             ]
         ], array_values($data->all()));
     }
@@ -937,26 +937,26 @@ class SupportCollectionTest extends TestCase
             'a' => [
                 'name' => 'a',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-18")
+                'endTime' => strtotime("2018-02-18"),
             ], 
             'b' => [
                 'name' => 'b',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ],
             'c' => [
                 'name' => 'c',
                 'startTime' => strtotime("2018-02-12"),
-                'endTime' => strtotime("2018-02-13")
+                'endTime' => strtotime("2018-02-13"),
             ],
             'd' => [
                 'name' => 'd',
                 'startTime' => strtotime("2018-02-10"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ]
         ]);
         $data = $data->sortByPredicate(function ($value, $pivotValue, $key, $pivotKey) {
-            return $value['startTime'] != $pivotValue['startTime'] ? 
+            return $value['startTime'] != $pivotValue['startTime'] ?
                 $value['startTime'] < $pivotValue['startTime'] : 
                 $key < $pivotKey;
         });
@@ -964,22 +964,22 @@ class SupportCollectionTest extends TestCase
             0 => [
                 'name' => 'd',
                 'startTime' => strtotime("2018-02-10"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ],
             1 => [
                 'name' => 'c',
                 'startTime' => strtotime("2018-02-12"),
-                'endTime' => strtotime("2018-02-13")
+                'endTime' => strtotime("2018-02-13"),
             ],
             2 => [
                 'name' => 'a',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-18")
+                'endTime' => strtotime("2018-02-18"),
             ],
             3 => [
                 'name' => 'b',
                 'startTime' => strtotime("2018-02-15"),
-                'endTime' => strtotime("2018-02-17")
+                'endTime' => strtotime("2018-02-17"),
             ]
         ], array_values($data->all()));
     }
