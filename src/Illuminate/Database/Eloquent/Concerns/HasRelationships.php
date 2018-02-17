@@ -720,6 +720,19 @@ trait HasRelationships
     }
 
     /**
+     * Unset the specific relationship in the model.
+     *
+     * @param  string  $relation
+     * @return $this
+     */
+    public function unsetRelation($relation)
+    {
+        unset($this->relations[$relation]);
+
+        return $this;
+    }
+
+    /**
      * Get the relationships that are touched on save.
      *
      * @return array
