@@ -6,40 +6,20 @@ use PDO;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\ConnectionManager;
 use Illuminate\Database\Connectors\ConnectionFactory;
 
 /**
  * @mixin \Illuminate\Database\Connection
  */
-class DatabaseManager implements ConnectionResolverInterface
+class DatabaseManager extends ConnectionManager implements ConnectionResolverInterface
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
     /**
      * The database connection factory instance.
      *
      * @var \Illuminate\Database\Connectors\ConnectionFactory
      */
     protected $factory;
-
-    /**
-     * The active connection instances.
-     *
-     * @var array
-     */
-    protected $connections = [];
-
-    /**
-     * The custom connection resolvers.
-     *
-     * @var array
-     */
-    protected $extensions = [];
 
     /**
      * Create a new database manager instance.
@@ -50,8 +30,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function __construct($app, ConnectionFactory $factory)
     {
-        $this->app = $app;
-        $this->factory = $factory;
+        parent::__construct($app, $factory);
     }
 
     /**
@@ -93,33 +72,6 @@ class DatabaseManager implements ConnectionResolverInterface
     }
 
     /**
-     * Make the database connection instance.
-     *
-     * @param  string  $name
-     * @return \Illuminate\Database\Connection
-     */
-    protected function makeConnection($name)
-    {
-        $config = $this->configuration($name);
-
-        // First we will check by the connection name to see if an extension has been
-        // registered specifically for that connection. If it has we will call the
-        // Closure and pass it the config allowing it to resolve the connection.
-        if (isset($this->extensions[$name])) {
-            return call_user_func($this->extensions[$name], $config, $name);
-        }
-
-        // Next we will check to see if an extension has been registered for a driver
-        // and will call the Closure if so, which allows us to have a more generic
-        // resolver for the drivers themselves which applies to all connections.
-        if (isset($this->extensions[$driver = $config['driver']])) {
-            return call_user_func($this->extensions[$driver], $config, $name);
-        }
-
-        return $this->factory->make($config, $name);
-    }
-
-    /**
      * Get the configuration for a connection.
      *
      * @param  string  $name
@@ -139,6 +91,8 @@ class DatabaseManager implements ConnectionResolverInterface
         if (is_null($config = Arr::get($connections, $name))) {
             throw new InvalidArgumentException("Database [$name] not configured.");
         }
+
+        $config['name'] = $name;
 
         return $config;
     }
@@ -291,39 +245,5 @@ class DatabaseManager implements ConnectionResolverInterface
             $this->supportedDrivers(),
             str_replace('dblib', 'sqlsrv', PDO::getAvailableDrivers())
         );
-    }
-
-    /**
-     * Register an extension connection resolver.
-     *
-     * @param  string    $name
-     * @param  callable  $resolver
-     * @return void
-     */
-    public function extend($name, callable $resolver)
-    {
-        $this->extensions[$name] = $resolver;
-    }
-
-    /**
-     * Return all of the created connections.
-     *
-     * @return array
-     */
-    public function getConnections()
-    {
-        return $this->connections;
-    }
-
-    /**
-     * Dynamically pass methods to the default connection.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->connection()->$method(...$parameters);
     }
 }
