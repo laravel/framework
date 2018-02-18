@@ -360,7 +360,7 @@ trait ValidatesAttributes
 
         $format = $parameters[0];
 
-        $date = DateTime::createFromFormat('!'.$format, $value);
+        $date = DateTime::createFromFormat('!'.$format, $value, new DateTimeZone('UTC'));
 
         return $date && $date->format($format) == $value;
     }
