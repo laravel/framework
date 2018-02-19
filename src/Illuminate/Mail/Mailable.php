@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -16,6 +17,8 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class Mailable implements MailableContract, Renderable
 {
+    use Localizable;
+
     /**
      * The person the message is from.
      *
@@ -129,27 +132,17 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
-        $currentLocale = $mailer->translator ? $mailer->translator->getLocale() : null;
-
-        try {
-            if ($mailer->translator && $this->locale) {
-                $mailer->translator->setLocale($this->locale);
-            }
-
+        $this->withLocale($this->locale, $mailer->translator, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
                 $this->buildFrom($message)
-                    ->buildRecipients($message)
-                    ->buildSubject($message)
-                    ->runCallbacks($message)
-                    ->buildAttachments($message);
+                     ->buildRecipients($message)
+                     ->buildSubject($message)
+                     ->runCallbacks($message)
+                     ->buildAttachments($message);
             });
-        } finally {
-            if ($mailer->translator) {
-                $mailer->translator->setLocale($currentLocale);
-            }
-        }
+        });
     }
 
     /**
