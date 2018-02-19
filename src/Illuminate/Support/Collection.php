@@ -1619,14 +1619,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function toArray($preserveElementClass = false)
     {
-        if (!$preserveElementClass)
+        if (! $preserveElementClass) {
             return array_map(function ($value) {
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
-
+        }
+        
         $modifier = function ($value) {
             return $value;
         };
+        
         return array_map($modifier, $this->items);
     }
 
