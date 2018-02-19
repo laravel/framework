@@ -1624,11 +1624,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
         }
-        
+
         $modifier = function ($value) {
             return $value;
         };
-        
+
         return array_map($modifier, $this->items);
     }
 
