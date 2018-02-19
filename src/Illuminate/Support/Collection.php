@@ -1262,13 +1262,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Reverse items order.
+     * Reverse items order and keep the original index or not.
      *
+     * @param bool $preserve
      * @return static
      */
-    public function reverse()
+    public function reverse($preserve = true)
     {
-        return new static(array_reverse($this->items, true));
+        return new static(array_reverse($this->items, $preserve));
     }
 
     /**
@@ -1611,15 +1612,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get the collection of items as a plain array.
+     * Get the collection of items as a plain array or an array which each element is instance of the original class.
      *
+     * @param bool $preserveElementClass
      * @return array
      */
-    public function toArray()
+    public function toArray($preserveElementClass = false)
     {
-        return array_map(function ($value) {
-            return $value instanceof Arrayable ? $value->toArray() : $value;
-        }, $this->items);
+        if (! $preserveElementClass) {
+            return array_map(function ($value) {
+                return $value instanceof Arrayable ? $value->toArray() : $value;
+            }, $this->items);
+        }
+
+        $modifier = function ($value) {
+            return $value;
+        };
+
+        return array_map($modifier, $this->items);
     }
 
     /**
