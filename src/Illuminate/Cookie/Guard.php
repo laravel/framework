@@ -99,6 +99,9 @@ class Guard implements HttpKernelInterface {
 
 		foreach ($cookie as $key => $value)
 		{
+			if (!is_string($value)) {
+				throw new DecryptException("Unexpected cookie type " . gettype($value) . " of $key");
+			}
 			$decrypted[$key] = $this->encrypter->decrypt($value);
 		}
 
