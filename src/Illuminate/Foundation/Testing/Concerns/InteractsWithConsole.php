@@ -17,4 +17,14 @@ trait InteractsWithConsole
     {
         return $this->app[Kernel::class]->call($command, $parameters);
     }
+
+    /**
+     * Get the output for the last run command.
+     *
+     * @return string
+     */
+    public function artisanOutput()
+    {
+        return $this->app[Kernel::class]->output();
+    }
 }
