@@ -65,7 +65,7 @@ class Guard implements HttpKernelInterface {
 			{
 				$request->cookies->set($key, $this->decryptCookie($c));
 			}
-			catch (DecryptException $e)
+			catch (\Throwable $e)
 			{
 				$request->cookies->set($key, null);
 			}
