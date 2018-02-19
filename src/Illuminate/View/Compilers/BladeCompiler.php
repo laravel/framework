@@ -447,18 +447,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Register a handler for custom directives.
-     *
-     * @param  string  $name
-     * @param  callable  $handler
-     * @return void
-     */
-    public function directive($name, callable $handler)
-    {
-        $this->customDirectives[$name] = $handler;
-    }
-
-    /**
      * Register an include alias directive.
      *
      * @param  string  $path
@@ -474,6 +462,18 @@ class BladeCompiler extends Compiler implements CompilerInterface
 
             return "<?php echo \$__env->make('{$path}', {$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
         });
+    }
+
+    /**
+     * Register a handler for custom directives.
+     *
+     * @param  string  $name
+     * @param  callable  $handler
+     * @return void
+     */
+    public function directive($name, callable $handler)
+    {
+        $this->customDirectives[$name] = $handler;
     }
 
     /**
