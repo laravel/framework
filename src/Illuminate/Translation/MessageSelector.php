@@ -109,6 +109,9 @@ class MessageSelector
      */
     public function getPluralIndex($locale, $number)
     {
+        // Normalize the locale string to support RFC 4646 language tags (https://tools.ietf.org/html/rfc5646)
+        $locale = str_replace('-', '_', $locale);
+
         switch ($locale) {
             case 'az':
             case 'az_AZ':
