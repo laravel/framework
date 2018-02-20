@@ -1304,8 +1304,9 @@ class Builder
         }
 
         if (! isset(static::$macros[$method])) {
-            $className = static::class;
-            throw new BadMethodCallException("Method {$className}::{$method} does not exist.");
+            $class = static::class;
+
+            throw new BadMethodCallException("Method {$class}::{$method} does not exist.");
         }
 
         if (static::$macros[$method] instanceof Closure) {
