@@ -230,8 +230,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
+                $model = get_class($this);
                 throw new MassAssignmentException(
-                    "Add [{$key}] to fillable property to allow mass assignment."
+                    "Add [{$key}] to fillable property to allow mass assignment on {$model}."
                 );
             }
         }
