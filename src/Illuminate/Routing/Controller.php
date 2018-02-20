@@ -65,6 +65,7 @@ abstract class Controller
      */
     public function __call($method, $parameters)
     {
-        throw new BadMethodCallException("Method [{$method}] does not exist on [".get_class($this).'].');
+        $className = static::class;
+        throw new BadMethodCallException("Method {$className}::{$method} does not exist.");
     }
 }

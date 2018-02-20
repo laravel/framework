@@ -1137,6 +1137,7 @@ class Validator implements ValidatorContract
             return $this->callExtension($rule, $parameters);
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist.");
+        $className = static::class;
+        throw new BadMethodCallException("Method {$className}::{$method} does not exist.");
     }
 }
