@@ -2508,7 +2508,6 @@ class Builder
         }
 
         $className = static::class;
-
-        throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
+        throw new BadMethodCallException("Method {$className}::{$method} does not exist.");
     }
 }

@@ -718,6 +718,7 @@ class Mailable implements MailableContract, Renderable
             return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist on mailable.");
+        $className = static::class;
+        throw new BadMethodCallException("Method {$className}::{$method} does not exist.");
     }
 }
