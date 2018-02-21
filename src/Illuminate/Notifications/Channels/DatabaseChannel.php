@@ -18,10 +18,25 @@ class DatabaseChannel
     {
         return $notifiable->routeNotificationFor('database', $notification)->create([
             'id' => $notification->id,
-            'type' => get_class($notification),
+            'type' => $this->getType($notification),
             'data' => $this->getData($notifiable, $notification),
             'read_at' => null,
         ]);
+    }
+
+    /**
+     * Get the type of the notification.
+     *
+     * @param  \Illuminate\Notifications\Notification  $notification
+     * @return array
+     */
+    protected function getType(Notification $notification)
+    {
+        if (method_exists($notification, 'broadcastType')) {
+            return $notification->broadcastType();
+        }
+
+        return get_class($notification);
     }
 
     /**
