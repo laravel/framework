@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Illuminate\Notifications\Channels\DatabaseChannel;
-use Illuminate\Notifications\Messages\DatabaseMessage;
-use Illuminate\Notifications\Notification;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Channels\DatabaseChannel;
+use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
