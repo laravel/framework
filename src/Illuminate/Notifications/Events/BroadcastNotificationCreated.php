@@ -64,6 +64,20 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     }
 
     /**
+     * Get the type of the broadcasted event.
+     *
+     * @return string
+     */
+    public function broadcastAs()
+    {
+        if (method_exists($this->notification, 'broadcastAs')) {
+            return $this->notification->broadcastAs();
+        }
+
+        return get_class($this->notification);
+    }
+
+    /**
      * Get the data that should be sent with the broadcasted event.
      *
      * @return array
@@ -72,7 +86,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         return array_merge($this->data, [
             'id' => $this->notification->id,
-            'type' => get_class($this->notification),
+            'type' => $this->broadcastAs(),
         ]);
     }
 
