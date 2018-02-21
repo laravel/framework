@@ -94,7 +94,9 @@ class TestResponse
         );
 
         if (! is_null($uri)) {
-            PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+            PHPUnit::assertEquals(
+                app('url')->to($uri), app('url')->to($this->headers->get('Location'))
+            );
         }
 
         return $this;

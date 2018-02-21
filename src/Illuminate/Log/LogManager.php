@@ -113,7 +113,7 @@ class LogManager implements LoggerInterface
     {
         try {
             return $this->channels[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
-                return $this->tap($name, new Logger($logger, $this->app['events']));
+                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -213,7 +213,9 @@ class LogManager implements LoggerInterface
      */
     protected function createCustomDriver(array $config)
     {
-        return $this->app->make($config['via'])->__invoke($config);
+        $factory = is_callable($via = $config['via']) ? $via : $this->app->make($via);
+
+        return $factory($config);
     }
 
     /**

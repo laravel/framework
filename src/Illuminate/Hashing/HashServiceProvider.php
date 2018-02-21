@@ -36,6 +36,6 @@ class HashServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['hash'];
+        return ['hash', 'hash.driver'];
     }
 }

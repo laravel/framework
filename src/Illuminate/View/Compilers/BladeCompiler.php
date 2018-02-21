@@ -447,6 +447,24 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Register an include alias directive.
+     *
+     * @param  string  $path
+     * @param  string  $alias
+     * @return void
+     */
+    public function include($path, $alias = null)
+    {
+        $alias = $alias ?: array_last(explode('.', $path));
+
+        $this->directive($alias, function ($expression) use ($path) {
+            $expression = $this->stripParentheses($expression) ?: '[]';
+
+            return "<?php echo \$__env->make('{$path}', {$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+        });
+    }
+
+    /**
      * Register a handler for custom directives.
      *
      * @param  string  $name

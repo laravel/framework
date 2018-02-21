@@ -24,10 +24,14 @@ class RouteRedirectTest extends TestCase
         Route::redirect('from/{param}/{param2?}', 'to', 301);
 
         $response = $this->get('/from/value1/value2');
+        $response->assertRedirect('to');
+
         $this->assertEquals(301, $response->getStatusCode());
         $this->assertEquals('to', $response->headers->get('Location'));
 
         $response = $this->get('/from/value1');
+        $response->assertRedirect('to');
+
         $this->assertEquals(301, $response->getStatusCode());
         $this->assertEquals('to', $response->headers->get('Location'));
     }

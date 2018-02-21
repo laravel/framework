@@ -2507,8 +2507,8 @@ class Builder
             return $this->dynamicWhere($method, $parameters);
         }
 
-        $className = static::class;
+        $class = static::class;
 
-        throw new BadMethodCallException("Call to undefined method {$className}::{$method}()");
+        throw new BadMethodCallException("Method {$class}::{$method} does not exist.");
     }
 }

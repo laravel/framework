@@ -23,7 +23,7 @@
         "erusev/parsedown": "~1.6",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.12",
-        "nesbot/carbon": "~1.20",
+        "nesbot/carbon": "^1.22.1",
         "psr/container": "~1.0",
         "psr/simple-cache": "^1.0",
         "ramsey/uuid": "^3.7",
@@ -68,7 +68,7 @@
         "illuminate/translation": "self.version",
         "illuminate/validation": "self.version",
         "illuminate/view": "self.version",
-        "tightenco/collect": "self.version"
+        "tightenco/collect": "<5.5.33"
     },
     "require-dev": {
         "aws/aws-sdk-php": "~3.0",

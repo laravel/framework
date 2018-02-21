@@ -396,7 +396,9 @@ class View implements ArrayAccess, ViewContract
     public function __call($method, $parameters)
     {
         if (! Str::startsWith($method, 'with')) {
-            throw new BadMethodCallException("Method [$method] does not exist on view.");
+            $class = static::class;
+
+            throw new BadMethodCallException("Method {$class}::{$method} does not exist.");
         }
 
         return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
