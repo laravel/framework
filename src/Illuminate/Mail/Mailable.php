@@ -181,7 +181,7 @@ class Mailable implements MailableContract, Renderable
     {
         Container::getInstance()->call([$this, 'build']);
 
-        return Container::getInstance()->make('mailer')->render(
+        return Container::getInstance()->make('mail')->render(
             $this->buildView(), $this->buildViewData()
         );
     }

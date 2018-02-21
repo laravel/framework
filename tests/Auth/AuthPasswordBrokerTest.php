@@ -138,7 +138,7 @@ class AuthPasswordBrokerTest extends TestCase
 
     protected function getBroker($mocks)
     {
-        return new \Illuminate\Auth\Passwords\PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mailer'], $mocks['view']);
+        return new \Illuminate\Auth\Passwords\PasswordBroker($mocks['tokens'], $mocks['users'], $mocks['mail'], $mocks['view']);
     }
 
     protected function getMocks()
@@ -146,7 +146,7 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks = [
             'tokens' => m::mock('Illuminate\Auth\Passwords\TokenRepositoryInterface'),
             'users'  => m::mock('Illuminate\Contracts\Auth\UserProvider'),
-            'mailer' => m::mock('Illuminate\Contracts\Mail\Mailer'),
+            'mail'   => m::mock('Illuminate\Contracts\Mail\Mailer'),
             'view'   => 'resetLinkView',
         ];
 

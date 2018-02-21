@@ -42,7 +42,7 @@ class MailServiceProvider extends ServiceProvider
      */
     protected function registerConnectionManager()
     {
-        $this->app->singleton('mailer', function ($app) {
+        $this->app->singleton('mail', function ($app) {
             return new MailManager($app, $app['swift.transport']);
         });
     }
@@ -54,7 +54,7 @@ class MailServiceProvider extends ServiceProvider
      */
     protected function registerIlluminateMailer()
     {
-        $this->app->bind('illuminate.mailer', function ($app, Swift_Mailer $swift) {
+        $this->app->bind('mailer', function ($app, Swift_Mailer $swift) {
             $config = $app->make('config')->get('mail');
 
             // Once we have create the mailer instance, we will set a container instance
@@ -160,7 +160,7 @@ class MailServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            'mailer', 'illuminate.mailer', 'swift.mailer', 'swift.transport', Markdown::class,
+            'mail', 'mailer', 'swift.mailer', 'swift.transport', Markdown::class,
         ];
     }
 }

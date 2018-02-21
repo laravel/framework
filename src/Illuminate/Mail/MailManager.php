@@ -78,7 +78,7 @@ class MailManager
         }
 
         // Next we will create the Mailer instance based on config.
-        return $this->app->make('illuminate.mailer', [
+        return $this->app->make('mailer', [
             $this->app->make('swift.mailer', [
                 $this->makeTransport($config['driver'], $config),
             ]),
