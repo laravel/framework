@@ -2,8 +2,8 @@
 
 namespace Illuminate\Notifications\Channels;
 
-use RuntimeException;
 use Illuminate\Notifications\Notification;
+use RuntimeException;
 
 class DatabaseChannel
 {
@@ -18,7 +18,7 @@ class DatabaseChannel
     {
         return $notifiable->routeNotificationFor('database', $notification)->create([
             'id' => $notification->id,
-            'type' => $notification->broadcastAs(),
+            'type' => get_class($notification),
             'data' => $this->getData($notifiable, $notification),
             'read_at' => null,
         ]);
