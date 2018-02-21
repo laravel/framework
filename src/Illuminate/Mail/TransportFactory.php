@@ -55,7 +55,7 @@ class TransportFactory
             return $this->$method($config);
         }
 
-        throw new InvalidArgumentException("Driver [$driver] not supported.");
+        throw new InvalidArgumentException("Unsupported driver [{$driver}]");
     }
 
     /**

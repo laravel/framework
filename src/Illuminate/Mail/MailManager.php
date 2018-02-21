@@ -65,6 +65,8 @@ class MailManager
      *
      * @param  string  $name
      * @return \Illuminate\Mail\Mailer
+     *
+     * @throws \InvalidArgumentException
      */
     protected function makeConnection($name)
     {
@@ -75,6 +77,10 @@ class MailManager
         // Closure and pass it the config allowing it to resolve the connection.
         if (isset($this->extensions[$name])) {
             return call_user_func($this->extensions[$name], $config, $name);
+        }
+
+        if (! isset($config['driver'])) {
+            throw new InvalidArgumentException('A driver must be specified.');
         }
 
         // Next we will create the Mailer instance based on config.
