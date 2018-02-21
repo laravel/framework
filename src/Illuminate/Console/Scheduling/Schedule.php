@@ -96,7 +96,7 @@ class Schedule
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                dispatch($job)->onQueue($queue);
+                dispatch($job->onQueue($queue));
             } else {
                 dispatch_now($job);
             }
