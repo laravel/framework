@@ -31,6 +31,23 @@ class NotificationDatabaseChannelTest extends TestCase
         $channel = new DatabaseChannel;
         $channel->send($notifiable, $notification);
     }
+
+    public function testDatabaseChannelCreatesDatabaseRecordWithCustomType()
+    {
+        $notification = new NotificationDatabaseChannelWithCustomTypeTestNotification;
+        $notification->id = 1;
+        $notifiable = Mockery::mock();
+
+        $notifiable->shouldReceive('routeNotificationFor->create')->with([
+            'id' => 1,
+            'type' => $notification->broadcastAs(),
+            'data' => ['invoice_id' => 1],
+            'read_at' => null,
+        ]);
+
+        $channel = new DatabaseChannel;
+        $channel->send($notifiable, $notification);
+    }
 }
 
 class NotificationDatabaseChannelTestNotification extends Notification
@@ -38,5 +55,18 @@ class NotificationDatabaseChannelTestNotification extends Notification
     public function toDatabase($notifiable)
     {
         return new DatabaseMessage(['invoice_id' => 1]);
+    }
+}
+
+class NotificationDatabaseChannelWithCustomTypeTestNotification extends Notification
+{
+    public function toDatabase($notifiable)
+    {
+        return new DatabaseMessage(['invoice_id' => 1]);
+    }
+
+    public function broadcastAs()
+    {
+        return 'custom.type';
     }
 }

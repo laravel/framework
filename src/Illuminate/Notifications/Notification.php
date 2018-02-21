@@ -16,6 +16,16 @@ class Notification
     public $id;
 
     /**
+     * Get the type of the broadcasted event.
+     *
+     * @return string
+     */
+    public function broadcastAs()
+    {
+        return get_class($this);
+    }
+
+    /**
      * Get the channels the event should broadcast on.
      *
      * @return array
