@@ -122,7 +122,7 @@ class ThrottleRequests
         );
 
         return new HttpException(
-            429, 'Too Many Attempts.', null, $headers
+            Response::HTTP_TOO_MANY_REQUESTS, 'Too Many Attempts.', null, $headers
         );
     }
 
