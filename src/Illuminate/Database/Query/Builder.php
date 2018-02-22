@@ -989,6 +989,10 @@ class Builder
      */
     public function orWhereDate($column, $operator, $value)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->whereDate($column, $operator, $value, 'or');
     }
 
@@ -1020,6 +1024,10 @@ class Builder
      */
     public function orWhereTime($column, $operator, $value = null)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->whereTime($column, $operator, $value, 'or');
     }
 
