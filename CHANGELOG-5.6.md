@@ -1,11 +1,12 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.4 (2018-02-21)
 
 ### Added
 - Added the ability to set message ID right hand side ([#23181](https://github.com/laravel/framework/pull/23181))
 - Support callbacks as custom log drivers ([#23184](https://github.com/laravel/framework/pull/23184))
 - Added `Blade::include()` method for include aliases ([#23172](https://github.com/laravel/framework/pull/23172))
+- Added `broadcastType()` method to notifications ([#23236](https://github.com/laravel/framework/pull/23236), [4227bd7](https://github.com/laravel/framework/commit/4227bd78d5ab2743e694bfd34784a5ccced20bef))
 
 ### Changed
 - Moved clone logic from `FormRequestServiceProvider` to `Request` ([b0c2459](https://github.com/laravel/framework/commit/b0c2459d7e55519d1c61927ab526e489a3a52eaf))

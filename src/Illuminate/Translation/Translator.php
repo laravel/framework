@@ -476,4 +476,15 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     {
         $this->fallback = $fallback;
     }
+
+    /**
+     * Set the loaded translation groups.
+     *
+     * @param  array  $loaded
+     * @return void
+     */
+    public function setLoaded(array $loaded)
+    {
+        $this->loaded = $loaded;
+    }
 }
