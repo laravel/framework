@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Mail\MailManager;
+use Illuminate\Support\Collection;
 use Illuminate\Mail\TransportFactory;
 
 class MailManagerTest extends TestCase
@@ -100,7 +100,7 @@ class MailManagerTest extends TestCase
         $mail->expects($this->once())->method('makeTransport')->with('ses', [
             'driver'  => 'ses',
             'service' => [
-                'key' => 'foo'
+                'key' => 'foo',
             ],
         ]);
         $mail->connection('first');

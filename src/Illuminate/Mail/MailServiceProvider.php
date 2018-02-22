@@ -3,7 +3,6 @@
 namespace Illuminate\Mail;
 
 use Swift_Mailer;
-use Swift_Transport;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Swift_DependencyContainer;
