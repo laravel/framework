@@ -382,8 +382,10 @@ if (! function_exists('class_basename')) {
      */
     function class_basename($class)
     {
-        $class = is_object($class) ? get_class($class) : $class;
-
+        if (is_object($class)) {
+            return (new \ReflectionClass($class))->getShortName();
+        }
+        
         return basename(str_replace('\\', '/', $class));
     }
 }
