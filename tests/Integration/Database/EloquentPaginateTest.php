@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentPaginateTest;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -21,7 +21,7 @@ class EloquentPaginateTest extends DatabaseTestCase
             $table->timestamps();
         });
     }
-    
+
     public function test_pagination_on_top_of_columns()
     {
         for ($i = 1; $i <= 50; $i++) {
