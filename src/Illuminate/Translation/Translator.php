@@ -478,12 +478,12 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     }
 
     /**
-     * Set loaded translation groups.
+     * Set the loaded translation groups.
      *
-     * @param  string  $fallback
+     * @param  array  $loaded
      * @return void
      */
-    public function setLoaded($loaded)
+    public function setLoaded(array $loaded)
     {
         $this->loaded = $loaded;
     }
