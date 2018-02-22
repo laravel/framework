@@ -414,9 +414,10 @@ trait HasAttributes
             throw new LogicException(get_class($this).'::'.$method.' must return a relationship instance.');
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
-            $this->setRelation($method, $results);
-        });
+        $results = $relation->getResults();
+        $this->setRelation($method, $results);
+
+        return $this->relations[$method];
     }
 
     /**
