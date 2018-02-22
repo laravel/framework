@@ -306,17 +306,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get the items in the collection that are not present in the given items using a user defined function
-     * as the comparator
+     * Get the items in the collection that are not present in the given items.
      *
-     * @param  mixed   $items
-     * @param callable $callback
-     *
+     * @param  mixed  $items
+     * @param  callable  $callback
      * @return static
      */
     public function diffUsing($items, callable $callback)
     {
-        return new static(array_udiff($this->items, $this->getArrayableItems($items),$callback));
+        return new static(array_udiff($this->items, $this->getArrayableItems($items), $callback));
     }
 
     /**
@@ -333,9 +331,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the items in the collection whose keys and values are not present in the given items.
      *
-     * @param  mixed   $items
-     * @param callable $callback
-     *
+     * @param  mixed  $items
+     * @param  callable  $callback
      * @return static
      */
     public function diffAssocUsing($items, callable $callback)
@@ -355,12 +352,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get the items in the collection whose keys are not present in the given items using a user defined function
-     * as the comparator.
+     * Get the items in the collection whose keys are not present in the given items.
      *
      * @param  mixed   $items
-     * @param callable $callback
-     *
+     * @param  callable  $callback
      * @return static
      */
     public function diffKeysUsing($items, callable $callback)
