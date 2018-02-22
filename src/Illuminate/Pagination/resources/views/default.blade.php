@@ -1,5 +1,12 @@
 @if ($paginator->hasPages())
     <ul class="pagination">
+        {{-- First Page Link --}}
+        @if ($paginator->onFirstPage())
+            <li class="disabled"><span>&laquo;</span></li>
+        @else
+            <li><a href="{{ $paginator->url(1) }}" rel="first">&laquo;</a></li>
+        @endif
+
         {{-- Previous Page Link --}}
         @if ($paginator->onFirstPage())
             <li class="disabled"><span>&lsaquo;</span></li>
@@ -31,6 +38,13 @@
             <li><a href="{{ $paginator->nextPageUrl() }}" rel="next">&rsaquo;</a></li>
         @else
             <li class="disabled"><span>&rsaquo;</span></li>
+        @endif
+
+        {{-- Last Page Link --}}
+        @if ($paginator->hasMorePages())
+            <li><a href="{{ $paginator->url($paginator->lastPage()) }}" rel="last">&raquo;</a></li>
+        @else
+            <li class="disabled"><span>&raquo;</span></li>
         @endif
     </ul>
 @endif
