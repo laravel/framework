@@ -583,7 +583,7 @@ class Builder
      *
      * @throws \InvalidArgumentException
      */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false)
+    public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
         if ($useDefault) {
             return [$operator, '='];
@@ -631,6 +631,10 @@ class Builder
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->where($column, $operator, $value, 'or');
     }
 
