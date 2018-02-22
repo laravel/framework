@@ -9,6 +9,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
@@ -16,6 +17,8 @@ use Illuminate\Contracts\Mail\Mailable as MailableContract;
 
 class Mailable implements MailableContract, Renderable
 {
+    use Localizable;
+
     /**
      * The person the message is from.
      *
@@ -50,6 +53,13 @@ class Mailable implements MailableContract, Renderable
      * @var array
      */
     public $replyTo = [];
+
+    /**
+     * The locale of the message.
+     *
+     * @var string
+     */
+    public $locale;
 
     /**
      * The subject of the message.
@@ -122,14 +132,16 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
-        Container::getInstance()->call([$this, 'build']);
+        $this->withLocale($this->locale, $mailer->translator, function () use ($mailer) {
+            Container::getInstance()->call([$this, 'build']);
 
-        $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
-            $this->buildFrom($message)
-                 ->buildRecipients($message)
-                 ->buildSubject($message)
-                 ->runCallbacks($message)
-                 ->buildAttachments($message);
+            $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
+                $this->buildFrom($message)
+                     ->buildRecipients($message)
+                     ->buildSubject($message)
+                     ->runCallbacks($message)
+                     ->buildAttachments($message);
+            });
         });
     }
 
@@ -570,6 +582,19 @@ class Mailable implements MailableContract, Renderable
 
             return $actual == $expected;
         });
+    }
+
+    /**
+     * Set the locale of the message.
+     *
+     * @param  string  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     /**

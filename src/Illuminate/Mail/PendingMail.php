@@ -35,6 +35,13 @@ class PendingMail
     protected $bcc = [];
 
     /**
+     * The locale of the message.
+     *
+     * @var array
+     */
+    protected $locale;
+
+    /**
      * Create a new mailable mailer instance.
      *
      * @param  \Illuminate\Mail\Mailer  $mailer
@@ -80,6 +87,19 @@ class PendingMail
     public function bcc($users)
     {
         $this->bcc = $users;
+
+        return $this;
+    }
+
+    /**
+     * Set the locale of the message.
+     *
+     * @param  string  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
 
         return $this;
     }
@@ -149,6 +169,7 @@ class PendingMail
     {
         return $mailable->to($this->to)
                         ->cc($this->cc)
-                        ->bcc($this->bcc);
+                        ->bcc($this->bcc)
+                        ->locale($this->locale);
     }
 }
