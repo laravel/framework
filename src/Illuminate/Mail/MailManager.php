@@ -85,8 +85,8 @@ class MailManager
 
         // Next we will create the Mailer instance based on config.
         return $this->app->make('mailer', [
-            $this->app->make('swift.mailer', [
-                $this->makeTransport($config['driver'], $config),
+            'swift' => $this->app->make('swift.mailer', [
+                'transport' => $this->makeTransport($config['driver'], $config),
             ]),
         ]);
     }
