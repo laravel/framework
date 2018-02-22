@@ -633,10 +633,11 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['en_GB', 'fr', 'HR']);
         // demonstrate that diffKeys wont support case insensitivity
-        $this->assertEquals(['en_GB', 'fr', 'HR'], $c->diff(new Collection(['en_gb' , 'hr']))->values()->toArray());
+        $this->assertEquals(['en_GB', 'fr', 'HR'], $c->diff(new Collection(['en_gb', 'hr']))->values()->toArray());
         // allow for case insensitive difference
-        $this->assertEquals(['fr'], $c->diffUsing(new Collection(['en_gb' , 'hr']), 'strcasecmp')->values()->toArray());
+        $this->assertEquals(['fr'], $c->diffUsing(new Collection(['en_gb', 'hr']), 'strcasecmp')->values()->toArray());
     }
+
     public function testDiffUsingWithNull()
     {
         $c = new Collection(['en_GB', 'fr', 'HR']);
