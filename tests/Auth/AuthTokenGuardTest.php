@@ -20,6 +20,7 @@ class AuthTokenGuardTest extends TestCase
         $provider = Mockery::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
+        $user->api_token = "foo";
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
 
@@ -28,6 +29,7 @@ class AuthTokenGuardTest extends TestCase
         $user = $guard->user();
 
         $this->assertEquals(1, $user->id);
+        $this->assertEquals("foo", $user->api_token);
         $this->assertTrue($guard->check());
         $this->assertFalse($guard->guest());
         $this->assertEquals(1, $guard->id());
@@ -64,6 +66,7 @@ class AuthTokenGuardTest extends TestCase
         $provider = Mockery::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
+        $user->api_token = "foo";
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
 
@@ -98,6 +101,7 @@ class AuthTokenGuardTest extends TestCase
         $provider = Mockery::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
         $user->id = 1;
+        $user->api_token = "foo";
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'custom'])->andReturn($user);
         $request = Request::create('/', 'GET', ['api_token' => 'foo']);
 
@@ -108,11 +112,41 @@ class AuthTokenGuardTest extends TestCase
 
         $this->assertEquals(1, $user->id);
     }
+
+    public function testItReturnsDifferentUsersWhenTokenIsChangedInSubsequentRequests()
+    {
+        $provider = Mockery::mock(UserProvider::class);
+
+        $first_user = new AuthTokenGuardTestUser;
+        $first_user->id = 1;
+        $first_user->api_token = "foo";
+
+        $second_user = new AuthTokenGuardTestUser;
+        $second_user->id = 2;
+        $second_user->api_token = "bar";
+
+        $provider->shouldReceive('retrieveByCredentials')->twice()->with(['api_token' => 'foo'])->andReturn($first_user);
+        $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'bar'])->andReturn($second_user);
+
+        $request = Request::create('/', 'GET', ['api_token' => 'foo']);
+        $guard = new TokenGuard($provider, $request);
+        $this->assertEquals(1, $guard->user()->id);
+
+        $guard->setRequest(Request::create('/', 'GET', ['api_token' => 'foo']));
+        $this->assertEquals(1, $guard->user()->id);
+
+        $guard->setRequest(Request::create('/', 'GET', ['api_token' => 'bar']));
+        $this->assertEquals(2, $guard->user()->id);
+
+        $guard->setRequest(Request::create('/', 'GET', ['api_token' => 'foo']));
+        $this->assertEquals(1, $guard->user()->id);
+    }
 }
 
 class AuthTokenGuardTestUser
 {
     public $id;
+    public $api_token;
 
     public function getAuthIdentifier()
     {
