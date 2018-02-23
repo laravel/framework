@@ -6,7 +6,6 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Cache\RateLimiter;
 use Illuminate\Auth\Events\Lockout;
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
 
 trait ThrottlesLogins
@@ -51,7 +50,7 @@ trait ThrottlesLogins
         );
 
         throw ValidationException::withMessages([
-            $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
+            $this->username() => [trans('auth.throttle', ['seconds' => $seconds])],
         ])->status(423);
     }
 
