@@ -26,7 +26,7 @@ class EloquentPaginateTest extends DatabaseTestCase
     {
         for ($i = 1; $i <= 50; $i++) {
             Post::create([
-                'title' => 'Title ' . $i,
+                'title' => 'Title '.$i,
             ]);
         }
 
