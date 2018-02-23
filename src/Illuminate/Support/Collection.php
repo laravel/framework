@@ -453,6 +453,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Run a filter over each of the items if the given conditional is truthy.
+     *
+     * @param  mixed  $condition
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function filterIf($condition, callable $callback = null)
+    {
+        return $condition ? $this->filter($callback) : $this;
+    }
+
+    /**
      * Apply the callback if the value is truthy.
      *
      * @param  bool  $value
