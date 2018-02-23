@@ -786,15 +786,16 @@ class SupportHelpersTest extends TestCase
 
     public function testOptionalWithArray()
     {
-        $this->assertNull(optional(null)['missing']);
-
         $this->assertEquals('here', optional(['present' => 'here'])['present']);
+        $this->assertNull(optional(null)['missing']);
+        $this->assertNull(optional(['present' => 'here'])->missing);
     }
 
     public function testOptionalReturnsObjectPropertyOrNull()
     {
         $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
         $this->assertNull(optional(['foo' => 'bar'])->foo);
+        $this->assertNull(optional((object) ['foo' => 'bar'])->bar);
     }
 
     public function testOptionalDeterminesWhetherKeyIsSet()
