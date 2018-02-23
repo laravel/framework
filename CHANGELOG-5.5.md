@@ -1,5 +1,12 @@
 # Release Notes for 5.5.x
 
+## v5.5.35 (2018-02-22)
+
+### Fixed
+- Fixed an issue with `orWhere*()` arguments ([3368494](https://github.com/laravel/framework/commit/3368494889130585bc6bbf22d8842881f8f4399c))
+- Fixed `tightenco/collect` version ([#23152](https://github.com/laravel/framework/pull/23152), [#23159](https://github.com/laravel/framework/pull/23159))
+
+
 ## v5.5.34 (2018-02-06)
 
 ### Changed
