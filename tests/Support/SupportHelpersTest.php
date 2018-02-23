@@ -795,6 +795,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
         $this->assertNull(optional(['foo' => 'bar'])->foo);
+        $this->assertNull(optional((object) ['foo' => 'bar'])->bar);
     }
 
     public function testOptionalDeterminesWhetherKeyIsSet()
