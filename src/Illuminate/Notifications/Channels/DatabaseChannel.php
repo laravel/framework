@@ -44,8 +44,6 @@ class DatabaseChannel
             return $notification->toArray($notifiable);
         }
 
-        throw new RuntimeException(
-            'Notification is missing toDatabase / toArray method.'
-        );
+        throw new RuntimeException('Notification is missing toDatabase / toArray method.');
     }
 }
