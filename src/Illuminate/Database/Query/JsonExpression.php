@@ -40,6 +40,6 @@ class JsonExpression extends Expression
                 return '?';
         }
 
-        throw new InvalidArgumentException('JSON value is of illegal type: '.$type);
+        throw new InvalidArgumentException("JSON value is of illegal type: {$type}");
     }
 }
