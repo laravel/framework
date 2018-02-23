@@ -87,14 +87,14 @@ abstract class AbstractPaginator implements Htmlable
      *
      * @var string
      */
-    public static $defaultView = 'pagination::bootstrap-4';
+    public static $defaultView = 'pagination::default';
 
     /**
      * The default "simple" pagination view.
      *
      * @var string
      */
-    public static $defaultSimpleView = 'pagination::simple-bootstrap-4';
+    public static $defaultSimpleView = 'pagination::simple-default';
 
     /**
      * Determine if the given value is a valid page number.
@@ -155,9 +155,9 @@ abstract class AbstractPaginator implements Htmlable
         }
 
         return $this->path
-                        .(Str::contains($this->path, '?') ? '&' : '?')
-                        .http_build_query($parameters, '', '&')
-                        .$this->buildFragment();
+                        . (Str::contains($this->path, '?') ? '&' : '?')
+                        . http_build_query($parameters, '', '&')
+                        . $this->buildFragment();
     }
 
     /**
@@ -231,7 +231,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     protected function buildFragment()
     {
-        return $this->fragment ? '#'.$this->fragment : '';
+        return $this->fragment ? '#' . $this->fragment : '';
     }
 
     /**
