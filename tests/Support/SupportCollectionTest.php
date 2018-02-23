@@ -331,6 +331,17 @@ class SupportCollectionTest extends TestCase
         })->all());
     }
 
+    public function testFilterIf()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $f = function ($val) {
+            return 0 === strpos($val, 'ba');
+        };
+
+        $this->assertEquals(['foo', 'bar', 'baz'], $c->filterIf(false, $f)->values()->toArray(), 'The filter should not be applied if $condition is false.');
+        $this->assertEquals(['bar', 'baz'], $c->filterIf(true, $f)->values()->toArray(), 'The filter should be applied if $condition is true.');
+    }
+
     public function testHigherOrderKeyBy()
     {
         $c = new Collection([
