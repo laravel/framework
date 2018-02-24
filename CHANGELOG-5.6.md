@@ -1,5 +1,16 @@
 # Release Notes for 5.6.x
 
+## v5.6.5 (2018-02-22)
+
+### Added
+- Added model reference to `MassAssignmentException` ([#23229](https://github.com/laravel/framework/pull/23229))
+- Added support for setting the locale on `Mailable` ([#23178](https://github.com/laravel/framework/pull/23178), [a432d9e](https://github.com/laravel/framework/commit/a432d9e1fabe14cebecdf9d9637a3d4b8167b478))
+- Added new udiff methods to the `Collection` ([#23107](https://github.com/laravel/framework/pull/23107))
+
+### Fixed
+- Fixed an issue with `orWhere*()` arguments ([e5042e1](https://github.com/laravel/framework/commit/e5042e10f940579b4457c99a51319887cd0a7b6f), [33739f9](https://github.com/laravel/framework/commit/33739f9887413f9855fb93a04211009256d5d904))
+
+
 ## v5.6.4 (2018-02-21)
 
 ### Added

@@ -65,8 +65,8 @@ abstract class Controller
      */
     public function __call($method, $parameters)
     {
-        $class = static::class;
-
-        throw new BadMethodCallException("Method {$class}::{$method} does not exist.");
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 }

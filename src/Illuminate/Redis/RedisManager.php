@@ -83,9 +83,7 @@ class RedisManager implements Factory
             return $this->resolveCluster($name);
         }
 
-        throw new InvalidArgumentException(
-            "Redis connection [{$name}] not configured."
-        );
+        throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
     }
 
     /**
