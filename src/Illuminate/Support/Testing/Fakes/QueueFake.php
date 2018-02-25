@@ -239,7 +239,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
-        foreach ($this->jobs as $job) {
+        foreach ($jobs as $job) {
             $this->push($job);
         }
     }
