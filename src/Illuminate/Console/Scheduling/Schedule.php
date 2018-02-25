@@ -41,12 +41,12 @@ class Schedule
         $container = Container::getInstance();
 
         $this->eventMutex = $container->bound(EventMutex::class)
-                                ? $container->make(EventMutex::class)
-                                : $container->make(CacheEventMutex::class);
+            ? $container->make(EventMutex::class)
+            : $container->make(CacheEventMutex::class);
 
         $this->schedulingMutex = $container->bound(SchedulingMutex::class)
-                                ? $container->make(SchedulingMutex::class)
-                                : $container->make(CacheSchedulingMutex::class);
+            ? $container->make(SchedulingMutex::class)
+            : $container->make(CacheSchedulingMutex::class);
     }
 
     /**
@@ -59,7 +59,9 @@ class Schedule
     public function call($callback, array $parameters = [])
     {
         $this->events[] = $event = new CallbackEvent(
-            $this->eventMutex, $callback, $parameters
+            $this->eventMutex,
+            $callback,
+            $parameters
         );
 
         return $event;
@@ -78,9 +80,7 @@ class Schedule
             $command = Container::getInstance()->make($command)->getName();
         }
 
-        return $this->exec(
-            Application::formatCommandString($command), $parameters
-        );
+        return $this->exec(Application::formatCommandString($command),$parameters);
     }
 
     /**
@@ -104,6 +104,24 @@ class Schedule
     }
 
     /**
+     * Add a new SchedulableClass event to the schedule.
+     *
+     * @param  object|string  $schedulableClass
+     * @return \Illuminate\Console\Scheduling\SchedulableClassEvent
+     */
+    public function use($schedulableClass)
+    {
+        $schedulableClass = is_string($schedulableClass) ? resolve($schedulableClass) : $schedulableClass;
+
+        $this->events[] = $event = (new SchedulableClassEvent(
+            $this->eventMutex,
+            $schedulableClass
+        ))->everyMinute();
+
+        return $event;
+    }
+
+    /**
      * Add a new command event to the schedule.
      *
      * @param  string  $command
@@ -113,7 +131,7 @@ class Schedule
     public function exec($command, array $parameters = [])
     {
         if (count($parameters)) {
-            $command .= ' '.$this->compileParameters($parameters);
+            $command .= ' ' . $this->compileParameters($parameters);
         }
 
         $this->events[] = $event = new Event($this->eventMutex, $command);
@@ -134,7 +152,7 @@ class Schedule
                 $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
-            } elseif (! is_numeric($value) && ! preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif (!is_numeric($value) && !preg_match('/^(-.$|--.*)/i', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 
