@@ -18,6 +18,7 @@ use League\Flysystem\FileNotFoundException;
 use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
@@ -151,6 +152,17 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function download($path, $name = null, array $headers = [])
     {
         return $this->response($path, $name, $headers, 'attachment');
+    }
+    
+    /**
+     * Send a streamed response (with accept-range support) for a given file.
+     *
+     * @param  string  $path
+     * @return \Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
+    public function download($path)
+    {
+        return new BinaryFileResponse($this->path($path));
     }
 
     /**
