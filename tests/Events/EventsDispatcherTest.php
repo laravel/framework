@@ -104,6 +104,23 @@ class EventsDispatcherTest extends TestCase
         $this->assertEquals('wildcard', $_SERVER['__event.test']);
     }
 
+    public function testWildcardListenersCacheFlushing()
+    {
+        unset($_SERVER['__event.test']);
+        $d = new Dispatcher;
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'cached_wildcard';
+        });
+        $d->fire('foo.bar');
+        $this->assertEquals('cached_wildcard', $_SERVER['__event.test']);
+
+        $d->listen('foo.*', function () {
+            $_SERVER['__event.test'] = 'new_wildcard';
+        });
+        $d->fire('foo.bar');
+        $this->assertEquals('new_wildcard', $_SERVER['__event.test']);
+    }
+
     public function testListenersCanBeRemoved()
     {
         unset($_SERVER['__event.test']);
