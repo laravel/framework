@@ -179,7 +179,7 @@ class ConnectionFactory
             $hosts = $this->parseHosts($config);
 
             // Shuffle hosts by default or if expicitly configured to shuffle
-            if (!array_key_exists('shuffle_hosts', $config) || $config['shuffle_hosts']) {
+            if (! array_key_exists('shuffle_hosts', $config) || $config['shuffle_hosts']) {
                 $hosts = Arr::shuffle($hosts);
             }
 
