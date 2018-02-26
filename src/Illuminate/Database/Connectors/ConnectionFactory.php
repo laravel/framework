@@ -176,7 +176,14 @@ class ConnectionFactory
     protected function createPdoResolverWithHosts(array $config)
     {
         return function () use ($config) {
-            foreach (Arr::shuffle($hosts = $this->parseHosts($config)) as $key => $host) {
+            $hosts = $this->parseHosts($config);
+
+            // Shuffle hosts by default or if expicitly configured to shuffle
+            if (! array_key_exists('shuffle_hosts', $config) || $config['shuffle_hosts']) {
+                $hosts = Arr::shuffle($hosts);
+            }
+
+            foreach ($hosts as $key => $host) {
                 $config['host'] = $host;
 
                 try {
