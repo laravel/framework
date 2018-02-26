@@ -189,6 +189,10 @@ trait HasAttributes
                 ($value === 'date' || $value === 'datetime')) {
                 $attributes[$key] = $this->serializeDate($attributes[$key]);
             }
+
+            if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
+                $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
+            }
         }
 
         return $attributes;
@@ -407,7 +411,9 @@ trait HasAttributes
         $relation = $this->$method();
 
         if (! $relation instanceof Relation) {
-            throw new LogicException(get_class($this).'::'.$method.' must return a relationship instance.');
+            throw new LogicException(sprintf(
+                '%s::%s must return a relationship instance.', static::class, $method
+            ));
         }
 
         return tap($relation->getResults(), function ($results) use ($method) {
@@ -488,6 +494,7 @@ trait HasAttributes
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
+            case 'custom_datetime':
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
@@ -504,7 +511,23 @@ trait HasAttributes
      */
     protected function getCastType($key)
     {
+        if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
+            return 'custom_datetime';
+        }
+
         return trim(strtolower($this->getCasts()[$key]));
+    }
+
+    /**
+     * Determine if the cast type is a custom date time cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isCustomDateTimeCast($cast)
+    {
+        return strncmp($cast, 'date:', 5) === 0 ||
+               strncmp($cast, 'datetime:', 9) === 0;
     }
 
     /**
@@ -781,7 +804,7 @@ trait HasAttributes
      *
      * @return string
      */
-    protected function getDateFormat()
+    public function getDateFormat()
     {
         return $this->dateFormat ?: $this->getConnection()->getQueryGrammar()->getDateFormat();
     }

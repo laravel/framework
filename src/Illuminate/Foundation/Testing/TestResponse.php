@@ -94,7 +94,9 @@ class TestResponse
         );
 
         if (! is_null($uri)) {
-            PHPUnit::assertEquals(app('url')->to($uri), $this->headers->get('Location'));
+            PHPUnit::assertEquals(
+                app('url')->to($uri), app('url')->to($this->headers->get('Location'))
+            );
         }
 
         return $this;
@@ -254,6 +256,32 @@ class TestResponse
     }
 
     /**
+     * Assert that the given strings are contained in order within the response.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeInOrder(array $values)
+    {
+        $position = 0;
+
+        foreach ($values as $value) {
+            $valuePosition = mb_strpos($this->getContent(), $value, $position);
+
+            if ($valuePosition === false || $valuePosition < $position) {
+                PHPUnit::fail(
+                    'Failed asserting that \''.$this->getContent().
+                    '\' contains "'.$value.'" in specified order.'
+                );
+            }
+
+            $position = $valuePosition + mb_strlen($value);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string is contained within the response text.
      *
      * @param  string  $value
@@ -262,6 +290,32 @@ class TestResponse
     public function assertSeeText($value)
     {
         PHPUnit::assertContains($value, strip_tags($this->getContent()));
+
+        return $this;
+    }
+
+    /**
+     * Assert that the given strings are contained in order within the response text.
+     *
+     * @param  array  $values
+     * @return $this
+     */
+    public function assertSeeTextInOrder(array $values)
+    {
+        $position = 0;
+
+        foreach ($values as $value) {
+            $valuePosition = mb_strpos(strip_tags($this->getContent()), $value, $position);
+
+            if ($valuePosition === false || $valuePosition < $position) {
+                PHPUnit::fail(
+                    'Failed asserting that \''.strip_tags($this->getContent()).
+                    '\' contains "'.$value.'" in specified order.'
+                );
+            }
+
+            $position = $valuePosition + mb_strlen($value);
+        }
 
         return $this;
     }
@@ -515,9 +569,10 @@ class TestResponse
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return array
+     * @param  string|null  $key
+     * @return mixed
      */
-    public function decodeResponseJson()
+    public function decodeResponseJson($key = null)
     {
         $decodedResponse = json_decode($this->getContent(), true);
 
@@ -529,17 +584,18 @@ class TestResponse
             }
         }
 
-        return $decodedResponse;
+        return data_get($decodedResponse, $key);
     }
 
     /**
      * Validate and return the decoded response JSON.
      *
-     * @return array
+     * @param  string|null  $key
+     * @return mixed
      */
-    public function json()
+    public function json($key = null)
     {
-        return $this->decodeResponseJson();
+        return $this->decodeResponseJson($key);
     }
 
     /**

@@ -96,7 +96,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/file.txt', 'Hello World');
         $files = new Filesystem;
         $files->deleteDirectory($this->tempDir.'/foo');
-        $this->assertFalse(is_dir($this->tempDir.'/foo'));
+        $this->assertDirectoryNotExists($this->tempDir.'/foo');
         $this->assertFileNotExists($this->tempDir.'/foo/file.txt');
     }
 
@@ -114,7 +114,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/file.txt', 'Hello World');
         $files = new Filesystem;
         $files->cleanDirectory($this->tempDir.'/foo');
-        $this->assertTrue(is_dir($this->tempDir.'/foo'));
+        $this->assertDirectoryExists($this->tempDir.'/foo');
         $this->assertFileNotExists($this->tempDir.'/foo/file.txt');
     }
 
@@ -158,10 +158,10 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
         $files->copyDirectory($this->tempDir.'/tmp', $this->tempDir.'/tmp2');
-        $this->assertTrue(is_dir($this->tempDir.'/tmp2'));
+        $this->assertDirectoryExists($this->tempDir.'/tmp2');
         $this->assertFileExists($this->tempDir.'/tmp2/foo.txt');
         $this->assertFileExists($this->tempDir.'/tmp2/bar.txt');
-        $this->assertTrue(is_dir($this->tempDir.'/tmp2/nested'));
+        $this->assertDirectoryExists($this->tempDir.'/tmp2/nested');
         $this->assertFileExists($this->tempDir.'/tmp2/nested/baz.txt');
     }
 
@@ -175,12 +175,12 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
         $files->moveDirectory($this->tempDir.'/tmp', $this->tempDir.'/tmp2');
-        $this->assertTrue(is_dir($this->tempDir.'/tmp2'));
+        $this->assertDirectoryExists($this->tempDir.'/tmp2');
         $this->assertFileExists($this->tempDir.'/tmp2/foo.txt');
         $this->assertFileExists($this->tempDir.'/tmp2/bar.txt');
-        $this->assertTrue(is_dir($this->tempDir.'/tmp2/nested'));
+        $this->assertDirectoryExists($this->tempDir.'/tmp2/nested');
         $this->assertFileExists($this->tempDir.'/tmp2/nested/baz.txt');
-        $this->assertFalse(is_dir($this->tempDir.'/tmp'));
+        $this->assertDirectoryNotExists($this->tempDir.'/tmp');
     }
 
     public function testMoveDirectoryMovesEntireDirectoryAndOverwrites()
@@ -196,14 +196,14 @@ class FilesystemTest extends TestCase
 
         $files = new Filesystem;
         $files->moveDirectory($this->tempDir.'/tmp', $this->tempDir.'/tmp2', true);
-        $this->assertTrue(is_dir($this->tempDir.'/tmp2'));
+        $this->assertDirectoryExists($this->tempDir.'/tmp2');
         $this->assertFileExists($this->tempDir.'/tmp2/foo.txt');
         $this->assertFileExists($this->tempDir.'/tmp2/bar.txt');
-        $this->assertTrue(is_dir($this->tempDir.'/tmp2/nested'));
+        $this->assertDirectoryExists($this->tempDir.'/tmp2/nested');
         $this->assertFileExists($this->tempDir.'/tmp2/nested/baz.txt');
         $this->assertFileNotExists($this->tempDir.'/tmp2/foo2.txt');
         $this->assertFileNotExists($this->tempDir.'/tmp2/bar2.txt');
-        $this->assertFalse(is_dir($this->tempDir.'/tmp'));
+        $this->assertDirectoryNotExists($this->tempDir.'/tmp');
     }
 
     public function testMoveDirectoryReturnsFalseWhileOverwritingAndUnableToDeleteDestinationDirectory()
@@ -482,7 +482,7 @@ class FilesystemTest extends TestCase
             'host' => 'ftp.example.com',
             'username' => 'admin',
             'permPublic' => 0700,
-            'unsopertedParam' => true,
+            'unsupportedParam' => true,
         ]);
 
         /** @var Ftp $adapter */

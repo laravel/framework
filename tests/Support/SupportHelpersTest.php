@@ -699,20 +699,30 @@ class SupportHelpersTest extends TestCase
 
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
-        $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
         ],
         class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
-        $this->assertEquals([
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+        $this->assertSame([
             'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
         ],
         class_uses_recursive(new SupportTestClassTwo));
+    }
+
+    public function testClassUsesRecursiveReturnParentTraitsFirst()
+    {
+        $this->assertSame([
+            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
+            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            'Illuminate\Tests\Support\SupportTestTraitThree' => 'Illuminate\Tests\Support\SupportTestTraitThree',
+        ],
+        class_uses_recursive(SupportTestClassThree::class));
     }
 
     public function testArrayAdd()
@@ -776,9 +786,47 @@ class SupportHelpersTest extends TestCase
 
     public function testOptionalWithArray()
     {
-        $this->assertNull(optional(null)['missing']);
-
         $this->assertEquals('here', optional(['present' => 'here'])['present']);
+        $this->assertNull(optional(null)['missing']);
+        $this->assertNull(optional(['present' => 'here'])->missing);
+    }
+
+    public function testOptionalReturnsObjectPropertyOrNull()
+    {
+        $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
+        $this->assertNull(optional(['foo' => 'bar'])->foo);
+        $this->assertNull(optional((object) ['foo' => 'bar'])->bar);
+    }
+
+    public function testOptionalDeterminesWhetherKeyIsSet()
+    {
+        $this->assertTrue(isset(optional(['foo' => 'bar'])['foo']));
+        $this->assertFalse(isset(optional(['foo' => 'bar'])['bar']));
+        $this->assertFalse(isset(optional()['bar']));
+    }
+
+    public function testOptionalAllowsToSetKey()
+    {
+        $optional = optional([]);
+        $optional['foo'] = 'bar';
+        $this->assertSame('bar', $optional['foo']);
+
+        $optional = optional(null);
+        $optional['foo'] = 'bar';
+        $this->assertFalse(isset($optional['foo']));
+    }
+
+    public function testOptionalAllowToUnsetKey()
+    {
+        $optional = optional(['foo' => 'bar']);
+        $this->assertTrue(isset($optional['foo']));
+        unset($optional['foo']);
+        $this->assertFalse(isset($optional['foo']));
+
+        $optional = optional((object) ['foo' => 'bar']);
+        $this->assertFalse(isset($optional['foo']));
+        $optional['foo'] = 'bar';
+        $this->assertFalse(isset($optional['foo']));
     }
 
     public function testOptionalIsMacroable()
@@ -843,6 +891,15 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
+}
+
+trait SupportTestTraitThree
+{
+}
+
+class SupportTestClassThree extends SupportTestClassTwo
+{
+    use SupportTestTraitThree;
 }
 
 class SupportTestArrayAccess implements ArrayAccess

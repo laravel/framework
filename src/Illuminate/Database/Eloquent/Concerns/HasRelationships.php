@@ -173,9 +173,10 @@ trait HasRelationships
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
+     * @param  string  $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    public function morphTo($name = null, $type = null, $id = null)
+    public function morphTo($name = null, $type = null, $id = null, $ownerKey = null)
     {
         // If no name is provided, we will use the backtrace to get the function name
         // since that is most likely the name of the polymorphic interface. We can
@@ -190,8 +191,8 @@ trait HasRelationships
         // the relationship. In this case we'll just pass in a dummy query where we
         // need to remove any eager loads that may already be defined on a model.
         return empty($class = $this->{$type})
-                    ? $this->morphEagerTo($name, $type, $id)
-                    : $this->morphInstanceTo($class, $name, $type, $id);
+                    ? $this->morphEagerTo($name, $type, $id, $ownerKey)
+                    : $this->morphInstanceTo($class, $name, $type, $id, $ownerKey);
     }
 
     /**
@@ -200,12 +201,13 @@ trait HasRelationships
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
+     * @param  string  $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphEagerTo($name, $type, $id)
+    protected function morphEagerTo($name, $type, $id, $ownerKey)
     {
         return $this->newMorphTo(
-            $this->newQuery()->setEagerLoads([]), $this, $id, null, $type, $name
+            $this->newQuery()->setEagerLoads([]), $this, $id, $ownerKey, $type, $name
         );
     }
 
@@ -216,16 +218,17 @@ trait HasRelationships
      * @param  string  $name
      * @param  string  $type
      * @param  string  $id
+     * @param  string  $ownerKey
      * @return \Illuminate\Database\Eloquent\Relations\MorphTo
      */
-    protected function morphInstanceTo($target, $name, $type, $id)
+    protected function morphInstanceTo($target, $name, $type, $id, $ownerKey)
     {
         $instance = $this->newRelatedInstance(
             static::getActualClassNameForMorph($target)
         );
 
         return $this->newMorphTo(
-            $instance->newQuery(), $this, $id, $instance->getKeyName(), $type, $name
+            $instance->newQuery(), $this, $id, $ownerKey ?? $instance->getKeyName(), $type, $name
         );
     }
 

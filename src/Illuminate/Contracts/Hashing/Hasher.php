@@ -5,6 +5,14 @@ namespace Illuminate\Contracts\Hashing;
 interface Hasher
 {
     /**
+     * Get information about the given hashed value.
+     *
+     * @param  string  $hashedValue
+     * @return array
+     */
+    public function info($hashedValue);
+
+    /**
      * Hash the given value.
      *
      * @param  string  $value
