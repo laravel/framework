@@ -107,4 +107,14 @@ class Optional implements ArrayAccess
             unset($this->value[$key]);
         }
     }
+
+    /**
+     * Casts the underlying object to a string.
+     *
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->value;
+    }
 }
