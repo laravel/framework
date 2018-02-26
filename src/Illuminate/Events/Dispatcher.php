@@ -37,7 +37,7 @@ class Dispatcher implements DispatcherContract
     protected $wildcards = [];
 
     /**
-     * Wildcard listeners cache which saves expensive string operations.
+     * The cached wildcard listeners.
      *
      * @var array
      */
@@ -290,9 +290,10 @@ class Dispatcher implements DispatcherContract
     {
         $listeners = $this->listeners[$eventName] ?? [];
 
-        $wildcardListeners = $this->wildcardsCache[$eventName] ?? $this->getWildcardListeners($eventName);
-
-        $listeners = array_merge($listeners, $wildcardListeners);
+        $listeners = array_merge(
+            $listeners,
+            $this->wildcardsCache[$eventName] ?? $this->getWildcardListeners($eventName)
+        );
 
         return class_exists($eventName, false)
                     ? $this->addInterfaceListeners($eventName, $listeners)
