@@ -164,7 +164,7 @@ class FileStore implements Store
     {
         $path = $this->path($key);
 
-        // If the file doesn't exists, we obviously can't return the cache so we will
+        // If the file doesn't exist, we obviously cannot return the cache so we will
         // just return null. Otherwise, we'll get the contents of the file and get
         // the expiration UNIX timestamps from the start of the file's contents.
         try {

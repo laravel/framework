@@ -177,7 +177,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array  $view
      * @param  array  $data
-     * @return \Illuminate\View\View
+     * @return string
      */
     public function render($view, array $data = [])
     {

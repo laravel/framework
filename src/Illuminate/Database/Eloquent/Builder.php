@@ -68,7 +68,7 @@ class Builder
      */
     protected $passthru = [
         'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
+        'exists', 'doesntExist', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
     ];
 
     /**
@@ -241,6 +241,10 @@ class Builder
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        list($value, $operator) = $this->query->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->where($column, $operator, $value, 'or');
     }
 
@@ -1220,6 +1224,17 @@ class Builder
         $this->query->from($model->getTable());
 
         return $this;
+    }
+
+    /**
+     * Qualify the given column name by the model's table.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualifyColumn($column)
+    {
+        return $this->model->qualifyColumn($column);
     }
 
     /**

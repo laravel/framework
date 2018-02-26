@@ -32,7 +32,7 @@ class DownCommand extends Command
     public function handle()
     {
         file_put_contents(
-            $this->laravel->storagePath().'/framework/down',
+            storage_path('framework/down'),
             json_encode($this->getDownFilePayload(), JSON_PRETTY_PRINT)
         );
 

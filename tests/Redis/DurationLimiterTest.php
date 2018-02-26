@@ -14,9 +14,9 @@ class DurationLimiterTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setup()
+    public function setUp()
     {
-        parent::setup();
+        parent::setUp();
 
         $this->setUpRedis();
     }

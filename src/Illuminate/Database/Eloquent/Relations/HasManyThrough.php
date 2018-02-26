@@ -125,7 +125,7 @@ class HasManyThrough extends Relation
      */
     public function getQualifiedParentKeyName()
     {
-        return $this->parent->getTable().'.'.$this->secondLocalKey;
+        return $this->parent->qualifyColumn($this->secondLocalKey);
     }
 
     /**
@@ -495,7 +495,7 @@ class HasManyThrough extends Relation
      */
     public function getQualifiedFirstKeyName()
     {
-        return $this->throughParent->getTable().'.'.$this->firstKey;
+        return $this->throughParent->qualifyColumn($this->firstKey);
     }
 
     /**
@@ -505,7 +505,7 @@ class HasManyThrough extends Relation
      */
     public function getQualifiedForeignKeyName()
     {
-        return $this->related->getTable().'.'.$this->secondKey;
+        return $this->related->qualifyColumn($this->secondKey);
     }
 
     /**
@@ -515,6 +515,6 @@ class HasManyThrough extends Relation
      */
     public function getQualifiedLocalKeyName()
     {
-        return $this->farParent->getTable().'.'.$this->localKey;
+        return $this->farParent->qualifyColumn($this->localKey);
     }
 }

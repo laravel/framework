@@ -153,14 +153,14 @@ class EventsDispatcherTest extends TestCase
     public function testEventPassedFirstToWildcards()
     {
         $d = new Dispatcher;
-        $d->listen('foo.*', function ($event, $data) use ($d) {
+        $d->listen('foo.*', function ($event, $data) {
             $this->assertEquals('foo.bar', $event);
             $this->assertEquals(['first', 'second'], $data);
         });
         $d->fire('foo.bar', ['first', 'second']);
 
         $d = new Dispatcher;
-        $d->listen('foo.bar', function ($first, $second) use ($d) {
+        $d->listen('foo.bar', function ($first, $second) {
             $this->assertEquals('first', $first);
             $this->assertEquals('second', $second);
         });

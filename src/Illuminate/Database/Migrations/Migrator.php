@@ -204,9 +204,9 @@ class Migrator
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
-        } else {
-            return $this->rollbackMigrations($migrations, $paths, $options);
         }
+
+        return $this->rollbackMigrations($migrations, $paths, $options);
     }
 
     /**
@@ -281,9 +281,9 @@ class Migrator
             $this->note('<info>Nothing to rollback.</info>');
 
             return [];
-        } else {
-            return $this->resetMigrations($migrations, $paths, $pretend);
         }
+
+        return $this->resetMigrations($migrations, $paths, $pretend);
     }
 
     /**
@@ -361,6 +361,7 @@ class Migrator
         };
 
         $this->getSchemaGrammar($connection)->supportsSchemaTransactions()
+            && $migration->withinTransaction
                     ? $connection->transaction($callback)
                     : $callback();
     }

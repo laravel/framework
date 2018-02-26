@@ -8,6 +8,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -124,6 +125,16 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $result = $builder->first();
         $this->assertEquals('bar', $result);
+    }
+
+    public function testQualifyColumn()
+    {
+        $builder = new Builder(m::mock(BaseBuilder::class));
+        $builder->shouldReceive('from')->with('stub');
+
+        $builder->setModel(new EloquentModelStub);
+
+        $this->assertEquals('stub.column', $builder->qualifyColumn('column'));
     }
 
     public function testGetMethodLoadsModelsAndHydratesEagerRelations()
@@ -366,7 +377,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     public function testLocalMacrosAreCalledOnBuilder()
     {
         unset($_SERVER['__test.builder']);
-        $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
+        $builder = new Builder(new BaseBuilder(
             m::mock('Illuminate\Database\ConnectionInterface'),
             m::mock('Illuminate\Database\Query\Grammars\Grammar'),
             m::mock('Illuminate\Database\Query\Processors\Processor')
@@ -987,7 +998,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     protected function getMockQueryBuilder()
     {
-        $query = m::mock('Illuminate\Database\Query\Builder');
+        $query = m::mock(BaseBuilder::class);
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;

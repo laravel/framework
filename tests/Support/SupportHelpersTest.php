@@ -124,7 +124,7 @@ class SupportHelpersTest extends TestCase
     {
         $array = ['name' => 'taylor', 'age' => 26];
         $this->assertEquals(['name' => 'taylor'], Arr::only($array, ['name']));
-        $this->assertSame([], Arr::only($array, ['nonExistingKey']));
+        $this->assertEmpty(Arr::only($array, ['nonExistingKey']));
     }
 
     public function testArrayCollapse()
@@ -772,6 +772,13 @@ class SupportHelpersTest extends TestCase
                 return 10;
             }
         })->something());
+    }
+
+    public function testOptionalWithArray()
+    {
+        $this->assertNull(optional(null)['missing']);
+
+        $this->assertEquals('here', optional(['present' => 'here'])['present']);
     }
 
     public function testOptionalIsMacroable()

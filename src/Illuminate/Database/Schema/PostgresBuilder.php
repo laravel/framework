@@ -12,11 +12,7 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
-            $schema = head($schema);
-        }
-
-        $schema = $schema ? $schema : 'public';
+        list($schema, $table) = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -75,11 +71,7 @@ class PostgresBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
-            $schema = head($schema);
-        }
-
-        $schema = $schema ? $schema : 'public';
+        list($schema, $table) = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -88,5 +80,26 @@ class PostgresBuilder extends Builder
         );
 
         return $this->connection->getPostProcessor()->processColumnListing($results);
+    }
+
+    /**
+     * Parse the table name and extract the schema and table.
+     *
+     * @param  string  $table
+     * @return array
+     */
+    protected function parseSchemaAndTable($table)
+    {
+        $table = explode('.', $table);
+
+        if (is_array($schema = $this->connection->getConfig('schema'))) {
+            if (in_array($table[0], $schema)) {
+                return [array_shift($table), implode('.', $table)];
+            }
+
+            $schema = head($schema);
+        }
+
+        return [$schema ?: 'public', implode('.', $table)];
     }
 }

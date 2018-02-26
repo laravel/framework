@@ -59,7 +59,6 @@ class BroadcasterTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     * @expectedExceptionMessage
      */
     public function testNotFoundThrowsHttpException()
     {

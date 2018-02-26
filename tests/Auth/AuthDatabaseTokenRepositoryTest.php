@@ -9,9 +9,9 @@ use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    public function setup()
+    public function setUp()
     {
-        parent::setup();
+        parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }

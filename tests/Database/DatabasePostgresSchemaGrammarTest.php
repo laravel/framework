@@ -449,6 +449,15 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" date not null', $statements[0]);
     }
 
+    public function testAddingYear()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->year('birth_year');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table "users" add column "birth_year" integer not null', $statements[0]);
+    }
+
     public function testAddingJson()
     {
         $blueprint = new Blueprint('users');

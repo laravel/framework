@@ -480,7 +480,7 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string|null  $operator
+     * @param  mixed   $operator
      * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
@@ -583,7 +583,7 @@ class Builder
      *
      * @throws \InvalidArgumentException
      */
-    protected function prepareValueAndOperator($value, $operator, $useDefault = false)
+    public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
         if ($useDefault) {
             return [$operator, '='];
@@ -631,6 +631,10 @@ class Builder
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->where($column, $operator, $value, 'or');
     }
 
@@ -985,6 +989,10 @@ class Builder
      */
     public function orWhereDate($column, $operator, $value)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->whereDate($column, $operator, $value, 'or');
     }
 
@@ -1012,6 +1020,10 @@ class Builder
      */
     public function orWhereTime($column, $operator, $value)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->whereTime($column, $operator, $value, 'or');
     }
 
@@ -1083,7 +1095,9 @@ class Builder
     {
         $this->wheres[] = compact('column', 'type', 'boolean', 'operator', 'value');
 
-        $this->addBinding($value, 'where');
+        if (! $value instanceof Expression) {
+            $this->addBinding($value, 'where');
+        }
 
         return $this;
     }
@@ -1771,9 +1785,9 @@ class Builder
             return 0;
         } elseif (is_object($results[0])) {
             return (int) $results[0]->aggregate;
-        } else {
-            return (int) array_change_key_case((array) $results[0])['aggregate'];
         }
+
+        return (int) array_change_key_case((array) $results[0])['aggregate'];
     }
 
     /**
@@ -1942,6 +1956,16 @@ class Builder
         }
 
         return false;
+    }
+
+    /**
+     * Determine if no rows exist for the current query.
+     *
+     * @return bool
+     */
+    public function doesntExist()
+    {
+        return ! $this->exists();
     }
 
     /**
@@ -2224,7 +2248,9 @@ class Builder
         }
 
         return $this->connection->delete(
-            $this->grammar->compileDelete($this), $this->getBindings()
+            $this->grammar->compileDelete($this), $this->cleanBindings(
+                $this->grammar->prepareBindingsForDelete($this->bindings)
+            )
         );
     }
 

@@ -553,6 +553,8 @@ if (! function_exists('dd')) {
      */
     function dd(...$args)
     {
+        http_response_code(500);
+
         foreach ($args as $x) {
             (new Dumper)->dump($x);
         }
@@ -566,15 +568,16 @@ if (! function_exists('e')) {
      * Escape HTML special characters in a string.
      *
      * @param  \Illuminate\Contracts\Support\Htmlable|string  $value
+     * @param  bool  $doubleEncode
      * @return string
      */
-    function e($value)
+    function e($value, $doubleEncode = false)
     {
         if ($value instanceof Htmlable) {
             return $value->toHtml();
         }
 
-        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', false);
+        return htmlspecialchars($value, ENT_QUOTES, 'UTF-8', $doubleEncode);
     }
 }
 
@@ -717,7 +720,7 @@ if (! function_exists('optional')) {
      * @param  mixed  $value
      * @return mixed
      */
-    function optional($value)
+    function optional($value = null)
     {
         return new Optional($value);
     }
@@ -864,7 +867,7 @@ if (! function_exists('str_is')) {
     /**
      * Determine if a given string matches a given pattern.
      *
-     * @param  string  $pattern
+     * @param  string|array  $pattern
      * @param  string  $value
      * @return bool
      */

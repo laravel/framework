@@ -562,6 +562,12 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
         $this->assertEquals('require it please!', $v->messages()->first('name'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['name' => 'foobarba'], ['name' => 'size:9'], ['size' => ['string' => ':attribute should be of length :size']]);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('name should be of length 9', $v->messages()->first('name'));
     }
 
     public function testInlineValidationMessagesAreRespectedWithAsterisks()
@@ -1483,6 +1489,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['foo' => ['f/oo', 'F/OO']], ['foo.*' => 'distinct:ignore_case']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans, ['foo' => ['1', '1']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['1', '11']], ['foo.*' => 'distinct:ignore_case']);
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => ['foo', 'bar']], ['foo.*' => 'distinct']);
         $this->assertTrue($v->passes());
 
@@ -1496,6 +1508,9 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
 
         $v = new Validator($trans, ['foo' => ['bar' => ['id' => 1], 'baz' => ['id' => 2]]], ['foo.*.id' => 'distinct']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['bar' => ['id' => 2], 'baz' => ['id' => 425]]], ['foo.*.id' => 'distinct:ignore_case']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['foo' => [['id' => 1, 'nested' => ['id' => 1]]]], ['foo.*.id' => 'distinct']);
@@ -1866,6 +1881,7 @@ class ValidationValidatorTest extends TestCase
             ['rtsp://fully.qualified.domain/path'],
             ['rtsps://fully.qualified.domain/path'],
             ['rtspu://fully.qualified.domain/path'],
+            ['s3://fully.qualified.domain/path'],
             ['secondlife://fully.qualified.domain/path'],
             ['service://fully.qualified.domain/path'],
             ['session://fully.qualified.domain/path'],

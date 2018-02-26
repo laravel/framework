@@ -64,10 +64,26 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertHeader('Location', '/bar');
+            $this->fail('No exception was thrown');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
             $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
         }
+    }
+
+    /**
+     * @expectedException \PHPUnit\Framework\ExpectationFailedException
+     * @expectedExceptionMessage Unexpected header [Location] is present on response.
+     */
+    public function testAssertHeaderMissing()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->header('Location', '/foo');
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertHeaderMissing('Location');
     }
 
     public function testAssertJsonWithArray()
@@ -132,6 +148,22 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertJsonCount()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // With simple key
+        $response->assertJsonCount(3, 'bars');
+
+        // With nested key
+        $response->assertJsonCount(1, 'barfoo.0.bar');
+        $response->assertJsonCount(3, 'barfoo.2.bar');
+
+        // Without structure
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response->assertJsonCount(4);
+    }
+
     public function testMacroable()
     {
         TestResponse::macro('foo', function () {
@@ -178,6 +210,11 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
             'baz'    => [
                 ['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']],
                 ['foo' => 'bar 1', 'bar' => ['foo' => 'bar 1', 'bar' => 'foo 1']],
+            ],
+            'barfoo' => [
+                ['bar' => ['bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0', 'bar' => 'foo 0']],
+                ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
             ],
         ];
     }

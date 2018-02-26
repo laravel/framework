@@ -206,7 +206,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a binding with the container.
      *
-     * @param  string|array  $abstract
+     * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
      * @param  bool  $shared
      * @return void
@@ -323,7 +323,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a shared binding in the container.
      *
-     * @param  string|array  $abstract
+     * @param  string  $abstract
      * @param  \Closure|string|null  $concrete
      * @return void
      */
@@ -936,7 +936,7 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a new resolving callback.
      *
-     * @param  string    $abstract
+     * @param  \Closure|string  $abstract
      * @param  \Closure|null  $callback
      * @return void
      */
@@ -956,8 +956,8 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Register a new after resolving callback for all types.
      *
-     * @param  string   $abstract
-     * @param  \Closure|null $callback
+     * @param  \Closure|string  $abstract
+     * @param  \Closure|null  $callback
      * @return void
      */
     public function afterResolving($abstract, Closure $callback = null)

@@ -20,9 +20,9 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
-    public function setup()
+    public function setUp()
     {
-        parent::setup();
+        parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
@@ -864,6 +864,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model->fill(['name' => 'foo', 'age' => 'bar']);
         $this->assertEquals('foo', $model->name);
         $this->assertEquals('bar', $model->age);
+    }
+
+    public function testQualifyColumn()
+    {
+        $model = new EloquentModelStub;
+
+        $this->assertEquals('stub.column', $model->qualifyColumn('column'));
     }
 
     public function testForceFillMethodFillsGuardedAttributes()

@@ -218,7 +218,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     protected function storeRawBlock($value)
     {
-        return $this->getRawPlaceHolder(
+        return $this->getRawPlaceholder(
             array_push($this->rawBlocks, $value) - 1
         );
     }
@@ -454,5 +454,15 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function setEchoFormat($format)
     {
         $this->echoFormat = $format;
+    }
+
+    /**
+     * Set the echo format to double encode entities.
+     *
+     * @return void
+     */
+    public function doubleEncode()
+    {
+        $this->setEchoFormat('e(%s, true)');
     }
 }

@@ -34,7 +34,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected static $proxies = [
         'average', 'avg', 'contains', 'each', 'every', 'filter', 'first', 'flatMap',
-        'keyBy', 'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum',
+        'keyBy', 'map', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum', 'unique',
     ];
 
     /**
@@ -226,13 +226,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return in_array($key, $this->items);
         }
 
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return $this->contains($this->operatorForWhere($key, $operator, $value));
+        return $this->contains($this->operatorForWhere(...func_get_args()));
     }
 
     /**
@@ -277,6 +271,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function dd(...$args)
     {
+        http_response_code(500);
+
         call_user_func_array([$this, 'dump'], $args);
 
         die(1);
@@ -385,24 +381,22 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return true;
         }
 
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return $this->every($this->operatorForWhere($key, $operator, $value));
+        return $this->every($this->operatorForWhere(...func_get_args()));
     }
 
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  mixed  $keys
+     * @param  \Illuminate\Support\Collection|mixed  $keys
      * @return static
      */
     public function except($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        if ($keys instanceof self) {
+            $keys = $keys->all();
+        } elseif (! is_array($keys)) {
+            $keys = func_get_args();
+        }
 
         return new static(Arr::except($this->items, $keys));
     }
@@ -433,9 +427,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function when($value, callable $callback, callable $default = null)
     {
         if ($value) {
-            return $callback($this);
+            return $callback($this, $value);
         } elseif ($default) {
-            return $default($this);
+            return $default($this, $value);
         }
 
         return $this;
@@ -464,13 +458,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function where($key, $operator, $value = null)
     {
-        if (func_num_args() == 2) {
-            $value = $operator;
-
-            $operator = '=';
-        }
-
-        return $this->filter($this->operatorForWhere($key, $operator, $value));
+        return $this->filter($this->operatorForWhere(...func_get_args()));
     }
 
     /**
@@ -481,13 +469,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return \Closure
      */
-    protected function operatorForWhere($key, $operator, $value)
+    protected function operatorForWhere($key, $operator, $value = null)
     {
+        if (func_num_args() == 2) {
+            $value = $operator;
+
+            $operator = '=';
+        }
+
         return function ($item) use ($key, $operator, $value) {
             $retrieved = data_get($item, $key);
 
-            if (count(array_filter([$retrieved, $value], 'is_object')) == 1) {
-                return false;
+            $strings = array_filter([$retrieved, $value], function ($value) {
+                return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
+            });
+
+            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+                return in_array($operator, ['!=', '<>', '!==']);
             }
 
             switch ($operator) {
@@ -589,6 +587,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the first item by the given key value pair.
+     *
+     * @param  string  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return static
+     */
+    public function firstWhere($key, $operator, $value = null)
+    {
+        return $this->first($this->operatorForWhere(...func_get_args()));
+    }
+
+    /**
      * Get a flattened array of the items in the collection.
      *
      * @param  int  $depth
@@ -649,6 +660,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
+        if (is_array($groupBy)) {
+            $nextGroups = $groupBy;
+
+            $groupBy = array_shift($nextGroups);
+        }
+
         $groupBy = $this->valueRetriever($groupBy);
 
         $results = [];
@@ -671,7 +688,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
         }
 
-        return new static($results);
+        $result = new static($results);
+
+        if (! empty($nextGroups)) {
+            return $result->map->groupBy($nextGroups, $preserveKeys);
+        }
+
+        return $result;
     }
 
     /**
@@ -1041,6 +1064,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if (is_null($keys)) {
             return new static($this->items);
+        }
+
+        if ($keys instanceof self) {
+            $keys = $keys->all();
         }
 
         $keys = is_array($keys) ? $keys : func_get_args();
@@ -1599,9 +1626,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return json_decode($value->toJson(), true);
             } elseif ($value instanceof Arrayable) {
                 return $value->toArray();
-            } else {
-                return $value;
             }
+
+            return $value;
         }, $this->items);
     }
 
