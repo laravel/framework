@@ -296,7 +296,7 @@ class BelongsToMany extends Relation
 
         // pivot table name
         $this->table = (new $class)->getTable();
-    
+
         return $this;
     }
 
