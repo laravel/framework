@@ -12,6 +12,7 @@ use League\Flysystem\FilesystemInterface;
 use League\Flysystem\Cached\CachedAdapter;
 use League\Flysystem\Filesystem as Flysystem;
 use League\Flysystem\Adapter\Ftp as FtpAdapter;
+use League\Flysystem\Sftp\SftpAdapter;
 use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use League\Flysystem\AwsS3v3\AwsS3Adapter as S3Adapter;
@@ -173,6 +174,19 @@ class FilesystemManager implements FactoryContract
     {
         return $this->adapt($this->createFlysystem(
             new FtpAdapter($config), $config
+        ));
+    }
+
+    /**
+     * Create an instance of the sftp driver.
+     *
+     * @param  array  $config
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
+     */
+    public function createSftpDriver(array $config)
+    {
+        return $this->adapt($this->createFlysystem(
+            new SftpAdapter($config), $config
         ));
     }
 
