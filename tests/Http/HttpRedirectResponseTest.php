@@ -121,7 +121,7 @@ class HttpRedirectResponseTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [doesNotExist] does not exist on Redirect.
+     * @expectedExceptionMessage Method Illuminate\Http\RedirectResponse::doesNotExist does not exist.
      */
     public function testMagicCallException()
     {

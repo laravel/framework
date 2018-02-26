@@ -33,6 +33,19 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "id" serial primary key not null, add column "email" varchar(255) not null', $statements[0]);
     }
 
+    public function testCreateTableAndCommentColumn()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->create();
+        $blueprint->increments('id');
+        $blueprint->string('email')->comment('my first comment');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('create table "users" ("id" serial primary key not null, "email" varchar(255) not null)', $statements[0]);
+        $this->assertEquals('comment on column "users"."email" is \'my first comment\'', $statements[1]);
+    }
+
     public function testCreateTemporaryTable()
     {
         $blueprint = new Blueprint('users');
@@ -432,11 +445,11 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function testAddingEnum()
     {
         $blueprint = new Blueprint('users');
-        $blueprint->enum('foo', ['bar', 'baz']);
+        $blueprint->enum('role', ['member', 'admin']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add column "foo" varchar(255) check ("foo" in (\'bar\', \'baz\')) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add column "role" varchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
     public function testAddingDate()

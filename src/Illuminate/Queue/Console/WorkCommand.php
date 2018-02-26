@@ -168,8 +168,9 @@ class WorkCommand extends Command
     protected function writeStatus(Job $job, $status, $type)
     {
         $this->output->writeln(sprintf(
-            "<{$type}>[%s] %s</{$type}> %s",
+            "<{$type}>[%s][%s] %s</{$type}> %s",
             Carbon::now()->format('Y-m-d H:i:s'),
+            $job->getJobId(),
             str_pad("{$status}:", 11), $job->resolveName()
         ));
     }

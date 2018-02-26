@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent;
 use LogicException;
 use Illuminate\Support\Arr;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Support\Collection as BaseCollection;
 
@@ -412,7 +413,23 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function getQueueableIds()
     {
-        return $this->modelKeys();
+        if ($this->isEmpty()) {
+            return [];
+        }
+
+        return $this->first() instanceof Pivot
+                    ? $this->map->getQueueableId()->all()
+                    : $this->modelKeys();
+    }
+
+    /**
+     * Get the relationships of the entities being queued.
+     *
+     * @return array
+     */
+    public function getQueueableRelations()
+    {
+        return $this->isNotEmpty() ? $this->first()->getQueueableRelations() : [];
     }
 
     /**

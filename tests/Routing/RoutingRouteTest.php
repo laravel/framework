@@ -304,7 +304,7 @@ class RoutingRouteTest extends TestCase
             return 'foo';
         })->name('foo');
 
-        $this->assertTrue(is_array($route->getAction()));
+        $this->assertInternalType('array', $route->getAction());
         $this->assertArrayHasKey('as', $route->getAction());
         $this->assertEquals('foo', $route->getAction('as'));
         $this->assertNull($route->getAction('unknown_property'));
@@ -880,6 +880,25 @@ class RoutingRouteTest extends TestCase
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
         $this->assertEquals('foo', $routes[0]->getPrefix());
+    }
+
+    public function testRouteGroupingOutsideOfInheritedNamespace()
+    {
+        $router = $this->getRouter();
+
+        $router->group(['namespace' => 'App\Http\Controllers'], function ($router) {
+            $router->group(['namespace' => '\Foo\Bar'], function ($router) {
+                $router->get('users', 'UsersController@index');
+            });
+        });
+
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals(
+            'Foo\Bar\UsersController@index',
+            $routes[0]->getAction()['uses']
+        );
     }
 
     public function testCurrentRouteUses()

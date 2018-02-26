@@ -4,28 +4,20 @@ namespace Illuminate\Log;
 
 use Closure;
 use RuntimeException;
-use InvalidArgumentException;
-use Monolog\Handler\StreamHandler;
-use Monolog\Handler\SyslogHandler;
-use Monolog\Formatter\LineFormatter;
-use Monolog\Handler\ErrorLogHandler;
-use Monolog\Logger as MonologLogger;
+use Psr\Log\LoggerInterface;
 use Illuminate\Log\Events\MessageLogged;
-use Monolog\Handler\RotatingFileHandler;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Support\Arrayable;
-use Psr\Log\LoggerInterface as PsrLoggerInterface;
-use Illuminate\Contracts\Logging\Log as LogContract;
 
-class Writer implements LogContract, PsrLoggerInterface
+class Logger implements LoggerInterface
 {
     /**
-     * The Monolog logger instance.
+     * The underlying logger implementation.
      *
-     * @var \Monolog\Logger
+     * @var \Psr\Log\LoggerInterface
      */
-    protected $monolog;
+    protected $logger;
 
     /**
      * The event dispatcher instance.
@@ -35,31 +27,15 @@ class Writer implements LogContract, PsrLoggerInterface
     protected $dispatcher;
 
     /**
-     * The Log levels.
-     *
-     * @var array
-     */
-    protected $levels = [
-        'debug'     => MonologLogger::DEBUG,
-        'info'      => MonologLogger::INFO,
-        'notice'    => MonologLogger::NOTICE,
-        'warning'   => MonologLogger::WARNING,
-        'error'     => MonologLogger::ERROR,
-        'critical'  => MonologLogger::CRITICAL,
-        'alert'     => MonologLogger::ALERT,
-        'emergency' => MonologLogger::EMERGENCY,
-    ];
-
-    /**
      * Create a new log writer instance.
      *
-     * @param  \Monolog\Logger  $monolog
+     * @param  \Psr\Log\LoggerInterface  $logger
      * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(MonologLogger $monolog, Dispatcher $dispatcher = null)
+    public function __construct(LoggerInterface $logger, Dispatcher $dispatcher = null)
     {
-        $this->monolog = $monolog;
+        $this->logger = $logger;
 
         if (isset($dispatcher)) {
             $this->dispatcher = $dispatcher;
@@ -189,7 +165,7 @@ class Writer implements LogContract, PsrLoggerInterface
     }
 
     /**
-     * Write a message to Monolog.
+     * Write a message to the log.
      *
      * @param  string  $level
      * @param  string  $message
@@ -200,65 +176,7 @@ class Writer implements LogContract, PsrLoggerInterface
     {
         $this->fireLogEvent($level, $message = $this->formatMessage($message), $context);
 
-        $this->monolog->{$level}($message, $context);
-    }
-
-    /**
-     * Register a file log handler.
-     *
-     * @param  string  $path
-     * @param  string  $level
-     * @return void
-     */
-    public function useFiles($path, $level = 'debug')
-    {
-        $this->monolog->pushHandler($handler = new StreamHandler($path, $this->parseLevel($level)));
-
-        $handler->setFormatter($this->getDefaultFormatter());
-    }
-
-    /**
-     * Register a daily file log handler.
-     *
-     * @param  string  $path
-     * @param  int     $days
-     * @param  string  $level
-     * @return void
-     */
-    public function useDailyFiles($path, $days = 0, $level = 'debug')
-    {
-        $this->monolog->pushHandler(
-            $handler = new RotatingFileHandler($path, $days, $this->parseLevel($level))
-        );
-
-        $handler->setFormatter($this->getDefaultFormatter());
-    }
-
-    /**
-     * Register a Syslog handler.
-     *
-     * @param  string  $name
-     * @param  string  $level
-     * @param  mixed  $facility
-     * @return \Psr\Log\LoggerInterface
-     */
-    public function useSyslog($name = 'laravel', $level = 'debug', $facility = LOG_USER)
-    {
-        return $this->monolog->pushHandler(new SyslogHandler($name, $facility, $level));
-    }
-
-    /**
-     * Register an error_log handler.
-     *
-     * @param  string  $level
-     * @param  int  $messageType
-     * @return void
-     */
-    public function useErrorLog($level = 'debug', $messageType = ErrorLogHandler::OPERATING_SYSTEM)
-    {
-        $this->monolog->pushHandler(
-            new ErrorLogHandler($messageType, $this->parseLevel($level))
-        );
+        $this->logger->{$level}($message, $context);
     }
 
     /**
@@ -316,42 +234,13 @@ class Writer implements LogContract, PsrLoggerInterface
     }
 
     /**
-     * Parse the string level into a Monolog constant.
+     * Get the underlying logger implementation.
      *
-     * @param  string  $level
-     * @return int
-     *
-     * @throws \InvalidArgumentException
+     * @return \Psr\Log\LoggerInterface
      */
-    protected function parseLevel($level)
+    public function getLogger()
     {
-        if (isset($this->levels[$level])) {
-            return $this->levels[$level];
-        }
-
-        throw new InvalidArgumentException('Invalid log level.');
-    }
-
-    /**
-     * Get the underlying Monolog instance.
-     *
-     * @return \Monolog\Logger
-     */
-    public function getMonolog()
-    {
-        return $this->monolog;
-    }
-
-    /**
-     * Get a default Monolog formatter instance.
-     *
-     * @return \Monolog\Formatter\LineFormatter
-     */
-    protected function getDefaultFormatter()
-    {
-        return tap(new LineFormatter(null, null, true, true), function ($formatter) {
-            $formatter->includeStacktraces();
-        });
+        return $this->logger;
     }
 
     /**
@@ -373,5 +262,17 @@ class Writer implements LogContract, PsrLoggerInterface
     public function setEventDispatcher(Dispatcher $dispatcher)
     {
         $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Dynamically proxy method calls to the underlying logger.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        return $this->logger->{$method}(...$parameters);
     }
 }

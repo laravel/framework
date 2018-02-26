@@ -14,6 +14,13 @@ class PendingMail
     protected $mailer;
 
     /**
+     * The locale of the message.
+     *
+     * @var array
+     */
+    protected $locale;
+
+    /**
      * The "to" recipients of the message.
      *
      * @var array
@@ -43,6 +50,19 @@ class PendingMail
     public function __construct(Mailer $mailer)
     {
         $this->mailer = $mailer;
+    }
+
+    /**
+     * Set the locale of the message.
+     *
+     * @param  string  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
+
+        return $this;
     }
 
     /**
@@ -149,6 +169,7 @@ class PendingMail
     {
         return $mailable->to($this->to)
                         ->cc($this->cc)
-                        ->bcc($this->bcc);
+                        ->bcc($this->bcc)
+                        ->locale($this->locale);
     }
 }

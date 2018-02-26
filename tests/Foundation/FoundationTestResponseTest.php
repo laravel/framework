@@ -41,6 +41,32 @@ class FoundationTestResponseTest extends TestCase
         $response->assertViewHas('foo');
     }
 
+    public function testAssertSeeInOrder()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeInOrder(['foo', 'bar', 'baz']);
+        $response->assertSeeInOrder(['foo', 'bar', 'baz', 'foo']);
+
+        try {
+            $response->assertSeeInOrder(['baz', 'bar', 'foo']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+
+        try {
+            $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+    }
+
     public function testAssertSeeText()
     {
         $baseResponse = tap(new Response, function ($response) {
@@ -52,6 +78,32 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse($baseResponse);
 
         $response->assertSeeText('foobar');
+    }
+
+    public function testAssertSeeTextInOrder()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeTextInOrder(['foobar', 'baz']);
+        $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
+
+        try {
+            $response->assertSeeTextInOrder(['baz', 'foobar']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
+
+        try {
+            $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
+            TestCase::fail('Assertion was expected to fail.');
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        }
     }
 
     public function testAssertHeader()
@@ -189,6 +241,17 @@ class FoundationTestResponseTest extends TestCase
         $this->assertEquals($tempDir.'/file.txt', $response->getFile()->getPathname());
 
         $files->deleteDirectory($tempDir);
+    }
+
+    public function testJsonHelper()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        $this->assertEquals('foo', $response->json('foobar.foobar_foo'));
+        $this->assertEquals(
+            json_decode($response->getContent(), true),
+            $response->json()
+        );
     }
 }
 

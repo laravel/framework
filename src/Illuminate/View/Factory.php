@@ -276,7 +276,7 @@ class Factory implements FactoryContract
     public function getEngineFromPath($path)
     {
         if (! $extension = $this->getExtension($path)) {
-            throw new InvalidArgumentException("Unrecognized extension in file: $path");
+            throw new InvalidArgumentException("Unrecognized extension in file: {$path}");
         }
 
         $engine = $this->extensions[$extension];

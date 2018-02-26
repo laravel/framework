@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use DateTimeInterface;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Support\ProcessUtils;
@@ -17,11 +18,18 @@ class Schedule
     protected $events = [];
 
     /**
-     * The mutex implementation.
+     * The event mutex implementation.
      *
-     * @var \Illuminate\Console\Scheduling\Mutex
+     * @var \Illuminate\Console\Scheduling\EventMutex
      */
-    protected $mutex;
+    protected $eventMutex;
+
+    /**
+     * The scheduling mutex implementation.
+     *
+     * @var \Illuminate\Console\Scheduling\SchedulingMutex
+     */
+    protected $schedulingMutex;
 
     /**
      * Create a new schedule instance.
@@ -32,9 +40,13 @@ class Schedule
     {
         $container = Container::getInstance();
 
-        $this->mutex = $container->bound(Mutex::class)
-                                ? $container->make(Mutex::class)
-                                : $container->make(CacheMutex::class);
+        $this->eventMutex = $container->bound(EventMutex::class)
+                                ? $container->make(EventMutex::class)
+                                : $container->make(CacheEventMutex::class);
+
+        $this->schedulingMutex = $container->bound(SchedulingMutex::class)
+                                ? $container->make(SchedulingMutex::class)
+                                : $container->make(CacheSchedulingMutex::class);
     }
 
     /**
@@ -47,7 +59,7 @@ class Schedule
     public function call($callback, array $parameters = [])
     {
         $this->events[] = $event = new CallbackEvent(
-            $this->mutex, $callback, $parameters
+            $this->eventMutex, $callback, $parameters
         );
 
         return $event;
@@ -104,7 +116,7 @@ class Schedule
             $command .= ' '.$this->compileParameters($parameters);
         }
 
-        $this->events[] = $event = new Event($this->mutex, $command);
+        $this->events[] = $event = new Event($this->eventMutex, $command);
 
         return $event;
     }
@@ -131,6 +143,18 @@ class Schedule
     }
 
     /**
+     * Determine if the server is allowed to run this event.
+     *
+     * @param  \Illuminate\Console\Scheduling\Event  $event
+     * @param  \DateTimeInterface  $time
+     * @return bool
+     */
+    public function serverShouldRun(Event $event, DateTimeInterface $time)
+    {
+        return $this->schedulingMutex->create($event, $time);
+    }
+
+    /**
      * Get all of the events on the schedule that are due.
      *
      * @param  \Illuminate\Contracts\Foundation\Application  $app
@@ -149,5 +173,24 @@ class Schedule
     public function events()
     {
         return $this->events;
+    }
+
+    /**
+     * Specify the cache store that should be used to store mutexes.
+     *
+     * @param  string  $store
+     * @return $this
+     */
+    public function useCache($store)
+    {
+        if ($this->eventMutex instanceof CacheEventMutex) {
+            $this->eventMutex->useStore($store);
+        }
+
+        if ($this->schedulingMutex instanceof CacheSchedulingMutex) {
+            $this->schedulingMutex->useStore($store);
+        }
+
+        return $this;
     }
 }

@@ -300,6 +300,10 @@ trait InteractsWithPivotTable
             $record = $this->addTimestampsToAttachment($record);
         }
 
+        foreach ($this->pivotValues as $value) {
+            $record[$value['column']] = $value['value'];
+        }
+
         return $record;
     }
 
@@ -313,6 +317,12 @@ trait InteractsWithPivotTable
     protected function addTimestampsToAttachment(array $record, $exists = false)
     {
         $fresh = $this->parent->freshTimestamp();
+
+        if ($this->using) {
+            $pivotModel = new $this->using;
+
+            $fresh = $fresh->format($pivotModel->getDateFormat());
+        }
 
         if (! $exists && $this->hasPivotColumn($this->createdAt())) {
             $record[$this->createdAt()] = $fresh;

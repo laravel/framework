@@ -344,6 +344,39 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Create a new request instance from the given Laravel request.
+     *
+     * @param  \Illuminate\Http\Request  $from
+     * @param  \Illuminate\Http\Request|null  $to
+     * @return static
+     */
+    public static function createFrom(self $from, $to = null)
+    {
+        $request = $to ?: new static;
+
+        $files = $from->files->all();
+
+        $files = is_array($files) ? array_filter($files) : $files;
+
+        $request->initialize(
+            $from->query->all(), $from->request->all(), $from->attributes->all(),
+            $from->cookies->all(), $files, $from->server->all(), $from->getContent()
+        );
+
+        $request->setJson($from->json());
+
+        if ($session = $from->getSession()) {
+            $request->setLaravelSession($session);
+        }
+
+        $request->setUserResolver($from->getUserResolver());
+
+        $request->setRouteResolver($from->getRouteResolver());
+
+        return $request;
+    }
+
+    /**
      * Create an Illuminate request from a Symfony instance.
      *
      * @param  \Symfony\Component\HttpFoundation\Request  $request
@@ -415,7 +448,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             throw new RuntimeException('Session store not set on request.');
         }
 
-        return $this->getSession();
+        return $this->session;
+    }
+
+    /**
+     * Get the session associated with the request.
+     *
+     * @return \Illuminate\Session\Store|null
+     */
+    public function getSession()
+    {
+        return $this->session;
     }
 
     /**
@@ -444,10 +487,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the route handling the request.
      *
      * @param  string|null  $param
-     *
+     * @param  mixed   $default
      * @return \Illuminate\Routing\Route|object|string
      */
-    public function route($param = null)
+    public function route($param = null, $default = null)
     {
         $route = call_user_func($this->getRouteResolver());
 
@@ -455,7 +498,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $route;
         }
 
-        return $route->parameter($param);
+        return $route->parameter($param, $default);
     }
 
     /**

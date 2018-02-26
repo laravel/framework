@@ -58,7 +58,7 @@ class RedisManager implements Factory
             return $this->connections[$name];
         }
 
-        return $this->connections[$name] = $this->resolve($name);
+        return $this->connections[$name] = $this->resolve($name)->setName($name);
     }
 
     /**
@@ -83,9 +83,7 @@ class RedisManager implements Factory
             return $this->resolveCluster($name);
         }
 
-        throw new InvalidArgumentException(
-            "Redis connection [{$name}] not configured."
-        );
+        throw new InvalidArgumentException("Redis connection [{$name}] not configured.");
     }
 
     /**
