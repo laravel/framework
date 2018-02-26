@@ -616,7 +616,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
     }
-    
+
     public function testAddingTimestampsCurrent()
     {
         $blueprint = new Blueprint('users');
