@@ -590,7 +590,8 @@ class PostgresGrammar extends Grammar
     {
         $columnType = "timestamp($column->precision) without time zone";
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        return $columnType
+            . ($column->useCurrent ? ' default CURRENT_TIMESTAMP' : '');
     }
 
     /**
@@ -603,7 +604,8 @@ class PostgresGrammar extends Grammar
     {
         $columnType = "timestamp($column->precision) with time zone";
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        return $columnType
+            . ($column->useCurrent ? ' default CURRENT_TIMESTAMP' : '');
     }
 
     /**
