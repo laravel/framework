@@ -1478,8 +1478,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Sort the collection keys.
      *
-     * @param int $options
-     * @param bool $descending
+     * @param  int  $options
+     * @param  bool  $descending
      * @return static
      */
     public function sortKeys($options = SORT_REGULAR, $descending = false)
@@ -1494,7 +1494,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Sort the collection keys in descending order.
      *
-     * @param int $options
+     * @param  int $options
      * @return static
      */
     public function sortKeysDesc($options = SORT_REGULAR)
