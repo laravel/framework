@@ -965,11 +965,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Convert the model instance to an array.
      *
+     * @param array|null $only
      * @return array
      */
-    public function toArray()
+    public function toArray($only = null)
     {
-        return array_merge($this->attributesToArray(), $this->relationsToArray());
+        $attributes = array_merge($this->attributesToArray(), $this->relationsToArray());
+
+        if (is_array($only)) {
+            return array_only($attributes, $only);
+        }
+
+        return $attributes;
     }
 
     /**
