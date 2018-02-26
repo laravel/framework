@@ -616,6 +616,54 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" add column "created_at" timestamp(0) with time zone null, add column "updated_at" timestamp(0) with time zone null', $statements[0]);
     }
+    
+    public function testAddingTimestampsCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(0, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add column "created_at" timestamp(0) without time zone default CURRENT_TIMESTAMP null, add column "updated_at" timestamp(0) without time zone default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsTzCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(0, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add column "created_at" timestamp(0) with time zone default CURRENT_TIMESTAMP null, add column "updated_at" timestamp(0) with time zone default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsCurrentPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(2, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add column "created_at" timestamp(2) without time zone default CURRENT_TIMESTAMP null, add column "updated_at" timestamp(2) without time zone default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsTzCurrentPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(2, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add column "created_at" timestamp(2) with time zone default CURRENT_TIMESTAMP null, add column "updated_at" timestamp(2) with time zone default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
 
     public function testAddingBinary()
     {

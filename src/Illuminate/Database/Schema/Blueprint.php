@@ -908,13 +908,16 @@ class Blueprint
      * Add nullable creation and update timestamps to the table.
      *
      * @param  int  $precision
+     * @param  bool $useCurrent
      * @return void
      */
-    public function timestamps($precision = 0)
+    public function timestamps($precision = 0, bool $useCurrent = false)
     {
-        $this->timestamp('created_at', $precision)->nullable();
+        $createdAt = $this->timestamp('created_at', $precision)->nullable();
+        $useCurrent && $createdAt->useCurrent();
 
-        $this->timestamp('updated_at', $precision)->nullable();
+        $updatedAt = $this->timestamp('updated_at', $precision)->nullable();
+        $useCurrent && $updatedAt->useCurrent()->updateCurrent();
     }
 
     /**
@@ -923,24 +926,28 @@ class Blueprint
      * Alias for self::timestamps().
      *
      * @param  int  $precision
+     * @param  bool $useCurrent
      * @return void
      */
-    public function nullableTimestamps($precision = 0)
+    public function nullableTimestamps($precision = 0, bool $useCurrent = false)
     {
-        $this->timestamps($precision);
+        $this->timestamps($precision, $useCurrent);
     }
 
     /**
      * Add creation and update timestampTz columns to the table.
      *
      * @param  int  $precision
+     * @param  bool $useCurrent
      * @return void
      */
-    public function timestampsTz($precision = 0)
+    public function timestampsTz($precision = 0, bool $useCurrent = false)
     {
-        $this->timestampTz('created_at', $precision)->nullable();
+        $createdAt = $this->timestampTz('created_at', $precision)->nullable();
+        $useCurrent && $createdAt->useCurrent();
 
-        $this->timestampTz('updated_at', $precision)->nullable();
+        $updatedAt = $this->timestampTz('updated_at', $precision)->nullable();
+        $useCurrent && $updatedAt->useCurrent()->updateCurrent();
     }
 
     /**
