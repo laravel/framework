@@ -773,6 +773,54 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add `created_at` timestamp null, add `updated_at` timestamp null', $statements[0]);
     }
 
+    public function testAddingTimestampsCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(0, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table `users` add `created_at` timestamp default CURRENT_TIMESTAMP null, add `updated_at` timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsTzCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(0, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table `users` add `created_at` timestamp default CURRENT_TIMESTAMP null, add `updated_at` timestamp default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsCurrentPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(1, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP null, add `updated_at` timestamp(1) default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsTzCurrentPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(1, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table `users` add `created_at` timestamp(1) default CURRENT_TIMESTAMP null, add `updated_at` timestamp(1) default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
     public function testAddingRememberToken()
     {
         $blueprint = new Blueprint('users');
