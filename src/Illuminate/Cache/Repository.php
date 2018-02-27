@@ -190,8 +190,9 @@ class Repository implements CacheContract, ArrayAccess
         if (is_array($key)) {
             return $this->putMany($key, $value);
         }
-
-        if (! is_null($minutes = $this->getMinutes($minutes))) {
+        if (is_null($minutes)) {
+            $this->forever($key, $value);
+        } elseif (! is_null($minutes = $this->getMinutes($minutes))) {
             $this->store->put($this->itemKey($key), $value, $minutes);
 
             $this->event(new KeyWritten($key, $value, $minutes));
