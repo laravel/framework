@@ -4,11 +4,9 @@ namespace Illuminate\Console\Scheduling;
 
 use Cron\CronExpression;
 use Illuminate\Support\Carbon;
-use Illuminate\Console\Scheduling\ManagesFrequencies;
 
 trait Schedulable
 {
-
     use ManagesFrequencies;
 
     /**
@@ -26,7 +24,8 @@ trait Schedulable
     public $timezone;
 
     /**
-     * Return a list of due items as a collection
+     * Return a list of due items as a collection.
+     * This is meant to be overidden.
      *
      * @return Illuminate\Support\Collection
      */
@@ -36,9 +35,9 @@ trait Schedulable
     }
 
     /**
-     * Determine if the schedule is due to run
+     * Determine if the schedule is due to run.
      *
-     * @return boolean
+     * @return bool
      */
     public function isDue()
     {
@@ -52,7 +51,7 @@ trait Schedulable
     }
 
     /**
-     * When the schedule is next due to run
+     * When the schedule is next due to run.
      *
      * @return Illuminate\Support\Carbon
      */
@@ -62,7 +61,7 @@ trait Schedulable
     }
 
     /**
-     * When the schedule was last due to run
+     * When the schedule was last due to run.
      *
      * @return Illuminate\Support\Carbon
      */
@@ -72,12 +71,11 @@ trait Schedulable
     }
 
     /**
-     * Code to be run when the schedule is due
-     *
-     * @return void
+     * Code to be run when the schedule is due.
+     * This is meant to be overidden.
      */
     public function runSchedule()
     {
-        return true;
+        // return true;
     }
 }
