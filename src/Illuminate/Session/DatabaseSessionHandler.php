@@ -3,8 +3,10 @@
 namespace Illuminate\Session;
 
 use Carbon\Carbon;
+use Illuminate\Support\Arr;
 use SessionHandlerInterface;
 use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Database\QueryException;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Container\Container;
 
@@ -112,14 +114,40 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
         }
 
         if ($this->exists) {
-            $this->getQuery()->where('id', $sessionId)->update($payload);
+            $this->performUpdate($sessionId, $payload);
         } else {
-            $payload['id'] = $sessionId;
-
-            $this->getQuery()->insert($payload);
+            $this->performInsert($sessionId, $payload);
         }
 
         $this->exists = true;
+    }
+
+    /**
+     * Perform an insert operation on the session ID.
+     *
+     * @param  string  $sessionId
+     * @param  string  $payload
+     * @return void
+     */
+    protected function performInsert($sessionId, $payload)
+    {
+        try {
+            return $this->getQuery()->insert(Arr::set($payload, 'id', $sessionId));
+        } catch (QueryException $e) {
+            $this->performUpdate($sessionId, $payload);
+        }
+    }
+
+    /**
+     * Perform an update operation on the session ID.
+     *
+     * @param  string  $sessionId
+     * @param  string  $payload
+     * @return int
+     */
+    protected function performUpdate($sessionId, $payload)
+    {
+        return $this->getQuery()->where('id', $sessionId)->update($payload);
     }
 
     /**
