@@ -1414,6 +1414,10 @@ class Builder
      */
     public function orHaving($column, $operator = null, $value = null)
     {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
         return $this->having($column, $operator, $value, 'or');
     }
 
