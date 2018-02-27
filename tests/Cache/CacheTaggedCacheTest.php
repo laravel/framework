@@ -90,7 +90,7 @@ class CacheTaggedCacheTest extends TestCase
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $store->shouldReceive('push')->with(sha1('foo|bar').':key1', 'key1:value');
 
-        $redis->put('key1', 'key1:value');
+        $redis->put('key1', 'key1:value', 0);
     }
 
     public function testRedisCacheTagsCanBeFlushed()
