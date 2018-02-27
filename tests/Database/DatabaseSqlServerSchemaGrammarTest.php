@@ -587,7 +587,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timestampTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset not null', $statements[0]);
     }
 
     public function testAddingTimestampTzWithPrecision()
@@ -614,7 +614,55 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) null, "updated_at" datetimeoffset(0) null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset null, "updated_at" datetimeoffset null', $statements[0]);
+    }
+
+    public function testAddingTimestampsCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(0, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add "created_at" datetime default CURRENT_TIMESTAMP null, "updated_at" datetime default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsTzCurrent()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(0, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add "created_at" datetimeoffset default CURRENT_TIMESTAMP null, "updated_at" datetimeoffset default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsCurrentPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestamps(2, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add "created_at" datetime2(2) default CURRENT_TIMESTAMP null, "updated_at" datetime2(2) default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
+    }
+
+    public function testAddingTimestampsTzCurrentPrecision()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->timestampsTz(2, true);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $this->assertCount(1, $statements);
+        $this->assertEquals(
+            'alter table "users" add "created_at" datetimeoffset(2) default CURRENT_TIMESTAMP null, "updated_at" datetimeoffset(2) default CURRENT_TIMESTAMP null',
+            $statements[0]
+        );
     }
 
     public function testAddingRememberToken()
