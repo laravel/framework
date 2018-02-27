@@ -553,7 +553,8 @@ class SqlServerGrammar extends Grammar
     {
         $columnType = $column->precision ? "datetime2($column->precision)" : 'datetime';
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        return $columnType
+            .($column->useCurrent ? ' default CURRENT_TIMESTAMP' : '');
     }
 
     /**
@@ -566,13 +567,10 @@ class SqlServerGrammar extends Grammar
      */
     protected function typeTimestampTz(Fluent $column)
     {
-        if ($column->useCurrent) {
-            $columnType = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
+        $columnType = $column->precision ? "datetimeoffset($column->precision)" : 'datetimeoffset';
 
-            return "$columnType default CURRENT_TIMESTAMP";
-        }
-
-        return "datetimeoffset($column->precision)";
+        return $columnType
+            .($column->useCurrent ? ' default CURRENT_TIMESTAMP' : '');
     }
 
     /**

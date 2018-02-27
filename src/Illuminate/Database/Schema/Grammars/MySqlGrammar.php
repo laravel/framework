@@ -639,7 +639,9 @@ class MySqlGrammar extends Grammar
     {
         $columnType = $column->precision ? "timestamp($column->precision)" : 'timestamp';
 
-        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
+        return $columnType
+            .($column->useCurrent ? ' default CURRENT_TIMESTAMP' : '')
+            .($column->updateCurrent ? ' on update CURRENT_TIMESTAMP' : '');
     }
 
     /**
