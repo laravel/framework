@@ -61,7 +61,7 @@ class MailManager
     }
 
     /**
-     * Make the database connection instance.
+     * Make the mailer connection instance.
      *
      * @param  string  $name
      * @return \Illuminate\Mail\Mailer
