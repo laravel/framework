@@ -5,30 +5,22 @@ namespace Illuminate\Console\Scheduling;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
-use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\EventMutex;
 use Illuminate\Contracts\Container\Container;
 
-class SchedulableClassEvent extends Event{
-
-
-    //TODO custom code here!
-
-    //use the props of the trait (and manage frequencies etc)
-
+class SchedulableClassEvent extends Event
+{
     /**
      * The schedulable class name to use.
      *
      * @var string
      */
     protected $schedulableClass;
-    
+
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
-     * @param  string  $schedulableClass
-     * @return void
+     * @param \Illuminate\Console\Scheduling\EventMutex $mutex
+     * @param string                                    $schedulableClass
      *
      * @throws \InvalidArgumentException
      */
@@ -36,7 +28,7 @@ class SchedulableClassEvent extends Event{
     {
         $schedulableClass = is_string($schedulableClass) ? resolve($schedulableClass) : $schedulableClass;
 
-        if (!in_array('Illuminate\Console\Scheduling\Schedulable',class_uses($schedulableClass))) {
+        if (!in_array('Illuminate\Console\Scheduling\Schedulable', class_uses($schedulableClass))) {
             throw new InvalidArgumentException(
                 'Schedulable trait was not found on this class'
             );
@@ -49,7 +41,8 @@ class SchedulableClassEvent extends Event{
     /**
      * Run the given event.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param \Illuminate\Contracts\Container\Container $container
+     *
      * @return mixed
      *
      * @throws \Exception
@@ -57,7 +50,7 @@ class SchedulableClassEvent extends Event{
     public function run(Container $container)
     {
         if ($this->description && $this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
+            !$this->mutex->create($this)) {
             return;
         }
 
@@ -68,11 +61,9 @@ class SchedulableClassEvent extends Event{
         parent::callBeforeCallbacks($container);
 
         try {
-            $resolved = resolve($this->schedulableClass);
+            $due_items = resolve($this->schedulableClass)::areDue();
 
-            $due_items = $resolved::areDue();
-            
-            $due_items = collect(is_array($due_items) ||$due_items instanceof Collection  ? $due_items : array($due_items));
+            $due_items = collect(is_array($due_items) || $due_items instanceof Collection ? $due_items : array($due_items));
 
             $due_items->each->runSchedule();
         } finally {
@@ -86,8 +77,6 @@ class SchedulableClassEvent extends Event{
 
     /**
      * Clear the mutex for the event.
-     *
-     * @return void
      */
     protected function removeMutex()
     {
@@ -99,14 +88,15 @@ class SchedulableClassEvent extends Event{
     /**
      * Do not allow the event to overlap each other.
      *
-     * @param  int  $expiresAt
+     * @param int $expiresAt
+     *
      * @return $this
      *
      * @throws \LogicException
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
-        if (! isset($this->description)) {
+        if (!isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );
@@ -130,7 +120,7 @@ class SchedulableClassEvent extends Event{
      */
     public function onOneServer()
     {
-        if (! isset($this->description)) {
+        if (!isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to only run on one server. Use the 'name' method before 'onOneServer'."
             );
@@ -164,6 +154,4 @@ class SchedulableClassEvent extends Event{
 
         return is_string($this->callback) ? $this->callback : 'Closure';
     }
-
-
 }
