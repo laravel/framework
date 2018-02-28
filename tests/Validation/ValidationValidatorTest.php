@@ -3747,7 +3747,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
             ['name' => new class implements Rule {
-                public function passes($attribute, $value)
+                public function passes($attribute, $value, $validator)
                 {
                     return $value === 'taylor';
                 }
@@ -3766,7 +3766,7 @@ class ValidationValidatorTest extends TestCase
             $this->getIlluminateArrayTranslator(),
             ['name' => 'adam'],
             ['name' => [new class implements Rule {
-                public function passes($attribute, $value)
+                public function passes($attribute, $value, $validator)
                 {
                     return $value === 'taylor';
                 }
@@ -3785,7 +3785,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
-            ['name.*' => function ($attribute, $value, $fail) {
+            ['name.*' => function ($attribute, $value, $validator, $fail) {
                 if ($value !== 'taylor') {
                     $fail(':attribute was '.$value.' instead of taylor');
                 }
@@ -3798,7 +3798,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'adam'],
-            ['name' => function ($attribute, $value, $fail) {
+            ['name' => function ($attribute, $value, $validator, $fail) {
                 if ($value !== 'taylor') {
                     $fail(':attribute was '.$value.' instead of taylor');
                 }
@@ -3814,7 +3814,7 @@ class ValidationValidatorTest extends TestCase
             ['name' => 'taylor', 'states' => ['AR', 'TX'], 'number' => 9],
             [
                 'states.*' => new class implements Rule {
-                    public function passes($attribute, $value)
+                    public function passes($attribute, $value, $validator)
                     {
                         return in_array($value, ['AK', 'HI']);
                     }
@@ -3824,7 +3824,7 @@ class ValidationValidatorTest extends TestCase
                         return ':attribute must be AR or TX';
                     }
                 },
-                'name' => function ($attribute, $value, $fail) {
+                'name' => function ($attribute, $value, $validator, $fail) {
                     if ($value !== 'taylor') {
                         $fail(':attribute must be taylor');
                     }
@@ -3832,7 +3832,7 @@ class ValidationValidatorTest extends TestCase
                 'number' => [
                     'required',
                     'integer',
-                    function ($attribute, $value, $fail) {
+                    function ($attribute, $value, $validator, $fail) {
                         if ($value % 4 !== 0) {
                             $fail(':attribute must be divisible by 4');
                         }
@@ -3856,7 +3856,7 @@ class ValidationValidatorTest extends TestCase
             ['name' => $rule = new class implements ImplicitRule {
                 public $called = false;
 
-                public function passes($attribute, $value)
+                public function passes($attribute, $value, $validator)
                 {
                     $this->called = true;
 
