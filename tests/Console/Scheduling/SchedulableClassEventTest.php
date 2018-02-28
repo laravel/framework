@@ -6,7 +6,6 @@ use Mockery as m;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\Schedulable;
 
@@ -32,10 +31,9 @@ class SchedulableClassEventTest extends TestCase
         );
     }
 
-    //test can call a class with the Schedulable Trait
     public function testCanAddSchedulableClass()
     {
-        $this->schedule->use(FooSchedulableClassStub::class);
+        $this->schedule->use(SchedulableClassStub::class);
 
         $events = $this->schedule->events();
 
@@ -44,22 +42,20 @@ class SchedulableClassEventTest extends TestCase
         $this->assertEquals("Illuminate\Console\Scheduling\SchedulableClassEvent", get_class($events[0]));
     }
 
-    //test exception thrown SchedulableTraitNotFoundException when no Scheduleable trait found
     public function testCannotAddNonSchedulableClass()
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->schedule->use(BarClassStub::class);
+        $this->schedule->use(NonSchedulableClassStub::class);
 
         $events = $this->schedule->events();
 
         $this->assertCount(0, $events);
     }
 
-    //Test event is run every minute / has ***** expression
     public function testSchedulableClassEventHasEeryMinuteSchedule()
     {
-        $this->schedule->use(FooSchedulableClassStub::class);
+        $this->schedule->use(SchedulableClassStub::class);
 
         $event = $this->schedule->events()[0];
 
@@ -67,11 +63,11 @@ class SchedulableClassEventTest extends TestCase
     }
 }
 
-class FooSchedulableClassStub
+class SchedulableClassStub
 {
     use Schedulable;
 }
 
-class BarClassStub
+class NonSchedulableClassStub
 {
 }
