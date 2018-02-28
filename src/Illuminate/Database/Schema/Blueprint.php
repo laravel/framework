@@ -1120,7 +1120,7 @@ class Blueprint
     {
         $this->string("{$name}_type");
 
-        $this->unsignedInteger("{$name}_id");
+        $this->unsignedBigInteger("{$name}_id");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
@@ -1136,7 +1136,7 @@ class Blueprint
     {
         $this->string("{$name}_type")->nullable();
 
-        $this->unsignedInteger("{$name}_id")->nullable();
+        $this->unsignedBigInteger("{$name}_id")->nullable();
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }

@@ -482,7 +482,7 @@ class FilesystemTest extends TestCase
             'host' => 'ftp.example.com',
             'username' => 'admin',
             'permPublic' => 0700,
-            'unsopertedParam' => true,
+            'unsupportedParam' => true,
         ]);
 
         /** @var Ftp $adapter */
