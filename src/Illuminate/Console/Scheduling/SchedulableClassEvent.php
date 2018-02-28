@@ -63,7 +63,7 @@ class SchedulableClassEvent extends Event
         try {
             $due_items = resolve($this->schedulableClass)::areDue();
 
-            $due_items = collect(is_array($due_items) || $due_items instanceof Collection ? $due_items : array($due_items));
+            $due_items = collect(is_array($due_items) || $due_items instanceof Collection ? $due_items : [$due_items]);
 
             $due_items->each->runSchedule();
         } finally {
@@ -71,8 +71,6 @@ class SchedulableClassEvent extends Event
 
             parent::callAfterCallbacks($container);
         }
-
-        return;
     }
 
     /**

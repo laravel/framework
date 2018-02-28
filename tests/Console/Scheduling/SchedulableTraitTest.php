@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Console\Scheduling;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Console\Scheduling\Schedulable;
 use Illuminate\Support\Collection;
+use Illuminate\Console\Scheduling\Schedulable;
 
 class SchedulableTraitTest extends TestCase
 {
