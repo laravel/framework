@@ -45,7 +45,7 @@ class DatabaseChannel
     }
 
     /**
-     * Build up an array payload for the DatabaseNotification Model.
+     * Build an array payload for the DatabaseNotification Model.
      *
      * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
