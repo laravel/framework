@@ -1,9 +1,13 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.7 (2018-02-28)
 
 ### Added
 - Added SFTP filesystem driver ([#23308](https://github.com/laravel/framework/pull/23308))
+
+### Changed
+- Pass parent model to `withDefault()` callback ([#23334](https://github.com/laravel/framework/pull/23334))
+- Upgrade Parsedown to 1.7.0 ([816f893](https://github.com/laravel/framework/commit/816f893c30152e95b14c4ae9d345f53168e5a20e))
 
 ### Fixed
 - Fixed `PostgresGrammar::whereTime()` casting ([#23323](https://github.com/laravel/framework/pull/23323))
