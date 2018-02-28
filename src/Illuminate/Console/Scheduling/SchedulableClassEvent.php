@@ -28,7 +28,7 @@ class SchedulableClassEvent extends Event
     {
         $schedulableClass = is_string($schedulableClass) ? resolve($schedulableClass) : $schedulableClass;
 
-        if (!in_array('Illuminate\Console\Scheduling\Schedulable', class_uses($schedulableClass))) {
+        if (! in_array('Illuminate\Console\Scheduling\Schedulable', class_uses($schedulableClass))) {
             throw new InvalidArgumentException(
                 'Schedulable trait was not found on this class'
             );
@@ -50,7 +50,7 @@ class SchedulableClassEvent extends Event
     public function run(Container $container)
     {
         if ($this->description && $this->withoutOverlapping &&
-            !$this->mutex->create($this)) {
+            ! $this->mutex->create($this)) {
             return;
         }
 
@@ -94,7 +94,7 @@ class SchedulableClassEvent extends Event
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
-        if (!isset($this->description)) {
+        if (! isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );
@@ -118,7 +118,7 @@ class SchedulableClassEvent extends Event
      */
     public function onOneServer()
     {
-        if (!isset($this->description)) {
+        if (! isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to only run on one server. Use the 'name' method before 'onOneServer'."
             );

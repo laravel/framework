@@ -156,7 +156,7 @@ class Schedule
                 $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');
-            } elseif (!is_numeric($value) && !preg_match('/^(-.$|--.*)/i', $value)) {
+            } elseif (! is_numeric($value) && !preg_match('/^(-.$|--.*)/i', $value)) {
                 $value = ProcessUtils::escapeArgument($value);
             }
 
