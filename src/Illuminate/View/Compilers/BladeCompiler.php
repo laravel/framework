@@ -91,6 +91,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $echoFormat = 'e(%s)';
 
     /**
+     * Determine if the double encoding will be used.
+     *
+     * @var string
+     */
+    protected $usesDoubleEncoding = true;
+
+    /**
      * Array of footer lines to be added to template.
      *
      * @var array
@@ -498,13 +505,36 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Get if the compiler uses double encoding.
+     * 
+     * @return bool
+     */
+    public function getUsesDoubleEncoding()
+    {
+        return $this->usesDoubleEncoding;
+    }
+
+    /**
+     * Set the double encoding to be used by the compiler.
+     * 
+     * @param  bool $value
+     * @return this
+     */
+    public function setUsesDoubleEncoding($value)
+    {
+        $this->usesDoubleEncoding = $value;
+
+        return $this;
+    }
+
+    /**
      * Set the "echo" format to double encode entities.
      *
      * @return void
      */
     public function withDoubleEncoding()
     {
-        $this->setEchoFormat('e(%s, true)');
+        $this->setUsesDoubleEncoding(true)->setEchoFormat('e(%s, true)');
     }
 
     /**
@@ -514,6 +544,6 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function withoutDoubleEncoding()
     {
-        $this->setEchoFormat('e(%s, false)');
+        $this->setUsesDoubleEncoding(false)->setEchoFormat('e(%s, false)');
     }
 }
