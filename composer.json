@@ -20,7 +20,7 @@
         "ext-openssl": "*",
         "doctrine/inflector": "~1.1",
         "dragonmantank/cron-expression": "~2.0",
-        "erusev/parsedown": "~1.6",
+        "erusev/parsedown": "~1.7",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.12",
         "nesbot/carbon": "^1.22.1",
