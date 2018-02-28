@@ -1449,10 +1449,11 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $builder->from('users')->selectSub(function ($query) {
-            $query->from('posts')->select('foo')->where('title', 'foo');
+            $query->from('posts')->select('foo', 'bar')->where('title', 'foo');
         }, 'post');
         $count = $builder->count();
         $this->assertEquals(1, $count);
+        $this->assertEquals('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->columns[0]->getValue());
         $this->assertEquals(['foo'], $builder->getBindings());
     }
 
