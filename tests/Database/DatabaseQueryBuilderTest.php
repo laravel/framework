@@ -340,11 +340,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereTimePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
+        $this->assertEquals('select * from "users" where "created_at"::time >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
     public function testWhereTimeOperatorOptionalPostgres()
     {
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '22:00');
-        $this->assertEquals('select * from "users" where extract(time from "created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where "created_at"::time = ?', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
@@ -402,6 +410,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
         $this->assertEquals('select * from "users" where strftime(\'%Y\', "created_at") = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
+    }
+
+    public function testWhereTimeSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
+        $this->assertEquals('select * from "users" where strftime(\'%H:%M:%S\', "created_at") >= ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereTimeOperatorOptionalSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from "users" where strftime(\'%H:%M:%S\', "created_at") = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
     public function testWhereDaySqlServer()

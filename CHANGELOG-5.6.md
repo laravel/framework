@@ -1,5 +1,32 @@
 # Release Notes for 5.6.x
 
+## [Unreleased]
+
+### Added
+- Added SFTP filesystem driver ([#23308](https://github.com/laravel/framework/pull/23308))
+
+### Fixed
+- Fixed `PostgresGrammar::whereTime()` casting ([#23323](https://github.com/laravel/framework/pull/23323))
+- Fixed `SQLiteGrammar::whereTime()` correct ([#23321](https://github.com/laravel/framework/pull/23321))
+
+
+## v5.6.6 (2018-02-27)
+
+### Added
+- Added `sortKeys()` and `sortKeysDesc()` methods to `Collection` ([#23286](https://github.com/laravel/framework/pull/23286))
+
+### Changed
+- Return `null` from `optional()` helper if object property is undefined ([#23267](https://github.com/laravel/framework/pull/23267))
+- Cache event wildcard listeners ([#23299](https://github.com/laravel/framework/pull/23299), [82099cb](https://github.com/laravel/framework/commit/82099cb3fdfe79f3f4f17008daf169f13fefffc0))
+- Changed `morphs()` and `nullableMorphs()` to use `unsignedBigInteger()` ([#23320](https://github.com/laravel/framework/pull/23320))
+
+### Fixed
+- Prevent delayed jobs in v5.5 fail to run in v5.6 ([#23287](https://github.com/laravel/framework/pull/23287))
+- `Queue::bulk()` fake now properly pushes expected jobs ([#23294](https://github.com/laravel/framework/pull/23294))
+- Fixed the list of packages removed when the "none" preset is installed ([#23305](https://github.com/laravel/framework/pull/23305))
+- Fixed an issue with `orHaving()` arguments ([e7f13be](https://github.com/laravel/framework/commit/e7f13be6a5dd8c348243a5f5dce488359160937c))
+
+
 ## v5.6.5 (2018-02-22)
 
 ### Added
