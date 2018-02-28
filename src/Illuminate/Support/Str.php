@@ -56,8 +56,8 @@ class Str
     {
         $languageSpecific = static::languageSpecificCharsArray($language);
 
-        if (! is_null($languageSpecific)) {
-            $value = str_replace($languageSpecific[0], $languageSpecific[1], $value);
+        if ($languageSpecific !== null) {
+            $value = str_replace(array_keys($languageSpecific), array_values($languageSpecific), $value);
         }
 
         foreach (static::charsArray() as $key => $val) {
@@ -703,12 +703,22 @@ class Str
         if (! isset($languageSpecific)) {
             $languageSpecific = [
                 'bg' => [
-                    ['х', 'Х', 'щ', 'Щ', 'ъ', 'Ъ', 'ь', 'Ь'],
-                    ['h', 'H', 'sht', 'SHT', 'a', 'А', 'y', 'Y'],
+                    'х' => 'h',
+                    'Х' => 'H',
+                    'щ' => 'sht',
+                    'Щ' => 'SHT',
+                    'ъ' => 'a',
+                    'Ъ' => 'А',
+                    'ь' => 'y',
+                    'Ь' => 'Y',
                 ],
                 'de' => [
-                    ['ä',  'ö',  'ü',  'Ä',  'Ö',  'Ü'],
-                    ['ae', 'oe', 'ue', 'AE', 'OE', 'UE'],
+                    'ä' => 'ae',
+                    'ö' => 'oe',
+                    'ü' => 'ue',
+                    'Ä' => 'AE',
+                    'Ö' => 'OE',
+                    'Ü' => 'UE',
                 ],
             ];
         }
