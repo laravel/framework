@@ -42,8 +42,20 @@ trait ManagesLayouts
                 $this->sectionStack[] = $section;
             }
         } else {
-            $this->extendSection($section, $content instanceof View ? $content : e($content));
+            $this->extendSection($section, $this->getInlineContent($content));
         }
+    }
+
+    /**
+     * Get inline content.
+     * 
+     * @return string
+     */
+    public function getInlineContent($content)
+    {
+        $bladeCompiler = app('blade.compiler');
+        
+        return $content instanceof View ? $content : e($content, $bladeCompiler->getUsesDoubleEncoding());
     }
 
     /**
