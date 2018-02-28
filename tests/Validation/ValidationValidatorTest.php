@@ -3785,7 +3785,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
             ['name' => 'taylor'],
-            ['name.*' => function ($attribute, $value, $fail) {
+            ['name.*' => function ($attribute, $value, $validator, $fail) {
                 if ($value !== 'taylor') {
                     $fail(':attribute was '.$value.' instead of taylor');
                 }
