@@ -69,7 +69,7 @@ class TransportManager extends Manager
     /**
      * Create an instance of the Amazon SES Swift Transport driver.
      *
-     * @return \Swift_SendmailTransport
+     * @return \Illuminate\Mail\Transport\SesTransport
      */
     protected function createSesDriver()
     {

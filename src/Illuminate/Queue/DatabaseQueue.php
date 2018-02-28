@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Throwable;
 use Illuminate\Support\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
@@ -191,19 +190,13 @@ class DatabaseQueue extends Queue implements QueueContract
     {
         $queue = $this->getQueue($queue);
 
-        try {
-            $this->database->beginTransaction();
-
+        return $this->database->transaction(function () use ($queue) {
             if ($job = $this->getNextAvailableJob($queue)) {
                 return $this->marshalJob($queue, $job);
             }
 
-            $this->database->commit();
-        } catch (Throwable $e) {
-            $this->database->rollBack();
-
-            throw $e;
-        }
+            return null;
+        });
     }
 
     /**
@@ -266,8 +259,6 @@ class DatabaseQueue extends Queue implements QueueContract
     protected function marshalJob($queue, $job)
     {
         $job = $this->markJobAsReserved($job);
-
-        $this->database->commit();
 
         return new DatabaseJob(
             $this->container, $this, $job, $this->connectionName, $queue

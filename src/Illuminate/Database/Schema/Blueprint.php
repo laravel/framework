@@ -3,9 +3,11 @@
 namespace Illuminate\Database\Schema;
 
 use Closure;
+use BadMethodCallException;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Database\SQLiteConnection;
 use Illuminate\Database\Schema\Grammars\Grammar;
 
 class Blueprint
@@ -96,13 +98,15 @@ class Blueprint
      */
     public function toSql(Connection $connection, Grammar $grammar)
     {
-        $this->addImpliedCommands();
+        $this->addImpliedCommands($grammar);
 
         $statements = [];
 
         // Each type of command has a corresponding compiler function on the schema
         // grammar which is used to build the necessary SQL statements to build
         // the blueprint element, so we'll just call that compilers function.
+        $this->ensureCommandsAreValid($connection);
+
         foreach ($this->commands as $command) {
             $method = 'compile'.ucfirst($command->name);
 
@@ -117,11 +121,41 @@ class Blueprint
     }
 
     /**
-     * Add the commands that are implied by the blueprint's state.
+     * Ensure the commands on the blueprint are valid for the connection type.
      *
+     * @param  \Illuminate\Database\Connection  $connection
      * @return void
      */
-    protected function addImpliedCommands()
+    protected function ensureCommandsAreValid(Connection $connection)
+    {
+        if ($connection instanceof SQLiteConnection &&
+            $this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
+            throw new BadMethodCallException(
+                "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
+            );
+        }
+    }
+
+    /**
+     * Get all of the commands matching the given names.
+     *
+     * @param  array  $names
+     * @return \Illuminate\Support\Collection
+     */
+    protected function commandsNamed(array $names)
+    {
+        return collect($this->commands)->filter(function ($command) use ($names) {
+            return in_array($command->name, $names);
+        });
+    }
+
+    /**
+     * Add the commands that are implied by the blueprint's state.
+     *
+     * @param  \Illuminate\Database\Grammar  $grammer
+     * @return void
+     */
+    protected function addImpliedCommands(Grammar $grammar)
     {
         if (count($this->getAddedColumns()) > 0 && ! $this->creating()) {
             array_unshift($this->commands, $this->createCommand('add'));
@@ -132,6 +166,8 @@ class Blueprint
         }
 
         $this->addFluentIndexes();
+
+        $this->addFluentCommands($grammar);
     }
 
     /**
@@ -160,6 +196,31 @@ class Blueprint
 
                     continue 2;
                 }
+            }
+        }
+    }
+
+    /**
+     * Add the fluent commands specified on any columns.
+     *
+     * @param  \Illuminate\Database\Grammar  $grammer
+     * @param
+     */
+    public function addFluentCommands(Grammar $grammar)
+    {
+        foreach ($this->columns as $column) {
+            foreach ($grammar->getFluentCommands() as $commandName) {
+                $attributeName = lcfirst($commandName);
+
+                if (! isset($column->{$attributeName})) {
+                    continue;
+                }
+
+                $value = $column->{$attributeName};
+
+                $this->addCommand(
+                    $commandName, compact('value', 'column')
+                );
             }
         }
     }
@@ -1057,11 +1118,11 @@ class Blueprint
      */
     public function morphs($name, $indexName = null)
     {
-        $this->unsignedInteger("{$name}_id");
-
         $this->string("{$name}_type");
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->unsignedBigInteger("{$name}_id");
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**
@@ -1073,11 +1134,11 @@ class Blueprint
      */
     public function nullableMorphs($name, $indexName = null)
     {
-        $this->unsignedInteger("{$name}_id")->nullable();
-
         $this->string("{$name}_type")->nullable();
 
-        $this->index(["{$name}_id", "{$name}_type"], $indexName);
+        $this->unsignedBigInteger("{$name}_id")->nullable();
+
+        $this->index(["{$name}_type", "{$name}_id"], $indexName);
     }
 
     /**

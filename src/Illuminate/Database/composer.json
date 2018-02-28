@@ -15,10 +15,10 @@
         }
     ],
     "require": {
-        "php": ">=7.0",
-        "illuminate/container": "5.5.*",
-        "illuminate/contracts": "5.5.*",
-        "illuminate/support": "5.5.*"
+        "php": "^7.1.3",
+        "illuminate/container": "5.6.*",
+        "illuminate/contracts": "5.6.*",
+        "illuminate/support": "5.6.*"
     },
     "autoload": {
         "psr-4": {
@@ -27,16 +27,16 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.5-dev"
+            "dev-master": "5.6-dev"
         }
     },
     "suggest": {
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.5).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.6).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
-        "illuminate/console": "Required to use the database commands (5.5.*).",
-        "illuminate/events": "Required to use the observers with Eloquent (5.5.*).",
-        "illuminate/filesystem": "Required to use the migrations (5.5.*).",
-        "illuminate/pagination": "Required to paginate the result set (5.5.*)."
+        "illuminate/console": "Required to use the database commands (5.6.*).",
+        "illuminate/events": "Required to use the observers with Eloquent (5.6.*).",
+        "illuminate/filesystem": "Required to use the migrations (5.6.*).",
+        "illuminate/pagination": "Required to paginate the result set (5.6.*)."
     },
     "config": {
         "sort-packages": true

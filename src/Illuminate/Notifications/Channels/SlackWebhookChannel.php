@@ -37,7 +37,7 @@ class SlackWebhookChannel
      */
     public function send($notifiable, Notification $notification)
     {
-        if (! $url = $notifiable->routeNotificationFor('slack')) {
+        if (! $url = $notifiable->routeNotificationFor('slack', $notification)) {
             return;
         }
 
@@ -92,6 +92,7 @@ class SlackWebhookChannel
                 'footer_icon' => $attachment->footerIcon,
                 'image_url' => $attachment->imageUrl,
                 'mrkdwn_in' => $attachment->markdown,
+                'pretext' => $attachment->pretext,
                 'text' => $attachment->content,
                 'thumb_url' => $attachment->thumbUrl,
                 'title' => $attachment->title,

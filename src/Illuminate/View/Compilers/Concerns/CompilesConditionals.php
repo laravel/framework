@@ -11,7 +11,7 @@ trait CompilesConditionals
      */
     protected $firstCaseInSwitch = true;
 
-    /*
+    /**
      * Compile the if-auth statements into valid PHP.
      *
      * @param  string|null  $guard

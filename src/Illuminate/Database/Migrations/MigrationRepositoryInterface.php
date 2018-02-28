@@ -5,7 +5,7 @@ namespace Illuminate\Database\Migrations;
 interface MigrationRepositoryInterface
 {
     /**
-     * Get the ran migrations for a given package.
+     * Get the completed migrations.
      *
      * @return array
      */
@@ -27,10 +27,17 @@ interface MigrationRepositoryInterface
     public function getLast();
 
     /**
+     * Get the completed migrations with their batch numbers.
+     *
+     * @return array
+     */
+    public function getMigrationBatches();
+
+    /**
      * Log that a migration was run.
      *
      * @param  string  $file
-     * @param  int     $batch
+     * @param  int  $batch
      * @return void
      */
     public function log($file, $batch);
