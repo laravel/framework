@@ -128,6 +128,13 @@ class CacheRepositoryTest extends TestCase
         $repo->put('foo', 'bar', Carbon::now());
     }
 
+    public function testPutWithoutMinutesRememberedForever()
+    {
+        $repo = $this->getRepository();
+        $repo->getStore()->shouldReceive('forever')->once();
+        $repo->put('foo', 'bar');
+    }
+
     public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
     {
         $repo = $this->getRepository();
