@@ -1036,6 +1036,18 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Merge the collection with the given items based on a given condition.
+     *
+     * @param bool $condition
+     * @param  mixed  $items
+     * @return static
+     */
+    public function mergeWhen($condition, $items)
+    {
+        return $condition ? $this->merge($items) : $this;
+    }
+
+    /**
      * Create a collection by using this collection for keys and another for its values.
      *
      * @param  mixed  $values
