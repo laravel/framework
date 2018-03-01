@@ -1940,6 +1940,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20', $builder->toSql());
     }
 
+    public function testMySqlSoundsLikeOperator()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('name', 'sounds like', 'John Doe');
+        $this->assertEquals('select * from `users` where `name` sounds like ?', $builder->toSql());
+        $this->assertEquals(['John Doe'], $builder->getBindings());
+    }
+
     public function testMergeWheresCanMergeWheresAndBindings()
     {
         $builder = $this->getBuilder();
