@@ -1674,6 +1674,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the collection of items as URL encoded query string.
+     *
+     * @param  string  $prefix
+     * @param  string  $separator
+     * @param  int  $encoding
+     * @return string
+     */
+    public function queryString($prefix = '', $separator = '&', $encoding = PHP_QUERY_RFC1738)
+    {
+        return http_build_query($this->toArray(), $prefix, $separator, $encoding);
+    }
+
+    /**
      * Get the collection of items as a plain array.
      *
      * @return array
