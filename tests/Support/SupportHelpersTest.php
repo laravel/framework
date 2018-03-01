@@ -854,6 +854,23 @@ class SupportHelpersTest extends TestCase
         })->present()->something());
     }
 
+    public function testOptionalCanBeCastedToString()
+    {
+        $this->assertEquals('Testing', (string) optional(new class('Testing') {
+            protected $string;
+
+            public function __construct(string $str)
+            {
+                $this->string = $str;
+            }
+
+            public function __toString()
+            {
+                return $this->string;
+            }
+        }));
+    }
+
     public function testTransform()
     {
         $this->assertEquals(10, transform(5, function ($value) {
