@@ -609,8 +609,8 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['name' => 'Hello']);
 
-        $this->assertEquals(['name' => 'Hello'], $c->mergeWhen(false,new Collection(['name' => 'World', 'id' => 1]))->all());
-        $this->assertEquals(['name' => 'World', 'id' => 1], $c->mergeWhen(true,new Collection(['name' => 'World', 'id' => 1]))->all());
+        $this->assertEquals(['name' => 'Hello'], $c->mergeWhen(false, new Collection(['name' => 'World', 'id' => 1]))->all());
+        $this->assertEquals(['name' => 'World', 'id' => 1], $c->mergeWhen(true, new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
     public function testUnionNull()
