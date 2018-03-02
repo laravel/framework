@@ -4,9 +4,11 @@ namespace Illuminate\Tests\Integration\Http;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
+use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
@@ -520,5 +522,140 @@ class ResourceTest extends TestCase
         $createdPosts->each(function ($post) use ($response) {
             $this->assertTrue($response->getOriginalContent()->contains($post));
         });
+    }
+
+    public function test_leading_merge_value_is_merged_correctly()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    new MergeValue(['First', 'Second']),
+                    'Taylor',
+                    'Mohamed',
+                    new MergeValue(['Adam', 'Matt']),
+                    'Jeffrey',
+                    new MergeValue(['Abigail', 'Lydia']),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'First', 'Second', 'Taylor', 'Mohamed', 'Adam', 'Matt', 'Jeffrey', 'Abigail', 'Lydia',
+        ], $results);
+    }
+
+    public function test_merge_values_may_be_missing()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    new MergeValue(['First', 'Second']),
+                    'Taylor',
+                    'Mohamed',
+                    $this->mergeWhen(false, ['Adam', 'Matt']),
+                    'Jeffrey',
+                    new MergeValue(['Abigail', 'Lydia']),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'First', 'Second', 'Taylor', 'Mohamed', 'Jeffrey', 'Abigail', 'Lydia',
+        ], $results);
+    }
+
+    public function test_initial_merge_values_may_be_missing()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeWhen(false, ['First', 'Second']),
+                    'Taylor',
+                    'Mohamed',
+                    $this->mergeWhen(true, ['Adam', 'Matt']),
+                    'Jeffrey',
+                    new MergeValue(['Abigail', 'Lydia']),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Adam', 'Matt', 'Jeffrey', 'Abigail', 'Lydia',
+        ], $results);
+    }
+
+    public function test_all_merge_values_may_be_missing()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeWhen(false, ['First', 'Second']),
+                    'Taylor',
+                    'Mohamed',
+                    $this->mergeWhen(false, ['Adam', 'Matt']),
+                    'Jeffrey',
+                    $this->mergeWhen(false, (['Abigail', 'Lydia'])),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Jeffrey',
+        ], $results);
+    }
+
+    public function test_nested_merges()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeWhen(true, [['Something']]),
+                    [
+                        $this->mergeWhen(true, ['First', $this->mergeWhen(true, ['Second'])]),
+                        'Third',
+                    ],
+                    [
+                        'Fourth',
+                    ],
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            [
+                'Something',
+            ],
+            [
+                'First', 'Second', 'Third',
+            ],
+            [
+                'Fourth',
+            ],
+        ], $results);
     }
 }
