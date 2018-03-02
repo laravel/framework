@@ -50,7 +50,7 @@ class ThrottleRequestsTest extends TestCase
         try {
             $this->withoutExceptionHandling()->get('/');
         } catch (Throwable $e) {
-            $this->assertTrue($e instanceof ThrottleRequestsException);
+            $this->assertInstanceOf(ThrottleRequestsException::class, $e);
             $this->assertEquals(429, $e->getStatusCode());
             $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
             $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);
