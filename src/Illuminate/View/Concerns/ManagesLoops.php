@@ -4,6 +4,7 @@ namespace Illuminate\View\Concerns;
 
 use Countable;
 use Illuminate\Support\Arr;
+use Traversable;
 
 trait ManagesLoops
 {
@@ -22,7 +23,9 @@ trait ManagesLoops
      */
     public function addLoop($data)
     {
-        $length = is_array($data) || $data instanceof Countable ? count($data) : null;
+        $length = is_array($data) || $data instanceof Countable
+                    ? count($data)
+                    : ($data instanceof Traversable ? iterator_count($data) : null);
 
         $parent = Arr::last($this->loopsStack);
 
