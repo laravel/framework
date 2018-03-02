@@ -313,7 +313,7 @@ class FactoryBuilder
     protected function expandAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
-            if (is_callable($attribute) && ! is_string($attribute)) {
+            if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
                 $attribute = $attribute($attributes);
             }
 
