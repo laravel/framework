@@ -495,6 +495,12 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testWhereInstanceOf()
+    {
+        $c = new Collection([new stdClass, new stdClass, new Collection, new stdClass]);
+        $this->assertCount(3, $c->whereInstanceOf(stdClass::class));
+    }
+
     public function testWhereIn()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
