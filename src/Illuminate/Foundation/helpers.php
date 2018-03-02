@@ -914,7 +914,6 @@ if (! function_exists('trans_choice')) {
     }
 }
 
-
 if (! function_exists('trans_html')) {
     /**
      * Translate the given message with html tags.
