@@ -624,11 +624,11 @@ class ResourceTest extends TestCase
         ], $results);
     }
 
-
     public function test_nested_merges()
     {
         $filter = new class {
             use ConditionallyLoadsAttributes;
+
             public function work()
             {
                 return $this->filter([
@@ -655,7 +655,7 @@ class ResourceTest extends TestCase
             ],
             [
                 'Fourth',
-            ]
+            ],
         ], $results);
     }
 }
