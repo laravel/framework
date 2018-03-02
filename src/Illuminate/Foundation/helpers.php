@@ -914,6 +914,21 @@ if (! function_exists('trans_choice')) {
     }
 }
 
+if (! function_exists('trans_html')) {
+    /**
+     * Translate the given message with html tags.
+     *
+     * @param  string  $key
+     * @param  array   $replace
+     * @param  string  $locale
+     * @return \Illuminate\Support\HtmlString
+     */
+    function trans_html($key, $replace = [], $locale = null)
+    {
+        return new HtmlString(trans($key, $replace, $locale));
+    }
+}
+
 if (! function_exists('__')) {
     /**
      * Translate the given message.
