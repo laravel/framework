@@ -632,6 +632,7 @@ class ResourceTest extends TestCase
             public function work()
             {
                 return $this->filter([
+                    $this->mergeWhen(true, [['Something']]),
                     [
                         $this->mergeWhen(true, ['First', $this->mergeWhen(true, ['Second'])]),
                         'Third',
@@ -646,6 +647,9 @@ class ResourceTest extends TestCase
         $results = $filter->work();
 
         $this->assertEquals([
+            [
+                'Something',
+            ],
             [
                 'First', 'Second', 'Third',
             ],
