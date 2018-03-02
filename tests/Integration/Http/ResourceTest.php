@@ -573,4 +573,54 @@ class ResourceTest extends TestCase
             'First', 'Second', 'Taylor', 'Mohamed', 'Jeffrey', 'Abigail', 'Lydia',
         ], $results);
     }
+
+
+    public function test_initial_merge_values_may_be_missing()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeWhen(false, ['First', 'Second']),
+                    'Taylor',
+                    'Mohamed',
+                    $this->mergeWhen(true, ['Adam', 'Matt']),
+                    'Jeffrey',
+                    new MergeValue(['Abigail', 'Lydia']),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Adam', 'Matt', 'Jeffrey', 'Abigail', 'Lydia',
+        ], $results);
+    }
+
+
+    public function test_all_merge_values_may_be_missing()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+            public function work()
+            {
+                return $this->filter([
+                    $this->mergeWhen(false, ['First', 'Second']),
+                    'Taylor',
+                    'Mohamed',
+                    $this->mergeWhen(false, ['Adam', 'Matt']),
+                    'Jeffrey',
+                    $this->mergeWhen(false, (['Abigail', 'Lydia'])),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'Taylor', 'Mohamed', 'Jeffrey',
+        ], $results);
+    }
 }
