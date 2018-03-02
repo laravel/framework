@@ -2019,6 +2019,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1, 2, 3, 4, 5], $c->all());
     }
 
+    public function testQueryString()
+    {
+        $c = new Collection(['a' => 'd', 'b' => 'e', 'c' => 'f']);
+        $this->assertEquals('a=d&b=e&c=f', $c->queryString());
+    }
+
     public function testGettingMaxItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
