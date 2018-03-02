@@ -623,4 +623,35 @@ class ResourceTest extends TestCase
             'Taylor', 'Mohamed', 'Jeffrey',
         ], $results);
     }
+
+
+    public function test_nested_merges()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+            public function work()
+            {
+                return $this->filter([
+                    [
+                        $this->mergeWhen(true, ['First', $this->mergeWhen(true, ['Second'])]),
+                        'Third',
+                    ],
+                    [
+                        'Fourth',
+                    ],
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            [
+                'First', 'Second', 'Third',
+            ],
+            [
+                'Fourth',
+            ]
+        ], $results);
+    }
 }
