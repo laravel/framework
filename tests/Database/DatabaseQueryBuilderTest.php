@@ -1449,10 +1449,11 @@ class DatabaseQueryBuilderTest extends TestCase
             return $results;
         });
         $builder->from('users')->selectSub(function ($query) {
-            $query->from('posts')->select('foo')->where('title', 'foo');
+            $query->from('posts')->select('foo', 'bar')->where('title', 'foo');
         }, 'post');
         $count = $builder->count();
         $this->assertEquals(1, $count);
+        $this->assertEquals('(select "foo", "bar" from "posts" where "title" = ?) as "post"', $builder->columns[0]->getValue());
         $this->assertEquals(['foo'], $builder->getBindings());
     }
 
@@ -1938,6 +1939,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->skip(10)->take(10)->orderBy('email', 'desc');
         $this->assertEquals('select * from (select *, row_number() over (order by [email] desc) as row_num from [users]) as temp_table where row_num between 11 and 20', $builder->toSql());
+    }
+
+    public function testMySqlSoundsLikeOperator()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('name', 'sounds like', 'John Doe');
+        $this->assertEquals('select * from `users` where `name` sounds like ?', $builder->toSql());
+        $this->assertEquals(['John Doe'], $builder->getBindings());
     }
 
     public function testMergeWheresCanMergeWheresAndBindings()

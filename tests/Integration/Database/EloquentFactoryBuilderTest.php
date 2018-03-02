@@ -42,6 +42,7 @@ class EloquentFactoryBuilderTest extends TestCase
             return [
                 'name' => $faker->name,
                 'status' => 'active',
+                'tags' => ['Storage', 'Data'],
                 'user_id' => function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
                 },
@@ -80,6 +81,7 @@ class EloquentFactoryBuilderTest extends TestCase
         Schema::create('servers', function ($table) {
             $table->increments('id');
             $table->string('name');
+            $table->string('tags');
             $table->integer('user_id');
             $table->string('status');
         });
@@ -134,6 +136,7 @@ class EloquentFactoryBuilderTest extends TestCase
         $callableServer = factory(FactoryBuildableServer::class)->states('callable')->create();
 
         $this->assertEquals('active', $server->status);
+        $this->assertEquals(['Storage', 'Data'], $server->tags);
         $this->assertEquals('callable', $callableServer->status);
     }
 
@@ -208,6 +211,7 @@ class FactoryBuildableServer extends Model
     public $table = 'servers';
     public $timestamps = false;
     protected $guarded = ['id'];
+    public $casts = ['tags' => 'array'];
 
     public function user()
     {
