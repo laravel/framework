@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 class ThrottleRequestsException extends HttpException
 {
     /**
-     * TooManyAttemptsException constructor.
+     * Create a new exception instance.
      *
      * @param  string|null  $message
      * @param  \Exception|null  $previous
