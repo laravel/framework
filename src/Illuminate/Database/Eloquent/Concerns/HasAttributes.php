@@ -312,8 +312,7 @@ trait HasAttributes
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
-            $this->hasGetMutator($key)) {
+        if ($this->hasAttributeFromArray($key) || $this->hasGetMutator($key)) {
             return $this->getAttributeValue($key);
         }
 
@@ -370,9 +369,20 @@ trait HasAttributes
      */
     protected function getAttributeFromArray($key)
     {
-        if (isset($this->attributes[$key])) {
+        if ($this->hasAttributeFromArray($key)) {
             return $this->attributes[$key];
         }
+    }
+
+    /**
+     * Check if an attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttributeFromArray($key)
+    {
+        return isset($this->attributes[$key]);
     }
 
     /**
@@ -635,8 +645,9 @@ trait HasAttributes
      */
     protected function getArrayAttributeByKey($key)
     {
-        return isset($this->attributes[$key]) ?
-                    $this->fromJson($this->attributes[$key]) : [];
+        return $this->hasAttributeFromArray($key)
+            ? $this->fromJson($this->attributes[$key])
+            : [];
     }
 
     /**
