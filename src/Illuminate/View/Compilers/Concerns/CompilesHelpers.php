@@ -26,17 +26,6 @@ trait CompilesHelpers
     }
 
     /**
-     * Compile the method statements into valid PHP.
-     *
-     * @param  string  $method
-     * @return string
-     */
-    protected function compileMethod($method)
-    {
-        return "<?php echo method_field{$method}; ?>";
-    }
-
-    /**
      * Compile the "dump" statements into valid PHP.
      *
      * @param  string  $arguments
@@ -45,5 +34,16 @@ trait CompilesHelpers
     protected function compileDump($arguments)
     {
         return "<?php dump{$arguments}; ?>";
+    }
+
+    /**
+     * Compile the method statements into valid PHP.
+     *
+     * @param  string  $method
+     * @return string
+     */
+    protected function compileMethod($method)
+    {
+        return "<?php echo method_field{$method}; ?>";
     }
 }
