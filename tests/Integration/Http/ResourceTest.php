@@ -574,11 +574,11 @@ class ResourceTest extends TestCase
         ], $results);
     }
 
-
     public function test_initial_merge_values_may_be_missing()
     {
         $filter = new class {
             use ConditionallyLoadsAttributes;
+
             public function work()
             {
                 return $this->filter([
@@ -599,11 +599,11 @@ class ResourceTest extends TestCase
         ], $results);
     }
 
-
     public function test_all_merge_values_may_be_missing()
     {
         $filter = new class {
             use ConditionallyLoadsAttributes;
+
             public function work()
             {
                 return $this->filter([
