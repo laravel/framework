@@ -35,4 +35,15 @@ trait CompilesHelpers
     {
         return "<?php echo method_field{$method}; ?>";
     }
+
+    /**
+     * Compile the "dump" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileDump($arguments)
+    {
+        return "<?php dump{$arguments}; ?>";
+    }
 }
