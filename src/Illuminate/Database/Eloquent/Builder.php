@@ -9,6 +9,8 @@ use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -1114,7 +1116,20 @@ class Builder
     protected function createSelectWithConstraint($name)
     {
         return [explode(':', $name)[0], function ($query) use ($name) {
-            $query->select(explode(',', explode(':', $name)[1]));
+            $columns = explode(',', explode(':', $name)[1]);
+
+            // Belongs to, has one and has many relationships require the key column for matching the results.
+            // If it is missing, we add it to the selected columns.
+            // Belongs to many and has many through relationships get the key from the pivot table.
+            if ($query instanceof BelongsTo || $query instanceof HasOneOrMany) {
+                $key = $query instanceof BelongsTo ? $query->getOwnerKey() : $query->getForeignKeyName();
+
+                if (!in_array($key, $columns)) {
+                    $columns[] = $key;
+                }
+            }
+
+            $query->select($columns);
         }];
     }
 

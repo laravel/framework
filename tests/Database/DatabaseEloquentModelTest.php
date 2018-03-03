@@ -14,6 +14,8 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentModelTest extends TestCase
@@ -217,6 +219,28 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNotNull($instance->getEagerLoads()['foo']);
         $closure = $instance->getEagerLoads()['foo'];
         $closure($builder);
+    }
+
+    public function testEagerLoadingWithMissingBelongsToKeyColumn()
+    {
+        $model = new EloquentModelWithoutRelationStub;
+        $instance = $model->newInstance()->newQuery()->with('foo:bar,baz');
+        $relation = m::mock(BelongsTo::class);
+        $relation->shouldReceive('getOwnerKey')->andReturn('id');
+        $relation->shouldReceive('select')->once()->with(['bar', 'baz', 'id']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($relation);
+    }
+
+    public function testEagerLoadingWithMissingHasOneOrManyKeyColumn()
+    {
+        $model = new EloquentModelWithoutRelationStub;
+        $instance = $model->newInstance()->newQuery()->with('foo:bar,baz');
+        $relation = m::mock(HasMany::class);
+        $relation->shouldReceive('getForeignKeyName')->andReturn('foreign_key');
+        $relation->shouldReceive('select')->once()->with(['bar', 'baz', 'foreign_key']);
+        $closure = $instance->getEagerLoads()['foo'];
+        $closure($relation);
     }
 
     public function testWithMethodCallsQueryBuilderCorrectlyWithArray()
