@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent;
 
+use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Contracts\Database\Eloquent\Hydrator as HydratorInterface;
-use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Hydrator implements HydratorInterface
 {
