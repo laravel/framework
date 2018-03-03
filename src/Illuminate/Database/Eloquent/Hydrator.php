@@ -7,7 +7,6 @@ use Illuminate\Contracts\Database\Eloquent\Hydrator as HydratorInterface;
 
 class Hydrator implements HydratorInterface
 {
-
     /**
      * The original model instance.
      *
