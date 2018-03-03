@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
+use Illuminate\Database\Eloquent\ObjectCastable;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -1578,6 +1579,32 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getAttributes();
     }
 
+    public function testObjectCastableAttributeCasting()
+    {
+        $obj = new ObjectCastableStub;
+        $obj->foo = 'bar';
+
+        $model = new EloquentModelObjectCastableCastingStub;
+        $model->setObjectAttributeValue((string) $obj);
+
+        $this->assertInstanceOf(ObjectCastableStub::class, $model->objectAttribute);
+    }
+
+    /**
+     * @expectedException \Illuminate\Database\Eloquent\ObjectCastingException
+     * @expectedExceptionMessage Unable to cast attribute [objectAttribute] for model [Illuminate\Tests\Database\EloquentModelNonObjectCastableCastingStub] to [Illuminate\Tests\Database\NonObjectCastableStub]: Illuminate\Tests\Database\NonObjectCastableStub must implement interface Illuminate\Database\Eloquent\ObjectCastable.
+     */
+    public function testNonObjectCastableAttributeCastingThrowsException()
+    {
+        $obj = new NonObjectCastableStub;
+        $obj->foo = 'bar';
+
+        $model = new EloquentModelNonObjectCastableCastingStub;
+        $model->setObjectAttributeValue((string) $obj);
+
+        $model->objectAttribute;
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
@@ -2013,6 +2040,57 @@ class EloquentModelCastingStub extends Model
     public function jsonAttributeValue()
     {
         return $this->attributes['jsonAttribute'];
+    }
+}
+
+class EloquentModelObjectCastableCastingStub extends Model
+{
+    protected $casts = [
+        'objectAttribute' => 'object:Illuminate\Tests\Database\ObjectCastableStub',
+    ];
+
+    public function setObjectAttributeValue($json)
+    {
+        $this->attributes['objectAttribute'] = $json;
+    }
+}
+
+class EloquentModelNonObjectCastableCastingStub extends Model
+{
+    protected $casts = [
+        'objectAttribute' => 'object:Illuminate\Tests\Database\NonObjectCastableStub',
+    ];
+
+    public function setObjectAttributeValue($json)
+    {
+        $this->attributes['objectAttribute'] = $json;
+    }
+}
+
+class ObjectCastableStub implements ObjectCastable
+{
+    public $foo;
+
+    public static function castFromObject(\stdClass $object)
+    {
+        $stub = new ObjectCastableStub;
+        $stub->foo = $object->foo;
+        return $stub;
+    }
+
+    public function __toString()
+    {
+        return json_encode($this);
+    }
+}
+
+class NonObjectCastableStub
+{
+    public $foo;
+
+    public function __toString()
+    {
+        return json_encode($this);
     }
 }
 

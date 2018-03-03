@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\ObjectCastable;
+use Illuminate\Database\Eloquent\ObjectCastingException;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -11,6 +13,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use ReflectionClass;
 
 trait HasAttributes
 {
@@ -170,6 +173,7 @@ trait HasAttributes
      */
     protected function addCastAttributesToArray(array $attributes, array $mutatedAttributes)
     {
+
         foreach ($this->getCasts() as $key => $value) {
             if (! array_key_exists($key, $attributes) || in_array($key, $mutatedAttributes)) {
                 continue;
@@ -192,6 +196,11 @@ trait HasAttributes
 
             if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
+            }
+
+            if ($attributes[$key] && $this->isCastableObject($value)) {
+                $class = explode(':', $value, 2)[1];
+                $attributes[$key] = $this->createObjectOfClass($class, $attributes[$key], $key);
             }
         }
 
@@ -348,6 +357,12 @@ trait HasAttributes
         // an appropriate native PHP type dependant upon the associated value
         // given with the key in the pair. Dayle made this comment line up.
         if ($this->hasCast($key)) {
+            // If the object key is for a custom object cast then produce the attribute
+            // as an instance of that class
+            if ($this->isCastableObject($this->getCasts()[$key])) {
+                $class = explode(':', $this->getCasts()[$key], 2)[1];
+                return $this->createObjectOfClass($class, $this->castAttribute($key, $value), $key);
+            }
             return $this->castAttribute($key, $value);
         }
 
@@ -515,6 +530,10 @@ trait HasAttributes
             return 'custom_datetime';
         }
 
+        if ($this->isCastableObject($this->getCasts()[$key])) {
+            return 'object';
+        }
+
         return trim(strtolower($this->getCasts()[$key]));
     }
 
@@ -528,6 +547,38 @@ trait HasAttributes
     {
         return strncmp($cast, 'date:', 5) === 0 ||
                strncmp($cast, 'datetime:', 9) === 0;
+    }
+
+    /**
+     * Determine if the cast type is a object cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isCastableObject($cast)
+    {
+        return strncmp($cast, 'object:', 7) === 0;
+    }
+
+    /**
+     * Returns an instance of a specified class if it implement ObjectCastable.
+     *
+     * @param  string  $class
+     * @param  \stdClass  $object
+     * @param  mixed  $key
+     * @return mixed
+     */
+    protected function createObjectOfClass($class, $object, $key)
+    {
+        $reflection = new ReflectionClass($class);
+
+        if (! $reflection->implementsInterface(ObjectCastable::class)) {
+            throw ObjectCastingException::forAttribute($this, $key, $class, sprintf(
+                '%s must implement interface %s', $class, ObjectCastable::class
+            ));
+        }
+
+        return call_user_func("$class::castFromObject", $object);
     }
 
     /**
@@ -1082,14 +1133,18 @@ trait HasAttributes
             return false;
         } elseif ($this->isDateAttribute($key)) {
             return $this->fromDateTime($current) ===
-                   $this->fromDateTime($original);
+                $this->fromDateTime($original);
+        } elseif ($this->hasCast($key) && $this->isCastableObject($this->getCasts()[$key])) {
+            $class = explode(':', $this->getCasts()[$key], 2)[1];
+            return $this->createObjectOfClass($class, $this->castAttribute($key, $current), $key) ===
+                $this->createObjectOfClass($class, $this->castAttribute($key, $original), $key);
         } elseif ($this->hasCast($key)) {
             return $this->castAttribute($key, $current) ===
-                   $this->castAttribute($key, $original);
+                $this->castAttribute($key, $original);
         }
 
         return is_numeric($current) && is_numeric($original)
-                && strcmp((string) $current, (string) $original) === 0;
+            && strcmp((string) $current, (string) $original) === 0;
     }
 
     /**
