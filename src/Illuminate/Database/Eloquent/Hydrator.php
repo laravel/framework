@@ -4,49 +4,29 @@ namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Contracts\Database\Eloquent\Hydrator as HydratorInterface;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class Hydrator implements HydratorInterface
 {
     /**
-     * The original model instance.
-     *
-     * @var Model
-     */
-    protected $model;
-
-    /**
-     * A custom database connection.
-     *
-     * @var string
-     */
-    protected $connection;
-
-    /**
-     * Hydrator constructor.
-     * @param Model $model
-     */
-    public function __construct(Model $model)
-    {
-        $this->model = $model;
-    }
-
-    /**
      * Fill a new Eloquent model instance with raw attributes returned from the query builder.
      *
+     * @param Model $model
      * @param array $attributes
-     * @return Hydratable
+     * @param array $options
+     * @return Hydratable|Model
      */
-    public function hydrate(array $attributes = []) : Hydratable
+    public function hydrate(Model $model, array $attributes = [], array $options = [])
     {
-        $model = $this->model->newInstance([], true);
+        $instance = $model->newInstance([], true);
 
-        $model->setRawAttributes($attributes, true);
+        $instance->setRawAttributes($attributes, true);
 
-        $model->setConnection($this->getConnectionName());
+        $instance->setConnection($options['connection'] ?? $model->getConnectionName());
 
-        $model->fireModelEvent('retrieved', false);
+        $instance->fireModelEvent('retrieved', false);
 
-        return $model;
+        return $instance;
     }
 
     /**

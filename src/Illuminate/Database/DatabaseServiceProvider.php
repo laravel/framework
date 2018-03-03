@@ -96,7 +96,7 @@ class DatabaseServiceProvider extends ServiceProvider
      */
     protected function registerEloquentHydrator()
     {
-        $this->app->bind(Hydrator::class, EloquentHydrator::class);
+        $this->app->singleton(Hydrator::class, EloquentHydrator::class);
     }
 
     /**
