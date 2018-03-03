@@ -4,14 +4,14 @@ namespace Illuminate\Database;
 
 use Faker\Factory as FakerFactory;
 use Faker\Generator as FakerGenerator;
-use Illuminate\Contracts\Database\Eloquent\Hydrator;
-use Illuminate\Database\Eloquent\Hydrator as EloquentHydrator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Queue\EntityResolver;
+use Illuminate\Contracts\Database\Eloquent\Hydrator;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\Hydrator as EloquentHydrator;
 
 class DatabaseServiceProvider extends ServiceProvider
 {

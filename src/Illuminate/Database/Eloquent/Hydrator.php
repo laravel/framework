@@ -1,7 +1,9 @@
-<?php namespace Illuminate\Database\Eloquent;
+<?php
+
+namespace Illuminate\Database\Eloquent;
 
 use Illuminate\Contracts\Database\Eloquent\Hydratable;
-use \Illuminate\Contracts\Database\Eloquent\Hydrator as HydratorInterface;
+use Illuminate\Contracts\Database\Eloquent\Hydrator as HydratorInterface;
 
 class Hydrator implements HydratorInterface
 {
@@ -64,7 +66,7 @@ class Hydrator implements HydratorInterface
      * @param string $connection
      * @return Hydrator
      */
-    public function on(string $connection = null) : Hydrator
+    public function on(string $connection = null) : self
     {
         $this->connection = $connection;
         return $this;

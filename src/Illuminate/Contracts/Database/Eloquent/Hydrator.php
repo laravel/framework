@@ -1,4 +1,6 @@
-<?php namespace Illuminate\Contracts\Database\Eloquent;
+<?php
+
+namespace Illuminate\Contracts\Database\Eloquent;
 
 interface Hydrator
 {
