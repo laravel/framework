@@ -312,15 +312,15 @@ abstract class Model implements ArrayAccess, Arrayable, Hydratable, Jsonable, Js
      */
     public function newFromBuilder($attributes = [], $connection = null)
     {
-        $model = $this->newInstance([], true);
+        return $this->newHydrator()->on($connection)->hydrate((array) $attributes);
+    }
 
-        $model->setRawAttributes((array) $attributes, true);
-
-        $model->setConnection($connection ?: $this->getConnectionName());
-
-        $model->fireModelEvent('retrieved', false);
-
-        return $model;
+    /**
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydrator|Hydrator
+     */
+    public function newHydrator() : \Illuminate\Contracts\Database\Eloquent\Hydrator
+    {
+        return app(Hydrator::class, ['model' => $this]);
     }
 
     /**
