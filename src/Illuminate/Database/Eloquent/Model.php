@@ -976,12 +976,11 @@ abstract class Model implements ArrayAccess, Arrayable, Hydratable, Jsonable, Js
      * @param  string  $table
      * @param  bool  $exists
      * @param  string|null  $using
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable|Pivot
      */
     public function newPivot(Hydratable $parent, array $attributes, $table, $exists, $using = null)
     {
-        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
-                      : Pivot::fromAttributes($parent, $attributes, $table, $exists);
+        return $this->newHydrator()->hydratePivot($parent, $attributes, $table, $exists, $using);
     }
 
     /**

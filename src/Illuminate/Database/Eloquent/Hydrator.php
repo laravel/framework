@@ -30,25 +30,19 @@ class Hydrator implements HydratorInterface
     }
 
     /**
-     * Get the custom connection or fallback to the default connection.
+     * Fill the pivot with raw attributes.
      *
-     * @return string
+     * @param Hydratable|Model $parent
+     * @param $attributes
+     * @param $table
+     * @param $exists
+     * @param null $using
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable|Pivot
      */
-    protected function getConnectionName()
+    public function hydratePivot(Model $parent, $attributes, $table, $exists, $using = null)
     {
-        return $this->connection ?: $this->model->getConnectionName();
-    }
-
-    /**
-     * Set a custom database connection.
-     *
-     * @param string $connection
-     * @return Hydrator
-     */
-    public function on(string $connection = null) : self
-    {
-        $this->connection = $connection;
-
-        return $this;
+        return method_exists($using, 'fromRawAttributes')
+            ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
+            : Pivot::fromAttributes($parent, $attributes, $table, $exists);
     }
 }
