@@ -9,10 +9,10 @@ use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Relations\HasOneOrMany;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -1124,7 +1124,7 @@ class Builder
             if ($query instanceof BelongsTo || $query instanceof HasOneOrMany) {
                 $key = $query instanceof BelongsTo ? $query->getOwnerKey() : $query->getForeignKeyName();
 
-                if (!in_array($key, $columns)) {
+                if (! in_array($key, $columns)) {
                     $columns[] = $key;
                 }
             }
