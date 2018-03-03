@@ -69,7 +69,7 @@ class Hydrator implements HydratorInterface
     public function on(string $connection = null) : self
     {
         $this->connection = $connection;
+
         return $this;
     }
-
 }
