@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
 use Illuminate\Contracts\Database\Eloquent\Hydratable;
-use Illuminate\Database\Eloquent\Model;
 
 trait SupportsDefaultModels
 {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class MorphOne extends MorphOneOrMany
@@ -29,6 +29,7 @@ class MorphOne extends MorphOneOrMany
      */
     public function initRelation(array $models, $relation)
     {
+        /** @var Hydratable $model */
         foreach ($models as $model) {
             $model->setRelation($relation, $this->getDefaultFor($model));
         }

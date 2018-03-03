@@ -13,9 +13,9 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
-use Illuminate\Contracts\Database\Eloquent\Hydratable;
 
 abstract class Model implements ArrayAccess, Arrayable, Hydratable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {

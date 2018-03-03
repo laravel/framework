@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 /**

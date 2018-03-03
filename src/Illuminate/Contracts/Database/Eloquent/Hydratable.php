@@ -1,12 +1,9 @@
 <?php
 
-
 namespace Illuminate\Contracts\Database\Eloquent;
-
 
 interface Hydratable
 {
-
     /**
      * Get the value of the entity's primary key.
      *
@@ -38,5 +35,4 @@ interface Hydratable
      * @return $this
      */
     public function setRelation($relation, $value);
-
 }
