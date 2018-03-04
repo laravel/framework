@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
+use Illuminate\Queue\SerializesModels;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -101,10 +104,61 @@ class QueueFakeTest extends TestCase
         $this->fake->assertPushedOn($queue, JobStub::class);
         $this->fake->assertPushed(JobStub::class, 2);
     }
+
+    public function testAssertPushedWithChain()
+    {
+        $chain = [
+            new JobStub,
+            new JobWithParameterStub(100)
+        ];
+
+        $jobWithChain = new JobWithChainStub($chain);
+
+        $this->fake->push($jobWithChain);
+        $this->fake->assertPushed(JobWithChainStub::class);
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, $chain);
+
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed.'));
+        }
+    }
 }
 
 class JobStub
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobWithParameterStub
+{
+    public $number;
+
+    function __construct($number)
+    {
+        $this->number = $number;
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobWithChainStub
+{
+    use Queueable;
+
+    function __construct($chain)
+    {
+        $this->chain($chain);
+    }
+
     public function handle()
     {
         //
