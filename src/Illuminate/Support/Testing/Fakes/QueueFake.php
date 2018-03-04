@@ -181,28 +181,8 @@ class QueueFake extends QueueManager implements Queue
     {
         $this->jobs[is_object($job) ? get_class($job) : $job][] = [
             'job' => $job,
-            'queue' => $queue,
-            'chain' => $this->getJobChain($job)
+            'queue' => $queue
         ];
-    }
-
-    /**
-     * @param mixed $job
-     * @return array
-     */
-    private function getJobChain($job)
-    {
-        if (is_object($job))
-            return [];
-
-        dd($job->chained);
-
-        return collect($job->chained)
-            ->map(function ($shackle) {
-                return unserialize($shackle);
-            })->map(function ($shackle) {
-                return get_class($shackle);
-            })->toArray();
     }
 
     /**
