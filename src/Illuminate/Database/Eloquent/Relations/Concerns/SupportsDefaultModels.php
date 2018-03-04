@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 
 trait SupportsDefaultModels
 {
@@ -18,10 +18,10 @@ trait SupportsDefaultModels
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Contracts\Database\Eloquent\Hydratable  $parent
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable
      */
-    abstract protected function newRelatedInstanceFor(Model $parent);
+    abstract protected function newRelatedInstanceFor(Hydratable $parent);
 
     /**
      * Return a new model instance in case the relationship does not exist.
@@ -39,10 +39,10 @@ trait SupportsDefaultModels
     /**
      * Get the default value for this relation.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model|null
+     * @param  \Illuminate\Contracts\Database\Eloquent\Hydratable $parent
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable|null
      */
-    protected function getDefaultFor(Model $parent)
+    protected function getDefaultFor(Hydratable $parent)
     {
         if (! $this->withDefault) {
             return;

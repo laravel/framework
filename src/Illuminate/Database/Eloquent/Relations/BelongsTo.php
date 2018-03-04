@@ -5,6 +5,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 /**
@@ -78,7 +79,7 @@ class BelongsTo extends Relation
      */
     public function getResults()
     {
-        return $this->query->first() ?: $this->getDefaultFor($this->parent);
+        return $this->getQuery()->first() ?: $this->getDefaultFor($this->parent);
     }
 
     /**
@@ -94,7 +95,7 @@ class BelongsTo extends Relation
             // of the related models matching on the foreign key that's on a parent.
             $table = $this->related->getTable();
 
-            $this->query->where($table.'.'.$this->ownerKey, '=', $this->child->{$this->foreignKey});
+            $this->getQuery()->where($table.'.'.$this->ownerKey, '=', $this->child->{$this->foreignKey});
         }
     }
 
@@ -111,7 +112,7 @@ class BelongsTo extends Relation
         // our eagerly loading query so it returns the proper models from execution.
         $key = $this->related->getTable().'.'.$this->ownerKey;
 
-        $this->query->whereIn($key, $this->getEagerModelKeys($models));
+        $this->getQuery()->whereIn($key, $this->getEagerModelKeys($models));
     }
 
     /**
@@ -302,10 +303,10 @@ class BelongsTo extends Relation
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Contracts\Database\Eloquent\Hydratable  $parent
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function newRelatedInstanceFor(Model $parent)
+    protected function newRelatedInstanceFor(Hydratable $parent)
     {
         return $this->related->newInstance();
     }

@@ -7,9 +7,11 @@ use Faker\Generator as FakerGenerator;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Queue\EntityResolver;
+use Illuminate\Contracts\Database\Eloquent\Hydrator;
 use Illuminate\Database\Connectors\ConnectionFactory;
 use Illuminate\Database\Eloquent\QueueEntityResolver;
 use Illuminate\Database\Eloquent\Factory as EloquentFactory;
+use Illuminate\Database\Eloquent\Hydrator as EloquentHydrator;
 
 class DatabaseServiceProvider extends ServiceProvider
 {
@@ -37,6 +39,8 @@ class DatabaseServiceProvider extends ServiceProvider
         $this->registerConnectionServices();
 
         $this->registerEloquentFactory();
+
+        $this->registerEloquentHydrator();
 
         $this->registerQueueableEntityResolver();
     }
@@ -83,6 +87,16 @@ class DatabaseServiceProvider extends ServiceProvider
                 $app->make(FakerGenerator::class), $this->app->databasePath('factories')
             );
         });
+    }
+
+    /**
+     * Register the Eloquent Hydrator.
+     *
+     * @return void
+     */
+    protected function registerEloquentHydrator()
+    {
+        $this->app->singleton(Hydrator::class, EloquentHydrator::class);
     }
 
     /**

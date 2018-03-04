@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Relations;
 
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class MorphOne extends MorphOneOrMany
@@ -29,6 +29,7 @@ class MorphOne extends MorphOneOrMany
      */
     public function initRelation(array $models, $relation)
     {
+        /** @var Hydratable $model */
         foreach ($models as $model) {
             $model->setRelation($relation, $this->getDefaultFor($model));
         }
@@ -52,13 +53,13 @@ class MorphOne extends MorphOneOrMany
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Contracts\Database\Eloquent\Hydratable  $parent
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable
      */
-    public function newRelatedInstanceFor(Model $parent)
+    public function newRelatedInstanceFor(Hydratable $parent)
     {
         return $this->related->newInstance()
-                    ->setAttribute($this->getForeignKeyName(), $parent->{$this->localKey})
+                    ->setAttribute($this->getForeignKeyName(), $parent->getAttribute($this->localKey))
                     ->setAttribute($this->getMorphType(), $this->morphClass);
     }
 }

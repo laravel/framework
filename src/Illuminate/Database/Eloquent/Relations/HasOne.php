@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Eloquent\Relations\Concerns\SupportsDefaultModels;
 
 class HasOne extends HasOneOrMany
@@ -52,13 +53,13 @@ class HasOne extends HasOneOrMany
     /**
      * Make a new related instance for the given model.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param  \Illuminate\Contracts\Database\Eloquent\Hydratable|Model  $parent
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable|Model
      */
-    public function newRelatedInstanceFor(Model $parent)
+    public function newRelatedInstanceFor(Hydratable $parent)
     {
         return $this->related->newInstance()->setAttribute(
-            $this->getForeignKeyName(), $parent->{$this->localKey}
+            $this->getForeignKeyName(), $parent->getAttribute($this->localKey)
         );
     }
 }

@@ -13,10 +13,11 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Contracts\Database\Eloquent\Hydratable;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
-abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
+abstract class Model implements ArrayAccess, Arrayable, Hydratable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
     use Concerns\HasAttributes,
         Concerns\HasEvents,
@@ -123,6 +124,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @var array
      */
     protected static $globalScopes = [];
+
+    /**
+     * Custom hydrator class or interface.
+     *
+     * @var string
+     */
+    protected static $hydrator;
 
     /**
      * The name of the "created at" column.
@@ -311,15 +319,29 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newFromBuilder($attributes = [], $connection = null)
     {
-        $model = $this->newInstance([], true);
+        return $this->newHydrator()->hydrate(
+            $this,
+            (array) $attributes,
+            compact('connection')
+        );
+    }
 
-        $model->setRawAttributes((array) $attributes, true);
+    /**
+     * Set a custom hydrator class or interface.
+     *
+     * @param string $hydrator
+     */
+    public static function setHydrator($hydrator)
+    {
+        static::$hydrator = $hydrator;
+    }
 
-        $model->setConnection($connection ?: $this->getConnectionName());
-
-        $model->fireModelEvent('retrieved', false);
-
-        return $model;
+    /**
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydrator|Hydrator
+     */
+    public function newHydrator()
+    {
+        return app(static::$hydrator ?: Hydrator::class);
     }
 
     /**
@@ -949,17 +971,16 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
+     * @param  \Illuminate\Contracts\Database\Eloquent\Hydratable  $parent
      * @param  array  $attributes
      * @param  string  $table
      * @param  bool  $exists
      * @param  string|null  $using
-     * @return \Illuminate\Database\Eloquent\Relations\Pivot
+     * @return \Illuminate\Contracts\Database\Eloquent\Hydratable|Pivot
      */
-    public function newPivot(self $parent, array $attributes, $table, $exists, $using = null)
+    public function newPivot(Hydratable $parent, array $attributes, $table, $exists, $using = null)
     {
-        return $using ? $using::fromRawAttributes($parent, $attributes, $table, $exists)
-                      : Pivot::fromAttributes($parent, $attributes, $table, $exists);
+        return $this->newHydrator()->hydratePivot($parent, $attributes, $table, $exists, $using);
     }
 
     /**
