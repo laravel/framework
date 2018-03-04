@@ -1,5 +1,14 @@
 # Release Notes for 5.5.x
 
+## v5.5.36 (2018-03-01)
+
+### Changed
+- Upgrade Parsedown to 1.7.0 ([14adb99](https://github.com/laravel/framework/commit/14adb9958729ea778767b9269df485e399fd6178))
+
+### Fixed
+- Fixed `PostgresGrammar::whereTime()` casting ([#23318](https://github.com/laravel/framework/pull/23318))
+
+
 ## v5.5.35 (2018-02-22)
 
 ### Fixed
