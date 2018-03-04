@@ -464,6 +464,19 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Dayle', $request->input('buddy'));
     }
 
+    public function testDynamicPropertyFromInput()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $this->assertEquals('Taylor', $request->name);
+    }
+
+    public function testSetDynamicProperty()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor']);
+        $request->buddy = 'Dayle';
+        $this->assertEquals('Dayle', $request->input('buddy'));
+    }
+
     public function testReplaceMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);

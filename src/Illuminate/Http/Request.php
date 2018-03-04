@@ -625,7 +625,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetSet($offset, $value)
     {
-        $this->getInputSource()->set($offset, $value);
+        $this->__set($offset, $value);
     }
 
     /**
@@ -663,5 +663,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return $this->route($key);
+    }
+
+    /**
+     * Set an input value of a given key.
+     *
+     * @param string $key
+     * @param mixed $value
+     * @return void
+     */
+    public function __set($key, $value)
+    {
+        $this->getInputSource()->set($key, $value);
     }
 }
