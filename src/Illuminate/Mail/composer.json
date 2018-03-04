@@ -15,7 +15,7 @@
     ],
     "require": {
         "php": ">=7.0",
-        "erusev/parsedown": "~1.6",
+        "erusev/parsedown": "~1.7",
         "illuminate/container": "5.5.*",
         "illuminate/contracts": "5.5.*",
         "illuminate/support": "5.5.*",
