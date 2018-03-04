@@ -86,7 +86,7 @@ class ScheduleRunCommand extends Command
     /**
      * Run the given single server event.
      *
-     * @param  \Illuminate\Support\Collection  $event
+     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
     protected function runSingleServerEvent($event)
@@ -101,7 +101,7 @@ class ScheduleRunCommand extends Command
     /**
      * Run the given event.
      *
-     * @param  \Illuminate\Support\Collection  $event
+     * @param  \Illuminate\Console\Scheduling\Event  $event
      * @return void
      */
     protected function runEvent($event)
