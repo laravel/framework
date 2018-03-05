@@ -48,6 +48,37 @@ trait DatabaseRule
     }
 
     /**
+     * Apply callback when given condition is true.
+     *
+     * @param bool|mixed $value
+     * @param callable $callback
+     * @return $this
+     */
+    public function when($value, callable $callback, callable $default = null)
+    {
+        if ($value) {
+            $this->using($callback);
+        } elseif ($default) {
+            $this->using($default);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Apply callback when given value is false.
+     *
+     * @param mixed|bool $value
+     * @param callable $callback
+     * @param callable $default
+     * @return $this
+     */
+    public function unless($value, callable $callback, callable $default = null)
+    {
+        return $this->when(! $value, $callback, $default);
+    }
+
+    /**
      * Set a "where" constraint on the query.
      *
      * @param  string|\Closure  $column
