@@ -102,7 +102,8 @@ class DatabaseMigrationRepository implements MigrationRepositoryInterface {
 	 */
 	public function getLastBatchNumber()
 	{
-		return $this->table()->max('batch');
+		$max = $this->table()->max('batch');
+		return is_int($max) ? $max : 0;
 	}
 
 	/**
