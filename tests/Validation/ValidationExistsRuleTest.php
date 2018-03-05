@@ -8,6 +8,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Database\Query\Builder;
 
 class ValidationExistsRuleTest extends TestCase
 {
@@ -114,6 +115,216 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testWhenTrueGivenCallbackAppliesToQueryCallbacks()
+    {
+        $rule = new Exists('users', 'id');
+        $fired = false;
+        $result = $rule->when(true, function () use (&$fired) {
+            $fired = true;
+        });
+
+        $this->assertEquals($result, $rule);
+
+        $this->assertFalse($fired);
+        $this->assertCount(1, $rule->queryCallbacks());
+
+        $rule->queryCallbacks()[0]();
+        $this->assertTrue($fired);
+    }
+
+    public function testWhenFalseGivenCallbackNotAppliesToQueryCallbacks()
+    {
+        $rule = new Exists('users', 'id');
+        $fired = false;
+        $rule->when(false, function () use (&$fired) {
+            $fired = true;
+        });
+
+        $this->assertFalse($fired);
+        $this->assertCount(0, $rule->queryCallbacks());
+    }
+
+    public function testWhenMoreThenOnce()
+    {
+        $callback = function () {
+        };
+        $rule = new Exists('users', 'id');
+        $rule->when(true, $callback)
+            ->when(true, $callback)
+            ->when(true, $callback)
+            ->when(false, $callback);
+
+        $this->assertCount(3, $rule->queryCallbacks());
+    }
+
+    public function testWhenDefaultCallbackNotCalledIfTrueGiven()
+    {
+        $rule = new Exists('users', 'id');
+
+        $rule->when(true, function () {
+            return 'callback';
+        }, function () {
+            return 'default';
+        });
+
+        $this->assertCount(1, $rule->queryCallbacks());
+        $this->assertEquals('callback', $rule->queryCallbacks()[0]());
+    }
+
+    public function testWhenDefaultCallbackCalledWhenFalseGiven()
+    {
+        $rule = new Exists('users', 'id');
+
+        $rule->when(false, function () {
+            return 'callback';
+        }, function () {
+            return 'default';
+        });
+
+        $this->assertCount(1, $rule->queryCallbacks());
+        $this->assertEquals('default', $rule->queryCallbacks()[0]());
+    }
+
+    public function testUnlessAppliesToQueryCallbacks()
+    {
+        $rule = new Exists('users', 'id');
+        $fired = false;
+        $result = $rule->unless(false, function () use (&$fired) {
+            $fired = true;
+        });
+
+        $this->assertEquals($result, $rule);
+
+        $this->assertFalse($fired);
+        $this->assertCount(1, $rule->queryCallbacks());
+
+        $rule->queryCallbacks()[0]();
+        $this->assertTrue($fired);
+    }
+
+    public function testUnlessTwiceAndCombinedWithPositive()
+    {
+        $callback = function () {
+        };
+        $rule = new Exists('users', 'id');
+        $rule->unless(false, $callback)
+            ->unless(false, $callback)
+            ->unless(false, $callback)
+            ->unless(true, $callback);
+
+        $this->assertCount(3, $rule->queryCallbacks());
+    }
+
+    public function testUnlessDefaultNotFiredWhenFalseGiven()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->unless(false, function () {
+            return 'callback';
+        }, function () {
+            return 'default';
+        });
+
+        $this->assertCount(1, $rule->queryCallbacks());
+        $this->assertEquals('callback', $rule->queryCallbacks()[0]());
+    }
+
+    public function testUnlessDefaultCalledWhenTrueGiven()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->unless(true, function () {
+            return 'callback';
+        }, function () {
+            return 'default';
+        });
+
+        $this->assertCount(1, $rule->queryCallbacks());
+        $this->assertEquals('default', $rule->queryCallbacks()[0]());
+    }
+
+    public function testWhenWithWhere()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->when(true, function (Builder $query) {
+            $query->where('type', 'foo');
+        });
+
+        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
+        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertTrue($v->passes());
+        $v->setData(['id' => 2]);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testWithDefaultCallbackWithWhere()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->when(false, function (Builder $query) {
+            throw new \RuntimeException('This callback will never call');
+        }, function (Builder $query) {
+            $query->where('type', 'foo');
+        });
+
+        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
+        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertTrue($v->passes());
+        $v->setData(['id' => 2]);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testUnlessWithWhere()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->unless(false, function (Builder $query) {
+            $query->where('type', 'foo');
+        });
+
+        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
+        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertTrue($v->passes());
+        $v->setData(['id' => 2]);
+        $this->assertFalse($v->passes());
+    }
+
+    public function testUnlessDefaultCallbackWithWhere()
+    {
+        $rule = new Exists('users', 'id');
+        $rule->unless(true, function () {
+            throw new \RuntimeException('This callback will never call.');
+        }, function (Builder $query) {
+            $query->where('type', 'foo');
+        });
+
+        EloquentTestUser::create(['id' => '1', 'type' => 'foo']);
+        EloquentTestUser::create(['id' => '2', 'type' => 'bar']);
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, [], ['id' => $rule]);
+        $v->setPresenceVerifier(new DatabasePresenceVerifier(Eloquent::getConnectionResolver()));
+
+        $v->setData(['id' => 1]);
+        $this->assertTrue($v->passes());
+        $v->setData(['id' => 2]);
+        $this->assertFalse($v->passes());
+    }
+
     protected function createSchema()
     {
         $this->schema('default')->create('users', function ($table) {
@@ -165,7 +376,8 @@ class ValidationExistsRuleTest extends TestCase
     public function getIlluminateArrayTranslator()
     {
         return new \Illuminate\Translation\Translator(
-            new \Illuminate\Translation\ArrayLoader, 'en'
+            new \Illuminate\Translation\ArrayLoader,
+            'en'
         );
     }
 }
