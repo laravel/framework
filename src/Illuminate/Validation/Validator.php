@@ -748,6 +748,10 @@ class Validator implements ValidatorContract
      */
     protected function getValue($attribute)
     {
+        if (Str::contains($attribute, '->')) {
+            $attribute = str_replace('->', '.', $attribute);
+        }
+        
         return Arr::get($this->data, $attribute);
     }
 
