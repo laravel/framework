@@ -87,6 +87,18 @@ class QueueFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('Jobs were pushed unexpectedly.'));
         }
     }
+
+    public function testAssertPushedUsingBulk()
+    {
+        $this->fake->assertNothingPushed();
+        $queue = 'my-test-queue';
+        $this->fake->bulk([
+            $this->job,
+            new JobStub(),
+        ], null, $queue);
+        $this->fake->assertPushedOn($queue, JobStub::class);
+        $this->fake->assertPushed(JobStub::class, 2);
+    }
 }
 
 class JobStub
