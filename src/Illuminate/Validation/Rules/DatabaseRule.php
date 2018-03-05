@@ -75,7 +75,7 @@ trait DatabaseRule
      */
     public function unless($value, callable $callback, callable $default = null)
     {
-        return $this->when(!$value, $callback, $default);
+        return $this->when(! $value, $callback, $default);
     }
 
     /**
