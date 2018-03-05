@@ -3874,6 +3874,30 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($rule->called);
     }
 
+    public function testGetDataForRules()
+    {
+        $post = ['first'=>'john', 'last'=>'doe', 'type' => 'admin'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required']);
+        $data = $v->getDataForRules();
+
+        $this->assertSame($data, ['first'=>'john']);
+
+        $v->sometimes('last', 'required', function () {
+            return true;
+        });
+        $data = $v->getDataForRules();
+
+        $this->assertSame($data, ['first'=>'john', 'last'=>'doe']);
+
+        $v->sometimes('type', 'required', function () {
+            return false;
+        });
+        $data = $v->getDataForRules();
+
+        $this->assertSame($data, ['first'=>'john', 'last'=>'doe']);
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');
