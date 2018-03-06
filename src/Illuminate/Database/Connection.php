@@ -4,6 +4,7 @@ use PDO;
 use Closure;
 use DateTime;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Processors\Processor;
 use Doctrine\DBAL\Connection as DoctrineConnection;
 
@@ -667,7 +668,14 @@ class Connection implements ConnectionInterface {
 	 */
 	protected function causedByLostConnection(QueryException $e)
 	{
-		return str_contains($e->getPrevious()->getMessage(), 'server has gone away');
+		$message = $e->getPrevious()->getMessage();
+		return Str::contains($message, [
+		    'server has gone away',
+		    'no connection to the server',
+		    'Lost connection',
+		    'is dead or not enabled',
+		    'Error while sending',
+		]);
 	}
 
 	/**
