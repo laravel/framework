@@ -465,6 +465,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
+    public function testWhereBetweenWithExpressions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [1, new Raw('2')]);
+        $this->assertEquals('select * from "users" where "id" between ? and 2', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWhereBetweenThrowsExpectedExceptionWithTooFewValuesValueCount()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [1]);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWhereBetweenThrowsExpectedExceptionWithTooManyValuesValueCount()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [1, 2, 3]);
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();

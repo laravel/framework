@@ -330,7 +330,7 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        return $this->wrap($where['column']).' '.$between.' ? and ?';
+        return $this->wrap($where['column']).' '.$between.' '.$this->parameter($where['values'][0]).' and '.$this->parameter($where['values'][1]);
     }
 
     /**
