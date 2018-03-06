@@ -946,11 +946,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         $result = [];
 
         foreach ($this->items as $record) {
-
             $row = [];
 
             foreach ($record as $field => $value) {
-
                 if (in_array($field, $keys)) {
 
                     $row[$field] = $value;
@@ -958,7 +956,6 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
 
             if ($row) {
-
                 $result[] = $row;
             }
         }
