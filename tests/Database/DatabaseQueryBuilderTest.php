@@ -473,6 +473,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWhereBetweenThrowsExpectedExceptionWithTooFewValuesValueCount()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [1]);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testWhereBetweenThrowsExpectedExceptionWithTooManyValuesValueCount()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [1, DB::raw('2'), 3]);
+    }
+
     public function testBasicOrWheres()
     {
         $builder = $this->getBuilder();
