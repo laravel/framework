@@ -296,7 +296,7 @@ class Validator implements ValidatorContract
     /**
      * Run the validator's rules against its data.
      *
-     * @return void
+     * @return array
      *
      * @throws \Illuminate\Validation\ValidationException
      */
@@ -305,6 +305,8 @@ class Validator implements ValidatorContract
         if ($this->fails()) {
             throw new ValidationException($this);
         }
+
+        return $this->getDataForRules();
     }
 
     /**
@@ -723,6 +725,20 @@ class Validator implements ValidatorContract
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * Get the data under validation only for the loaded rules.
+     *
+     * @return array
+     */
+    public function getDataForRules()
+    {
+        $ruleKeys = collect($this->getRules())->keys()->map(function ($rule) {
+            return explode('.', $rule, 2)[0];
+        })->unique()->toArray();
+
+        return collect($this->getData())->only($ruleKeys)->toArray();
     }
 
     /**
