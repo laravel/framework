@@ -3874,6 +3874,16 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($rule->called);
     }
 
+    public function testValidateReturnsValidatedData()
+    {
+        $post = ['first' => 'john', 'last' => 'doe', 'type' => 'admin'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required']);
+        $data = $v->validate();
+
+        $this->assertEquals(['first' => 'john'], $data);
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');

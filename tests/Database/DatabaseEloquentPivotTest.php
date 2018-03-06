@@ -47,6 +47,16 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals(['name' => 'Taylor'], $pivot->foo);
     }
 
+    public function testFromRawAttributesDoesNotMutate()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
+
+        $pivot = DatabaseEloquentPivotTestMutatorStub::fromRawAttributes($parent, ['foo' => 'bar'], 'table', true);
+
+        $this->assertFalse($pivot->getMutatorCalled());
+    }
+
     public function testPropertiesUnchangedAreNotDirty()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');

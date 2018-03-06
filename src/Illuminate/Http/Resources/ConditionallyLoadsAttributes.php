@@ -80,7 +80,8 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        return $numericKeys ? array_values($data) : $data;
+        return ! empty($data) && is_numeric(array_keys($data)[0])
+                        ? array_values($data) : $data;
     }
 
     /**

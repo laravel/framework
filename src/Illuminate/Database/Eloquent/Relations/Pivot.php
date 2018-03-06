@@ -80,7 +80,7 @@ class Pivot extends Model
      */
     public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        $instance = static::fromAttributes($parent, $attributes, $table, $exists);
+        $instance = static::fromAttributes($parent, [], $table, $exists);
 
         $instance->setRawAttributes($attributes, true);
 
