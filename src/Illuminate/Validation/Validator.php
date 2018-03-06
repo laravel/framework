@@ -306,7 +306,11 @@ class Validator implements ValidatorContract
             throw new ValidationException($this);
         }
 
-        return $this->getDataForRules();
+        $data = collect($this->getData());
+
+        return $data->only(collect($this->getRules())->keys()->map(function ($rule) {
+            return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
+        }))->unique()->toArray();
     }
 
     /**
@@ -725,20 +729,6 @@ class Validator implements ValidatorContract
     public function getData()
     {
         return $this->data;
-    }
-
-    /**
-     * Get the data under validation only for the loaded rules.
-     *
-     * @return array
-     */
-    public function getDataForRules()
-    {
-        $ruleKeys = collect($this->getRules())->keys()->map(function ($rule) {
-            return explode('.', $rule, 2)[0];
-        })->unique()->toArray();
-
-        return collect($this->getData())->only($ruleKeys)->toArray();
     }
 
     /**
