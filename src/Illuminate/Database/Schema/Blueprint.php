@@ -408,6 +408,18 @@ class Blueprint
     }
 
     /**
+     * Indicate that the polymorphic columns should be dropped.
+     *
+     * @param string $name
+     *
+     * @return void
+     */
+    public function dropMorphs($name)
+    {
+        $this->dropColumn("{$name}_type", "{$name}_id");
+    }
+
+    /**
      * Rename the table to a given name.
      *
      * @param  string  $to
