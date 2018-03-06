@@ -1,5 +1,37 @@
 # Release Notes for 5.6.x
 
+## [Unreleased]
+
+### Changed
+- Regenerate token when regenerating the session ([20e8419](https://github.com/laravel/framework/commit/20e84191d5ef21eb5c015908c11eabf8e81d6212))
+
+
+## v5.6.8 (2018-03-06)
+
+### Added
+- Added support for MySQL’s sounds-like operator ([#23351](https://github.com/laravel/framework/pull/23351))
+- Added `ThrottleRequestsException` exception ([#23358](https://github.com/laravel/framework/pull/23358)
+- Added `@dump` Blade directive ([#23364](https://github.com/laravel/framework/pull/23364))
+- Added `Collection::whereInstanceOfMethod()` ([78b5b92](https://github.com/laravel/framework/commit/78b5b9298d48a5199ad494a4a7cc411dacd84256))
+- Added `Dispatchable::dispatchNow()` ([#23399](https://github.com/laravel/framework/pull/23399))
+
+### Changed
+- Allow extension of `DatabaseNotification` model attributes ([#23337](https://github.com/laravel/framework/pull/23337))
+- Made auth scaffolding translatable ([#23342](https://github.com/laravel/framework/pull/23342))
+- Use `getKeyName()` in `getForeignKey()` ([#23362](https://github.com/laravel/framework/pull/23362))
+- Sort `FileSystem` files and directories by name ([#23387](https://github.com/laravel/framework/pull/23387))
+- Return validated data from `Validator::validate()` ([#23397](https://github.com/laravel/framework/pull/23397), [3657d66](https://github.com/laravel/framework/commit/3657d66b0be6623bbbd69ed2f2667ac76c36dea3))
+
+### Fixed
+- Fixed `serve` command escaping ([#23348](https://github.com/laravel/framework/pull/23348))
+- Fixed an issue with multiple select statements in combination with `withCount()` ([#23357](https://github.com/laravel/framework/pull/23357))
+- Fixed conditional loading issues  ([#23369](https://github.com/laravel/framework/pull/23369))
+- Prevent considering arrays as `callable` while building model factories ([#23372](https://github.com/laravel/framework/pull/23372))
+- Move `tightenco/collect` to Composer’s `conflict` ([#23379](https://github.com/laravel/framework/pull/23379))
+- Set up loop variable correctly on all `Traversable` objects ([#23388](https://github.com/laravel/framework/pull/23388), [49770ec](https://github.com/laravel/framework/commit/49770eca4e2e780d4e8cdc762e2adbcab8b924fa))
+- Removed attribute filling from pivot model ([#23401](https://github.com/laravel/framework/pull/23401))
+
+
 ## v5.6.7 (2018-02-28)
 
 ### Added
