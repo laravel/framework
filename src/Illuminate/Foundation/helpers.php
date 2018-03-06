@@ -489,6 +489,20 @@ if (! function_exists('factory')) {
     }
 }
 
+if (! function_exists('hidden_field')) {
+    /**
+     * Generate a hidden form field.
+     *
+     * @param  string  $name
+     * @param  string  $value
+     * @return \Illuminate\Support\HtmlString
+     */
+    function hidden_field($name, $value)
+    {
+        return new HtmlString('<input type="hidden" name="'.$name.'" value="'.$value.'">');
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.

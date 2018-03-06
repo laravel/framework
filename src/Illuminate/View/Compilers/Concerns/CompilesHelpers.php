@@ -37,6 +37,17 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the hidden statements into valid PHP.
+     *
+     * @param  string  $expression
+     * @return string
+     */
+    protected function compileHidden($expression)
+    {
+        return "<?php echo hidden_field{$expression}; ?>";
+    }
+
+    /**
      * Compile the method statements into valid PHP.
      *
      * @param  string  $method
