@@ -540,7 +540,7 @@ class ResourceTest extends TestCase
         $results = $filter->work();
 
         $this->assertEquals([
-            'name' => 'mohamed', 'location' => 'hurghada'
+            'name' => 'mohamed', 'location' => 'hurghada',
         ], $results);
     }
 
