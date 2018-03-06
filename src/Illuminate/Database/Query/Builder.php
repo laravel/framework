@@ -910,7 +910,7 @@ class Builder
 
         $type = 'between';
 
-        $this->wheres[] = compact('column', 'type', 'boolean', 'not');
+        $this->wheres[] = compact('column', 'values', 'type', 'boolean', 'not');
 
         foreach ($values as $value) {
             if (! $value instanceof Expression) {
