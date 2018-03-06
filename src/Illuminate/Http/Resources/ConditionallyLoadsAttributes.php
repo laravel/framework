@@ -81,7 +81,7 @@ trait ConditionallyLoadsAttributes
         }
 
         return ! empty($data) && is_numeric(array_keys($data)[0])
-                ? array_values($data) : $data;
+                        ? array_values($data) : $data;
     }
 
     /**
