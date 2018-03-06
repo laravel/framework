@@ -258,6 +258,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
     }
 
+    public function testDropMorphs()
+    {
+        $blueprint = new Blueprint('photos');
+        $blueprint->dropMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `photos` drop `imageable_type`, drop `imageable_id`', $statements[0]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
