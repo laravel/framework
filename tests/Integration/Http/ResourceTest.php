@@ -524,6 +524,26 @@ class ResourceTest extends TestCase
         });
     }
 
+    public function test_leading_merge__keyed_value_is_merged_correctly()
+    {
+        $filter = new class {
+            use ConditionallyLoadsAttributes;
+
+            public function work()
+            {
+                return $this->filter([
+                    new MergeValue(['name' => 'mohamed', 'location' => 'hurghada']),
+                ]);
+            }
+        };
+
+        $results = $filter->work();
+
+        $this->assertEquals([
+            'name' => 'mohamed', 'location' => 'hurghada',
+        ], $results);
+    }
+
     public function test_leading_merge_value_is_merged_correctly()
     {
         $filter = new class {
