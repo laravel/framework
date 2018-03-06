@@ -151,7 +151,7 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('David', $t->getFromJson('baz.user.name'));
     }
 
-    public function testGetJsonRetrievesItemWithDotNotationInOldFormat()
+    public function testGetJsonRetrievesItemWithDotNotationInOneLevelFormat()
     {
         $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => 'bar', 'baz.one' => 'two', 'baz.user.name' => 'David']);
@@ -163,6 +163,13 @@ class TranslationTranslatorTest extends TestCase
     {
         $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => ['to :name I give :greeting' => ':greeting :name']]);
+        $this->assertEquals('Greetings David', $t->getFromJson('foo.to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
+    }
+
+    public function testGetJsonPreservesOrderWithDotNotationInOneLevelFormat()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo.to :name I give :greeting' => ':greeting :name']);
         $this->assertEquals('Greetings David', $t->getFromJson('foo.to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
     }
 
