@@ -75,45 +75,49 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
+     * @param mixed $data
+     *
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Type is not supported
+     *
+     * @dataProvider jsonErrorDataProvider
      */
-    public function testJsonErrorResource()
+    public function testInvalidArgumentExceptionOnJsonError($data)
     {
-        $resource = tmpfile();
-        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource]);
+        new \Illuminate\Http\JsonResponse(['data' => $data]);
     }
 
-    public function testJsonErrorResourceWithPartialOutputOnError()
+    /**
+     * @param mixed $data
+     *
+     * @dataProvider jsonErrorDataProvider
+     */
+    public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data)
     {
-        $resource = tmpfile();
-        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
-        $data = $response->getData();
-        $this->assertInstanceOf('stdClass', $data);
-        $this->assertNull($data->resource);
+        new \Illuminate\Http\JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
     }
 
-    public function testJsonErrorRecursionDetectedWithPartialOutputOnError()
+    /**
+     * @return array
+     */
+    public function jsonErrorDataProvider()
     {
-        $objectA = new \stdClass();
+        // Resources can't be encoded
+        $resource = tmpfile();
+
+        // Recursion can't be encoded
+        $recursiveObject = new \stdClass();
         $objectB = new \stdClass();
-        $objectA->b = $objectB;
-        $objectB->a = $objectA;
+        $recursiveObject->b = $objectB;
+        $objectB->a = $recursiveObject;
 
-        $response = new \Illuminate\Http\JsonResponse($objectA, 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
-        $data = $response->getData();
+        // NAN or INF can't be encoded
+        $nan = NAN;
 
-        $this->assertNotNull($data);
-    }
-
-    public function testJsonErrorInfOrNanWithPartialOutputOnError()
-    {
-        $data = ['product' => NAN];
-
-        $response = new \Illuminate\Http\JsonResponse($data, 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
-        $data = $response->getData();
-
-        $this->assertNotNull($data);
+        return [
+            [$resource],
+            [$recursiveObject],
+            [$nan],
+        ];
     }
 }
 
