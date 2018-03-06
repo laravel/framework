@@ -83,6 +83,14 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('breeze bar', $t->get('foo.bar', ['foo' => 'bar']));
     }
 
+    public function testGetMethodProperlyLoadsAndRetrievesItemWithDotNotation()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'bar', 'foo')->andReturn(['foo' => 'foo', 'baz' => ['one' => 'breeze :foo']]);
+        $this->assertEquals('breeze bar', $t->get('foo::bar.baz.one', ['foo' => 'bar'], 'en'));
+        $this->assertEquals('foo', $t->get('foo::bar.foo'));
+    }
+
     public function testChoiceMethodProperlyLoadsAndRetrievesItem()
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
@@ -133,6 +141,36 @@ class TranslationTranslatorTest extends TestCase
         $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['to :name I give :greeting' => ':greeting :name']);
         $this->assertEquals('Greetings David', $t->getFromJson('to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
+    }
+
+    public function testGetJsonRetrievesItemWithDotNotation()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => 'bar', 'baz' => ['one' => 'two', 'user' => ['name' => 'David']]]);
+        $this->assertEquals('two', $t->getFromJson('baz.one'));
+        $this->assertEquals('David', $t->getFromJson('baz.user.name'));
+    }
+
+    public function testGetJsonRetrievesItemWithDotNotationInOneLevelFormat()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => 'bar', 'baz.one' => 'two', 'baz.user.name' => 'David']);
+        $this->assertEquals('two', $t->getFromJson('baz.one'));
+        $this->assertEquals('David', $t->getFromJson('baz.user.name'));
+    }
+
+    public function testGetJsonPreservesOrderWithDotNotation()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo' => ['to :name I give :greeting' => ':greeting :name']]);
+        $this->assertEquals('Greetings David', $t->getFromJson('foo.to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
+    }
+
+    public function testGetJsonPreservesOrderWithDotNotationInOneLevelFormat()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn(['foo.to :name I give :greeting' => ':greeting :name']);
+        $this->assertEquals('Greetings David', $t->getFromJson('foo.to :name I give :greeting', ['name' => 'David', 'greeting' => 'Greetings']));
     }
 
     public function testGetJsonForNonExistingJsonKeyLooksForRegularKeys()
