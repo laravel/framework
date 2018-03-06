@@ -92,6 +92,29 @@ class HttpJsonResponseTest extends TestCase
         $this->assertInstanceOf('stdClass', $data);
         $this->assertNull($data->resource);
     }
+
+    public function testJsonErrorRecursionDetectedWithPartialOutputOnError()
+    {
+        $objectA = new \stdClass();
+        $objectB = new \stdClass();
+        $objectA->b = $objectB;
+        $objectB->a = $objectA;
+
+        $response = new \Illuminate\Http\JsonResponse($objectA, 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+        $data = $response->getData();
+
+        $this->assertNotNull($data);
+    }
+
+    public function testJsonErrorInfOrNanWithPartialOutputOnError()
+    {
+        $data = ['product' => NAN];
+
+        $response = new \Illuminate\Http\JsonResponse($data, 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+        $data = $response->getData();
+
+        $this->assertNotNull($data);
+    }
 }
 
 class JsonResponseTestJsonableObject implements Jsonable

@@ -86,9 +86,24 @@ class JsonResponse extends BaseJsonResponse
      */
     protected function hasValidJson($jsonError)
     {
-        return $jsonError === JSON_ERROR_NONE ||
-                ($jsonError === JSON_ERROR_UNSUPPORTED_TYPE &&
-                $this->hasEncodingOption(JSON_PARTIAL_OUTPUT_ON_ERROR));
+        // No error is obviously fine
+        if ($jsonError === JSON_ERROR_NONE) {
+            return true;
+        }
+
+        // If the JSON_PARTIAL_OUTPUT_ON_ERROR option is set, some additional errors are fine
+        // (see https://secure.php.net/manual/en/json.constants.php)
+        if ($this->hasEncodingOption(JSON_PARTIAL_OUTPUT_ON_ERROR)) {
+            $acceptableErrors = [
+                JSON_ERROR_RECURSION,
+                JSON_ERROR_INF_OR_NAN,
+                JSON_ERROR_UNSUPPORTED_TYPE,
+            ];
+
+            return \in_array($jsonError, $acceptableErrors);
+        }
+
+        return false;
     }
 
     /**
