@@ -37,14 +37,14 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertTrue($pivot->getMutatorCalled());
     }
 
-    public function testFromRawAttributesDoesNotDoubleMutate()
+    public function testFromRawAttributesDoesNotMutate()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
-        $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
+        $pivot = DatabaseEloquentPivotTestMutatorStub::fromRawAttributes($parent, ['foo' => 'bar'], 'table', true);
 
-        $this->assertEquals(['name' => 'Taylor'], $pivot->foo);
+        $this->assertFalse($pivot->getMutatorCalled());
     }
 
     public function testPropertiesUnchangedAreNotDirty()
@@ -134,11 +134,4 @@ class DatabaseEloquentPivotTestMutatorStub extends \Illuminate\Database\Eloquent
     {
         return $this->mutatorCalled;
     }
-}
-
-class DatabaseEloquentPivotTestJsonCastStub extends \Illuminate\Database\Eloquent\Relations\Pivot
-{
-    protected $casts = [
-        'foo' => 'json',
-    ];
 }
