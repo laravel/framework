@@ -930,6 +930,43 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the items from table in array format with the specified keys.
+     *
+     * @param  mixed  $keys
+     * @return static
+     */
+    public function select($keys)
+    {
+        if (is_null($keys)) {
+            return new static($this->items);
+        }
+
+        $keys = is_array($keys) ? $keys : func_get_args();
+
+        $result = [];
+
+        foreach($this->items as $record){
+
+            $row = [];
+
+            foreach($record as $field => $value){
+
+                if(in_array($field, $keys)){
+
+                    $row[$field] = $value;
+                }
+            }
+
+            if($row){
+
+                $result[] = $row;
+            }
+        }
+
+        return new static($result);
+    }
+
+    /**
      * Get the items with the specified keys.
      *
      * @param  mixed  $keys
