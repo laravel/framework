@@ -899,9 +899,15 @@ class Builder
      * @param  string  $boolean
      * @param  bool  $not
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereBetween($column, array $values, $boolean = 'and', $not = false)
     {
+        if (count($values) !== 2) {
+            throw new InvalidArgumentException('Exactly 2 values required.');
+        }
+
         $type = 'between';
 
         $this->wheres[] = compact('column', 'type', 'boolean', 'not');
