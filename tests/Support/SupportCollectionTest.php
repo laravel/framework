@@ -1707,24 +1707,24 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->min());
     }
 
-    public function testSelect() {
-
+    public function testSelect()
+    {
         $data = collect([
             [
                 'name' => 'Car',
                 'latitude' => 17.7187837,
-                'longitude' => 42.208035
+                'longitude' => 42.208035,
             ],
             [
                 'name' => 'Mobile',
                 'latitude' => null,
-                'longitude' => null
+                'longitude' => null,
             ],
             [
                 'name' => 'Watch',
                 'attend_date' => '2018-03-06 08:39:51',
                 'latitude' => 17.7187837,
-                'longitude' => 42.208035
+                'longitude' => 42.208035,
             ],
             [
                 'name' => 'TV',
