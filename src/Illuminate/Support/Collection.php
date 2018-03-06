@@ -951,7 +951,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
             foreach ($record as $field => $value) {
 
-                if(in_array($field, $keys)) {
+                if (in_array($field, $keys)) {
 
                     $row[$field] = $value;
                 }
