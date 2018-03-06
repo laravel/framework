@@ -1,5 +1,12 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Fixed
+- `Queue::bulk()` fake now properly pushes expected jobs ([#23389](https://github.com/laravel/framework/pull/23389))
+- Set up loop variable correctly on all `Traversable` objects ([#23388](https://github.com/laravel/framework/pull/23388))
+
+
 ## v5.5.36 (2018-03-01)
 
 ### Changed
