@@ -190,8 +190,8 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
         $this->assertCount(2, $statements);
-        $this->assertEquals('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[0]);
-        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[1]);
+        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index" on "photos"', $statements[0]);
+        $this->assertEquals('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[1]);
     }
 
     public function testRenameTable()
