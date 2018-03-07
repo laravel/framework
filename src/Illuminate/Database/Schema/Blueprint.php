@@ -410,7 +410,8 @@ class Blueprint
     /**
      * Indicate that the polymorphic columns should be dropped.
      *
-     * @param string $name
+     * @param string  $name
+     * @param  string|null  $indexName
      *
      * @return void
      */
