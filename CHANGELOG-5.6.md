@@ -3,7 +3,16 @@
 ## [Unreleased]
 
 ### Changed
+- Added `v-pre` to dropdown link in `app.stub` ([98fdbb0](https://github.com/laravel/framework/commit/98fdbb098cf52a74441fe949be121c18e3dbbe6a))
+
+
+## v5.6.9 (2018-03-07)
+
+### Changed
 - Regenerate token when regenerating the session ([20e8419](https://github.com/laravel/framework/commit/20e84191d5ef21eb5c015908c11eabf8e81d6212))
+
+### Fixed
+- Fixed an issue with resources when loading a single merge value with an associative array ([#23414](https://github.com/laravel/framework/pull/23414))
 
 
 ## v5.6.8 (2018-03-06)
