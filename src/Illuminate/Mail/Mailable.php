@@ -15,6 +15,7 @@ use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 
 class Mailable implements MailableContract, Renderable
 {
@@ -701,6 +702,38 @@ class Mailable implements MailableContract, Renderable
         $this->attachments[] = compact('file', 'options');
 
         return $this;
+    }
+
+    /**
+     * Attach a file to the message from storage.
+     *
+     * @param  string  $path
+     * @param  string  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachFromStorage($path, $name = null, array $options = [])
+    {
+        return $this->attachFromStorageDisk(null, $path, $name, $options);
+    }
+
+    /**
+     * Attach a file to the message from storage.
+     *
+     * @param  string  $disk
+     * @param  string  $path
+     * @param  string  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
+    {
+        $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+
+        return $this->attachData(
+            $storage->get($path), $name ?? basename($path),
+            array_merge(['mime' => $storage->mimeType($path)], $options)
+        );
     }
 
     /**
