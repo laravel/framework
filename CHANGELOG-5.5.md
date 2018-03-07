@@ -3,8 +3,18 @@
 ## [Unreleased]
 
 ### Fixed
+- Fixed `--force` flag on `GeneratorCommand` ([#23427](https://github.com/laravel/framework/pull/23427))
+
+
+## v5.5.37 (2018-03-07)
+
+### Changed
+- Added `v-pre` to dropdown link in `app.stub` ([987c19f](https://github.com/laravel/framework/commit/987c19fc252a4883ec05e1691b98e7e9e0c74be8))
+
+### Fixed
 - `Queue::bulk()` fake now properly pushes expected jobs ([#23389](https://github.com/laravel/framework/pull/23389))
 - Set up loop variable correctly on all `Traversable` objects ([#23388](https://github.com/laravel/framework/pull/23388))
+- Fixed `SQLiteGrammar::whereTime()` formatting ([#23408](https://github.com/laravel/framework/pull/23408))
 
 
 ## v5.5.36 (2018-03-01)
