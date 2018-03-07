@@ -179,8 +179,9 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $blueprint->dropMorphs('imageable');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
+        $this->assertCount(2, $statements);
         $this->assertEquals('alter table "photos" drop column "imageable_type", drop column "imageable_id"', $statements[0]);
+        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index"', $statements[1]);
     }
 
     public function testRenameTable()

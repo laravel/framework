@@ -264,8 +264,9 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->dropMorphs('imageable');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertCount(1, $statements);
+        $this->assertCount(2, $statements);
         $this->assertEquals('alter table `photos` drop `imageable_type`, drop `imageable_id`', $statements[0]);
+        $this->assertEquals('alter table `photos` drop index `photos_imageable_type_imageable_id_index`', $statements[1]);
     }
 
     public function testRenameTable()
