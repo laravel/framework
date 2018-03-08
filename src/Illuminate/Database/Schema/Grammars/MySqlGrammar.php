@@ -66,6 +66,12 @@ class MySqlGrammar extends Grammar
             $sql, $connection, $blueprint
         );
 
+        // We will append the table comment onto this SQL statement.This is very
+        // important for the description of the table.
+        $sql = $this->compileCreateComment(
+            $sql, $connection, $blueprint
+        );
+
         // Finally, we will append the engine configuration onto this SQL statement as
         // the final thing we do before returning this finished SQL. Once this gets
         // added the query will be ready to execute against the real connections.
@@ -136,6 +142,23 @@ class MySqlGrammar extends Grammar
             return $sql.' engine = '.$blueprint->engine;
         } elseif (! is_null($engine = $connection->getConfig('engine'))) {
             return $sql.' engine = '.$engine;
+        }
+
+        return $sql;
+    }
+
+    /**
+     * Append the comment specifications to a command.
+     *
+     * @param  string  $sql
+     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @return string
+     */
+    protected function compileCreateComment($sql, Connection $connection, Blueprint $blueprint)
+    {
+        if (isset($blueprint->comment)) {
+            return $sql.' comment = \''.$blueprint->comment.'\'';
         }
 
         return $sql;
