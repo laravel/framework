@@ -802,6 +802,19 @@ class Blueprint
     }
 
     /**
+     * Create a new unsigned tiny integer (1-byte) column on the table.
+     *
+     * Alias for self::unsignedTinyInteger().
+     * 
+     * @param string $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function byte($column)
+    {
+        return $this->unsignedTinyInteger($column);
+    }
+
+    /**
      * Create a new enum column on the table.
      *
      * @param  string  $column
