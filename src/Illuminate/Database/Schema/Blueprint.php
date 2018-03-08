@@ -412,7 +412,6 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
-     *
      * @return void
      */
     public function dropMorphs($name, $indexName = null)
