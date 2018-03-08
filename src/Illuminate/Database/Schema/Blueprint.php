@@ -805,7 +805,7 @@ class Blueprint
      * Create a new unsigned tiny integer (1-byte) column on the table.
      *
      * Alias for self::unsignedTinyInteger().
-     * 
+     *
      * @param string $column
      * @return \Illuminate\Support\Fluent
      */
