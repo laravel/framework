@@ -308,6 +308,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    public function testOrWhereDayMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDay('created_at', '=', 1)->orWhereDay('created_at', '=', 2);
+        $this->assertEquals('select * from `users` where day(`created_at`) = ? or day(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+    }
+
     public function testWhereMonthMySql()
     {
         $builder = $this->getMySqlBuilder();
@@ -316,12 +324,28 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 5], $builder->getBindings());
     }
 
+    public function testOrWhereMonthMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereMonth('created_at', '=', 5)->orWhereMonth('created_at', '=', 6);
+        $this->assertEquals('select * from `users` where month(`created_at`) = ? or month(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => 5, 1 => 6], $builder->getBindings());
+    }
+
     public function testWhereYearMySql()
     {
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
+    }
+
+    public function testOrWhereYearMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereYear('created_at', '=', 2014)->orWhereYear('created_at', '=', 2015);
+        $this->assertEquals('select * from `users` where year(`created_at`) = ? or year(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => 2014, 1 => 2015], $builder->getBindings());
     }
 
     public function testWhereTimeMySql()
