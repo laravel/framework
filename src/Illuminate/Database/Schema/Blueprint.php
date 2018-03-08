@@ -412,14 +412,11 @@ class Blueprint
      *
      * @param  string  $name
      * @param  string|null  $indexName
-     *
      * @return void
      */
     public function dropMorphs($name, $indexName = null)
     {
-        $indexName = $indexName ?: $this->createIndexName('index', ["{$name}_type", "{$name}_id"]);
-
-        $this->dropIndex($indexName);
+        $this->dropIndex($indexName ?: $this->createIndexName('index', ["{$name}_type", "{$name}_id"]));
 
         $this->dropColumn("{$name}_type", "{$name}_id");
     }
