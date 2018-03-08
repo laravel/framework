@@ -408,6 +408,20 @@ class Blueprint
     }
 
     /**
+     * Indicate that the polymorphic columns should be dropped.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function dropMorphs($name, $indexName = null)
+    {
+        $this->dropIndex($indexName ?: $this->createIndexName('index', ["{$name}_type", "{$name}_id"]));
+
+        $this->dropColumn("{$name}_type", "{$name}_id");
+    }
+
+    /**
      * Rename the table to a given name.
      *
      * @param  string  $to

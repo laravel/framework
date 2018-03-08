@@ -173,6 +173,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
     }
 
+    public function testDropMorphs()
+    {
+        $blueprint = new Blueprint('photos');
+        $blueprint->dropMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index"', $statements[0]);
+        $this->assertEquals('alter table "photos" drop column "imageable_type", drop column "imageable_id"', $statements[1]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');

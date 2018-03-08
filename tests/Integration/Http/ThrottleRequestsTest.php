@@ -27,7 +27,7 @@ class ThrottleRequestsTest extends TestCase
 
     public function test_lock_opens_immediately_after_decay()
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
 
         Route::get('/', function () {
             return 'yes';
@@ -43,9 +43,7 @@ class ThrottleRequestsTest extends TestCase
         $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
         $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 
-        Carbon::setTestNow(
-            Carbon::now()->addSeconds(58)
-        );
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 58));
 
         try {
             $this->withoutExceptionHandling()->get('/');
