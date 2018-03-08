@@ -21,17 +21,11 @@ class RoutingServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerRouter();
-
         $this->registerUrlGenerator();
-
         $this->registerRedirector();
-
         $this->registerPsrRequest();
-
         $this->registerPsrResponse();
-
         $this->registerResponseFactory();
-
         $this->registerControllerDispatcher();
     }
 
