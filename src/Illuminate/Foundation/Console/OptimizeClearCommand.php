@@ -18,7 +18,7 @@ class OptimizeClearCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Clear all caches (routes, config, views, compiled class)';
+    protected $description = 'Remove the cached bootstrap files';
 
     /**
      * Execute the console command.
@@ -27,11 +27,11 @@ class OptimizeClearCommand extends Command
      */
     public function handle()
     {
+        $this->call('view:clear');
         $this->call('cache:clear');
         $this->call('route:clear');
-        $this->call('view:clear');
         $this->call('clear-compiled');
 
-        $this->info('Config, routes and view cache cleared successfully!');
+        $this->info('Caches cleared successfully!');
     }
 }

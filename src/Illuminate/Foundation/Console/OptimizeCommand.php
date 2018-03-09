@@ -18,7 +18,7 @@ class OptimizeCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Optimize everything (cache routes, config)';
+    protected $description = 'Cache the framework bootstrap files';
 
     /**
      * Execute the console command.
@@ -27,11 +27,9 @@ class OptimizeCommand extends Command
      */
     public function handle()
     {
-        $this->call('cache:clear');
         $this->call('config:cache');
-        $this->call('route:clear');
         $this->call('route:cache');
 
-        $this->info('Config and routes cached successfully!');
+        $this->info('Files cached successfully!');
     }
 }
