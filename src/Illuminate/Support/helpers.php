@@ -1023,19 +1023,22 @@ if (! function_exists('studly_case')) {
 
 if (! function_exists('tap')) {
     /**
-     * Call the given Closure with the given value then return the value.
+     * Call a Closure with a value if the condition is true, then return the value.
      *
      * @param  mixed  $value
      * @param  callable|null  $callback
+     * @param  mixed  $condition
      * @return mixed
      */
-    function tap($value, $callback = null)
+    function tap($value, $callback = null, $condition = true)
     {
         if (is_null($callback)) {
             return new HigherOrderTapProxy($value);
         }
 
-        $callback($value);
+        if ($condition) {
+            $callback($value);
+        }
 
         return $value;
     }
