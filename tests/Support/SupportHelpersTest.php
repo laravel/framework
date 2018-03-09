@@ -745,6 +745,11 @@ class SupportHelpersTest extends TestCase
             $object->id = 2;
         })->id);
 
+        $object = (object) ['id' => 1];
+        $this->assertEquals(1, tap($object, function ($object) {
+            $object->id = 2;
+        }, false)->id);
+
         $mock = m::mock();
         $mock->shouldReceive('foo')->once()->andReturn('bar');
         $this->assertEquals($mock, tap($mock)->foo());
