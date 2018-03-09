@@ -161,15 +161,13 @@ abstract class Relation
      */
     public function touch()
     {
-        tap($this->getRelated(), function ($model) {
-            /** @var Model $model */
+        $model = $this->getRelated();
 
-            if ($model->shouldTouch()) {
-                $column = $model->getUpdatedAtColumn();
+        if ($model->shouldTouch()) {
+            $column = $model->getUpdatedAtColumn();
 
-                $this->rawUpdate([$column => $model->freshTimestampString()]);
-            }
-        });
+            $this->rawUpdate([$column => $model->freshTimestampString()]);
+        }
     }
 
     /**

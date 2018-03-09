@@ -24,6 +24,10 @@ trait HasTimestamps
             return false;
         }
 
+        if ($this->exists && ! $this->shouldTouch()) {
+            return true;
+        }
+
         $this->updateTimestamps();
 
         return $this->save();

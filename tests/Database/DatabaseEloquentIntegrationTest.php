@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Database;
 
 use Exception;
 use ReflectionObject;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
@@ -79,6 +81,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
                 $table->integer('user_id');
                 $table->integer('parent_id')->nullable();
                 $table->string('name');
+                $table->timestamps();
+            });
+
+            $this->schema($connection)->create('comments', function ($table) {
+                $table->increments('id');
+                $table->integer('post_id');
+                $table->string('content');
                 $table->timestamps();
             });
 
@@ -1213,6 +1222,161 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $attribute = $model->fromDateTime($model->getAttribute('updated_at'));
     }
 
+    public function testUpdatingChildModelTouchesParent()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        $post->update(['name' => 'Updated']);
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testMultiLevelTouchingWorks()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testCanDisableGlobalTouching()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($before->copy()->addDays(3));
+
+        Model::withoutTouching(function () use ($user, $post) {
+            $user->touch();
+            $post->touch();
+        });
+
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testCanDisableSpecificModelTouching()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingPost::withoutTouching(function () use ($user, $post) {
+            $user->touch();
+            $post->touch();
+        });
+
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testCanNestDisablingTouchingModels()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () use ($user, $post) {
+            EloquentTouchingPost::withoutTouching(function () use ($user, $post) {
+                $user->touch();
+                $post->touch();
+            });
+        });
+
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testUpdatingChildPostRespectsNoTouchingDefinition()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () use ($post) {
+            $post->update(['name' => 'Updated']);
+        });
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testRespectedMultiLevelTouchingChain()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () {
+            EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+        });
+
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
     /**
      * Helpers...
      */
@@ -1446,5 +1610,41 @@ class EloquentTestFriendPivot extends Pivot
     public function level()
     {
         return $this->belongsTo(EloquentTestFriendLevel::class, 'friend_level_id');
+    }
+}
+
+class EloquentTouchingUser extends Eloquent
+{
+    protected $table = 'users';
+    protected $guarded = [];
+}
+
+class EloquentTouchingPost extends Eloquent
+{
+    protected $table = 'posts';
+    protected $guarded = [];
+
+    protected $touches = [
+        'user',
+    ];
+
+    public function user()
+    {
+        return $this->belongsTo('Illuminate\Tests\Database\EloquentTouchingUser', 'user_id');
+    }
+}
+
+class EloquentTouchingComment extends Eloquent
+{
+    protected $table = 'comments';
+    protected $guarded = [];
+
+    protected $touches = [
+        'post',
+    ];
+
+    public function post()
+    {
+        return $this->belongsTo('Illuminate\Tests\Database\EloquentTouchingPost', 'post_id');
     }
 }

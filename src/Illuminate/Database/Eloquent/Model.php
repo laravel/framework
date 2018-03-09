@@ -230,7 +230,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function shouldTouch()
     {
-        foreach (static::$ignoreOnTouch as $ignoredClass) {
+        foreach (self::$ignoreOnTouch as $ignoredClass) {
             if ($this instanceof $ignoredClass) {
                 return false;
             }

@@ -1699,6 +1699,23 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testWithoutTouchingCallback()
+    {
+        $model = new EloquentModelStub(['id' => 1]);
+
+        $called = false;
+
+        $this->assertTrue($model->shouldTouch());
+
+        EloquentModelStub::withoutTouching(function () use (&$called, $model) {
+            $this->assertFalse($model->shouldTouch());
+            $called = true;
+        });
+
+        $this->assertTrue($called);
+        $this->assertTrue($model->shouldTouch());
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));
