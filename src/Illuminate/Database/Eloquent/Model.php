@@ -125,6 +125,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $globalScopes = [];
 
     /**
+     * The list of models classes that should not be affected with touch.
+     *
+     * @var array
+     */
+    protected static $ignoreOnTouch = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string
@@ -195,6 +202,41 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 forward_static_call([$class, $method]);
             }
         }
+    }
+
+    /**
+     * Disables the touching behavior for specific models and
+     * their children for the scope of the given callback.
+     *
+     * @param $callback
+     */
+    public static function withoutTouching($callback)
+    {
+        $currentClass = static::class;
+
+        self::$ignoreOnTouch[] = $currentClass;
+
+        try {
+            call_user_func($callback);
+        } finally {
+            self::$ignoreOnTouch = array_values(array_diff(self::$ignoreOnTouch, [$currentClass]));
+        }
+    }
+
+    /**
+     * Whether or not the current model is going to be touched.
+     *
+     * @return bool
+     */
+    public function shouldTouch()
+    {
+        foreach (static::$ignoreOnTouch as $ignoredClass) {
+            if ($this instanceof $ignoredClass) {
+                return false;
+            }
+        }
+
+        return true;
     }
 
     /**
