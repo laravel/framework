@@ -107,22 +107,59 @@ class QueueFakeTest extends TestCase
 
     public function testAssertPushedWithChain()
     {
-        $chain = [
+        $jobWithChain = new JobWithChainStub([
             new JobStub,
-            new JobWithParameterStub(100)
-        ];
+            new JobWithParameterStub(0)
+        ]);
 
-        $jobWithChain = new JobWithChainStub($chain);
+        $jobWithParameterAndChain = new JobWithParameterAndChainStub('first', [
+            new JobStub,
+        ]);
+        $anotherJobWithParameterAndChain = new JobWithParameterAndChainStub('second', [
+            new JobWithParameterStub(1)
+        ]);
 
         $this->fake->push($jobWithChain);
-        $this->fake->assertPushed(JobWithChainStub::class);
-        $this->fake->assertPushedWithChain(JobWithChainStub::class, $chain);
+        $this->fake->push($jobWithParameterAndChain);
+        $this->fake->push($anotherJobWithParameterAndChain);
+
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+            new JobStub,
+            new JobWithParameterStub(0)
+        ]);
+
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+            JobStub::class,
+            JobWithParameterStub::class
+        ]);
 
         try {
             $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
             $this->fail();
         } catch (ExpectationFailedException $e) {
-            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed.'));
+            $this->assertThat($e, new ExceptionMessage('The expected chain can not be empty'));
+        }
+
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+                new JobStub
+            ]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+        }
+
+        $this->fake->assertPushedWithChain(JobWithParameterAndChainStub::class, [
+            new JobStub
+        ], function ($job) {
+            return $job->parameter == 'first';
+        });
+
+        try {
+            $this->fake->assertPushedWithChain(NotPushedJobStub::class, []);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\NotPushedJobStub] job was not pushed'));
         }
     }
 }
@@ -156,6 +193,32 @@ class JobWithChainStub
 
     function __construct($chain)
     {
+        $this->chain($chain);
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class NotPushedJobStub
+{
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobWithParameterAndChainStub
+{
+    use Queueable;
+
+    public $parameter;
+
+    function __construct($parameter, $chain)
+    {
+        $this->parameter = $parameter;
         $this->chain($chain);
     }
 
