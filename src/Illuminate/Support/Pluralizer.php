@@ -18,6 +18,7 @@ class Pluralizer
         'chassis',
         'compensation',
         'coreopsis',
+        'corn',
         'data',
         'deer',
         'education',
