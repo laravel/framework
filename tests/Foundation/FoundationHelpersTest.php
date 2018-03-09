@@ -78,4 +78,10 @@ class FoundationHelpersTest extends TestCase
 
         unlink(public_path('mix-manifest.json'));
     }
+
+    public function testFakerIsCreated()
+    {
+        $this->assertTrue(faker() instanceof \Faker\Generator);
+        $this->assertTrue(faker('fr_FR') instanceof \Faker\Generator);
+    }
 }

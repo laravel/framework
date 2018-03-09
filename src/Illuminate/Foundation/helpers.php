@@ -489,6 +489,19 @@ if (! function_exists('factory')) {
     }
 }
 
+if (! function_exists('faker')) {
+    /**
+     * Create a Faker instance for the given locale.
+     *
+     * @param  string  $locale
+     * @return \Faker\Generator
+     */
+    function faker($locale = null)
+    {
+        return \Faker\Factory::create($locale ?? \Faker\Factory::DEFAULT_LOCALE);
+    }
+}
+
 if (! function_exists('info')) {
     /**
      * Write some information to the log.
