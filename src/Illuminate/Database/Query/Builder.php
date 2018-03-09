@@ -1048,6 +1048,23 @@ class Builder
     }
 
     /**
+     * Add an "or where day" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereDay($column, $operator, $value = null)
+    {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Day', $column, $operator, $value, 'or');
+    }
+
+    /**
      * Add a "where month" statement to the query.
      *
      * @param  string  $column
@@ -1066,6 +1083,23 @@ class Builder
     }
 
     /**
+     * Add an "or where month" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereMonth($column, $operator, $value = null)
+    {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Month', $column, $operator, $value, 'or');
+    }
+
+    /**
      * Add a "where year" statement to the query.
      *
      * @param  string  $column
@@ -1081,6 +1115,23 @@ class Builder
         );
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
+    }
+
+    /**
+     * Add an "or where year" statement to the query.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  mixed  $value
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereYear($column, $operator, $value = null)
+    {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() == 2
+        );
+
+        return $this->addDateBasedWhere('Year', $column, $operator, $value, 'or');
     }
 
     /**
