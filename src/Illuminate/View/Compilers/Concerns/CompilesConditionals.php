@@ -153,22 +153,22 @@ trait CompilesConditionals
     }
     
     /**
-     * Compile the if-isset statements into valid PHP.
+     * Compile the if-notset statements into valid PHP.
      *
      * @param  string  $expression
      * @return string
      */
-    protected function compileNotSet($expression)
+    protected function compileNotset($expression)
     {
         return "<?php if(!isset{$expression}): ?>";
     }
 
     /**
-     * Compile the end-isset statements into valid PHP.
+     * Compile the end-notset statements into valid PHP.
      *
      * @return string
      */
-    protected function compileNotSet()
+    protected function compileEndNotset()
     {
         return '<?php endif; ?>';
     }
