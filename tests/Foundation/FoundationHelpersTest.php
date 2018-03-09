@@ -81,7 +81,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testFakerIsCreated()
     {
-        $this->assertTrue(faker() instanceOf \Faker\Generator);
-        $this->assertTrue(faker('fr_FR') instanceOf \Faker\Generator);
+        $this->assertTrue(faker() instanceof \Faker\Generator);
+        $this->assertTrue(faker('fr_FR') instanceof \Faker\Generator);
     }
 }
