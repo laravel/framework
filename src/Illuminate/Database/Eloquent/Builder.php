@@ -820,7 +820,7 @@ class Builder
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps()) {
+        if (! $this->model->usesTimestamps() || ($this->model->exists && ! $this->model->shouldTouch())) {
             return $values;
         }
 

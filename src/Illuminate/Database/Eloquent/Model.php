@@ -661,7 +661,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // First we need to create a fresh query instance and touch the creation and
         // update timestamp on the model which are maintained by us for developer
         // convenience. Then we will just continue saving the model instances.
-        if ($this->usesTimestamps()) {
+        if ($this->usesTimestamps() && $this->shouldTouch()) {
             $this->updateTimestamps();
         }
 
