@@ -153,7 +153,7 @@ class Str
      */
     public static function is($pattern, $value)
     {
-        $patterns = is_array($pattern) ? $pattern : (array) $pattern;
+        $patterns = Arr::wrap($pattern);
 
         if (empty($patterns)) {
             return false;
