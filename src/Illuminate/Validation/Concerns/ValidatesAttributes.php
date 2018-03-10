@@ -1115,6 +1115,25 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute does not pass a regular expression check.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateNotRegex($attribute, $value, $parameters)
+    {
+        if (! is_string($value) && ! is_numeric($value)) {
+            return false;
+        }
+
+        $this->requireParameterCount(1, $parameters, 'not_regex');
+
+        return preg_match($parameters[0], $value) < 1;
+    }
+
+    /**
      * Validate that a required attribute exists.
      *
      * @param  string  $attribute
