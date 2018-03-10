@@ -2037,31 +2037,21 @@ class Builder
             }
         );
 
+        if (empty($queryResult)) {
+            return collect();
+        }
+
         // If the columns are qualified with a table or have an alias, we cannot use
         // those directly in the "pluck" operations since the results from the DB
         // are only keyed by the column itself. We'll strip the table out here.
         $column = $this->stripTableForPluck($column);
         $key = $this->stripTableForPluck($key);
 
-        $results = [];
-
-        foreach ($queryResult as $row) {
-            $itemValue = data_get($row, $column);
-
-            if (is_null($key)) {
-                $results[] = $itemValue;
-            } else {
-                $itemKey = data_get($row, $key);
-
-                if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
-                    $itemKey = (string) $itemKey;
-                }
-
-                $results[$itemKey] = $itemValue;
-            }
+        if (is_array($queryResult[0])) {
+            return $this->pluckFromArrayColumn($queryResult, $column, $key);
+        } else {
+            return $this->pluckFromObjectColumn($queryResult, $column, $key);
         }
-
-        return collect($results);
     }
 
     /**
@@ -2097,6 +2087,56 @@ class Builder
     protected function stripTableForPluck($column)
     {
         return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
+    }
+
+    /**
+     * Retrieve column values from rows represented as objects.
+     *
+     * @param  array  $queryResult
+     * @param  string $column
+     * @param  string $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function pluckFromObjectColumn($queryResult, $column, $key)
+    {
+        $results = [];
+
+        if (is_null($key)) {
+            foreach ($queryResult as $row) {
+                $results[] = $row->$column;
+            }
+        } else {
+            foreach ($queryResult as $row) {
+                $results[$row->$key] = $row->$column;
+            }
+        }
+
+        return collect($results);
+    }
+
+    /**
+     * Retrieve column values from rows represented as arrays.
+     *
+     * @param  array  $queryResult
+     * @param  string $column
+     * @param  string $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function pluckFromArrayColumn($queryResult, $column, $key)
+    {
+        $results = [];
+
+        if (is_null($key)) {
+            foreach ($queryResult as $row) {
+                $results[] = $row[$column];
+            }
+        } else {
+            foreach ($queryResult as $row) {
+                $results[$row[$key]] = $row[$column];
+            }
+        }
+
+        return collect($results);
     }
 
     /**
