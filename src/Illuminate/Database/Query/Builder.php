@@ -1830,17 +1830,11 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $results = $this->processor->processSelect($this, $this->runSelect());
-
-        $this->columns = $original;
-
-        return collect($results);
+        return collect(
+            $this->onceWithColumns($columns, function () {
+                return $this->processor->processSelect($this, $this->runSelect());
+            })
+        );
     }
 
     /**
@@ -2036,15 +2030,47 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
+        $results = $this->onceWithColumns(
+            is_null($key) ? [$column] : [$column, $key],
+            function () {
+                return $this->processor->processSelect($this, $this->runSelect());
+            }
+        );
 
         // If the columns are qualified with a table or have an alias, we cannot use
         // those directly in the "pluck" operations since the results from the DB
         // are only keyed by the column itself. We'll strip the table out here.
-        return $results->pluck(
-            $this->stripTableForPluck($column),
-            $this->stripTableForPluck($key)
+        return collect(
+            Arr::pluck(
+                $results,
+                $this->stripTableForPluck($column),
+                $this->stripTableForPluck($key)
+            )
         );
+    }
+
+    /**
+     * Execute the given callback while selecting the given columns.
+     *
+     * After running the callback, the columns are reset to the original value.
+     *
+     * @param  array     $columns
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function onceWithColumns($columns, $callback)
+    {
+        $original = $this->columns;
+
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
+
+        $result = $callback();
+
+        $this->columns = $original;
+
+        return $result;
     }
 
     /**
