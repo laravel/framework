@@ -64,4 +64,37 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a date equals constraint builder instance.
+     *
+     * @param  \DateTime  $date
+     * @return Rules\DateComparison
+     */
+    public static function dateEquals(\DateTime $date)
+    {
+        return new Rules\DateComparison($date);
+    }
+
+    /**
+     * Get a before (date) constraint builder instance.
+     *
+     * @param  \DateTime  $date
+     * @return Rules\DateComparison
+     */
+    public static function before(\DateTime $date)
+    {
+        return (new Rules\DateComparison($date))->before();
+    }
+
+    /**
+     * Get a after (date) constraint builder instance.
+     *
+     * @param  \DateTime  $date
+     * @return Rules\DateComparison
+     */
+    public static function after(\DateTime $date)
+    {
+        return (new Rules\DateComparison($date))->after();
+    }
 }
