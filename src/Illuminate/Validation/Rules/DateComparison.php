@@ -69,7 +69,7 @@ class DateComparison
             '%s%s:%s',
             $this->comparison,
             $this->orEqual && $this->comparison !== 'date_equals' ? '_or_equal' : '',
-            $this->dateTime->format('Y-m-d H:i:s')
+            $this->dateTime->format('c')
         );
     }
 }
