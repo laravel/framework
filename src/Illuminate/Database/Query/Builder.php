@@ -2030,7 +2030,7 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->onceWithColumns(
+        $queryResult = $this->onceWithColumns(
             is_null($key) ? [$column] : [$column, $key],
             function () {
                 return $this->processor->processSelect($this, $this->runSelect());
@@ -2040,13 +2040,28 @@ class Builder
         // If the columns are qualified with a table or have an alias, we cannot use
         // those directly in the "pluck" operations since the results from the DB
         // are only keyed by the column itself. We'll strip the table out here.
-        return collect(
-            Arr::pluck(
-                $results,
-                $this->stripTableForPluck($column),
-                $this->stripTableForPluck($key)
-            )
-        );
+        $column = $this->stripTableForPluck($column);
+        $key = $this->stripTableForPluck($key);
+
+        $results = [];
+
+        foreach ($queryResult as $row) {
+            $itemValue = data_get($row, $column);
+
+            if (is_null($key)) {
+                $results[] = $itemValue;
+            } else {
+                $itemKey = data_get($row, $key);
+
+                if (is_object($itemKey) && method_exists($itemKey, '__toString')) {
+                    $itemKey = (string) $itemKey;
+                }
+
+                $results[$itemKey] = $itemValue;
+            }
+        }
+
+        return collect($results);
     }
 
     /**
