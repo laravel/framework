@@ -46,6 +46,26 @@ class NotificationFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
         }
     }
+
+    public function testResettingNotificationId()
+    {
+        $notification = new NotificationStub();
+
+        $this->fake->send($this->user, $notification);
+
+        $id = $notification->id;
+
+        $this->fake->send($this->user, $notification);
+
+        $this->assertSame($id, $notification->id);
+
+        $notification->id = null;
+
+        $this->fake->send($this->user, $notification);
+
+        $this->assertNotNull($notification->id);
+        $this->assertNotSame($id, $notification->id);
+    }
 }
 
 class NotificationStub extends Notification

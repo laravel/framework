@@ -1,8 +1,15 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.39 (2018-03-09)
 
 ### Fixed
+- Fix for Carbon 1.24.1 ([b3a5608](https://github.com/laravel/framework/commit/b3a5608ff60a3679d51536a65bb525bdc2390fbc), [72286b3](https://github.com/laravel/framework/commit/72286b302e9bf6a29dd5f0e20f4e7c6dbce78a5d))
+
+
+## v5.5.38 (2018-03-09)
+
+### Fixed
+- Fix for Carbon 1.24.0 ([#23459](https://github.com/laravel/framework/pull/23459))
 - Fixed `--force` flag on `GeneratorCommand` ([#23427](https://github.com/laravel/framework/pull/23427))
 
 
