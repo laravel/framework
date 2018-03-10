@@ -23,7 +23,7 @@
         "illuminate/mail": "5.7.*",
         "illuminate/queue": "5.7.*",
         "illuminate/support": "5.7.*",
-        "ramsey/uuid": "~3.0"
+        "ramsey/uuid": "^3.0"
     },
     "autoload": {
         "psr-4": {

@@ -16,7 +16,7 @@
     "require": {
         "php": "^7.1.3",
         "illuminate/contracts": "5.7.*",
-        "psr/container": "~1.0"
+        "psr/container": "^1.0"
     },
     "autoload": {
         "psr-4": {
