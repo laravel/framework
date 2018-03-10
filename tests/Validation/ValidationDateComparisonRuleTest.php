@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Validation;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\Rules\DateComparison;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\Rules\DateComparison;
 
 class ValidationDateComparisonRuleTest extends TestCase
 {

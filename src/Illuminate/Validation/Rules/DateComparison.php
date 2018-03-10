@@ -36,6 +36,7 @@ class DateComparison
     public function before()
     {
         $this->comparison = 'before';
+
         return $this;
     }
 
@@ -45,6 +46,7 @@ class DateComparison
     public function after()
     {
         $this->comparison = 'after';
+
         return $this;
     }
 
@@ -54,6 +56,7 @@ class DateComparison
     public function orEqual()
     {
         $this->orEqual = true;
+
         return $this;
     }
 
