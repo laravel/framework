@@ -301,7 +301,7 @@ class Builder
     }
 
     /**
-     * Add a raw or where clause to the query.
+     * Add a raw from clause to the query.
      *
      * @param  string  $expression
      * @param  mixed   $bindings
