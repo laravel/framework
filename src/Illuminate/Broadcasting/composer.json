@@ -32,7 +32,7 @@
         }
     },
     "suggest": {
-        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~3.0)."
+        "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (^3.0)."
     },
     "config": {
         "sort-packages": true

@@ -34,8 +34,8 @@
         }
     },
     "suggest": {
-        "aws/aws-sdk-php": "Required to use the SES mail driver (~3.0).",
-        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (~6.0)."
+        "aws/aws-sdk-php": "Required to use the SES mail driver (^3.0).",
+        "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers (^6.0)."
     },
     "config": {
         "sort-packages": true
