@@ -5,7 +5,6 @@ namespace Illuminate\Tests\Database;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
-use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\Console\Migrations\MigrateCommand;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
