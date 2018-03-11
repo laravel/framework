@@ -53,14 +53,12 @@ class Migrator
      */
     protected $paths = [];
     
-    
     /**
      * The paths to all of the migration files.
      *
      * @var Symfony\Component\Console\Output\OutputInterface
      */
     protected $output;
-    
 
     /**
      * Create a new migrator instance.
