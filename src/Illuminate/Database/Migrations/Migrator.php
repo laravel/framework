@@ -569,7 +569,7 @@ class Migrator
     }
 
     /**
-     * Set the output instance
+     * Set the output instance.
      *
      * @params Symfony\Component\Console\Output\OutputInterface $output
      */
@@ -579,7 +579,7 @@ class Migrator
     }
 
     /**
-     * Raise a note event for the migrator, if an output is set, prints to the output
+     * Raise a note event for the migrator, if an output is set, prints to the output.
      *
      * @param  string  $message
      * @return void
