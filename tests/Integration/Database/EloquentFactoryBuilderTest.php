@@ -42,12 +42,12 @@ class EloquentFactoryBuilderTest extends TestCase
             return [
                 'user_id' => function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
-                }
+                },
             ];
         });
 
         $factory->after(FactoryBuildableUser::class, 'make', function (FactoryBuildableUser $user, Generator $faker) {
-            $profile =factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
+            $profile = factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
             $user->setRelation('profile', $profile);
         });
 
