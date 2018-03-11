@@ -193,8 +193,9 @@ class FactoryBuilder
     {
         if ($this->amount === null) {
             $instance = $this->makeInstance($attributes);
+            $this->applyAfter(collect([$instance]), 'make');
 
-            return $this->applyAfter(collect([$instance]), 'make');
+            return $instance;
         }
 
         if ($this->amount < 1) {
@@ -204,8 +205,9 @@ class FactoryBuilder
         $instances = (new $this->class)->newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
+        $this->applyAfter($instances, 'make');
 
-        return $this->applyAfter($instances, 'make');
+        return $instances;
     }
 
     /**
@@ -346,7 +348,7 @@ class FactoryBuilder
     /**
      * Run after callback on a collection of models.
      *
-     * @param  \Illuminate\Support\Collection  $results
+     * @param  \Illuminate\Support\Collection  $models
      * @param  string  $action
      * @return void
      */
@@ -359,7 +361,5 @@ class FactoryBuilder
 
             call_user_func_array($this->after[$this->class][$action], [$model, $this->faker]);
         });
-
-        return $models;
     }
 }
