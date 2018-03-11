@@ -6,8 +6,8 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Database\ConnectionResolverInterface as Resolver;
 use Symfony\Component\Console\Output\OutputInterface;
+use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
 {
@@ -581,8 +581,7 @@ class Migrator
     }
 
     /**
-     * Raise a note event for the migrator.
-     * If Output Interface is set, writes a line to output
+     * Raise a note event for the migrator.If output is set, writes a line to output
      *
      * @param  string  $message
      * @return void
