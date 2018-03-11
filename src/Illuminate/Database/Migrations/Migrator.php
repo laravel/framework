@@ -582,6 +582,7 @@ class Migrator
 
     /**
      * Raise a note event for the migrator.
+     * If Output Interface is set, writes a line to output
      *
      * @param  string  $message
      * @return void
