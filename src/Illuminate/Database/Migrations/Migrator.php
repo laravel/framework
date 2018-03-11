@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -53,6 +54,13 @@ class Migrator
     protected $paths = [];
 
     /**
+     * The paths to all of the migration files.
+     *
+     * @var Symfony\Component\Console\Output\OutputInterface
+     */
+    protected $output;
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -74,10 +82,15 @@ class Migrator
      *
      * @param  array|string  $paths
      * @param  array  $options
+     * @params Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function run($paths = [], array $options = [])
+    public function run($paths = [], array $options = [], OutputInterface $output = null)
     {
+        if ($output) {
+            $this->setOutput($output);
+        }
+
         $this->notes = [];
 
         // Once we grab all of the migration files for the path, we will compare them
@@ -556,13 +569,27 @@ class Migrator
     }
 
     /**
-     * Raise a note event for the migrator.
+     * Set the output instance.
+     *
+     * @params Symfony\Component\Console\Output\OutputInterface $output
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
+    }
+
+    /**
+     * Raise a note event for the migrator, if an output is set, prints to the output.
      *
      * @param  string  $message
      * @return void
      */
     protected function note($message)
     {
+        if ($this->output) {
+            $this->output->writeln($message);
+        }
+
         $this->notes[] = $message;
     }
 
