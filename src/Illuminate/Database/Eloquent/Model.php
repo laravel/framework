@@ -1354,6 +1354,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $this->getKeyName();
     }
 
+
+    /**
+     * Get the table name for the model.
+     *
+     * @return string
+     */
+    public static function getTableName()
+    {
+        return (new static)->getTable();
+    }
+
+
     /**
      * Retrieve the model for a bound value.
      *
