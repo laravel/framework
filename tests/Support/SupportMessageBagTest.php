@@ -299,9 +299,17 @@ class SupportMessageBagTest extends TestCase
         $this->assertEquals(':message', $container->getFormat());
     }
 
-    public function testConstructorUniqueness()
+    public function testConstructorUniquenessConsistency()
     {
         $messageBag = new MessageBag(['messages' => ['first', 'second', 'third', 'third']]);
+        $messages = $messageBag->getMessages();
+        $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
+
+        $messageBag = new MessageBag;
+        $messageBag->add('messages', 'first');
+        $messageBag->add('messages', 'second');
+        $messageBag->add('messages', 'third');
+        $messageBag->add('messages', 'third');
         $messages = $messageBag->getMessages();
         $this->assertEquals(['first', 'second', 'third'], $messages['messages']);
     }
