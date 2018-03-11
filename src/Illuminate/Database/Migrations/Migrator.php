@@ -52,7 +52,7 @@ class Migrator
      * @var array
      */
     protected $paths = [];
-    
+
     /**
      * The paths to all of the migration files.
      *
@@ -90,7 +90,7 @@ class Migrator
         if ($output) {
             $this->setOutput($output);
         }
-        
+
         $this->notes = [];
 
         // Once we grab all of the migration files for the path, we will compare them
@@ -567,7 +567,7 @@ class Migrator
     {
         return $this->files;
     }
-    
+
     /**
      * Set the default OutputInterface instance
      *
@@ -589,7 +589,7 @@ class Migrator
         if ($this->output) {
             $this->output->writeln($message);
         }
-        
+
         $this->notes[] = $message;
     }
 
