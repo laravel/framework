@@ -1354,7 +1354,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         return $this->getKeyName();
     }
 
-
     /**
      * Get the table name for the model.
      *
@@ -1364,7 +1363,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         return (new static)->getTable();
     }
-
 
     /**
      * Retrieve the model for a bound value.
