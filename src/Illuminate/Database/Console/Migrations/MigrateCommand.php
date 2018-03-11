@@ -70,13 +70,6 @@ class MigrateCommand extends BaseCommand
             'step' => $this->option('step'),
         ], $this->getOutput());
 
-        // Once the migrator has run we will grab the note output and send it out to
-        // the console screen, since the migrator itself functions without having
-        // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note) {
-            $this->output->writeln($note);
-        }
-
         // Finally, if the "seed" option has been given, we will re-run the database
         // seed task to re-populate the database, which is convenient when adding
         // a migration and a seed at the same time, as it is only this command.
