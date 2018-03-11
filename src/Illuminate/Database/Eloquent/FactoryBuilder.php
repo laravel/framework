@@ -46,6 +46,13 @@ class FactoryBuilder
     protected $states;
 
     /**
+     * The model callbacks.
+     *
+     * @var array
+     */
+    protected $after = [];
+
+    /**
      * The states to apply.
      *
      * @var array
@@ -76,13 +83,14 @@ class FactoryBuilder
      * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct($class, $name, array $definitions, array $states, Faker $faker)
+    public function __construct($class, $name, array $definitions, array $states, array $after, Faker $faker)
     {
         $this->name = $name;
         $this->class = $class;
         $this->faker = $faker;
         $this->states = $states;
         $this->definitions = $definitions;
+        $this->after = $after;
     }
 
     /**
@@ -149,8 +157,10 @@ class FactoryBuilder
 
         if ($results instanceof Model) {
             $this->store(collect([$results]));
+            $this->applyAfter(collect([$results]), 'create');
         } else {
             $this->store($results);
+            $this->applyAfter($results, 'create');
         }
 
         return $results;
@@ -182,16 +192,18 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         if ($this->amount === null) {
-            return $this->makeInstance($attributes);
+            $instance = $this->makeInstance($attributes);
+            return $this->applyAfter(collect([$instance]), 'make');
         }
 
         if ($this->amount < 1) {
             return (new $this->class)->newCollection();
         }
 
-        return (new $this->class)->newCollection(array_map(function () use ($attributes) {
+        $instances = (new $this->class)->newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
+        return $this->applyAfter($instances, 'make');
     }
 
     /**
@@ -327,5 +339,25 @@ class FactoryBuilder
         }
 
         return $attributes;
+    }
+
+    /**
+     * Run after callback on a collection of models
+     *
+     * @param  \Illuminate\Support\Collection  $results
+     * @param  string  $action
+     * @return void
+     */
+    public function applyAfter($models, $action)
+    {
+        $models->each(function ($model) use ($action) {
+            if (! isset($this->after[$this->class][$action])) {
+                return;
+            }
+
+            call_user_func_array($this->after[$this->class][$action], [$model, $this->faker]);
+        });
+
+        return $models;
     }
 }

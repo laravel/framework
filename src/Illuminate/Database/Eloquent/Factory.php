@@ -23,6 +23,13 @@ class Factory implements ArrayAccess
     protected $states = [];
 
     /**
+     * The registered callbacks.
+     *
+     * @var array
+     */
+    protected $after = [];
+
+    /**
      * The Faker instance for the builder.
      *
      * @var \Faker\Generator
@@ -93,6 +100,26 @@ class Factory implements ArrayAccess
     public function state($class, $state, $attributes)
     {
         $this->states[$class][$state] = $attributes;
+
+        return $this;
+    }
+
+    /**
+     * Define a callback to run after an action.
+     *
+     * @param  string  $class
+     * @param  string  $action
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function after($class, $action, $callback = null)
+    {
+        if (is_callable($action) && $callback === null) {
+            $callback = $action;
+            $action = 'create';
+        }
+
+        $this->after[$class][$action] = $callback;
 
         return $this;
     }
@@ -184,7 +211,7 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->states, $this->faker);
+        return new FactoryBuilder($class, $name, $this->definitions, $this->states, $this->after, $this->faker);
     }
 
     /**
