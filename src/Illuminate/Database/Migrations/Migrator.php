@@ -51,6 +51,15 @@ class Migrator
      * @var array
      */
     protected $paths = [];
+    
+    
+    /**
+     * The paths to all of the migration files.
+     *
+     * @var Symfony\Component\Console\Output\OutputInterface
+     */
+    protected $output;
+    
 
     /**
      * Create a new migrator instance.
@@ -74,10 +83,13 @@ class Migrator
      *
      * @param  array|string  $paths
      * @param  array  $options
+     * @params Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function run($paths = [], array $options = [])
+    public function run($paths = [], array $options = [], OutputInterface $output = null)
     {
+        $this->output = $output;
+        
         $this->notes = [];
 
         // Once we grab all of the migration files for the path, we will compare them
@@ -563,6 +575,10 @@ class Migrator
      */
     protected function note($message)
     {
+        if ($this->output) {
+            $this->output->writeln($message);
+        }
+        
         $this->notes[] = $message;
     }
 
