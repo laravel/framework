@@ -89,7 +89,9 @@ class Migrator
      */
     public function run($paths = [], array $options = [], OutputInterface $output = null)
     {
-        $this->output = $output;
+        if ($output) {
+            $this->setOutput($output);
+        }
         
         $this->notes = [];
 
@@ -566,6 +568,16 @@ class Migrator
     public function getFilesystem()
     {
         return $this->files;
+    }
+    
+    /**
+     * Set the default OutputInterface instance
+     *
+     * @params Symfony\Component\Console\Output\OutputInterface $output
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
     }
 
     /**
