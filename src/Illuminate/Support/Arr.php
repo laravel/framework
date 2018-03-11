@@ -541,7 +541,7 @@ class Arr
      * Shuffle the given array and return the result.
      *
      * @param  array  $array
-     * @param  int  $seed
+     * @param  int|null  $seed
      * @return array
      */
     public static function shuffle($array, $seed = null)
