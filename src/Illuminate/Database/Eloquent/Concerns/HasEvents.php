@@ -25,21 +25,38 @@ trait HasEvents
     protected $observables = [];
 
     /**
-     * Register an observer with the Model.
+     * Register observers with the Model.
      *
-     * @param  object|string  $class
+     * @param  object|string|array  $classes
      * @return void
      */
-    public static function observe($class)
+    public static function observe($classes)
     {
         $instance = new static;
 
+        if (! is_array($classes)) {
+            $classes = [$classes];
+        }
+
+        foreach ($classes as $class) {
+            $instance->registerObserver($class);
+        }
+    }
+
+    /**
+     * Registers a single observer with the Model.
+     *
+     * @param  object|string $class
+     * @return void
+     */
+    private function registerObserver($class)
+    {
         $className = is_string($class) ? $class : get_class($class);
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
         // it into the model's event system, making it convenient to watch these.
-        foreach ($instance->getObservableEvents() as $event) {
+        foreach ($this->getObservableEvents() as $event) {
             if (method_exists($class, $event)) {
                 static::registerModelEvent($event, $className.'@'.$event);
             }
