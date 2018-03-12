@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\QueueManager;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Queue
@@ -31,6 +31,59 @@ class QueueFake extends QueueManager implements Queue
         PHPUnit::assertTrue(
             $this->pushed($job, $callback)->count() > 0,
             "The expected [{$job}] job was not pushed."
+        );
+    }
+
+    /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    public function assertPushedWithChain($job, $expectedChain = [], $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->count() > 0,
+            "The expected [{$job}] job was not pushed."
+        );
+
+        PHPUnit::assertTrue(
+            collect($expectedChain)->count() > 0,
+            "The expected chain can not be empty."
+        );
+
+        $isExpectedChainOfObjects = collect($expectedChain)
+            ->filter(function ($job) { return is_object($job); })
+            ->count() == collect($expectedChain)->count();
+
+        if ($isExpectedChainOfObjects)
+        {
+            $chain = collect($expectedChain)->map(function ($job) { return serialize($job); })->all();
+            PHPUnit::assertTrue(
+                $this->pushed($job, $callback)
+                    ->filter(function ($job) use ($chain) {
+                        return $job->chained == $chain;
+                    })->count() > 0,
+                "The expected chain was not pushed."
+            );
+
+            return;
+        }
+
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)
+                ->map(function ($job) {
+                    return $job->chained;
+                })->map(function ($chain) {
+                    return collect($chain)->map(function ($chainedJob) {
+                        return get_class(unserialize($chainedJob));
+                    });
+                })->filter(function ($chain) use ($expectedChain) {
+                    return $chain == collect($expectedChain);
+                })->count() > 0,
+            'The expected chain was not pushed'
         );
     }
 
@@ -160,7 +213,7 @@ class QueueFake extends QueueManager implements Queue
     {
         $this->jobs[is_object($job) ? get_class($job) : $job][] = [
             'job' => $job,
-            'queue' => $queue,
+            'queue' => $queue
         ];
     }
 
