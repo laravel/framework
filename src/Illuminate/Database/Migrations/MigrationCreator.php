@@ -46,7 +46,7 @@ class MigrationCreator
      */
     public function create($name, $path, $table = null, $create = false)
     {
-        $this->ensureMigrationDoesntAlreadyExist($name);
+        $this->ensureMigrationDoesntAlreadyExist($name, $path);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
@@ -70,12 +70,18 @@ class MigrationCreator
      * Ensure that a migration with the given name doesn't already exist.
      *
      * @param  string  $name
+     * @param  string  $path
      * @return void
      *
      * @throws \InvalidArgumentException
      */
-    protected function ensureMigrationDoesntAlreadyExist($name)
+    protected function ensureMigrationDoesntAlreadyExist($name, $path)
     {
+        //first require all migration files since they are not being auto loaded
+        foreach ($this->files->glob($path.'/*_*.php') as $file) {
+            $this->files->requireOnce($file);
+        }
+
         if (class_exists($className = $this->getClassName($name))) {
             throw new InvalidArgumentException("A {$className} class already exists.");
         }
