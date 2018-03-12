@@ -46,7 +46,7 @@ class EloquentFactoryBuilderTest extends TestCase
             ];
         });
 
-        $factory->after(FactoryBuildableUser::class, 'make', function (FactoryBuildableUser $user, Generator $faker) {
+        $factory->afterMaking(FactoryBuildableUser::class, function (FactoryBuildableUser $user, Generator $faker) {
             $profile = factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
             $user->setRelation('profile', $profile);
         });
@@ -60,7 +60,7 @@ class EloquentFactoryBuilderTest extends TestCase
             ];
         });
 
-        $factory->after(FactoryBuildableTeam::class, function (FactoryBuildableTeam $team, Generator $faker) {
+        $factory->afterCreating(FactoryBuildableTeam::class, function (FactoryBuildableTeam $team, Generator $faker) {
             $team->users()->attach($team->owner);
         });
 

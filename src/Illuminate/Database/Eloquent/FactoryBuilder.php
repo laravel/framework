@@ -46,11 +46,18 @@ class FactoryBuilder
     protected $states;
 
     /**
-     * The model callbacks.
+     * The model after making callbacks.
      *
      * @var array
      */
-    protected $after = [];
+    protected $afterMaking = [];
+
+    /**
+     * The model after creating callbacks.
+     *
+     * @var array
+     */
+    protected $afterCreating = [];
 
     /**
      * The states to apply.
@@ -80,17 +87,21 @@ class FactoryBuilder
      * @param  string  $name
      * @param  array  $definitions
      * @param  array  $states
+     * @param  array  $afterMaking
+     * @param  array  $afterCreating
      * @param  \Faker\Generator  $faker
      * @return void
      */
-    public function __construct($class, $name, array $definitions, array $states, array $after, Faker $faker)
+    public function __construct($class, $name, array $definitions, array $states,
+                                array $afterMaking, array $afterCreating, Faker $faker)
     {
         $this->name = $name;
         $this->class = $class;
         $this->faker = $faker;
         $this->states = $states;
         $this->definitions = $definitions;
-        $this->after = $after;
+        $this->afterMaking = $afterMaking;
+        $this->afterCreating = $afterCreating;
     }
 
     /**
@@ -157,10 +168,12 @@ class FactoryBuilder
 
         if ($results instanceof Model) {
             $this->store(collect([$results]));
-            $this->applyAfter(collect([$results]), 'create');
+
+            $this->callAfterCreating(collect([$results]));
         } else {
             $this->store($results);
-            $this->applyAfter($results, 'create');
+
+            $this->callAfterCreating($results);
         }
 
         return $results;
@@ -192,10 +205,9 @@ class FactoryBuilder
     public function make(array $attributes = [])
     {
         if ($this->amount === null) {
-            $instance = $this->makeInstance($attributes);
-            $this->applyAfter(collect([$instance]), 'make');
-
-            return $instance;
+            return tap($this->makeInstance($attributes), function ($instance) {
+                $this->callAfterMaking(collect([$instance]));
+            });
         }
 
         if ($this->amount < 1) {
@@ -205,7 +217,8 @@ class FactoryBuilder
         $instances = (new $this->class)->newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
-        $this->applyAfter($instances, 'make');
+
+        $this->callAfterMaking($instances);
 
         return $instances;
     }
@@ -346,20 +359,36 @@ class FactoryBuilder
     }
 
     /**
-     * Run after callback on a collection of models.
+     * Run after making callbacks on a collection of models.
      *
      * @param  \Illuminate\Support\Collection  $models
-     * @param  string  $action
      * @return void
      */
-    public function applyAfter($models, $action)
+    public function callAfterMaking($models)
     {
-        $models->each(function ($model) use ($action) {
-            if (! isset($this->after[$this->class][$action])) {
-                return;
+        $models->each(function ($model) {
+            if (isset($this->afterMaking[$this->class])) {
+                foreach ($this->afterMaking[$this->class] as $callback) {
+                    $callback($model, $this->faker);
+                }
             }
+        });
+    }
 
-            call_user_func_array($this->after[$this->class][$action], [$model, $this->faker]);
+    /**
+     * Run after creating callbacks on a collection of models.
+     *
+     * @param  \Illuminate\Support\Collection  $models
+     * @return void
+     */
+    public function callAfterCreating($models)
+    {
+        $models->each(function ($model) {
+            if (isset($this->afterCreating[$this->class])) {
+                foreach ($this->afterCreating[$this->class] as $callback) {
+                    $callback($model, $this->faker);
+                }
+            }
         });
     }
 }

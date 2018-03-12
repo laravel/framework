@@ -23,11 +23,18 @@ class Factory implements ArrayAccess
     protected $states = [];
 
     /**
-     * The registered callbacks.
+     * The registered after making callbacks.
      *
      * @var array
      */
-    protected $after = [];
+    protected $afterMaking = [];
+
+    /**
+     * The registered after creating callbacks.
+     *
+     * @var array
+     */
+    protected $afterCreating = [];
 
     /**
      * The Faker instance for the builder.
@@ -105,21 +112,29 @@ class Factory implements ArrayAccess
     }
 
     /**
-     * Define a callback to run after an action.
+     * Define a callback to run after making a model.
      *
      * @param  string  $class
-     * @param  string  $action
      * @param  callable  $callback
      * @return $this
      */
-    public function after($class, $action, $callback = null)
+    public function afterMaking($class, $callback)
     {
-        if (is_callable($action) && $callback === null) {
-            $callback = $action;
-            $action = 'create';
-        }
+        $this->afterMaking[$class][] = $callback;
 
-        $this->after[$class][$action] = $callback;
+        return $this;
+    }
+
+    /**
+     * Define a callback to run after creating a model.
+     *
+     * @param  string  $class
+     * @param  callable  $callback
+     * @return $this
+     */
+    public function afterCreating($class, $callback)
+    {
+        $this->afterCreating[$class][] = $callback;
 
         return $this;
     }
@@ -211,7 +226,10 @@ class Factory implements ArrayAccess
      */
     public function of($class, $name = 'default')
     {
-        return new FactoryBuilder($class, $name, $this->definitions, $this->states, $this->after, $this->faker);
+        return new FactoryBuilder(
+            $class, $name, $this->definitions, $this->states,
+            $this->afterMaking, $this->afterCreating, $this->faker
+        );
     }
 
     /**
