@@ -138,6 +138,21 @@ if (! function_exists('asset')) {
     }
 }
 
+if (! function_exists('asset_from')) {
+    /**
+     * Generate an asset path for the application from a custom root domain such as CDN, etc.
+     *
+     * @param  string  $root
+     * @param  string  $path
+     * @param  bool    $secure
+     * @return string
+     */
+    function asset_from($root, $path, $secure = null)
+    {
+        return app('url')->assetFrom($root, $path, $secure);
+    }
+}
+
 if (! function_exists('auth')) {
     /**
      * Get the available auth instance.
