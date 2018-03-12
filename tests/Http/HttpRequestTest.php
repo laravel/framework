@@ -304,6 +304,12 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->filledAny(['name']));
         $this->assertTrue($request->filledAny('name'));
 
+        $this->assertFalse($request->filledAny(['age']));
+        $this->assertFalse($request->filledAny('age'));
+
+        $this->assertFalse($request->filledAny(['foo']));
+        $this->assertFalse($request->filledAny('foo'));
+
         $this->assertTrue($request->filledAny(['age', 'name']));
         $this->assertTrue($request->filledAny('age', 'name'));
 
@@ -312,6 +318,9 @@ class HttpRequestTest extends TestCase
 
         $this->assertFalse($request->filledAny('age', 'city'));
         $this->assertFalse($request->filledAny('age', 'city'));
+
+        $this->assertFalse($request->filledAny('foo', 'bar'));
+        $this->assertFalse($request->filledAny('foo', 'bar'));
     }
 
     public function testInputMethod()
