@@ -35,6 +35,56 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string  $job
+     * @param  array $chain
+     * @param  callable|null  $callback
+     * @return void
+     */
+    public function assertPushedWithChain($job, $chain = [], $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->count() > 0,
+            "The expected [{$job}] job was not pushed."
+        );
+
+        PHPUnit::assertTrue(
+            collect($chain)->count() > 0,
+            "The expected chain can not be empty."
+        );
+
+        $isChainOfObjects = collect($chain)
+            ->filter(function ($job) {
+                return is_object($job);
+            })->count() == collect($chain)->count();
+
+        if ($isChainOfObjects)
+        {
+            PHPUnit::assertEquals(
+                collect($chain)->map(function ($job) { return serialize($job); })->all(),
+                $this->pushed($job, $callback)->first()->chained,
+                "The expected chain was not pushed."
+            );
+
+            return;
+        }
+
+        $chainedClasses = collect($this->pushed($job, $callback)->first()->chained)
+            ->map(function ($job) {
+                return unserialize($job);
+            })->map(function($job) {
+                return get_class($job);
+            })->all();
+
+        PHPUnit::assertEquals(
+            $chain,
+            $chainedClasses,
+            "The expected chain was not pushed."
+        );
+    }
+
+    /**
      * Assert if a job was pushed a number of times.
      *
      * @param  string  $job
@@ -160,7 +210,7 @@ class QueueFake extends QueueManager implements Queue
     {
         $this->jobs[is_object($job) ? get_class($job) : $job][] = [
             'job' => $job,
-            'queue' => $queue,
+            'queue' => $queue
         ];
     }
 
