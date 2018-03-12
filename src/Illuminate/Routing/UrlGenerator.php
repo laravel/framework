@@ -3,6 +3,7 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -70,6 +71,13 @@ class UrlGenerator implements UrlGeneratorContract
      * @var callable
      */
     protected $sessionResolver;
+
+    /**
+     * The encryption key resolver callable.
+     *
+     * @var callable
+     */
+    protected $keyResolver;
 
     /**
      * The callback to use to format hosts.
@@ -284,6 +292,37 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         return $this->cachedSchema;
+    }
+
+    /**
+     * Create a signed route URL for a named route.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @return string
+     */
+    public function signedRoute($name, $parameters = [])
+    {
+        $key = call_user_func($this->keyResolver);
+
+        return $this->route($name, $parameters + [
+            'signature' => hash_hmac('sha256', $this->route($name, $parameters), $key),
+        ]);
+    }
+
+    /**
+     * Create a temporary signed route URL for a named route.
+     *
+     * @param  string  $name
+     * @param  \DateTimeInterface  $expiration
+     * @param  array  $parameters
+     * @return string
+     */
+    public function temporarySignedRoute($name, DateTimeInterface $expiration, $parameters = [])
+    {
+        return $this->signedRoute(
+            $name, $parameters + ['expires' => $expiration->getTimestamp()]
+        );
     }
 
     /**
@@ -610,6 +649,19 @@ class UrlGenerator implements UrlGeneratorContract
     public function setSessionResolver(callable $sessionResolver)
     {
         $this->sessionResolver = $sessionResolver;
+
+        return $this;
+    }
+
+    /**
+     * Set the encryption key resolver.
+     *
+     * @param  callable  $keyResolver
+     * @return $this
+     */
+    public function setKeyResolver(callable $keyResolver)
+    {
+        $this->keyResolver = $keyResolver;
 
         return $this;
     }
