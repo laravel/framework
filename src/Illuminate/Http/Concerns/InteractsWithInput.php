@@ -131,7 +131,7 @@ trait InteractsWithInput
         return true;
     }
 
-        /**
+    /**
      * Determine if the request contains a non-empty value for any of the given inputs.
      *
      * @param  string|array  $keys
