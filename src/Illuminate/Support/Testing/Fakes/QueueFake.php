@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Queue\QueueManager;
 use Illuminate\Contracts\Queue\Queue;
+use Illuminate\Queue\QueueManager;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 class QueueFake extends QueueManager implements Queue
@@ -37,12 +37,12 @@ class QueueFake extends QueueManager implements Queue
     /**
      * Assert if a job was pushed with chained jobs based on a truth-test callback.
      *
-     * @param  string  $job
-     * @param  array $chain
-     * @param  callable|null  $callback
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
      * @return void
      */
-    public function assertPushedWithChain($job, $chain = [], $callback = null)
+    public function assertPushedWithChain($job, $expectedChain = [], $callback = null)
     {
         PHPUnit::assertTrue(
             $this->pushed($job, $callback)->count() > 0,
@@ -50,37 +50,40 @@ class QueueFake extends QueueManager implements Queue
         );
 
         PHPUnit::assertTrue(
-            collect($chain)->count() > 0,
+            collect($expectedChain)->count() > 0,
             "The expected chain can not be empty."
         );
 
-        $isChainOfObjects = collect($chain)
-            ->filter(function ($job) {
-                return is_object($job);
-            })->count() == collect($chain)->count();
+        $isExpectedChainOfObjects = collect($expectedChain)
+            ->filter(function ($job) { return is_object($job); })
+            ->count() == collect($expectedChain)->count();
 
-        if ($isChainOfObjects)
+        if ($isExpectedChainOfObjects)
         {
-            PHPUnit::assertEquals(
-                collect($chain)->map(function ($job) { return serialize($job); })->all(),
-                $this->pushed($job, $callback)->first()->chained,
+            $chain = collect($expectedChain)->map(function ($job) { return serialize($job); })->all();
+            PHPUnit::assertTrue(
+                $this->pushed($job, $callback)
+                    ->filter(function ($job) use ($chain) {
+                        return $job->chained == $chain;
+                    })->count() > 0,
                 "The expected chain was not pushed."
             );
 
             return;
         }
 
-        $chainedClasses = collect($this->pushed($job, $callback)->first()->chained)
-            ->map(function ($job) {
-                return unserialize($job);
-            })->map(function($job) {
-                return get_class($job);
-            })->all();
-
-        PHPUnit::assertEquals(
-            $chain,
-            $chainedClasses,
-            "The expected chain was not pushed."
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)
+                ->map(function ($job) {
+                    return $job->chained;
+                })->map(function ($chain) {
+                    return collect($chain)->map(function ($chainedJob) {
+                        return get_class(unserialize($chainedJob));
+                    });
+                })->filter(function ($chain) use ($expectedChain) {
+                    return $chain == collect($expectedChain);
+                })->count() > 0,
+            'The expected chain was not pushed'
         );
     }
 
