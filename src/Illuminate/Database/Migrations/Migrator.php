@@ -82,14 +82,12 @@ class Migrator
      *
      * @param  array|string  $paths
      * @param  array  $options
-     * @params Symfony\Component\Console\Output\OutputInterface $output
+     * @param Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
     public function run($paths = [], array $options = [], OutputInterface $output = null)
     {
-        if ($output) {
-            $this->setOutput($output);
-        }
+        $this->setOutput($output);
 
         $this->notes = [];
 
@@ -202,10 +200,13 @@ class Migrator
      *
      * @param  array|string $paths
      * @param  array  $options
+     * @param Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function rollback($paths = [], array $options = [])
+    public function rollback($paths = [], array $options = [], OutputInterface $output = null)
     {
+        $this->setOutput($output);
+
         $this->notes = [];
 
         // We want to pull in the last batch of migrations that ran on the previous
@@ -279,10 +280,13 @@ class Migrator
      *
      * @param  array|string $paths
      * @param  bool  $pretend
+     * @param Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function reset($paths = [], $pretend = false)
+    public function reset($paths = [], $pretend = false, OutputInterface $output = null)
     {
+        $this->setOutput($output);
+
         $this->notes = [];
 
         // Next, we will reverse the migration list so we can run them back in the
@@ -571,7 +575,8 @@ class Migrator
     /**
      * Set the output instance.
      *
-     * @params Symfony\Component\Console\Output\OutputInterface $output
+     * @param Symfony\Component\Console\Output\OutputInterface $output
+     * @return  void
      */
     public function setOutput($output)
     {
