@@ -38,6 +38,32 @@ class EloquentFactoryBuilderTest extends TestCase
             ];
         });
 
+        $factory->define(FactoryBuildableProfile::class, function (Generator $faker) {
+            return [
+                'user_id' => function () {
+                    return factory(FactoryBuildableUser::class)->create()->id;
+                },
+            ];
+        });
+
+        $factory->after(FactoryBuildableUser::class, 'make', function (FactoryBuildableUser $user, Generator $faker) {
+            $profile = factory(FactoryBuildableProfile::class)->make(['user_id' => $user->id]);
+            $user->setRelation('profile', $profile);
+        });
+
+        $factory->define(FactoryBuildableTeam::class, function (Generator $faker) {
+            return [
+                'name' => $faker->name,
+                'owner_id' => function () {
+                    return factory(FactoryBuildableUser::class)->create()->id;
+                },
+            ];
+        });
+
+        $factory->after(FactoryBuildableTeam::class, function (FactoryBuildableTeam $team, Generator $faker) {
+            $team->users()->attach($team->owner);
+        });
+
         $factory->define(FactoryBuildableServer::class, function (Generator $faker) {
             return [
                 'name' => $faker->name,
@@ -70,6 +96,23 @@ class EloquentFactoryBuilderTest extends TestCase
             $table->increments('id');
             $table->string('name');
             $table->string('email');
+        });
+
+        Schema::create('profiles', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('user_id');
+        });
+
+        Schema::create('teams', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->string('owner_id');
+        });
+
+        Schema::create('team_users', function ($table) {
+            $table->increments('id');
+            $table->unsignedInteger('team_id');
+            $table->unsignedInteger('user_id');
         });
 
         Schema::connection('alternative-connection')->create('users', function ($table) {
@@ -183,6 +226,14 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertTrue($user->is($dbUser));
     }
 
+    /** @test **/
+    public function creating_models_with_after_callback()
+    {
+        $team = factory(FactoryBuildableTeam::class)->create();
+
+        $this->assertTrue($team->users->contains($team->owner));
+    }
+
     /** @test */
     public function making_models_with_a_custom_connection()
     {
@@ -191,6 +242,14 @@ class EloquentFactoryBuilderTest extends TestCase
             ->make();
 
         $this->assertEquals('alternative-connection', $user->getConnectionName());
+    }
+
+    /** @test **/
+    public function making_models_with_after_callback()
+    {
+        $user = factory(FactoryBuildableUser::class)->make();
+
+        $this->assertNotNull($user->profile);
     }
 }
 
@@ -203,6 +262,45 @@ class FactoryBuildableUser extends Model
     public function servers()
     {
         return $this->hasMany(FactoryBuildableServer::class, 'user_id');
+    }
+
+    public function profile()
+    {
+        return $this->hasOne(FactoryBuildableProfile::class, 'user_id');
+    }
+}
+
+class FactoryBuildableProfile extends Model
+{
+    public $table = 'profiles';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    public function user()
+    {
+        return $this->belongsTo(FactoryBuildableUser::class, 'user_id');
+    }
+}
+
+class FactoryBuildableTeam extends Model
+{
+    public $table = 'teams';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    public function owner()
+    {
+        return $this->belongsTo(FactoryBuildableUser::class, 'owner_id');
+    }
+
+    public function users()
+    {
+        return $this->belongsToMany(
+            FactoryBuildableUser::class,
+            'team_users',
+            'team_id',
+            'user_id'
+        );
     }
 }
 
