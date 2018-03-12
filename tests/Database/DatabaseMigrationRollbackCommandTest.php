@@ -22,8 +22,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 0]);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 0], m::type('Symfony\Component\Console\Output\OutputInterface'));
+        $migrator->shouldNotReceive('getNotes');
 
         $this->runCommand($command);
     }
@@ -36,8 +36,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with(null);
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 2]);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => false, 'step' => 2], m::type('Symfony\Component\Console\Output\OutputInterface'));
+        $migrator->shouldNotReceive('getNotes');
 
         $this->runCommand($command, ['--step' => 2]);
     }
@@ -50,8 +50,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], true);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], true, m::type('Symfony\Component\Console\Output\OutputInterface'));
+        $migrator->shouldNotReceive('getNotes');
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
@@ -64,8 +64,8 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $command->setLaravel($app);
         $migrator->shouldReceive('paths')->once()->andReturn([]);
         $migrator->shouldReceive('setConnection')->once()->with('foo');
-        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => true, 'step' => 2]);
-        $migrator->shouldReceive('getNotes')->andReturn([]);
+        $migrator->shouldReceive('rollback')->once()->with([__DIR__.'/migrations'], ['pretend' => true, 'step' => 2], m::type('Symfony\Component\Console\Output\OutputInterface'));
+        $migrator->shouldNotReceive('getNotes');
 
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo', '--step' => 2]);
     }

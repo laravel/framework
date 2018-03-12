@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Output\OutputInterface;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -53,6 +54,13 @@ class Migrator
     protected $paths = [];
 
     /**
+     * The paths to all of the migration files.
+     *
+     * @var Symfony\Component\Console\Output\OutputInterface
+     */
+    protected $output;
+
+    /**
      * Create a new migrator instance.
      *
      * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
@@ -74,10 +82,13 @@ class Migrator
      *
      * @param  array|string  $paths
      * @param  array  $options
+     * @param Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function run($paths = [], array $options = [])
+    public function run($paths = [], array $options = [], OutputInterface $output = null)
     {
+        $this->setOutput($output);
+
         $this->notes = [];
 
         // Once we grab all of the migration files for the path, we will compare them
@@ -189,10 +200,13 @@ class Migrator
      *
      * @param  array|string $paths
      * @param  array  $options
+     * @param Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function rollback($paths = [], array $options = [])
+    public function rollback($paths = [], array $options = [], OutputInterface $output = null)
     {
+        $this->setOutput($output);
+
         $this->notes = [];
 
         // We want to pull in the last batch of migrations that ran on the previous
@@ -266,10 +280,13 @@ class Migrator
      *
      * @param  array|string $paths
      * @param  bool  $pretend
+     * @param Symfony\Component\Console\Output\OutputInterface $output
      * @return array
      */
-    public function reset($paths = [], $pretend = false)
+    public function reset($paths = [], $pretend = false, OutputInterface $output = null)
     {
+        $this->setOutput($output);
+
         $this->notes = [];
 
         // Next, we will reverse the migration list so we can run them back in the
@@ -556,13 +573,28 @@ class Migrator
     }
 
     /**
-     * Raise a note event for the migrator.
+     * Set the output instance.
+     *
+     * @param Symfony\Component\Console\Output\OutputInterface $output
+     * @return  void
+     */
+    public function setOutput($output)
+    {
+        $this->output = $output;
+    }
+
+    /**
+     * Raise a note event for the migrator, if an output is set, prints to the output.
      *
      * @param  string  $message
      * @return void
      */
     protected function note($message)
     {
+        if ($this->output) {
+            $this->output->writeln($message);
+        }
+
         $this->notes[] = $message;
     }
 
