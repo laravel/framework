@@ -301,26 +301,26 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
 
-        $this->assertTrue($request->filledAny(['name']));
-        $this->assertTrue($request->filledAny('name'));
+        $this->assertTrue($request->anyFilled(['name']));
+        $this->assertTrue($request->anyFilled('name'));
 
-        $this->assertFalse($request->filledAny(['age']));
-        $this->assertFalse($request->filledAny('age'));
+        $this->assertFalse($request->anyFilled(['age']));
+        $this->assertFalse($request->anyFilled('age'));
 
-        $this->assertFalse($request->filledAny(['foo']));
-        $this->assertFalse($request->filledAny('foo'));
+        $this->assertFalse($request->anyFilled(['foo']));
+        $this->assertFalse($request->anyFilled('foo'));
 
-        $this->assertTrue($request->filledAny(['age', 'name']));
-        $this->assertTrue($request->filledAny('age', 'name'));
+        $this->assertTrue($request->anyFilled(['age', 'name']));
+        $this->assertTrue($request->anyFilled('age', 'name'));
 
-        $this->assertTrue($request->filledAny(['foo', 'name']));
-        $this->assertTrue($request->filledAny('foo', 'name'));
+        $this->assertTrue($request->anyFilled(['foo', 'name']));
+        $this->assertTrue($request->anyFilled('foo', 'name'));
 
-        $this->assertFalse($request->filledAny('age', 'city'));
-        $this->assertFalse($request->filledAny('age', 'city'));
+        $this->assertFalse($request->anyFilled('age', 'city'));
+        $this->assertFalse($request->anyFilled('age', 'city'));
 
-        $this->assertFalse($request->filledAny('foo', 'bar'));
-        $this->assertFalse($request->filledAny('foo', 'bar'));
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
     }
 
     public function testInputMethod()

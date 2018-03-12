@@ -137,7 +137,7 @@ trait InteractsWithInput
      * @param  string|array  $keys
      * @return bool
      */
-    public function filledAny($keys)
+    public function anyFilled($keys)
     {
         $keys = is_array($keys) ? $keys : func_get_args();
 
