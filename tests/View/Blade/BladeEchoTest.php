@@ -43,6 +43,11 @@ class BladeEchoTest extends AbstractBladeTestCase
             $name or \'foo\'
         }}'));
 
+	    $this->assertEquals('<?php echo e($name ? "yes" : "no"); ?>', $this->compiler->compileString('{{$name ? "yes" : "no"}}'));
+	    $this->assertEquals('<?php echo e($name ? "lorem or ipsum" : "dolor or sit"); ?>', $this->compiler->compileString('{{$name ? "lorem or ipsum" : "dolor or sit"}}'));
+	    $this->assertEquals('<?php echo e(($name) ? "yes" : "no"); ?>', $this->compiler->compileString('{{($name) ? "yes" : "no"}}'));
+	    $this->assertEquals('<?php echo e(($name) ? "lorem or ipsum" : "dolor or sit"); ?>', $this->compiler->compileString('{{($name) ? "lorem or ipsum" : "dolor or sit"}}'));
+
         $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $this->compiler->compileString('{{ $age or 90 }}'));
         $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $this->compiler->compileString('{{$age or 90}}'));
         $this->assertEquals('<?php echo e(isset($age) ? $age : 90); ?>', $this->compiler->compileString('{{
