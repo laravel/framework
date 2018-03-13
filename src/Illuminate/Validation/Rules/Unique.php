@@ -20,7 +20,7 @@ class Unique
      *
      * @var string
      */
-    protected $idColumn;
+    protected $idColumn = 'id';
 
     /**
      * Ignore the given ID during the unique check.
@@ -67,7 +67,7 @@ class Unique
             $this->table,
             $this->column,
             $this->ignore ? '"'.$this->ignore.'"' : 'NULL',
-            $this->idColumn ?? 'NULL',
+            $this->idColumn,
             $this->formatWheres()
         ), ',');
     }

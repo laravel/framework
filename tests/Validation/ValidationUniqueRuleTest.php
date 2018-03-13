@@ -11,7 +11,7 @@ class ValidationUniqueRuleTest extends TestCase
     {
         $rule = new \Illuminate\Validation\Rules\Unique('table');
         $rule->where('foo', 'bar');
-        $this->assertEquals('unique:table,NULL,NULL,NULL,foo,bar', (string) $rule);
+        $this->assertEquals('unique:table,NULL,NULL,id,foo,bar', (string) $rule);
 
         $rule = new \Illuminate\Validation\Rules\Unique('table', 'column');
         $rule->ignore('Taylor, Otwell', 'id_column');
