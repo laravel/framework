@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Log;
 
+use ReflectionProperty;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
-use Monolog\Handler\LogEntriesHandler;
-use Monolog\Handler\StreamHandler;
 use Monolog\Logger as Monolog;
 use Orchestra\Testbench\TestCase;
-use ReflectionProperty;
+use Monolog\Handler\StreamHandler;
+use Monolog\Handler\LogEntriesHandler;
 
 class LogManagerTest extends TestCase
 {
@@ -32,8 +32,8 @@ class LogManagerTest extends TestCase
             'handler_params' => [
                 'stream' => 'php://stderr',
                 'level' => Monolog::NOTICE,
-                'bubble' => false
-            ]
+                'bubble' => false,
+            ],
         ]);
 
         $manager = new LogManager($this->app);
@@ -55,8 +55,8 @@ class LogManagerTest extends TestCase
             'name' => 'le',
             'handler_type' => 'LogEntries',
             'handler_params' => [
-                'token' => '123456789'
-            ]
+                'token' => '123456789',
+            ],
         ]);
 
         $logger = $manager->channel('logentries');
