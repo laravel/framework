@@ -1291,7 +1291,7 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('forget');
         EloquentModelStub::observe([
             'Illuminate\Tests\Database\EloquentTestObserverStub',
-            'Illuminate\Tests\Database\EloquentTestAnotherObserverStub'
+            'Illuminate\Tests\Database\EloquentTestAnotherObserverStub',
         ]);
         EloquentModelStub::flushEventListeners();
     }
