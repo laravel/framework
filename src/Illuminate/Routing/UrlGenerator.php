@@ -303,7 +303,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  \DateTimeInterface  $expiration
      * @return string
      */
-    public function signed($name, $parameters = [], DateTimeInterface $expiration = null)
+    public function signedRoute($name, $parameters = [], DateTimeInterface $expiration = null)
     {
         if ($expiration) {
             $parameters = $parameters + ['expires' => $expiration->getTimestamp()];
@@ -324,9 +324,9 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  array  $parameters
      * @return string
      */
-    public function temporarySigned($name, DateTimeInterface $expiration, $parameters = [])
+    public function temporarySignedRoute($name, DateTimeInterface $expiration, $parameters = [])
     {
-        return $this->signed($name, $parameters, $expiration);
+        return $this->signedRoute($name, $parameters, $expiration);
     }
 
     /**
@@ -337,9 +337,9 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasValidSignature(Request $request)
     {
-        $original = $request->url().'?'.http_build_query(
+        $original = rtrim($request->url().'?'.http_build_query(
             Arr::except($request->query(), 'signature')
-        );
+        ), '?');
 
         $expires = Arr::get($request->query(), 'expires');
 
