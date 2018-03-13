@@ -1286,13 +1286,17 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
+
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestAnotherObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestAnotherObserverStub@saved');
+
         $events->shouldReceive('forget');
+
         EloquentModelStub::observe([
             'Illuminate\Tests\Database\EloquentTestObserverStub',
             'Illuminate\Tests\Database\EloquentTestAnotherObserverStub',
         ]);
+
         EloquentModelStub::flushEventListeners();
     }
 
