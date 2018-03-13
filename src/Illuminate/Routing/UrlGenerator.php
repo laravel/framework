@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
