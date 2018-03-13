@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\AggregateServiceProvider;
 
 class FoundationServiceProvider extends AggregateServiceProvider
@@ -55,17 +56,8 @@ class FoundationServiceProvider extends AggregateServiceProvider
      */
     public function registerRequestSignatureValidation()
     {
-        $app = $this->app;
-
-        Request::macro('hasValidSignature', function () use ($app) {
-            $original = $this->url().'?'.http_build_query(
-                Arr::except($this->query(), 'signature')
-            );
-
-            $expires = Arr::get($this->query(), 'expires');
-
-            return $this->query('signature') === hash_hmac('sha256', $original, $app['config']['app.key']) &&
-                   ! ($expires && Carbon::now()->getTimestamp() > $expires);
+        Request::macro('hasValidSignature', function () {
+            return URL::hasValidSignature($this);
         });
     }
 }

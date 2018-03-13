@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
@@ -299,10 +300,15 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $name
      * @param  array  $parameters
+     * @param  \DateTimeInterface  $expiration
      * @return string
      */
-    public function signedRoute($name, $parameters = [])
+    public function signed($name, $parameters = [], DateTimeInterface $expiration = null)
     {
+        if ($expiration) {
+            $parameters = $parameters + ['expires' => $expiration->getTimestamp()];
+        }
+
         $key = call_user_func($this->keyResolver);
 
         return $this->route($name, $parameters + [
@@ -318,11 +324,29 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  array  $parameters
      * @return string
      */
-    public function temporarySignedRoute($name, DateTimeInterface $expiration, $parameters = [])
+    public function temporarySigned($name, DateTimeInterface $expiration, $parameters = [])
     {
-        return $this->signedRoute(
-            $name, $parameters + ['expires' => $expiration->getTimestamp()]
+        return $this->signed($name, $parameters, $expiration);
+    }
+
+    /**
+     * Determine if the given request has a valid signature.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function hasValidSignature(Request $request)
+    {
+        $original = $request->url().'?'.http_build_query(
+            Arr::except($request->query(), 'signature')
         );
+
+        $expires = Arr::get($request->query(), 'expires');
+
+        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
+
+        return $request->query('signature') === $signature &&
+               ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
 
     /**
