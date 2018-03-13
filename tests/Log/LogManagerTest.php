@@ -46,9 +46,12 @@ class LogManagerTest extends TestCase
         $this->assertEquals('foobar', $logger->getName());
         $this->assertCount(1, $handlers);
         $this->assertInstanceOf(StreamHandler::class, $handlers[0]);
-        $this->assertEquals('php://stderr', $handlers[0]->getUrl());
         $this->assertEquals(Monolog::NOTICE, $handlers[0]->getLevel());
         $this->assertFalse($handlers[0]->getBubble());
+
+        $url = new ReflectionProperty(get_class($handlers[0]), 'url');
+        $url->setAccessible(true);
+        $this->assertEquals('php://stderr', $url->getValue($handlers[0]));
 
         $config->set('logging.channels.logentries', [
             'driver' => 'monolog',
