@@ -418,9 +418,11 @@ if (! function_exists('collect')) {
      * @param  mixed  $value
      * @return \Illuminate\Support\Collection
      */
-    function collect(...$value)
+    function collect($value = null)
     {
-        return new Collection(...$value);
+        return new Collection(
+            func_num_args() === 1 ? $value : func_get_args()
+        );
     }
 }
 
