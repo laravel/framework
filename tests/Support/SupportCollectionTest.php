@@ -1359,8 +1359,11 @@ class SupportCollectionTest extends TestCase
 
     public function testConstructMethodFromArguments()
     {
-        $collection = new Collection('foo', 'bar', 'baz');
-        $this->assertEquals(['foo', 'bar', 'baz'], $collection->all());
+        $data = new Collection('foo', 'bar', 'baz');
+        $this->assertEquals(['foo', 'bar', 'baz'], $data->all());
+
+        $data = new Collection(['foo'], ['bar']);
+        $this->assertEquals([['foo'], ['bar']], $data->all());
     }
 
     public function testSplice()

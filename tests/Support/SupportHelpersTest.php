@@ -880,6 +880,7 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(['foo'], collect('foo')->all());
         $this->assertEquals(['foo', 'bar'], collect(['foo', 'bar'])->all());
         $this->assertEquals(['foo', 'bar'], collect('foo', 'bar')->all());
+        $this->assertEquals([['foo'], ['bar']], collect(['foo'], ['bar'])->all());
     }
 }
 
