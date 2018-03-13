@@ -873,6 +873,15 @@ class SupportHelpersTest extends TestCase
             return $five + 5;
         }));
     }
+
+    public function testCollect()
+    {
+        $this->assertEquals([], collect()->all());
+        $this->assertEquals(['foo'], collect('foo')->all());
+        $this->assertEquals(['foo', 'bar'], collect(['foo', 'bar'])->all());
+        $this->assertEquals(['foo', 'bar'], collect('foo', 'bar')->all());
+        $this->assertEquals([['foo'], ['bar']], collect(['foo'], ['bar'])->all());
+    }
 }
 
 trait SupportTestTraitOne
