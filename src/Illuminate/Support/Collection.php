@@ -45,7 +45,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function __construct($items = [])
     {
-        $this->items = $this->getArrayableItems($items);
+        $this->items = $this->getArrayableItems(
+            func_num_args() === 1 ? $items : func_get_args()
+        );
     }
 
     /**
