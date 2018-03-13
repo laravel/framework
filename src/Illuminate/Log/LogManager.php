@@ -320,7 +320,7 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Create an instance of any handler provided by Monolog provided via configuration.
+     * Create an instance of any handler available in Monolog from configuration.
      *
      * @param array $config
      * @return \Monolog\Logger
@@ -340,17 +340,10 @@ class LogManager implements LoggerInterface
             throw new InvalidArgumentException($handlerClass.' must be an instance of '.HandlerInterface::class);
         }
 
-        $container = $this->app;
-
-        if (isset($config['handler_params'])) {
-            // clone app so that contextual bindings are not persisted
-            $container = clone $this->app;
-            foreach ($config['handler_params'] as $name => $value) {
-                $container->addContextualBinding($handlerClass, '$'.$name, $value);
-            }
-        }
-
-        return new Monolog($this->parseChannel($config), [$this->prepareHandler($container->build($handlerClass))]);
+        return new Monolog(
+            $this->parseChannel($config),
+            [$this->prepareHandler($this->app->make($handlerClass, $config['handler_params'] ?? []))]
+        );
     }
 
     /**
