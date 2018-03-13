@@ -218,7 +218,17 @@ class Handler implements ExceptionHandlerContract
     {
         return $request->expectsJson()
                     ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest(route('login'));
+                    : redirect()->guest($this->unauthenticatedRedirectUrl());
+    }
+
+    /**
+     * Get the URL to redirect to when handling an authentication exception.
+     *
+     * @return string
+     */
+    protected function unauthenticatedRedirectUrl()
+    {
+        return route('login');
     }
 
     /**
