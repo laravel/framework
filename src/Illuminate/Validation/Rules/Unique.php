@@ -26,7 +26,7 @@ class Unique
      * Ignore the given ID during the unique check.
      *
      * @param  mixed  $id
-     * @param  string  $idColumn
+     * @param  string|null  $idColumn
      * @return $this
      */
     public function ignore($id, $idColumn = null)
@@ -44,8 +44,8 @@ class Unique
     /**
      * Ignore the given model during the unique check.
      *
-     * @param Model $model
-     * @param string|null $idColumn
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param  string|null  $idColumn
      * @return $this
      */
     public function ignoreModel($model, $idColumn = null)
