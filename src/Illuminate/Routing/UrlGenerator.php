@@ -10,12 +10,13 @@ use Illuminate\Http\Request;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract
 {
-    use Macroable;
+    use InteractsWithTime, Macroable;
 
     /**
      * The route collection.
@@ -300,13 +301,13 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $name
      * @param  array  $parameters
-     * @param  \DateTimeInterface  $expiration
+     * @param  \DateTimeInterface|int  $expiration
      * @return string
      */
-    public function signedRoute($name, $parameters = [], DateTimeInterface $expiration = null)
+    public function signedRoute($name, $parameters = [], $expiration = null)
     {
         if ($expiration) {
-            $parameters = $parameters + ['expires' => $expiration->getTimestamp()];
+            $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
         }
 
         $key = call_user_func($this->keyResolver);
@@ -320,11 +321,11 @@ class UrlGenerator implements UrlGeneratorContract
      * Create a temporary signed route URL for a named route.
      *
      * @param  string  $name
-     * @param  \DateTimeInterface  $expiration
+     * @param  \DateTimeInterface|int  $expiration
      * @param  array  $parameters
      * @return string
      */
-    public function temporarySignedRoute($name, DateTimeInterface $expiration, $parameters = [])
+    public function temporarySignedRoute($name, $expiration, $parameters = [])
     {
         return $this->signedRoute($name, $parameters, $expiration);
     }
