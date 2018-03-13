@@ -1236,8 +1236,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $post->update(['name' => 'Updated']);
 
-        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
 
         Carbon::setTestNow($before);
     }
@@ -1256,8 +1256,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
 
-        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching models related timestamps.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
 
         Carbon::setTestNow($before);
     }
@@ -1276,7 +1276,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $post->delete();
 
-        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
 
         Carbon::setTestNow($before);
     }
@@ -1295,8 +1295,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $post->touch();
 
-        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps.');
+        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is not touching models related timestamps.');
 
         Carbon::setTestNow($before);
     }
@@ -1317,8 +1317,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $post->touch();
         });
 
-        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue(
+            $future->isSameDay($post->fresh()->updated_at),
+            'It is not touching model own timestamps in withoutTouching scope.'
+        );
+
+        $this->assertTrue(
+            $before->isSameDay($user->fresh()->updated_at),
+            'It is touching model own timestamps in withoutTouching scope, when it should not.'
+        );
 
         Carbon::setTestNow($before);
     }
@@ -1340,8 +1347,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $post->touch();
         });
 
-        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue(
+            $before->isSameDay($user->fresh()->updated_at),
+            'It is touching models when in withoutTouching scope, when it should not.'
+        );
+
+        $this->assertTrue(
+            $before->isSameDay($post->fresh()->updated_at),
+            'It is touching models when in withoutTouching scope, when it should not.'
+        );
 
         Carbon::setTestNow($before);
     }
@@ -1363,8 +1377,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $post->touch();
         });
 
-        $this->assertTrue($future->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue(
+            $future->isSameDay($user->fresh()->updated_at),
+            'It is not touching related model when in withoutTouching scope, when it should.'
+        );
+
+        $this->assertTrue(
+            $before->isSameDay($post->fresh()->updated_at),
+            'It is touching models when in withoutTouching scope, when it should not.'
+        );
 
         Carbon::setTestNow($before);
     }
@@ -1388,8 +1409,15 @@ class DatabaseEloquentIntegrationTest extends TestCase
             });
         });
 
-        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue(
+            $before->isSameDay($user->fresh()->updated_at),
+            'It is touching models when in withoutTouching scope, when it should not.'
+        );
+
+        $this->assertTrue(
+            $before->isSameDay($post->fresh()->updated_at),
+            'It is touching models when in withoutTouching scope, when it should not.'
+        );
 
         Carbon::setTestNow($before);
     }
@@ -1410,13 +1438,13 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $post->update(['name' => 'Updated']);
         });
 
-        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
-        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is not touching model own timestamps when it should.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models relationships when it should be disabled.');
 
         Carbon::setTestNow($before);
     }
 
-    public function testUpdatingModelInTheDisabledScopeDoesNotTouchesTimestamps()
+    public function testUpdatingModelInTheDisabledScopeTouchesItsOwnTimestamps()
     {
         $before = Carbon::now();
 
@@ -1432,7 +1460,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             $post->update(['name' => 'Updated']);
         });
 
-        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($future->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
 
         Carbon::setTestNow($before);
