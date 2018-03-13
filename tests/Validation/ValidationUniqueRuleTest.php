@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 
 class ValidationUniqueRuleTest extends TestCase
 {
@@ -23,9 +23,8 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertEquals('unique:table,column,NULL,id_column,foo,bar', (string) $rule);
 
-
         $model = new EloquentModelStub(['id_column' => 1]);
-        
+
         $rule = new \Illuminate\Validation\Rules\Unique('table', 'column');
         $rule->ignore($model);
         $rule->where('foo', 'bar');
