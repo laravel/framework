@@ -31,8 +31,8 @@
         }
     },
     "suggest": {
-        "doctrine/dbal": "Required to rename columns and drop SQLite columns (~2.6).",
-        "fzaninotto/faker": "Required to use the eloquent factory builder (~1.4).",
+        "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
+        "fzaninotto/faker": "Required to use the eloquent factory builder (^1.4).",
         "illuminate/console": "Required to use the database commands (5.7.*).",
         "illuminate/events": "Required to use the observers with Eloquent (5.7.*).",
         "illuminate/filesystem": "Required to use the migrations (5.7.*).",

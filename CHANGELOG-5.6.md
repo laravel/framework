@@ -3,7 +3,32 @@
 ## [Unreleased]
 
 ### Changed
+- Only set id on `NotificationFake` if there is no id set ([#23470](https://github.com/laravel/framework/pull/23470))
+- Check whether `fetch()` method exists in `Application::output()` ([#23471](https://github.com/laravel/framework/pull/23471))
+
+
+## v5.6.11 (2018-03-09)
+
+### Fixed
+- Fix for Carbon 1.24.1 ([#23464](https://github.com/laravel/framework/pull/23464))
+
+
+## v5.6.10 (2018-03-09)
+
+### Added
+- Added `Blueprint::dropMorphs()` ([#23431](https://github.com/laravel/framework/pull/23431))
+- Added `Mailable::attachFromStorage()` methods ([0fa361d](https://github.com/laravel/framework/commit/0fa361d0e2e111a1a684606a675b414ebd471257))
+- Added `orWhere*()` builder methods for day, month and year ([#23449](https://github.com/laravel/framework/pull/23449))
+
+### Changed
 - Added `v-pre` to dropdown link in `app.stub` ([98fdbb0](https://github.com/laravel/framework/commit/98fdbb098cf52a74441fe949be121c18e3dbbe6a))
+- Handle more JSON errors gracefully when `JSON_PARTIAL_OUTPUT_ON_ERROR` is set ([#23410](https://github.com/laravel/framework/pull/23410), [972b82a](https://github.com/laravel/framework/commit/972b82a67c6dd09fa01bf5e0b349a547ece33666))
+- Add bubble, permission and locking config to single/daily log ([#23439](https://github.com/laravel/framework/pull/23439))
+- Use `Str::contains()` instead of `str_contains()` ([ae4cb28](https://github.com/laravel/framework/commit/ae4cb28d040dca8db9a678978efd9ab63c6ea9fd))
+
+### Fixed
+- Fixed `unique()` call in `Validator::validate()` ([#23432](https://github.com/laravel/framework/pull/23432))
+- Fix for Carbon 1.24.0 ([67d8a4b](https://github.com/laravel/framework/commit/67d8a4b15ffdeeacc2c27efad05735a59dba1c44))
 
 
 ## v5.6.9 (2018-03-07)

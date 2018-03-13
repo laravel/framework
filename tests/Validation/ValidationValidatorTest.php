@@ -2330,19 +2330,34 @@ class ValidationValidatorTest extends TestCase
     public function testValidateRegex()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['x' => 'asdasdf'], ['x' => 'Regex:/^([a-z])+$/i']);
+        $v = new Validator($trans, ['x' => 'asdasdf'], ['x' => 'Regex:/^[a-z]+$/i']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => 'aasd234fsd1'], ['x' => 'Regex:/^([a-z])+$/i']);
+        $v = new Validator($trans, ['x' => 'aasd234fsd1'], ['x' => 'Regex:/^[a-z]+$/i']);
         $this->assertFalse($v->passes());
 
+        // Ensure commas are not interpreted as parameter separators
         $v = new Validator($trans, ['x' => 'a,b'], ['x' => 'Regex:/^a,b$/i']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['x' => '12'], ['x' => 'Regex:/^12$/i']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['x' => 123], ['x' => 'Regex:/^123$/i']);
+        $v = new Validator($trans, ['x' => 12], ['x' => 'Regex:/^12$/i']);
+        $this->assertTrue($v->passes());
+    }
+
+    public function testValidateNotRegex()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'foo bar'], ['x' => 'NotRegex:/[xyz]/i']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'foo xxx bar'], ['x' => 'NotRegex:/[xyz]/i']);
+        $this->assertFalse($v->passes());
+
+        // Ensure commas are not interpreted as parameter separators
+        $v = new Validator($trans, ['x' => 'foo bar'], ['x' => 'NotRegex:/x{3,}/i']);
         $this->assertTrue($v->passes());
     }
 
