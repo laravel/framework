@@ -320,6 +320,40 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Create an instance of any handler provided by Monolog provided via configuration
+     *
+     * @param array $config
+     * @return \Monolog\Logger
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function createMonologDriver(array $config)
+    {
+        if (isset($config['handler_type'])) {
+            $handlerClass = 'Monolog\Handler\\'.ucfirst($config['handler_type']).'Handler';
+        } elseif (isset($config['handler_class'])) {
+            $handlerClass = $config['handler_class'];
+        } else {
+            throw new InvalidArgumentException('"handler_type" or "handler_class" is required for the monolog driver');
+        }
+
+        if (! is_a($handlerClass, HandlerInterface::class, true)) {
+            throw new InvalidArgumentException($handlerClass.' must be an instance of '.HandlerInterface::class);
+        }
+
+        $container = $this->app;
+
+        if (isset($config['handler_params'])) {
+            // clone app so that contextual bindings are not persisted
+            $container = clone $this->app;
+            foreach ($config['handler_params'] as $name => $value) {
+                $container->addContextualBinding($handlerClass, '$' . $name, $value);
+            }
+        }
+
+        return new Monolog($this->parseChannel($config), [$this->prepareHandler($container->build($handlerClass))]);
+    }
+
+    /**
      * Prepare the handlers for usage by Monolog.
      *
      * @param  array  $handlers
