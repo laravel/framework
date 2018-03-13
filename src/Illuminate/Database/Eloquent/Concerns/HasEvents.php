@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
@@ -25,31 +26,27 @@ trait HasEvents
     protected $observables = [];
 
     /**
-     * Register observers with the Model.
+     * Register observers with the model.
      *
-     * @param  object|string|array  $classes
+     * @param  object|array|string  $classes
      * @return void
      */
     public static function observe($classes)
     {
         $instance = new static;
 
-        if (! is_array($classes)) {
-            $classes = [$classes];
-        }
-
-        foreach ($classes as $class) {
+        foreach (Arr::wrap($classes) as $class) {
             $instance->registerObserver($class);
         }
     }
 
     /**
-     * Registers a single observer with the Model.
+     * Register a single observer with the model.
      *
      * @param  object|string $class
      * @return void
      */
-    private function registerObserver($class)
+    protected function registerObserver($class)
     {
         $className = is_string($class) ? $class : get_class($class);
 
