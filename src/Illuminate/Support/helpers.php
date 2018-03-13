@@ -413,14 +413,14 @@ if (! function_exists('class_uses_recursive')) {
 
 if (! function_exists('collect')) {
     /**
-     * Create a collection from the given value.
+     * Create a collection from the given values.
      *
      * @param  mixed  $value
      * @return \Illuminate\Support\Collection
      */
-    function collect($value = null)
+    function collect(...$value)
     {
-        return new Collection($value);
+        return new Collection(...$value);
     }
 }
 
