@@ -496,11 +496,7 @@ trait InteractsWithPivotTable
      */
     protected function parseId($value)
     {
-        if ($value instanceof Model) {
-            return $value->getKey();
-        }
-
-        return $value;
+        return $value instanceof Model ? $value->getKey() : $value;
     }
 
     /**
