@@ -85,7 +85,7 @@ class QueueFake extends QueueManager implements Queue
 
         PHPUnit::assertTrue(
             collect($expectedChain)->isNotEmpty(),
-            "The expected chain can not be empty."
+            'The expected chain can not be empty.'
         );
 
         $this->isChainOfObjects($expectedChain)
@@ -111,7 +111,7 @@ class QueueFake extends QueueManager implements Queue
             $this->pushed($job, $callback)->filter(function ($job) use ($chain) {
                 return $job->chained == $chain;
             })->isNotEmpty(),
-            "The expected chain was not pushed."
+            'The expected chain was not pushed.'
         );
     }
 

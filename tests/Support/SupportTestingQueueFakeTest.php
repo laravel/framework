@@ -106,26 +106,26 @@ class QueueFakeTest extends TestCase
     public function testAssertPushedWithChainUsingClassesOrObjectsArray()
     {
         $this->fake->push(new JobWithChainStub([
-            new JobStub
+            new JobStub,
         ]));
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
-            JobStub::class
+            JobStub::class,
         ]);
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
-            new JobStub
+            new JobStub,
         ]);
     }
 
     public function testAssertPushedWithChainSameJobDifferentChains()
     {
         $this->fake->push(new JobWithChainStub([
-            new JobStub
+            new JobStub,
         ]));
         $this->fake->push(new JobWithChainStub([
             new JobStub,
-            new JobStub
+            new JobStub,
         ]));
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
@@ -134,7 +134,7 @@ class QueueFakeTest extends TestCase
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
             JobStub::class,
-            JobStub::class
+            JobStub::class,
         ]);
     }
 
@@ -142,15 +142,15 @@ class QueueFakeTest extends TestCase
     {
         $this->fake->push(new JobWithChainAndParameterStub('first', [
             new JobStub,
-            new JobStub
+            new JobStub,
         ]));
 
         $this->fake->push(new JobWithChainAndParameterStub('second', [
-            new JobStub
+            new JobStub,
         ]));
 
         $this->fake->assertPushedWithChain(JobWithChainAndParameterStub::class, [
-            JobStub::class
+            JobStub::class,
         ], function ($job) {
             return $job->parameter == 'second';
         });
@@ -178,7 +178,7 @@ class QueueFakeTest extends TestCase
         }
 
         $this->fake->push(new JobWithChainStub([
-            new JobStub
+            new JobStub,
         ]));
 
         try {
@@ -191,7 +191,7 @@ class QueueFakeTest extends TestCase
         try {
             $this->fake->assertPushedWithChain(JobWithChainStub::class, [
                 new JobStub,
-                new JobStub
+                new JobStub,
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
@@ -201,7 +201,7 @@ class QueueFakeTest extends TestCase
         try {
             $this->fake->assertPushedWithChain(JobWithChainStub::class, [
                 JobStub::class,
-                JobStub::class
+                JobStub::class,
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {
@@ -222,7 +222,7 @@ class JobWithChainStub
 {
     use Queueable;
 
-    function __construct($chain)
+    public function __construct($chain)
     {
         $this->chain($chain);
     }
@@ -239,7 +239,7 @@ class JobWithChainAndParameterStub
 
     public $parameter;
 
-    function __construct($parameter, $chain)
+    public function __construct($parameter, $chain)
     {
         $this->parameter = $parameter;
         $this->chain($chain);
