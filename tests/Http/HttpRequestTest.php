@@ -328,6 +328,7 @@ class HttpRequestTest extends TestCase
     public function testArrayAccess()
     {
         $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
+
         $request->setRouteResolver(function () use ($request) {
             $route = new Route('GET', '/foo/bar/{id}/{name}', []);
             $route->bind($request);
@@ -342,6 +343,7 @@ class HttpRequestTest extends TestCase
 
         $this->assertTrue(isset($request['name']));
         $this->assertEquals(null, $request['name']);
+
         $this->assertNotEquals('Taylor', $request['name']);
 
         $this->assertTrue(isset($request['foo.bar']));
