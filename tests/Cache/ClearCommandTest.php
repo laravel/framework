@@ -119,7 +119,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($command, ['store' => 'redis', '--tags' => 'foo']);
     }
 
-    public function testClearWillClearsRealTimeFacades()
+    public function testClearWillClearRealTimeFacades()
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
