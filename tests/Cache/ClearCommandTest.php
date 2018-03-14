@@ -4,11 +4,51 @@ namespace Illuminate\Tests\Cache;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Contracts\Cache\Repository;
 
 class ClearCommandTest extends TestCase
 {
+    /**
+     * @var ClearCommandTestStub
+     */
+    private $command;
+
+    /**
+     * @var CacheManager|m\Mock
+     */
+    private $cacheManager;
+
+    /**
+     * @var Filesystem|m\Mock
+     */
+    private $files;
+
+    /**
+     * @var Repository|m\Mock
+     */
+    private $cacheRepository;
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->cacheManager = m::mock('Illuminate\Cache\CacheManager');
+        $this->files = m::mock('Illuminate\Filesystem\Filesystem');
+        $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->command = new ClearCommandTestStub($this->cacheManager, $this->files);
+
+        $app = new Application;
+        $app['path.storage'] = __DIR__;
+        $this->command->setLaravel($app);
+    }
+
     public function tearDown()
     {
         m::close();
@@ -16,44 +56,24 @@ class ClearCommandTest extends TestCase
 
     public function testClearWithNoStoreArgument()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
 
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $files->shouldReceive('exists')->andReturn(true);
-        $files->shouldReceive('files')->andReturn([]);
-
-        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('flush')->once();
-
-        $this->runCommand($command);
+        $this->runCommand($this->command);
     }
 
     public function testClearWithStoreArgument()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
 
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $files->shouldReceive('exists')->andReturn(true);
-        $files->shouldReceive('files')->andReturn([]);
-
-        $cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('flush')->once();
-
-        $this->runCommand($command, ['store' => 'foo']);
+        $this->runCommand($this->command, ['store' => 'foo']);
     }
 
     /**
@@ -61,111 +81,61 @@ class ClearCommandTest extends TestCase
      */
     public function testClearWithInvalidStoreArgument()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
+        $this->files->shouldReceive('files')->andReturn([]);
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('InvalidArgumentException');
+        $this->cacheRepository->shouldReceive('flush')->never();
 
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $files->shouldReceive('files')->andReturn([]);
-
-        $cacheManager->shouldReceive('store')->once()->with('bar')->andThrow('InvalidArgumentException');
-        $cacheRepository->shouldReceive('flush')->never();
-
-        $this->runCommand($command, ['store' => 'bar']);
+        $this->runCommand($this->command, ['store' => 'bar']);
     }
 
     public function testClearWithTagsOption()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('tags')->once()->with(['foo', 'bar'])->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
 
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $files->shouldReceive('exists')->andReturn(true);
-        $files->shouldReceive('files')->andReturn([]);
-
-        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('tags')->once()->with(['foo', 'bar'])->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('flush')->once();
-
-        $this->runCommand($command, ['--tags' => 'foo,bar']);
+        $this->runCommand($this->command, ['--tags' => 'foo,bar']);
     }
 
     public function testClearWithStoreArgumentAndTagsOption()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn([]);
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('tags')->once()->with(['foo'])->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
 
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $files->shouldReceive('exists')->andReturn(true);
-        $files->shouldReceive('files')->andReturn([]);
-
-        $cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('tags')->once()->with(['foo'])->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('flush')->once();
-
-        $this->runCommand($command, ['store' => 'redis', '--tags' => 'foo']);
+        $this->runCommand($this->command, ['store' => 'redis', '--tags' => 'foo']);
     }
 
     public function testClearWillClearRealTimeFacades()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
 
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+        $this->files->shouldReceive('exists')->andReturn(true);
+        $this->files->shouldReceive('files')->andReturn(['/facade-XXXX.php']);
+        $this->files->shouldReceive('delete')->with('/facade-XXXX.php')->once();
 
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('flush')->once();
-
-        $files->shouldReceive('exists')->andReturn(true);
-        $files->shouldReceive('files')->andReturn(['/facade-XXXX.php']);
-        $files->shouldReceive('delete')->with('/facade-XXXX.php')->once();
-
-        $this->runCommand($command);
+        $this->runCommand($this->command);
     }
 
     public function testClearWillNotClearRealTimeFacadesIfCacheDirectoryDoesntExist()
     {
-        $command = new ClearCommandTestStub(
-            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
-            $files = m::mock('Illuminate\Filesystem\Filesystem')
-        );
-
-        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
-
-        $app = new Application;
-        $app['path.storage'] = __DIR__;
-        $command->setLaravel($app);
-        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
-        $cacheRepository->shouldReceive('flush')->once();
+        $this->cacheManager->shouldReceive('store')->once()->with(null)->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('flush')->once();
 
         // No files should be looped over and nothing should be deleted if the cache directory doesn't exist
-        $files->shouldReceive('exists')->andReturn(false);
-        $files->shouldNotReceive('files');
-        $files->shouldNotReceive('delete');
+        $this->files->shouldReceive('exists')->andReturn(false);
+        $this->files->shouldNotReceive('files');
+        $this->files->shouldNotReceive('delete');
 
-        $this->runCommand($command);
+        $this->runCommand($this->command);
     }
 
     protected function runCommand($command, $input = [])
