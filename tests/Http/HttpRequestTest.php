@@ -325,6 +325,34 @@ class HttpRequestTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
     }
 
+    public function testArrayAccess()
+    {
+        $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar/{id}/{name}', []);
+            $route->bind($request);
+            $route->setParameter('id', 'foo');
+            $route->setParameter('name', 'Taylor');
+
+            return $route;
+        });
+
+        $this->assertFalse(isset($request['non-existant']));
+        $this->assertNull($request['non-existant']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertEquals(null, $request['name']);
+        $this->assertNotEquals('Taylor', $request['name']);
+
+        $this->assertTrue(isset($request['foo.bar']));
+        $this->assertEquals(null, $request['foo.bar']);
+        $this->assertTrue(isset($request['foo.baz']));
+        $this->assertEquals('', $request['foo.baz']);
+
+        $this->assertTrue(isset($request['id']));
+        $this->assertEquals('foo', $request['id']);
+    }
+
     public function testAllMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => null]);
