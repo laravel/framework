@@ -28,8 +28,8 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.nonbubblingstream', [
             'driver' => 'monolog',
             'name' => 'foobar',
-            'handler_type' => 'stream',
-            'handler_params' => [
+            'handler' => StreamHandler::class,
+            'with' => [
                 'stream' => 'php://stderr',
                 'level' => Monolog::NOTICE,
                 'bubble' => false,
@@ -56,8 +56,8 @@ class LogManagerTest extends TestCase
         $config->set('logging.channels.logentries', [
             'driver' => 'monolog',
             'name' => 'le',
-            'handler_type' => 'LogEntries',
-            'handler_params' => [
+            'handler' => LogEntriesHandler::class,
+            'with' => [
                 'token' => '123456789',
             ],
         ]);
