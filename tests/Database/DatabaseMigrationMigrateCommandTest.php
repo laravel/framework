@@ -106,7 +106,7 @@ class ApplicationDatabaseMigrationStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$patterns)
     {
         return 'development';
     }

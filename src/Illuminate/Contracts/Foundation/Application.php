@@ -23,9 +23,15 @@ interface Application extends Container
     /**
      * Get or check the current application environment.
      *
-     * @return string
+     * If a string or array of strings is provided, it will be checked against the current
+     * environment. If a match is found, `true` is returned; `false` otherwise.
+     * If no arguments are provided, this method will return the name
+     * of the current environment as a string.
+     *
+     * @param  string|string[] $patterns,...
+     * @return string|bool
      */
-    public function environment();
+    public function environment(...$patterns);
 
     /**
      * Determine if the application is running in the console.
