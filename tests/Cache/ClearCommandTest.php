@@ -26,6 +26,7 @@ class ClearCommandTest extends TestCase
         $app = new Application;
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
+        $files->shouldReceive('exists')->andReturn(true);
         $files->shouldReceive('files')->andReturn([]);
 
         $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
@@ -46,6 +47,7 @@ class ClearCommandTest extends TestCase
         $app = new Application;
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
+        $files->shouldReceive('exists')->andReturn(true);
         $files->shouldReceive('files')->andReturn([]);
 
         $cacheManager->shouldReceive('store')->once()->with('foo')->andReturn($cacheRepository);
@@ -89,6 +91,7 @@ class ClearCommandTest extends TestCase
         $app = new Application;
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
+        $files->shouldReceive('exists')->andReturn(true);
         $files->shouldReceive('files')->andReturn([]);
 
         $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
@@ -110,6 +113,7 @@ class ClearCommandTest extends TestCase
         $app = new Application;
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
+        $files->shouldReceive('exists')->andReturn(true);
         $files->shouldReceive('files')->andReturn([]);
 
         $cacheManager->shouldReceive('store')->once()->with('redis')->andReturn($cacheRepository);
@@ -134,8 +138,32 @@ class ClearCommandTest extends TestCase
         $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
         $cacheRepository->shouldReceive('flush')->once();
 
+        $files->shouldReceive('exists')->andReturn(true);
         $files->shouldReceive('files')->andReturn(['/facade-XXXX.php']);
         $files->shouldReceive('delete')->with('/facade-XXXX.php')->once();
+
+        $this->runCommand($command);
+    }
+
+    public function testClearWillNotClearRealTimeFacadesIfCacheDirectoryDoesntExist()
+    {
+        $command = new ClearCommandTestStub(
+            $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
+            $files = m::mock('Illuminate\Filesystem\Filesystem')
+        );
+
+        $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
+
+        $app = new Application;
+        $app['path.storage'] = __DIR__;
+        $command->setLaravel($app);
+        $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
+        $cacheRepository->shouldReceive('flush')->once();
+
+        // No files should be looped over and nothing should be deleted if the cache directory doesn't exist
+        $files->shouldReceive('exists')->andReturn(false);
+        $files->shouldNotReceive('files');
+        $files->shouldNotReceive('delete');
 
         $this->runCommand($command);
     }
