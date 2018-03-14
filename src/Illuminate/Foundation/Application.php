@@ -474,13 +474,18 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Get or check the current application environment.
      *
+     * If a string or array of strings is provided, it will be checked against the current
+     * environment. If a match is found, `true` is returned; `false` otherwise.
+     * If no arguments are provided, this method will return the name
+     * of the current environment as a string.
+     *
+     * @param  string|string[] $patterns,...
      * @return string|bool
      */
-    public function environment()
+    public function environment(...$patterns)
     {
-        if (func_num_args() > 0) {
-            $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
-
+        if (count($patterns) > 0) {
+            $patterns = is_array($patterns[0]) ? $patterns[0] : $patterns;
             foreach ($patterns as $pattern) {
                 if (Str::is($pattern, $this['env'])) {
                     return true;
