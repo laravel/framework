@@ -82,7 +82,14 @@ class ClearCommand extends Command
      */
     public function flushFacades()
     {
-        foreach ($this->files->files(storage_path('framework/cache')) as $file) {
+        // Applications that don't use the file cache may not have the directory
+        $storagePath = storage_path('framework/cache');
+
+        if (! $this->files->exists($storagePath)) {
+            return;
+        }
+
+        foreach ($this->files->files($storagePath) as $file) {
             if (preg_match('/facade-.*\.php$/', $file)) {
                 $this->files->delete($file);
             }
