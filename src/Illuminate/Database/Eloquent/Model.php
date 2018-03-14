@@ -214,12 +214,12 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $currentClass = static::class;
 
-        self::$ignoreOnTouch[] = $currentClass;
+        static::$ignoreOnTouch[] = $currentClass;
 
         try {
             call_user_func($callback);
         } finally {
-            self::$ignoreOnTouch = array_values(array_diff(self::$ignoreOnTouch, [$currentClass]));
+            static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, [$currentClass]));
         }
     }
 
@@ -230,7 +230,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function shouldTouch()
     {
-        foreach (self::$ignoreOnTouch as $ignoredClass) {
+        foreach (static::$ignoreOnTouch as $ignoredClass) {
             if ($this instanceof $ignoredClass) {
                 return false;
             }
