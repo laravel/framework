@@ -396,6 +396,26 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if all items in the collection are equal to the given items
+     *
+     * @param  mixed  $items
+     * @return bool
+     */
+    public function equals($items)
+    {
+        $givenItems = $this->getArrayableItems($items);
+
+        $firstDiff = count($this->diff($givenItems)) === 0;
+
+        $originalItems = $this->items;
+        $this->items = $givenItems;
+        $secondDiff = count($this->diff($originalItems)) === 0;
+        $this->items = $originalItems;
+
+        return  $firstDiff && $secondDiff;
+    }
+
+    /**
      * Determine if all items in the collection pass the given test.
      *
      * @param  string|callable  $key

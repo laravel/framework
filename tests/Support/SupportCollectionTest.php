@@ -742,6 +742,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([[1, 'a', 0], [2, 'b', 1]], $result);
     }
 
+    public function testEquals(){
+        $a = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $b = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c = new Collection(['id' => 1, 'first_word' => 'Goodbye']);
+        
+        $this->assertTrue($a->equals($b));
+        $this->assertTrue($b->equals($a));
+        $this->assertFalse($a->equals($c));
+
+        $a = new Collection([1,2,3]);
+        $b = new Collection([1,2,3]);
+        $c = new Collection([1,2,3,4]);
+        
+        $this->assertTrue($a->equals($b));
+        $this->assertTrue($b->equals($a));
+        $this->assertFalse($a->equals($c));
+    }
+
     public function testIntersectNull()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
