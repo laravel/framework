@@ -82,10 +82,7 @@ class ClearCommand extends Command
      */
     public function flushFacades()
     {
-        // Applications that don't use the file cache may not have the directory
-        $storagePath = storage_path('framework/cache');
-
-        if (! $this->files->exists($storagePath)) {
+        if (! $this->files->exists($storagePath = storage_path('framework/cache'))) {
             return;
         }
 
