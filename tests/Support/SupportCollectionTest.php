@@ -2032,9 +2032,11 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(20, $c->max('foo'));
+        $this->assertEquals(20, $c->max->foo);
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
         $this->assertEquals(20, $c->max('foo'));
+        $this->assertEquals(20, $c->max->foo);
 
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(5, $c->max());
@@ -2050,9 +2052,11 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(10, $c->min('foo'));
+        $this->assertEquals(10, $c->min->foo);
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
         $this->assertEquals(10, $c->min('foo'));
+        $this->assertEquals(10, $c->min->foo);
 
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(1, $c->min());
