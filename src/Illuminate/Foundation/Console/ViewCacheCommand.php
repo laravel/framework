@@ -8,14 +8,14 @@ use Illuminate\Support\Facades\View;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 
-class BladeCacheCommand extends Command
+class ViewCacheCommand extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'blade:cache';
+    protected $signature = 'view:cache';
 
     /**
      * The console command description.

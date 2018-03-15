@@ -23,9 +23,9 @@ use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
 use Illuminate\Foundation\Console\RouteCacheCommand;
-use Illuminate\Foundation\Console\BladeCacheCommand;
 use Illuminate\Foundation\Console\RouteClearCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
@@ -84,7 +84,6 @@ class ArtisanServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
-        'BladeCache' => 'command.blade.cache',
         'CacheClear' => 'command.cache.clear',
         'CacheForget' => 'command.cache.forget',
         'ClearCompiled' => 'command.clear-compiled',
@@ -118,6 +117,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ScheduleRun' => ScheduleRunCommand::class,
         'StorageLink' => 'command.storage.link',
         'Up' => 'command.up',
+        'ViewCache' => 'command.view.cache',
         'ViewClear' => 'command.view.clear',
     ];
 
@@ -207,18 +207,6 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.auth.make', function ($app) {
             return new AuthMakeCommand;
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerBladeCacheCommand()
-    {
-        $this->app->singleton('command.blade.cache', function ($app) {
-            return new BladeCacheCommand;
         });
     }
 
@@ -930,6 +918,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.vendor.publish', function ($app) {
             return new VendorPublishCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerViewCacheCommand()
+    {
+        $this->app->singleton('command.view.cache', function ($app) {
+            return new ViewCacheCommand;
         });
     }
 
