@@ -48,22 +48,8 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->perPage = $perPage;
         $this->lastPage = max((int) ceil($total / $perPage), 1);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
-        $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
+        $this->setCurrentPage($currentPage, $this->pageName);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
-    }
-
-    /**
-     * Get the current page for the request.
-     *
-     * @param  int  $currentPage
-     * @param  string  $pageName
-     * @return int
-     */
-    protected function setCurrentPage($currentPage, $pageName)
-    {
-        $currentPage = $currentPage ?: static::resolveCurrentPage($pageName);
-
-        return $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
     }
 
     /**
@@ -122,6 +108,16 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     }
 
     /**
+     * Determine if there are enough items to split into multiple pages.
+     *
+     * @return bool
+     */
+    public function hasPages()
+    {
+        return $this->currentPage() != 1 || $this->hasMorePages();
+    }
+
+    /**
      * Determine if there are more items in the data source.
      *
      * @return bool
@@ -141,6 +137,8 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         if ($this->lastPage() > $this->currentPage()) {
             return $this->url($this->currentPage() + 1);
         }
+
+        return null;
     }
 
     /**

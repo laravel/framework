@@ -14,6 +14,20 @@ interface LengthAwarePaginator extends Paginator
     public function getUrlRange($start, $end);
 
     /**
+     * Determine if there are enough items to split into multiple pages.
+     *
+     * @return bool
+     */
+    public function hasPages();
+
+    /**
+     * Determine if there is more items in the data store.
+     *
+     * @return bool
+     */
+    public function hasMorePages();
+
+    /**
      * Determine the total number of items in the data store.
      *
      * @return int
