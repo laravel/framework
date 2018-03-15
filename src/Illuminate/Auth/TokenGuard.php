@@ -36,7 +36,7 @@ class TokenGuard implements Guard
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Illuminate\Http\Request  $request
-     * @param. string  $inputKey
+     * @param  string  $inputKey
      * @param  string  $storageKey
      * @return void
      */
