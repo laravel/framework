@@ -6,11 +6,12 @@ use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Contracts\Pagination\Paginator;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
-abstract class AbstractPaginator implements Htmlable
+abstract class AbstractPaginator implements Htmlable, Paginator
 {
     /**
      * All of the items being paginated.
@@ -108,6 +109,30 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Get the current page for the request.
+     *
+     * @param  int  $currentPage
+     * @param  string  $pageName
+     * @return int
+     */
+    protected function setCurrentPage($currentPage, $pageName)
+    {
+        $currentPage = $currentPage ?: static::resolveCurrentPage($pageName);
+
+        return $this->currentPage = $this->isValidPageNumber($currentPage) ? (int) $currentPage : 1;
+    }
+
+    /**
+     * Get the URL for the next page.
+     *
+     * @return string
+     */
+    public function nextPageUrl()
+    {
+        return $this->url($this->currentPage() + 1);
+    }
+
+    /**
      * Get the URL for the previous page.
      *
      * @return string|null
@@ -117,6 +142,8 @@ abstract class AbstractPaginator implements Htmlable
         if ($this->currentPage() > 1) {
             return $this->url($this->currentPage() - 1);
         }
+
+        return null;
     }
 
     /**
@@ -272,16 +299,6 @@ abstract class AbstractPaginator implements Htmlable
     public function perPage()
     {
         return $this->perPage;
-    }
-
-    /**
-     * Determine if there are enough items to split into multiple pages.
-     *
-     * @return bool
-     */
-    public function hasPages()
-    {
-        return $this->currentPage() != 1 || $this->hasMorePages();
     }
 
     /**

@@ -79,20 +79,6 @@ interface Paginator
     public function currentPage();
 
     /**
-     * Determine if there are enough items to split into multiple pages.
-     *
-     * @return bool
-     */
-    public function hasPages();
-
-    /**
-     * Determine if there is more items in the data store.
-     *
-     * @return bool
-     */
-    public function hasMorePages();
-
-    /**
      * Determine if the list of items is empty or not.
      *
      * @return bool
@@ -111,7 +97,7 @@ interface Paginator
      *
      * @param  string|null  $view
      * @param  array  $data
-     * @return string
+     * @return \Illuminate\Support\HtmlString
      */
     public function render($view = null, $data = []);
 }

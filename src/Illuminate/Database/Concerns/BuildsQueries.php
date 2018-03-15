@@ -134,7 +134,7 @@ trait BuildsQueries
      * @param  int  $perPage
      * @param  int  $currentPage
      * @param  array  $options
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     protected function paginator($items, $total, $perPage, $currentPage, $options)
     {
