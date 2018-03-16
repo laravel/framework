@@ -29,7 +29,7 @@ class PhpRedisConnection extends Connection
      */
     public function get($key)
     {
-        $result = $this->client->get($key);
+        $result = $this->command('get', [$key]);
 
         return $result !== false ? $result : null;
     }
@@ -44,7 +44,7 @@ class PhpRedisConnection extends Connection
     {
         return array_map(function ($value) {
             return $value !== false ? $value : null;
-        }, $this->client->mget($keys));
+        }, $this->command('mget', $keys));
     }
 
     /**
@@ -90,7 +90,7 @@ class PhpRedisConnection extends Connection
      */
     public function setnx($key, $value)
     {
-        return (int) $this->client->setnx($key, $value);
+        return (int) $this->command('setnx', [$key, $value]);
     }
 
     /**
@@ -139,7 +139,7 @@ class PhpRedisConnection extends Connection
      */
     public function hsetnx($hash, $key, $value)
     {
-        return (int) $this->client->hsetnx($hash, $key, $value);
+        return (int) $this->command('hsetnx', [$hash, $key, $value]);
     }
 
     /**
@@ -240,10 +240,10 @@ class PhpRedisConnection extends Connection
      */
     public function zinterstore($output, $keys, $options = [])
     {
-        return $this->zInter($output, $keys,
+        return $this->command('zInter', [$output, $keys,
             $options['weights'] ?? null,
-            $options['aggregate'] ?? 'sum'
-        );
+            $options['aggregate'] ?? 'sum',
+        ]);
     }
 
     /**
@@ -256,10 +256,10 @@ class PhpRedisConnection extends Connection
      */
     public function zunionstore($output, $keys, $options = [])
     {
-        return $this->zUnion($output, $keys,
+        return $this->command('zUnion', [$output, $keys,
             $options['weights'] ?? null,
-            $options['aggregate'] ?? 'sum'
-        );
+            $options['aggregate'] ?? 'sum',
+        ]);
     }
 
     /**
@@ -317,7 +317,7 @@ class PhpRedisConnection extends Connection
      */
     public function eval($script, $numberOfKeys, ...$arguments)
     {
-        return $this->client->eval($script, $arguments, $numberOfKeys);
+        return $this->command('eval', [$script, $arguments, $numberOfKeys]);
     }
 
     /**
@@ -404,8 +404,6 @@ class PhpRedisConnection extends Connection
      */
     public function __call($method, $parameters)
     {
-        $method = strtolower($method);
-
-        return parent::__call($method, $parameters);
+        return parent::__call(strtolower($method), $parameters);
     }
 }

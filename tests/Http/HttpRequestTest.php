@@ -187,6 +187,23 @@ class HttpRequestTest extends TestCase
         $this->assertFalse($request->routeIs('foo.foo'));
     }
 
+    public function testRouteMethod()
+    {
+        $request = Request::create('/foo/bar', 'GET');
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/{required}/{optional?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertEquals('bar', $request->route('required'));
+        $this->assertEquals('bar', $request->route('required', 'default'));
+        $this->assertNull($request->route('optional'));
+        $this->assertEquals('default', $request->route('optional', 'default'));
+    }
+
     public function testAjaxMethod()
     {
         $request = Request::create('/', 'GET');
@@ -332,6 +349,36 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
+    }
+
+    public function testArrayAccess()
+    {
+        $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar/{id}/{name}', []);
+            $route->bind($request);
+            $route->setParameter('id', 'foo');
+            $route->setParameter('name', 'Taylor');
+
+            return $route;
+        });
+
+        $this->assertFalse(isset($request['non-existant']));
+        $this->assertNull($request['non-existant']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertEquals(null, $request['name']);
+
+        $this->assertNotEquals('Taylor', $request['name']);
+
+        $this->assertTrue(isset($request['foo.bar']));
+        $this->assertEquals(null, $request['foo.bar']);
+        $this->assertTrue(isset($request['foo.baz']));
+        $this->assertEquals('', $request['foo.baz']);
+
+        $this->assertTrue(isset($request['id']));
+        $this->assertEquals('foo', $request['id']);
     }
 
     public function testAllMethod()
