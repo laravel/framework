@@ -225,6 +225,7 @@ class Builder
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
+            $column = $this->model->qualifyColumn($column);
             $this->query->where(...func_get_args());
         }
 
