@@ -2505,6 +2505,40 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }
 
+    public function testFromSub()
+    {
+        $builder = $this->getBuilder();
+        $builder->fromSub(function ($query) {
+            $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions')->where('foo', '=', '1');
+        }, 'sessions')->where('bar', '<', '10');
+        $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions" where "foo" = ?) as "sessions" where "bar" < ?', $builder->toSql());
+        $this->assertEquals(['1', '10'], $builder->getBindings());
+    }
+
+    public function testFromSubWithoutBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->fromSub(function ($query) {
+            $query->select(new Raw('max(last_seen_at) as last_seen_at'))->from('user_sessions');
+        }, 'sessions');
+        $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"', $builder->toSql());
+    }
+
+    public function testFromRaw()
+    {
+        $builder = $this->getBuilder();
+        $builder->fromRaw(new Raw('(select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"'));
+        $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"', $builder->toSql());
+    }
+
+    public function testFromRawWithWhereOnTheMainQuery()
+    {
+        $builder = $this->getBuilder();
+        $builder->fromRaw(new Raw('(select max(last_seen_at) as last_seen_at from "sessions") as "last_seen_at"'))->where('last_seen_at', '>', '1520652582');
+        $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "sessions") as "last_seen_at" where "last_seen_at" > ?', $builder->toSql());
+        $this->assertEquals(['1520652582'], $builder->getBindings());
+    }
+
     protected function getBuilder()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;

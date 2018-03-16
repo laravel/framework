@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Support;
 
+use Illuminate\Bus\Queueable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
@@ -101,10 +102,149 @@ class QueueFakeTest extends TestCase
         $this->fake->assertPushedOn($queue, JobStub::class);
         $this->fake->assertPushed(JobStub::class, 2);
     }
+
+    public function testAssertPushedWithChainUsingClassesOrObjectsArray()
+    {
+        $this->fake->push(new JobWithChainStub([
+            new JobStub,
+        ]));
+
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+            JobStub::class,
+        ]);
+
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+            new JobStub,
+        ]);
+    }
+
+    public function testAssertPushedWithChainSameJobDifferentChains()
+    {
+        $this->fake->push(new JobWithChainStub([
+            new JobStub,
+        ]));
+        $this->fake->push(new JobWithChainStub([
+            new JobStub,
+            new JobStub,
+        ]));
+
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+            JobStub::class,
+        ]);
+
+        $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+            JobStub::class,
+            JobStub::class,
+        ]);
+    }
+
+    public function testAssertPushedWithChainUsingCallback()
+    {
+        $this->fake->push(new JobWithChainAndParameterStub('first', [
+            new JobStub,
+            new JobStub,
+        ]));
+
+        $this->fake->push(new JobWithChainAndParameterStub('second', [
+            new JobStub,
+        ]));
+
+        $this->fake->assertPushedWithChain(JobWithChainAndParameterStub::class, [
+            JobStub::class,
+        ], function ($job) {
+            return $job->parameter == 'second';
+        });
+
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainAndParameterStub::class, [
+                JobStub::class,
+                JobStub::class,
+            ], function ($job) {
+                return $job->parameter == 'second';
+            });
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+        }
+    }
+
+    public function testAssertPushedWithChainErrorHandling()
+    {
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\JobWithChainStub] job was not pushed'));
+        }
+
+        $this->fake->push(new JobWithChainStub([
+            new JobStub,
+        ]));
+
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainStub::class, []);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected chain can not be empty'));
+        }
+
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+                new JobStub,
+                new JobStub,
+            ]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+        }
+
+        try {
+            $this->fake->assertPushedWithChain(JobWithChainStub::class, [
+                JobStub::class,
+                JobStub::class,
+            ]);
+            $this->fail();
+        } catch (ExpectationFailedException $e) {
+            $this->assertThat($e, new ExceptionMessage('The expected chain was not pushed'));
+        }
+    }
 }
 
 class JobStub
 {
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobWithChainStub
+{
+    use Queueable;
+
+    public function __construct($chain)
+    {
+        $this->chain($chain);
+    }
+
+    public function handle()
+    {
+        //
+    }
+}
+
+class JobWithChainAndParameterStub
+{
+    use Queueable;
+
+    public $parameter;
+
+    public function __construct($parameter, $chain)
+    {
+        $this->parameter = $parameter;
+        $this->chain($chain);
+    }
+
     public function handle()
     {
         //

@@ -64,6 +64,36 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a not found status code.
+     *
+     * @return $this
+     */
+    public function assertNotFound()
+    {
+        PHPUnit::assertTrue(
+            $this->isNotFound(),
+            'Response status code ['.$this->getStatusCode().'] is not a not found status code.'
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the response has a forbidden status code.
+     *
+     * @return $this
+     */
+    public function assertForbidden()
+    {
+        PHPUnit::assertTrue(
+            $this->isForbidden(),
+            'Response status code ['.$this->getStatusCode().'] is not a forbidden status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has the given status code.
      *
      * @param  int  $status
