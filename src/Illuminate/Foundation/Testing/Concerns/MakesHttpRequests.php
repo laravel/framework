@@ -169,6 +169,21 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route name with a GET request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function getRoute($name, array $parameters = [], array $headers = [])
+    {
+        $uri = route($name, $parameters);
+
+        return $this->get($uri, $headers);
+    }
+
+    /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -193,6 +208,22 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
 
         return $this->call('POST', $uri, $data, [], [], $server);
+    }
+
+    /**
+     * Visit the given route name with a POST request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function postRoute($name, array $parameters = [], array $data = [], array $headers = [])
+    {
+        $uri = route($name, $parameters);
+
+        return $this->post($uri, $data, $headers);
     }
 
     /**
@@ -224,6 +255,22 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route name with a PUT request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function putRoute($name, array $parameters = [], array $data = [], array $headers = [])
+    {
+        $uri = route($name, $parameters);
+
+        return $this->put($uri, $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a PUT request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -252,6 +299,22 @@ trait MakesHttpRequests
     }
 
     /**
+     * Visit the given route name with a PATCH request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function patchRoute($name, array $parameters = [], array $data = [], array $headers = [])
+    {
+        $uri = route($name, $parameters);
+
+        return $this->patch($uri, $data, $headers);
+    }
+
+    /**
      * Visit the given URI with a PATCH request, expecting a JSON response.
      *
      * @param  string  $uri
@@ -277,6 +340,22 @@ trait MakesHttpRequests
         $server = $this->transformHeadersToServerVars($headers);
 
         return $this->call('DELETE', $uri, $data, [], [], $server);
+    }
+
+    /**
+     * Visit the given route name with a DELETE request.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  array  $data
+     * @param  array  $headers
+     * @return \Illuminate\Foundation\Testing\TestResponse
+     */
+    public function deleteRoute($name, array $parameters = [], array $data = [], array $headers = [])
+    {
+        $uri = route($name, $parameters);
+
+        return $this->delete($uri, $data, $headers);
     }
 
     /**
