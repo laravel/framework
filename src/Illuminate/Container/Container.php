@@ -416,6 +416,7 @@ class Container implements ArrayAccess, ContainerContract
             foreach ($aliases as $index => $alias) {
                 if ($alias == $searched) {
                     unset($this->abstractAliases[$abstract][$index]);
+                    break;
                 }
             }
         }
