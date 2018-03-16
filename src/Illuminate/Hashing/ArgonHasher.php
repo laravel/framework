@@ -29,11 +29,11 @@ class ArgonHasher implements HasherContract
     protected $threads = 2;
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param array $options
      */
-    public function __construct($options=null)
+    public function __construct($options = null)
     {
         $this->memory = $options['memory'] ?? $this->memory;
         $this->time = $options['time'] ?? $this->time;
