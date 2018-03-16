@@ -90,9 +90,9 @@ class Schedule
      * @param  string|null  $queue
      * @return \Illuminate\Console\Scheduling\CallbackEvent
      */
-    public function job($job, $connection = null, $queue = null)
+    public function job($job, $queue = null, $connection = null)
     {
-        return $this->call(function () use ($job, $connection, $queue) {
+        return $this->call(function () use ($job, $queue, $connection) {
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
