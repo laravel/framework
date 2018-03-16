@@ -18,7 +18,7 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $description = 'Create a symbolic link from "public/storage" to "storage/app/public"';
+    protected $description = 'Create a symbolic link from "public/storage" to public root path';
 
     /**
      * Execute the console command.
@@ -32,7 +32,8 @@ class StorageLinkCommand extends Command
         }
 
         $this->laravel->make('files')->link(
-            storage_path('app/public'), public_path('storage')
+            config('filesystem.disks.public.root') ?: storage_path('app/public'),
+            public_path('storage')
         );
 
         $this->info('The [public/storage] directory has been linked.');
