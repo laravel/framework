@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Routing\Middleware\ValidateSignature;
 
 /**
@@ -61,5 +62,38 @@ class UrlSigningTest extends TestCase
 
         $response = $this->get($url);
         $response->assertStatus(401);
+    }
+
+    public function test_signed_middleware_with_routable_parameter()
+    {
+        $model = new RoutableInterfaceStub;
+        $model->routable = 'routable';
+
+        Route::get('/foo/{bar}', function (Request $request, $routable) {
+            return $request->hasValidSignature() ? $routable : 'invalid';
+        })->name('foo');
+
+        $this->assertTrue(is_string($url = URL::signedRoute('foo', $model)));
+        $this->assertEquals('routable', $this->get($url)->original);
+    }
+}
+
+class RoutableInterfaceStub implements UrlRoutable
+{
+    public $key;
+
+    public function getRouteKey()
+    {
+        return $this->{$this->getRouteKeyName()};
+    }
+
+    public function getRouteKeyName()
+    {
+        return 'routable';
+    }
+
+    public function resolveRouteBinding($routeKey)
+    {
+        //
     }
 }

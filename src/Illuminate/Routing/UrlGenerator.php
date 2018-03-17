@@ -305,6 +305,8 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function signedRoute($name, $parameters = [], $expiration = null)
     {
+        $parameters = $this->formatParameters($parameters);
+
         if ($expiration) {
             $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
         }
