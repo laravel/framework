@@ -39,8 +39,7 @@ class PasswordBroker implements PasswordBrokerContract
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
      * @return void
      */
-    public function __construct(TokenRepositoryInterface $tokens,
-                                UserProvider $users)
+    public function __construct(TokenRepositoryInterface $tokens, UserProvider $users)
     {
         $this->users = $users;
         $this->tokens = $tokens;
