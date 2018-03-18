@@ -11,5 +11,6 @@ class BladeHelpersTest extends AbstractBladeTestCase
         $this->assertEquals('<?php dd($var1); ?>', $this->compiler->compileString('@dd($var1)'));
         $this->assertEquals('<?php dd($var1, $var2); ?>', $this->compiler->compileString('@dd($var1, $var2)'));
         $this->assertEquals('<?php dump($var1, $var2); ?>', $this->compiler->compileString('@dump($var1, $var2)'));
+        $this->assertEquals('<?php echo collect([\'foo\' => true, \'bar\' => false])->filter()->keys()->implode(\' \') ?>', $this->compiler->compileString('@class([\'foo\' => true, \'bar\' => false])'));
     }
 }
