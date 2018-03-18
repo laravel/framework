@@ -116,6 +116,13 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     protected $environmentPath;
 
     /**
+     * The custom bootstrap cahche path defined by the developer.
+     *
+     * @var string
+     */
+    protected $bootstrapCachePath;
+
+    /**
      * The environment file to load during bootstrapping.
      *
      * @var string
@@ -132,13 +139,18 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     /**
      * Create a new Illuminate application instance.
      *
-     * @param  string|null  $basePath
+     * @param  string|null $basePath
+     * @param null|string $bootstrapCachePath
      * @return void
      */
-    public function __construct($basePath = null)
+    public function __construct($basePath = null, ?string $bootstrapCachePath = null)
     {
         if ($basePath) {
             $this->setBasePath($basePath);
+        }
+
+        if ($bootstrapCachePath) {
+            $this->setBootstrapCachePath($bootstrapCachePath);
         }
 
         $this->registerBaseBindings();
@@ -267,6 +279,19 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->basePath = rtrim($basePath, '\/');
 
         $this->bindPathsInContainer();
+
+        return $this;
+    }
+
+    /**
+     * Set bootstrap cache path for the application.
+     *
+     * @param string $bootstrapCachePath
+     * @return $this
+     */
+    public function setBootstrapCachePath(string $bootstrapCachePath)
+    {
+        $this->bootstrapCachePath = $this->basePath().DIRECTORY_SEPARATOR.rtrim($bootstrapCachePath, '\/');
 
         return $this;
     }
@@ -860,13 +885,23 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Get the path to the cache directory.
+     *
+     * @return string
+     */
+    public function bootstrapCachePath()
+    {
+        return $this->bootstrapCachePath ?: $this->bootstrapPath().DIRECTORY_SEPARATOR.'cache';
+    }
+
+    /**
      * Get the path to the cached services.php file.
      *
      * @return string
      */
     public function getCachedServicesPath()
     {
-        return $this->bootstrapPath().'/cache/services.php';
+        return $this->bootstrapCachePath().DIRECTORY_SEPARATOR.'services.php';
     }
 
     /**
@@ -876,7 +911,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedPackagesPath()
     {
-        return $this->bootstrapPath().'/cache/packages.php';
+        return $this->bootstrapCachePath().DIRECTORY_SEPARATOR.'packages.php';
     }
 
     /**
@@ -896,7 +931,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedConfigPath()
     {
-        return $this->bootstrapPath().'/cache/config.php';
+        return $this->bootstrapCachePath().DIRECTORY_SEPARATOR.'config.php';
     }
 
     /**
@@ -916,7 +951,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getCachedRoutesPath()
     {
-        return $this->bootstrapPath().'/cache/routes.php';
+        return $this->bootstrapCachePath().DIRECTORY_SEPARATOR.'routes.php';
     }
 
     /**
