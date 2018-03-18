@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresProcessorTest extends TestCase
 {
-    public function testProcessColumnListing()
+    public function testProcessColumnListing(): void
     {
         $processor = new \Illuminate\Database\Query\Processors\PostgresProcessor;
 

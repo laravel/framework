@@ -17,7 +17,7 @@ class RepositoryTest extends TestCase
      */
     protected $config;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         $this->repository = new Repository($this->config = [
             'foo' => 'bar',
@@ -40,27 +40,27 @@ class RepositoryTest extends TestCase
         parent::setUp();
     }
 
-    public function testConstruct()
+    public function testConstruct(): void
     {
         $this->assertInstanceOf(Repository::class, $this->repository);
     }
 
-    public function testHasIsTrue()
+    public function testHasIsTrue(): void
     {
         $this->assertTrue($this->repository->has('foo'));
     }
 
-    public function testHasIsFalse()
+    public function testHasIsFalse(): void
     {
         $this->assertFalse($this->repository->has('not-exist'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->assertSame('bar', $this->repository->get('foo'));
     }
 
-    public function testGetWithArrayOfKeys()
+    public function testGetWithArrayOfKeys(): void
     {
         $this->assertSame([
             'foo' => 'bar',
@@ -85,7 +85,7 @@ class RepositoryTest extends TestCase
         ]));
     }
 
-    public function testGetMany()
+    public function testGetMany(): void
     {
         $this->assertSame([
             'foo' => 'bar',
@@ -110,18 +110,18 @@ class RepositoryTest extends TestCase
         ]));
     }
 
-    public function testGetWithDefault()
+    public function testGetWithDefault(): void
     {
         $this->assertSame('default', $this->repository->get('not-exist', 'default'));
     }
 
-    public function testSet()
+    public function testSet(): void
     {
         $this->repository->set('key', 'value');
         $this->assertSame('value', $this->repository->get('key'));
     }
 
-    public function testSetArray()
+    public function testSetArray(): void
     {
         $this->repository->set([
             'key1' => 'value1',
@@ -131,24 +131,24 @@ class RepositoryTest extends TestCase
         $this->assertSame('value2', $this->repository->get('key2'));
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         $this->repository->prepend('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.0'));
     }
 
-    public function testPush()
+    public function testPush(): void
     {
         $this->repository->push('array', 'xxx');
         $this->assertSame('xxx', $this->repository->get('array.2'));
     }
 
-    public function testAll()
+    public function testAll(): void
     {
         $this->assertSame($this->config, $this->repository->all());
     }
 
-    public function testOffsetUnset()
+    public function testOffsetUnset(): void
     {
         $this->assertArrayHasKey('associate', $this->repository->all());
         $this->assertSame($this->config['associate'], $this->repository->get('associate'));

@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class SessionStoreTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testSessionIsLoadedFromHandler()
+    public function testSessionIsLoadedFromHandler(): void
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('read')->once()->with($this->getSessionId())->andReturn(serialize(['foo' => 'bar', 'bagged' => ['name' => 'taylor']]));
@@ -29,7 +29,7 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->has('baz'));
     }
 
-    public function testSessionMigration()
+    public function testSessionMigration(): void
     {
         $session = $this->getSession();
         $oldId = $session->getId();
@@ -44,7 +44,7 @@ class SessionStoreTest extends TestCase
         $this->assertNotEquals($oldId, $session->getId());
     }
 
-    public function testSessionRegeneration()
+    public function testSessionRegeneration(): void
     {
         $session = $this->getSession();
         $oldId = $session->getId();
@@ -53,7 +53,7 @@ class SessionStoreTest extends TestCase
         $this->assertNotEquals($oldId, $session->getId());
     }
 
-    public function testCantSetInvalidId()
+    public function testCantSetInvalidId(): void
     {
         $session = $this->getSession();
         $this->assertTrue($session->isValidId($session->getId()));
@@ -69,7 +69,7 @@ class SessionStoreTest extends TestCase
         $this->assertNotEquals('wrong', $session->getId());
     }
 
-    public function testSessionInvalidate()
+    public function testSessionInvalidate(): void
     {
         $session = $this->getSession();
         $oldId = $session->getId();
@@ -88,7 +88,7 @@ class SessionStoreTest extends TestCase
         $this->assertCount(0, $session->all());
     }
 
-    public function testSessionIsProperlySaved()
+    public function testSessionIsProperlySaved(): void
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('read')->once()->andReturn(serialize([]));
@@ -113,7 +113,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->isStarted());
     }
 
-    public function testOldInputFlashing()
+    public function testOldInputFlashing(): void
     {
         $session = $this->getSession();
         $session->put('boom', 'baz');
@@ -132,7 +132,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->hasOldInput('boom'));
     }
 
-    public function testDataFlashing()
+    public function testDataFlashing(): void
     {
         $session = $this->getSession();
         $session->flash('foo', 'bar');
@@ -156,7 +156,7 @@ class SessionStoreTest extends TestCase
         $this->assertNull($session->get('foo'));
     }
 
-    public function testDataFlashingNow()
+    public function testDataFlashingNow(): void
     {
         $session = $this->getSession();
         $session->now('foo', 'bar');
@@ -172,7 +172,7 @@ class SessionStoreTest extends TestCase
         $this->assertNull($session->get('foo'));
     }
 
-    public function testDataMergeNewFlashes()
+    public function testDataMergeNewFlashes(): void
     {
         $session = $this->getSession();
         $session->flash('foo', 'bar');
@@ -187,7 +187,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse(array_search('qu', $session->get('_flash.old')));
     }
 
-    public function testReflash()
+    public function testReflash(): void
     {
         $session = $this->getSession();
         $session->flash('foo', 'bar');
@@ -197,7 +197,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
-    public function testReflashWithNow()
+    public function testReflashWithNow(): void
     {
         $session = $this->getSession();
         $session->now('foo', 'bar');
@@ -206,7 +206,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse(array_search('foo', $session->get('_flash.old')));
     }
 
-    public function testReplace()
+    public function testReplace(): void
     {
         $session = $this->getSession();
         $session->put('foo', 'bar');
@@ -216,7 +216,7 @@ class SessionStoreTest extends TestCase
         $this->assertEquals('ux', $session->get('qu'));
     }
 
-    public function testRemove()
+    public function testRemove(): void
     {
         $session = $this->getSession();
         $session->put('foo', 'bar');
@@ -225,7 +225,7 @@ class SessionStoreTest extends TestCase
         $this->assertEquals('bar', $pulled);
     }
 
-    public function testClear()
+    public function testClear(): void
     {
         $session = $this->getSession();
         $session->put('foo', 'bar');
@@ -239,7 +239,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->has('foo'));
     }
 
-    public function testIncrement()
+    public function testIncrement(): void
     {
         $session = $this->getSession();
 
@@ -256,7 +256,7 @@ class SessionStoreTest extends TestCase
         $this->assertEquals(1, $session->get('bar'));
     }
 
-    public function testDecrement()
+    public function testDecrement(): void
     {
         $session = $this->getSession();
 
@@ -273,7 +273,7 @@ class SessionStoreTest extends TestCase
         $this->assertEquals(-1, $session->get('bar'));
     }
 
-    public function testHasOldInputWithoutKey()
+    public function testHasOldInputWithoutKey(): void
     {
         $session = $this->getSession();
         $session->flash('boom', 'baz');
@@ -283,7 +283,7 @@ class SessionStoreTest extends TestCase
         $this->assertTrue($session->hasOldInput());
     }
 
-    public function testHandlerNeedsRequest()
+    public function testHandlerNeedsRequest(): void
     {
         $session = $this->getSession();
         $this->assertFalse($session->handlerNeedsRequest());
@@ -296,13 +296,13 @@ class SessionStoreTest extends TestCase
         $session->setRequestOnHandler($request);
     }
 
-    public function testToken()
+    public function testToken(): void
     {
         $session = $this->getSession();
         $this->assertEquals($session->token(), $session->token());
     }
 
-    public function testRegenerateToken()
+    public function testRegenerateToken(): void
     {
         $session = $this->getSession();
         $token = $session->token();
@@ -310,7 +310,7 @@ class SessionStoreTest extends TestCase
         $this->assertNotEquals($token, $session->token());
     }
 
-    public function testName()
+    public function testName(): void
     {
         $session = $this->getSession();
         $this->assertEquals($session->getName(), $this->getSessionName());
@@ -318,7 +318,7 @@ class SessionStoreTest extends TestCase
         $this->assertEquals($session->getName(), 'foo');
     }
 
-    public function testKeyExists()
+    public function testKeyExists(): void
     {
         $session = $this->getSession();
         $session->put('foo', 'bar');
@@ -334,7 +334,7 @@ class SessionStoreTest extends TestCase
         $this->assertFalse($session->exists(['hulk.two']));
     }
 
-    public function testRememberMethodCallsPutAndReturnsDefault()
+    public function testRememberMethodCallsPutAndReturnsDefault(): void
     {
         $session = $this->getSession();
         $session->getHandler()->shouldReceive('get')->andReturn(null);

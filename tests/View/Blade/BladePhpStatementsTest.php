@@ -4,14 +4,14 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladePhpStatementsTest extends AbstractBladeTestCase
 {
-    public function testPhpStatementsWithExpressionAreCompiled()
+    public function testPhpStatementsWithExpressionAreCompiled(): void
     {
         $string = '@php($set = true)';
         $expected = '<?php ($set = true); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testPhpStatementsWithoutExpressionAreIgnored()
+    public function testPhpStatementsWithoutExpressionAreIgnored(): void
     {
         $string = '@php';
         $expected = '@php';
@@ -22,14 +22,14 @@ class BladePhpStatementsTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testPhpStatementsDontParseBladeCode()
+    public function testPhpStatementsDontParseBladeCode(): void
     {
         $string = '@php echo "{{ This is a blade tag }}" @endphp';
         $expected = '<?php echo "{{ This is a blade tag }}" ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testVerbatimAndPhpStatementsDontGetMixedUp()
+    public function testVerbatimAndPhpStatementsDontGetMixedUp(): void
     {
         $string = "@verbatim {{ Hello, I'm not blade! }}"
                 ."\n@php echo 'And I'm not PHP!' @endphp"

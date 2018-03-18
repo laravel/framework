@@ -14,19 +14,19 @@ class FilesystemAdapterTest extends TestCase
     private $tempDir;
     private $filesystem;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->tempDir = __DIR__.'/tmp';
         $this->filesystem = new Filesystem(new Local($this->tempDir));
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         $filesystem = new Filesystem(new Local(dirname($this->tempDir)));
         $filesystem->deleteDir(basename($this->tempDir));
     }
 
-    public function testResponse()
+    public function testResponse(): void
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem);
@@ -41,7 +41,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals('inline; filename="file.txt"', $response->headers->get('content-disposition'));
     }
 
-    public function testDownload()
+    public function testDownload(): void
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem);
@@ -50,42 +50,42 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
     }
 
-    public function testExists()
+    public function testExists(): void
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->exists('file.txt'));
     }
 
-    public function testPath()
+    public function testPath(): void
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertEquals($this->tempDir.'/file.txt', $filesystemAdapter->path('file.txt'));
     }
 
-    public function testGet()
+    public function testGet(): void
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertEquals('Hello World', $filesystemAdapter->get('file.txt'));
     }
 
-    public function testGetFileNotFound()
+    public function testGetFileNotFound(): void
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->expectException(FileNotFoundException::class);
         $filesystemAdapter->get('file.txt');
     }
 
-    public function testPut()
+    public function testPut(): void
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->put('file.txt', 'Something inside');
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something inside');
     }
 
-    public function testPrepend()
+    public function testPrepend(): void
     {
         file_put_contents($this->tempDir.'/file.txt', 'World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
@@ -93,7 +93,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nWorld");
     }
 
-    public function testAppend()
+    public function testAppend(): void
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello ');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
@@ -101,7 +101,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', "Hello \nMoon");
     }
 
-    public function testDelete()
+    public function testDelete(): void
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
@@ -109,13 +109,13 @@ class FilesystemAdapterTest extends TestCase
         $this->assertFalse(file_exists($this->tempDir.'/file.txt'));
     }
 
-    public function testDeleteReturnsFalseWhenFileNotFound()
+    public function testDeleteReturnsFalseWhenFileNotFound(): void
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertFalse($filesystemAdapter->delete('file.txt'));
     }
 
-    public function testCopy()
+    public function testCopy(): void
     {
         $data = '33232';
         mkdir($this->tempDir.'/foo');
@@ -131,7 +131,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
     }
 
-    public function testMove()
+    public function testMove(): void
     {
         $data = '33232';
         mkdir($this->tempDir.'/foo');

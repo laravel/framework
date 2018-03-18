@@ -11,42 +11,42 @@ use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
 class AuthorizesResourcesTest extends TestCase
 {
-    public function testCreateMethod()
+    public function testCreateMethod(): void
     {
         $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'create', 'can:create,App\User');
     }
 
-    public function testStoreMethod()
+    public function testStoreMethod(): void
     {
         $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'store', 'can:create,App\User');
     }
 
-    public function testShowMethod()
+    public function testShowMethod(): void
     {
         $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'show', 'can:view,user');
     }
 
-    public function testEditMethod()
+    public function testEditMethod(): void
     {
         $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'edit', 'can:update,user');
     }
 
-    public function testUpdateMethod()
+    public function testUpdateMethod(): void
     {
         $controller = new AuthorizesResourcesController;
 
         $this->assertHasMiddleware($controller, 'update', 'can:update,user');
     }
 
-    public function testDestroyMethod()
+    public function testDestroyMethod(): void
     {
         $controller = new AuthorizesResourcesController;
 

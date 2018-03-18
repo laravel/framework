@@ -9,12 +9,12 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testGetRanMigrationsListMigrationsByPackage()
+    public function testGetRanMigrationsListMigrationsByPackage(): void
     {
         $repo = $this->getRepository();
         $query = m::mock('stdClass');
@@ -29,7 +29,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertEquals(['bar'], $repo->getRan());
     }
 
-    public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber()
+    public function testGetLastMigrationsGetsAllMigrationsWithTheLatestBatchNumber(): void
     {
         $repo = $this->getMockBuilder('Illuminate\Database\Migrations\DatabaseMigrationRepository')->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             $resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations',
@@ -47,7 +47,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertEquals(['foo'], $repo->getLast());
     }
 
-    public function testLogMethodInsertsRecordIntoMigrationTable()
+    public function testLogMethodInsertsRecordIntoMigrationTable(): void
     {
         $repo = $this->getRepository();
         $query = m::mock('stdClass');
@@ -60,7 +60,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo->log('bar', 1);
     }
 
-    public function testDeleteMethodRemovesAMigrationFromTheTable()
+    public function testDeleteMethodRemovesAMigrationFromTheTable(): void
     {
         $repo = $this->getRepository();
         $query = m::mock('stdClass');
@@ -75,7 +75,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $repo->delete($migration);
     }
 
-    public function testGetNextBatchNumberReturnsLastBatchNumberPlusOne()
+    public function testGetNextBatchNumberReturnsLastBatchNumberPlusOne(): void
     {
         $repo = $this->getMockBuilder('Illuminate\Database\Migrations\DatabaseMigrationRepository')->setMethods(['getLastBatchNumber'])->setConstructorArgs([
             m::mock('Illuminate\Database\ConnectionResolverInterface'), 'migrations',
@@ -85,7 +85,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertEquals(2, $repo->getNextBatchNumber());
     }
 
-    public function testGetLastBatchNumberReturnsMaxBatch()
+    public function testGetLastBatchNumberReturnsMaxBatch(): void
     {
         $repo = $this->getRepository();
         $query = m::mock('stdClass');
@@ -98,7 +98,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $this->assertEquals(1, $repo->getLastBatchNumber());
     }
 
-    public function testCreateRepositoryCreatesProperDatabaseTable()
+    public function testCreateRepositoryCreatesProperDatabaseTable(): void
     {
         $repo = $this->getRepository();
         $schema = m::mock('stdClass');

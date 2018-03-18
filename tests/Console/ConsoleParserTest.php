@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConsoleParserTest extends TestCase
 {
-    public function testBasicParameterParsing()
+    public function testBasicParameterParsing(): void
     {
         $results = Parser::parse('command:name');
 
@@ -66,7 +66,7 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->isArray());
     }
 
-    public function testShortcutNameParsing()
+    public function testShortcutNameParsing(): void
     {
         $results = Parser::parse('command:name {--o|option}');
 
@@ -108,7 +108,7 @@ class ConsoleParserTest extends TestCase
         $this->assertTrue($results[2][0]->isArray());
     }
 
-    public function testDefaultValueParsing()
+    public function testDefaultValueParsing(): void
     {
         $results = Parser::parse('command:name {argument=defaultArgumentValue} {--option=defaultOptionValue}');
 
@@ -127,7 +127,7 @@ class ConsoleParserTest extends TestCase
         $this->assertEquals(['defaultOptionValue1', 'defaultOptionValue2'], $results[2][0]->getDefault());
     }
 
-    public function testArgumentDefaultValue()
+    public function testArgumentDefaultValue(): void
     {
         $results = Parser::parse('command:name {argument= : The argument description.}');
         $this->assertNull($results[1][0]->getDefault());
@@ -136,7 +136,7 @@ class ConsoleParserTest extends TestCase
         $this->assertSame('default', $results[1][0]->getDefault());
     }
 
-    public function testOptionDefaultValue()
+    public function testOptionDefaultValue(): void
     {
         $results = Parser::parse('command:name {--option= : The option description.}');
         $this->assertNull($results[2][0]->getDefault());

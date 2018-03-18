@@ -8,7 +8,7 @@ use Illuminate\Support\ServiceProvider;
 
 class SupportServiceProviderTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         ServiceProvider::$publishes = [];
         ServiceProvider::$publishGroups = [];
@@ -20,12 +20,12 @@ class SupportServiceProviderTest extends TestCase
         $two->boot();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testPublishableServiceProviders()
+    public function testPublishableServiceProviders(): void
     {
         $toPublish = ServiceProvider::publishableProviders();
         $expected = [
@@ -35,13 +35,13 @@ class SupportServiceProviderTest extends TestCase
         $this->assertEquals($expected, $toPublish, 'Publishable service providers do not return expected set of providers.');
     }
 
-    public function testPublishableGroups()
+    public function testPublishableGroups(): void
     {
         $toPublish = ServiceProvider::publishableGroups();
         $this->assertEquals(['some_tag'], $toPublish, 'Publishable groups do not return expected set of groups.');
     }
 
-    public function testSimpleAssetsArePublishedCorrectly()
+    public function testSimpleAssetsArePublishedCorrectly(): void
     {
         $toPublish = ServiceProvider::pathsToPublish('Illuminate\Tests\Support\ServiceProviderForTestingOne');
         $this->assertArrayHasKey('source/unmarked/one', $toPublish, 'Service provider does not return expected published path key.');
@@ -49,7 +49,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertEquals(['source/unmarked/one' => 'destination/unmarked/one', 'source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published paths.');
     }
 
-    public function testMultipleAssetsArePublishedCorrectly()
+    public function testMultipleAssetsArePublishedCorrectly(): void
     {
         $toPublish = ServiceProvider::pathsToPublish('Illuminate\Tests\Support\ServiceProviderForTestingTwo');
         $this->assertArrayHasKey('source/unmarked/two/a', $toPublish, 'Service provider does not return expected published path key.');
@@ -67,7 +67,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published paths.');
     }
 
-    public function testSimpleTaggedAssetsArePublishedCorrectly()
+    public function testSimpleTaggedAssetsArePublishedCorrectly(): void
     {
         $toPublish = ServiceProvider::pathsToPublish('Illuminate\Tests\Support\ServiceProviderForTestingOne', 'some_tag');
         $this->assertArrayNotHasKey('source/tagged/two/a', $toPublish, 'Service provider does return unexpected tagged path key.');
@@ -76,7 +76,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertEquals(['source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
 
-    public function testMultipleTaggedAssetsArePublishedCorrectly()
+    public function testMultipleTaggedAssetsArePublishedCorrectly(): void
     {
         $toPublish = ServiceProvider::pathsToPublish('Illuminate\Tests\Support\ServiceProviderForTestingTwo', 'some_tag');
         $this->assertArrayHasKey('source/tagged/two/a', $toPublish, 'Service provider does not return expected tagged path key.');
@@ -90,7 +90,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
 
-    public function testMultipleTaggedAssetsAreMergedCorrectly()
+    public function testMultipleTaggedAssetsAreMergedCorrectly(): void
     {
         $toPublish = ServiceProvider::pathsToPublish(null, 'some_tag');
         $this->assertArrayHasKey('source/tagged/two/a', $toPublish, 'Service provider does not return expected tagged path key.');

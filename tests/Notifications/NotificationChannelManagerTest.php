@@ -12,12 +12,12 @@ use Illuminate\Contracts\Bus\Dispatcher as Bus;
 
 class NotificationChannelManagerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testNotificationCanBeDispatchedToDriver()
+    public function testNotificationCanBeDispatchedToDriver(): void
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
@@ -33,7 +33,7 @@ class NotificationChannelManagerTest extends TestCase
         $manager->send(new NotificationChannelManagerTestNotifiable, new NotificationChannelManagerTestNotification);
     }
 
-    public function testNotificationNotSentOnHalt()
+    public function testNotificationNotSentOnHalt(): void
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);
@@ -50,7 +50,7 @@ class NotificationChannelManagerTest extends TestCase
         $manager->send([new NotificationChannelManagerTestNotifiable], new NotificationChannelManagerTestNotificationWithTwoChannels);
     }
 
-    public function testNotificationCanBeQueued()
+    public function testNotificationCanBeQueued(): void
     {
         $container = new Container;
         $container->instance('config', ['app.name' => 'Name', 'app.logo' => 'Logo']);

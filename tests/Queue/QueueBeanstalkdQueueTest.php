@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testPushProperlyPushesJobOntoBeanstalkd()
+    public function testPushProperlyPushesJobOntoBeanstalkd(): void
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();
@@ -24,7 +24,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $queue->push('foo', ['data']);
     }
 
-    public function testDelayedPushProperlyPushesJobOntoBeanstalkd()
+    public function testDelayedPushProperlyPushesJobOntoBeanstalkd(): void
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();
@@ -36,7 +36,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $queue->later(5, 'foo', ['data']);
     }
 
-    public function testPopProperlyPopsJobOffOfBeanstalkd()
+    public function testPopProperlyPopsJobOffOfBeanstalkd(): void
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
@@ -50,7 +50,7 @@ class QueueBeanstalkdQueueTest extends TestCase
         $this->assertInstanceOf('Illuminate\Queue\Jobs\BeanstalkdJob', $result);
     }
 
-    public function testDeleteProperlyRemoveJobsOffBeanstalkd()
+    public function testDeleteProperlyRemoveJobsOffBeanstalkd(): void
     {
         $queue = new \Illuminate\Queue\BeanstalkdQueue(m::mock('Pheanstalk\Pheanstalk'), 'default', 60);
         $pheanstalk = $queue->getPheanstalk();

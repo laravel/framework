@@ -11,7 +11,7 @@ class VerifyCsrfTokenExceptTest extends TestCase
     private $stub;
     private $request;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -19,20 +19,20 @@ class VerifyCsrfTokenExceptTest extends TestCase
         $this->request = Request::create('http://example.com/foo/bar', 'POST');
     }
 
-    public function testItCanExceptPaths()
+    public function testItCanExceptPaths(): void
     {
         $this->assertMatchingExcept(['/foo/bar']);
         $this->assertMatchingExcept(['foo/bar']);
         $this->assertNonMatchingExcept(['/bar/foo']);
     }
 
-    public function testItCanExceptWildcardPaths()
+    public function testItCanExceptWildcardPaths(): void
     {
         $this->assertMatchingExcept(['/foo/*']);
         $this->assertNonMatchingExcept(['/bar*']);
     }
 
-    public function testItCanExceptFullUrlPaths()
+    public function testItCanExceptFullUrlPaths(): void
     {
         $this->assertMatchingExcept(['http://example.com/foo/bar']);
         $this->assertMatchingExcept(['http://example.com/foo/bar/']);
@@ -41,7 +41,7 @@ class VerifyCsrfTokenExceptTest extends TestCase
         $this->assertNonMatchingExcept(['http://foobar.com/']);
     }
 
-    public function testItCanExceptFullUrlWildcardPaths()
+    public function testItCanExceptFullUrlWildcardPaths(): void
     {
         $this->assertMatchingExcept(['http://example.com/*']);
         $this->assertMatchingExcept(['*example.com*']);

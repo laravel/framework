@@ -7,7 +7,7 @@ use Illuminate\Support\NamespacedItemResolver;
 
 class SupportNamespacedItemResolverTest extends TestCase
 {
-    public function testResolution()
+    public function testResolution(): void
     {
         $r = new NamespacedItemResolver;
 
@@ -17,7 +17,7 @@ class SupportNamespacedItemResolverTest extends TestCase
         $this->assertEquals([null, 'bar', null], $r->parseKey('bar'));
     }
 
-    public function testParsedItemsAreCached()
+    public function testParsedItemsAreCached(): void
     {
         $r = $this->getMockBuilder('Illuminate\Support\NamespacedItemResolver')->setMethods(['parseBasicSegments', 'parseNamespacedSegments'])->getMock();
         $r->setParsedKey('foo.bar', ['foo']);

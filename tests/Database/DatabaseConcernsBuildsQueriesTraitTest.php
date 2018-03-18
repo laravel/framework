@@ -7,7 +7,7 @@ use Illuminate\Database\Concerns\BuildsQueries;
 
 class DatabaseConcernsBuildsQueriesTraitTest extends TestCase
 {
-    public function testTapCallbackInstance()
+    public function testTapCallbackInstance(): void
     {
         $mock = $this->getMockForTrait(BuildsQueries::class);
         $mock->tap(function ($builder) use ($mock) {

@@ -7,7 +7,7 @@ use Illuminate\Pagination\Paginator;
 
 class PaginatorTest extends TestCase
 {
-    public function testSimplePaginatorReturnsRelevantContextInformation()
+    public function testSimplePaginatorReturnsRelevantContextInformation(): void
     {
         $p = new Paginator($array = ['item3', 'item4', 'item5'], 2, 2);
 
@@ -31,7 +31,7 @@ class PaginatorTest extends TestCase
         $this->assertEquals($pageInfo, $p->toArray());
     }
 
-    public function testPaginatorRemovesTrailingSlashes()
+    public function testPaginatorRemovesTrailingSlashes(): void
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test/']);
@@ -39,7 +39,7 @@ class PaginatorTest extends TestCase
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
 
-    public function testPaginatorGeneratesUrlsWithoutTrailingSlash()
+    public function testPaginatorGeneratesUrlsWithoutTrailingSlash(): void
     {
         $p = new Paginator($array = ['item1', 'item2', 'item3'], 2, 2,
                                     ['path' => 'http://website.com/test']);

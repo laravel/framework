@@ -14,7 +14,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -58,7 +58,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('posts');
@@ -70,7 +70,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         Relation::morphMap([], false);
     }
 
-    public function testCreation()
+    public function testCreation(): void
     {
         $post = EloquentManyToManyPolymorphicTestPost::create();
         $image = EloquentManyToManyPolymorphicTestImage::create();
@@ -89,7 +89,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
         $this->assertEquals(0, $tag2->images->count());
     }
 
-    public function testEagerLoading()
+    public function testEagerLoading(): void
     {
         $post = EloquentManyToManyPolymorphicTestPost::create();
         $tag = EloquentManyToManyPolymorphicTestTag::create();

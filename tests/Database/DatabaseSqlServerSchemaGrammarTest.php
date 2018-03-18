@@ -8,12 +8,12 @@ use Illuminate\Database\Schema\Blueprint;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicCreateTable()
+    public function testBasicCreateTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -42,7 +42,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('create table "prefix_users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
-    public function testCreateTemporaryTable()
+    public function testCreateTemporaryTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -55,7 +55,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('create table "#users" ("id" int identity primary key not null, "email" nvarchar(255) not null)', $statements[0]);
     }
 
-    public function testDropTable()
+    public function testDropTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->drop();
@@ -72,7 +72,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('drop table "prefix_users"', $statements[0]);
     }
 
-    public function testDropTableIfExists()
+    public function testDropTableIfExists(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropIfExists();
@@ -89,7 +89,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('if exists (select * from INFORMATION_SCHEMA.TABLES where TABLE_NAME = \'prefix_users\') drop table "prefix_users"', $statements[0]);
     }
 
-    public function testDropColumn()
+    public function testDropColumn(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropColumn('foo');
@@ -113,7 +113,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop column "foo", "bar"', $statements[0]);
     }
 
-    public function testDropPrimary()
+    public function testDropPrimary(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropPrimary('foo');
@@ -123,7 +123,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
-    public function testDropUnique()
+    public function testDropUnique(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropUnique('foo');
@@ -133,7 +133,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo" on "users"', $statements[0]);
     }
 
-    public function testDropIndex()
+    public function testDropIndex(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropIndex('foo');
@@ -143,7 +143,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo" on "users"', $statements[0]);
     }
 
-    public function testDropSpatialIndex()
+    public function testDropSpatialIndex(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->dropSpatialIndex(['coordinates']);
@@ -153,7 +153,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "geo_coordinates_spatialindex" on "geo"', $statements[0]);
     }
 
-    public function testDropForeign()
+    public function testDropForeign(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropForeign('foo');
@@ -163,7 +163,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop constraint "foo"', $statements[0]);
     }
 
-    public function testDropTimestamps()
+    public function testDropTimestamps(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropTimestamps();
@@ -173,7 +173,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
     }
 
-    public function testDropTimestampsTz()
+    public function testDropTimestampsTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropTimestampsTz();
@@ -183,7 +183,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop column "created_at", "updated_at"', $statements[0]);
     }
 
-    public function testDropMorphs()
+    public function testDropMorphs(): void
     {
         $blueprint = new Blueprint('photos');
         $blueprint->dropMorphs('imageable');
@@ -194,7 +194,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "photos" drop column "imageable_type", "imageable_id"', $statements[1]);
     }
 
-    public function testRenameTable()
+    public function testRenameTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->rename('foo');
@@ -204,7 +204,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('sp_rename "users", "foo"', $statements[0]);
     }
 
-    public function testAddingPrimaryKey()
+    public function testAddingPrimaryKey(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->primary('foo', 'bar');
@@ -214,7 +214,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add constraint "bar" primary key ("foo")', $statements[0]);
     }
 
-    public function testAddingUniqueKey()
+    public function testAddingUniqueKey(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->unique('foo', 'bar');
@@ -224,7 +224,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
-    public function testAddingIndex()
+    public function testAddingIndex(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->index(['foo', 'bar'], 'baz');
@@ -234,7 +234,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('create index "baz" on "users" ("foo", "bar")', $statements[0]);
     }
 
-    public function testAddingSpatialIndex()
+    public function testAddingSpatialIndex(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->spatialIndex('coordinates');
@@ -244,7 +244,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('create spatial index "geo_coordinates_spatialindex" on "geo" ("coordinates")', $statements[0]);
     }
 
-    public function testAddingFluentSpatialIndex()
+    public function testAddingFluentSpatialIndex(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->point('coordinates')->spatialIndex();
@@ -254,7 +254,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('create spatial index "geo_coordinates_spatialindex" on "geo" ("coordinates")', $statements[1]);
     }
 
-    public function testAddingIncrementingID()
+    public function testAddingIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -264,7 +264,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
     }
 
-    public function testAddingSmallIncrementingID()
+    public function testAddingSmallIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->smallIncrements('id');
@@ -274,7 +274,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "id" smallint identity primary key not null', $statements[0]);
     }
 
-    public function testAddingMediumIncrementingID()
+    public function testAddingMediumIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->mediumIncrements('id');
@@ -284,7 +284,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "id" int identity primary key not null', $statements[0]);
     }
 
-    public function testAddingBigIncrementingID()
+    public function testAddingBigIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->bigIncrements('id');
@@ -294,7 +294,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "id" bigint identity primary key not null', $statements[0]);
     }
 
-    public function testAddingString()
+    public function testAddingString(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->string('foo');
@@ -318,7 +318,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(100) null default \'bar\'', $statements[0]);
     }
 
-    public function testAddingText()
+    public function testAddingText(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->text('foo');
@@ -328,7 +328,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(max) not null', $statements[0]);
     }
 
-    public function testAddingBigInteger()
+    public function testAddingBigInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->bigInteger('foo');
@@ -345,7 +345,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" bigint identity primary key not null', $statements[0]);
     }
 
-    public function testAddingInteger()
+    public function testAddingInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo');
@@ -362,7 +362,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" int identity primary key not null', $statements[0]);
     }
 
-    public function testAddingMediumInteger()
+    public function testAddingMediumInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->mediumInteger('foo');
@@ -379,7 +379,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" int identity primary key not null', $statements[0]);
     }
 
-    public function testAddingTinyInteger()
+    public function testAddingTinyInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->tinyInteger('foo');
@@ -396,7 +396,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" tinyint identity primary key not null', $statements[0]);
     }
 
-    public function testAddingSmallInteger()
+    public function testAddingSmallInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->smallInteger('foo');
@@ -413,7 +413,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" smallint identity primary key not null', $statements[0]);
     }
 
-    public function testAddingFloat()
+    public function testAddingFloat(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->float('foo', 5, 2);
@@ -423,7 +423,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" float not null', $statements[0]);
     }
 
-    public function testAddingDouble()
+    public function testAddingDouble(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->double('foo', 15, 2);
@@ -433,7 +433,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" float not null', $statements[0]);
     }
 
-    public function testAddingDecimal()
+    public function testAddingDecimal(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->decimal('foo', 5, 2);
@@ -443,7 +443,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" decimal(5, 2) not null', $statements[0]);
     }
 
-    public function testAddingBoolean()
+    public function testAddingBoolean(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->boolean('foo');
@@ -453,7 +453,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" bit not null', $statements[0]);
     }
 
-    public function testAddingEnum()
+    public function testAddingEnum(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->enum('role', ['member', 'admin']);
@@ -463,7 +463,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "role" nvarchar(255) check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
-    public function testAddingJson()
+    public function testAddingJson(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->json('foo');
@@ -473,7 +473,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(max) not null', $statements[0]);
     }
 
-    public function testAddingJsonb()
+    public function testAddingJsonb(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->jsonb('foo');
@@ -483,7 +483,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(max) not null', $statements[0]);
     }
 
-    public function testAddingDate()
+    public function testAddingDate(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->date('foo');
@@ -493,7 +493,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" date not null', $statements[0]);
     }
 
-    public function testAddingYear()
+    public function testAddingYear(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->year('birth_year');
@@ -502,7 +502,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "birth_year" int not null', $statements[0]);
     }
 
-    public function testAddingDateTime()
+    public function testAddingDateTime(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTime('created_at');
@@ -511,7 +511,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingDateTimeWithPrecision()
+    public function testAddingDateTimeWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTime('created_at', 1);
@@ -520,7 +520,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetime2(1) not null', $statements[0]);
     }
 
-    public function testAddingDateTimeTz()
+    public function testAddingDateTimeTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTimeTz('foo');
@@ -529,7 +529,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" datetimeoffset not null', $statements[0]);
     }
 
-    public function testAddingDateTimeTzWithPrecision()
+    public function testAddingDateTimeTzWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTimeTz('foo', 1);
@@ -538,7 +538,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" datetimeoffset(1) not null', $statements[0]);
     }
 
-    public function testAddingTime()
+    public function testAddingTime(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->time('created_at');
@@ -547,7 +547,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" time not null', $statements[0]);
     }
 
-    public function testAddingTimeWithPrecision()
+    public function testAddingTimeWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->time('created_at', 1);
@@ -556,7 +556,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" time(1) not null', $statements[0]);
     }
 
-    public function testAddingTimeTz()
+    public function testAddingTimeTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timeTz('created_at');
@@ -565,7 +565,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" time not null', $statements[0]);
     }
 
-    public function testAddingTimeTzWithPrecision()
+    public function testAddingTimeTzWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timeTz('created_at', 1);
@@ -574,7 +574,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" time(1) not null', $statements[0]);
     }
 
-    public function testAddingTimestamp()
+    public function testAddingTimestamp(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamp('created_at');
@@ -583,7 +583,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingTimestampWithPrecision()
+    public function testAddingTimestampWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamp('created_at', 1);
@@ -592,7 +592,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetime2(1) not null', $statements[0]);
     }
 
-    public function testAddingTimestampTz()
+    public function testAddingTimestampTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampTz('created_at');
@@ -601,7 +601,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null', $statements[0]);
     }
 
-    public function testAddingTimestampTzWithPrecision()
+    public function testAddingTimestampTzWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampTz('created_at', 1);
@@ -610,7 +610,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetimeoffset(1) not null', $statements[0]);
     }
 
-    public function testAddingTimestamps()
+    public function testAddingTimestamps(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
@@ -619,7 +619,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetime null, "updated_at" datetime null', $statements[0]);
     }
 
-    public function testAddingTimestampsTz()
+    public function testAddingTimestampsTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
@@ -628,7 +628,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) null, "updated_at" datetimeoffset(0) null', $statements[0]);
     }
 
-    public function testAddingRememberToken()
+    public function testAddingRememberToken(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->rememberToken();
@@ -638,7 +638,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "remember_token" nvarchar(100) null', $statements[0]);
     }
 
-    public function testAddingBinary()
+    public function testAddingBinary(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->binary('foo');
@@ -648,7 +648,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" varbinary(max) not null', $statements[0]);
     }
 
-    public function testAddingUuid()
+    public function testAddingUuid(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->uuid('foo');
@@ -658,7 +658,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" uniqueidentifier not null', $statements[0]);
     }
 
-    public function testAddingIpAddress()
+    public function testAddingIpAddress(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->ipAddress('foo');
@@ -668,7 +668,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(45) not null', $statements[0]);
     }
 
-    public function testAddingMacAddress()
+    public function testAddingMacAddress(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->macAddress('foo');
@@ -678,7 +678,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add "foo" nvarchar(17) not null', $statements[0]);
     }
 
-    public function testAddingGeometry()
+    public function testAddingGeometry(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->geometry('coordinates');
@@ -688,7 +688,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingPoint()
+    public function testAddingPoint(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->point('coordinates');
@@ -698,7 +698,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingLineString()
+    public function testAddingLineString(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->linestring('coordinates');
@@ -708,7 +708,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingPolygon()
+    public function testAddingPolygon(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->polygon('coordinates');
@@ -718,7 +718,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingGeometryCollection()
+    public function testAddingGeometryCollection(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->geometrycollection('coordinates');
@@ -728,7 +728,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingMultiPoint()
+    public function testAddingMultiPoint(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->multipoint('coordinates');
@@ -738,7 +738,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingMultiLineString()
+    public function testAddingMultiLineString(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->multilinestring('coordinates');
@@ -748,7 +748,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add "coordinates" geography not null', $statements[0]);
     }
 
-    public function testAddingMultiPolygon()
+    public function testAddingMultiPolygon(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->multipolygon('coordinates');

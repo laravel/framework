@@ -11,7 +11,7 @@ use Illuminate\Console\Scheduling\SchedulingMutex;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -26,12 +26,12 @@ class ConsoleEventSchedulerTest extends TestCase
         );
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testMutexCanReceiveCustomStore()
+    public function testMutexCanReceiveCustomStore(): void
     {
         Container::getInstance()->make(EventMutex::class)->shouldReceive('useStore')->once()->with('test');
         Container::getInstance()->make(SchedulingMutex::class)->shouldReceive('useStore')->once()->with('test');
@@ -39,7 +39,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->schedule->useCache('test');
     }
 
-    public function testExecCreatesNewCommand()
+    public function testExecCreatesNewCommand(): void
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
         $escapeReal = '\\' === DIRECTORY_SEPARATOR ? '\\"' : '"';
@@ -65,7 +65,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals("path/to/command {$escape}-1 minute{$escape}", $events[7]->command);
     }
 
-    public function testCommandCreatesNewArtisanCommand()
+    public function testCommandCreatesNewArtisanCommand(): void
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
@@ -81,7 +81,7 @@ class ConsoleEventSchedulerTest extends TestCase
         $this->assertEquals($binary.' artisan queue:listen --tries=3', $events[2]->command);
     }
 
-    public function testCreateNewArtisanCommandUsingCommandClass()
+    public function testCreateNewArtisanCommandUsingCommandClass(): void
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 

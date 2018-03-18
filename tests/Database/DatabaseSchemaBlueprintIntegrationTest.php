@@ -17,7 +17,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -33,13 +33,13 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
     }
 
-    public function testRenamingAndChangingColumnsWork()
+    public function testRenamingAndChangingColumnsWork(): void
     {
         $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
             $table->string('name');

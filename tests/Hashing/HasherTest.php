@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class HasherTest extends TestCase
 {
-    public function testBasicBcryptHashing()
+    public function testBasicBcryptHashing(): void
     {
         $hasher = new \Illuminate\Hashing\BcryptHasher;
         $value = $hasher->make('password');
@@ -16,7 +16,7 @@ class HasherTest extends TestCase
         $this->assertTrue($hasher->needsRehash($value, ['rounds' => 1]));
     }
 
-    public function testBasicArgonHashing()
+    public function testBasicArgonHashing(): void
     {
         if (! defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with argon2 hashing support.');

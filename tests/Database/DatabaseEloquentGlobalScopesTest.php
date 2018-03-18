@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -19,14 +19,14 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         ])->bootEloquent();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
 
         Eloquent::unsetConnectionResolver();
     }
 
-    public function testGlobalScopeIsApplied()
+    public function testGlobalScopeIsApplied(): void
     {
         $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery();
@@ -34,7 +34,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
-    public function testGlobalScopeCanBeRemoved()
+    public function testGlobalScopeCanBeRemoved(): void
     {
         $model = new EloquentGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope(ActiveScope::class);
@@ -42,7 +42,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
-    public function testClosureGlobalScopeIsApplied()
+    public function testClosureGlobalScopeIsApplied(): void
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
@@ -50,7 +50,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([1], $query->getBindings());
     }
 
-    public function testClosureGlobalScopeCanBeRemoved()
+    public function testClosureGlobalScopeCanBeRemoved(): void
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScope('active_scope');
@@ -58,7 +58,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
-    public function testGlobalScopeCanBeRemovedAfterTheQueryIsExecuted()
+    public function testGlobalScopeCanBeRemovedAfterTheQueryIsExecuted(): void
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery();
@@ -70,7 +70,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
-    public function testAllGlobalScopesCanBeRemoved()
+    public function testAllGlobalScopesCanBeRemoved(): void
     {
         $model = new EloquentClosureGlobalScopesTestModel;
         $query = $model->newQuery()->withoutGlobalScopes();
@@ -82,7 +82,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals([], $query->getBindings());
     }
 
-    public function testGlobalScopesWithOrWhereConditionsAreNested()
+    public function testGlobalScopesWithOrWhereConditionsAreNested(): void
     {
         $model = new EloquentClosureGlobalScopesWithOrTestModel;
 
@@ -95,7 +95,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals(['val1', 'val2', 'taylor@gmail.com', 'someone@else.com', 1], $query->getBindings());
     }
 
-    public function testRegularScopesWithOrWhereConditionsAreNested()
+    public function testRegularScopesWithOrWhereConditionsAreNested(): void
     {
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->approved();
 
@@ -103,7 +103,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
-    public function testScopesStartingWithOrBooleanArePreserved()
+    public function testScopesStartingWithOrBooleanArePreserved(): void
     {
         $query = EloquentClosureGlobalScopesTestModel::withoutGlobalScopes()->where('foo', 'foo')->orWhere('bar', 'bar')->orApproved();
 
@@ -111,7 +111,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         $this->assertEquals(['foo', 'bar', 1, 0], $query->getBindings());
     }
 
-    public function testHasQueryWhereBothModelsHaveGlobalScopes()
+    public function testHasQueryWhereBothModelsHaveGlobalScopes(): void
     {
         $query = EloquentGlobalScopesWithRelationModel::has('related')->where('bar', 'baz');
 

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeJsonTest extends AbstractBladeTestCase
 {
-    public function testStatementIsCompiledWithSafeDefaultEncodingOptions()
+    public function testStatementIsCompiledWithSafeDefaultEncodingOptions(): void
     {
         $string = 'var foo = @json($var);';
         $expected = 'var foo = <?php echo json_encode($var, 15, 512) ?>;';
@@ -12,7 +12,7 @@ class BladeJsonTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testEncodingOptionsCanBeOverwritten()
+    public function testEncodingOptionsCanBeOverwritten(): void
     {
         $string = 'var foo = @json($var, JSON_HEX_TAG);';
         $expected = 'var foo = <?php echo json_encode($var, JSON_HEX_TAG, 512) ?>;';

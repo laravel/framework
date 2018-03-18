@@ -7,7 +7,7 @@ use Orchestra\Testbench\TestCase;
 
 class LogManagerTest extends TestCase
 {
-    public function testLogManagerCachesLoggerInstances()
+    public function testLogManagerCachesLoggerInstances(): void
     {
         $manager = new LogManager($this->app);
 

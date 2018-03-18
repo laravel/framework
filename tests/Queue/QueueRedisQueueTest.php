@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testPushProperlyPushesJobOntoRedis()
+    public function testPushProperlyPushesJobOntoRedis(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
@@ -23,7 +23,7 @@ class QueueRedisQueueTest extends TestCase
         $this->assertEquals('foo', $id);
     }
 
-    public function testDelayedPushProperlyPushesJobOntoRedis()
+    public function testDelayedPushProperlyPushesJobOntoRedis(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
@@ -40,7 +40,7 @@ class QueueRedisQueueTest extends TestCase
         $this->assertEquals('foo', $id);
     }
 
-    public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis()
+    public function testDelayedPushWithDateTimeProperlyPushesJobOntoRedis(): void
     {
         $date = \Illuminate\Support\Carbon::now();
         $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();

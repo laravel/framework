@@ -9,12 +9,12 @@ use Illuminate\Http\RedirectResponse;
 
 class HttpRedirectResponseTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testHeaderOnRedirect()
+    public function testHeaderOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $this->assertNull($response->headers->get('foo'));
@@ -26,7 +26,7 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertEquals('baz', $response->headers->get('foo'));
     }
 
-    public function testWithOnRedirect()
+    public function testWithOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -35,7 +35,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->with(['name', 'age']);
     }
 
-    public function testWithCookieOnRedirect()
+    public function testWithCookieOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $this->assertCount(0, $response->headers->getCookies());
@@ -46,7 +46,7 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertEquals('bar', $cookies[0]->getValue());
     }
 
-    public function testInputOnRedirect()
+    public function testInputOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -55,7 +55,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->withInput();
     }
 
-    public function testOnlyInputOnRedirect()
+    public function testOnlyInputOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -64,7 +64,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->onlyInput('name');
     }
 
-    public function testExceptInputOnRedirect()
+    public function testExceptInputOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -73,7 +73,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->exceptInput('age');
     }
 
-    public function testFlashingErrorsOnRedirect()
+    public function testFlashingErrorsOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -85,7 +85,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->withErrors($provider);
     }
 
-    public function testSettersGettersOnRequest()
+    public function testSettersGettersOnRequest(): void
     {
         $response = new RedirectResponse('foo.bar');
         $this->assertNull($response->getRequest());
@@ -99,7 +99,7 @@ class HttpRedirectResponseTest extends TestCase
         $this->assertSame($session, $response->getSession());
     }
 
-    public function testRedirectWithErrorsArrayConvertsToMessageBag()
+    public function testRedirectWithErrorsArrayConvertsToMessageBag(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -110,7 +110,7 @@ class HttpRedirectResponseTest extends TestCase
         $response->withErrors($provider);
     }
 
-    public function testMagicCall()
+    public function testMagicCall(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -123,7 +123,7 @@ class HttpRedirectResponseTest extends TestCase
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Method Illuminate\Http\RedirectResponse::doesNotExist does not exist.
      */
-    public function testMagicCallException()
+    public function testMagicCallException(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');

@@ -7,7 +7,7 @@ use Illuminate\Routing\SortedMiddleware;
 
 class RoutingSortedMiddlewareTest extends TestCase
 {
-    public function testMiddlewareCanBeSortedByPriority()
+    public function testMiddlewareCanBeSortedByPriority(): void
     {
         $priority = [
             'First',

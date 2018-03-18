@@ -7,12 +7,12 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class NotificationMailMessageTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->message = new MailMessage;
     }
 
-    public function testTemplate()
+    public function testTemplate(): void
     {
         $this->assertEquals('notifications::email', $this->message->markdown);
 

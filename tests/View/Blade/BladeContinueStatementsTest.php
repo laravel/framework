@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeContinueStatementsTest extends AbstractBladeTestCase
 {
-    public function testContinueStatementsAreCompiled()
+    public function testContinueStatementsAreCompiled(): void
     {
         $string = '@for ($i = 0; $i < 10; $i++)
 test
@@ -17,7 +17,7 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testContinueStatementsWithExpressionAreCompiled()
+    public function testContinueStatementsWithExpressionAreCompiled(): void
     {
         $string = '@for ($i = 0; $i < 10; $i++)
 test
@@ -30,7 +30,7 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testContinueStatementsWithArgumentAreCompiled()
+    public function testContinueStatementsWithArgumentAreCompiled(): void
     {
         $string = '@for ($i = 0; $i < 10; $i++)
 test
@@ -43,7 +43,7 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testContinueStatementsWithSpacedArgumentAreCompiled()
+    public function testContinueStatementsWithSpacedArgumentAreCompiled(): void
     {
         $string = '@for ($i = 0; $i < 10; $i++)
 test
@@ -56,7 +56,7 @@ test
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testContinueStatementsWithFaultyArgumentAreCompiled()
+    public function testContinueStatementsWithFaultyArgumentAreCompiled(): void
     {
         $string = '@for ($i = 0; $i < 10; $i++)
 test

@@ -8,7 +8,7 @@ use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 
 class TransformsRequestTest extends TestCase
 {
-    public function testLowerAgeAndAddBeer()
+    public function testLowerAgeAndAddBeer(): void
     {
         $middleware = new ManipulateInput;
         $request = new Request(
@@ -26,7 +26,7 @@ class TransformsRequestTest extends TestCase
         });
     }
 
-    public function testAjaxLowerAgeAndAddBeer()
+    public function testAjaxLowerAgeAndAddBeer(): void
     {
         $middleware = new ManipulateInput;
         $request = new Request(

@@ -8,12 +8,12 @@ use Illuminate\Foundation\Application;
 
 class FoundationHelpersTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCache()
+    public function testCache(): void
     {
         $app = new Application;
         $app['cache'] = $cache = m::mock('stdClass');
@@ -38,12 +38,12 @@ class FoundationHelpersTest extends TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage You must specify an expiration time when setting a value in the cache.
      */
-    public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided()
+    public function testCacheThrowsAnExceptionIfAnExpirationIsNotProvided(): void
     {
         cache(['foo' => 'bar']);
     }
 
-    public function testUnversionedElixir()
+    public function testUnversionedElixir(): void
     {
         $file = 'unversioned.css';
 
@@ -58,7 +58,7 @@ class FoundationHelpersTest extends TestCase
         unlink(public_path($file));
     }
 
-    public function testMixDoesNotIncludeHost()
+    public function testMixDoesNotIncludeHost(): void
     {
         $file = 'unversioned.css';
 

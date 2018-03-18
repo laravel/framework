@@ -23,7 +23,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     protected $request;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->config = m::mock(Config::class);
 
@@ -45,12 +45,12 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler = new Handler($this->container);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testHandlerReportsExceptionAsContext()
+    public function testHandlerReportsExceptionAsContext(): void
     {
         $logger = m::mock(LoggerInterface::class);
         $this->container->instance(LoggerInterface::class, $logger);
@@ -59,7 +59,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->handler->report(new \RuntimeException('Exception message'));
     }
 
-    public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()
+    public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue(): void
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
@@ -73,14 +73,14 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertContains('"trace":', $response);
     }
 
-    public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
+    public function testReturnsCustomResponseWhenExceptionImplementsResponsable(): void
     {
         $response = $this->handler->render($this->request, new CustomException)->getContent();
 
         $this->assertSame('{"response":"My custom exception response"}', $response);
     }
 
-    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
+    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked(): void
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
@@ -95,7 +95,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertNotContains('"trace":', $response);
     }
 
-    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndHttpExceptionErrorIsShown()
+    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndHttpExceptionErrorIsShown(): void
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);
@@ -110,7 +110,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertNotContains('"trace":', $response);
     }
 
-    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndAccessDeniedHttpExceptionErrorIsShown()
+    public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndAccessDeniedHttpExceptionErrorIsShown(): void
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
         $this->request->shouldReceive('expectsJson')->once()->andReturn(true);

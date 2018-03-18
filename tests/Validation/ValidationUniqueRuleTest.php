@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationUniqueRuleTest extends TestCase
 {
-    public function testItCorrectlyFormatsAStringVersionOfTheRule()
+    public function testItCorrectlyFormatsAStringVersionOfTheRule(): void
     {
         $rule = new \Illuminate\Validation\Rules\Unique('table');
         $rule->where('foo', 'bar');

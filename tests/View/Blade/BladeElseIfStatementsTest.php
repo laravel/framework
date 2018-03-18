@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeElseIfStatementsTest extends AbstractBladeTestCase
 {
-    public function testElseIfStatementsAreCompiled()
+    public function testElseIfStatementsAreCompiled(): void
     {
         $string = '@if(name(foo(bar)))
 breeze

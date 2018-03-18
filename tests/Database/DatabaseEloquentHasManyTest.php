@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testMakeMethodDoesNotSaveNewModel()
+    public function testMakeMethodDoesNotSaveNewModel(): void
     {
         $relation = $this->getRelation();
         $instance = $this->expectNewModel($relation, ['name' => 'taylor']);
@@ -25,7 +25,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
     }
 
-    public function testCreateMethodProperlyCreatesNewModel()
+    public function testCreateMethodProperlyCreatesNewModel(): void
     {
         $relation = $this->getRelation();
         $created = $this->expectCreatedModel($relation, ['name' => 'taylor']);
@@ -33,7 +33,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
-    public function testFindOrNewMethodFindsModel()
+    public function testFindOrNewMethodFindsModel(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn($model = m::mock('stdClass'));
@@ -42,7 +42,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->findOrNew('foo'));
     }
 
-    public function testFindOrNewMethodReturnsNewModelWithForeignKeySet()
+    public function testFindOrNewMethodReturnsNewModelWithForeignKeySet(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn(null);
@@ -52,7 +52,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
     }
 
-    public function testFirstOrNewMethodFindsFirstModel()
+    public function testFirstOrNewMethodFindsFirstModel(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -62,7 +62,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo']));
     }
 
-    public function testFirstOrNewMethodWithValuesFindsFirstModel()
+    public function testFirstOrNewMethodWithValuesFindsFirstModel(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -73,7 +73,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testFirstOrNewMethodReturnsNewModelWithForeignKeySet()
+    public function testFirstOrNewMethodReturnsNewModelWithForeignKeySet(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -83,7 +83,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($model, $relation->firstOrNew(['foo']));
     }
 
-    public function testFirstOrNewMethodWithValuesCreatesNewModelWithForeignKeySet()
+    public function testFirstOrNewMethodWithValuesCreatesNewModelWithForeignKeySet(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -93,7 +93,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($model, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testFirstOrCreateMethodFindsFirstModel()
+    public function testFirstOrCreateMethodFindsFirstModel(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -105,7 +105,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->firstOrCreate(['foo']));
     }
 
-    public function testFirstOrCreateMethodWithValuesFindsFirstModel()
+    public function testFirstOrCreateMethodWithValuesFindsFirstModel(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -117,7 +117,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testFirstOrCreateMethodCreatesNewModelWithForeignKeySet()
+    public function testFirstOrCreateMethodCreatesNewModelWithForeignKeySet(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -127,7 +127,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($model, $relation->firstOrCreate(['foo']));
     }
 
-    public function testFirstOrCreateMethodWithValuesCreatesNewModelWithForeignKeySet()
+    public function testFirstOrCreateMethodWithValuesCreatesNewModelWithForeignKeySet(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -137,7 +137,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($model, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
+    public function testUpdateOrCreateMethodFindsFirstModelAndUpdates(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -149,7 +149,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(stdClass::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
-    public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet()
+    public function testUpdateOrCreateMethodCreatesNewModelWithForeignKeySet(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -162,7 +162,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
-    public function testUpdateMethodUpdatesModelsWithTimestamps()
+    public function testUpdateMethodUpdatesModelsWithTimestamps(): void
     {
         $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
@@ -173,7 +173,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals('results', $relation->update(['foo' => 'bar']));
     }
 
-    public function testRelationIsProperlyInitialized()
+    public function testRelationIsProperlyInitialized(): void
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
@@ -186,7 +186,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals([$model], $models);
     }
 
-    public function testEagerConstraintsAreProperlyAdded()
+    public function testEagerConstraintsAreProperlyAdded(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
@@ -197,7 +197,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
-    public function testModelsAreProperlyMatchedToParents()
+    public function testModelsAreProperlyMatchedToParents(): void
     {
         $relation = $this->getRelation();
 
@@ -228,7 +228,7 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertNull($models[2]->foo);
     }
 
-    public function testCreateManyCreatesARelatedModelForEachRecord()
+    public function testCreateManyCreatesARelatedModelForEachRecord(): void
     {
         $records = [
             'taylor' => ['name' => 'taylor'],

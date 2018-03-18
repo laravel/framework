@@ -11,12 +11,12 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class BroadcasterTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testExtractingParametersWhileCheckingForUserAccess()
+    public function testExtractingParametersWhileCheckingForUserAccess(): void
     {
         $broadcaster = new FakeBroadcaster;
 
@@ -57,7 +57,7 @@ class BroadcasterTest extends TestCase
         Container::setInstance(new Container);
     }
 
-    public function testCanUseChannelClasses()
+    public function testCanUseChannelClasses(): void
     {
         $broadcaster = new FakeBroadcaster;
 
@@ -68,14 +68,14 @@ class BroadcasterTest extends TestCase
     /**
      * @expectedException \Exception
      */
-    public function testUnknownChannelAuthHandlerTypeThrowsException()
+    public function testUnknownChannelAuthHandlerTypeThrowsException(): void
     {
         $broadcaster = new FakeBroadcaster;
 
         $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
     }
 
-    public function testCanRegisterChannelsAsClasses()
+    public function testCanRegisterChannelsAsClasses(): void
     {
         $broadcaster = new FakeBroadcaster;
 
@@ -87,7 +87,7 @@ class BroadcasterTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
      */
-    public function testNotFoundThrowsHttpException()
+    public function testNotFoundThrowsHttpException(): void
     {
         $broadcaster = new FakeBroadcaster;
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {

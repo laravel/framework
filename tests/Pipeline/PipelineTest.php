@@ -7,7 +7,7 @@ use Illuminate\Pipeline\Pipeline;
 
 class PipelineTest extends TestCase
 {
-    public function testPipelineBasicUsage()
+    public function testPipelineBasicUsage(): void
     {
         $pipeTwo = function ($piped, $next) {
             $_SERVER['__test.pipe.two'] = $piped;
@@ -30,7 +30,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.two']);
     }
 
-    public function testPipelineUsageWithObjects()
+    public function testPipelineUsageWithObjects(): void
     {
         $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
@@ -45,7 +45,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
-    public function testPipelineUsageWithInvokableObjects()
+    public function testPipelineUsageWithInvokableObjects(): void
     {
         $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
@@ -62,7 +62,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
-    public function testPipelineUsageWithCallable()
+    public function testPipelineUsageWithCallable(): void
     {
         $function = function ($piped, $next) {
             $_SERVER['__test.pipe.one'] = 'foo';
@@ -85,7 +85,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
-    public function testPipelineUsageWithInvokableClass()
+    public function testPipelineUsageWithInvokableClass(): void
     {
         $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
@@ -102,7 +102,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.one']);
     }
 
-    public function testPipelineUsageWithParameters()
+    public function testPipelineUsageWithParameters(): void
     {
         $parameters = ['one', 'two'];
 
@@ -119,7 +119,7 @@ class PipelineTest extends TestCase
         unset($_SERVER['__test.pipe.parameters']);
     }
 
-    public function testPipelineViaChangesTheMethodBeingCalledOnThePipes()
+    public function testPipelineViaChangesTheMethodBeingCalledOnThePipes(): void
     {
         $pipelineInstance = new Pipeline(new \Illuminate\Container\Container);
         $result = $pipelineInstance->send('data')
@@ -135,7 +135,7 @@ class PipelineTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage A container instance has not been passed to the Pipeline.
      */
-    public function testPipelineThrowsExceptionOnResolveWithoutContainer()
+    public function testPipelineThrowsExceptionOnResolveWithoutContainer(): void
     {
         (new Pipeline)->send('data')
             ->through('Illuminate\Tests\Pipeline\PipelineTestPipeOne')

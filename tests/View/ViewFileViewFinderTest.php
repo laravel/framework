@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class ViewFileViewFinderTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicViewFinding()
+    public function testBasicViewFinding(): void
     {
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(true);
@@ -20,7 +20,7 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals(__DIR__.'/foo.blade.php', $finder->find('foo'));
     }
 
-    public function testCascadingFileLoading()
+    public function testCascadingFileLoading(): void
     {
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
@@ -29,7 +29,7 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals(__DIR__.'/foo.php', $finder->find('foo'));
     }
 
-    public function testDirectoryCascadingFileLoading()
+    public function testDirectoryCascadingFileLoading(): void
     {
         $finder = $this->getFinder();
         $finder->addLocation(__DIR__.'/nested');
@@ -41,7 +41,7 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals(__DIR__.'/nested/foo.blade.php', $finder->find('foo'));
     }
 
-    public function testNamespacedBasicFileLoading()
+    public function testNamespacedBasicFileLoading(): void
     {
         $finder = $this->getFinder();
         $finder->addNamespace('foo', __DIR__.'/foo');
@@ -50,7 +50,7 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals(__DIR__.'/foo/bar/baz.blade.php', $finder->find('foo::bar.baz'));
     }
 
-    public function testCascadingNamespacedFileLoading()
+    public function testCascadingNamespacedFileLoading(): void
     {
         $finder = $this->getFinder();
         $finder->addNamespace('foo', __DIR__.'/foo');
@@ -60,7 +60,7 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals(__DIR__.'/foo/bar/baz.php', $finder->find('foo::bar.baz'));
     }
 
-    public function testDirectoryCascadingNamespacedFileLoading()
+    public function testDirectoryCascadingNamespacedFileLoading(): void
     {
         $finder = $this->getFinder();
         $finder->addNamespace('foo', [__DIR__.'/foo', __DIR__.'/bar']);
@@ -75,7 +75,7 @@ class ViewFileViewFinderTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testExceptionThrownWhenViewNotFound()
+    public function testExceptionThrownWhenViewNotFound(): void
     {
         $finder = $this->getFinder();
         $finder->getFilesystem()->shouldReceive('exists')->once()->with(__DIR__.'/foo.blade.php')->andReturn(false);
@@ -89,7 +89,7 @@ class ViewFileViewFinderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No hint path defined for [name].
      */
-    public function testExceptionThrownOnInvalidViewName()
+    public function testExceptionThrownOnInvalidViewName(): void
     {
         $finder = $this->getFinder();
         $finder->find('name::');
@@ -99,13 +99,13 @@ class ViewFileViewFinderTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage No hint path defined for [name].
      */
-    public function testExceptionThrownWhenNoHintPathIsRegistered()
+    public function testExceptionThrownWhenNoHintPathIsRegistered(): void
     {
         $finder = $this->getFinder();
         $finder->find('name::foo');
     }
 
-    public function testAddingExtensionPrependsNotAppends()
+    public function testAddingExtensionPrependsNotAppends(): void
     {
         $finder = $this->getFinder();
         $finder->addExtension('baz');
@@ -113,7 +113,7 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertEquals('baz', reset($extensions));
     }
 
-    public function testAddingExtensionsReplacesOldOnes()
+    public function testAddingExtensionsReplacesOldOnes(): void
     {
         $finder = $this->getFinder();
         $finder->addExtension('baz');
@@ -122,21 +122,21 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertCount(4, $finder->getExtensions());
     }
 
-    public function testPassingViewWithHintReturnsTrue()
+    public function testPassingViewWithHintReturnsTrue(): void
     {
         $finder = $this->getFinder();
 
         $this->assertTrue($finder->hasHintInformation('hint::foo.bar'));
     }
 
-    public function testPassingViewWithoutHintReturnsFalse()
+    public function testPassingViewWithoutHintReturnsFalse(): void
     {
         $finder = $this->getFinder();
 
         $this->assertFalse($finder->hasHintInformation('foo.bar'));
     }
 
-    public function testPassingViewWithFalseHintReturnsFalse()
+    public function testPassingViewWithFalseHintReturnsFalse(): void
     {
         $finder = $this->getFinder();
 

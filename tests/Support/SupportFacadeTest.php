@@ -9,18 +9,18 @@ use PHPUnit\Framework\TestCase;
 
 class SupportFacadeTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         \Illuminate\Support\Facades\Facade::clearResolvedInstances();
         FacadeStub::setFacadeApplication(null);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testFacadeCallsUnderlyingApplication()
+    public function testFacadeCallsUnderlyingApplication(): void
     {
         $app = new ApplicationStub;
         $app->setAttributes(['foo' => $mock = m::mock('stdClass')]);
@@ -29,7 +29,7 @@ class SupportFacadeTest extends TestCase
         $this->assertEquals('baz', FacadeStub::bar());
     }
 
-    public function testShouldReceiveReturnsAMockeryMock()
+    public function testShouldReceiveReturnsAMockeryMock(): void
     {
         $app = new ApplicationStub;
         $app->setAttributes(['foo' => new stdClass]);
@@ -39,7 +39,7 @@ class SupportFacadeTest extends TestCase
         $this->assertEquals('baz', $app['foo']->foo('bar'));
     }
 
-    public function testShouldReceiveCanBeCalledTwice()
+    public function testShouldReceiveCanBeCalledTwice(): void
     {
         $app = new ApplicationStub;
         $app->setAttributes(['foo' => new stdClass]);
@@ -51,7 +51,7 @@ class SupportFacadeTest extends TestCase
         $this->assertEquals('baz2', $app['foo']->foo2('bar2'));
     }
 
-    public function testCanBeMockedWithoutUnderlyingInstance()
+    public function testCanBeMockedWithoutUnderlyingInstance(): void
     {
         FacadeStub::shouldReceive('foo')->once()->andReturn('bar');
         $this->assertEquals('bar', FacadeStub::foo());

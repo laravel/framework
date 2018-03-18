@@ -10,12 +10,12 @@ use Illuminate\Notifications\Channels\BroadcastChannel;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
+    public function testDatabaseChannelCreatesDatabaseRecordWithProperData(): void
     {
         $notification = new NotificationBroadcastChannelTestNotification;
         $notification->id = 1;
@@ -27,7 +27,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $channel->send($notifiable, $notification);
     }
 
-    public function testNotificationIsBroadcastedOnCustomChannels()
+    public function testNotificationIsBroadcastedOnCustomChannels(): void
     {
         $notification = new CustomChannelsTestNotification;
         $notification->id = 1;
@@ -42,7 +42,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $this->assertEquals(new PrivateChannel('custom-channel'), $channels[0]);
     }
 
-    public function testNotificationIsBroadcastedWithCustomEventName()
+    public function testNotificationIsBroadcastedWithCustomEventName(): void
     {
         $notification = new CustomEventNameTestNotification;
         $notification->id = 1;
@@ -57,7 +57,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $this->assertSame('custom.type', $eventName);
     }
 
-    public function testNotificationIsBroadcastedWithCustomDataType()
+    public function testNotificationIsBroadcastedWithCustomDataType(): void
     {
         $notification = new CustomEventNameTestNotification;
         $notification->id = 1;
@@ -72,7 +72,7 @@ class NotificationBroadcastChannelTest extends TestCase
         $this->assertSame('custom.type', $data['type']);
     }
 
-    public function testNotificationIsBroadcastedNow()
+    public function testNotificationIsBroadcastedNow(): void
     {
         $notification = new TestNotificationBroadCastedNow;
         $notification->id = 1;

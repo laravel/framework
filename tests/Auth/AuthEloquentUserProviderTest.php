@@ -8,12 +8,12 @@ use Illuminate\Auth\EloquentUserProvider;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testRetrieveByIDReturnsUser()
+    public function testRetrieveByIDReturnsUser(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock('stdClass');
@@ -27,7 +27,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertEquals('bar', $user);
     }
 
-    public function testRetrieveByTokenReturnsUser()
+    public function testRetrieveByTokenReturnsUser(): void
     {
         $mockUser = m::mock('stdClass');
         $mockUser->shouldReceive('getRememberToken')->once()->andReturn('a');
@@ -43,7 +43,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertEquals($mockUser, $user);
     }
 
-    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    public function testRetrieveTokenWithBadIdentifierReturnsNull(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock('stdClass');
@@ -56,7 +56,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByBadTokenReturnsNull()
+    public function testRetrieveByBadTokenReturnsNull(): void
     {
         $mockUser = m::mock('stdClass');
         $mockUser->shouldReceive('getRememberToken')->once()->andReturn(null);
@@ -72,7 +72,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByCredentialsReturnsUser()
+    public function testRetrieveByCredentialsReturnsUser(): void
     {
         $provider = $this->getProviderMock();
         $mock = m::mock('stdClass');
@@ -85,7 +85,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertEquals('bar', $user);
     }
 
-    public function testCredentialValidation()
+    public function testCredentialValidation(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
@@ -98,7 +98,7 @@ class AuthEloquentUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testModelsCanBeCreated()
+    public function testModelsCanBeCreated(): void
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
         $provider = new EloquentUserProvider($hasher, 'Illuminate\Tests\Auth\EloquentProviderUserStub');

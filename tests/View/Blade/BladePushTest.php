@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladePushTest extends AbstractBladeTestCase
 {
-    public function testPushIsCompiled()
+    public function testPushIsCompiled(): void
     {
         $string = '@push(\'foo\')
 test

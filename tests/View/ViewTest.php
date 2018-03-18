@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testDataCanBeSetOnView()
+    public function testDataCanBeSetOnView(): void
     {
         $view = $this->getView();
         $view->with('foo', 'bar');
@@ -25,7 +25,7 @@ class ViewTest extends TestCase
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
     }
 
-    public function testRenderProperlyRendersView()
+    public function testRenderProperlyRendersView(): void
     {
         $view = $this->getView(['foo' => 'bar']);
         $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
@@ -43,7 +43,7 @@ class ViewTest extends TestCase
         $this->assertEquals('contents', $view->render($callback));
     }
 
-    public function testRenderHandlingCallbackReturnValues()
+    public function testRenderHandlingCallbackReturnValues(): void
     {
         $view = $this->getView();
         $view->getFactory()->shouldReceive('incrementRender');
@@ -66,7 +66,7 @@ class ViewTest extends TestCase
         }));
     }
 
-    public function testRenderSectionsReturnsEnvironmentSections()
+    public function testRenderSectionsReturnsEnvironmentSections(): void
     {
         $view = m::mock('Illuminate\View\View[render]', [
             m::mock('Illuminate\View\Factory'),
@@ -81,7 +81,7 @@ class ViewTest extends TestCase
         $this->assertEquals($sections, $view->renderSections());
     }
 
-    public function testSectionsAreNotFlushedWhenNotDoneRendering()
+    public function testSectionsAreNotFlushedWhenNotDoneRendering(): void
     {
         $view = $this->getView(['foo' => 'bar']);
         $view->getFactory()->shouldReceive('incrementRender')->twice();
@@ -95,7 +95,7 @@ class ViewTest extends TestCase
         $this->assertEquals('contents', (string) $view);
     }
 
-    public function testViewNestBindsASubView()
+    public function testViewNestBindsASubView(): void
     {
         $view = $this->getView();
         $view->getFactory()->shouldReceive('make')->once()->with('foo', ['data']);
@@ -104,7 +104,7 @@ class ViewTest extends TestCase
         $this->assertInstanceOf('Illuminate\View\View', $result);
     }
 
-    public function testViewAcceptsArrayableImplementations()
+    public function testViewAcceptsArrayableImplementations(): void
     {
         $arrayable = m::mock('Illuminate\Contracts\Support\Arrayable');
         $arrayable->shouldReceive('toArray')->once()->andReturn(['foo' => 'bar', 'baz' => ['qux', 'corge']]);
@@ -115,7 +115,7 @@ class ViewTest extends TestCase
         $this->assertEquals(['qux', 'corge'], $view->baz);
     }
 
-    public function testViewGettersSetters()
+    public function testViewGettersSetters(): void
     {
         $view = $this->getView(['foo' => 'bar']);
         $this->assertEquals($view->getName(), 'view');
@@ -126,7 +126,7 @@ class ViewTest extends TestCase
         $this->assertEquals($view->getPath(), 'newPath');
     }
 
-    public function testViewArrayAccess()
+    public function testViewArrayAccess(): void
     {
         $view = $this->getView(['foo' => 'bar']);
         $this->assertInstanceOf('ArrayAccess', $view);
@@ -138,7 +138,7 @@ class ViewTest extends TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    public function testViewConstructedWithObjectData()
+    public function testViewConstructedWithObjectData(): void
     {
         $view = $this->getView(new DataObjectStub);
         $this->assertInstanceOf('ArrayAccess', $view);
@@ -150,7 +150,7 @@ class ViewTest extends TestCase
         $this->assertFalse($view->offsetExists('foo'));
     }
 
-    public function testViewMagicMethods()
+    public function testViewMagicMethods(): void
     {
         $view = $this->getView(['foo' => 'bar']);
         $this->assertTrue(isset($view->foo));
@@ -167,13 +167,13 @@ class ViewTest extends TestCase
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Method Illuminate\View\View::badMethodCall does not exist.
      */
-    public function testViewBadMethod()
+    public function testViewBadMethod(): void
     {
         $view = $this->getView();
         $view->badMethodCall();
     }
 
-    public function testViewGatherDataWithRenderable()
+    public function testViewGatherDataWithRenderable(): void
     {
         $view = $this->getView();
         $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
@@ -188,7 +188,7 @@ class ViewTest extends TestCase
         $this->assertEquals('contents', $view->render());
     }
 
-    public function testViewRenderSections()
+    public function testViewRenderSections(): void
     {
         $view = $this->getView();
         $view->getFactory()->shouldReceive('incrementRender')->once()->ordered();
@@ -204,7 +204,7 @@ class ViewTest extends TestCase
         $this->assertEquals($sections[1], 'bar');
     }
 
-    public function testWithErrors()
+    public function testWithErrors(): void
     {
         $view = $this->getView();
         $errors = ['foo' => 'bar', 'qu' => 'ux'];

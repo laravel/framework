@@ -11,12 +11,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class AuthGuardTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicReturnsNullOnValidAttempt()
+    public function testBasicReturnsNullOnValidAttempt(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
@@ -28,7 +28,7 @@ class AuthGuardTest extends TestCase
         $guard->basic('email');
     }
 
-    public function testBasicReturnsNullWhenAlreadyLoggedIn()
+    public function testBasicReturnsNullWhenAlreadyLoggedIn(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard[check]', ['default', $provider, $session]);
@@ -43,7 +43,7 @@ class AuthGuardTest extends TestCase
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
-    public function testBasicReturnsResponseOnFailure()
+    public function testBasicReturnsResponseOnFailure(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
@@ -54,7 +54,7 @@ class AuthGuardTest extends TestCase
         $guard->basic('email');
     }
 
-    public function testBasicWithExtraConditions()
+    public function testBasicWithExtraConditions(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
@@ -66,7 +66,7 @@ class AuthGuardTest extends TestCase
         $guard->basic('email', ['active' => 1]);
     }
 
-    public function testAttemptCallsRetrieveByCredentials()
+    public function testAttemptCallsRetrieveByCredentials(): void
     {
         $guard = $this->getGuard();
         $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
@@ -76,7 +76,7 @@ class AuthGuardTest extends TestCase
         $guard->attempt(['foo']);
     }
 
-    public function testAttemptReturnsUserInterface()
+    public function testAttemptReturnsUserInterface(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['login'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -89,7 +89,7 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($guard->attempt(['foo']));
     }
 
-    public function testAttemptReturnsFalseIfUserNotGiven()
+    public function testAttemptReturnsFalseIfUserNotGiven(): void
     {
         $mock = $this->getGuard();
         $mock->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
@@ -99,7 +99,7 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($mock->attempt(['foo']));
     }
 
-    public function testLoginStoresIdentifierInSession()
+    public function testLoginStoresIdentifierInSession(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -111,7 +111,7 @@ class AuthGuardTest extends TestCase
         $mock->login($user);
     }
 
-    public function testSessionGuardIsMacroable()
+    public function testSessionGuardIsMacroable(): void
     {
         $guard = $this->getGuard();
 
@@ -124,7 +124,7 @@ class AuthGuardTest extends TestCase
         );
     }
 
-    public function testLoginFiresLoginAndAuthenticatedEvents()
+    public function testLoginFiresLoginAndAuthenticatedEvents(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -139,7 +139,7 @@ class AuthGuardTest extends TestCase
         $mock->login($user);
     }
 
-    public function testFailedAttemptFiresFailedEvent()
+    public function testFailedAttemptFiresFailedEvent(): void
     {
         $guard = $this->getGuard();
         $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
@@ -149,7 +149,7 @@ class AuthGuardTest extends TestCase
         $guard->attempt(['foo']);
     }
 
-    public function testAuthenticateReturnsUserWhenUserIsNotNull()
+    public function testAuthenticateReturnsUserWhenUserIsNotNull(): void
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $guard = $this->getGuard()->setUser($user);
@@ -157,7 +157,7 @@ class AuthGuardTest extends TestCase
         $this->assertEquals($user, $guard->authenticate());
     }
 
-    public function testSetUserFiresAuthenticatedEvent()
+    public function testSetUserFiresAuthenticatedEvent(): void
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $guard = $this->getGuard();
@@ -170,7 +170,7 @@ class AuthGuardTest extends TestCase
      * @expectedException \Illuminate\Auth\AuthenticationException
      * @expectedExceptionMessage Unauthenticated.
      */
-    public function testAuthenticateThrowsWhenUserIsNull()
+    public function testAuthenticateThrowsWhenUserIsNull(): void
     {
         $guard = $this->getGuard();
         $guard->getSession()->shouldReceive('get')->once()->andReturn(null);
@@ -178,7 +178,7 @@ class AuthGuardTest extends TestCase
         $guard->authenticate();
     }
 
-    public function testIsAuthedReturnsTrueWhenUserIsNotNull()
+    public function testIsAuthedReturnsTrueWhenUserIsNotNull(): void
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $mock = $this->getGuard();
@@ -187,7 +187,7 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($mock->guest());
     }
 
-    public function testIsAuthedReturnsFalseWhenUserIsNull()
+    public function testIsAuthedReturnsFalseWhenUserIsNull(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['user'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -196,7 +196,7 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($mock->guest());
     }
 
-    public function testUserMethodReturnsCachedUser()
+    public function testUserMethodReturnsCachedUser(): void
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $mock = $this->getGuard();
@@ -204,14 +204,14 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $mock->user());
     }
 
-    public function testNullIsReturnedForUserIfNoUserFound()
+    public function testNullIsReturnedForUserIfNoUserFound(): void
     {
         $mock = $this->getGuard();
         $mock->getSession()->shouldReceive('get')->once()->andReturn(null);
         $this->assertNull($mock->user());
     }
 
-    public function testUserIsSetToRetrievedUser()
+    public function testUserIsSetToRetrievedUser(): void
     {
         $mock = $this->getGuard();
         $mock->getSession()->shouldReceive('get')->once()->andReturn(1);
@@ -221,7 +221,7 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $mock->getUser());
     }
 
-    public function testLogoutRemovesSessionTokenAndRememberMeCookie()
+    public function testLogoutRemovesSessionTokenAndRememberMeCookie(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName', 'getRecallerName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -242,7 +242,7 @@ class AuthGuardTest extends TestCase
         $this->assertNull($mock->getUser());
     }
 
-    public function testLogoutDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist()
+    public function testLogoutDoesNotEnqueueRememberMeCookieForDeletionIfCookieDoesntExist(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['getName', 'recaller'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -259,7 +259,7 @@ class AuthGuardTest extends TestCase
         $this->assertNull($mock->getUser());
     }
 
-    public function testLogoutFiresLogoutEvent()
+    public function testLogoutFiresLogoutEvent(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $mock = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['clearUserDataFromStorage'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
@@ -274,7 +274,7 @@ class AuthGuardTest extends TestCase
         $mock->logout();
     }
 
-    public function testLoginMethodQueuesCookieWhenRemembering()
+    public function testLoginMethodQueuesCookieWhenRemembering(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = new \Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
@@ -293,7 +293,7 @@ class AuthGuardTest extends TestCase
         $guard->login($user, true);
     }
 
-    public function testLoginMethodCreatesRememberTokenIfOneDoesntExist()
+    public function testLoginMethodCreatesRememberTokenIfOneDoesntExist(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = new \Illuminate\Auth\SessionGuard('default', $provider, $session, $request);
@@ -312,7 +312,7 @@ class AuthGuardTest extends TestCase
         $guard->login($user, true);
     }
 
-    public function testLoginUsingIdLogsInWithUser()
+    public function testLoginUsingIdLogsInWithUser(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
 
@@ -325,7 +325,7 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $guard->loginUsingId(10));
     }
 
-    public function testLoginUsingIdFailure()
+    public function testLoginUsingIdFailure(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
@@ -336,7 +336,7 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($guard->loginUsingId(11));
     }
 
-    public function testOnceUsingIdSetsUser()
+    public function testOnceUsingIdSetsUser(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
@@ -348,7 +348,7 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $guard->onceUsingId(10));
     }
 
-    public function testOnceUsingIdFailure()
+    public function testOnceUsingIdFailure(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
@@ -359,7 +359,7 @@ class AuthGuardTest extends TestCase
         $this->assertFalse($guard->onceUsingId(11));
     }
 
-    public function testUserUsesRememberCookieIfItExists()
+    public function testUserUsesRememberCookieIfItExists(): void
     {
         $guard = $this->getGuard();
         list($session, $provider, $request, $cookie) = $this->getMocks();
@@ -375,7 +375,7 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($guard->viaRemember());
     }
 
-    public function testLoginOnceSetsUser()
+    public function testLoginOnceSetsUser(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();
@@ -386,7 +386,7 @@ class AuthGuardTest extends TestCase
         $this->assertTrue($guard->once(['foo']));
     }
 
-    public function testLoginOnceFailure()
+    public function testLoginOnceFailure(): void
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
         $guard = m::mock('Illuminate\Auth\SessionGuard', ['default', $provider, $session])->makePartial();

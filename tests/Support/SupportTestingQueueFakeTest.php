@@ -10,14 +10,14 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class QueueFakeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new QueueFake(new Application);
         $this->job = new JobStub;
     }
 
-    public function testAssertPushed()
+    public function testAssertPushed(): void
     {
         try {
             $this->fake->assertPushed(JobStub::class);
@@ -31,7 +31,7 @@ class QueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class);
     }
 
-    public function testAssertNotPushed()
+    public function testAssertNotPushed(): void
     {
         $this->fake->assertNotPushed(JobStub::class);
 
@@ -45,7 +45,7 @@ class QueueFakeTest extends TestCase
         }
     }
 
-    public function testAssertPushedOn()
+    public function testAssertPushedOn(): void
     {
         $this->fake->push($this->job, '', 'foo');
 
@@ -59,7 +59,7 @@ class QueueFakeTest extends TestCase
         $this->fake->assertPushedOn('foo', JobStub::class);
     }
 
-    public function testAssertPushedTimes()
+    public function testAssertPushedTimes(): void
     {
         $this->fake->push($this->job);
         $this->fake->push($this->job);
@@ -74,7 +74,7 @@ class QueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class, 2);
     }
 
-    public function testAssertNothingPushed()
+    public function testAssertNothingPushed(): void
     {
         $this->fake->assertNothingPushed();
 
@@ -88,7 +88,7 @@ class QueueFakeTest extends TestCase
         }
     }
 
-    public function testAssertPushedUsingBulk()
+    public function testAssertPushedUsingBulk(): void
     {
         $this->fake->assertNothingPushed();
 

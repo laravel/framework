@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseConnectorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testOptionResolution()
+    public function testOptionResolution(): void
     {
         $connector = new \Illuminate\Database\Connectors\Connector;
         $connector->setDefaultOptions([0 => 'foo', 1 => 'bar']);
@@ -23,7 +23,7 @@ class DatabaseConnectorTest extends TestCase
     /**
      * @dataProvider mySqlConnectProvider
      */
-    public function testMySqlConnectCallsCreateConnectionWithProperArguments($dsn, $config)
+    public function testMySqlConnectCallsCreateConnectionWithProperArguments($dsn, $config): void
     {
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\MySqlConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
         $connection = m::mock('PDO');
@@ -46,7 +46,7 @@ class DatabaseConnectorTest extends TestCase
         ];
     }
 
-    public function testPostgresConnectCallsCreateConnectionWithProperArguments()
+    public function testPostgresConnectCallsCreateConnectionWithProperArguments(): void
     {
         $dsn = 'pgsql:host=foo;dbname=bar;port=111';
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'charset' => 'utf8'];
@@ -61,7 +61,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testPostgresSearchPathIsSet()
+    public function testPostgresSearchPathIsSet(): void
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => 'public', 'charset' => 'utf8'];
@@ -77,7 +77,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testPostgresSearchPathArraySupported()
+    public function testPostgresSearchPathArraySupported(): void
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'schema' => ['public', 'user'], 'charset' => 'utf8'];
@@ -93,7 +93,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testPostgresApplicationNameIsSet()
+    public function testPostgresApplicationNameIsSet(): void
     {
         $dsn = 'pgsql:host=foo;dbname=bar';
         $config = ['host' => 'foo', 'database' => 'bar', 'charset' => 'utf8', 'application_name' => 'Laravel App'];
@@ -109,7 +109,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testSQLiteMemoryDatabasesMayBeConnectedTo()
+    public function testSQLiteMemoryDatabasesMayBeConnectedTo(): void
     {
         $dsn = 'sqlite::memory:';
         $config = ['database' => ':memory:'];
@@ -122,7 +122,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testSQLiteFileDatabasesMayBeConnectedTo()
+    public function testSQLiteFileDatabasesMayBeConnectedTo(): void
     {
         $dsn = 'sqlite:'.__DIR__;
         $config = ['database' => __DIR__];
@@ -135,7 +135,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testSqlServerConnectCallsCreateConnectionWithProperArguments()
+    public function testSqlServerConnectCallsCreateConnectionWithProperArguments(): void
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
         $dsn = $this->getDsn($config);
@@ -148,7 +148,7 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
-    public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments()
+    public function testSqlServerConnectCallsCreateConnectionWithOptionalArguments(): void
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false, 'appname' => 'baz'];
         $dsn = $this->getDsn($config);

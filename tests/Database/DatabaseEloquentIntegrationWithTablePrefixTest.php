@@ -14,7 +14,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -65,7 +65,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         foreach (['default'] as $connection) {
             $this->schema($connection)->drop('users');
@@ -77,7 +77,7 @@ class DatabaseEloquentIntegrationWithTablePrefixTest extends TestCase
         Relation::morphMap([], false);
     }
 
-    public function testBasicModelHydration()
+    public function testBasicModelHydration(): void
     {
         EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         EloquentTestUser::create(['email' => 'abigailotwell@gmail.com']);

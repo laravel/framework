@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\View;
  */
 class SendingMailWithLocaleTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -40,12 +40,12 @@ class SendingMailWithLocaleTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
     }
 
-    public function test_mail_is_sent_with_default_locale()
+    public function test_mail_is_sent_with_default_locale(): void
     {
         Mail::to('test@mail.com')->send(new TestMail());
 
@@ -54,7 +54,7 @@ class SendingMailWithLocaleTest extends TestCase
         );
     }
 
-    public function test_mail_is_sent_with_selected_locale()
+    public function test_mail_is_sent_with_selected_locale(): void
     {
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
 
@@ -63,7 +63,7 @@ class SendingMailWithLocaleTest extends TestCase
         );
     }
 
-    public function test_locale_is_set_back_to_default_after_mail_sent()
+    public function test_locale_is_set_back_to_default_after_mail_sent(): void
     {
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
         Mail::to('test@mail.com')->send(new TestMail());

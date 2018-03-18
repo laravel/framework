@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMySqlProcessorTest extends TestCase
 {
-    public function testProcessColumnListing()
+    public function testProcessColumnListing(): void
     {
         $processor = new \Illuminate\Database\Query\Processors\MySqlProcessor;
         $listing = [['column_name' => 'id'], ['column_name' => 'name'], ['column_name' => 'email']];

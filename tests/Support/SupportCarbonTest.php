@@ -15,14 +15,14 @@ class SupportCarbonTest extends TestCase
      */
     protected $now;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow($this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC'));
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Carbon::setTestNow();
         Carbon::serializeUsing(null);
@@ -30,7 +30,7 @@ class SupportCarbonTest extends TestCase
         parent::tearDown();
     }
 
-    public function testInstance()
+    public function testInstance(): void
     {
         $this->assertInstanceOf(DateTime::class, $this->now);
         $this->assertInstanceOf(DateTimeInterface::class, $this->now);
@@ -38,7 +38,7 @@ class SupportCarbonTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $this->now);
     }
 
-    public function testCarbonIsMacroableWhenNotCalledStatically()
+    public function testCarbonIsMacroableWhenNotCalledStatically(): void
     {
         Carbon::macro('diffInDecades', function (Carbon $dt = null, $abs = true) {
             return (int) ($this->diffInYears($dt, $abs) / 10);
@@ -47,7 +47,7 @@ class SupportCarbonTest extends TestCase
         $this->assertSame(2, $this->now->diffInDecades(Carbon::now()->addYears(25)));
     }
 
-    public function testCarbonIsMacroableWhenCalledStatically()
+    public function testCarbonIsMacroableWhenCalledStatically(): void
     {
         Carbon::macro('twoDaysAgoAtNoon', function () {
             return Carbon::now()->subDays(2)->setTime(12, 0, 0);
@@ -60,7 +60,7 @@ class SupportCarbonTest extends TestCase
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Method Illuminate\Support\Carbon::nonExistingStaticMacro does not exist.
      */
-    public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
+    public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound(): void
     {
         Carbon::nonExistingStaticMacro();
     }
@@ -69,12 +69,12 @@ class SupportCarbonTest extends TestCase
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Method Illuminate\Support\Carbon::nonExistingMacro does not exist.
      */
-    public function testCarbonRaisesExceptionWhenMacroIsNotFound()
+    public function testCarbonRaisesExceptionWhenMacroIsNotFound(): void
     {
         Carbon::now()->nonExistingMacro();
     }
 
-    public function testCarbonAllowsCustomSerializer()
+    public function testCarbonAllowsCustomSerializer(): void
     {
         Carbon::serializeUsing(function (Carbon $carbon) {
             return $carbon->getTimestamp();
@@ -85,7 +85,7 @@ class SupportCarbonTest extends TestCase
         $this->assertSame(1498569255, $result);
     }
 
-    public function testCarbonCanSerializeToJson()
+    public function testCarbonCanSerializeToJson(): void
     {
         $this->assertSame([
             'date' => '2017-06-27 13:14:15.000000',
@@ -94,7 +94,7 @@ class SupportCarbonTest extends TestCase
         ], $this->now->jsonSerialize());
     }
 
-    public function testSetStateReturnsCorrectType()
+    public function testSetStateReturnsCorrectType(): void
     {
         $carbon = Carbon::__set_state([
             'date' => '2017-06-27 13:14:15.000000',
@@ -105,7 +105,7 @@ class SupportCarbonTest extends TestCase
         $this->assertInstanceOf(Carbon::class, $carbon);
     }
 
-    public function testDeserializationOccursCorrectly()
+    public function testDeserializationOccursCorrectly(): void
     {
         $carbon = new Carbon('2017-06-27 13:14:15.000000');
         $serialized = 'return '.var_export($carbon, true).';';

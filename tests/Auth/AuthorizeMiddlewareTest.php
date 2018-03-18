@@ -21,12 +21,12 @@ class AuthorizeMiddlewareTest extends TestCase
     protected $container;
     protected $user;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -58,7 +58,7 @@ class AuthorizeMiddlewareTest extends TestCase
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage This action is unauthorized.
      */
-    public function testSimpleAbilityUnauthorized()
+    public function testSimpleAbilityUnauthorized(): void
     {
         $this->gate()->define('view-dashboard', function ($user, $additional = null) {
             $this->assertNull($additional);
@@ -76,7 +76,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('dashboard', 'GET'));
     }
 
-    public function testSimpleAbilityAuthorized()
+    public function testSimpleAbilityAuthorized(): void
     {
         $this->gate()->define('view-dashboard', function ($user) {
             return true;
@@ -98,7 +98,7 @@ class AuthorizeMiddlewareTest extends TestCase
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage This action is unauthorized.
      */
-    public function testModelTypeUnauthorized()
+    public function testModelTypeUnauthorized(): void
     {
         $this->gate()->define('create', function ($user, $model) {
             $this->assertEquals($model, 'App\User');
@@ -116,7 +116,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('users/create', 'GET'));
     }
 
-    public function testModelTypeAuthorized()
+    public function testModelTypeAuthorized(): void
     {
         $this->gate()->define('create', function ($user, $model) {
             $this->assertEquals($model, 'App\User');
@@ -140,7 +140,7 @@ class AuthorizeMiddlewareTest extends TestCase
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage This action is unauthorized.
      */
-    public function testModelUnauthorized()
+    public function testModelUnauthorized(): void
     {
         $post = new stdClass;
 
@@ -164,7 +164,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->router->dispatch(Request::create('posts/1/edit', 'GET'));
     }
 
-    public function testModelAuthorized()
+    public function testModelAuthorized(): void
     {
         $post = new stdClass;
 
@@ -190,7 +190,7 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
-    public function testModelInstanceAsParameter()
+    public function testModelInstanceAsParameter(): void
     {
         $instance = m::mock(\Illuminate\Database\Eloquent\Model::class);
 

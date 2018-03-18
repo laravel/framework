@@ -8,12 +8,12 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeIfAuthStatementsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testIfStatementsAreCompiled()
+    public function testIfStatementsAreCompiled(): void
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@auth("api")
@@ -25,7 +25,7 @@ breeze
         $this->assertEquals($expected, $compiler->compileString($string));
     }
 
-    public function testPlainIfStatementsAreCompiled()
+    public function testPlainIfStatementsAreCompiled(): void
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@auth

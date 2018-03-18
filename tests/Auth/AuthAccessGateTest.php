@@ -15,12 +15,12 @@ class GateTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Callback must be a callable or a 'Class@method'
      */
-    public function test_gate_throws_exception_on_invalid_callback_type()
+    public function test_gate_throws_exception_on_invalid_callback_type(): void
     {
         $this->getBasicGate()->define('foo', 'foo');
     }
 
-    public function test_basic_closures_can_be_defined()
+    public function test_basic_closures_can_be_defined(): void
     {
         $gate = $this->getBasicGate();
 
@@ -35,7 +35,7 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
-    public function test_resource_gates_can_be_defined()
+    public function test_resource_gates_can_be_defined(): void
     {
         $gate = $this->getBasicGate();
 
@@ -49,7 +49,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('test.delete', $dummy));
     }
 
-    public function test_custom_resource_gates_can_be_defined()
+    public function test_custom_resource_gates_can_be_defined(): void
     {
         $gate = $this->getBasicGate();
 
@@ -64,7 +64,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('test.ability2'));
     }
 
-    public function test_before_callbacks_can_override_result_if_necessary()
+    public function test_before_callbacks_can_override_result_if_necessary(): void
     {
         $gate = $this->getBasicGate();
 
@@ -80,7 +80,7 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check('foo'));
     }
 
-    public function test_before_callbacks_dont_interrupt_gate_check_if_no_value_is_returned()
+    public function test_before_callbacks_dont_interrupt_gate_check_if_no_value_is_returned(): void
     {
         $gate = $this->getBasicGate();
 
@@ -93,7 +93,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
-    public function test_after_callbacks_are_called_with_result()
+    public function test_after_callbacks_are_called_with_result(): void
     {
         $gate = $this->getBasicGate();
 
@@ -117,7 +117,7 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check('missing'));
     }
 
-    public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
+    public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks(): void
     {
         $gate = $this->getBasicGate();
 
@@ -130,7 +130,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
-    public function test_a_single_argument_can_be_passed_when_checking_abilities()
+    public function test_a_single_argument_can_be_passed_when_checking_abilities(): void
     {
         $gate = $this->getBasicGate();
 
@@ -145,7 +145,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('foo', $dummy));
     }
 
-    public function test_multiple_arguments_can_be_passed_when_checking_abilities()
+    public function test_multiple_arguments_can_be_passed_when_checking_abilities(): void
     {
         $gate = $this->getBasicGate();
 
@@ -162,7 +162,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('foo', [$dummy1, $dummy2]));
     }
 
-    public function test_classes_can_be_defined_as_callbacks_using_at_notation()
+    public function test_classes_can_be_defined_as_callbacks_using_at_notation(): void
     {
         $gate = $this->getBasicGate();
 
@@ -171,7 +171,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('foo'));
     }
 
-    public function test_policy_classes_can_be_defined_to_handle_checks_for_given_type()
+    public function test_policy_classes_can_be_defined_to_handle_checks_for_given_type(): void
     {
         $gate = $this->getBasicGate();
 
@@ -180,7 +180,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
-    public function test_policy_classes_handle_checks_for_all_subtypes()
+    public function test_policy_classes_handle_checks_for_all_subtypes(): void
     {
         $gate = $this->getBasicGate();
 
@@ -189,7 +189,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
     }
 
-    public function test_policy_classes_handle_checks_for_interfaces()
+    public function test_policy_classes_handle_checks_for_interfaces(): void
     {
         $gate = $this->getBasicGate();
 
@@ -198,7 +198,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestSubDummy));
     }
 
-    public function test_policy_converts_dash_to_camel()
+    public function test_policy_converts_dash_to_camel(): void
     {
         $gate = $this->getBasicGate();
 
@@ -207,7 +207,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update-dash', new AccessGateTestDummy));
     }
 
-    public function test_policy_default_to_false_if_method_does_not_exist_and_gate_does_not_exist()
+    public function test_policy_default_to_false_if_method_does_not_exist_and_gate_does_not_exist(): void
     {
         $gate = $this->getBasicGate();
 
@@ -216,7 +216,7 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check('nonexistent_method', new AccessGateTestDummy));
     }
 
-    public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name()
+    public function test_policy_classes_can_be_defined_to_handle_checks_for_given_class_name(): void
     {
         $gate = $this->getBasicGate(true);
 
@@ -225,7 +225,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('create', [AccessGateTestDummy::class, true]));
     }
 
-    public function test_policies_may_have_before_methods_to_override_checks()
+    public function test_policies_may_have_before_methods_to_override_checks(): void
     {
         $gate = $this->getBasicGate();
 
@@ -234,7 +234,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
-    public function test_policies_always_override_closures_with_same_name()
+    public function test_policies_always_override_closures_with_same_name(): void
     {
         $gate = $this->getBasicGate();
 
@@ -247,7 +247,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('update', new AccessGateTestDummy));
     }
 
-    public function test_policies_defer_to_gates_if_method_does_not_exist()
+    public function test_policies_defer_to_gates_if_method_does_not_exist(): void
     {
         $gate = $this->getBasicGate();
 
@@ -260,7 +260,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check('nonexistent_method', new AccessGateTestDummy));
     }
 
-    public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance()
+    public function test_for_user_method_attaches_a_new_user_to_a_new_gate_instance(): void
     {
         $gate = $this->getBasicGate();
 
@@ -278,7 +278,7 @@ class GateTest extends TestCase
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage You are not an admin.
      */
-    public function test_authorize_throws_unauthorized_exception()
+    public function test_authorize_throws_unauthorized_exception(): void
     {
         $gate = $this->getBasicGate();
 
@@ -287,7 +287,7 @@ class GateTest extends TestCase
         $gate->authorize('create', new AccessGateTestDummy);
     }
 
-    public function test_authorize_returns_allowed_response()
+    public function test_authorize_returns_allowed_response(): void
     {
         $gate = $this->getBasicGate(true);
 
@@ -301,7 +301,7 @@ class GateTest extends TestCase
         $this->assertTrue($check);
     }
 
-    public function test_authorize_returns_an_allowed_response_for_a_truthy_return()
+    public function test_authorize_returns_an_allowed_response_for_a_truthy_return(): void
     {
         $gate = $this->getBasicGate();
 
@@ -320,7 +320,7 @@ class GateTest extends TestCase
         });
     }
 
-    public function test_any_ability_check_passes_if_all_pass()
+    public function test_any_ability_check_passes_if_all_pass(): void
     {
         $gate = $this->getBasicGate();
 
@@ -329,7 +329,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->any(['edit', 'update'], new AccessGateTestDummy));
     }
 
-    public function test_any_ability_check_passes_if_at_least_one_passes()
+    public function test_any_ability_check_passes_if_at_least_one_passes(): void
     {
         $gate = $this->getBasicGate();
 
@@ -338,7 +338,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->any(['edit', 'update'], new AccessGateTestDummy));
     }
 
-    public function test_any_ability_check_fails_if_none_pass()
+    public function test_any_ability_check_fails_if_none_pass(): void
     {
         $gate = $this->getBasicGate();
 
@@ -347,7 +347,7 @@ class GateTest extends TestCase
         $this->assertFalse($gate->any(['edit', 'update'], new AccessGateTestDummy));
     }
 
-    public function test_every_ability_check_passes_if_all_pass()
+    public function test_every_ability_check_passes_if_all_pass(): void
     {
         $gate = $this->getBasicGate();
 
@@ -356,7 +356,7 @@ class GateTest extends TestCase
         $this->assertTrue($gate->check(['edit', 'update'], new AccessGateTestDummy));
     }
 
-    public function test_every_ability_check_fails_if_at_least_one_fails()
+    public function test_every_ability_check_fails_if_at_least_one_fails(): void
     {
         $gate = $this->getBasicGate();
 
@@ -365,7 +365,7 @@ class GateTest extends TestCase
         $this->assertFalse($gate->check(['edit', 'update'], new AccessGateTestDummy));
     }
 
-    public function test_every_ability_check_fails_if_none_pass()
+    public function test_every_ability_check_fails_if_none_pass(): void
     {
         $gate = $this->getBasicGate();
 

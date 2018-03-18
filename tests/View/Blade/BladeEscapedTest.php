@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeEscapedTest extends AbstractBladeTestCase
 {
-    public function testEscapedWithAtDirectivesAreCompiled()
+    public function testEscapedWithAtDirectivesAreCompiled(): void
     {
         $this->assertEquals('@foreach', $this->compiler->compileString('@@foreach'));
         $this->assertEquals('@verbatim @continue @endverbatim', $this->compiler->compileString('@@verbatim @@continue @@endverbatim'));

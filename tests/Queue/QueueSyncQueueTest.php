@@ -9,12 +9,12 @@ use Illuminate\Container\Container;
 
 class QueueSyncQueueTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testPushShouldFireJobInstantly()
+    public function testPushShouldFireJobInstantly(): void
     {
         unset($_SERVER['__sync.test']);
 
@@ -27,7 +27,7 @@ class QueueSyncQueueTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $_SERVER['__sync.test'][1]);
     }
 
-    public function testFailedJobGetsHandledWhenAnExceptionIsThrown()
+    public function testFailedJobGetsHandledWhenAnExceptionIsThrown(): void
     {
         unset($_SERVER['__sync.failed']);
 

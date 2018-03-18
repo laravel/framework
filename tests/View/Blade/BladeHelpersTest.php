@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeHelpersTest extends AbstractBladeTestCase
 {
-    public function testEchosAreCompiled()
+    public function testEchosAreCompiled(): void
     {
         $this->assertEquals('<?php echo csrf_field(); ?>', $this->compiler->compileString('@csrf'));
         $this->assertEquals('<?php echo method_field(\'patch\'); ?>', $this->compiler->compileString("@method('patch')"));

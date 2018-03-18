@@ -12,14 +12,14 @@ use Illuminate\Queue\Events\JobFailed;
  */
 class CallQueuedHandlerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         Mockery::close();
     }
 
-    public function test_job_can_be_dispatched()
+    public function test_job_can_be_dispatched(): void
     {
         CallQueuedHandlerTestJob::$handled = false;
 
@@ -39,7 +39,7 @@ class CallQueuedHandlerTest extends TestCase
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
     }
 
-    public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown()
+    public function test_job_is_marked_as_failed_if_model_not_found_exception_is_thrown(): void
     {
         Event::fake();
 
@@ -60,7 +60,7 @@ class CallQueuedHandlerTest extends TestCase
         Event::assertDispatched(JobFailed::class);
     }
 
-    public function test_job_is_deleted_if_has_delete_property()
+    public function test_job_is_deleted_if_has_delete_property(): void
     {
         Event::fake();
 

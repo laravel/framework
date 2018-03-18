@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class EncryptedSessionStoreTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testSessionIsProperlyEncrypted()
+    public function testSessionIsProperlyEncrypted(): void
     {
         $session = $this->getSession();
         $session->getEncrypter()->shouldReceive('decrypt')->once()->with(serialize([]))->andReturn(serialize([]));

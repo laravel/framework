@@ -9,12 +9,12 @@ use Illuminate\Support\ServiceProvider;
 
 class FoundationApplicationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
+    public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent(): void
     {
         $app = new Application;
         $app['config'] = $config = m::mock('stdClass');
@@ -27,7 +27,7 @@ class FoundationApplicationTest extends TestCase
         $app->setLocale('foo');
     }
 
-    public function testServiceProvidersAreCorrectlyRegistered()
+    public function testServiceProvidersAreCorrectlyRegistered(): void
     {
         $provider = m::mock('Illuminate\Tests\Foundation\ApplicationBasicServiceProviderStub');
         $class = get_class($provider);
@@ -38,7 +38,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
     }
 
-    public function testClassesAreBoundWhenServiceProviderIsRegistered()
+    public function testClassesAreBoundWhenServiceProviderIsRegistered(): void
     {
         $app = new Application;
         $provider = new ServiceProviderForTestingThree($app);
@@ -49,7 +49,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertInstanceOf(ConcreteClass::class, $app->make(AbstractClass::class));
     }
 
-    public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
+    public function testSingletonsAreCreatedWhenServiceProviderIsRegistered(): void
     {
         $app = new Application;
         $provider = new ServiceProviderForTestingThree($app);
@@ -62,7 +62,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
-    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent()
+    public function testServiceProvidersAreCorrectlyRegisteredWhenRegisterMethodIsNotPresent(): void
     {
         $provider = m::mock('Illuminate\Support\ServiceProvider');
         $class = get_class($provider);
@@ -73,7 +73,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
     }
 
-    public function testDeferredServicesMarkedAsBound()
+    public function testDeferredServicesMarkedAsBound(): void
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
@@ -81,7 +81,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals('foo', $app->make('foo'));
     }
 
-    public function testDeferredServicesAreSharedProperly()
+    public function testDeferredServicesAreSharedProperly(): void
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredSharedServiceProviderStub']);
@@ -93,7 +93,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertSame($one, $two);
     }
 
-    public function testDeferredServicesCanBeExtended()
+    public function testDeferredServicesCanBeExtended(): void
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
@@ -103,7 +103,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals('foobar', $app->make('foo'));
     }
 
-    public function testDeferredServiceProviderIsRegisteredOnlyOnce()
+    public function testDeferredServiceProviderIsRegisteredOnlyOnce(): void
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderCountStub']);
@@ -113,7 +113,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals(1, ApplicationDeferredServiceProviderCountStub::$count);
     }
 
-    public function testDeferredServiceDontRunWhenInstanceSet()
+    public function testDeferredServiceDontRunWhenInstanceSet(): void
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
@@ -122,7 +122,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals($instance, 'bar');
     }
 
-    public function testDeferredServicesAreLazilyInitialized()
+    public function testDeferredServicesAreLazilyInitialized(): void
     {
         ApplicationDeferredServiceProviderStub::$initialized = false;
         $app = new Application;
@@ -137,7 +137,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertTrue(ApplicationDeferredServiceProviderStub::$initialized);
     }
 
-    public function testDeferredServicesCanRegisterFactories()
+    public function testDeferredServicesCanRegisterFactories(): void
     {
         $app = new Application;
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationFactoryProviderStub']);
@@ -147,7 +147,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals(3, $app->make('foo'));
     }
 
-    public function testSingleProviderCanProvideMultipleDeferredServices()
+    public function testSingleProviderCanProvideMultipleDeferredServices(): void
     {
         $app = new Application;
         $app->setDeferredServices([
@@ -158,7 +158,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertEquals('foobar', $app->make('bar'));
     }
 
-    public function testEnvironment()
+    public function testEnvironment(): void
     {
         $app = new Application;
         $app['env'] = 'foo';
@@ -176,7 +176,7 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->environment(['qux', 'bar']));
     }
 
-    public function testMethodAfterLoadingEnvironmentAddsClosure()
+    public function testMethodAfterLoadingEnvironmentAddsClosure(): void
     {
         $app = new Application;
         $closure = function () {
@@ -186,7 +186,7 @@ class FoundationApplicationTest extends TestCase
         // $this->assertSame($closure, $app['events']->getListeners('bootstrapped: Illuminate\Foundation\Bootstrap\LoadEnvironmentVariables')[0]);
     }
 
-    public function testBeforeBootstrappingAddsClosure()
+    public function testBeforeBootstrappingAddsClosure(): void
     {
         $app = new Application;
         $closure = function () {
@@ -196,7 +196,7 @@ class FoundationApplicationTest extends TestCase
         // $this->assertSame($closure, $app['events']->getListeners('bootstrapping: Illuminate\Foundation\Bootstrap\RegisterFacades')[0]);
     }
 
-    public function testAfterBootstrappingAddsClosure()
+    public function testAfterBootstrappingAddsClosure(): void
     {
         $app = new Application;
         $closure = function () {

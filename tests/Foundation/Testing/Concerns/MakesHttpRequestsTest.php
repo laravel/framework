@@ -6,7 +6,7 @@ use Orchestra\Testbench\TestCase;
 
 class MakesHttpRequestsTest extends TestCase
 {
-    public function testWithoutAndWithMiddleware()
+    public function testWithoutAndWithMiddleware(): void
     {
         $this->assertFalse($this->app->has('middleware.disable'));
 
@@ -18,7 +18,7 @@ class MakesHttpRequestsTest extends TestCase
         $this->assertFalse($this->app->has('middleware.disable'));
     }
 
-    public function testWithoutAndWithMiddlewareWithParameter()
+    public function testWithoutAndWithMiddlewareWithParameter(): void
     {
         $next = function ($request) {
             return $request;

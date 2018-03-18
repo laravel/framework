@@ -9,12 +9,12 @@ use Illuminate\Cache\Console\CacheTableCommand;
 
 class CacheTableCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCreateMakesMigration()
+    public function testCreateMakesMigration(): void
     {
         $command = new CacheTableCommandTestStub(
             $files = m::mock('Illuminate\Filesystem\Filesystem'),

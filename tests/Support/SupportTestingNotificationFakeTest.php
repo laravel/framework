@@ -11,7 +11,7 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 class NotificationFakeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new NotificationFake;
@@ -19,7 +19,7 @@ class NotificationFakeTest extends TestCase
         $this->user = new UserStub;
     }
 
-    public function testAssertSentTo()
+    public function testAssertSentTo(): void
     {
         try {
             $this->fake->assertSentTo($this->user, NotificationStub::class);
@@ -33,7 +33,7 @@ class NotificationFakeTest extends TestCase
         $this->fake->assertSentTo($this->user, NotificationStub::class);
     }
 
-    public function testAssertNotSentTo()
+    public function testAssertNotSentTo(): void
     {
         $this->fake->assertNotSentTo($this->user, NotificationStub::class);
 
@@ -47,7 +47,7 @@ class NotificationFakeTest extends TestCase
         }
     }
 
-    public function testResettingNotificationId()
+    public function testResettingNotificationId(): void
     {
         $notification = new NotificationStub();
 

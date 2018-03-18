@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeStackTest extends AbstractBladeTestCase
 {
-    public function testStackIsCompiled()
+    public function testStackIsCompiled(): void
     {
         $string = '@stack(\'foo\')';
         $expected = '<?php echo $__env->yieldPushContent(\'foo\'); ?>';

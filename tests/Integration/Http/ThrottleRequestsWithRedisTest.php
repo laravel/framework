@@ -16,7 +16,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         Carbon::setTestNow(null);
@@ -27,7 +27,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function test_lock_opens_immediately_after_decay()
+    public function test_lock_opens_immediately_after_decay(): void
     {
         $this->ifRedisAvailable(function () {
             Carbon::setTestNow(null);

@@ -9,12 +9,12 @@ use Illuminate\Notifications\Messages\NexmoMessage;
 
 class NotificationNexmoChannelTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testSmsIsSentViaNexmo()
+    public function testSmsIsSentViaNexmo(): void
     {
         $notification = new NotificationNexmoChannelTestNotification;
         $notifiable = new NotificationNexmoChannelTestNotifiable;
@@ -33,7 +33,7 @@ class NotificationNexmoChannelTest extends TestCase
         $channel->send($notifiable, $notification);
     }
 
-    public function testSmsIsSentViaNexmoWithCustomFrom()
+    public function testSmsIsSentViaNexmoWithCustomFrom(): void
     {
         $notification = new NotificationNexmoChannelTestCustomFromNotification;
         $notifiable = new NotificationNexmoChannelTestNotifiable;

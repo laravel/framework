@@ -7,32 +7,32 @@ use PHPUnit\Framework\TestCase;
 
 class SupportPluralizerTest extends TestCase
 {
-    public function testBasicSingular()
+    public function testBasicSingular(): void
     {
         $this->assertEquals('child', Str::singular('children'));
     }
 
-    public function testBasicPlural()
+    public function testBasicPlural(): void
     {
         $this->assertEquals('children', Str::plural('child'));
         $this->assertEquals('cod', Str::plural('cod'));
     }
 
-    public function testCaseSensitiveSingularUsage()
+    public function testCaseSensitiveSingularUsage(): void
     {
         $this->assertEquals('Child', Str::singular('Children'));
         $this->assertEquals('CHILD', Str::singular('CHILDREN'));
         $this->assertEquals('Test', Str::singular('Tests'));
     }
 
-    public function testCaseSensitiveSingularPlural()
+    public function testCaseSensitiveSingularPlural(): void
     {
         $this->assertEquals('Children', Str::plural('Child'));
         $this->assertEquals('CHILDREN', Str::plural('CHILD'));
         $this->assertEquals('Tests', Str::plural('Test'));
     }
 
-    public function testIfEndOfWordPlural()
+    public function testIfEndOfWordPlural(): void
     {
         $this->assertEquals('VortexFields', Str::plural('VortexField'));
         $this->assertEquals('MatrixFields', Str::plural('MatrixField'));

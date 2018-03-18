@@ -8,12 +8,12 @@ use Illuminate\Notifications\SendQueuedNotifications;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testNotificationsCanBeSent()
+    public function testNotificationsCanBeSent(): void
     {
         $job = new SendQueuedNotifications('notifiables', 'notification');
         $manager = Mockery::mock('Illuminate\Notifications\ChannelManager');

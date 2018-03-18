@@ -27,7 +27,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
      */
     protected $container;
 
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -95,7 +95,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->schema()->drop('jobs');
     }
@@ -103,7 +103,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     /**
      * Test that jobs that are not reserved and have an available_at value less then now, are popped.
      */
-    public function testAvailableAndUnReservedJobsArePopped()
+    public function testAvailableAndUnReservedJobsArePopped(): void
     {
         $this->connection()
             ->table('jobs')
@@ -125,7 +125,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     /**
      * Test that when jobs are popped, the attempts attribute is incremented.
      */
-    public function testPoppedJobsIncrementAttempts()
+    public function testPoppedJobsIncrementAttempts(): void
     {
         $job = [
             'id' => 1,
@@ -150,7 +150,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     /**
      * Test that jobs that are not reserved and have an available_at value in the future, are not popped.
      */
-    public function testUnavailableJobsAreNotPopped()
+    public function testUnavailableJobsAreNotPopped(): void
     {
         $this->connection()
             ->table('jobs')
@@ -172,7 +172,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     /**
      * Test that jobs that are reserved and have expired are popped.
      */
-    public function testThatReservedAndExpiredJobsArePopped()
+    public function testThatReservedAndExpiredJobsArePopped(): void
     {
         $this->connection()
             ->table('jobs')
@@ -194,7 +194,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     /**
      * Test that jobs that are reserved and not expired and available are not popped.
      */
-    public function testThatReservedJobsAreNotPopped()
+    public function testThatReservedJobsAreNotPopped(): void
     {
         $this->connection()
             ->table('jobs')

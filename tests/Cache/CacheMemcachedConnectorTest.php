@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testServersAreAddedCorrectly()
+    public function testServersAreAddedCorrectly(): void
     {
         $memcached = $this->memcachedMockWithAddServer();
 
@@ -27,7 +27,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
-    public function testServersAreAddedCorrectlyWithPersistentConnection()
+    public function testServersAreAddedCorrectlyWithPersistentConnection(): void
     {
         $persistentConnectionId = 'persistent_connection_id';
 
@@ -44,7 +44,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
-    public function testServersAreAddedCorrectlyWithValidOptions()
+    public function testServersAreAddedCorrectlyWithValidOptions(): void
     {
         if (! class_exists('Memcached')) {
             $this->markTestSkipped('Memcached module not installed');
@@ -68,7 +68,7 @@ class CacheMemcachedConnectorTest extends TestCase
         $this->assertSame($result, $memcached);
     }
 
-    public function testServersAreAddedCorrectlyWithSaslCredentials()
+    public function testServersAreAddedCorrectlyWithSaslCredentials(): void
     {
         if (! class_exists('Memcached')) {
             $this->markTestSkipped('Memcached module not installed');

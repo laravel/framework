@@ -11,7 +11,7 @@ use Illuminate\Contracts\Support\Responsable;
  */
 class ResponsableTest extends TestCase
 {
-    public function test_responsable_objects_are_rendered()
+    public function test_responsable_objects_are_rendered(): void
     {
         Route::get('/responsable', function () {
             return new TestResponsableResponse;

@@ -14,7 +14,7 @@ use Illuminate\Http\Exceptions\ThrottleRequestsException;
  */
 class ThrottleRequestsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         Carbon::setTestNow(null);
@@ -25,7 +25,7 @@ class ThrottleRequestsTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function test_lock_opens_immediately_after_decay()
+    public function test_lock_opens_immediately_after_decay(): void
     {
         Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
 

@@ -36,7 +36,7 @@ class CacheSchedulingMutexTest extends TestCase
      */
     protected $cacheRepository;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -48,14 +48,14 @@ class CacheSchedulingMutexTest extends TestCase
         $this->time = Carbon::now();
     }
 
-    public function testMutexReceviesCorrectCreate()
+    public function testMutexReceviesCorrectCreate(): void
     {
         $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
     }
 
-    public function testCanUseCustomConnection()
+    public function testCanUseCustomConnection(): void
     {
         $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
         $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
@@ -64,21 +64,21 @@ class CacheSchedulingMutexTest extends TestCase
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
     }
 
-    public function testPreventsMultipleRuns()
+    public function testPreventsMultipleRuns(): void
     {
         $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->create($this->event, $this->time));
     }
 
-    public function testChecksForNonRunSchedule()
+    public function testChecksForNonRunSchedule(): void
     {
         $this->cacheRepository->shouldReceive('has')->once()->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(false);
 
         $this->assertFalse($this->cacheMutex->exists($this->event, $this->time));
     }
 
-    public function testChecksForAlreadyRunSchedule()
+    public function testChecksForAlreadyRunSchedule(): void
     {
         $this->cacheRepository->shouldReceive('has')->with($this->event->mutexName().$this->time->format('Hi'))->andReturn(true);
 

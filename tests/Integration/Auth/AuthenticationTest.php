@@ -28,7 +28,7 @@ class AuthenticationTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -138,7 +138,7 @@ class AuthenticationTest extends TestCase
     /**
      * @test
      */
-    public function test_logging_in_using_id()
+    public function test_logging_in_using_id(): void
     {
         $this->app['auth']->loginUsingId(1);
         $this->assertEquals(1, $this->app['auth']->user()->id);
@@ -149,7 +149,7 @@ class AuthenticationTest extends TestCase
     /**
      * @test
      */
-    public function test_logging_out()
+    public function test_logging_out(): void
     {
         Event::fake();
 

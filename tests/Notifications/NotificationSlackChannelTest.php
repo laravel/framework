@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\SlackMessage;
 
 class NotificationSlackChannelTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
@@ -31,7 +31,7 @@ class NotificationSlackChannelTest extends TestCase
         $channel->send($notifiable, $notification);
     }
 
-    public function testCorrectPayloadIsSentToSlack()
+    public function testCorrectPayloadIsSentToSlack(): void
     {
         $this->validatePayload(
             new NotificationSlackChannelTestNotification,
@@ -68,7 +68,7 @@ class NotificationSlackChannelTest extends TestCase
         );
     }
 
-    public function testCorrectPayloadIsSentToSlackWithImageIcon()
+    public function testCorrectPayloadIsSentToSlackWithImageIcon(): void
     {
         $this->validatePayload(
             new NotificationSlackChannelTestNotificationWithImageIcon,
@@ -102,7 +102,7 @@ class NotificationSlackChannelTest extends TestCase
         );
     }
 
-    public function testCorrectPayloadWithoutOptionalFieldsIsSentToSlack()
+    public function testCorrectPayloadWithoutOptionalFieldsIsSentToSlack(): void
     {
         $this->validatePayload(
             new NotificationSlackChannelWithoutOptionalFieldsTestNotification,
@@ -128,7 +128,7 @@ class NotificationSlackChannelTest extends TestCase
         );
     }
 
-    public function testCorrectPayloadWithAttachmentFieldBuilderIsSentToSlack()
+    public function testCorrectPayloadWithAttachmentFieldBuilderIsSentToSlack(): void
     {
         $this->validatePayload(
             new NotificationSlackChannelWithAttachmentFieldBuilderTestNotification,

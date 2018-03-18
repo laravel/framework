@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationInstallCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testFireCallsRepositoryToInstall()
+    public function testFireCallsRepositoryToInstall(): void
     {
         $command = new \Illuminate\Database\Console\Migrations\InstallCommand($repo = m::mock('Illuminate\Database\Migrations\MigrationRepositoryInterface'));
         $command->setLaravel(new \Illuminate\Foundation\Application);

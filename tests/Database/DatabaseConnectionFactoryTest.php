@@ -12,7 +12,7 @@ class DatabaseConnectionFactoryTest extends TestCase
 {
     protected $db;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = new DB;
 
@@ -34,12 +34,12 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->db->setAsGlobal();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testConnectionCanBeCreated()
+    public function testConnectionCanBeCreated(): void
     {
         $this->assertInstanceOf('PDO', $this->db->connection()->getPdo());
         $this->assertInstanceOf('PDO', $this->db->connection()->getReadPdo());
@@ -47,7 +47,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getReadPdo());
     }
 
-    public function testSingleConnectionNotCreatedUntilNeeded()
+    public function testSingleConnectionNotCreatedUntilNeeded(): void
     {
         $connection = $this->db->connection();
         $pdo = new ReflectionProperty(get_class($connection), 'pdo');
@@ -59,7 +59,7 @@ class DatabaseConnectionFactoryTest extends TestCase
         $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
     }
 
-    public function testReadWriteConnectionsNotCreatedUntilNeeded()
+    public function testReadWriteConnectionsNotCreatedUntilNeeded(): void
     {
         $connection = $this->db->connection('read_write');
         $pdo = new ReflectionProperty(get_class($connection), 'pdo');
@@ -75,7 +75,7 @@ class DatabaseConnectionFactoryTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage A driver must be specified.
      */
-    public function testIfDriverIsntSetExceptionIsThrown()
+    public function testIfDriverIsntSetExceptionIsThrown(): void
     {
         $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $factory->createConnector(['foo']);
@@ -85,14 +85,14 @@ class DatabaseConnectionFactoryTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Unsupported driver [foo]
      */
-    public function testExceptionIsThrownOnUnsupportedDriver()
+    public function testExceptionIsThrownOnUnsupportedDriver(): void
     {
         $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $container->shouldReceive('bound')->once()->andReturn(false);
         $factory->createConnector(['driver' => 'foo']);
     }
 
-    public function testCustomConnectorsCanBeResolvedViaContainer()
+    public function testCustomConnectorsCanBeResolvedViaContainer(): void
     {
         $factory = new ConnectionFactory($container = m::mock('Illuminate\Container\Container'));
         $container->shouldReceive('bound')->once()->with('db.connector.foo')->andReturn(true);

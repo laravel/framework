@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class MailMailableDataTest extends TestCase
 {
-    public function testMailableDataIsNotLost()
+    public function testMailableDataIsNotLost(): void
     {
         $testData = ['first_name' => 'James'];
 

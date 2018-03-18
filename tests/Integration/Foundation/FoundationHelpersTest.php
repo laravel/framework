@@ -10,7 +10,7 @@ use Orchestra\Testbench\TestCase;
  */
 class HelpersTest extends TestCase
 {
-    public function test_rescue()
+    public function test_rescue(): void
     {
         $this->assertEquals(rescue(function () {
             throw new Exception;

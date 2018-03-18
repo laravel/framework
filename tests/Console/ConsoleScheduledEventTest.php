@@ -16,20 +16,20 @@ class ConsoleScheduledEventTest extends TestCase
      */
     protected $defaultTimezone;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->defaultTimezone = date_default_timezone_get();
         date_default_timezone_set('UTC');
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         date_default_timezone_set($this->defaultTimezone);
         Carbon::setTestNow(null);
         m::close();
     }
 
-    public function testBasicCronCompilation()
+    public function testBasicCronCompilation(): void
     {
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
@@ -73,7 +73,7 @@ class ConsoleScheduledEventTest extends TestCase
             $eventB->hourly()->weekdays()->getExpression());
     }
 
-    public function testEventIsDueCheck()
+    public function testEventIsDueCheck(): void
     {
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
@@ -89,7 +89,7 @@ class ConsoleScheduledEventTest extends TestCase
         $this->assertTrue($event->isDue($app));
     }
 
-    public function testTimeBetweenChecks()
+    public function testTimeBetweenChecks(): void
     {
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);

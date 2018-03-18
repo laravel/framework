@@ -8,12 +8,12 @@ use Illuminate\View\Engines\CompilerEngine;
 
 class ViewCompilerEngineTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testViewsMayBeRecompiledAndRendered()
+    public function testViewsMayBeRecompiledAndRendered(): void
     {
         $engine = $this->getEngine();
         $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');
@@ -25,7 +25,7 @@ class ViewCompilerEngineTest extends TestCase
 ', $results);
     }
 
-    public function testViewsAreNotRecompiledIfTheyAreNotExpired()
+    public function testViewsAreNotRecompiledIfTheyAreNotExpired(): void
     {
         $engine = $this->getEngine();
         $engine->getCompiler()->shouldReceive('getCompiledPath')->with(__DIR__.'/fixtures/foo.php')->andReturn(__DIR__.'/fixtures/basic.php');

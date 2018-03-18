@@ -9,12 +9,12 @@ use Illuminate\Support\HtmlString;
 
 class MailMailerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testMailerSendSendsMessageWithProperViewContent()
+    public function testMailerSendSendsMessageWithProperViewContent(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
@@ -34,7 +34,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlStrings()
+    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlStrings(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
@@ -55,7 +55,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod()
+    public function testMailerSendSendsMessageWithProperViewContentUsingHtmlMethod(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
@@ -75,7 +75,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function testMailerSendSendsMessageWithProperPlainViewContent()
+    public function testMailerSendSendsMessageWithProperPlainViewContent(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
@@ -97,7 +97,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit()
+    public function testMailerSendSendsMessageWithProperPlainViewContentWhenExplicit(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage'])->setConstructorArgs($this->getMocks())->getMock();
@@ -119,7 +119,7 @@ class MailMailerTest extends TestCase
         unset($_SERVER['__mailer.test']);
     }
 
-    public function testGlobalFromIsRespectedOnAllMessages()
+    public function testGlobalFromIsRespectedOnAllMessages(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMailer();
@@ -135,7 +135,7 @@ class MailMailerTest extends TestCase
         });
     }
 
-    public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
+    public function testFailedRecipientsAreAppendedAndCanBeRetrieved(): void
     {
         unset($_SERVER['__mailer.test']);
         $mailer = $this->getMailer();
@@ -153,7 +153,7 @@ class MailMailerTest extends TestCase
         $this->assertEquals(['taylorotwell@gmail.com'], $mailer->failures());
     }
 
-    public function testEventsAreDispatched()
+    public function testEventsAreDispatched(): void
     {
         unset($_SERVER['__mailer.test']);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
@@ -169,7 +169,7 @@ class MailMailerTest extends TestCase
         });
     }
 
-    public function testMacroable()
+    public function testMacroable(): void
     {
         Mailer::macro('foo', function () {
             return 'bar';

@@ -9,12 +9,12 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testRollbackCommandCallsMigratorWithProperArguments()
+    public function testRollbackCommandCallsMigratorWithProperArguments(): void
     {
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
@@ -28,7 +28,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $this->runCommand($command);
     }
 
-    public function testRollbackCommandCallsMigratorWithStepOption()
+    public function testRollbackCommandCallsMigratorWithStepOption(): void
     {
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
@@ -42,7 +42,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $this->runCommand($command, ['--step' => 2]);
     }
 
-    public function testRollbackCommandCanBePretended()
+    public function testRollbackCommandCanBePretended(): void
     {
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);
@@ -56,7 +56,7 @@ class DatabaseMigrationRollbackCommandTest extends TestCase
         $this->runCommand($command, ['--pretend' => true, '--database' => 'foo']);
     }
 
-    public function testRollbackCommandCanBePretendedWithStepOption()
+    public function testRollbackCommandCanBePretendedWithStepOption(): void
     {
         $command = new RollbackCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseRollbackStub(['path.database' => __DIR__]);

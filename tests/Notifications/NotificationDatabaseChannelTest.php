@@ -10,12 +10,12 @@ use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
+    public function testDatabaseChannelCreatesDatabaseRecordWithProperData(): void
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;
@@ -32,7 +32,7 @@ class NotificationDatabaseChannelTest extends TestCase
         $channel->send($notifiable, $notification);
     }
 
-    public function testCorrectPayloadIsSentToDatabase()
+    public function testCorrectPayloadIsSentToDatabase(): void
     {
         $notification = new NotificationDatabaseChannelTestNotification;
         $notification->id = 1;

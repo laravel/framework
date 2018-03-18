@@ -12,7 +12,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentModelCustomEventsTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -25,7 +25,7 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
         });
     }
 
-    public function testFlushListenersClearsCustomEvents()
+    public function testFlushListenersClearsCustomEvents(): void
     {
         $_SERVER['fired_event'] = false;
 
@@ -36,7 +36,7 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
         $this->assertFalse($_SERVER['fired_event']);
     }
 
-    public function testCustomEventListenersAreFired()
+    public function testCustomEventListenersAreFired(): void
     {
         $_SERVER['fired_event'] = false;
 

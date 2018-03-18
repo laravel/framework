@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicCreateMethodStoresMigrationFile()
+    public function testBasicCreateMethodStoresMigrationFile(): void
     {
         $creator = $this->getCreator();
         unset($_SERVER['__migration.creator']);
@@ -30,7 +30,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         unset($_SERVER['__migration.creator']);
     }
 
-    public function testTableUpdateMigrationStoresMigrationFile()
+    public function testTableUpdateMigrationStoresMigrationFile(): void
     {
         $creator = $this->getCreator();
         $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
@@ -40,7 +40,7 @@ class DatabaseMigrationCreatorTest extends TestCase
         $creator->create('create_bar', 'foo', 'baz');
     }
 
-    public function testTableCreationMigrationStoresMigrationFile()
+    public function testTableCreationMigrationStoresMigrationFile(): void
     {
         $creator = $this->getCreator();
         $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
@@ -54,7 +54,7 @@ class DatabaseMigrationCreatorTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage A MigrationCreatorFakeMigration class already exists.
      */
-    public function testTableUpdateMigrationWontCreateDuplicateClass()
+    public function testTableUpdateMigrationWontCreateDuplicateClass(): void
     {
         $creator = $this->getCreator();
 

@@ -7,14 +7,14 @@ use PHPUnit\Framework\TestCase;
 
 class CacheNullStoreTest extends TestCase
 {
-    public function testItemsCanNotBeCached()
+    public function testItemsCanNotBeCached(): void
     {
         $store = new NullStore;
         $store->put('foo', 'bar', 10);
         $this->assertNull($store->get('foo'));
     }
 
-    public function testGetMultipleReturnsMultipleNulls()
+    public function testGetMultipleReturnsMultipleNulls(): void
     {
         $store = new NullStore;
 

@@ -10,12 +10,12 @@ use Illuminate\Cache\ArrayStore;
 
 class CacheTaggedCacheTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCacheCanBeSavedWithMultipleTags()
+    public function testCacheCanBeSavedWithMultipleTags(): void
     {
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
@@ -23,7 +23,7 @@ class CacheTaggedCacheTest extends TestCase
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
     }
 
-    public function testCacheCanBeSetWithDatetimeArgument()
+    public function testCacheCanBeSetWithDatetimeArgument(): void
     {
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
@@ -33,7 +33,7 @@ class CacheTaggedCacheTest extends TestCase
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
     }
 
-    public function testCacheSavedWithMultipleTagsCanBeFlushed()
+    public function testCacheSavedWithMultipleTagsCanBeFlushed(): void
     {
         $store = new ArrayStore;
         $tags1 = ['bop', 'zap'];
@@ -45,14 +45,14 @@ class CacheTaggedCacheTest extends TestCase
         $this->assertEquals('bar', $store->tags($tags2)->get('foo'));
     }
 
-    public function testTagsWithStringArgument()
+    public function testTagsWithStringArgument(): void
     {
         $store = new ArrayStore;
         $store->tags('bop')->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->tags('bop')->get('foo'));
     }
 
-    public function testTagsCacheForever()
+    public function testTagsCacheForever(): void
     {
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
@@ -60,7 +60,7 @@ class CacheTaggedCacheTest extends TestCase
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
     }
 
-    public function testRedisCacheTagsPushForeverKeysCorrectly()
+    public function testRedisCacheTagsPushForeverKeysCorrectly(): void
     {
         $store = m::mock('Illuminate\Contracts\Cache\Store');
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
@@ -77,7 +77,7 @@ class CacheTaggedCacheTest extends TestCase
         $redis->forever('key1', 'key1:value');
     }
 
-    public function testRedisCacheTagsPushStandardKeysCorrectly()
+    public function testRedisCacheTagsPushStandardKeysCorrectly(): void
     {
         $store = m::mock('Illuminate\Contracts\Cache\Store');
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
@@ -93,7 +93,7 @@ class CacheTaggedCacheTest extends TestCase
         $redis->put('key1', 'key1:value');
     }
 
-    public function testRedisCacheTagsCanBeFlushed()
+    public function testRedisCacheTagsCanBeFlushed(): void
     {
         $store = m::mock('Illuminate\Contracts\Cache\Store');
         $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);

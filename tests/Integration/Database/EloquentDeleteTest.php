@@ -25,7 +25,7 @@ class EloquentDeleteTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -49,7 +49,7 @@ class EloquentDeleteTest extends TestCase
         });
     }
 
-    public function testOnlyDeleteWhatGiven()
+    public function testOnlyDeleteWhatGiven(): void
     {
         for ($i = 1; $i <= 10; $i++) {
             Comment::create([
@@ -64,7 +64,7 @@ class EloquentDeleteTest extends TestCase
         $this->assertEquals(8, Post::all()->count());
     }
 
-    public function testForceDeletedEventIsFired()
+    public function testForceDeletedEventIsFired(): void
     {
         $role = Role::create([]);
         $this->assertInstanceOf(Role::class, $role);

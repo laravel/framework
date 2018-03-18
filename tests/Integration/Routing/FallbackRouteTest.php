@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
  */
 class FallbackRouteTest extends TestCase
 {
-    public function test_basic_fallback()
+    public function test_basic_fallback(): void
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -25,7 +25,7 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
-    public function test_fallback_with_prefix()
+    public function test_fallback_with_prefix(): void
     {
         Route::group(['prefix' => 'prefix'], function () {
             Route::fallback(function () {
@@ -43,7 +43,7 @@ class FallbackRouteTest extends TestCase
         $this->assertContains('Page Not Found', $this->get('/non-existing')->getContent());
     }
 
-    public function test_fallback_with_wildcards()
+    public function test_fallback_with_wildcards(): void
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -62,7 +62,7 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(200, $this->get('/non-existing')->getStatusCode());
     }
 
-    public function test_no_routes()
+    public function test_no_routes(): void
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -72,7 +72,7 @@ class FallbackRouteTest extends TestCase
         $this->assertEquals(404, $this->get('/non-existing')->getStatusCode());
     }
 
-    public function test_respond_with_named_fallback_route()
+    public function test_respond_with_named_fallback_route(): void
     {
         Route::fallback(function () {
             return response('fallback', 404);
@@ -86,7 +86,7 @@ class FallbackRouteTest extends TestCase
         $this->assertContains('fallback', $this->get('/one')->getContent());
     }
 
-    public function test_no_fallbacks()
+    public function test_no_fallbacks(): void
     {
         Route::get('one', function () {
             return 'one';

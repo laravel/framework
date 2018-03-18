@@ -11,13 +11,13 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class SupportTestingEventFakeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new EventFake(m::mock(Dispatcher::class));
     }
 
-    public function testAssertDispacthed()
+    public function testAssertDispacthed(): void
     {
         try {
             $this->fake->assertDispatched(EventStub::class);
@@ -31,7 +31,7 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatched(EventStub::class);
     }
 
-    public function testAssertDispatchedWithCallbackInt()
+    public function testAssertDispatchedWithCallbackInt(): void
     {
         $this->fake->dispatch(EventStub::class);
         $this->fake->dispatch(EventStub::class);
@@ -46,7 +46,7 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatched(EventStub::class, 2);
     }
 
-    public function testAssertDispatchedTimes()
+    public function testAssertDispatchedTimes(): void
     {
         $this->fake->dispatch(EventStub::class);
         $this->fake->dispatch(EventStub::class);
@@ -61,7 +61,7 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake->assertDispatchedTimes(EventStub::class, 2);
     }
 
-    public function testAssertNotDispatched()
+    public function testAssertNotDispatched(): void
     {
         $this->fake->assertNotDispatched(EventStub::class);
 

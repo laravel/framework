@@ -26,7 +26,7 @@ class EncryptCookiesTest extends TestCase
     protected $setCookiePath = 'cookie/set';
     protected $queueCookiePath = 'cookie/queue';
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -38,7 +38,7 @@ class EncryptCookiesTest extends TestCase
         $this->router = new Router(new Dispatcher, $container);
     }
 
-    public function testSetCookieEncryption()
+    public function testSetCookieEncryption(): void
     {
         $this->router->get($this->setCookiePath, [
             'middleware' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware',
@@ -55,7 +55,7 @@ class EncryptCookiesTest extends TestCase
         $this->assertEquals('value', $cookies[1]->getValue());
     }
 
-    public function testQueuedCookieEncryption()
+    public function testQueuedCookieEncryption(): void
     {
         $this->router->get($this->queueCookiePath, [
             'middleware' => ['Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware', 'Illuminate\Tests\Cookie\Middleware\AddQueuedCookiesToResponseTestMiddleware'],

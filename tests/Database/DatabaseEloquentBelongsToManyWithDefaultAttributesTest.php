@@ -7,18 +7,18 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testwithPivotValueMethodSetsWhereConditionsForFetching()
+    public function testwithPivotValueMethodSetsWhereConditionsForFetching(): void
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);
     }
 
-    public function testwithPivotValueMethodSetsDefaultArgumentsForInsertion()
+    public function testwithPivotValueMethodSetsDefaultArgumentsForInsertion(): void
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\BelongsToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $relation->withPivotValue(['is_admin' => 1]);

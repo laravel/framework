@@ -7,7 +7,7 @@ use Illuminate\Notifications\Messages\SimpleMessage as Message;
 
 class NotificationMessageTest extends TestCase
 {
-    public function testLevelCanBeRetrieved()
+    public function testLevelCanBeRetrieved(): void
     {
         $message = new Message;
         $this->assertEquals('info', $message->level);
@@ -17,7 +17,7 @@ class NotificationMessageTest extends TestCase
         $this->assertEquals('error', $message->level);
     }
 
-    public function testMessageFormatsMultiLineText()
+    public function testMessageFormatsMultiLineText(): void
     {
         $message = new Message;
         $message->with('

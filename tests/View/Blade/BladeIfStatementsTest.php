@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeIfStatementsTest extends AbstractBladeTestCase
 {
-    public function testIfStatementsAreCompiled()
+    public function testIfStatementsAreCompiled(): void
     {
         $string = '@if (name(foo(bar)))
 breeze
@@ -15,7 +15,7 @@ breeze
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testSwitchstatementsAreCompiled()
+    public function testSwitchstatementsAreCompiled(): void
     {
         $string = '@switch(true)
 @case(1)

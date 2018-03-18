@@ -15,12 +15,12 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     protected $parent;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testHasOneWithDefault()
+    public function testHasOneWithDefault(): void
     {
         $relation = $this->getRelation()->withDefault();
 
@@ -35,7 +35,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
-    public function testHasOneWithDynamicDefault()
+    public function testHasOneWithDynamicDefault(): void
     {
         $relation = $this->getRelation()->withDefault(function ($newModel) {
             $newModel->username = 'taylor';
@@ -54,7 +54,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
-    public function testHasOneWithDynamicDefaultUseParentModel()
+    public function testHasOneWithDynamicDefaultUseParentModel(): void
     {
         $relation = $this->getRelation()->withDefault(function ($newModel, $parentModel) {
             $newModel->username = $parentModel->username;
@@ -73,7 +73,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
-    public function testHasOneWithArrayDefault()
+    public function testHasOneWithArrayDefault(): void
     {
         $attributes = ['username' => 'taylor'];
 
@@ -92,7 +92,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertSame(1, $newModel->getAttribute('foreign_key'));
     }
 
-    public function testMakeMethodDoesNotSaveNewModel()
+    public function testMakeMethodDoesNotSaveNewModel(): void
     {
         $relation = $this->getRelation();
         $instance = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save', 'newInstance', 'setAttribute'])->getMock();
@@ -103,7 +103,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
     }
 
-    public function testSaveMethodSetsForeignKeyOnModel()
+    public function testSaveMethodSetsForeignKeyOnModel(): void
     {
         $relation = $this->getRelation();
         $mockModel = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save'])->getMock();
@@ -114,7 +114,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals(1, $attributes['foreign_key']);
     }
 
-    public function testCreateMethodProperlyCreatesNewModel()
+    public function testCreateMethodProperlyCreatesNewModel(): void
     {
         $relation = $this->getRelation();
         $created = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save', 'getKey', 'setAttribute'])->getMock();
@@ -125,7 +125,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
-    public function testUpdateMethodUpdatesModelsWithTimestamps()
+    public function testUpdateMethodUpdatesModelsWithTimestamps(): void
     {
         $relation = $this->getRelation();
         $relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
@@ -136,7 +136,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals('results', $relation->update(['foo' => 'bar']));
     }
 
-    public function testRelationIsProperlyInitialized()
+    public function testRelationIsProperlyInitialized(): void
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
@@ -146,7 +146,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertEquals([$model], $models);
     }
 
-    public function testEagerConstraintsAreProperlyAdded()
+    public function testEagerConstraintsAreProperlyAdded(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
@@ -157,7 +157,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
-    public function testModelsAreProperlyMatchedToParents()
+    public function testModelsAreProperlyMatchedToParents(): void
     {
         $relation = $this->getRelation();
 
@@ -180,7 +180,7 @@ class DatabaseEloquentHasOneTest extends TestCase
         $this->assertNull($models[2]->foo);
     }
 
-    public function testRelationCountQueryCanBeBuilt()
+    public function testRelationCountQueryCanBeBuilt(): void
     {
         $relation = $this->getRelation();
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');

@@ -9,12 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 class ViewFactoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
+    public function testMakeCreatesNewViewInstanceWithProperPathAndEngine(): void
     {
         unset($_SERVER['__test.view']);
 
@@ -35,7 +35,7 @@ class ViewFactoryTest extends TestCase
         unset($_SERVER['__test.view']);
     }
 
-    public function testExistsPassesAndFailsViews()
+    public function testExistsPassesAndFailsViews(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('foo')->andThrow('InvalidArgumentException');
@@ -45,7 +45,7 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->exists('bar'));
     }
 
-    public function testFirstCreatesNewViewInstanceWithProperPath()
+    public function testFirstCreatesNewViewInstanceWithProperPath(): void
     {
         unset($_SERVER['__test.view']);
 
@@ -70,7 +70,7 @@ class ViewFactoryTest extends TestCase
     /**
      * @expectedException InvalidArgumentException
      */
-    public function testFirstThrowsInvalidArgumentExceptionIfNoneFound()
+    public function testFirstThrowsInvalidArgumentExceptionIfNoneFound(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andThrow('InvalidArgumentException');
@@ -81,7 +81,7 @@ class ViewFactoryTest extends TestCase
         $view = $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
     }
 
-    public function testRenderEachCreatesViewForEachItemInArray()
+    public function testRenderEachCreatesViewForEachItemInArray(): void
     {
         $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
         $factory->shouldReceive('make')->once()->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1 = m::mock('stdClass'));
@@ -94,7 +94,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('daylerees', $result);
     }
 
-    public function testEmptyViewsCanBeReturnedFromRenderEach()
+    public function testEmptyViewsCanBeReturnedFromRenderEach(): void
     {
         $factory = m::mock('Illuminate\View\Factory[make]', $this->getFactoryArgs());
         $factory->shouldReceive('make')->once()->with('foo')->andReturn($mockView = m::mock('stdClass'));
@@ -103,12 +103,12 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('empty', $factory->renderEach('view', [], 'iterator', 'foo'));
     }
 
-    public function testRawStringsMayBeReturnedFromRenderEach()
+    public function testRawStringsMayBeReturnedFromRenderEach(): void
     {
         $this->assertEquals('foo', $this->getFactory()->renderEach('foo', [], 'item', 'raw|foo'));
     }
 
-    public function testEnvironmentAddsExtensionWithCustomResolver()
+    public function testEnvironmentAddsExtensionWithCustomResolver(): void
     {
         $factory = $this->getFactory();
 
@@ -128,7 +128,7 @@ class ViewFactoryTest extends TestCase
         $this->assertSame($engine, $view->getEngine());
     }
 
-    public function testAddingExtensionPrependsNotAppends()
+    public function testAddingExtensionPrependsNotAppends(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
@@ -140,7 +140,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('foo', key($extensions));
     }
 
-    public function testPrependedExtensionOverridesExistingExtensions()
+    public function testPrependedExtensionOverridesExistingExtensions(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('foo');
@@ -154,7 +154,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('baz', key($extensions));
     }
 
-    public function testComposersAreProperlyRegistered()
+    public function testComposersAreProperlyRegistered(): void
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
@@ -166,7 +166,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('bar', $callback());
     }
 
-    public function testComposersCanBeMassRegistered()
+    public function testComposersCanBeMassRegistered(): void
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: bar', m::type('Closure'));
@@ -186,7 +186,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals(['class' => 'baz', 'method' => 'baz'], $reflections[1]->getStaticVariables());
     }
 
-    public function testClassCallbacks()
+    public function testClassCallbacks(): void
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
@@ -199,7 +199,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('composed', $callback('view'));
     }
 
-    public function testClassCallbacksWithMethods()
+    public function testClassCallbacksWithMethods(): void
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type('Closure'));
@@ -212,7 +212,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('composed', $callback('view'));
     }
 
-    public function testCallComposerCallsProperEvent()
+    public function testCallComposerCallsProperEvent(): void
     {
         $factory = $this->getFactory();
         $view = m::mock(\Illuminate\View\View::class);
@@ -222,7 +222,7 @@ class ViewFactoryTest extends TestCase
         $factory->callComposer($view);
     }
 
-    public function testComposersAreRegisteredWithSlashAndDot()
+    public function testComposersAreRegisteredWithSlashAndDot(): void
     {
         $factory = $this->getFactory();
         $factory->getDispatcher()->shouldReceive('listen')->with('composing: foo.bar', m::any())->twice();
@@ -230,7 +230,7 @@ class ViewFactoryTest extends TestCase
         $factory->composer('foo/bar', '');
     }
 
-    public function testRenderCountHandling()
+    public function testRenderCountHandling(): void
     {
         $factory = $this->getFactory();
         $factory->incrementRender();
@@ -239,19 +239,19 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->doneRendering());
     }
 
-    public function testYieldDefault()
+    public function testYieldDefault(): void
     {
         $factory = $this->getFactory();
         $this->assertEquals('hi', $factory->yieldContent('foo', 'hi'));
     }
 
-    public function testYieldDefaultIsEscaped()
+    public function testYieldDefaultIsEscaped(): void
     {
         $factory = $this->getFactory();
         $this->assertEquals('&lt;p&gt;hi&lt;/p&gt;', $factory->yieldContent('foo', '<p>hi</p>'));
     }
 
-    public function testYieldDefaultViewIsNotEscapedTwice()
+    public function testYieldDefaultViewIsNotEscapedTwice(): void
     {
         $factory = $this->getFactory();
         $view = m::mock('Illuminate\View\View');
@@ -259,7 +259,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo', $view));
     }
 
-    public function testBasicSectionHandling()
+    public function testBasicSectionHandling(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -268,21 +268,21 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hi', $factory->yieldContent('foo'));
     }
 
-    public function testBasicSectionDefault()
+    public function testBasicSectionDefault(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo', 'hi');
         $this->assertEquals('hi', $factory->yieldContent('foo'));
     }
 
-    public function testBasicSectionDefaultIsEscaped()
+    public function testBasicSectionDefaultIsEscaped(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo', '<p>hi</p>');
         $this->assertEquals('&lt;p&gt;hi&lt;/p&gt;', $factory->yieldContent('foo'));
     }
 
-    public function testBasicSectionDefaultViewIsNotEscapedTwice()
+    public function testBasicSectionDefaultViewIsNotEscapedTwice(): void
     {
         $factory = $this->getFactory();
         $view = m::mock('Illuminate\View\View');
@@ -291,7 +291,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('<p>hi</p>&lt;p&gt;already escaped&lt;/p&gt;', $factory->yieldContent('foo'));
     }
 
-    public function testSectionExtending()
+    public function testSectionExtending(): void
     {
         $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
         $factory = $this->getFactory();
@@ -304,7 +304,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hi there', $factory->yieldContent('foo'));
     }
 
-    public function testSectionMultipleExtending()
+    public function testSectionMultipleExtending(): void
     {
         $placeholder = \Illuminate\View\Factory::parentPlaceholder('foo');
         $factory = $this->getFactory();
@@ -320,7 +320,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hello my friend nice to see you my friend', $factory->yieldContent('foo'));
     }
 
-    public function testComponentHandling()
+    public function testComponentHandling(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
@@ -336,7 +336,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('title<hr> component Taylor laravel.com', $contents);
     }
 
-    public function testTranslation()
+    public function testTranslation(): void
     {
         $container = new \Illuminate\Container\Container;
         $container->instance('translator', $translator = m::mock('stdClass'));
@@ -350,7 +350,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('Bar', $string);
     }
 
-    public function testSingleStackPush()
+    public function testSingleStackPush(): void
     {
         $factory = $this->getFactory();
         $factory->startPush('foo');
@@ -359,7 +359,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hi', $factory->yieldPushContent('foo'));
     }
 
-    public function testMultipleStackPush()
+    public function testMultipleStackPush(): void
     {
         $factory = $this->getFactory();
         $factory->startPush('foo');
@@ -371,7 +371,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hi, Hello!', $factory->yieldPushContent('foo'));
     }
 
-    public function testSessionAppending()
+    public function testSessionAppending(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -383,7 +383,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hithere', $factory->yieldContent('foo'));
     }
 
-    public function testYieldSectionStopsAndYields()
+    public function testYieldSectionStopsAndYields(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -391,20 +391,20 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('hi', $factory->yieldSection());
     }
 
-    public function testInjectStartsSectionWithContent()
+    public function testInjectStartsSectionWithContent(): void
     {
         $factory = $this->getFactory();
         $factory->inject('foo', 'hi');
         $this->assertEquals('hi', $factory->yieldContent('foo'));
     }
 
-    public function testEmptyStringIsReturnedForNonSections()
+    public function testEmptyStringIsReturnedForNonSections(): void
     {
         $factory = $this->getFactory();
         $this->assertEmpty($factory->yieldContent('foo'));
     }
 
-    public function testSectionFlushing()
+    public function testSectionFlushing(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -418,7 +418,7 @@ class ViewFactoryTest extends TestCase
         $this->assertCount(0, $factory->getSections());
     }
 
-    public function testHasSection()
+    public function testHasSection(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -429,7 +429,7 @@ class ViewFactoryTest extends TestCase
         $this->assertFalse($factory->hasSection('bar'));
     }
 
-    public function testGetSection()
+    public function testGetSection(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -441,7 +441,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals('default', $factory->getSection('bar', 'default'));
     }
 
-    public function testMakeWithSlashAndDot()
+    public function testMakeWithSlashAndDot(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->twice()->with('foo.bar')->andReturn('path.php');
@@ -451,7 +451,7 @@ class ViewFactoryTest extends TestCase
         $factory->make('foo.bar');
     }
 
-    public function testNamespacedViewNamesAreNormalizedProperly()
+    public function testNamespacedViewNamesAreNormalizedProperly(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->twice()->with('vendor/package::foo.bar')->andReturn('path.php');
@@ -464,7 +464,7 @@ class ViewFactoryTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testExceptionIsThrownForUnknownExtension()
+    public function testExceptionIsThrownForUnknownExtension(): void
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('view.foo');
@@ -475,7 +475,7 @@ class ViewFactoryTest extends TestCase
      * @expectedException \ErrorException
      * @expectedExceptionMessage section exception message
      */
-    public function testExceptionsInSectionsAreThrown()
+    public function testExceptionsInSectionsAreThrown(): void
     {
         $engine = new \Illuminate\View\Engines\CompilerEngine(m::mock(\Illuminate\View\Compilers\CompilerInterface::class));
         $engine->getCompiler()->shouldReceive('getCompiledPath')->andReturnUsing(function ($path) {
@@ -495,7 +495,7 @@ class ViewFactoryTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Cannot end a section without first starting one.
      */
-    public function testExtraStopSectionCallThrowsException()
+    public function testExtraStopSectionCallThrowsException(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -508,7 +508,7 @@ class ViewFactoryTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Cannot end a section without first starting one.
      */
-    public function testExtraAppendSectionCallThrowsException()
+    public function testExtraAppendSectionCallThrowsException(): void
     {
         $factory = $this->getFactory();
         $factory->startSection('foo');
@@ -517,7 +517,7 @@ class ViewFactoryTest extends TestCase
         $factory->appendSection();
     }
 
-    public function testAddingLoops()
+    public function testAddingLoops(): void
     {
         $factory = $this->getFactory();
 
@@ -555,7 +555,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
     }
 
-    public function testAddingTraversableLoop()
+    public function testAddingTraversableLoop(): void
     {
         $factory = $this->getFactory();
 
@@ -577,7 +577,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
     }
 
-    public function testAddingUncountableLoop()
+    public function testAddingUncountableLoop(): void
     {
         $factory = $this->getFactory();
 
@@ -597,7 +597,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
     }
 
-    public function testIncrementingLoopIndices()
+    public function testIncrementingLoopIndices(): void
     {
         $factory = $this->getFactory();
 
@@ -612,7 +612,7 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals(2, $factory->getLoopStack()[0]['remaining']);
     }
 
-    public function testReachingEndOfLoop()
+    public function testReachingEndOfLoop(): void
     {
         $factory = $this->getFactory();
 
@@ -625,7 +625,7 @@ class ViewFactoryTest extends TestCase
         $this->assertTrue($factory->getLoopStack()[0]['last']);
     }
 
-    public function testIncrementingLoopIndicesOfUncountable()
+    public function testIncrementingLoopIndicesOfUncountable(): void
     {
         $factory = $this->getFactory();
 

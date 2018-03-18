@@ -9,12 +9,12 @@ use Illuminate\Cache\Console\ClearCommand;
 
 class ClearCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testClearWithNoStoreArgument()
+    public function testClearWithNoStoreArgument(): void
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
@@ -34,7 +34,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($command);
     }
 
-    public function testClearWithStoreArgument()
+    public function testClearWithStoreArgument(): void
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
@@ -57,7 +57,7 @@ class ClearCommandTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testClearWithInvalidStoreArgument()
+    public function testClearWithInvalidStoreArgument(): void
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
@@ -77,7 +77,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($command, ['store' => 'bar']);
     }
 
-    public function testClearWithTagsOption()
+    public function testClearWithTagsOption(): void
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
@@ -98,7 +98,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($command, ['--tags' => 'foo,bar']);
     }
 
-    public function testClearWithStoreArgumentAndTagsOption()
+    public function testClearWithStoreArgumentAndTagsOption(): void
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),
@@ -119,7 +119,7 @@ class ClearCommandTest extends TestCase
         $this->runCommand($command, ['store' => 'redis', '--tags' => 'foo']);
     }
 
-    public function testClearWillClearsRealTimeFacades()
+    public function testClearWillClearsRealTimeFacades(): void
     {
         $command = new ClearCommandTestStub(
             $cacheManager = m::mock('Illuminate\Cache\CacheManager'),

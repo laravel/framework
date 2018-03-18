@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -68,14 +68,14 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
     }
 
-    public function testItLoadsRelationshipsAutomatically()
+    public function testItLoadsRelationshipsAutomatically(): void
     {
         $this->seedData();
 
@@ -85,7 +85,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertEquals(TestComment::first(), $like->likeable);
     }
 
-    public function testItLoadsChainedRelationshipsAutomatically()
+    public function testItLoadsChainedRelationshipsAutomatically(): void
     {
         $this->seedData();
 
@@ -95,7 +95,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertEquals(TestPost::first(), $like->likeable->commentable);
     }
 
-    public function testItLoadsNestedRelationshipsAutomatically()
+    public function testItLoadsNestedRelationshipsAutomatically(): void
     {
         $this->seedData();
 
@@ -107,7 +107,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertEquals(TestUser::first(), $like->likeable->owner);
     }
 
-    public function testItLoadsNestedRelationshipsOnDemand()
+    public function testItLoadsNestedRelationshipsOnDemand(): void
     {
         $this->seedData();
 

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsJobTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->key = 'AMAZONSQSKEY';
         $this->secret = 'AmAz0n+SqSsEcReT+aLpHaNuM3R1CsTr1nG';
@@ -45,12 +45,12 @@ class QueueSqsJobTest extends TestCase
         ];
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testFireProperlyCallsTheJobHandler()
+    public function testFireProperlyCallsTheJobHandler(): void
     {
         $job = $this->getJob();
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('stdClass'));
@@ -58,7 +58,7 @@ class QueueSqsJobTest extends TestCase
         $job->fire();
     }
 
-    public function testDeleteRemovesTheJobFromSqs()
+    public function testDeleteRemovesTheJobFromSqs(): void
     {
         $this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
             ->setMethods(['deleteMessage'])
@@ -71,7 +71,7 @@ class QueueSqsJobTest extends TestCase
         $job->delete();
     }
 
-    public function testReleaseProperlyReleasesTheJobOntoSqs()
+    public function testReleaseProperlyReleasesTheJobOntoSqs(): void
     {
         $this->mockedSqsClient = $this->getMockBuilder('Aws\Sqs\SqsClient')
             ->setMethods(['changeMessageVisibility'])

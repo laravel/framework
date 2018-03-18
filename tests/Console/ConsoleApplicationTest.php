@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class ConsoleApplicationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testAddSetsLaravelInstance()
+    public function testAddSetsLaravelInstance(): void
     {
         $app = $this->getMockConsole(['addToParent']);
         $command = m::mock('Illuminate\Console\Command');
@@ -23,7 +23,7 @@ class ConsoleApplicationTest extends TestCase
         $this->assertEquals($command, $result);
     }
 
-    public function testLaravelNotSetOnSymfonyCommands()
+    public function testLaravelNotSetOnSymfonyCommands(): void
     {
         $app = $this->getMockConsole(['addToParent']);
         $command = m::mock('Symfony\Component\Console\Command\Command');
@@ -34,7 +34,7 @@ class ConsoleApplicationTest extends TestCase
         $this->assertEquals($command, $result);
     }
 
-    public function testResolveAddsCommandViaApplicationResolution()
+    public function testResolveAddsCommandViaApplicationResolution(): void
     {
         $app = $this->getMockConsole(['addToParent']);
         $command = m::mock('Symfony\Component\Console\Command\Command');

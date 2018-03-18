@@ -15,7 +15,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentBelongsToManyTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

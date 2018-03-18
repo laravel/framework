@@ -8,12 +8,12 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class ViewBladeCompilerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testIsExpiredReturnsTrueIfCompiledFileDoesntExist()
+    public function testIsExpiredReturnsTrueIfCompiledFileDoesntExist(): void
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('foo').'.php')->andReturn(false);
@@ -24,12 +24,12 @@ class ViewBladeCompilerTest extends TestCase
      * @expectedException \InvalidArgumentException
      * @expectedExceptionMessage Please provide a valid cache path.
      */
-    public function testCannotConstructWithBadCachePath()
+    public function testCannotConstructWithBadCachePath(): void
     {
         new BladeCompiler($this->getFiles(), null);
     }
 
-    public function testIsExpiredReturnsTrueWhenModificationTimesWarrant()
+    public function testIsExpiredReturnsTrueWhenModificationTimesWarrant(): void
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('exists')->once()->with(__DIR__.'/'.sha1('foo').'.php')->andReturn(true);
@@ -38,13 +38,13 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertTrue($compiler->isExpired('foo'));
     }
 
-    public function testCompilePathIsProperlyCreated()
+    public function testCompilePathIsProperlyCreated(): void
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $this->assertEquals(__DIR__.'/'.sha1('foo').'.php', $compiler->getCompiledPath('foo'));
     }
 
-    public function testCompileCompilesFileAndReturnsContents()
+    public function testCompileCompilesFileAndReturnsContents(): void
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
@@ -52,7 +52,7 @@ class ViewBladeCompilerTest extends TestCase
         $compiler->compile('foo');
     }
 
-    public function testCompileCompilesAndGetThePath()
+    public function testCompileCompilesAndGetThePath(): void
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
@@ -61,14 +61,14 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertEquals('foo', $compiler->getPath());
     }
 
-    public function testCompileSetAndGetThePath()
+    public function testCompileSetAndGetThePath(): void
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $compiler->setPath('foo');
         $this->assertEquals('foo', $compiler->getPath());
     }
 
-    public function testCompileWithPathSetBefore()
+    public function testCompileWithPathSetBefore(): void
     {
         $compiler = new BladeCompiler($files = $this->getFiles(), __DIR__);
         $files->shouldReceive('get')->once()->with('foo')->andReturn('Hello World');
@@ -80,7 +80,7 @@ class ViewBladeCompilerTest extends TestCase
         $this->assertEquals('foo', $compiler->getPath());
     }
 
-    public function testRawTagsCanBeSetToLegacyValues()
+    public function testRawTagsCanBeSetToLegacyValues(): void
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $compiler->setEchoFormat('%s');

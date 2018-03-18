@@ -9,12 +9,12 @@ use Illuminate\Auth\DatabaseUserProvider;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testRetrieveByIDReturnsUserWhenUserIsFound()
+    public function testRetrieveByIDReturnsUserWhenUserIsFound(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -28,7 +28,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertEquals('Dayle', $user->name);
     }
 
-    public function testRetrieveByIDReturnsNullWhenUserIsNotFound()
+    public function testRetrieveByIDReturnsNullWhenUserIsNotFound(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -40,7 +40,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByTokenReturnsUser()
+    public function testRetrieveByTokenReturnsUser(): void
     {
         $mockUser = new \stdClass();
         $mockUser->remember_token = 'a';
@@ -55,7 +55,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertEquals(new GenericUser((array) $mockUser), $user);
     }
 
-    public function testRetrieveTokenWithBadIdentifierReturnsNull()
+    public function testRetrieveTokenWithBadIdentifierReturnsNull(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -67,7 +67,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByBadTokenReturnsNull()
+    public function testRetrieveByBadTokenReturnsNull(): void
     {
         $mockUser = new \stdClass();
         $mockUser->remember_token = null;
@@ -82,7 +82,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testRetrieveByCredentialsReturnsUserWhenUserIsFound()
+    public function testRetrieveByCredentialsReturnsUserWhenUserIsFound(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -97,7 +97,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertEquals('taylor', $user->name);
     }
 
-    public function testRetrieveByCredentialsReturnsNullWhenUserIsFound()
+    public function testRetrieveByCredentialsReturnsNullWhenUserIsFound(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
@@ -110,7 +110,7 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertNull($user);
     }
 
-    public function testCredentialValidation()
+    public function testCredentialValidation(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');

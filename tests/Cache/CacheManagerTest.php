@@ -8,12 +8,12 @@ use Illuminate\Cache\CacheManager;
 
 class CacheManagerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCustomDriverClosureBoundObjectIsCacheManager()
+    public function testCustomDriverClosureBoundObjectIsCacheManager(): void
     {
         $cacheManager = new CacheManager([
             'config' => [
