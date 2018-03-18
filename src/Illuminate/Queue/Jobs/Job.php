@@ -3,6 +3,7 @@
 namespace Illuminate\Queue\Jobs;
 
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Queue\PayloadSerializerManager;
 
 abstract class Job
 {
@@ -185,13 +186,31 @@ abstract class Job
     }
 
     /**
+     * @return \Illuminate\Queue\PayloadSerializerManager
+     */
+    protected function getPayloadSerializerManager()
+    {
+        return $this->container->make(PayloadSerializerManager::class);
+    }
+
+    /**
+     * @param $connectionName
+     * @return \Illuminate\Contracts\Queue\PayloadSerializer
+     */
+    protected function getPayloadSerializer($connectionName)
+    {
+        return $this->getPayloadSerializerManager()->getSerializer($connectionName);
+    }
+
+    /**
      * Get the decoded body of the job.
      *
      * @return array
      */
     public function payload()
     {
-        return json_decode($this->getRawBody(), true);
+        return $this->getPayloadSerializer($this->getConnectionName())
+            ->unserialize($this->getRawBody(), $this->getConnectionName(), $this->getQueue());
     }
 
     /**
