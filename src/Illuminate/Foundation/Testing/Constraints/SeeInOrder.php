@@ -73,11 +73,11 @@ class SeeInOrder extends Constraint
     /**
      * Get a string representation of the object.
      *
-     * @param  int  $options
      * @return string
      */
-    public function toString($options = 0) : string
+    public function toString() : string
     {
-        return json_encode($this->data, $options);
+        $class = new ReflectionClass($this);
+        return $class->name;
     }
 }
