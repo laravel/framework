@@ -17,7 +17,7 @@ class SeeInOrder extends Constraint
     /**
      * The string we want to check the content of.
      * 
-     * @var string
+     * @var
      */
     protected $content;
 
@@ -68,5 +68,16 @@ class SeeInOrder extends Constraint
             $this->content,
             $this->failedValue
         );
+    }
+
+    /**
+     * Get a string representation of the object.
+     *
+     * @param  int  $options
+     * @return string
+     */
+    public function toString($options = 0) : string
+    {
+        return json_encode($this->data, $options);
     }
 }
