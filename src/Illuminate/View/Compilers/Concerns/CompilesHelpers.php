@@ -46,4 +46,15 @@ trait CompilesHelpers
     {
         return "<?php echo method_field{$method}; ?>";
     }
+
+    /**
+     * Compile the class statements into valid PHP.
+     *
+     * @param  string  $classList
+     * @return string
+     */
+    protected function compileClass($classList)
+    {
+        return "<?php echo collect{$classList}->filter()->keys()->implode(' ') ?>";
+    }
 }
