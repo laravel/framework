@@ -8,8 +8,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 
 /**
  * @mixin \Illuminate\Http\Response

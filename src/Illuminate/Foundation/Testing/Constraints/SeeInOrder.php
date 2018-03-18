@@ -2,21 +2,20 @@
 
 namespace Illuminate\Foundation\Testing\Constraints;
 
-use Illuminate\Database\Connection;
 use PHPUnit\Framework\Constraint\Constraint;
 
 class SeeInOrder extends Constraint
 {
     /**
      * The value that failed. Used to display in the error message.
-     * 
+     *
      * @var string
      */
     protected $failedValue;
 
     /**
      * The string we want to check the content of.
-     * 
+     *
      * @var
      */
     protected $content;
@@ -47,11 +46,13 @@ class SeeInOrder extends Constraint
 
             if ($valuePosition === false || $valuePosition < $position) {
                 $this->failedValue = $value;
+
                 return false;
             }
 
             $position = $valuePosition + mb_strlen($value);
         }
+
         return true;
     }
 
@@ -78,6 +79,7 @@ class SeeInOrder extends Constraint
     public function toString() : string
     {
         $class = new ReflectionClass($this);
+
         return $class->name;
     }
 }

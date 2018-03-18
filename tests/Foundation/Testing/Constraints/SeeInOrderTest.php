@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation\Constraints;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 use Illuminate\Tests\Foundation\FoundationTestResponseTest;
 
 class SeeInOrderTest extends TestCase
