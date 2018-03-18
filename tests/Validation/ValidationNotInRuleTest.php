@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\NotIn;
 
 class ValidationNotInRuleTest extends TestCase
 {
-    public function testItCorrectlyFormatsAStringVersionOfTheRule()
+    public function testItCorrectlyFormatsAStringVersionOfTheRule(): void
     {
         $rule = new NotIn(['Laravel', 'Framework', 'PHP']);
 

@@ -8,7 +8,7 @@ use Illuminate\Foundation\PackageManifest;
 
 class FoundationPackageManifestTest extends TestCase
 {
-    public function testAssetLoading()
+    public function testAssetLoading(): void
     {
         @unlink(__DIR__.'/fixtures/packages.php');
         $manifest = new PackageManifest(new Filesystem, __DIR__.'/fixtures', __DIR__.'/fixtures/packages.php');

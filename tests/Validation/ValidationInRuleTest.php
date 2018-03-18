@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\In;
 
 class ValidationInRuleTest extends TestCase
 {
-    public function testItCorrectlyFormatsAStringVersionOfTheRule()
+    public function testItCorrectlyFormatsAStringVersionOfTheRule(): void
     {
         $rule = new In(['Laravel', 'Framework', 'PHP']);
 

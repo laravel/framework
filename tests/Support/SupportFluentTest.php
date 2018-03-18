@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class SupportFluentTest extends TestCase
 {
-    public function testAttributesAreSetByConstructor()
+    public function testAttributesAreSetByConstructor(): void
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent($array);
@@ -22,7 +22,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->getAttributes());
     }
 
-    public function testAttributesAreSetByConstructorGivenstdClass()
+    public function testAttributesAreSetByConstructorGivenstdClass(): void
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent((object) $array);
@@ -35,7 +35,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->getAttributes());
     }
 
-    public function testAttributesAreSetByConstructorGivenArrayIterator()
+    public function testAttributesAreSetByConstructorGivenArrayIterator(): void
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent(new FluentArrayIteratorStub($array));
@@ -48,7 +48,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->getAttributes());
     }
 
-    public function testGetMethodReturnsAttribute()
+    public function testGetMethodReturnsAttribute(): void
     {
         $fluent = new Fluent(['name' => 'Taylor']);
 
@@ -58,7 +58,7 @@ class SupportFluentTest extends TestCase
         $this->assertNull($fluent->foo);
     }
 
-    public function testArrayAccessToAttributes()
+    public function testArrayAccessToAttributes(): void
     {
         $fluent = new Fluent(['attributes' => '1']);
 
@@ -70,7 +70,7 @@ class SupportFluentTest extends TestCase
         $this->assertTrue($fluent['attributes']);
     }
 
-    public function testMagicMethodsCanBeUsedToSetAttributes()
+    public function testMagicMethodsCanBeUsedToSetAttributes(): void
     {
         $fluent = new Fluent;
 
@@ -84,7 +84,7 @@ class SupportFluentTest extends TestCase
         $this->assertInstanceOf('Illuminate\Support\Fluent', $fluent->programmer());
     }
 
-    public function testIssetMagicMethod()
+    public function testIssetMagicMethod(): void
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent($array);
@@ -96,7 +96,7 @@ class SupportFluentTest extends TestCase
         $this->assertFalse(isset($fluent->name));
     }
 
-    public function testToArrayReturnsAttribute()
+    public function testToArrayReturnsAttribute(): void
     {
         $array = ['name' => 'Taylor', 'age' => 25];
         $fluent = new Fluent($array);
@@ -104,7 +104,7 @@ class SupportFluentTest extends TestCase
         $this->assertEquals($array, $fluent->toArray());
     }
 
-    public function testToJsonEncodesTheToArrayResult()
+    public function testToJsonEncodesTheToArrayResult(): void
     {
         $fluent = $this->getMockBuilder('Illuminate\Support\Fluent')->setMethods(['toArray'])->getMock();
         $fluent->expects($this->once())->method('toArray')->will($this->returnValue('foo'));

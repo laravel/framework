@@ -9,12 +9,12 @@ use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testResetCommandCallsMigratorWithProperArguments()
+    public function testResetCommandCallsMigratorWithProperArguments(): void
     {
         $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);
@@ -29,7 +29,7 @@ class DatabaseMigrationResetCommandTest extends TestCase
         $this->runCommand($command);
     }
 
-    public function testResetCommandCanBePretended()
+    public function testResetCommandCanBePretended(): void
     {
         $command = new ResetCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseResetStub(['path.database' => __DIR__]);

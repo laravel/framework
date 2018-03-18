@@ -25,7 +25,7 @@ class EloquentUpdateTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class EloquentUpdateTest extends TestCase
         });
     }
 
-    public function testBasicUpdate()
+    public function testBasicUpdate(): void
     {
         TestUpdateModel1::create([
             'name' => str_random(),
@@ -56,7 +56,7 @@ class EloquentUpdateTest extends TestCase
         $this->assertEquals(0, TestUpdateModel1::all()->count());
     }
 
-    public function testUpdateWithLimitsAndOrders()
+    public function testUpdateWithLimitsAndOrders(): void
     {
         for ($i = 1; $i <= 10; $i++) {
             TestUpdateModel1::create();
@@ -68,7 +68,7 @@ class EloquentUpdateTest extends TestCase
         $this->assertNotEquals('Dr.', TestUpdateModel1::find(7)->title);
     }
 
-    public function testUpdatedAtWithJoins()
+    public function testUpdatedAtWithJoins(): void
     {
         TestUpdateModel1::create([
             'name' => 'Abdul',
@@ -89,7 +89,7 @@ class EloquentUpdateTest extends TestCase
         $this->assertEquals('Engineer: Abdul', $record->job.': '.$record->name);
     }
 
-    public function testSoftDeleteWithJoins()
+    public function testSoftDeleteWithJoins(): void
     {
         TestUpdateModel1::create([
             'name' => str_random(),

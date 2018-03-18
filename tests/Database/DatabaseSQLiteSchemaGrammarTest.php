@@ -8,12 +8,12 @@ use Illuminate\Database\Schema\Blueprint;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicCreateTable()
+    public function testBasicCreateTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -37,7 +37,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals($expected, $statements);
     }
 
-    public function testCreateTemporaryTable()
+    public function testCreateTemporaryTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -50,7 +50,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create temporary table "users" ("id" integer not null primary key autoincrement, "email" varchar not null)', $statements[0]);
     }
 
-    public function testDropTable()
+    public function testDropTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->drop();
@@ -60,7 +60,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('drop table "users"', $statements[0]);
     }
 
-    public function testDropTableIfExists()
+    public function testDropTableIfExists(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropIfExists();
@@ -70,7 +70,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('drop table if exists "users"', $statements[0]);
     }
 
-    public function testDropUnique()
+    public function testDropUnique(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropUnique('foo');
@@ -80,7 +80,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
-    public function testDropIndex()
+    public function testDropIndex(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropIndex('foo');
@@ -90,7 +90,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('drop index "foo"', $statements[0]);
     }
 
-    public function testDropColumn()
+    public function testDropColumn(): void
     {
         if (! class_exists('Doctrine\DBAL\Schema\SqliteSchemaManager')) {
             $this->markTestSkipped('Doctrine should be installed to run dropColumn tests');
@@ -125,14 +125,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage The database driver in use does not support spatial indexes.
      */
-    public function testDropSpatialIndex()
+    public function testDropSpatialIndex(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->dropSpatialIndex(['coordinates']);
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
-    public function testRenameTable()
+    public function testRenameTable(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->rename('foo');
@@ -142,7 +142,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" rename to "foo"', $statements[0]);
     }
 
-    public function testAddingPrimaryKey()
+    public function testAddingPrimaryKey(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -153,7 +153,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create table "users" ("foo" varchar not null, primary key ("foo"))', $statements[0]);
     }
 
-    public function testAddingForeignKey()
+    public function testAddingForeignKey(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -166,7 +166,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create table "users" ("foo" varchar not null, "order_id" varchar not null, foreign key("order_id") references "orders"("id"), primary key ("foo"))', $statements[0]);
     }
 
-    public function testAddingUniqueKey()
+    public function testAddingUniqueKey(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->unique('foo', 'bar');
@@ -176,7 +176,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('create unique index "bar" on "users" ("foo")', $statements[0]);
     }
 
-    public function testAddingIndex()
+    public function testAddingIndex(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->index(['foo', 'bar'], 'baz');
@@ -190,7 +190,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage The database driver in use does not support spatial indexes.
      */
-    public function testAddingSpatialIndex()
+    public function testAddingSpatialIndex(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->spatialIndex('coordinates');
@@ -201,14 +201,14 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage The database driver in use does not support spatial indexes.
      */
-    public function testAddingFluentSpatialIndex()
+    public function testAddingFluentSpatialIndex(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->point('coordinates')->spatialIndex();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
-    public function testAddingIncrementingID()
+    public function testAddingIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -218,7 +218,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingSmallIncrementingID()
+    public function testAddingSmallIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->smallIncrements('id');
@@ -228,7 +228,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingMediumIncrementingID()
+    public function testAddingMediumIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->mediumIncrements('id');
@@ -238,7 +238,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingBigIncrementingID()
+    public function testAddingBigIncrementingID(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->bigIncrements('id');
@@ -248,7 +248,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "id" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingString()
+    public function testAddingString(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->string('foo');
@@ -272,7 +272,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar null default \'bar\'', $statements[0]);
     }
 
-    public function testAddingText()
+    public function testAddingText(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->text('foo');
@@ -282,7 +282,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
     }
 
-    public function testAddingBigInteger()
+    public function testAddingBigInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->bigInteger('foo');
@@ -299,7 +299,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingInteger()
+    public function testAddingInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->integer('foo');
@@ -316,7 +316,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingMediumInteger()
+    public function testAddingMediumInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->mediumInteger('foo');
@@ -333,7 +333,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingTinyInteger()
+    public function testAddingTinyInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->tinyInteger('foo');
@@ -350,7 +350,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingSmallInteger()
+    public function testAddingSmallInteger(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->smallInteger('foo');
@@ -367,7 +367,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" integer not null primary key autoincrement', $statements[0]);
     }
 
-    public function testAddingFloat()
+    public function testAddingFloat(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->float('foo', 5, 2);
@@ -377,7 +377,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" float not null', $statements[0]);
     }
 
-    public function testAddingDouble()
+    public function testAddingDouble(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->double('foo', 15, 8);
@@ -387,7 +387,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" float not null', $statements[0]);
     }
 
-    public function testAddingDecimal()
+    public function testAddingDecimal(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->decimal('foo', 5, 2);
@@ -397,7 +397,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" numeric not null', $statements[0]);
     }
 
-    public function testAddingBoolean()
+    public function testAddingBoolean(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->boolean('foo');
@@ -407,7 +407,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" tinyint(1) not null', $statements[0]);
     }
 
-    public function testAddingEnum()
+    public function testAddingEnum(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->enum('role', ['member', 'admin']);
@@ -417,7 +417,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "role" varchar check ("role" in (\'member\', \'admin\')) not null', $statements[0]);
     }
 
-    public function testAddingJson()
+    public function testAddingJson(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->json('foo');
@@ -427,7 +427,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
     }
 
-    public function testAddingJsonb()
+    public function testAddingJsonb(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->jsonb('foo');
@@ -437,7 +437,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" text not null', $statements[0]);
     }
 
-    public function testAddingDate()
+    public function testAddingDate(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->date('foo');
@@ -447,7 +447,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" date not null', $statements[0]);
     }
 
-    public function testAddingYear()
+    public function testAddingYear(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->year('birth_year');
@@ -456,7 +456,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "birth_year" integer not null', $statements[0]);
     }
 
-    public function testAddingDateTime()
+    public function testAddingDateTime(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTime('created_at');
@@ -465,7 +465,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingDateTimeWithPrecision()
+    public function testAddingDateTimeWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTime('created_at', 1);
@@ -474,7 +474,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingDateTimeTz()
+    public function testAddingDateTimeTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTimeTz('created_at');
@@ -483,7 +483,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingDateTimeTzWithPrecision()
+    public function testAddingDateTimeTzWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dateTimeTz('created_at', 1);
@@ -492,7 +492,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingTime()
+    public function testAddingTime(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->time('created_at');
@@ -501,7 +501,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" time not null', $statements[0]);
     }
 
-    public function testAddingTimeWithPrecision()
+    public function testAddingTimeWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->time('created_at', 1);
@@ -510,7 +510,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" time not null', $statements[0]);
     }
 
-    public function testAddingTimeTz()
+    public function testAddingTimeTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timeTz('created_at');
@@ -519,7 +519,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" time not null', $statements[0]);
     }
 
-    public function testAddingTimeTzWithPrecision()
+    public function testAddingTimeTzWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timeTz('created_at', 1);
@@ -528,7 +528,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" time not null', $statements[0]);
     }
 
-    public function testAddingTimestamp()
+    public function testAddingTimestamp(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamp('created_at');
@@ -537,7 +537,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingTimestampWithPrecision()
+    public function testAddingTimestampWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamp('created_at', 1);
@@ -546,7 +546,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingTimestampTz()
+    public function testAddingTimestampTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampTz('created_at');
@@ -555,7 +555,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingTimestampTzWithPrecision()
+    public function testAddingTimestampTzWithPrecision(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampTz('created_at', 1);
@@ -564,7 +564,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "created_at" datetime not null', $statements[0]);
     }
 
-    public function testAddingTimestamps()
+    public function testAddingTimestamps(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestamps();
@@ -576,7 +576,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
-    public function testAddingTimestampsTz()
+    public function testAddingTimestampsTz(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->timestampsTz();
@@ -588,7 +588,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         ], $statements);
     }
 
-    public function testAddingRememberToken()
+    public function testAddingRememberToken(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->rememberToken();
@@ -598,7 +598,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "remember_token" varchar null', $statements[0]);
     }
 
-    public function testAddingBinary()
+    public function testAddingBinary(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->binary('foo');
@@ -608,7 +608,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" blob not null', $statements[0]);
     }
 
-    public function testAddingUuid()
+    public function testAddingUuid(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->uuid('foo');
@@ -618,7 +618,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
-    public function testAddingIpAddress()
+    public function testAddingIpAddress(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->ipAddress('foo');
@@ -628,7 +628,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
-    public function testAddingMacAddress()
+    public function testAddingMacAddress(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->macAddress('foo');
@@ -638,7 +638,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" add column "foo" varchar not null', $statements[0]);
     }
 
-    public function testAddingGeometry()
+    public function testAddingGeometry(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->geometry('coordinates');
@@ -648,7 +648,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" geometry not null', $statements[0]);
     }
 
-    public function testAddingPoint()
+    public function testAddingPoint(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->point('coordinates');
@@ -658,7 +658,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" point not null', $statements[0]);
     }
 
-    public function testAddingLineString()
+    public function testAddingLineString(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->linestring('coordinates');
@@ -668,7 +668,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" linestring not null', $statements[0]);
     }
 
-    public function testAddingPolygon()
+    public function testAddingPolygon(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->polygon('coordinates');
@@ -678,7 +678,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" polygon not null', $statements[0]);
     }
 
-    public function testAddingGeometryCollection()
+    public function testAddingGeometryCollection(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->geometrycollection('coordinates');
@@ -688,7 +688,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" geometrycollection not null', $statements[0]);
     }
 
-    public function testAddingMultiPoint()
+    public function testAddingMultiPoint(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->multipoint('coordinates');
@@ -698,7 +698,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" multipoint not null', $statements[0]);
     }
 
-    public function testAddingMultiLineString()
+    public function testAddingMultiLineString(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->multilinestring('coordinates');
@@ -708,7 +708,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" multilinestring not null', $statements[0]);
     }
 
-    public function testAddingMultiPolygon()
+    public function testAddingMultiPolygon(): void
     {
         $blueprint = new Blueprint('geo');
         $blueprint->multipolygon('coordinates');

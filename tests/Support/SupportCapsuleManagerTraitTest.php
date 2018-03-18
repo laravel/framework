@@ -11,12 +11,12 @@ class SupportCapsuleManagerTraitTest extends TestCase
 {
     use CapsuleManagerTrait;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testSetupContainerForCapsule()
+    public function testSetupContainerForCapsule(): void
     {
         $this->container = null;
         $app = new Container;
@@ -26,7 +26,7 @@ class SupportCapsuleManagerTraitTest extends TestCase
         $this->assertInstanceOf('Illuminate\Support\Fluent', $app['config']);
     }
 
-    public function testSetupContainerForCapsuleWhenConfigIsBound()
+    public function testSetupContainerForCapsuleWhenConfigIsBound(): void
     {
         $this->container = null;
         $app = new Container;

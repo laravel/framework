@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseProcessorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testInsertGetIdProcessing()
+    public function testInsertGetIdProcessing(): void
     {
         $pdo = $this->createMock('Illuminate\Tests\Database\ProcessorTestPDOStub');
         $pdo->expects($this->once())->method('lastInsertId')->with($this->equalTo('id'))->will($this->returnValue('1'));

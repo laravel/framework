@@ -9,12 +9,12 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testIfUserIsNotFoundErrorRedirectIsReturned()
+    public function testIfUserIsNotFoundErrorRedirectIsReturned(): void
     {
         $mocks = $this->getMocks();
         $broker = $this->getMockBuilder('Illuminate\Auth\Passwords\PasswordBroker')->setMethods(['getUser', 'makeErrorRedirect'])->setConstructorArgs(array_values($mocks))->getMock();
@@ -27,7 +27,7 @@ class AuthPasswordBrokerTest extends TestCase
      * @expectedException \UnexpectedValueException
      * @expectedExceptionMessage User must implement CanResetPassword interface.
      */
-    public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword()
+    public function testGetUserThrowsExceptionIfUserDoesntImplementCanResetPassword(): void
     {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn('bar');
@@ -35,7 +35,7 @@ class AuthPasswordBrokerTest extends TestCase
         $broker->getUser(['foo']);
     }
 
-    public function testUserIsRetrievedByCredentials()
+    public function testUserIsRetrievedByCredentials(): void
     {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock('Illuminate\Contracts\Auth\CanResetPassword'));
@@ -43,7 +43,7 @@ class AuthPasswordBrokerTest extends TestCase
         $this->assertEquals($user, $broker->getUser(['foo']));
     }
 
-    public function testBrokerCreatesTokenAndRedirectsWithoutError()
+    public function testBrokerCreatesTokenAndRedirectsWithoutError(): void
     {
         $mocks = $this->getMocks();
         $broker = $this->getMockBuilder('Illuminate\Auth\Passwords\PasswordBroker')->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
@@ -56,7 +56,7 @@ class AuthPasswordBrokerTest extends TestCase
         $this->assertEquals(PasswordBroker::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $callback));
     }
 
-    public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid()
+    public function testRedirectIsReturnedByResetWhenUserCredentialsInvalid(): void
     {
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['creds'])->andReturn(null);
@@ -65,7 +65,7 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenPasswordsDontMatch()
+    public function testRedirectReturnedByRemindWhenPasswordsDontMatch(): void
     {
         $creds = ['password' => 'foo', 'password_confirmation' => 'bar'];
         $broker = $this->getBroker($mocks = $this->getMocks());
@@ -75,7 +75,7 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenPasswordNotSet()
+    public function testRedirectReturnedByRemindWhenPasswordNotSet(): void
     {
         $creds = ['password' => null, 'password_confirmation' => null];
         $broker = $this->getBroker($mocks = $this->getMocks());
@@ -85,7 +85,7 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters()
+    public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters(): void
     {
         $creds = ['password' => 'abc', 'password_confirmation' => 'abc'];
         $broker = $this->getBroker($mocks = $this->getMocks());
@@ -95,7 +95,7 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator()
+    public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator(): void
     {
         $creds = ['password' => 'abcdef', 'password_confirmation' => 'abcdef'];
         $broker = $this->getBroker($mocks = $this->getMocks());
@@ -108,7 +108,7 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
+    public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable(): void
     {
         $creds = ['token' => 'token'];
         $broker = $this->getMockBuilder('Illuminate\Auth\Passwords\PasswordBroker')->setMethods(['validateNewPassword'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();
@@ -120,7 +120,7 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testResetRemovesRecordOnReminderTableAndCallsCallback()
+    public function testResetRemovesRecordOnReminderTableAndCallsCallback(): void
     {
         unset($_SERVER['__password.reset.test']);
         $broker = $this->getMockBuilder('Illuminate\Auth\Passwords\PasswordBroker')->setMethods(['validateReset', 'getPassword', 'getToken'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();

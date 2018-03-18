@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
  */
 class RouteRedirectTest extends TestCase
 {
-    public function test_route_redirect()
+    public function test_route_redirect(): void
     {
         Route::redirect('from', 'to', 301);
 
@@ -19,7 +19,7 @@ class RouteRedirectTest extends TestCase
         $this->assertEquals('to', $response->headers->get('Location'));
     }
 
-    public function test_route_redirect_with_params()
+    public function test_route_redirect_with_params(): void
     {
         Route::redirect('from/{param}/{param2?}', 'to', 301);
 

@@ -11,19 +11,19 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DatabaseEloquentMorphTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Relation::morphMap([], false);
 
         m::close();
     }
 
-    public function testMorphOneSetsProperConstraints()
+    public function testMorphOneSetsProperConstraints(): void
     {
         $relation = $this->getOneRelation();
     }
 
-    public function testMorphOneEagerConstraintsAreProperlyAdded()
+    public function testMorphOneEagerConstraintsAreProperlyAdded(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
@@ -40,12 +40,12 @@ class DatabaseEloquentMorphTest extends TestCase
      * Note that the tests are the exact same for morph many because the classes share this code...
      * Will still test to be safe.
      */
-    public function testMorphManySetsProperConstraints()
+    public function testMorphManySetsProperConstraints(): void
     {
         $relation = $this->getManyRelation();
     }
 
-    public function testMorphManyEagerConstraintsAreProperlyAdded()
+    public function testMorphManyEagerConstraintsAreProperlyAdded(): void
     {
         $relation = $this->getManyRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.morph_id', [1, 2]);
@@ -58,7 +58,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
-    public function testMakeFunctionOnMorph()
+    public function testMakeFunctionOnMorph(): void
     {
         $_SERVER['__eloquent.saved'] = false;
         // Doesn't matter which relation type we use since they share the code...
@@ -72,7 +72,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertEquals($instance, $relation->make(['name' => 'taylor']));
     }
 
-    public function testCreateFunctionOnMorph()
+    public function testCreateFunctionOnMorph(): void
     {
         // Doesn't matter which relation type we use since they share the code...
         $relation = $this->getOneRelation();
@@ -85,7 +85,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertEquals($created, $relation->create(['name' => 'taylor']));
     }
 
-    public function testFindOrNewMethodFindsModel()
+    public function testFindOrNewMethodFindsModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn($model = m::mock('Illuminate\Database\Eloquent\Model'));
@@ -96,7 +96,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
     }
 
-    public function testFindOrNewMethodReturnsNewModelWithMorphKeysSet()
+    public function testFindOrNewMethodReturnsNewModelWithMorphKeysSet(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('find')->once()->with('foo', ['*'])->andReturn(null);
@@ -108,7 +108,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->findOrNew('foo'));
     }
 
-    public function testFirstOrNewMethodFindsFirstModel()
+    public function testFirstOrNewMethodFindsFirstModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -120,7 +120,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo']));
     }
 
-    public function testFirstOrNewMethodWithValueFindsFirstModel()
+    public function testFirstOrNewMethodWithValueFindsFirstModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -132,7 +132,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testFirstOrNewMethodReturnsNewModelWithMorphKeysSet()
+    public function testFirstOrNewMethodReturnsNewModelWithMorphKeysSet(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -145,7 +145,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo']));
     }
 
-    public function testFirstOrNewMethodWithValuesReturnsNewModelWithMorphKeysSet()
+    public function testFirstOrNewMethodWithValuesReturnsNewModelWithMorphKeysSet(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -158,7 +158,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrNew(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testFirstOrCreateMethodFindsFirstModel()
+    public function testFirstOrCreateMethodFindsFirstModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -170,7 +170,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo']));
     }
 
-    public function testFirstOrCreateMethodWithValuesFindsFirstModel()
+    public function testFirstOrCreateMethodWithValuesFindsFirstModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -182,7 +182,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testFirstOrCreateMethodCreatesNewMorphModel()
+    public function testFirstOrCreateMethodCreatesNewMorphModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -195,7 +195,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo']));
     }
 
-    public function testFirstOrCreateMethodWithValuesCreatesNewMorphModel()
+    public function testFirstOrCreateMethodWithValuesCreatesNewMorphModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo' => 'bar'])->andReturn($relation->getQuery());
@@ -208,7 +208,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->firstOrCreate(['foo' => 'bar'], ['baz' => 'qux']));
     }
 
-    public function testUpdateOrCreateMethodFindsFirstModelAndUpdates()
+    public function testUpdateOrCreateMethodFindsFirstModelAndUpdates(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -221,7 +221,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
-    public function testUpdateOrCreateMethodCreatesNewMorphModel()
+    public function testUpdateOrCreateMethodCreatesNewMorphModel(): void
     {
         $relation = $this->getOneRelation();
         $relation->getQuery()->shouldReceive('where')->once()->with(['foo'])->andReturn($relation->getQuery());
@@ -235,7 +235,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $this->assertInstanceOf(Model::class, $relation->updateOrCreate(['foo'], ['bar']));
     }
 
-    public function testCreateFunctionOnNamespacedMorph()
+    public function testCreateFunctionOnNamespacedMorph(): void
     {
         $relation = $this->getNamespacedRelation('namespace');
         $created = m::mock('Illuminate\Database\Eloquent\Model');

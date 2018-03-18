@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testLookupDictionaryIsProperlyConstructed()
+    public function testLookupDictionaryIsProperlyConstructed(): void
     {
         $relation = $this->getRelation();
         $relation->addEagerConstraints([
@@ -39,7 +39,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         ], $dictionary);
     }
 
-    public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
+    public function testAssociateMethodSetsForeignKeyAndTypeOnModel(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
@@ -57,7 +57,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $relation->associate($associate);
     }
 
-    public function testAssociateMethodIgnoresNullValue()
+    public function testAssociateMethodIgnoresNullValue(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
@@ -71,7 +71,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $relation->associate(null);
     }
 
-    public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel()
+    public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');

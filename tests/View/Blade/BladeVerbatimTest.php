@@ -4,14 +4,14 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeVerbatimTest extends AbstractBladeTestCase
 {
-    public function testVerbatimBlocksAreCompiled()
+    public function testVerbatimBlocksAreCompiled(): void
     {
         $string = '@verbatim {{ $a }} @if($b) {{ $b }} @endif @endverbatim';
         $expected = ' {{ $a }} @if($b) {{ $b }} @endif ';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testVerbatimBlocksWithMultipleLinesAreCompiled()
+    public function testVerbatimBlocksWithMultipleLinesAreCompiled(): void
     {
         $string = 'Some text
 @verbatim
@@ -30,14 +30,14 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testMultipleVerbatimBlocksAreCompiled()
+    public function testMultipleVerbatimBlocksAreCompiled(): void
     {
         $string = '@verbatim {{ $a }} @endverbatim {{ $b }} @verbatim {{ $c }} @endverbatim';
         $expected = ' {{ $a }}  <?php echo e($b); ?>  {{ $c }} ';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testRawBlocksAreRenderedInTheRightOrder()
+    public function testRawBlocksAreRenderedInTheRightOrder(): void
     {
         $string = '@php echo "#1"; @endphp @verbatim {{ #2 }} @endverbatim @verbatim {{ #3 }} @endverbatim @php echo "#4"; @endphp';
 
@@ -46,7 +46,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
-    public function testMultilineTemplatesWithRawBlocksAreRenderedInTheRightOrder()
+    public function testMultilineTemplatesWithRawBlocksAreRenderedInTheRightOrder(): void
     {
         $string = '{{ $first }}
 @php
@@ -79,7 +79,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
         $this->assertSame($expected, $this->compiler->compileString($string));
     }
 
-    public function testRawBlocksDontGetMixedUpWhenSomeAreRemovedByBladeComments()
+    public function testRawBlocksDontGetMixedUpWhenSomeAreRemovedByBladeComments(): void
     {
         $string = '{{-- @verbatim Block #1 @endverbatim --}} @php "Block #2" @endphp';
         $expected = ' <?php "Block #2" ?>';

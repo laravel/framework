@@ -12,13 +12,13 @@ class RedisCacheIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->setUpRedis();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
         m::close();
@@ -30,7 +30,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testRedisCacheAddTwice($driver)
+    public function testRedisCacheAddTwice($driver): void
     {
         $store = new RedisStore($this->redis[$driver]);
         $repository = new Repository($store);
@@ -46,7 +46,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testRedisCacheAddFalse($driver)
+    public function testRedisCacheAddFalse($driver): void
     {
         $store = new RedisStore($this->redis[$driver]);
         $repository = new Repository($store);
@@ -62,7 +62,7 @@ class RedisCacheIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testRedisCacheAddNull($driver)
+    public function testRedisCacheAddNull($driver): void
     {
         $store = new RedisStore($this->redis[$driver]);
         $repository = new Repository($store);

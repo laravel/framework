@@ -15,7 +15,7 @@ class CacheLockTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,7 +24,7 @@ class CacheLockTest extends TestCase
         }
     }
 
-    public function test_memcached_locks_can_be_acquired_and_released()
+    public function test_memcached_locks_can_be_acquired_and_released(): void
     {
         Cache::store('memcached')->lock('foo')->release();
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->get());
@@ -35,7 +35,7 @@ class CacheLockTest extends TestCase
         Cache::store('memcached')->lock('foo')->release();
     }
 
-    public function test_redis_locks_can_be_acquired_and_released()
+    public function test_redis_locks_can_be_acquired_and_released(): void
     {
         $this->ifRedisAvailable(function () {
             Cache::store('redis')->lock('foo')->release();
@@ -48,7 +48,7 @@ class CacheLockTest extends TestCase
         });
     }
 
-    public function test_memcached_locks_can_block_for_seconds()
+    public function test_memcached_locks_can_block_for_seconds(): void
     {
         Carbon::setTestNow();
 
@@ -61,7 +61,7 @@ class CacheLockTest extends TestCase
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->block(1));
     }
 
-    public function test_redis_locks_can_block_for_seconds()
+    public function test_redis_locks_can_block_for_seconds(): void
     {
         $this->ifRedisAvailable(function () {
             Carbon::setTestNow();
@@ -76,7 +76,7 @@ class CacheLockTest extends TestCase
         });
     }
 
-    public function test_locks_can_run_callbacks()
+    public function test_locks_can_run_callbacks(): void
     {
         Cache::store('memcached')->lock('foo')->release();
         $this->assertEquals('taylor', Cache::store('memcached')->lock('foo', 10)->get(function () {
@@ -87,7 +87,7 @@ class CacheLockTest extends TestCase
     /**
      * @expectedException \Illuminate\Contracts\Cache\LockTimeoutException
      */
-    public function test_locks_throw_timeout_if_block_expires()
+    public function test_locks_throw_timeout_if_block_expires(): void
     {
         Carbon::setTestNow();
 

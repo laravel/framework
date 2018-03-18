@@ -13,12 +13,12 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     protected $related;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBelongsToWithDefault()
+    public function testBelongsToWithDefault(): void
     {
         $relation = $this->getRelation()->withDefault(); //belongsTo relationships
 
@@ -31,7 +31,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame($newModel, $relation->getResults());
     }
 
-    public function testBelongsToWithDynamicDefault()
+    public function testBelongsToWithDynamicDefault(): void
     {
         $relation = $this->getRelation()->withDefault(function ($newModel) {
             $newModel->username = 'taylor';
@@ -48,7 +48,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame('taylor', $newModel->username);
     }
 
-    public function testBelongsToWithArrayDefault()
+    public function testBelongsToWithArrayDefault(): void
     {
         $relation = $this->getRelation()->withDefault(['username' => 'taylor']);
 
@@ -63,7 +63,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertSame('taylor', $newModel->username);
     }
 
-    public function testUpdateMethodRetrievesModelAndUpdates()
+    public function testUpdateMethodRetrievesModelAndUpdates(): void
     {
         $relation = $this->getRelation();
         $mock = m::mock('Illuminate\Database\Eloquent\Model');
@@ -74,7 +74,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertTrue($relation->update(['attributes']));
     }
 
-    public function testEagerConstraintsAreProperlyAdded()
+    public function testEagerConstraintsAreProperlyAdded(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 'foreign.value.two']);
@@ -82,7 +82,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
-    public function testIdsInEagerConstraintsCanBeZero()
+    public function testIdsInEagerConstraintsCanBeZero(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 0]);
@@ -90,7 +90,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
-    public function testRelationIsProperlyInitialized()
+    public function testRelationIsProperlyInitialized(): void
     {
         $relation = $this->getRelation();
         $model = m::mock('Illuminate\Database\Eloquent\Model');
@@ -100,7 +100,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertEquals([$model], $models);
     }
 
-    public function testModelsAreProperlyMatchedToParents()
+    public function testModelsAreProperlyMatchedToParents(): void
     {
         $relation = $this->getRelation();
         $result1 = m::mock('stdClass');
@@ -117,7 +117,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->assertEquals(2, $models[1]->foo->getAttribute('id'));
     }
 
-    public function testAssociateMethodSetsForeignKeyOnModel()
+    public function testAssociateMethodSetsForeignKeyOnModel(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
@@ -130,7 +130,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->associate($associate);
     }
 
-    public function testDissociateMethodUnsetsForeignKeyOnModel()
+    public function testDissociateMethodUnsetsForeignKeyOnModel(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
@@ -140,7 +140,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->dissociate();
     }
 
-    public function testAssociateMethodSetsForeignKeyOnModelById()
+    public function testAssociateMethodSetsForeignKeyOnModelById(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
@@ -149,7 +149,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->associate(1);
     }
 
-    public function testDefaultEagerConstraintsWhenIncrementing()
+    public function testDefaultEagerConstraintsWhenIncrementing(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
@@ -157,7 +157,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
-    public function testDefaultEagerConstraintsWhenIncrementingAndNonIntKeyType()
+    public function testDefaultEagerConstraintsWhenIncrementingAndNonIntKeyType(): void
     {
         $relation = $this->getRelation(null, false, 'string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
@@ -165,7 +165,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $relation->addEagerConstraints($models);
     }
 
-    public function testDefaultEagerConstraintsWhenNotIncrementing()
+    public function testDefaultEagerConstraintsWhenNotIncrementing(): void
     {
         $relation = $this->getRelation(null, false);
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));

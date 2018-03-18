@@ -13,7 +13,7 @@ class FrequencyTest extends TestCase
      */
     protected $event;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->event = new Event(
             m::mock('Illuminate\Console\Scheduling\EventMutex'),
@@ -21,104 +21,104 @@ class FrequencyTest extends TestCase
         );
     }
 
-    public function testEveryMinute()
+    public function testEveryMinute(): void
     {
         $this->assertEquals('* * * * *', $this->event->getExpression());
         $this->assertEquals('* * * * *', $this->event->everyMinute()->getExpression());
     }
 
-    public function testEveryFiveMinutes()
+    public function testEveryFiveMinutes(): void
     {
         $this->assertEquals('*/5 * * * *', $this->event->everyFiveMinutes()->getExpression());
     }
 
-    public function testDaily()
+    public function testDaily(): void
     {
         $this->assertEquals('0 0 * * *', $this->event->daily()->getExpression());
     }
 
-    public function testTwiceDaily()
+    public function testTwiceDaily(): void
     {
         $this->assertEquals('0 3,15 * * *', $this->event->twiceDaily(3, 15)->getExpression());
     }
 
-    public function testOverrideWithHourly()
+    public function testOverrideWithHourly(): void
     {
         $this->assertEquals('0 * * * *', $this->event->everyFiveMinutes()->hourly()->getExpression());
         $this->assertEquals('37 * * * *', $this->event->hourlyAt(37)->getExpression());
     }
 
-    public function testMonthlyOn()
+    public function testMonthlyOn(): void
     {
         $this->assertEquals('0 15 4 * *', $this->event->monthlyOn(4, '15:00')->getExpression());
     }
 
-    public function testTwiceMonthly()
+    public function testTwiceMonthly(): void
     {
         $this->assertEquals('0 0 1,16 * *', $this->event->twiceMonthly(1, 16)->getExpression());
     }
 
-    public function testMonthlyOnWithMinutes()
+    public function testMonthlyOnWithMinutes(): void
     {
         $this->assertEquals('15 15 4 * *', $this->event->monthlyOn(4, '15:15')->getExpression());
     }
 
-    public function testWeekdaysDaily()
+    public function testWeekdaysDaily(): void
     {
         $this->assertEquals('0 0 * * 1-5', $this->event->weekdays()->daily()->getExpression());
     }
 
-    public function testWeekdaysHourly()
+    public function testWeekdaysHourly(): void
     {
         $this->assertEquals('0 * * * 1-5', $this->event->weekdays()->hourly()->getExpression());
     }
 
-    public function testWeekdays()
+    public function testWeekdays(): void
     {
         $this->assertEquals('* * * * 1-5', $this->event->weekdays()->getExpression());
     }
 
-    public function testSundays()
+    public function testSundays(): void
     {
         $this->assertEquals('* * * * 0', $this->event->sundays()->getExpression());
     }
 
-    public function testMondays()
+    public function testMondays(): void
     {
         $this->assertEquals('* * * * 1', $this->event->mondays()->getExpression());
     }
 
-    public function testTuesdays()
+    public function testTuesdays(): void
     {
         $this->assertEquals('* * * * 2', $this->event->tuesdays()->getExpression());
     }
 
-    public function testWednesdays()
+    public function testWednesdays(): void
     {
         $this->assertEquals('* * * * 3', $this->event->wednesdays()->getExpression());
     }
 
-    public function testThursdays()
+    public function testThursdays(): void
     {
         $this->assertEquals('* * * * 4', $this->event->thursdays()->getExpression());
     }
 
-    public function testFridays()
+    public function testFridays(): void
     {
         $this->assertEquals('* * * * 5', $this->event->fridays()->getExpression());
     }
 
-    public function testSaturdays()
+    public function testSaturdays(): void
     {
         $this->assertEquals('* * * * 6', $this->event->saturdays()->getExpression());
     }
 
-    public function testQuarterly()
+    public function testQuarterly(): void
     {
         $this->assertEquals('0 0 1 1-12/3 *', $this->event->quarterly()->getExpression());
     }
 
-    public function testFrequencyMacro()
+    public function testFrequencyMacro(): void
     {
         Event::macro('everyXMinutes', function ($x) {
             return $this->spliceIntoPosition(1, "*/{$x}");

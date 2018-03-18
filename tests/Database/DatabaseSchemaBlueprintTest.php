@@ -12,12 +12,12 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testToSqlRunsCommandsFromBlueprint()
+    public function testToSqlRunsCommandsFromBlueprint(): void
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('statement')->once()->with('foo');
@@ -29,7 +29,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->build($conn, $grammar);
     }
 
-    public function testIndexDefaultNames()
+    public function testIndexDefaultNames(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->unique(['foo', 'bar']);
@@ -47,7 +47,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
-    public function testDropIndexDefaultNames()
+    public function testDropIndexDefaultNames(): void
     {
         $blueprint = new Blueprint('users');
         $blueprint->dropUnique(['foo', 'bar']);
@@ -65,7 +65,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
-    public function testDefaultCurrentTimestamp()
+    public function testDefaultCurrentTimestamp(): void
     {
         $base = new Blueprint('users', function ($table) {
             $table->timestamp('created')->useCurrent();
@@ -86,7 +86,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table "users" add "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SqlServerGrammar));
     }
 
-    public function testUnsignedDecimalTable()
+    public function testUnsignedDecimalTable(): void
     {
         $base = new Blueprint('users', function ($table) {
             $table->unsignedDecimal('money', 10, 2)->useCurrent();

@@ -11,12 +11,12 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testSetRelationFail()
+    public function testSetRelationFail(): void
     {
         $parent = new EloquentRelationResetModelStub;
         $relation = new EloquentRelationResetModelStub;
@@ -25,7 +25,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertArrayNotHasKey('foo', $parent->toArray());
     }
 
-    public function testTouchMethodUpdatesRelatedTimestamps()
+    public function testTouchMethodUpdatesRelatedTimestamps(): void
     {
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
@@ -44,7 +44,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation->touch();
     }
 
-    public function testSettingMorphMapWithNumericArrayUsesTheTableNames()
+    public function testSettingMorphMapWithNumericArrayUsesTheTableNames(): void
     {
         Relation::morphMap([EloquentRelationResetModelStub::class]);
 
@@ -55,7 +55,7 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
-    public function testSettingMorphMapWithNumericKeys()
+    public function testSettingMorphMapWithNumericKeys(): void
     {
         Relation::morphMap([1 => 'App\User']);
 
@@ -66,7 +66,7 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([], false);
     }
 
-    public function testMacroable()
+    public function testMacroable(): void
     {
         Relation::macro('foo', function () {
             return 'foo';

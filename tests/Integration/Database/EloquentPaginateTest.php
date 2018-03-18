@@ -11,7 +11,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentPaginateTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -22,7 +22,7 @@ class EloquentPaginateTest extends DatabaseTestCase
         });
     }
 
-    public function test_pagination_on_top_of_columns()
+    public function test_pagination_on_top_of_columns(): void
     {
         for ($i = 1; $i <= 50; $i++) {
             Post::create([

@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicCount()
+    public function testBasicCount(): void
     {
         $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
         $verifier->setConnection('connection');
@@ -31,7 +31,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $this->assertEquals(100, $verifier->getCount('table', 'column', 'value', null, null, $extra));
     }
 
-    public function testBasicCountWithClosures()
+    public function testBasicCountWithClosures(): void
     {
         $verifier = new \Illuminate\Validation\DatabasePresenceVerifier($db = m::mock('Illuminate\Database\ConnectionResolverInterface'));
         $verifier->setConnection('connection');

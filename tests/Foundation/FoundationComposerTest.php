@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationComposerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testDumpAutoloadRunsTheCorrectCommand()
+    public function testDumpAutoloadRunsTheCorrectCommand(): void
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';
 
@@ -26,7 +26,7 @@ class FoundationComposerTest extends TestCase
         $composer->dumpAutoloads();
     }
 
-    public function testDumpAutoloadRunsTheCorrectCommandWhenComposerIsntPresent()
+    public function testDumpAutoloadRunsTheCorrectCommandWhenComposerIsntPresent(): void
     {
         $composer = $this->getMockBuilder('Illuminate\Support\Composer')->setMethods(['getProcess'])->setConstructorArgs([$files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__])->getMock();
         $files->shouldReceive('exists')->once()->with(__DIR__.'/composer.phar')->andReturn(false);

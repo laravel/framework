@@ -23,7 +23,7 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -44,7 +44,7 @@ class InteractsWithAuthenticationTest extends TestCase
         ]);
     }
 
-    public function test_acting_as_is_properly_handled_for_session_auth()
+    public function test_acting_as_is_properly_handled_for_session_auth(): void
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;
@@ -58,7 +58,7 @@ class InteractsWithAuthenticationTest extends TestCase
             ->assertSeeText('Hello taylorotwell');
     }
 
-    public function test_acting_as_is_properly_handled_for_auth_via_request()
+    public function test_acting_as_is_properly_handled_for_auth_via_request(): void
     {
         Route::get('me', function (Request $request) {
             return 'Hello '.$request->user()->username;

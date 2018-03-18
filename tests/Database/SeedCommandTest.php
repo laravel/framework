@@ -11,7 +11,7 @@ use Illuminate\Database\ConnectionResolverInterface;
 
 class SeedCommandTest extends TestCase
 {
-    public function testHandle()
+    public function testHandle(): void
     {
         $seeder = Mockery::mock(Seeder::class);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
@@ -36,7 +36,7 @@ class SeedCommandTest extends TestCase
         $container->shouldHaveReceived('call')->with([$command, 'handle']);
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Mockery::close();
     }

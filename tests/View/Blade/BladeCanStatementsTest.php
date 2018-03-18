@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeCanStatementsTest extends AbstractBladeTestCase
 {
-    public function testCanStatementsAreCompiled()
+    public function testCanStatementsAreCompiled(): void
     {
         $string = '@can (\'update\', [$post])
 breeze

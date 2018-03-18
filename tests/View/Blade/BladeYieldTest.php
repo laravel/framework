@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeYieldTest extends AbstractBladeTestCase
 {
-    public function testYieldsAreCompiled()
+    public function testYieldsAreCompiled(): void
     {
         $this->assertEquals('<?php echo $__env->yieldContent(\'foo\'); ?>', $this->compiler->compileString('@yield(\'foo\')'));
         $this->assertEquals('<?php echo $__env->yieldContent(\'foo\', \'bar\'); ?>', $this->compiler->compileString('@yield(\'foo\', \'bar\')'));

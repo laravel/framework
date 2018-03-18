@@ -18,7 +18,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -44,13 +44,13 @@ class DatabaseMigratorIntegrationTest extends TestCase
         }
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         \Illuminate\Support\Facades\Facade::clearResolvedInstances();
         \Illuminate\Support\Facades\Facade::setFacadeApplication(null);
     }
 
-    public function testBasicMigrationOfSingleFolder()
+    public function testBasicMigrationOfSingleFolder(): void
     {
         $ran = $this->migrator->run([__DIR__.'/migrations/one']);
 
@@ -61,7 +61,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue(Str::contains($ran[1], 'password_resets'));
     }
 
-    public function testMigrationsCanBeRolledBack()
+    public function testMigrationsCanBeRolledBack(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
@@ -74,7 +74,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue(Str::contains($rolledBack[1], 'users'));
     }
 
-    public function testMigrationsCanBeReset()
+    public function testMigrationsCanBeReset(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
@@ -87,7 +87,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue(Str::contains($rolledBack[1], 'users'));
     }
 
-    public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist()
+    public function testNoErrorIsThrownWhenNoOutstandingMigrationsExist(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
@@ -95,7 +95,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->run([__DIR__.'/migrations/one']);
     }
 
-    public function testNoErrorIsThrownWhenNothingToRollback()
+    public function testNoErrorIsThrownWhenNothingToRollback(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
@@ -106,7 +106,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->migrator->rollback([__DIR__.'/migrations/one']);
     }
 
-    public function testMigrationsCanRunAcrossMultiplePaths()
+    public function testMigrationsCanRunAcrossMultiplePaths(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
@@ -114,7 +114,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertTrue($this->db->schema()->hasTable('flights'));
     }
 
-    public function testMigrationsCanBeRolledBackAcrossMultiplePaths()
+    public function testMigrationsCanBeRolledBackAcrossMultiplePaths(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
         $this->assertTrue($this->db->schema()->hasTable('users'));
@@ -126,7 +126,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db->schema()->hasTable('flights'));
     }
 
-    public function testMigrationsCanBeResetAcrossMultiplePaths()
+    public function testMigrationsCanBeResetAcrossMultiplePaths(): void
     {
         $this->migrator->run([__DIR__.'/migrations/one', __DIR__.'/migrations/two']);
         $this->assertTrue($this->db->schema()->hasTable('users'));

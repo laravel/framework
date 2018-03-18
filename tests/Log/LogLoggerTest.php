@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class LogLoggerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testMethodsPassErrorAdditionsToMonolog()
+    public function testMethodsPassErrorAdditionsToMonolog(): void
     {
         $writer = new Logger($monolog = m::mock('Monolog\Logger'));
         $monolog->shouldReceive('error')->once()->with('foo', []);
@@ -21,7 +21,7 @@ class LogLoggerTest extends TestCase
         $writer->error('foo');
     }
 
-    public function testLoggerFiresEventsDispatcher()
+    public function testLoggerFiresEventsDispatcher(): void
     {
         $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = new \Illuminate\Events\Dispatcher);
         $monolog->shouldReceive('error')->once()->with('foo', []);
@@ -48,14 +48,14 @@ class LogLoggerTest extends TestCase
      * @expectedException \RuntimeException
      * @expectedExceptionMessage Events dispatcher has not been set.
      */
-    public function testListenShortcutFailsWithNoDispatcher()
+    public function testListenShortcutFailsWithNoDispatcher(): void
     {
         $writer = new Logger($monolog = m::mock('Monolog\Logger'));
         $writer->listen(function () {
         });
     }
 
-    public function testListenShortcut()
+    public function testListenShortcut(): void
     {
         $writer = new Logger($monolog = m::mock('Monolog\Logger'), $events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
 

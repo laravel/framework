@@ -12,7 +12,7 @@ use Illuminate\Tests\Integration\Database\DatabaseTestCase;
  */
 class EloquentModelDateCastingTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -23,7 +23,7 @@ class EloquentModelDateCastingTest extends DatabaseTestCase
         });
     }
 
-    public function test_dates_are_custom_castable()
+    public function test_dates_are_custom_castable(): void
     {
         $user = TestModel1::create([
             'date_field' => '2019-10-01',

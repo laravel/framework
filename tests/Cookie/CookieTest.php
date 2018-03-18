@@ -9,12 +9,12 @@ use Symfony\Component\HttpFoundation\Request;
 
 class CookieTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCookiesAreCreatedWithProperOptions()
+    public function testCookiesAreCreatedWithProperOptions(): void
     {
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('foo', 'bar');
@@ -39,7 +39,7 @@ class CookieTest extends TestCase
         $this->assertTrue($c3->getExpiresTime() < time());
     }
 
-    public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain()
+    public function testCookiesAreCreatedWithProperOptionsUsingDefaultPathAndDomain(): void
     {
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
@@ -51,7 +51,7 @@ class CookieTest extends TestCase
         $this->assertEquals('lax', $c->getSameSite());
     }
 
-    public function testCookiesCanSetSecureOptionUsingDefaultPathAndDomain()
+    public function testCookiesCanSetSecureOptionUsingDefaultPathAndDomain(): void
     {
         $cookie = $this->getCreator();
         $cookie->setDefaultPathAndDomain('/path', '/domain', true, 'lax');
@@ -63,7 +63,7 @@ class CookieTest extends TestCase
         $this->assertEquals('lax', $c->getSameSite());
     }
 
-    public function testQueuedCookies()
+    public function testQueuedCookies(): void
     {
         $cookie = $this->getCreator();
         $this->assertEmpty($cookie->getQueuedCookies());
@@ -78,7 +78,7 @@ class CookieTest extends TestCase
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\Cookie', $cookie->queued('qu'));
     }
 
-    public function testUnqueue()
+    public function testUnqueue(): void
     {
         $cookie = $this->getCreator();
         $cookie->queue($cookie->make('foo', 'bar'));

@@ -20,14 +20,14 @@ class RedisQueueIntegrationTest extends TestCase
      */
     private $queue;
 
-    public function setUp()
+    public function setUp(): void
     {
         Carbon::setTestNow(Carbon::now());
         parent::setUp();
         $this->setUpRedis();
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Carbon::setTestNow(null);
         parent::tearDown();
@@ -40,7 +40,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testExpiredJobsArePopped($driver)
+    public function testExpiredJobsArePopped($driver): void
     {
         $this->setQueue($driver);
 
@@ -70,7 +70,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testPopProperlyPopsJobOffOfRedis($driver)
+    public function testPopProperlyPopsJobOffOfRedis($driver): void
     {
         $this->setQueue($driver);
 
@@ -105,7 +105,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testPopProperlyPopsDelayedJobOffOfRedis($driver)
+    public function testPopProperlyPopsDelayedJobOffOfRedis($driver): void
     {
         $this->setQueue($driver);
         // Push an item into queue
@@ -132,7 +132,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testPopPopsDelayedJobOffOfRedisWhenExpireNull($driver)
+    public function testPopPopsDelayedJobOffOfRedisWhenExpireNull($driver): void
     {
         $this->queue = new RedisQueue($this->redis[$driver], 'default', null, null);
         $this->queue->setContainer(m::mock(Container::class));
@@ -161,7 +161,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testNotExpireJobsWhenExpireNull($driver)
+    public function testNotExpireJobsWhenExpireNull($driver): void
     {
         $this->queue = new RedisQueue($this->redis[$driver], 'default', null, null);
         $this->queue->setContainer(m::mock(Container::class));
@@ -205,7 +205,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testExpireJobsWhenExpireSet($driver)
+    public function testExpireJobsWhenExpireSet($driver): void
     {
         $this->queue = new RedisQueue($this->redis[$driver], 'default', null, 30);
         $this->queue->setContainer(m::mock(Container::class));
@@ -234,7 +234,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testRelease($driver)
+    public function testRelease($driver): void
     {
         $this->setQueue($driver);
 
@@ -275,7 +275,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testReleaseInThePast($driver)
+    public function testReleaseInThePast($driver): void
     {
         $this->setQueue($driver);
         $job = new RedisQueueIntegrationTestJob(30);
@@ -293,7 +293,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testDelete($driver)
+    public function testDelete($driver): void
     {
         $this->setQueue($driver);
 
@@ -317,7 +317,7 @@ class RedisQueueIntegrationTest extends TestCase
      *
      * @param string $driver
      */
-    public function testSize($driver)
+    public function testSize($driver): void
     {
         $this->setQueue($driver);
         $this->assertEquals(0, $this->queue->size());

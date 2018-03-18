@@ -16,7 +16,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $this->db = $db = new DB;
 
@@ -32,13 +32,13 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         Facade::setFacadeApplication($container);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Facade::clearResolvedInstances();
         Facade::setFacadeApplication(null);
     }
 
-    public function testDropAllTablesWorksWithForeignKeys()
+    public function testDropAllTablesWorksWithForeignKeys(): void
     {
         $this->db->connection()->getSchemaBuilder()->create('table1', function ($table) {
             $table->integer('id');
@@ -60,7 +60,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
         $this->assertFalse($this->db->connection()->getSchemaBuilder()->hasTable('table2'));
     }
 
-    public function testHasColumnWithTablePrefix()
+    public function testHasColumnWithTablePrefix(): void
     {
         $this->db->connection()->setTablePrefix('test_');
 

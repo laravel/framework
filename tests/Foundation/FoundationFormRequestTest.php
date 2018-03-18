@@ -18,14 +18,14 @@ class FoundationFormRequestTest extends TestCase
 {
     protected $mocks = [];
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
 
         $this->mocks = [];
     }
 
-    public function test_validated_method_returns_the_validated_data()
+    public function test_validated_method_returns_the_validated_data(): void
     {
         $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
 
@@ -37,7 +37,7 @@ class FoundationFormRequestTest extends TestCase
     /**
      * @expectedException \Illuminate\Validation\ValidationException
      */
-    public function test_validate_throws_when_validation_fails()
+    public function test_validate_throws_when_validation_fails(): void
     {
         $request = $this->createRequest(['no' => 'name']);
 
@@ -50,12 +50,12 @@ class FoundationFormRequestTest extends TestCase
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage This action is unauthorized.
      */
-    public function test_validate_method_throws_when_authorization_fails()
+    public function test_validate_method_throws_when_authorization_fails(): void
     {
         $this->createRequest([], FoundationTestFormRequestForbiddenStub::class)->validateResolved();
     }
 
-    public function test_prepare_for_validation_runs_before_validation()
+    public function test_prepare_for_validation_runs_before_validation(): void
     {
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
     }

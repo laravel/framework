@@ -10,12 +10,12 @@ use Illuminate\Config\Repository as Config;
 
 class BusDispatcherTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCommandsThatShouldQueueIsQueued()
+    public function testCommandsThatShouldQueueIsQueued(): void
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -28,7 +28,7 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(m::mock('Illuminate\Contracts\Queue\ShouldQueue'));
     }
 
-    public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler()
+    public function testCommandsThatShouldQueueIsQueuedUsingCustomHandler(): void
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -41,7 +41,7 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(new BusDispatcherTestCustomQueueCommand);
     }
 
-    public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay()
+    public function testCommandsThatShouldQueueIsQueuedUsingCustomQueueAndDelay(): void
     {
         $container = new Container;
         $dispatcher = new Dispatcher($container, function () {
@@ -54,7 +54,7 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(new BusDispatcherTestSpecificQueueAndDelayCommand);
     }
 
-    public function testDispatchNowShouldNeverQueue()
+    public function testDispatchNowShouldNeverQueue(): void
     {
         $container = new Container;
         $mock = m::mock('Illuminate\Contracts\Queue\Queue');
@@ -66,7 +66,7 @@ class BusDispatcherTest extends TestCase
         $dispatcher->dispatch(new BusDispatcherBasicCommand);
     }
 
-    public function testDispatcherCanDispatchStandAloneHandler()
+    public function testDispatcherCanDispatchStandAloneHandler(): void
     {
         $container = new Container;
         $mock = m::mock('Illuminate\Contracts\Queue\Queue');
@@ -81,7 +81,7 @@ class BusDispatcherTest extends TestCase
         $this->assertInstanceOf(StandAloneCommand::class, $response);
     }
 
-    public function testOnConnectionOnJobWhenDispatching()
+    public function testOnConnectionOnJobWhenDispatching(): void
     {
         $container = new Container;
         $container->singleton('config', function () {

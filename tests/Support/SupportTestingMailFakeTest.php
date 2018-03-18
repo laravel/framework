@@ -11,14 +11,14 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class MailFakeTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
         $this->fake = new MailFake;
         $this->mailable = new MailableStub;
     }
 
-    public function testAssertSent()
+    public function testAssertSent(): void
     {
         try {
             $this->fake->assertSent(MailableStub::class);
@@ -32,7 +32,7 @@ class MailFakeTest extends TestCase
         $this->fake->assertSent(MailableStub::class);
     }
 
-    public function testAssertNotSent()
+    public function testAssertNotSent(): void
     {
         $this->fake->assertNotSent(MailableStub::class);
 
@@ -46,7 +46,7 @@ class MailFakeTest extends TestCase
         }
     }
 
-    public function testAssertSentTimes()
+    public function testAssertSentTimes(): void
     {
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
         $this->fake->to('taylor@laravel.com')->send($this->mailable);
@@ -61,7 +61,7 @@ class MailFakeTest extends TestCase
         $this->fake->assertSent(MailableStub::class, 2);
     }
 
-    public function testAssertQueued()
+    public function testAssertQueued(): void
     {
         try {
             $this->fake->assertQueued(MailableStub::class);
@@ -75,7 +75,7 @@ class MailFakeTest extends TestCase
         $this->fake->assertQueued(MailableStub::class);
     }
 
-    public function testAssertQueuedTimes()
+    public function testAssertQueuedTimes(): void
     {
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
         $this->fake->to('taylor@laravel.com')->queue($this->mailable);
@@ -90,7 +90,7 @@ class MailFakeTest extends TestCase
         $this->fake->assertQueued(MailableStub::class, 2);
     }
 
-    public function testSendQueuesAMailableThatShouldBeQueued()
+    public function testSendQueuesAMailableThatShouldBeQueued(): void
     {
         $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub);
 
@@ -104,7 +104,7 @@ class MailFakeTest extends TestCase
         }
     }
 
-    public function testAssertNothingSent()
+    public function testAssertNothingSent(): void
     {
         $this->fake->assertNothingSent();
 

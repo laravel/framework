@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testPropertiesAreSetCorrectly()
+    public function testPropertiesAreSetCorrectly(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
@@ -27,7 +27,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertTrue($pivot->exists);
     }
 
-    public function testMutatorsAreCalledFromConstructor()
+    public function testMutatorsAreCalledFromConstructor(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -37,7 +37,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertTrue($pivot->getMutatorCalled());
     }
 
-    public function testFromRawAttributesDoesNotDoubleMutate()
+    public function testFromRawAttributesDoesNotDoubleMutate(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -47,7 +47,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals(['name' => 'Taylor'], $pivot->foo);
     }
 
-    public function testFromRawAttributesDoesNotMutate()
+    public function testFromRawAttributesDoesNotMutate(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -57,7 +57,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertFalse($pivot->getMutatorCalled());
     }
 
-    public function testPropertiesUnchangedAreNotDirty()
+    public function testPropertiesUnchangedAreNotDirty(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -66,7 +66,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals([], $pivot->getDirty());
     }
 
-    public function testPropertiesChangedAreDirty()
+    public function testPropertiesChangedAreDirty(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -76,7 +76,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals(['shimy' => 'changed'], $pivot->getDirty());
     }
 
-    public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
+    public function testTimestampPropertyIsSetIfCreatedAtInAttributes(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
@@ -88,7 +88,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertFalse($pivot->timestamps);
     }
 
-    public function testKeysCanBeSetProperly()
+    public function testKeysCanBeSetProperly(): void
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
@@ -99,7 +99,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertEquals('other', $pivot->getOtherKey());
     }
 
-    public function testDeleteMethodDeletesModelByKeys()
+    public function testDeleteMethodDeletesModelByKeys(): void
     {
         $pivot = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\Pivot')->setMethods(['newQuery'])->getMock();
         $pivot->setPivotKeys('foreign', 'other');
@@ -113,7 +113,7 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertTrue($pivot->delete());
     }
 
-    public function testPivotModelTableNameIsSingular()
+    public function testPivotModelTableNameIsSingular(): void
     {
         $pivot = new Pivot();
 

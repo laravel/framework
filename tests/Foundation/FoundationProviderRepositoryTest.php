@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
+    public function testServicesAreRegisteredWhenManifestIsNotRecompiled(): void
     {
         $app = m::mock('Illuminate\Foundation\Application');
 
@@ -28,7 +28,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo->load([]);
     }
 
-    public function testManifestIsProperlyRecompiled()
+    public function testManifestIsProperlyRecompiled(): void
     {
         $app = m::mock('Illuminate\Foundation\Application');
 
@@ -57,7 +57,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $manifest = $repo->load(['foo', 'bar']);
     }
 
-    public function testShouldRecompileReturnsCorrectValue()
+    public function testShouldRecompileReturnsCorrectValue(): void
     {
         $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), new \Illuminate\Filesystem\Filesystem, __DIR__.'/services.php');
         $this->assertTrue($repo->shouldRecompile(null, []));
@@ -65,7 +65,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $this->assertFalse($repo->shouldRecompile(['providers' => ['foo']], ['foo']));
     }
 
-    public function testLoadManifestReturnsParsedJSON()
+    public function testLoadManifestReturnsParsedJSON(): void
     {
         $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
         $files->shouldReceive('exists')->once()->with(__DIR__.'/services.php')->andReturn(true);
@@ -74,7 +74,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $this->assertEquals($array, $repo->loadManifest());
     }
 
-    public function testWriteManifestStoresToProperLocation()
+    public function testWriteManifestStoresToProperLocation(): void
     {
         $repo = new \Illuminate\Foundation\ProviderRepository(m::mock('Illuminate\Contracts\Foundation\Application'), $files = m::mock('Illuminate\Filesystem\Filesystem'), __DIR__.'/services.php');
         $files->shouldReceive('put')->once()->with(__DIR__.'/services.php', '<?php return '.var_export(['foo'], true).';');

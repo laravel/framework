@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Route;
  */
 class RouteViewTest extends TestCase
 {
-    public function test_route_view()
+    public function test_route_view(): void
     {
         Route::view('route', 'view', ['foo' => 'bar']);
 
@@ -20,7 +20,7 @@ class RouteViewTest extends TestCase
         $this->assertContains('Test bar', $this->get('/route')->getContent());
     }
 
-    public function test_route_view_with_params()
+    public function test_route_view_with_params(): void
     {
         Route::view('route/{param}/{param2?}', 'view', ['foo' => 'bar']);
 

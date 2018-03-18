@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
  */
 class FluentRoutingTest extends TestCase
 {
-    public function test_middleware_run_when_registered_as_array_or_params()
+    public function test_middleware_run_when_registered_as_array_or_params(): void
     {
         Route::middleware(Middleware::class, Middleware2::class)
             ->get('one', function () {

@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testApplyingScopeToABuilder()
+    public function testApplyingScopeToABuilder(): void
     {
         $scope = m::mock('Illuminate\Database\Eloquent\SoftDeletingScope[extend]');
         $builder = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -23,7 +23,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $scope->apply($builder, $model);
     }
 
-    public function testRestoreExtension()
+    public function testRestoreExtension(): void
     {
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
             m::mock('Illuminate\Database\ConnectionInterface'),
@@ -42,7 +42,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $callback($givenBuilder);
     }
 
-    public function testWithTrashedExtension()
+    public function testWithTrashedExtension(): void
     {
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
             m::mock('Illuminate\Database\ConnectionInterface'),
@@ -60,7 +60,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $this->assertEquals($givenBuilder, $result);
     }
 
-    public function testOnlyTrashedExtension()
+    public function testOnlyTrashedExtension(): void
     {
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
             m::mock('Illuminate\Database\ConnectionInterface'),
@@ -83,7 +83,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
         $this->assertEquals($givenBuilder, $result);
     }
 
-    public function testWithoutTrashedExtension()
+    public function testWithoutTrashedExtension(): void
     {
         $builder = new \Illuminate\Database\Eloquent\Builder(new \Illuminate\Database\Query\Builder(
             m::mock('Illuminate\Database\ConnectionInterface'),

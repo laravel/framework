@@ -8,12 +8,12 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeIfGuestStatementsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testIfStatementsAreCompiled()
+    public function testIfStatementsAreCompiled(): void
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);
         $string = '@guest("api")

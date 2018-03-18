@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeExtendsTest extends AbstractBladeTestCase
 {
-    public function testExtendsAreCompiled()
+    public function testExtendsAreCompiled(): void
     {
         $string = '@extends(\'foo\')
 test';
@@ -16,7 +16,7 @@ test';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
-    public function testSequentialCompileStringCalls()
+    public function testSequentialCompileStringCalls(): void
     {
         $string = '@extends(\'foo\')
 test';

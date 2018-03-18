@@ -8,12 +8,12 @@ use Illuminate\View\Engines\PhpEngine;
 
 class ViewPhpEngineTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testViewsMayBeProperlyRendered()
+    public function testViewsMayBeProperlyRendered(): void
     {
         $engine = new PhpEngine;
         $this->assertEquals('Hello World

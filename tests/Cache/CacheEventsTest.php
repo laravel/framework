@@ -11,12 +11,12 @@ use Illuminate\Cache\Events\KeyForgotten;
 
 class CacheEventsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testHasTriggersEvents()
+    public function testHasTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -34,7 +34,7 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->tags('taylor')->has('baz'));
     }
 
-    public function testGetTriggersEvents()
+    public function testGetTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -52,7 +52,7 @@ class CacheEventsTest extends TestCase
         $this->assertEquals('qux', $repository->tags('taylor')->get('baz'));
     }
 
-    public function testPullTriggersEvents()
+    public function testPullTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -62,7 +62,7 @@ class CacheEventsTest extends TestCase
         $this->assertEquals('qux', $repository->pull('baz'));
     }
 
-    public function testPullTriggersEventsUsingTags()
+    public function testPullTriggersEventsUsingTags(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -72,7 +72,7 @@ class CacheEventsTest extends TestCase
         $this->assertEquals('qux', $repository->tags('taylor')->pull('baz'));
     }
 
-    public function testPutTriggersEvents()
+    public function testPutTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -84,7 +84,7 @@ class CacheEventsTest extends TestCase
         $repository->tags('taylor')->put('foo', 'bar', 99);
     }
 
-    public function testAddTriggersEvents()
+    public function testAddTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -98,7 +98,7 @@ class CacheEventsTest extends TestCase
         $this->assertTrue($repository->tags('taylor')->add('foo', 'bar', 99));
     }
 
-    public function testForeverTriggersEvents()
+    public function testForeverTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -110,7 +110,7 @@ class CacheEventsTest extends TestCase
         $repository->tags('taylor')->forever('foo', 'bar');
     }
 
-    public function testRememberTriggersEvents()
+    public function testRememberTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -128,7 +128,7 @@ class CacheEventsTest extends TestCase
         }));
     }
 
-    public function testRememberForeverTriggersEvents()
+    public function testRememberForeverTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);
@@ -146,7 +146,7 @@ class CacheEventsTest extends TestCase
         }));
     }
 
-    public function testForgetTriggersEvents()
+    public function testForgetTriggersEvents(): void
     {
         $dispatcher = $this->getDispatcher();
         $repository = $this->getRepository($dispatcher);

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ViewEngineResolverTest extends TestCase
 {
-    public function testResolversMayBeResolved()
+    public function testResolversMayBeResolved(): void
     {
         $resolver = new \Illuminate\View\Engines\EngineResolver;
         $resolver->register('foo', function () {
@@ -21,7 +21,7 @@ class ViewEngineResolverTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testResolverThrowsExceptionOnUnknownEngine()
+    public function testResolverThrowsExceptionOnUnknownEngine(): void
     {
         $resolver = new \Illuminate\View\Engines\EngineResolver;
         $resolver->resolve('foo');

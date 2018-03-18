@@ -8,12 +8,12 @@ use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class DatabaseMigrationMakeCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicCreateDumpsAutoload()
+    public function testBasicCreateDumpsAutoload(): void
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
@@ -28,7 +28,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_foo']);
     }
 
-    public function testBasicCreateGivesCreatorProperArguments()
+    public function testBasicCreateGivesCreatorProperArguments(): void
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
@@ -42,7 +42,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_foo']);
     }
 
-    public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase()
+    public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase(): void
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
@@ -56,7 +56,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'CreateFoo']);
     }
 
-    public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
+    public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet(): void
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
@@ -70,7 +70,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
     }
 
-    public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound()
+    public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound(): void
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
@@ -84,7 +84,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_users_table']);
     }
 
-    public function testCanSpecifyPathToCreateMigrationsIn()
+    public function testCanSpecifyPathToCreateMigrationsIn(): void
     {
         $command = new MigrateMakeCommand(
             $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),

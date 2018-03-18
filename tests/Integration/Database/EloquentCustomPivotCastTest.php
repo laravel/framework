@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         });
     }
 
-    public function test_casts_are_respected_on_attach()
+    public function test_casts_are_respected_on_attach(): void
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -47,7 +47,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_attach_array()
+    public function test_casts_are_respected_on_attach_array(): void
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -71,7 +71,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_sync()
+    public function test_casts_are_respected_on_sync(): void
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -87,7 +87,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['foo' => 'bar'], $project->collaborators[0]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_sync_array()
+    public function test_casts_are_respected_on_sync_array(): void
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -111,7 +111,7 @@ class EloquentCustomPivotCastTest extends DatabaseTestCase
         $this->assertEquals(['baz' => 'bar'], $project->collaborators[1]->pivot->permissions);
     }
 
-    public function test_casts_are_respected_on_sync_array_while_updating_existing()
+    public function test_casts_are_respected_on_sync_array_while_updating_existing(): void
     {
         $user = CustomPivotCastTestUser::forceCreate([
             'email' => 'taylor@laravel.com',

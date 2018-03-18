@@ -9,12 +9,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testPushProperlyPushesJobOntoDatabase()
+    public function testPushProperlyPushesJobOntoDatabase(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock('Illuminate\Database\Connection'), 'table', 'default'])->getMock();
         $queue->expects($this->any())->method('currentTime')->will($this->returnValue('time'));
@@ -30,7 +30,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->push('foo', ['data']);
     }
 
-    public function testDelayedPushProperlyPushesJobOntoDatabase()
+    public function testDelayedPushProperlyPushesJobOntoDatabase(): void
     {
         $queue = $this->getMockBuilder(
             'Illuminate\Queue\DatabaseQueue')->setMethods(
@@ -50,7 +50,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->later(10, 'foo', ['data']);
     }
 
-    public function testFailureToCreatePayloadFromObject()
+    public function testFailureToCreatePayloadFromObject(): void
     {
         $this->expectException('InvalidArgumentException');
 
@@ -67,7 +67,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         ]);
     }
 
-    public function testFailureToCreatePayloadFromArray()
+    public function testFailureToCreatePayloadFromArray(): void
     {
         $this->expectException('InvalidArgumentException');
 
@@ -81,7 +81,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         ]);
     }
 
-    public function testBulkBatchPushesOntoDatabase()
+    public function testBulkBatchPushesOntoDatabase(): void
     {
         $database = m::mock('Illuminate\Database\Connection');
         $queue = $this->getMockBuilder('Illuminate\Queue\DatabaseQueue')->setMethods(['currentTime', 'availableAt'])->setConstructorArgs([$database, 'table', 'default'])->getMock();
@@ -109,7 +109,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->bulk(['foo', 'bar'], ['data'], 'queue');
     }
 
-    public function testBuildDatabaseRecordWithPayloadAtTheEnd()
+    public function testBuildDatabaseRecordWithPayloadAtTheEnd(): void
     {
         $queue = m::mock('Illuminate\Queue\DatabaseQueue');
         $record = $queue->buildDatabaseRecord('queue', 'any_payload', 0);

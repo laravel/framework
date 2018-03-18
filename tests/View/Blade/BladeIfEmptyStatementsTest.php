@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeIfEmptyStatementsTest extends AbstractBladeTestCase
 {
-    public function testIfStatementsAreCompiled()
+    public function testIfStatementsAreCompiled(): void
     {
         $string = '@empty ($test)
 breeze

@@ -9,12 +9,12 @@ use Illuminate\Database\Console\Migrations\MigrateCommand;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicMigrationsCallMigratorWithProperArguments()
+    public function testBasicMigrationsCallMigratorWithProperArguments(): void
     {
         $command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -29,7 +29,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command);
     }
 
-    public function testMigrationRepositoryCreatedWhenNecessary()
+    public function testMigrationRepositoryCreatedWhenNecessary(): void
     {
         $params = [$migrator = m::mock('Illuminate\Database\Migrations\Migrator')];
         $command = $this->getMockBuilder('Illuminate\Database\Console\Migrations\MigrateCommand')->setMethods(['call'])->setConstructorArgs($params)->getMock();
@@ -46,7 +46,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command);
     }
 
-    public function testTheCommandMayBePretended()
+    public function testTheCommandMayBePretended(): void
     {
         $command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -61,7 +61,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command, ['--pretend' => true]);
     }
 
-    public function testTheDatabaseMayBeSet()
+    public function testTheDatabaseMayBeSet(): void
     {
         $command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);
@@ -76,7 +76,7 @@ class DatabaseMigrationMigrateCommandTest extends TestCase
         $this->runCommand($command, ['--database' => 'foo']);
     }
 
-    public function testStepMayBeSet()
+    public function testStepMayBeSet(): void
     {
         $command = new MigrateCommand($migrator = m::mock('Illuminate\Database\Migrations\Migrator'));
         $app = new ApplicationDatabaseMigrationStub(['path.database' => __DIR__]);

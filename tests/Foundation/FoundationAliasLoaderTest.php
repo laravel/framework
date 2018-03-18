@@ -7,7 +7,7 @@ use Illuminate\Foundation\AliasLoader;
 
 class FoundationAliasLoaderTest extends TestCase
 {
-    public function testLoaderCanBeCreatedAndRegisteredOnce()
+    public function testLoaderCanBeCreatedAndRegisteredOnce(): void
     {
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
 
@@ -18,7 +18,7 @@ class FoundationAliasLoaderTest extends TestCase
         $this->assertTrue($loader->isRegistered());
     }
 
-    public function testGetInstanceCreatesOneInstance()
+    public function testGetInstanceCreatesOneInstance(): void
     {
         $loader = AliasLoader::getInstance(['foo' => 'bar']);
         $this->assertSame($loader, AliasLoader::getInstance());

@@ -7,17 +7,17 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class LengthAwarePaginatorTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         unset($this->p);
     }
 
-    public function testLengthAwarePaginatorGetAndSetPageName()
+    public function testLengthAwarePaginatorGetAndSetPageName(): void
     {
         $this->assertEquals('page', $this->p->getPageName());
 
@@ -25,7 +25,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEquals('p', $this->p->getPageName());
     }
 
-    public function testLengthAwarePaginatorCanGiveMeRelevantPageInformation()
+    public function testLengthAwarePaginatorCanGiveMeRelevantPageInformation(): void
     {
         $this->assertEquals(2, $this->p->lastPage());
         $this->assertEquals(2, $this->p->currentPage());
@@ -34,7 +34,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEquals(['item1', 'item2', 'item3', 'item4'], $this->p->items());
     }
 
-    public function testLengthAwarePaginatorSetCorrectInformationWithNoItems()
+    public function testLengthAwarePaginatorSetCorrectInformationWithNoItems(): void
     {
         $paginator = new LengthAwarePaginator([], 0, 2, 1);
 
@@ -45,7 +45,7 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEmpty($paginator->items());
     }
 
-    public function testLengthAwarePaginatorCanGenerateUrls()
+    public function testLengthAwarePaginatorCanGenerateUrls(): void
     {
         $this->p->setPath('http://website.com');
         $this->p->setPageName('foo');
@@ -60,7 +60,7 @@ class LengthAwarePaginatorTest extends TestCase
                             $this->p->url($this->p->currentPage() - 2));
     }
 
-    public function testLengthAwarePaginatorCanGenerateUrlsWithQuery()
+    public function testLengthAwarePaginatorCanGenerateUrlsWithQuery(): void
     {
         $this->p->setPath('http://website.com?sort_by=date');
         $this->p->setPageName('foo');
@@ -69,7 +69,7 @@ class LengthAwarePaginatorTest extends TestCase
                             $this->p->url($this->p->currentPage()));
     }
 
-    public function testLengthAwarePaginatorCanGenerateUrlsWithoutTrailingSlashes()
+    public function testLengthAwarePaginatorCanGenerateUrlsWithoutTrailingSlashes(): void
     {
         $this->p->setPath('http://website.com/test');
         $this->p->setPageName('foo');

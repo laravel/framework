@@ -8,12 +8,12 @@ use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testDefaultConnectionCanBeResolved()
+    public function testDefaultConnectionCanBeResolved(): void
     {
         $app = [
             'config' => [
@@ -36,7 +36,7 @@ class QueueManagerTest extends TestCase
         $this->assertSame($queue, $manager->connection('sync'));
     }
 
-    public function testOtherConnectionCanBeResolved()
+    public function testOtherConnectionCanBeResolved(): void
     {
         $app = [
             'config' => [
@@ -59,7 +59,7 @@ class QueueManagerTest extends TestCase
         $this->assertSame($queue, $manager->connection('foo'));
     }
 
-    public function testNullConnectionCanBeResolved()
+    public function testNullConnectionCanBeResolved(): void
     {
         $app = [
             'config' => [

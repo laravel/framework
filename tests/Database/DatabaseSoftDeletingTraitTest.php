@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testDeleteSetsSoftDeletedColumn()
+    public function testDeleteSetsSoftDeletedColumn(): void
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();
@@ -28,7 +28,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
     }
 
-    public function testRestore()
+    public function testRestore(): void
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();
@@ -41,7 +41,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         $this->assertNull($model->deleted_at);
     }
 
-    public function testRestoreCancel()
+    public function testRestoreCancel(): void
     {
         $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
         $model->shouldDeferMissing();

@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationRuleTest extends TestCase
 {
-    public function testMacroable()
+    public function testMacroable(): void
     {
         // phone macro : validate a phone number
         Rule::macro('phone', function () {

@@ -25,12 +25,12 @@ class TestDepsSeeder extends Seeder
 
 class DatabaseSeederTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCallResolveTheClassAndCallsRun()
+    public function testCallResolveTheClassAndCallsRun(): void
     {
         $seeder = new TestSeeder;
         $seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
@@ -47,21 +47,21 @@ class DatabaseSeederTest extends TestCase
         $seeder->call('ClassName');
     }
 
-    public function testSetContainer()
+    public function testSetContainer(): void
     {
         $seeder = new TestSeeder;
         $container = m::mock('Illuminate\Container\Container');
         $this->assertEquals($seeder->setContainer($container), $seeder);
     }
 
-    public function testSetCommand()
+    public function testSetCommand(): void
     {
         $seeder = new TestSeeder;
         $command = m::mock('Illuminate\Console\Command');
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }
 
-    public function testInjectDependenciesOnRunMethod()
+    public function testInjectDependenciesOnRunMethod(): void
     {
         $container = m::mock('Illuminate\Container\Container');
         $container->shouldReceive('call');

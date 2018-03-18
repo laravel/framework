@@ -11,12 +11,12 @@ use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 
 class ValidationFactoryTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testMakeMethodCreatesValidValidator()
+    public function testMakeMethodCreatesValidValidator(): void
     {
         $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);
@@ -53,7 +53,7 @@ class ValidationFactoryTest extends TestCase
         $this->assertEquals($presence, $validator->getPresenceVerifier());
     }
 
-    public function testValidateCallsValidateOnTheValidator()
+    public function testValidateCallsValidateOnTheValidator(): void
     {
         $validator = m::mock(Validator::class);
         $translator = m::mock(TranslatorInterface::class);
@@ -68,7 +68,7 @@ class ValidationFactoryTest extends TestCase
         $factory->validate(['foo' => 'bar'], ['foo' => 'required']);
     }
 
-    public function testCustomResolverIsCalled()
+    public function testCustomResolverIsCalled(): void
     {
         unset($_SERVER['__validator.factory']);
         $translator = m::mock(TranslatorInterface::class);
@@ -87,7 +87,7 @@ class ValidationFactoryTest extends TestCase
         unset($_SERVER['__validator.factory']);
     }
 
-    public function testValidateMethodCanBeCalledPublicly()
+    public function testValidateMethodCanBeCalledPublicly(): void
     {
         $translator = m::mock(TranslatorInterface::class);
         $factory = new Factory($translator);

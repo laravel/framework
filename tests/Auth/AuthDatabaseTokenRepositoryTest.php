@@ -9,14 +9,14 @@ use Illuminate\Auth\Passwords\DatabaseTokenRepository;
 
 class AuthDatabaseTokenRepositoryTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -24,7 +24,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         Carbon::setTestNow(null);
     }
 
-    public function testCreateInsertsNewRecordIntoTable()
+    public function testCreateInsertsNewRecordIntoTable(): void
     {
         $repo = $this->getRepo();
         $repo->getHasher()->shouldReceive('make')->once()->andReturn('hashed-token');
@@ -41,7 +41,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $this->assertGreaterThan(1, strlen($results));
     }
 
-    public function testExistReturnsFalseIfNoRowFoundForUser()
+    public function testExistReturnsFalseIfNoRowFoundForUser(): void
     {
         $repo = $this->getRepo();
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
@@ -53,7 +53,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $this->assertFalse($repo->exists($user, 'token'));
     }
 
-    public function testExistReturnsFalseIfRecordIsExpired()
+    public function testExistReturnsFalseIfRecordIsExpired(): void
     {
         $repo = $this->getRepo();
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
@@ -66,7 +66,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $this->assertFalse($repo->exists($user, 'token'));
     }
 
-    public function testExistReturnsTrueIfValidRecordExists()
+    public function testExistReturnsTrueIfValidRecordExists(): void
     {
         $repo = $this->getRepo();
         $repo->getHasher()->shouldReceive('check')->once()->with('token', 'hashed-token')->andReturn(true);
@@ -80,7 +80,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $this->assertTrue($repo->exists($user, 'token'));
     }
 
-    public function testExistReturnsFalseIfInvalidToken()
+    public function testExistReturnsFalseIfInvalidToken(): void
     {
         $repo = $this->getRepo();
         $repo->getHasher()->shouldReceive('check')->once()->with('wrong-token', 'hashed-token')->andReturn(false);
@@ -94,7 +94,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $this->assertFalse($repo->exists($user, 'wrong-token'));
     }
 
-    public function testDeleteMethodDeletesByToken()
+    public function testDeleteMethodDeletesByToken(): void
     {
         $repo = $this->getRepo();
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));
@@ -106,7 +106,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
         $repo->delete($user);
     }
 
-    public function testDeleteExpiredMethodDeletesExpiredTokens()
+    public function testDeleteExpiredMethodDeletesExpiredTokens(): void
     {
         $repo = $this->getRepo();
         $repo->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($query = m::mock('stdClass'));

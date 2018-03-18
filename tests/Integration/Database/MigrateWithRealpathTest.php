@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Schema;
 
 class MigrateWithRealpathTest extends DatabaseTestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -22,12 +22,12 @@ class MigrateWithRealpathTest extends DatabaseTestCase
         });
     }
 
-    public function test_realpath_migration_has_properly_executed()
+    public function test_realpath_migration_has_properly_executed(): void
     {
         $this->assertTrue(Schema::hasTable('members'));
     }
 
-    public function test_migrations_has_the_migrated_table()
+    public function test_migrations_has_the_migrated_table(): void
     {
         $this->assertDatabaseHas('migrations', [
             'id' => 1,

@@ -9,12 +9,12 @@ use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEventTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBasicEventBroadcastParameterFormatting()
+    public function testBasicEventBroadcastParameterFormatting(): void
     {
         $broadcaster = m::mock(Broadcaster::class);
 
@@ -27,7 +27,7 @@ class BroadcastEventTest extends TestCase
         (new \Illuminate\Broadcasting\BroadcastEvent($event))->handle($broadcaster);
     }
 
-    public function testManualParameterSpecification()
+    public function testManualParameterSpecification(): void
     {
         $broadcaster = m::mock(Broadcaster::class);
 

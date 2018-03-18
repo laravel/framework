@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EloquentCollectionFreshTest extends DatabaseTestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -20,7 +20,7 @@ class EloquentCollectionFreshTest extends DatabaseTestCase
         });
     }
 
-    public function test_eloquent_collection_fresh()
+    public function test_eloquent_collection_fresh(): void
     {
         User::insert([
             ['email' => 'laravel@framework.com'],

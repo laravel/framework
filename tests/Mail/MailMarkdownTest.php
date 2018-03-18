@@ -6,12 +6,12 @@ use PHPUnit\Framework\TestCase;
 
 class MailMarkdownTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         \Mockery::close();
     }
 
-    public function testRenderFunctionReturnsHtml()
+    public function testRenderFunctionReturnsHtml(): void
     {
         $viewFactory = \Mockery::mock('Illuminate\View\Factory');
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);
@@ -26,7 +26,7 @@ class MailMarkdownTest extends TestCase
         $this->assertTrue(strpos($result, '<html></html>') !== false);
     }
 
-    public function testRenderFunctionReturnsHtmlWithCustomTheme()
+    public function testRenderFunctionReturnsHtmlWithCustomTheme(): void
     {
         $viewFactory = \Mockery::mock('Illuminate\View\Factory');
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);
@@ -42,7 +42,7 @@ class MailMarkdownTest extends TestCase
         $this->assertTrue(strpos($result, '<html></html>') !== false);
     }
 
-    public function testRenderTextReturnsText()
+    public function testRenderTextReturnsText(): void
     {
         $viewFactory = \Mockery::mock('Illuminate\View\Factory');
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);
@@ -56,7 +56,7 @@ class MailMarkdownTest extends TestCase
         $this->assertEquals('text', $result);
     }
 
-    public function testParseReturnsParsedMarkdown()
+    public function testParseReturnsParsedMarkdown(): void
     {
         $viewFactory = \Mockery::mock('Illuminate\View\Factory');
         $markdown = new \Illuminate\Mail\Markdown($viewFactory);

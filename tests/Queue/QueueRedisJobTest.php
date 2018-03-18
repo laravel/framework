@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueRedisJobTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testFireProperlyCallsTheJobHandler()
+    public function testFireProperlyCallsTheJobHandler(): void
     {
         $job = $this->getJob();
         $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('stdClass'));
@@ -21,7 +21,7 @@ class QueueRedisJobTest extends TestCase
         $job->fire();
     }
 
-    public function testDeleteRemovesTheJobFromRedis()
+    public function testDeleteRemovesTheJobFromRedis(): void
     {
         $job = $this->getJob();
         $job->getRedisQueue()->shouldReceive('deleteReserved')->once()
@@ -30,7 +30,7 @@ class QueueRedisJobTest extends TestCase
         $job->delete();
     }
 
-    public function testReleaseProperlyReleasesJobOntoRedis()
+    public function testReleaseProperlyReleasesJobOntoRedis(): void
     {
         $job = $this->getJob();
         $job->getRedisQueue()->shouldReceive('deleteAndRelease')->once()

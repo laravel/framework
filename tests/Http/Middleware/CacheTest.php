@@ -9,7 +9,7 @@ use Illuminate\Http\Middleware\SetCacheHeaders as Cache;
 
 class CacheTest extends TestCase
 {
-    public function testDoNotSetHeaderWhenMethodNotCacheable()
+    public function testDoNotSetHeaderWhenMethodNotCacheable(): void
     {
         $request = new Request();
         $request->setMethod('PUT');
@@ -21,7 +21,7 @@ class CacheTest extends TestCase
         $this->assertNull($response->getMaxAge());
     }
 
-    public function testDoNotSetHeaderWhenNoContent()
+    public function testDoNotSetHeaderWhenNoContent(): void
     {
         $response = (new Cache())->handle(new Request(), function () {
             return new Response();
@@ -31,7 +31,7 @@ class CacheTest extends TestCase
         $this->assertNull($response->getEtag());
     }
 
-    public function testAddHeaders()
+    public function testAddHeaders(): void
     {
         $response = (new Cache())->handle(new Request(), function () {
             return new Response('some content');
@@ -41,7 +41,7 @@ class CacheTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
     }
 
-    public function testAddHeadersUsingArray()
+    public function testAddHeadersUsingArray(): void
     {
         $response = (new Cache())->handle(new Request(), function () {
             return new Response('some content');
@@ -51,7 +51,7 @@ class CacheTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
     }
 
-    public function testGenerateEtag()
+    public function testGenerateEtag(): void
     {
         $response = (new Cache())->handle(new Request(), function () {
             return new Response('some content');
@@ -61,7 +61,7 @@ class CacheTest extends TestCase
         $this->assertSame('max-age=100, public, s-maxage=200', $response->headers->get('Cache-Control'));
     }
 
-    public function testIsNotModified()
+    public function testIsNotModified(): void
     {
         $request = new Request();
         $request->headers->set('If-None-Match', '"9893532233caff98cd083a116b013c0b"');
@@ -76,7 +76,7 @@ class CacheTest extends TestCase
     /**
      * @expectedException \InvalidArgumentException
      */
-    public function testInvalidOption()
+    public function testInvalidOption(): void
     {
         (new Cache())->handle(new Request(), function () {
             return new Response('some content');

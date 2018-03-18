@@ -10,12 +10,12 @@ use Illuminate\Contracts\Notifications\Dispatcher;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testNotificationCanBeDispatched()
+    public function testNotificationCanBeDispatched(): void
     {
         $container = new Container;
         $factory = Mockery::mock(Dispatcher::class);
@@ -28,7 +28,7 @@ class NotificationRoutesNotificationsTest extends TestCase
         $notifiable->notify($instance);
     }
 
-    public function testNotificationCanBeSentNow()
+    public function testNotificationCanBeSentNow(): void
     {
         $container = new Container;
         $factory = Mockery::mock(Dispatcher::class);
@@ -41,7 +41,7 @@ class NotificationRoutesNotificationsTest extends TestCase
         $notifiable->notifyNow($instance);
     }
 
-    public function testNotificationOptionRouting()
+    public function testNotificationOptionRouting(): void
     {
         $instance = new RoutesNotificationsTestInstance;
         $this->assertEquals('bar', $instance->routeNotificationFor('foo'));

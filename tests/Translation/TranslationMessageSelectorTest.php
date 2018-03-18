@@ -10,7 +10,7 @@ class TranslationMessageSelectorTest extends TestCase
     /**
      * @dataProvider chooseTestData
      */
-    public function testChoose($expected, $id, $number)
+    public function testChoose($expected, $id, $number): void
     {
         $selector = new MessageSelector;
 

@@ -9,12 +9,12 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 
 class CacheRateLimiterTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testTooManyAttemptsReturnTrueIfAlreadyLockedOut()
+    public function testTooManyAttemptsReturnTrueIfAlreadyLockedOut(): void
     {
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(1);
@@ -25,7 +25,7 @@ class CacheRateLimiterTest extends TestCase
         $this->assertTrue($rateLimiter->tooManyAttempts('key', 1));
     }
 
-    public function testHitProperlyIncrementsAttemptCount()
+    public function testHitProperlyIncrementsAttemptCount(): void
     {
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
@@ -36,7 +36,7 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter->hit('key', 1);
     }
 
-    public function testHitHasNoMemoryLeak()
+    public function testHitHasNoMemoryLeak(): void
     {
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
@@ -48,7 +48,7 @@ class CacheRateLimiterTest extends TestCase
         $rateLimiter->hit('key', 1);
     }
 
-    public function testRetriesLeftReturnsCorrectCount()
+    public function testRetriesLeftReturnsCorrectCount(): void
     {
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('get')->once()->with('key', 0)->andReturn(3);
@@ -57,7 +57,7 @@ class CacheRateLimiterTest extends TestCase
         $this->assertEquals(2, $rateLimiter->retriesLeft('key', 5));
     }
 
-    public function testClearClearsTheCacheKeys()
+    public function testClearClearsTheCacheKeys(): void
     {
         $cache = m::mock(Cache::class);
         $cache->shouldReceive('forget')->once()->with('key');

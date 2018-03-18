@@ -16,7 +16,7 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function setUp()
+    public function setUp(): void
     {
         $db = new DB;
 
@@ -31,7 +31,7 @@ class ValidationExistsRuleTest extends TestCase
         $this->createSchema();
     }
 
-    public function testItCorrectlyFormatsAStringVersionOfTheRule()
+    public function testItCorrectlyFormatsAStringVersionOfTheRule(): void
     {
         $rule = new Exists('table');
         $rule->where('foo', 'bar');
@@ -42,7 +42,7 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertEquals('exists:table,column,foo,bar', (string) $rule);
     }
 
-    public function testItChoosesValidRecordsUsingWhereInRule()
+    public function testItChoosesValidRecordsUsingWhereInRule(): void
     {
         $rule = new Exists('users', 'id');
         $rule->whereIn('type', ['foo', 'bar']);
@@ -66,7 +66,7 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
-    public function testItChoosesValidRecordsUsingWhereNotInRule()
+    public function testItChoosesValidRecordsUsingWhereNotInRule(): void
     {
         $rule = new Exists('users', 'id');
         $rule->whereNotIn('type', ['foo', 'bar']);
@@ -90,7 +90,7 @@ class ValidationExistsRuleTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
-    public function testItChoosesValidRecordsUsingWhereNotInAndWhereNotInRulesTogether()
+    public function testItChoosesValidRecordsUsingWhereNotInAndWhereNotInRulesTogether(): void
     {
         $rule = new Exists('users', 'id');
         $rule->whereIn('type', ['foo', 'bar', 'baz'])->whereNotIn('type', ['foo', 'bar']);
@@ -157,7 +157,7 @@ class ValidationExistsRuleTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    public function tearDown(): void
     {
         $this->schema('default')->drop('users');
     }

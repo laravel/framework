@@ -12,12 +12,12 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class HttpResponseTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testJsonResponsesAreConvertedAndHeadersAreSet()
+    public function testJsonResponsesAreConvertedAndHeadersAreSet(): void
     {
         $response = new \Illuminate\Http\Response(new ArrayableStub);
         $this->assertEquals('{"foo":"bar"}', $response->getContent());
@@ -49,7 +49,7 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('application/json', $response->headers->get('Content-Type'));
     }
 
-    public function testRenderablesAreRendered()
+    public function testRenderablesAreRendered(): void
     {
         $mock = m::mock('Illuminate\Contracts\Support\Renderable');
         $mock->shouldReceive('render')->once()->andReturn('foo');
@@ -57,7 +57,7 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('foo', $response->getContent());
     }
 
-    public function testHeader()
+    public function testHeader(): void
     {
         $response = new \Illuminate\Http\Response;
         $this->assertNull($response->headers->get('foo'));
@@ -69,7 +69,7 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('baz', $response->headers->get('foo'));
     }
 
-    public function testWithCookie()
+    public function testWithCookie(): void
     {
         $response = new \Illuminate\Http\Response;
         $this->assertCount(0, $response->headers->getCookies());
@@ -80,7 +80,7 @@ class HttpResponseTest extends TestCase
         $this->assertEquals('bar', $cookies[0]->getValue());
     }
 
-    public function testGetOriginalContent()
+    public function testGetOriginalContent(): void
     {
         $arr = ['foo' => 'bar'];
         $response = new \Illuminate\Http\Response;
@@ -88,7 +88,7 @@ class HttpResponseTest extends TestCase
         $this->assertSame($arr, $response->getOriginalContent());
     }
 
-    public function testGetOriginalContentRetrievesTheFirstOriginalContent()
+    public function testGetOriginalContentRetrievesTheFirstOriginalContent(): void
     {
         $previousResponse = new \Illuminate\Http\Response(['foo' => 'bar']);
         $response = new \Illuminate\Http\Response($previousResponse);
@@ -96,14 +96,14 @@ class HttpResponseTest extends TestCase
         $this->assertSame(['foo' => 'bar'], $response->getOriginalContent());
     }
 
-    public function testSetAndRetrieveStatusCode()
+    public function testSetAndRetrieveStatusCode(): void
     {
         $response = new \Illuminate\Http\Response('foo');
         $response->setStatusCode(404);
         $this->assertSame(404, $response->getStatusCode());
     }
 
-    public function testOnlyInputOnRedirect()
+    public function testOnlyInputOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -112,7 +112,7 @@ class HttpResponseTest extends TestCase
         $response->onlyInput('name');
     }
 
-    public function testExceptInputOnRedirect()
+    public function testExceptInputOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -121,7 +121,7 @@ class HttpResponseTest extends TestCase
         $response->exceptInput('age');
     }
 
-    public function testFlashingErrorsOnRedirect()
+    public function testFlashingErrorsOnRedirect(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -133,7 +133,7 @@ class HttpResponseTest extends TestCase
         $response->withErrors($provider);
     }
 
-    public function testSettersGettersOnRequest()
+    public function testSettersGettersOnRequest(): void
     {
         $response = new RedirectResponse('foo.bar');
         $this->assertNull($response->getRequest());
@@ -147,7 +147,7 @@ class HttpResponseTest extends TestCase
         $this->assertSame($session, $response->getSession());
     }
 
-    public function testRedirectWithErrorsArrayConvertsToMessageBag()
+    public function testRedirectWithErrorsArrayConvertsToMessageBag(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -158,7 +158,7 @@ class HttpResponseTest extends TestCase
         $response->withErrors($provider);
     }
 
-    public function testWithHeaders()
+    public function testWithHeaders(): void
     {
         $response = new \Illuminate\Http\Response(null, 200, ['foo' => 'bar']);
         $this->assertSame('bar', $response->headers->get('foo'));
@@ -178,7 +178,7 @@ class HttpResponseTest extends TestCase
         $this->assertSame('TATA', $response->headers->get('titi'));
     }
 
-    public function testMagicCall()
+    public function testMagicCall(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->setRequest(Request::create('/', 'GET', ['name' => 'Taylor', 'age' => 26]));
@@ -191,7 +191,7 @@ class HttpResponseTest extends TestCase
      * @expectedException \BadMethodCallException
      * @expectedExceptionMessage Method Illuminate\Http\RedirectResponse::doesNotExist does not exist.
      */
-    public function testMagicCallException()
+    public function testMagicCallException(): void
     {
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');

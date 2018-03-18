@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class MailMailableTest extends TestCase
 {
-    public function testMailableSetsRecipientsCorrectly()
+    public function testMailableSetsRecipientsCorrectly(): void
     {
         $mailable = new WelcomeMailableStub;
         $mailable->to('taylor@laravel.com');
@@ -54,7 +54,7 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasTo('taylor@laravel.com'));
     }
 
-    public function testMailableSetsReplyToCorrectly()
+    public function testMailableSetsReplyToCorrectly(): void
     {
         $mailable = new WelcomeMailableStub;
         $mailable->replyTo('taylor@laravel.com');
@@ -101,7 +101,7 @@ class MailMailableTest extends TestCase
         $this->assertTrue($mailable->hasReplyTo('taylor@laravel.com'));
     }
 
-    public function testMailableBuildsViewData()
+    public function testMailableBuildsViewData(): void
     {
         $mailable = new WelcomeMailableStub;
 

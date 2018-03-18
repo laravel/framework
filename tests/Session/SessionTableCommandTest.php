@@ -9,12 +9,12 @@ use Illuminate\Session\Console\SessionTableCommand;
 
 class SessionTableCommandTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testCreateMakesMigration()
+    public function testCreateMakesMigration(): void
     {
         $command = new SessionTableCommandTestStub(
             $files = m::mock('Illuminate\Filesystem\Filesystem'),

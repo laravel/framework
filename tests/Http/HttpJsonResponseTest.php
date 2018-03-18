@@ -9,7 +9,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class HttpJsonResponseTest extends TestCase
 {
-    public function testSetAndRetrieveJsonableData()
+    public function testSetAndRetrieveJsonableData(): void
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonableObject);
         $data = $response->getData();
@@ -17,7 +17,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
-    public function testSetAndRetrieveJsonSerializeData()
+    public function testSetAndRetrieveJsonSerializeData(): void
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestJsonSerializeObject);
         $data = $response->getData();
@@ -25,7 +25,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
-    public function testSetAndRetrieveArrayableData()
+    public function testSetAndRetrieveArrayableData(): void
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $data = $response->getData();
@@ -33,7 +33,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
-    public function testSetAndRetrieveData()
+    public function testSetAndRetrieveData(): void
     {
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $data = $response->getData();
@@ -41,7 +41,7 @@ class HttpJsonResponseTest extends TestCase
         $this->assertEquals('bar', $data->foo);
     }
 
-    public function testGetOriginalContent()
+    public function testGetOriginalContent(): void
     {
         $response = new \Illuminate\Http\JsonResponse(new JsonResponseTestArrayableObject);
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
@@ -51,20 +51,20 @@ class HttpJsonResponseTest extends TestCase
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
     }
 
-    public function testSetAndRetrieveOptions()
+    public function testSetAndRetrieveOptions(): void
     {
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $response->setEncodingOptions(JSON_PRETTY_PRINT);
         $this->assertSame(JSON_PRETTY_PRINT, $response->getEncodingOptions());
     }
 
-    public function testSetAndRetrieveDefaultOptions()
+    public function testSetAndRetrieveDefaultOptions(): void
     {
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $this->assertSame(0, $response->getEncodingOptions());
     }
 
-    public function testSetAndRetrieveStatusCode()
+    public function testSetAndRetrieveStatusCode(): void
     {
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar'], 404);
         $this->assertSame(404, $response->getStatusCode());
@@ -81,7 +81,7 @@ class HttpJsonResponseTest extends TestCase
      *
      * @dataProvider jsonErrorDataProvider
      */
-    public function testInvalidArgumentExceptionOnJsonError($data)
+    public function testInvalidArgumentExceptionOnJsonError($data): void
     {
         new \Illuminate\Http\JsonResponse(['data' => $data]);
     }
@@ -91,7 +91,7 @@ class HttpJsonResponseTest extends TestCase
      *
      * @dataProvider jsonErrorDataProvider
      */
-    public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data)
+    public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data): void
     {
         new \Illuminate\Http\JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
     }

@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class FoundationEnvironmentDetectorTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testClosureCanBeUsedForCustomEnvironmentDetection()
+    public function testClosureCanBeUsedForCustomEnvironmentDetection(): void
     {
         $env = new \Illuminate\Foundation\EnvironmentDetector;
 
@@ -22,7 +22,7 @@ class FoundationEnvironmentDetectorTest extends TestCase
         $this->assertEquals('foobar', $result);
     }
 
-    public function testConsoleEnvironmentDetection()
+    public function testConsoleEnvironmentDetection(): void
     {
         $env = new \Illuminate\Foundation\EnvironmentDetector;
 

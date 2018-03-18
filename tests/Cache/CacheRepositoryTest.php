@@ -11,34 +11,34 @@ use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         m::close();
         Carbon::setTestNow();
     }
 
-    public function testGetReturnsValueFromCache()
+    public function testGetReturnsValueFromCache(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $this->assertEquals('bar', $repo->get('foo'));
     }
 
-    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArray()
+    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArray(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => 'bar', 'bar' => 'baz']);
         $this->assertEquals(['foo' => 'bar', 'bar' => 'baz'], $repo->get(['foo', 'bar']));
     }
 
-    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArrayWithDefaultValues()
+    public function testGetReturnsMultipleValuesFromCacheWhenGivenAnArrayWithDefaultValues(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('many')->once()->with(['foo', 'bar'])->andReturn(['foo' => null, 'bar' => 'baz']);
         $this->assertEquals(['foo' => 'default', 'bar' => 'baz'], $repo->get(['foo' => 'default', 'bar']));
     }
 
-    public function testDefaultValueIsReturned()
+    public function testDefaultValueIsReturned(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->times(2)->andReturn(null);
@@ -48,14 +48,14 @@ class CacheRepositoryTest extends TestCase
         }));
     }
 
-    public function testSettingDefaultCacheTime()
+    public function testSettingDefaultCacheTime(): void
     {
         $repo = $this->getRepository();
         $repo->setDefaultCacheTime(10);
         $this->assertEquals(10, $repo->getDefaultCacheTime());
     }
 
-    public function testHasMethod()
+    public function testHasMethod(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->with('foo')->andReturn(null);
@@ -65,7 +65,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($repo->has('foo'));
     }
 
-    public function testRememberMethodCallsPutAndReturnsDefault()
+    public function testRememberMethodCallsPutAndReturnsDefault(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
@@ -94,7 +94,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertEquals('qux', $result);
     }
 
-    public function testRememberForeverMethodCallsForeverAndReturnsDefault()
+    public function testRememberForeverMethodCallsForeverAndReturnsDefault(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('get')->once()->andReturn(null);
@@ -105,14 +105,14 @@ class CacheRepositoryTest extends TestCase
         $this->assertEquals('bar', $result);
     }
 
-    public function testPuttingMultipleItemsInCache()
+    public function testPuttingMultipleItemsInCache(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('putMany')->once()->with(['foo' => 'bar', 'bar' => 'baz'], 1);
         $repo->put(['foo' => 'bar', 'bar' => 'baz'], 1);
     }
 
-    public function testSettingMultipleItemsInCache()
+    public function testSettingMultipleItemsInCache(): void
     {
         // Alias of PuttingMultiple
         $repo = $this->getRepository();
@@ -120,7 +120,7 @@ class CacheRepositoryTest extends TestCase
         $repo->setMultiple(['foo' => 'bar', 'bar' => 'baz'], 1);
     }
 
-    public function testPutWithDatetimeInPastOrZeroSecondsDoesntSaveItem()
+    public function testPutWithDatetimeInPastOrZeroSecondsDoesntSaveItem(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->never();
@@ -128,7 +128,7 @@ class CacheRepositoryTest extends TestCase
         $repo->put('foo', 'bar', Carbon::now());
     }
 
-    public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately()
+    public function testAddWithDatetimeInPastOrZeroSecondsReturnsImmediately(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('add', 'get', 'put')->never();
@@ -138,7 +138,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertFalse($result);
     }
 
-    public function testCacheAddCallsRedisStoreAdd()
+    public function testCacheAddCallsRedisStoreAdd(): void
     {
         $store = m::mock(\Illuminate\Cache\RedisStore::class);
         $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
@@ -163,7 +163,7 @@ class CacheRepositoryTest extends TestCase
      * @dataProvider dataProviderTestGetMinutes
      * @param mixed $duration
      */
-    public function testGetMinutes($duration)
+    public function testGetMinutes($duration): void
     {
         Carbon::setTestNow(Carbon::parse($this->getTestDate()));
 
@@ -172,7 +172,7 @@ class CacheRepositoryTest extends TestCase
         $repo->put($key, $value, $duration);
     }
 
-    public function testRegisterMacroWithNonStaticCall()
+    public function testRegisterMacroWithNonStaticCall(): void
     {
         $repo = $this->getRepository();
         $repo::macro(__CLASS__, function () {
@@ -181,14 +181,14 @@ class CacheRepositoryTest extends TestCase
         $this->assertEquals($repo->{__CLASS__}(), 'Taylor');
     }
 
-    public function testForgettingCacheKey()
+    public function testForgettingCacheKey(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);
         $repo->forget('a-key');
     }
 
-    public function testRemovingCacheKey()
+    public function testRemovingCacheKey(): void
     {
         // Alias of Forget
         $repo = $this->getRepository();
@@ -196,21 +196,21 @@ class CacheRepositoryTest extends TestCase
         $repo->delete('a-key');
     }
 
-    public function testSettingCache()
+    public function testSettingCache(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('put')->with($key = 'foo', $value = 'bar', 1);
         $repo->set($key, $value, 1);
     }
 
-    public function testClearingWholeCache()
+    public function testClearingWholeCache(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('flush')->andReturn(true);
         $repo->clear();
     }
 
-    public function testGettingMultipleValuesFromCache()
+    public function testGettingMultipleValuesFromCache(): void
     {
         $keys = ['key1', 'key2', 'key3'];
         $default = ['key2' => 5];
@@ -220,7 +220,7 @@ class CacheRepositoryTest extends TestCase
         $this->assertEquals(['key1' => 1, 'key2' => 5, 'key3' => null], $repo->getMultiple($keys, $default));
     }
 
-    public function testRemovingMultipleKeys()
+    public function testRemovingMultipleKeys(): void
     {
         $repo = $this->getRepository();
         $repo->getStore()->shouldReceive('forget')->once()->with('a-key')->andReturn(true);

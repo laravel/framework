@@ -8,7 +8,7 @@ use Illuminate\Validation\Rules\Dimensions;
 
 class ValidationDimensionsRuleTest extends TestCase
 {
-    public function testItCorrectlyFormatsAStringVersionOfTheRule()
+    public function testItCorrectlyFormatsAStringVersionOfTheRule(): void
     {
         $rule = new Dimensions(['min_width' => 100, 'min_height' => 100]);
 

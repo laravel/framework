@@ -21,7 +21,7 @@ class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
@@ -52,7 +52,7 @@ class SendingMailNotificationsTest extends TestCase
         });
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -62,7 +62,7 @@ class SendingMailNotificationsTest extends TestCase
         });
     }
 
-    public function test_mail_is_sent()
+    public function test_mail_is_sent(): void
     {
         $notification = new TestMailNotification;
 
@@ -102,7 +102,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_with_subject()
+    public function test_mail_is_sent_with_subject(): void
     {
         $notification = new TestMailNotificationWithSubject;
 
@@ -132,7 +132,7 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
-    public function test_mail_is_sent_using_mailable()
+    public function test_mail_is_sent_using_mailable(): void
     {
         $notification = new TestMailNotificationWithMailable;
 

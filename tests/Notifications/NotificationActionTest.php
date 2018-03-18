@@ -7,7 +7,7 @@ use Illuminate\Notifications\Action;
 
 class NotificationActionTest extends TestCase
 {
-    public function testActionIsCreatedProperly()
+    public function testActionIsCreatedProperly(): void
     {
         $action = new Action('Text', 'url');
 

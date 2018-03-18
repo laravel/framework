@@ -8,12 +8,12 @@ use Illuminate\Database\Schema\Builder;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testHasTableCorrectlyCallsGrammar()
+    public function testHasTableCorrectlyCallsGrammar(): void
     {
         $connection = m::mock('Illuminate\Database\Connection');
         $grammar = m::mock('stdClass');
@@ -26,7 +26,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->assertTrue($builder->hasTable('table'));
     }
 
-    public function testTableHasColumns()
+    public function testTableHasColumns(): void
     {
         $connection = m::mock('Illuminate\Database\Connection');
         $grammar = m::mock('stdClass');
@@ -38,7 +38,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $this->assertFalse($builder->hasColumns('users', ['id', 'address']));
     }
 
-    public function testGetColumnTypeAddsPrefix()
+    public function testGetColumnTypeAddsPrefix(): void
     {
         $connection = m::mock('Illuminate\Database\Connection');
         $column = m::mock('stdClass');

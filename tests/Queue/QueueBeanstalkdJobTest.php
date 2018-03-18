@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueBeanstalkdJobTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testFireProperlyCallsTheJobHandler()
+    public function testFireProperlyCallsTheJobHandler(): void
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
@@ -22,7 +22,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->fire();
     }
 
-    public function testFailedProperlyCallsTheJobHandler()
+    public function testFailedProperlyCallsTheJobHandler(): void
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
@@ -32,7 +32,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->failed(new \Exception);
     }
 
-    public function testDeleteRemovesTheJobFromBeanstalkd()
+    public function testDeleteRemovesTheJobFromBeanstalkd(): void
     {
         $job = $this->getJob();
         $job->getPheanstalk()->shouldReceive('delete')->once()->with($job->getPheanstalkJob());
@@ -40,7 +40,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->delete();
     }
 
-    public function testReleaseProperlyReleasesJobOntoBeanstalkd()
+    public function testReleaseProperlyReleasesJobOntoBeanstalkd(): void
     {
         $job = $this->getJob();
         $job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), \Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 0);
@@ -48,7 +48,7 @@ class QueueBeanstalkdJobTest extends TestCase
         $job->release();
     }
 
-    public function testBuryProperlyBuryTheJobFromBeanstalkd()
+    public function testBuryProperlyBuryTheJobFromBeanstalkd(): void
     {
         $job = $this->getJob();
         $job->getPheanstalk()->shouldReceive('bury')->once()->with($job->getPheanstalkJob());

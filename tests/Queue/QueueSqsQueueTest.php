@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function setUp()
+    public function setUp(): void
     {
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock('Aws\Sqs\SqsClient');
@@ -63,7 +63,7 @@ class QueueSqsQueueTest extends TestCase
         ]);
     }
 
-    public function testPopProperlyPopsJobOffOfSqs()
+    public function testPopProperlyPopsJobOffOfSqs(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
@@ -73,7 +73,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertInstanceOf('Illuminate\Queue\Jobs\SqsJob', $result);
     }
 
-    public function testPopProperlyHandlesEmptyMessage()
+    public function testPopProperlyHandlesEmptyMessage(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->setContainer(m::mock('Illuminate\Container\Container'));
@@ -83,7 +83,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertNull($result);
     }
 
-    public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs()
+    public function testDelayedPushWithDateTimeProperlyPushesJobOntoSqs(): void
     {
         $now = \Illuminate\Support\Carbon::now();
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
@@ -95,7 +95,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($this->mockedMessageId, $id);
     }
 
-    public function testDelayedPushProperlyPushesJobOntoSqs()
+    public function testDelayedPushProperlyPushesJobOntoSqs(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'secondsUntil', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
@@ -106,7 +106,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($this->mockedMessageId, $id);
     }
 
-    public function testPushProperlyPushesJobOntoSqs()
+    public function testPushProperlyPushesJobOntoSqs(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['createPayload', 'getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('createPayload')->with($this->mockedJob, $this->mockedData)->will($this->returnValue($this->mockedPayload));
@@ -116,7 +116,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($this->mockedMessageId, $id);
     }
 
-    public function testSizeProperlyReadsSqsQueueSize()
+    public function testSizeProperlyReadsSqsQueueSize(): void
     {
         $queue = $this->getMockBuilder('Illuminate\Queue\SqsQueue')->setMethods(['getQueue'])->setConstructorArgs([$this->sqs, $this->queueName, $this->account])->getMock();
         $queue->expects($this->once())->method('getQueue')->with($this->queueName)->will($this->returnValue($this->queueUrl));
@@ -125,7 +125,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($size, 1);
     }
 
-    public function testGetQueueProperlyResolvesUrlWithPrefix()
+    public function testGetQueueProperlyResolvesUrlWithPrefix(): void
     {
         $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueName, $this->prefix);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));
@@ -133,7 +133,7 @@ class QueueSqsQueueTest extends TestCase
         $this->assertEquals($queueUrl, $queue->getQueue('test'));
     }
 
-    public function testGetQueueProperlyResolvesUrlWithoutPrefix()
+    public function testGetQueueProperlyResolvesUrlWithoutPrefix(): void
     {
         $queue = new \Illuminate\Queue\SqsQueue($this->sqs, $this->queueUrl);
         $this->assertEquals($this->queueUrl, $queue->getQueue(null));

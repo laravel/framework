@@ -10,12 +10,12 @@ use Illuminate\Contracts\Auth\UserProvider;
 
 class AuthTokenGuardTest extends TestCase
 {
-    protected function tearDown()
+    protected function tearDown(): void
     {
         Mockery::close();
     }
 
-    public function testUserCanBeRetrievedByQueryStringVariable()
+    public function testUserCanBeRetrievedByQueryStringVariable(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
@@ -33,7 +33,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertEquals(1, $guard->id());
     }
 
-    public function testUserCanBeRetrievedByAuthHeaders()
+    public function testUserCanBeRetrievedByAuthHeaders(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
@@ -46,7 +46,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertEquals(1, $user->id);
     }
 
-    public function testUserCanBeRetrievedByBearerToken()
+    public function testUserCanBeRetrievedByBearerToken(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn((object) ['id' => 1]);
@@ -59,7 +59,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertEquals(1, $user->id);
     }
 
-    public function testValidateCanDetermineIfCredentialsAreValid()
+    public function testValidateCanDetermineIfCredentialsAreValid(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;
@@ -72,7 +72,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertTrue($guard->validate(['api_token' => 'foo']));
     }
 
-    public function testValidateCanDetermineIfCredentialsAreInvalid()
+    public function testValidateCanDetermineIfCredentialsAreInvalid(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $provider->shouldReceive('retrieveByCredentials')->once()->with(['api_token' => 'foo'])->andReturn(null);
@@ -83,7 +83,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertFalse($guard->validate(['api_token' => 'foo']));
     }
 
-    public function testValidateIfApiTokenIsEmpty()
+    public function testValidateIfApiTokenIsEmpty(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $request = Request::create('/', 'GET', ['api_token' => '']);
@@ -93,7 +93,7 @@ class AuthTokenGuardTest extends TestCase
         $this->assertFalse($guard->validate(['api_token' => '']));
     }
 
-    public function testItAllowsToPassCustomRequestInSetterAndUseItForValidation()
+    public function testItAllowsToPassCustomRequestInSetterAndUseItForValidation(): void
     {
         $provider = Mockery::mock(UserProvider::class);
         $user = new AuthTokenGuardTestUser;

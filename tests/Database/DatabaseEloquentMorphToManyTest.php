@@ -8,12 +8,12 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class DatabaseEloquentMorphToManyTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testEagerConstraintsAreProperlyAdded()
+    public function testEagerConstraintsAreProperlyAdded(): void
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('taggables.taggable_id', [1, 2]);
@@ -25,7 +25,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation->addEagerConstraints([$model1, $model2]);
     }
 
-    public function testAttachInsertsPivotTableRecord()
+    public function testAttachInsertsPivotTableRecord(): void
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\MorphToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
@@ -38,7 +38,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation->attach(2, ['foo' => 'bar']);
     }
 
-    public function testDetachRemovesPivotTableRecord()
+    public function testDetachRemovesPivotTableRecord(): void
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\MorphToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
@@ -54,7 +54,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $this->assertTrue($relation->detach([1, 2, 3]));
     }
 
-    public function testDetachMethodClearsAllPivotRecordsWhenNoIDsAreGiven()
+    public function testDetachMethodClearsAllPivotRecordsWhenNoIDsAreGiven(): void
     {
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\MorphToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');

@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RoutingUrlGeneratorTest extends TestCase
 {
-    public function testBasicGeneration()
+    public function testBasicGeneration(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -46,7 +46,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
-    public function testBasicGenerationWithFormatting()
+    public function testBasicGenerationWithFormatting(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -67,7 +67,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/something/named-route', $url->route('plain', [], false));
     }
 
-    public function testBasicRouteGeneration()
+    public function testBasicRouteGeneration(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -158,7 +158,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://en.example.com/foo', $url->route('defaults'));
     }
 
-    public function testFluentRouteNameDefinitions()
+    public function testFluentRouteNameDefinitions(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -176,7 +176,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function testControllerRoutesWithADefaultNamespace()
+    public function testControllerRoutesWithADefaultNamespace(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -202,7 +202,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
     }
 
-    public function testControllerRoutesOutsideOfDefaultNamespace()
+    public function testControllerRoutesOutsideOfDefaultNamespace(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -221,7 +221,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://www.foo.com/invokable/namespace', $url->action('\root\namespace\InvokableActionStub'));
     }
 
-    public function testRoutableInterfaceRouting()
+    public function testRoutableInterfaceRouting(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -237,7 +237,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
     }
 
-    public function testRoutableInterfaceRoutingWithSingleParameter()
+    public function testRoutableInterfaceRoutingWithSingleParameter(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -253,7 +253,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/foo/routable', $url->route('routable', $model, false));
     }
 
-    public function testRoutesMaintainRequestScheme()
+    public function testRoutesMaintainRequestScheme(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -269,7 +269,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://www.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function testHttpOnlyRoutes()
+    public function testHttpOnlyRoutes(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -285,7 +285,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://www.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function testRoutesWithDomains()
+    public function testRoutesWithDomains(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -306,7 +306,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell'], false));
     }
 
-    public function testRoutesWithDomainsAndPorts()
+    public function testRoutesWithDomainsAndPorts(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -326,7 +326,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://sub.taylor.com:8080/foo/bar/otwell', $url->route('bar', ['taylor', 'otwell']));
     }
 
-    public function testRoutesWithDomainsStripsProtocols()
+    public function testRoutesWithDomainsStripsProtocols(): void
     {
         /*
          * http:// Route
@@ -355,7 +355,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('foo'));
     }
 
-    public function testHttpsRoutesWithDomains()
+    public function testHttpsRoutesWithDomains(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -371,7 +371,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://sub.foo.com/foo/bar', $url->route('baz'));
     }
 
-    public function testRoutesWithDomainsThroughProxy()
+    public function testRoutesWithDomainsThroughProxy(): void
     {
         Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
 
@@ -389,7 +389,7 @@ class RoutingUrlGeneratorTest extends TestCase
     /**
      * @expectedException \Illuminate\Routing\Exceptions\UrlGenerationException
      */
-    public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
+    public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -403,7 +403,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));
     }
 
-    public function testForceRootUrl()
+    public function testForceRootUrl(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
@@ -435,7 +435,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://www.bar.com/foo', $url->route('plain'));
     }
 
-    public function testPrevious()
+    public function testPrevious(): void
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,

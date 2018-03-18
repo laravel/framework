@@ -12,7 +12,7 @@ use Illuminate\Mail\Transport\SesTransport;
 
 class MailSesTransportTest extends TestCase
 {
-    public function testGetTransport()
+    public function testGetTransport(): void
     {
         /** @var Application $app */
         $app = [
@@ -36,7 +36,7 @@ class MailSesTransportTest extends TestCase
         $this->assertEquals('us-east-1', $ses->getRegion());
     }
 
-    public function testSend()
+    public function testSend(): void
     {
         $message = new \Swift_Message('Foo subject', 'Bar body');
         $message->setSender('myself@example.com');

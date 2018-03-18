@@ -21,7 +21,7 @@ class QueueWorkerTest extends TestCase
     public $events;
     public $exceptionHandler;
 
-    public function setUp()
+    public function setUp(): void
     {
         $this->events = Mockery::spy(Dispatcher::class);
         $this->exceptionHandler = Mockery::spy(ExceptionHandler::class);
@@ -32,12 +32,12 @@ class QueueWorkerTest extends TestCase
         $container->instance(ExceptionHandler::class, $this->exceptionHandler);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         Container::setInstance();
     }
 
-    public function test_job_can_be_fired()
+    public function test_job_can_be_fired(): void
     {
         $worker = $this->getWorker('default', ['queue' => [$job = new WorkerFakeJob]]);
         $worker->runNextJob('default', 'queue', new WorkerOptions);
@@ -46,7 +46,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessed::class))->once();
     }
 
-    public function test_job_can_be_fired_based_on_priority()
+    public function test_job_can_be_fired_based_on_priority(): void
     {
         $worker = $this->getWorker('default', [
             'high' => [$highJob = new WorkerFakeJob, $secondHighJob = new WorkerFakeJob], 'low' => [$lowJob = new WorkerFakeJob],
@@ -65,7 +65,7 @@ class QueueWorkerTest extends TestCase
         $this->assertTrue($lowJob->fired);
     }
 
-    public function test_exception_is_reported_if_connection_throws_exception_on_job_pop()
+    public function test_exception_is_reported_if_connection_throws_exception_on_job_pop(): void
     {
         $worker = new InsomniacWorker(
             new WorkerFakeManager('default', new BrokenQueueConnection($e = new RuntimeException)),
@@ -78,14 +78,14 @@ class QueueWorkerTest extends TestCase
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
     }
 
-    public function test_worker_sleeps_when_queue_is_empty()
+    public function test_worker_sleeps_when_queue_is_empty(): void
     {
         $worker = $this->getWorker('default', ['queue' => []]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['sleep' => 5]));
         $this->assertEquals(5, $worker->sleptFor);
     }
 
-    public function test_job_is_released_on_exception()
+    public function test_job_is_released_on_exception(): void
     {
         $e = new RuntimeException;
 
@@ -103,7 +103,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
-    public function test_job_is_not_released_if_it_has_exceeded_max_attempts()
+    public function test_job_is_not_released_if_it_has_exceeded_max_attempts(): void
     {
         $e = new RuntimeException;
 
@@ -127,7 +127,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
-    public function test_job_is_not_released_if_it_has_expired()
+    public function test_job_is_not_released_if_it_has_expired(): void
     {
         $e = new RuntimeException;
 
@@ -158,7 +158,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
-    public function test_job_is_failed_if_it_has_already_exceeded_max_attempts()
+    public function test_job_is_failed_if_it_has_already_exceeded_max_attempts(): void
     {
         $job = new WorkerFakeJob(function ($job) {
             $job->attempts++;
@@ -178,7 +178,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
-    public function test_job_is_failed_if_it_has_already_expired()
+    public function test_job_is_failed_if_it_has_already_expired(): void
     {
         $job = new WorkerFakeJob(function ($job) {
             $job->attempts++;
@@ -204,7 +204,7 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
-    public function test_job_based_max_retries()
+    public function test_job_based_max_retries(): void
     {
         $job = new WorkerFakeJob(function ($job) {
             $job->attempts++;

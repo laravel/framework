@@ -8,12 +8,12 @@ use Illuminate\Console\Scheduling\Event;
 
 class EventTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testBuildCommand()
+    public function testBuildCommand(): void
     {
         $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
 
@@ -31,7 +31,7 @@ class EventTest extends TestCase
         $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 ; '".PHP_BINARY."' artisan schedule:finish \"framework/schedule-eeb46c93d45e928d62aaf684d727e213b7094822\") > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
     }
 
-    public function testBuildCommandSendOutputTo()
+    public function testBuildCommandSendOutputTo(): void
     {
         $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
 
@@ -46,7 +46,7 @@ class EventTest extends TestCase
         $this->assertSame("php -i > {$quote}/my folder/foo.log{$quote} 2>&1", $event->buildCommand());
     }
 
-    public function testBuildCommandAppendOutput()
+    public function testBuildCommandAppendOutput(): void
     {
         $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
 
@@ -56,7 +56,7 @@ class EventTest extends TestCase
         $this->assertSame("php -i >> {$quote}/dev/null{$quote} 2>&1", $event->buildCommand());
     }
 
-    public function testNextRunDate()
+    public function testNextRunDate(): void
     {
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php -i');
         $event->dailyAt('10:15');

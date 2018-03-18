@@ -7,12 +7,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueListenerTest extends TestCase
 {
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testRunProcessCallsProcess()
+    public function testRunProcessCallsProcess(): void
     {
         $process = m::mock('Symfony\Component\Process\Process')->makePartial();
         $process->shouldReceive('run')->once();
@@ -22,7 +22,7 @@ class QueueListenerTest extends TestCase
         $listener->runProcess($process, 1);
     }
 
-    public function testListenerStopsWhenMemoryIsExceeded()
+    public function testListenerStopsWhenMemoryIsExceeded(): void
     {
         $process = m::mock('Symfony\Component\Process\Process')->makePartial();
         $process->shouldReceive('run')->once();
@@ -33,7 +33,7 @@ class QueueListenerTest extends TestCase
         $listener->runProcess($process, 1);
     }
 
-    public function testMakeProcessCorrectlyFormatsCommandLine()
+    public function testMakeProcessCorrectlyFormatsCommandLine(): void
     {
         $listener = new \Illuminate\Queue\Listener(__DIR__);
         $options = new \Illuminate\Queue\ListenerOptions;

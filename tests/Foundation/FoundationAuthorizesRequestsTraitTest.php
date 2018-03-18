@@ -11,7 +11,7 @@ use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
 class FoundationAuthorizesRequestsTraitTest extends TestCase
 {
-    public function test_basic_gate_check()
+    public function test_basic_gate_check(): void
     {
         unset($_SERVER['_test.authorizes.trait']);
 
@@ -33,7 +33,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage This action is unauthorized.
      */
-    public function test_exception_is_thrown_if_gate_check_fails()
+    public function test_exception_is_thrown_if_gate_check_fails(): void
     {
         $gate = $this->getBasicGate();
 
@@ -44,7 +44,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         (new FoundationTestAuthorizeTraitClass)->authorize('baz');
     }
 
-    public function test_policies_may_be_called()
+    public function test_policies_may_be_called(): void
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -58,7 +58,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed_passing_model_instance()
+    public function test_policy_method_may_be_guessed_passing_model_instance(): void
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -72,7 +72,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed_passing_class_name()
+    public function test_policy_method_may_be_guessed_passing_class_name(): void
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 
@@ -86,7 +86,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
         $this->assertTrue($_SERVER['_test.authorizes.trait.policy']);
     }
 
-    public function test_policy_method_may_be_guessed_and_normalized()
+    public function test_policy_method_may_be_guessed_and_normalized(): void
     {
         unset($_SERVER['_test.authorizes.trait.policy']);
 

@@ -4,7 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 class BladeEchoTest extends AbstractBladeTestCase
 {
-    public function testEchosAreCompiled()
+    public function testEchosAreCompiled(): void
     {
         $this->assertEquals('<?php echo $name; ?>', $this->compiler->compileString('{!!$name!!}'));
         $this->assertEquals('<?php echo $name; ?>', $this->compiler->compileString('{!! $name !!}'));
@@ -48,7 +48,7 @@ class BladeEchoTest extends AbstractBladeTestCase
             $this->compiler->compileString('{{ myfunc("$name or \'foo\'") }}'));
     }
 
-    public function testEscapedWithAtEchosAreCompiled()
+    public function testEscapedWithAtEchosAreCompiled(): void
     {
         $this->assertEquals('{{$name}}', $this->compiler->compileString('@{{$name}}'));
         $this->assertEquals('{{ $name }}', $this->compiler->compileString('@{{ $name }}'));

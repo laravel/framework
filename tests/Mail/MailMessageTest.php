@@ -18,7 +18,7 @@ class MailMessageTest extends TestCase
      */
     protected $message;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -26,77 +26,77 @@ class MailMessageTest extends TestCase
         $this->message = new Message($this->swift);
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         m::close();
     }
 
-    public function testFromMethod()
+    public function testFromMethod(): void
     {
         $this->swift->shouldReceive('setFrom')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->from('foo@bar.baz', 'Foo'));
     }
 
-    public function testSenderMethod()
+    public function testSenderMethod(): void
     {
         $this->swift->shouldReceive('setSender')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->sender('foo@bar.baz', 'Foo'));
     }
 
-    public function testReturnPathMethod()
+    public function testReturnPathMethod(): void
     {
         $this->swift->shouldReceive('setReturnPath')->once()->with('foo@bar.baz');
         $this->assertInstanceOf(Message::class, $this->message->returnPath('foo@bar.baz'));
     }
 
-    public function testToMethod()
+    public function testToMethod(): void
     {
         $this->swift->shouldReceive('addTo')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->to('foo@bar.baz', 'Foo', false));
     }
 
-    public function testToMethodWithOverride()
+    public function testToMethodWithOverride(): void
     {
         $this->swift->shouldReceive('setTo')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->to('foo@bar.baz', 'Foo', true));
     }
 
-    public function testCcMethod()
+    public function testCcMethod(): void
     {
         $this->swift->shouldReceive('addCc')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->cc('foo@bar.baz', 'Foo'));
     }
 
-    public function testBccMethod()
+    public function testBccMethod(): void
     {
         $this->swift->shouldReceive('addBcc')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->bcc('foo@bar.baz', 'Foo'));
     }
 
-    public function testReplyToMethod()
+    public function testReplyToMethod(): void
     {
         $this->swift->shouldReceive('addReplyTo')->once()->with('foo@bar.baz', 'Foo');
         $this->assertInstanceOf(Message::class, $this->message->replyTo('foo@bar.baz', 'Foo'));
     }
 
-    public function testSubjectMethod()
+    public function testSubjectMethod(): void
     {
         $this->swift->shouldReceive('setSubject')->once()->with('foo');
         $this->assertInstanceOf(Message::class, $this->message->subject('foo'));
     }
 
-    public function testPriorityMethod()
+    public function testPriorityMethod(): void
     {
         $this->swift->shouldReceive('setPriority')->once()->with(1);
         $this->assertInstanceOf(Message::class, $this->message->priority(1));
     }
 
-    public function testGetSwiftMessageMethod()
+    public function testGetSwiftMessageMethod(): void
     {
         $this->assertInstanceOf(\Swift_Mime_Message::class, $this->message->getSwiftMessage());
     }
 
-    public function testBasicAttachment()
+    public function testBasicAttachment(): void
     {
         $swift = m::mock('stdClass');
         $message = $this->getMockBuilder('Illuminate\Mail\Message')->setMethods(['createAttachmentFromPath'])->setConstructorArgs([$swift])->getMock();
@@ -108,7 +108,7 @@ class MailMessageTest extends TestCase
         $message->attach('foo.jpg', ['mime' => 'image/jpeg', 'as' => 'bar.jpg']);
     }
 
-    public function testDataAttachment()
+    public function testDataAttachment(): void
     {
         $swift = m::mock('stdClass');
         $message = $this->getMockBuilder('Illuminate\Mail\Message')->setMethods(['createAttachmentFromData'])->setConstructorArgs([$swift])->getMock();

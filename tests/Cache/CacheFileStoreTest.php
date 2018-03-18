@@ -9,21 +9,21 @@ use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class CacheFileStoreTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
 
-    public function tearDown()
+    public function tearDown(): void
     {
         parent::tearDown();
 
         Carbon::setTestNow(null);
     }
 
-    public function testNullIsReturnedIfFileDoesntExist()
+    public function testNullIsReturnedIfFileDoesntExist(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('get')->will($this->throwException(new FileNotFoundException));
@@ -32,7 +32,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testPutCreatesMissingDirectories()
+    public function testPutCreatesMissingDirectories(): void
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foo');
@@ -43,7 +43,7 @@ class CacheFileStoreTest extends TestCase
         $store->put('foo', '0000000000', 0);
     }
 
-    public function testExpiredItemsReturnNull()
+    public function testExpiredItemsReturnNull(): void
     {
         $files = $this->mockFilesystem();
         $contents = '0000000000';
@@ -54,7 +54,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertNull($value);
     }
 
-    public function testValidItemReturnsContents()
+    public function testValidItemReturnsContents(): void
     {
         $files = $this->mockFilesystem();
         $contents = '9999999999'.serialize('Hello World');
@@ -63,7 +63,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertEquals('Hello World', $store->get('foo'));
     }
 
-    public function testStoreItemProperlyStoresValues()
+    public function testStoreItemProperlyStoresValues(): void
     {
         $files = $this->mockFilesystem();
         $store = $this->getMockBuilder('Illuminate\Cache\FileStore')->setMethods(['expiration'])->setConstructorArgs([$files, __DIR__])->getMock();
@@ -75,7 +75,7 @@ class CacheFileStoreTest extends TestCase
         $store->put('foo', 'Hello World', 10);
     }
 
-    public function testForeversAreStoredWithHighTimestamp()
+    public function testForeversAreStoredWithHighTimestamp(): void
     {
         $files = $this->mockFilesystem();
         $contents = '9999999999'.serialize('Hello World');
@@ -86,7 +86,7 @@ class CacheFileStoreTest extends TestCase
         $store->forever('foo', 'Hello World', 10);
     }
 
-    public function testForeversAreNotRemovedOnIncrement()
+    public function testForeversAreNotRemovedOnIncrement(): void
     {
         $files = $this->mockFilesystem();
         $contents = '9999999999'.serialize('Hello World');
@@ -97,7 +97,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertEquals('Hello World', $store->get('foo'));
     }
 
-    public function testIncrementDoesNotExtendCacheLife()
+    public function testIncrementDoesNotExtendCacheLife(): void
     {
         $files = $this->mockFilesystem();
         $expiration = Carbon::now()->addSeconds(50)->getTimestamp();
@@ -111,7 +111,7 @@ class CacheFileStoreTest extends TestCase
         $store->increment('foo');
     }
 
-    public function testRemoveDeletesFileDoesntExist()
+    public function testRemoveDeletesFileDoesntExist(): void
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foobull');
@@ -121,7 +121,7 @@ class CacheFileStoreTest extends TestCase
         $store->forget('foobull');
     }
 
-    public function testRemoveDeletesFile()
+    public function testRemoveDeletesFile(): void
     {
         $files = $this->mockFilesystem();
         $hash = sha1('foobar');
@@ -133,7 +133,7 @@ class CacheFileStoreTest extends TestCase
         $store->forget('foobar');
     }
 
-    public function testFlushCleansDirectory()
+    public function testFlushCleansDirectory(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
@@ -145,7 +145,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertTrue($result, 'Flush failed');
     }
 
-    public function testFlushFailsDirectoryClean()
+    public function testFlushFailsDirectoryClean(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__))->will($this->returnValue(true));
@@ -157,7 +157,7 @@ class CacheFileStoreTest extends TestCase
         $this->assertFalse($result, 'Flush should not have cleared directories');
     }
 
-    public function testFlushIgnoreNonExistingDirectory()
+    public function testFlushIgnoreNonExistingDirectory(): void
     {
         $files = $this->mockFilesystem();
         $files->expects($this->once())->method('isDirectory')->with($this->equalTo(__DIR__.'--wrong'))->will($this->returnValue(false));
