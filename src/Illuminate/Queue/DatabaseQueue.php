@@ -78,7 +78,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushToDatabase($queue, $this->createPayload($job, $data));
+        return $this->pushToDatabase($queue, $this->createPayload($this->getQueue($queue), $job, $data));
     }
 
     /**

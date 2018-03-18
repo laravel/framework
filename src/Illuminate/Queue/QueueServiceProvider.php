@@ -33,6 +33,8 @@ class QueueServiceProvider extends ServiceProvider
 
         $this->registerConnection();
 
+        $this->registerPayloadSerializerManager();
+
         $this->registerWorker();
 
         $this->registerListener();
@@ -157,6 +159,16 @@ class QueueServiceProvider extends ServiceProvider
     {
         $manager->addConnector('sqs', function () {
             return new SqsConnector;
+        });
+    }
+
+    /**
+     *
+     */
+    protected function registerPayloadSerializerManager()
+    {
+        $this->app->singleton(PayloadSerializerManager::class, function ($app) {
+            return new PayloadSerializerManager($app);
         });
     }
 

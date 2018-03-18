@@ -53,7 +53,7 @@ class SqsQueue extends Queue implements QueueContract
     public function size($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
-            'QueueUrl' => $this->getQueue($queue),
+            'QueueUrl' => $this->getQueueUrl($queue),
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
 
@@ -72,7 +72,7 @@ class SqsQueue extends Queue implements QueueContract
      */
     public function push($job, $data = '', $queue = null)
     {
-        return $this->pushRaw($this->createPayload($job, $data), $queue);
+        return $this->pushRaw($this->createPayload($this->getQueue($queue), $job, $data), $queue);
     }
 
     /**
@@ -86,7 +86,7 @@ class SqsQueue extends Queue implements QueueContract
     public function pushRaw($payload, $queue = null, array $options = [])
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue), 'MessageBody' => $payload,
+            'QueueUrl' => $this->getQueueUrl($queue), 'MessageBody' => $payload,
         ])->get('MessageId');
     }
 
@@ -102,7 +102,7 @@ class SqsQueue extends Queue implements QueueContract
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue),
+            'QueueUrl' => $this->getQueueUrl($queue),
             'MessageBody' => $this->createPayload($job, $data),
             'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
@@ -117,7 +117,7 @@ class SqsQueue extends Queue implements QueueContract
     public function pop($queue = null)
     {
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue = $this->getQueue($queue),
+            'QueueUrl' => $queue = $this->getQueueUrl($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
@@ -130,14 +130,23 @@ class SqsQueue extends Queue implements QueueContract
     }
 
     /**
+     * @param string|null $queue
+     * @return string
+     */
+    protected function getQueue($queue)
+    {
+        return $queue ?: $this->default;
+    }
+
+    /**
      * Get the queue or return the default.
      *
      * @param  string|null  $queue
      * @return string
      */
-    public function getQueue($queue)
+    public function getQueueUrl($queue)
     {
-        $queue = $queue ?: $this->default;
+        $queue = $this->getQueue($queue);
 
         return filter_var($queue, FILTER_VALIDATE_URL) === false
                         ? rtrim($this->prefix, '/').'/'.$queue : $queue;
