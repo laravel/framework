@@ -33,8 +33,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first', 'flatMap', 'keyBy',
-        'map', 'max', 'min', 'partition', 'reject', 'sortBy', 'sortByDesc', 'sum', 'unique',
+        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
+        'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
+        'reject', 'sortBy', 'sortByDesc', 'sum', 'unique',
     ];
 
     /**
