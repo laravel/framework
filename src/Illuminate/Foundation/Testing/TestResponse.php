@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Foundation\Testing\Constraints\SeeInOrder;
 
 /**
  * @mixin \Illuminate\Http\Response
@@ -293,20 +294,7 @@ class TestResponse
      */
     public function assertSeeInOrder(array $values)
     {
-        $position = 0;
-
-        foreach ($values as $value) {
-            $valuePosition = mb_strpos($this->getContent(), $value, $position);
-
-            if ($valuePosition === false || $valuePosition < $position) {
-                PHPUnit::fail(
-                    'Failed asserting that \''.$this->getContent().
-                    '\' contains "'.$value.'" in specified order.'
-                );
-            }
-
-            $position = $valuePosition + mb_strlen($value);
-        }
+        PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
         return $this;
     }
@@ -332,20 +320,7 @@ class TestResponse
      */
     public function assertSeeTextInOrder(array $values)
     {
-        $position = 0;
-
-        foreach ($values as $value) {
-            $valuePosition = mb_strpos(strip_tags($this->getContent()), $value, $position);
-
-            if ($valuePosition === false || $valuePosition < $position) {
-                PHPUnit::fail(
-                    'Failed asserting that \''.strip_tags($this->getContent()).
-                    '\' contains "'.$value.'" in specified order.'
-                );
-            }
-
-            $position = $valuePosition + mb_strlen($value);
-        }
+        PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
         return $this;
     }
