@@ -16,7 +16,7 @@ class SeeInOrder extends Constraint
     /**
      * The string we want to check the content of.
      *
-     * @var
+     * @var string
      */
     protected $content;
 
