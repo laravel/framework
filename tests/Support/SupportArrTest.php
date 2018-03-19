@@ -136,6 +136,65 @@ class SupportArrTest extends TestCase
         $this->assertEquals(100, Arr::first($array));
     }
 
+    public function testSecond()
+    {
+        $array = [100, 200, 300];
+
+        $value = Arr::second($array, function ($value) {
+            return $value >= 150;
+        });
+
+        $this->assertEquals(300, $value);
+        $this->assertEquals(200, Arr::second($array));
+    }
+
+    public function testThird()
+    {
+        $array = [100, 200, 300, 400];
+
+        $value = Arr::third($array, function ($value) {
+            return $value >= 150;
+        });
+
+        $this->assertEquals(400, $value);
+        $this->assertEquals(300, Arr::third($array));
+    }
+
+    public function testFourth()
+    {
+        $array = [100, 200, 300, 400, 500];
+
+        $value = Arr::fourth($array, function ($value) {
+            return $value >= 150;
+        });
+
+        $this->assertEquals(500, $value);
+        $this->assertEquals(400, Arr::fourth($array));
+    }
+
+    public function testFifth()
+    {
+        $array = [100, 200, 300, 400, 500, 600];
+
+        $value = Arr::fifth($array, function ($value) {
+            return $value >= 150;
+        });
+
+        $this->assertEquals(600, $value);
+        $this->assertEquals(500, Arr::fifth($array));
+    }
+
+    public function testFortyTwo()
+    {
+        $array = range(1, 43);
+        $value = Arr::fortyTwo($array, function ($value) {
+            return $value >= 2;
+        });
+
+        $this->assertEquals(43, $value);
+        $this->assertEquals(42, Arr::fortyTwo($array));
+    }
+
     public function testLast()
     {
         $array = [100, 200, 300];
@@ -151,6 +210,40 @@ class SupportArrTest extends TestCase
         $this->assertEquals(200, $last);
 
         $this->assertEquals(300, Arr::last($array));
+    }
+
+    public function testSecondToLast()
+    {
+        $array = [100, 200, 300];
+
+        $last = Arr::secondToLast($array, function ($value) {
+            return $value < 250;
+        });
+        $this->assertEquals(100, $last);
+
+        $last = Arr::secondToLast($array, function ($value, $key) {
+            return $key < 2;
+        });
+        $this->assertEquals(100, $last);
+
+        $this->assertEquals(200, Arr::secondToLast($array));
+    }
+
+    public function testThirdToLast()
+    {
+        $array = [100, 200, 300, 400];
+
+        $last = Arr::thirdToLast($array, function ($value) {
+            return $value < 350;
+        });
+        $this->assertEquals(100, $last);
+
+        $last = Arr::thirdToLast($array, function ($value, $key) {
+            return $key < 3;
+        });
+        $this->assertEquals(100, $last);
+
+        $this->assertEquals(200, Arr::thirdToLast($array));
     }
 
     public function testFlatten()
