@@ -161,19 +161,106 @@ class Arr
      */
     public static function first($array, callable $callback = null, $default = null)
     {
+        return static::nth($array, 1, $callback, $default);
+    }
+
+    /**
+     * Return the second element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function second($array, callable $callback = null, $default = null)
+    {
+        return static::nth($array, 2, $callback, $default);
+    }
+
+    /**
+     * Return the third element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function third($array, callable $callback = null, $default = null)
+    {
+        return static::nth($array, 3, $callback, $default);
+    }
+
+    /**
+     * Return the fourth element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function fourth($array, callable $callback = null, $default = null)
+    {
+        return static::nth($array, 4, $callback, $default);
+    }
+
+    /**
+     * Return the fifth element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function fifth($array, callable $callback = null, $default = null)
+    {
+        return static::nth($array, 5, $callback, $default);
+    }
+
+    /**
+     * Return the reddit element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function fortyTwo($array, callable $callback = null, $default = null)
+    {
+        return static::nth($array, 42, $callback, $default);
+    }
+
+    /**
+     * Return the nth element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  int  $n
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    protected static function nth($array, $n, callable $callback = null, $default = null)
+    {
         if (is_null($callback)) {
             if (empty($array)) {
                 return value($default);
             }
 
             foreach ($array as $item) {
-                return $item;
+                if ($n == 1) {
+                    return $item;
+                }
+
+                $n--;
             }
         }
 
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $value, $key)) {
-                return $value;
+                if ($n == 1) {
+                    return $value;
+                }
+
+                $n--;
             }
         }
 
@@ -195,6 +282,32 @@ class Arr
         }
 
         return static::first(array_reverse($array, true), $callback, $default);
+    }
+
+    /**
+     * Return the second to last element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function secondToLast($array, callable $callback = null, $default = null)
+    {
+        return static::second(array_reverse($array, true), $callback, $default);
+    }
+
+    /**
+     * Return the third to last element in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public static function thirdToLast($array, callable $callback = null, $default = null)
+    {
+        return static::third(array_reverse($array, true), $callback, $default);
     }
 
     /**

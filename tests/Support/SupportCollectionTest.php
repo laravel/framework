@@ -46,6 +46,57 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function nthItemMethodsDataProvider()
+    {
+        // this seemed more sensible than typing them out again and again
+        return [
+            [range(1, 5), 'second', 2],
+            [range(1, 5), 'second', 3, function ($i) { return $i > 1;}],
+            [range(1, 5), 'second', 100, function ($i) { return $i < 1;}, 100],
+            [[], 'second', 100, null, 100],
+
+            [range(1, 5), 'third', 3],
+            [range(1, 5), 'third', 4, function ($i) { return $i > 1;}],
+            [range(1, 5), 'third', 100, function ($i) { return $i < 1;}, 100],
+            [[], 'third', 100, null, 100],
+
+            [range(1, 6), 'fourth', 4],
+            [range(1, 6), 'fourth', 5, function ($i) { return $i > 1;}],
+            [range(1, 6), 'fourth', 100, function ($i) { return $i < 1;}, 100],
+            [[], 'fourth', 100, null, 100],
+
+            [range(1, 7), 'fifth', 5],
+            [range(1, 7), 'fifth', 6, function ($i) { return $i > 1;}],
+            [range(1, 7), 'fifth', 100, function ($i) { return $i < 1;}, 100],
+            [[], 'fifth', 100, null, 100],
+
+            [range(1, 43), 'fortyTwo', 42],
+            [range(1, 43), 'fortyTwo', 43, function ($i) { return $i > 1;}],
+            [range(1, 43), 'fortyTwo', 100, function ($i) { return $i < 1;}, 100],
+            [[], 'fortyTwo', 100, null, 100],
+
+            [range(1, 5), 'secondToLast', 4],
+            [range(1, 5), 'secondToLast', 3, function ($i) { return $i < 5;}],
+            [range(1, 5), 'secondToLast', 100, function ($i) { return $i > 5;}, 100],
+            [[], 'secondToLast', 100, null, 100],
+
+            [range(1, 5), 'thirdToLast', 3],
+            [range(1, 5), 'thirdToLast', 2, function ($i) { return $i < 5;}],
+            [range(1, 5), 'thirdToLast', 100, function ($i) { return $i > 5;}, 100],
+            [[], 'thirdToLast', 100, null, 100],
+        ];
+    }
+
+    /**
+     * @dataProvider nthItemMethodsDataProvider
+     */
+    public function testNthItemMethods($data, $method, $expected, $callback = null, $default = null)
+    {
+        $c = new Collection($data);
+        $this->assertEquals($expected, $c->$method($callback, $default));
+    }
+
+
     public function testFirstWhere()
     {
         $data = new Collection([

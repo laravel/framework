@@ -636,6 +636,66 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the second item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function second(callable $callback = null, $default = null)
+    {
+        return Arr::second($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the third item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function third(callable $callback = null, $default = null)
+    {
+        return Arr::third($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the fourth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function fourth(callable $callback = null, $default = null)
+    {
+        return Arr::fourth($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the fifth item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function fifth(callable $callback = null, $default = null)
+    {
+        return Arr::fifth($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the reddit item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function fortyTwo(callable $callback = null, $default = null)
+    {
+        return Arr::fortyTwo($this->items, $callback, $default);
+    }
+
+    /**
      * Get the first item by the given key value pair.
      *
      * @param  string  $key
@@ -883,6 +943,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function last(callable $callback = null, $default = null)
     {
         return Arr::last($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the second to last item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function secondToLast(callable $callback = null, $default = null)
+    {
+        return Arr::secondToLast($this->items, $callback, $default);
+    }
+
+    /**
+     * Get the third to last item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function thirdToLast(callable $callback = null, $default = null)
+    {
+        return Arr::thirdToLast($this->items, $callback, $default);
     }
 
     /**
