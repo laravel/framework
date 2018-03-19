@@ -7,32 +7,32 @@ use PHPUnit\Framework\Constraint\Constraint;
 class SeeInOrder extends Constraint
 {
     /**
-     * The value that failed. Used to display in the error message.
-     *
-     * @var string
-     */
-    protected $failedValue;
-
-    /**
-     * The string we want to check the content of.
+     * The string under validation.
      *
      * @var string
      */
     protected $content;
 
     /**
+     * The last value that failed to pass validation.
+     *
+     * @var string
+     */
+    protected $failedValue;
+
+    /**
      * Create a new constraint instance.
      *
-     * @param  string $content
+     * @param  string  $content
      * @return void
      */
-    public function __construct(string $content)
+    public function __construct($content)
     {
         $this->content = $content;
     }
 
     /**
-     * Check if the data is found in the given table.
+     * Determine if the rule passes validation.
      *
      * @param  array  $values
      * @return bool
@@ -78,8 +78,6 @@ class SeeInOrder extends Constraint
      */
     public function toString() : string
     {
-        $class = new ReflectionClass($this);
-
-        return $class->name;
+        return (new ReflectionClass($this))->name;
     }
 }
