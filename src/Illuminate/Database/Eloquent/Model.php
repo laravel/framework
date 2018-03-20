@@ -62,6 +62,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public $incrementing = true;
 
     /**
+     * The foreign key for the model used in relationships.
+     *
+     * @var string
+     */
+    protected $foreignKey;
+
+    /**
      * The relations to eager load on every query.
      *
      * @var array
@@ -1372,7 +1379,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_'.$this->getKeyName();
+        if (! isset($this->foreignKey)) {
+            return Str::snake(class_basename($this)) . '_' . $this->getKeyName();
+        }
+
+        return $this->foreignKey;
     }
 
     /**
