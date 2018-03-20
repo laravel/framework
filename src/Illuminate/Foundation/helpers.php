@@ -770,9 +770,9 @@ if (! function_exists('response')) {
     /**
      * Return a new response from the application.
      *
-     * @param  string  $content
-     * @param  int     $status
-     * @param  array   $headers
+     * @param  string|array  $content
+     * @param  int           $status
+     * @param  array         $headers
      * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Routing\ResponseFactory
      */
     function response($content = '', $status = 200, array $headers = [])
