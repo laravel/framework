@@ -40,7 +40,7 @@ class RedisManager implements Factory
     protected $connections;
 
     /**
-     * Whether or not event dispatcher is set on connections.
+     * Indicates whether event dispatcher is set on connections.
      *
      * @var bool
      */
@@ -164,6 +164,16 @@ class RedisManager implements Factory
     }
 
     /**
+     * Enable setting event dispatcher on connections.
+     *
+     * @return array
+     */
+    public function enableEvents()
+    {
+        return $this->events = true;
+    }
+    
+        /**
      * Disable setting event dispatcher on connections.
      *
      * @return array
