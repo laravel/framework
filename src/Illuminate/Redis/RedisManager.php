@@ -173,7 +173,7 @@ class RedisManager implements Factory
         return $this->events = true;
     }
     
-        /**
+    /**
      * Disable setting event dispatcher on connections.
      *
      * @return array
