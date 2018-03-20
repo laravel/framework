@@ -40,6 +40,13 @@ class RedisManager implements Factory
     protected $connections;
 
     /**
+     * Whether or not event dispatcher is set on connections.
+     *
+     * @var bool
+     */
+    protected $events = true;
+
+    /**
      * Create a new Redis manager instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
@@ -124,7 +131,7 @@ class RedisManager implements Factory
     {
         $connection->setName($name);
 
-        if ($this->app->bound('events')) {
+        if ($this->events && $this->app->bound('events')) {
             $connection->setEventDispatcher($this->app['events']);
         }
 
@@ -154,6 +161,16 @@ class RedisManager implements Factory
     public function connections()
     {
         return $this->connections;
+    }
+
+    /**
+     * Disable setting event dispatcher on connections.
+     *
+     * @return array
+     */
+    public function disableEvents()
+    {
+        return $this->events = false;
     }
 
     /**
