@@ -59,7 +59,7 @@ interface Filesystem
      *
      * @param  string  $path
      * @param  string  $visibility
-     * @return void
+     * @return bool
      */
     public function setVisibility($path, $visibility);
 
