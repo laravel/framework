@@ -412,7 +412,7 @@ class FactoryBuilder
      */
     protected function callAfterCallbacks(array $afterCallbacks, $model, $state)
     {
-        if (!isset($afterCallbacks[$this->class][$state])) {
+        if (! isset($afterCallbacks[$this->class][$state])) {
             return;
         }
 
