@@ -778,9 +778,9 @@ if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
      *
-     * @param  string  $name
-     * @param  array   $parameters
-     * @param  bool    $absolute
+     * @param  array|string  $name
+     * @param  array  $parameters
+     * @param  bool  $absolute
      * @return string
      */
     function route($name, $parameters = [], $absolute = true)
