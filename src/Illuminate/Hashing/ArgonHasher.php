@@ -29,6 +29,19 @@ class ArgonHasher implements HasherContract
     protected $threads = 2;
 
     /**
+     * Create a new hasher instance.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    public function __construct(array $options = [])
+    {
+        $this->time = $options['time'] ?? $this->time;
+        $this->memory = $options['memory'] ?? $this->memory;
+        $this->threads = $options['threads'] ?? $this->threads;
+    }
+
+    /**
      * Get information about the given hashed value.
      *
      * @param  string  $hashedValue
@@ -42,8 +55,8 @@ class ArgonHasher implements HasherContract
     /**
      * Hash the given value.
      *
-     * @param  string $value
-     * @param  array $options
+     * @param  string  $value
+     * @param  array  $options
      * @return string
      */
     public function make($value, array $options = [])
@@ -64,9 +77,9 @@ class ArgonHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string $value
-     * @param  string $hashedValue
-     * @param  array $options
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
      * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
@@ -81,8 +94,8 @@ class ArgonHasher implements HasherContract
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string $hashedValue
-     * @param  array $options
+     * @param  string  $hashedValue
+     * @param  array  $options
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])

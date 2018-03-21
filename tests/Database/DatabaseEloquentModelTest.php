@@ -1271,6 +1271,35 @@ class DatabaseEloquentModelTest extends TestCase
         EloquentModelStub::flushEventListeners();
     }
 
+    public function testModelObserversCanBeAttachedToModelsThroughAnArray()
+    {
+        EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
+        $events->shouldReceive('forget');
+        EloquentModelStub::observe(['Illuminate\Tests\Database\EloquentTestObserverStub']);
+        EloquentModelStub::flushEventListeners();
+    }
+
+    public function testModelObserversCanBeAttachedToModelsThroughCallingObserveMethodOnlyOnce()
+    {
+        EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
+
+        $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestAnotherObserverStub@creating');
+        $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestAnotherObserverStub@saved');
+
+        $events->shouldReceive('forget');
+
+        EloquentModelStub::observe([
+            'Illuminate\Tests\Database\EloquentTestObserverStub',
+            'Illuminate\Tests\Database\EloquentTestAnotherObserverStub',
+        ]);
+
+        EloquentModelStub::flushEventListeners();
+    }
+
     public function testSetObservableEvents()
     {
         $class = new EloquentModelStub;
@@ -1709,6 +1738,17 @@ class DatabaseEloquentModelTest extends TestCase
 }
 
 class EloquentTestObserverStub
+{
+    public function creating()
+    {
+    }
+
+    public function saved()
+    {
+    }
+}
+
+class EloquentTestAnotherObserverStub
 {
     public function creating()
     {

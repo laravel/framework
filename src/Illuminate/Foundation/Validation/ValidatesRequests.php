@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Validation;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
 use Illuminate\Validation\ValidationException;
@@ -58,7 +57,7 @@ trait ValidatesRequests
     protected function extractInputFromRules(Request $request, array $rules)
     {
         return $request->only(collect($rules)->keys()->map(function ($rule) {
-            return Str::contains($rule, '.') ? explode('.', $rule)[0] : $rule;
+            return explode('.', $rule)[0];
         })->unique()->toArray());
     }
 

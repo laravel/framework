@@ -320,6 +320,30 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Create an instance of any handler available in Monolog.
+     *
+     * @param  array  $config
+     * @return \Psr\Log\LoggerInterface
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     */
+    protected function createMonologDriver(array $config)
+    {
+        if (! is_a($config['handler'], HandlerInterface::class, true)) {
+            throw new InvalidArgumentException(
+                $config['handler'].' must be an instance of '.HandlerInterface::class
+            );
+        }
+
+        $handlers = [$this->prepareHandler(
+            $this->app->make($config['handler'], $config['with'] ?? [])
+        )];
+
+        return new Monolog($this->parseChannel($config), $handlers);
+    }
+
+    /**
      * Prepare the handlers for usage by Monolog.
      *
      * @param  array  $handlers

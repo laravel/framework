@@ -2,9 +2,41 @@
 
 ## [Unreleased]
 
+### Added
+- Added `view:cache` command ([9fd1273](https://github.com/laravel/framework/commit/9fd1273ad79a46bb3aa006129109c6bc72766e4b), [2ab8acf](https://github.com/laravel/framework/commit/2ab8acfef5d7e784148b2367b5bcf083a0d0d024))
+- Added `min()` and `max()` to as higher order proxies ([#23560](https://github.com/laravel/framework/pull/23560))
+- Added `@elseauth` and `@elseguest` Blade directives ([#23569](https://github.com/laravel/framework/pull/23569))
+- Added support for hashing configuration ([#23573](https://github.com/laravel/framework/pull/23573), [d6e3ca9](https://github.com/laravel/framework/commit/d6e3ca97ff4175ff6a9b270b65b04c0d836a7bec))
+- Allow tagged cache keys to be incremented/decremented ([#23578](https://github.com/laravel/framework/pull/23578))
+
+### Changed
+- Support generating a signed route with a `UrlRoutable` parameter ([#23584](https://github.com/laravel/framework/pull/23584))
+
+
+## v5.6.12 (2018-03-14)
+
+### Added
+- Added `fromSub()` and `fromRaw()` methods to query builder ([#23476](https://github.com/laravel/framework/pull/23476))
+- Added "Not Regex" validation rule ([#23475](https://github.com/laravel/framework/pull/23475))
+- Added seed parameter to `Arr::shuffle()` ([#23490](https://github.com/laravel/framework/pull/23490))
+- Added after callback to model factories ([#23495](https://github.com/laravel/framework/pull/23495), [d79509d](https://github.com/laravel/framework/commit/d79509dfb82a8518ca0a0ccb9d4986cfa632b1ab))
+- Added `Request::anyFilled()` method ([#23499](https://github.com/laravel/framework/pull/23499), [896d817](https://github.com/laravel/framework/commit/896d817a13bcf9bc879e53e4f8b7b5b15c27ee86))
+- Added support for signed routes ([#23519](https://github.com/laravel/framework/pull/23519))
+- Added `assertNotFound()` and `assertForbidden()` methods to `TestResponse` ([#23526](https://github.com/laravel/framework/pull/23526))
+- Added test helpers to assert that a job has been queued with a chain ([#23531](https://github.com/laravel/framework/pull/23531), [696f4d8](https://github.com/laravel/framework/commit/696f4d88c132ac39a3a805dbe490b3b754c9ce5f))
+
 ### Changed
 - Only set id on `NotificationFake` if there is no id set ([#23470](https://github.com/laravel/framework/pull/23470))
 - Check whether `fetch()` method exists in `Application::output()` ([#23471](https://github.com/laravel/framework/pull/23471))
+- Improve asset loading in `app.stub` ([#23479](https://github.com/laravel/framework/pull/23479))
+- Support ignoring a model during a unique validation check ([#23524](https://github.com/laravel/framework/pull/23524))
+- Support multiple model observers ([#23507](https://github.com/laravel/framework/pull/23507))
+- `LogManager` driver capable of producing logger with any Monolog handler ([#23527](https://github.com/laravel/framework/pull/23527), [d499617](https://github.com/laravel/framework/commit/d4996170ec0ea2d5189db213c51ebcf4f526ab6d))
+- Support passing model instance to `updateExistingPivot()` ([#23535](https://github.com/laravel/framework/pull/23535))
+- Allow for custom `TokenGuard` fields ([#23542](https://github.com/laravel/framework/pull/23542))
+
+### Fixed
+- Fixed clearing the cache without a cache directory ([#23538](https://github.com/laravel/framework/pull/23538))
 
 
 ## v5.6.11 (2018-03-09)
