@@ -2,7 +2,6 @@
 
 namespace Illuminate\Routing\Exceptions;
 
-use Exception;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class InvalidSignatureException extends HttpException
