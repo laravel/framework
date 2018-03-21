@@ -802,6 +802,21 @@ if (! function_exists('route')) {
     }
 }
 
+if (! function_exists('signed_route')) {
+    /**
+     * Create a signed route URL for a named route.
+     *
+     * @param  string  $name
+     * @param  array   $parameters
+     * @param  \DateTimeInterface|int    $expiration
+     * @return string
+     */
+    function signed_route($name, $parameters = [], $expiration = null)
+    {
+        return app('url')->signedRoute($name, $parameters, $expiration);
+    }
+}
+
 if (! function_exists('secure_asset')) {
     /**
      * Generate an asset path for the application.
