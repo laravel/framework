@@ -300,9 +300,10 @@ class FactoryBuilder
     {
         foreach ($this->activeStates as $state) {
             if (! isset($this->states[$this->class][$state])) {
-                if ($this->afterStateExists($state)) {
+                if ($this->stateHasAfterCallback($state)) {
                     continue;
                 }
+
                 throw new InvalidArgumentException("Unable to locate [{$state}] state for [{$this->class}].");
             }
 
@@ -421,11 +422,14 @@ class FactoryBuilder
     }
 
     /**
+     * Determine if the given state has an "after" callback.
+     *
      * @param  string  $state
      * @return bool
      */
-    protected function afterStateExists($state)
+    protected function stateHasAfterCallback($state)
     {
-        return  isset($this->afterMaking[$this->class][$state]) || isset($this->afterCreating[$this->class][$state]);
+        return isset($this->afterMaking[$this->class][$state]) ||
+               isset($this->afterCreating[$this->class][$state]);
     }
 }
