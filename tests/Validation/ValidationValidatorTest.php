@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
@@ -3796,6 +3797,29 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
         $this->assertEquals('name must be taylor', $v->errors()->all()[0]);
 
+        // Test passing case with class name..
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'taylor'],
+            ['name' => TaylorRuleFake::class]
+        );
+
+        $v->setContainer(new Container());
+
+        $this->assertTrue($v->passes());
+
+        // Test failling case with class name..
+        $v = new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => 'adam'],
+            ['name' => [TaylorRuleFake::class]]
+        );
+
+        $v->setContainer(new Container());
+
+        $this->assertTrue($v->fails());
+        $this->assertEquals('name must be taylor', $v->errors()->all()[0]);
+
         // Test passing case with Closure...
         $v = new Validator(
             $this->getIlluminateArrayTranslator(),
@@ -3912,5 +3936,18 @@ class ValidationValidatorTest extends TestCase
         return new \Illuminate\Translation\Translator(
             new \Illuminate\Translation\ArrayLoader, 'en'
         );
+    }
+}
+
+class TaylorRuleFake implements Rule
+{
+    public function passes($attribute, $value)
+    {
+        return $value === 'taylor';
+    }
+
+    public function message()
+    {
+        return ':attribute must be taylor';
     }
 }
