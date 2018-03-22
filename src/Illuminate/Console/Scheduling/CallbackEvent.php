@@ -61,6 +61,7 @@ class CallbackEvent extends Event
         }
 
         $pid = getmypid();
+
         register_shutdown_function(function () use ($pid) {
             if ($pid === getmypid()) {
                 $this->removeMutex();
