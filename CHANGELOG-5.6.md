@@ -4,7 +4,7 @@
 
 ### Added
 - Added `view:cache` command ([9fd1273](https://github.com/laravel/framework/commit/9fd1273ad79a46bb3aa006129109c6bc72766e4b), [2ab8acf](https://github.com/laravel/framework/commit/2ab8acfef5d7e784148b2367b5bcf083a0d0d024))
-- Added `min()` and `max()` to as higher order proxies ([#23560](https://github.com/laravel/framework/pull/23560))
+- Added `min()` and `max()` and `groupBy()` to as higher order proxies ([#23560](https://github.com/laravel/framework/pull/23560),[#23608](https://github.com/laravel/framework/pull/23608))
 - Added `@elseauth` and `@elseguest` Blade directives ([#23569](https://github.com/laravel/framework/pull/23569))
 - Added support for hashing configuration ([#23573](https://github.com/laravel/framework/pull/23573), [d6e3ca9](https://github.com/laravel/framework/commit/d6e3ca97ff4175ff6a9b270b65b04c0d836a7bec))
 - Allow tagged cache keys to be incremented/decremented ([#23578](https://github.com/laravel/framework/pull/23578))
