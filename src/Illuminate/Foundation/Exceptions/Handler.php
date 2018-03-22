@@ -23,6 +23,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Illuminate\Routing\Exceptions\InvalidSignatureException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -57,6 +58,7 @@ class Handler implements ExceptionHandlerContract
         AuthorizationException::class,
         HttpException::class,
         HttpResponseException::class,
+        InvalidSignatureException::class,
         ModelNotFoundException::class,
         TokenMismatchException::class,
         ValidationException::class,
