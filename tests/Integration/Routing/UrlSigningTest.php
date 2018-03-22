@@ -61,7 +61,7 @@ class UrlSigningTest extends TestCase
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);
-        $response->assertStatus(401);
+        $response->assertStatus(403);
     }
 
     public function test_signed_middleware_with_routable_parameter()
