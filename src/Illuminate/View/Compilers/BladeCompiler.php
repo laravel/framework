@@ -372,12 +372,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
     public function parseArguments($expression)
     {
         $regex = '/^(\s*(?:' // Match just the first argument, composed of one or more of either:
-                . '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"' // double quoted string,
-                . '|\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'' // single quoted string,
-                . '|\[(?:(?1),?)*\]' // nested square arrays,
-                . '|(?:\w|->|::)+\s*\((?:(?1),?)*\)' // nested functions or arrays,
-                . '|[^,\'"\[\]\(\)]+' // something else but none of the above.
-            . ')+\s*)(?:$|(?>,\s*)(?!$))/i'; // Match end of string or argument separator.
+                .'"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"' // double quoted string,
+                .'|\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'' // single quoted string,
+                .'|\[(?:(?1),?)*\]' // nested square arrays,
+                .'|(?:\w|->|::)+\s*\((?:(?1),?)*\)' // nested functions or arrays,
+                .'|[^,\'"\[\]\(\)]+' // something else but none of the above.
+            .')+\s*)(?:$|(?>,\s*)(?!$))/i'; // Match end of string or argument separator.
 
         $arguments = [];
         $expression = $this->stripParentheses($expression);
