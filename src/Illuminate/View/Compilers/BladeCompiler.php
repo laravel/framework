@@ -364,6 +364,36 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
+     * Parse given expression into an array of arguments.
+     *
+     * @param  string  $expression
+     * @return array
+     */
+    public function parseArguments($expression)
+    {
+        $regex = '/^(\s*(?:' // Match just the first argument, composed of one or more of either:
+                . '"[^"\\\\]*(?:\\\\.[^"\\\\]*)*"' // double quoted string,
+                . '|\'[^\'\\\\]*(?:\\\\.[^\'\\\\]*)*\'' // single quoted string,
+                . '|\[(?:(?1),?)*\]' // nested square arrays,
+                . '|(?:\w|->|::)+\s*\((?:(?1),?)*\)' // nested functions or arrays,
+                . '|[^,\'"\[\]\(\)]+' // something else but none of the above.
+            . ')+\s*)(?:$|(?>,\s*)(?!$))/i'; // Match end of string or argument separator.
+
+        $arguments = [];
+        $expression = $this->stripParentheses($expression);
+
+        // Looping the regex may not match whole expression for malformed argument lists.
+        // We will just ignore all unmatched arguments, as used regex is anyway quite
+        // forgiving in terms of syntax errors. We'll leave spotting these to user.
+        while (preg_match($regex, $expression, $match)) {
+            $arguments[] = trim($match[1]);
+            $expression = substr($expression, strlen($match[0]));
+        }
+
+        return $arguments;
+    }
+
+    /**
      * Register a custom Blade compiler.
      *
      * @param  callable  $compiler
