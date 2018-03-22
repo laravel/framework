@@ -19,11 +19,11 @@ trait CompilesJson
      */
     protected function compileJson($expression)
     {
-        $parts = explode(',', $this->stripParentheses($expression));
+        $parts = $this->parseArguments($expression);
 
-        $options = isset($parts[1]) ? trim($parts[1]) : $this->encodingOptions;
+        $options = $parts[1] ?? $this->encodingOptions;
 
-        $depth = isset($parts[2]) ? trim($parts[2]) : 512;
+        $depth = $parts[2] ?? 512;
 
         return "<?php echo json_encode($parts[0], $options, $depth) ?>";
     }
