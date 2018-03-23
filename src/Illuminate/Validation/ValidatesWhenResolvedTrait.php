@@ -18,9 +18,9 @@ trait ValidatesWhenResolvedTrait
 
         $instance = $this->getValidatorInstance();
 
-        if (! $this->passesAuthorization()) {
+        if (!$this->passesAuthorization()) {
             $this->failedAuthorization();
-        } elseif (! $instance->passes()) {
+        } elseif (!$instance->passes()) {
             $this->failedValidation($instance);
         }
     }
@@ -77,10 +77,10 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      *
-     * @throws \Illuminate\Validation\UnauthorizedException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     protected function failedAuthorization()
     {
-        throw new UnauthorizedException;
+        throw new AuthorizationException('This action is unauthorized.');
     }
 }
