@@ -25,6 +25,23 @@ class AddHttp2ServerPushTest extends TestCase
     }
 
     /** @test */
+    public function it_will_not_modify_a_json_response()
+    {
+        $request = new Request();
+
+        $next = $this->getNext('pageWithCss');
+
+        $response = $this->middleware->handle($request, function ($request) use ($next) {
+            $response = $next($request);
+            $response->headers->set('Content-Type', 'application/json');
+
+            return $response;
+        });
+
+        $this->assertFalse($this->isServerPushResponse($response));
+    }
+
+    /** @test */
     public function it_will_return_a_css_link_header_for_css()
     {
         $request = new Request();

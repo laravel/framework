@@ -3,6 +3,7 @@
 namespace Illuminate\Http\Middleware;
 
 use Closure;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Symfony\Component\DomCrawler\Crawler;
@@ -28,7 +29,7 @@ class Http2ServerPush
     {
         $response = $next($request);
 
-        if ($response->isRedirection() || ! $response instanceof Response || $request->isJson()) {
+        if (! $response instanceof Response || $response->isRedirection() || $this->isJson($response)) {
             return $response;
         }
 
@@ -131,5 +132,10 @@ class Http2ServerPush
         }
 
         $response->header('Link', $link);
+    }
+
+    private function isJson(Response $response)
+    {
+        return Str::contains($response->headers->get('Content-Type'), ['/json', '+json']);
     }
 }
