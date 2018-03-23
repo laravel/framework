@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentTimestamps extends TestCase
 {
@@ -76,7 +76,6 @@ class DatabaseEloquentTimestamps extends TestCase
         $this->assertEquals($now->toDateTimeString(), $user->created_at->toDateTimeString());
         $this->assertEquals($now->toDateTimeString(), $user->updated_at->toDateTimeString());
     }
-
 
     public function testUserWithCreatedAt()
     {
