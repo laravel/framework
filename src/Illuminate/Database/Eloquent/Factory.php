@@ -116,11 +116,12 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  callable  $callback
+     * @param  string  $name
      * @return $this
      */
-    public function afterMaking($class, $callback)
+    public function afterMaking($class, callable $callback, $name = 'default')
     {
-        $this->afterMaking[$class]['default'][] = $callback;
+        $this->afterMaking[$class][$name][] = $callback;
 
         return $this;
     }
@@ -133,11 +134,9 @@ class Factory implements ArrayAccess
      * @param  callable  $callback
      * @return $this
      */
-    public function afterMakingState($class, $state, $callback)
+    public function afterMakingState($class, $state, callable $callback)
     {
-        $this->afterMaking[$class][$state][] = $callback;
-
-        return $this;
+        return $this->afterMaking($class, $callback, $state);
     }
 
     /**
@@ -145,11 +144,12 @@ class Factory implements ArrayAccess
      *
      * @param  string  $class
      * @param  callable  $callback
+     * @param  string $name
      * @return $this
      */
-    public function afterCreating($class, $callback)
+    public function afterCreating($class, callable $callback, $name = 'default')
     {
-        $this->afterCreating[$class]['default'][] = $callback;
+        $this->afterCreating[$class][$name][] = $callback;
 
         return $this;
     }
@@ -162,11 +162,9 @@ class Factory implements ArrayAccess
      * @param  callable  $callback
      * @return $this
      */
-    public function afterCreatingState($class, $state, $callback)
+    public function afterCreatingState($class, $state, callable $callback)
     {
-        $this->afterCreating[$class][$state][] = $callback;
-
-        return $this;
+        return $this->afterCreating($class, $callback, $state);
     }
 
     /**
