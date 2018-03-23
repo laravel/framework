@@ -19,6 +19,13 @@ abstract class Connection
     protected $client;
 
     /**
+     * The Redis connection name.
+     *
+     * @var string|null
+     */
+    protected $name;
+
+    /**
      * Subscribe to a set of given channels for messages.
      *
      * @param  array|string  $channels
@@ -94,6 +101,29 @@ abstract class Connection
     public function command($method, array $parameters = [])
     {
         return $this->client->{$method}(...$parameters);
+    }
+
+    /**
+     * Get the connection name.
+     *
+     * @return string|null
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Set the connections name.
+     *
+     * @param  string  $name
+     * @return $this
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+
+        return $this;
     }
 
     /**

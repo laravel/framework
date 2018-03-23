@@ -70,7 +70,7 @@ class BladeVerbatimTest extends AbstractBladeTestCase
     <?php echo e($third); ?>
 
 <?php endif; ?>
-<?php echo $__env->make("users", array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>
+<?php echo $__env->make("users", \Illuminate\Support\Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>
 
     {{ $fourth }} @include("test")
  
