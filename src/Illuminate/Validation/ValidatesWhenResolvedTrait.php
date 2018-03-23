@@ -2,6 +2,8 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Auth\Access\AuthorizationException;
+
 /**
  * Provides default implementation of ValidatesWhenResolved contract.
  */
@@ -77,10 +79,10 @@ trait ValidatesWhenResolvedTrait
      *
      * @return void
      *
-     * @throws \Illuminate\Validation\UnauthorizedException
+     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     protected function failedAuthorization()
     {
-        throw new UnauthorizedException;
+        throw new AuthorizationException('This action is unauthorized.');
     }
 }
