@@ -324,7 +324,7 @@ class Repository implements CacheContract, ArrayAccess
             return $value;
         }
 
-        $this->put($key, $value = $callback(), $minutes);
+        $this->put($key, $value = $callback($minutes), $minutes);
 
         return $value;
     }
