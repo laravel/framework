@@ -555,28 +555,6 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
     }
 
-    public function testAddingTraversableLoop()
-    {
-        $factory = $this->getFactory();
-
-        $data = new \DatePeriod(\Carbon\Carbon::today(), \Carbon\CarbonInterval::day(), \Carbon\Carbon::tomorrow()->endOfDay());
-
-        $factory->addLoop($data);
-
-        $expectedLoop = [
-            'iteration' => 0,
-            'index' => 0,
-            'remaining' => 2,
-            'count' => 2,
-            'first' => true,
-            'last' => false,
-            'depth' => 1,
-            'parent' => null,
-        ];
-
-        $this->assertEquals([$expectedLoop], $factory->getLoopStack());
-    }
-
     public function testAddingLoopDoesNotCloseGenerator()
     {
         $factory = $this->getFactory();
@@ -595,7 +573,7 @@ class ViewFactoryTest extends TestCase
             $this->assertEquals(['a', 'b'], $chunk);
         }
     }
-
+    
     public function testAddingUncountableLoop()
     {
         $factory = $this->getFactory();
