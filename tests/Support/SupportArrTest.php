@@ -782,7 +782,7 @@ class SupportArrTest extends TestCase
             ],
             1 => [
                 'second' => 'Teacher',
-            ]
+            ],
         ], Arr::deepMerge($array1, $array2));
 
         $array1 = [
@@ -797,7 +797,7 @@ class SupportArrTest extends TestCase
             'first' => [
                 'name'    => 'Taylor',
                 'surname' => 'Otwell',
-            ]
+            ],
         ];
 
         $this->assertEquals([
@@ -806,7 +806,7 @@ class SupportArrTest extends TestCase
             'first' => [
                 'name'    => 'Taylor',
                 'surname' => 'Otwell',
-            ]
+            ],
         ], Arr::deepMerge($array1, $array2));
     }
 }
