@@ -72,6 +72,8 @@ trait HasEvents
                 'retrieved', 'creating', 'created', 'updating', 'updated',
                 'saving', 'saved', 'restoring', 'restored',
                 'deleting', 'deleted', 'forceDeleted',
+                'incrementing', 'incremented',
+                'decrementing', 'decremented'
             ],
             $this->observables
         );
@@ -297,6 +299,50 @@ trait HasEvents
     public static function deleted($callback)
     {
         static::registerModelEvent('deleted', $callback);
+    }
+
+    /**
+     * Register a incrementing model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function incrementing($callback)
+    {
+        static::registerModelEvent('incrementing', $callback);
+    }
+
+    /**
+     * Register a incremented model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function incremented($callback)
+    {
+        static::registerModelEvent('incremented', $callback);
+    }
+
+    /**
+     * Register a decrementing model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function decrementing($callback)
+    {
+        static::registerModelEvent('decrementing', $callback);
+    }
+
+    /**
+     * Register a decremented model event with the dispatcher.
+     *
+     * @param  \Closure|string  $callback
+     * @return void
+     */
+    public static function decremented($callback)
+    {
+        static::registerModelEvent('decremented', $callback);
     }
 
     /**
