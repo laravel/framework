@@ -637,11 +637,11 @@ class Arr
                 continue;
             }
 
-            if (static::isAssoc($value)) {
+            if (! static::exists($array2, $key)) {
                 continue;
             }
 
-            if (! static::exists($array2, $key)) {
+            if (is_integer($key)) {
                 continue;
             }
 
