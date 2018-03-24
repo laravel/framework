@@ -447,6 +447,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function incrementOrDecrement($column, $amount, $extra, $method)
     {
+
+        $method == 'increment' ? $event = 'incrementing' : $event = 'decrementing';
+
+        if ($this->fireModelEvent($event) === false) {
+            return false;
+        }
+
         $query = $this->newQuery();
 
         if (! $this->exists) {
@@ -472,6 +479,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected function incrementOrDecrementAttributeValue($column, $amount, $extra, $method)
     {
         $this->{$column} = $this->{$column} + ($method == 'increment' ? $amount : $amount * -1);
+
+        $method == 'increment' ? $event = 'incremented' : $event = 'decremented';
+
+        $this->fireModelEvent($event, false);
 
         $this->forceFill($extra);
 
