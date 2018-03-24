@@ -620,4 +620,34 @@ class Arr
 
         return ! is_array($value) ? [$value] : $value;
     }
+
+    /**
+     * Merges two arrays and takes multi-dimensional arrays into account.
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @return array
+     */
+    public static function deepMerge(array $array1, array $array2)
+    {
+        $array = array_merge($array1, $array2);
+
+        foreach ($array1 as $key => $value) {
+            if (! is_array($value)) {
+                continue;
+            }
+
+            if (! static::exists($array2, $key)) {
+                continue;
+            }
+
+            if (is_integer($key)) {
+                continue;
+            }
+
+            $array[$key] = static::deepMerge($value, $array2[$key]);
+        }
+
+        return $array;
+    }
 }

@@ -331,6 +331,20 @@ if (! function_exists('array_wrap')) {
     }
 }
 
+if (! function_exists('array_deep_merge')) {
+    /**
+     * Merges two arrays and takes multi-dimensional arrays into account.
+     *
+     * @param  array  $array1
+     * @param  array  $array2
+     * @return array
+     */
+    function array_deep_merge($array1, $array2)
+    {
+        return Arr::deepMerge($array1, $array2);
+    }
+}
+
 if (! function_exists('blank')) {
     /**
      * Determine if the given value is "blank".

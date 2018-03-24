@@ -672,4 +672,141 @@ class SupportArrTest extends TestCase
         $this->assertEquals([$object], Arr::wrap($object));
         $this->assertEquals([], Arr::wrap(null));
     }
+
+    public function testDeepMerge()
+    {
+        $array1 = [
+            'foo'   => 'bar',
+            'names' => [
+                'developer' => 'Taylor',
+            ],
+        ];
+
+        $array2 = [
+            'foo'   => 'foo',
+            'names' => [
+                'developer' => 'Abigail',
+            ],
+        ];
+
+        $this->assertEquals([
+            'foo'   => 'foo',
+            'names' => [
+                'developer' => 'Abigail',
+            ],
+        ], Arr::deepMerge($array1, $array2));
+
+        $array1 = [
+            'foo'   => 'bar',
+            'names' => [
+                'Taylor',
+            ],
+        ];
+
+        $array2 = [
+            'foo'   => 'foo',
+            'names' => [
+                'Abigail',
+            ],
+        ];
+
+        $this->assertEquals([
+            'foo'   => 'foo',
+            'names' => [
+                'Taylor',
+                'Abigail',
+            ],
+        ], Arr::deepMerge($array1, $array2));
+
+        $array1 = [
+            'developers' => [
+                [
+                    'name' => 'Taylor',
+                ],
+            ],
+        ];
+
+        $array2 = [
+            'developers' => [
+                [
+                    'name' => 'Abigail',
+                ],
+            ],
+        ];
+
+        $this->assertEquals([
+            'developers' => [
+                [
+                    'name' => 'Taylor',
+                ],
+                [
+                    'name' => 'Abigail',
+                ],
+            ],
+        ], Arr::deepMerge($array1, $array2));
+
+        $array1 = [
+            'jobs' => [
+                'first'  => 'Programmer',
+            ],
+        ];
+
+        $array2 = [
+            'jobs' => [
+                'second' => 'Teacher',
+            ],
+        ];
+
+        $this->assertEquals([
+            'jobs'  => [
+                'first'  => 'Programmer',
+                'second' => 'Teacher',
+            ],
+        ], Arr::deepMerge($array1, $array2));
+
+        $array1 = [
+            0 => [
+                'first' => 'Programmer',
+            ],
+        ];
+
+        $array2 = [
+            0 => [
+                'second' => 'Teacher',
+            ],
+        ];
+
+        $this->assertEquals([
+            0  => [
+                'first' => 'Programmer',
+            ],
+            1 => [
+                'second' => 'Teacher',
+            ],
+        ], Arr::deepMerge($array1, $array2));
+
+        $array1 = [
+            0 => 'a string',
+            'first' => [
+                'name' => 'Abigail',
+            ],
+        ];
+
+        $array2 = [
+            0 => 420,
+            'first' => [
+                'name'    => 'Taylor',
+                'surname' => 'Otwell',
+            ],
+        ];
+
+        $this->assertEquals([
+            0 => 'a string',
+            1 => 420,
+            'first' => [
+                'name'    => 'Taylor',
+                'surname' => 'Otwell',
+            ],
+        ], Arr::deepMerge($array1, $array2));
+    }
 }
