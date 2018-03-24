@@ -744,5 +744,24 @@ class SupportArrTest extends TestCase
                 ],
             ],
         ], Arr::deepMerge($array1, $array2));
+
+        $array1 = [
+            'jobs' => [
+                'first'  => 'Programmer',
+            ],
+        ];
+
+        $array2 = [
+            'jobs' => [
+                'second' => 'Teacher',
+            ],
+        ];
+
+        $this->assertEquals([
+            'jobs'  => [
+                'first'  => 'Programmer',
+                'second' => 'Teacher',
+            ],
+        ], Arr::deepMerge($array1, $array2));
     }
 }
