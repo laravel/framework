@@ -36,8 +36,9 @@ class JsonExpression extends Expression
             case 'string':
                 return '?';
             case 'object':
-            case 'array':
                 return '?';
+            case 'array':
+                return 'json_merge(?, \'[]\')';
         }
 
         throw new InvalidArgumentException("JSON value is of illegal type: {$type}");
