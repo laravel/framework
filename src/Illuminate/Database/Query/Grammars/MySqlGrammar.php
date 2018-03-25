@@ -60,9 +60,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileUnion(array $union)
     {
-        $conjuction = $union['all'] ? ' union all ' : ' union ';
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
 
-        return $conjuction.'('.$union['query']->toSql().')';
+        return $conjunction.'('.$union['query']->toSql().')';
     }
 
     /**

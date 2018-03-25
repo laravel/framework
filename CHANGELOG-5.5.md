@@ -1,5 +1,12 @@
 # Release Notes for 5.5.x
 
+## [Unreleased]
+
+### Changed
+- Only set id on `NotificationFake` if no id is set ([#23474](https://github.com/laravel/framework/pull/23474))
+- Removed attribute filling from pivot models ([#23554](https://github.com/laravel/framework/pull/23554))
+
+
 ## v5.5.39 (2018-03-09)
 
 ### Fixed
