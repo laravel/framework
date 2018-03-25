@@ -788,11 +788,11 @@ class SupportHelpersTest extends TestCase
 
     public function testMemoizeWithFalsyReturnValueStillCaches()
     {
-        $this->memoizeFalsyRunTimes = 0;
+        $this->memoizeFalsyRunCount = 0;
 
         $memoized = function() {
             return memoize(function () {
-                $this->memoizeFalsyRunTimes++;
+                $this->memoizeFalsyRunCount++;
 
                 return false;
             });
@@ -802,7 +802,7 @@ class SupportHelpersTest extends TestCase
         $resultCached = $memoized();
 
         $this->assertEquals($resultFirst, $resultCached);
-        $this->assertEquals(1, $this->memoizeFalsyRunTimes);
+        $this->assertEquals(1, $this->memoizeFalsyRunCount);
     }
 
     public function testMemoizeWithVaryingParametersDoesntCache()
