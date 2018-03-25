@@ -36,9 +36,9 @@ class ServeCommand extends Command
 
         $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
 
-        passthru($this->serverCommand(), $returnVar);
+        passthru($this->serverCommand(), $status);
 
-        return $returnVar;
+        return $status;
     }
 
     /**
