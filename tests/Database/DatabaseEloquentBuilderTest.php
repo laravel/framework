@@ -28,6 +28,16 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('baz', $result);
     }
 
+    public function testFindMethodDoesNotQueryWhenGivenNull()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($this->getMockModel());
+        $builder->getQuery()->shouldReceive('where')->never();
+
+        $result = $builder->find(null);
+        $this->assertNull($result);
+    }
+
     public function testFindOrNewMethodModelFound()
     {
         $model = $this->getMockModel();
