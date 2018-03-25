@@ -3898,16 +3898,16 @@ class ValidationValidatorTest extends TestCase
             'type' => 'admin',
             'nested' => [
                 'foo' => 'bar',
-                'baz' => ''
+                'baz' => '',
             ],
-            'array' => [1, 2]
+            'array' => [1, 2],
         ];
 
         $rules = [
             'first' => 'required',
             'preferred' => 'required',
             'nested.foo' => 'required',
-            'array.*' => 'integer'
+            'array.*' => 'integer',
         ];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
@@ -3920,9 +3920,9 @@ class ValidationValidatorTest extends TestCase
             'first' => 'john',
             'preferred' => 'john',
             'nested' => [
-                'foo' => 'bar'
+                'foo' => 'bar',
             ],
-            'array' => [1, 2]
+            'array' => [1, 2],
         ];
 
         $this->assertEquals($expected, $data);

@@ -31,10 +31,10 @@ class FoundationFormRequestTest extends TestCase
             'name' => 'specified',
             'nested' => [
                 'foo' => 'bar',
-                'baz' => ''
+                'baz' => '',
             ],
             'array' => [1, 2],
-            'with' => 'extras'
+            'with' => 'extras',
         ];
 
         $request = $this->createRequest($payload);
@@ -44,9 +44,9 @@ class FoundationFormRequestTest extends TestCase
         $expected = [
             'name' => 'specified',
             'nested' => [
-                'foo' => 'bar'
+                'foo' => 'bar',
             ],
-            'array' => [1, 2]
+            'array' => [1, 2],
         ];
 
         $this->assertEquals($expected, $request->validated());
@@ -186,7 +186,7 @@ class FoundationTestFormRequestStub extends FormRequest
         return [
             'name' => 'required',
             'nested.foo' => 'required',
-            'array.*' => 'integer'
+            'array.*' => 'integer',
         ];
     }
 
