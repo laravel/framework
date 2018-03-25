@@ -3891,15 +3891,41 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateReturnsValidatedData()
     {
-        $post = ['first' => 'john',  'preferred'=>'john', 'last' => 'doe', 'type' => 'admin'];
+        $post = [
+            'first' => 'john',
+            'preferred' => 'john',
+            'last' => 'doe',
+            'type' => 'admin',
+            'nested' => [
+                'foo' => 'bar',
+                'baz' => ''
+            ],
+            'array' => [1, 2]
+        ];
 
-        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['first' => 'required', 'preferred'=> 'required']);
+        $rules = [
+            'first' => 'required',
+            'preferred' => 'required',
+            'nested.foo' => 'required',
+            'array.*' => 'integer'
+        ];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
         $v->sometimes('type', 'required', function () {
             return false;
         });
         $data = $v->validate();
 
-        $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+        $expected = [
+            'first' => 'john',
+            'preferred' => 'john',
+            'nested' => [
+                'foo' => 'bar'
+            ],
+            'array' => [1, 2]
+        ];
+
+        $this->assertEquals($expected, $data);
     }
 
     protected function getTranslator()

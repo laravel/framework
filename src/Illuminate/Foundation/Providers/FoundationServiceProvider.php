@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Providers;
 
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\AggregateServiceProvider;
@@ -41,7 +42,7 @@ class FoundationServiceProvider extends AggregateServiceProvider
             validator()->validate($this->all(), $rules, ...$params);
 
             return $this->only(collect($rules)->keys()->map(function ($rule) {
-                return explode('.', $rule)[0];
+                return Str::contains($rule, '*') ? explode('.', $rule)[0] : $rule;
             })->unique()->toArray());
         });
     }
