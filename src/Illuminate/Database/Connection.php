@@ -958,7 +958,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection used for reading.
      *
-     * @param  \PDO||\Closure|null  $pdo
+     * @param  \PDO|\Closure|null  $pdo
      * @return $this
      */
     public function setReadPdo($pdo)
