@@ -815,8 +815,10 @@ class SupportHelpersTest extends TestCase
 
         $resultFirst = $memoized('foo');
         $resultSecond = $memoized('bar');
+        $resultThird = $memoized('foo');
 
         $this->assertNotEquals($resultFirst, $resultSecond);
+        $this->assertEquals($resultFirst, $resultThird);
     }
 
     public function testOptional()
