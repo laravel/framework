@@ -980,30 +980,3 @@ class SupportTestArrayAccess implements ArrayAccess
         unset($this->attributes[$offset]);
     }
 }
-
-class SupportTestMemoize
-{
-    public static $falsyRunCount = 0;
-
-    public function simple()
-    {
-        return memoize(function () {
-            return microtime(true);
-        });
-    }
-
-    public function falsy()
-    {
-        return memoize(function () {
-            self::$falsyRunCount++;
-            return false;
-        });
-    }
-
-    public function varyingParameters($param)
-    {
-        return memoize(function () use ($param) {
-            return microtime(true) . $param;
-        });
-    }
-}
