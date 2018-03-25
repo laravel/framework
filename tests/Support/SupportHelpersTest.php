@@ -774,7 +774,7 @@ class SupportHelpersTest extends TestCase
 
     public function testMemoize()
     {
-        $memoized = function() {
+        $memoized = function () {
             return memoize(function () {
                 return microtime(true);
             });
@@ -790,7 +790,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->memoizeFalsyRunCount = 0;
 
-        $memoized = function() {
+        $memoized = function () {
             return memoize(function () {
                 $this->memoizeFalsyRunCount++;
 

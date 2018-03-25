@@ -701,10 +701,10 @@ if (! function_exists('memoize')) {
         $reflector = new ReflectionFunction($callback);
 
         $thumbprint = $reflector->getFilename()
-            . $reflector->getStartLine()
-            . $reflector->getEndLine()
-            . serialize($reflector->getParameters())
-            . serialize($reflector->getStaticVariables());
+            .$reflector->getStartLine()
+            .$reflector->getEndLine()
+            .serialize($reflector->getParameters())
+            .serialize($reflector->getStaticVariables());
 
         $hash = md5($thumbprint);
 
