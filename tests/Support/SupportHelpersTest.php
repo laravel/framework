@@ -784,6 +784,19 @@ class SupportHelpersTest extends TestCase
         })->something());
     }
 
+    public function testOptionalWithCallback()
+    {
+        $this->assertNull(optional(null, function () {
+            throw new RuntimeException(
+                'The optional callback should not be called for null'
+            );
+        }));
+
+        $this->assertEquals(10, optional(5, function ($number) {
+            return $number * 2;
+        }));
+    }
+
     public function testOptionalWithArray()
     {
         $this->assertEquals('here', optional(['present' => 'here'])['present']);
