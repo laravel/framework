@@ -772,6 +772,53 @@ class SupportHelpersTest extends TestCase
         throw_if(true, RuntimeException::class, 'Test Message');
     }
 
+    public function testMemoize()
+    {
+        $memoized = function() {
+            return memoize(function () {
+                return microtime(true);
+            });
+        };
+
+        $resultFirst = $memoized();
+        $resultCached = $memoized();
+
+        $this->assertEquals($resultFirst, $resultCached);
+    }
+
+    public function testMemoizeWithFalsyReturnValueStillCaches()
+    {
+        $this->memoizeFalsyRunTimes = 0;
+
+        $memoized = function() {
+            return memoize(function () {
+                $this->memoizeFalsyRunTimes++;
+
+                return false;
+            });
+        };
+
+        $resultFirst = $memoized();
+        $resultCached = $memoized();
+
+        $this->assertEquals($resultFirst, $resultCached);
+        $this->assertEquals(1, $this->memoizeFalsyRunTimes);
+    }
+
+    public function testMemoizeWithVaryingParametersDoesntCache()
+    {
+        $memoized = function ($param) {
+            return memoize(function () use ($param) {
+                return $param;
+            });
+        };
+
+        $resultFirst = $memoized('foo');
+        $resultSecond = $memoized('bar');
+
+        $this->assertNotEquals($resultFirst, $resultSecond);
+    }
+
     public function testOptional()
     {
         $this->assertNull(optional(null)->something());
@@ -929,5 +976,32 @@ class SupportTestArrayAccess implements ArrayAccess
     public function offsetUnset($offset)
     {
         unset($this->attributes[$offset]);
+    }
+}
+
+class SupportTestMemoize
+{
+    public static $falsyRunCount = 0;
+
+    public function simple()
+    {
+        return memoize(function () {
+            return microtime(true);
+        });
+    }
+
+    public function falsy()
+    {
+        return memoize(function () {
+            self::$falsyRunCount++;
+            return false;
+        });
+    }
+
+    public function varyingParameters($param)
+    {
+        return memoize(function () use ($param) {
+            return microtime(true) . $param;
+        });
     }
 }
