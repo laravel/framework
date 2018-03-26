@@ -1048,7 +1048,7 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($callbacksPerType as $type => $callbacks) {
-            if ($type === $abstract || ($object instanceof $type && ! in_array($type, $this->resolveStack))) {
+            if (! $this->pendingInResolveStack($object) && ($type === $abstract || $object instanceof $type)) {
                 $results = array_merge($results, $callbacks);
             }
         }
@@ -1068,6 +1068,24 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($callbacks as $callback) {
             $callback($object, $this);
         }
+    }
+
+    /**
+     * Check if object or a generalisation is pending in the resolve stack.
+     *
+     * @param   object    $object
+     *
+     * @return  bool
+     */
+    protected function pendingInResolveStack($object)
+    {
+        foreach ($this->resolveStack as $resolving) {
+            if ($resolving !== end($this->resolveStack) && $object instanceof $resolving) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
