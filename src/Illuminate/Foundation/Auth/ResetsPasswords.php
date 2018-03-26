@@ -14,19 +14,16 @@ trait ResetsPasswords
     use RedirectsUsers;
 
     /**
-     * Display the password reset view for the given token.
-     *
-     * If no token is present, display the link request form.
+     * Display the password reset view.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  string|null  $token
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function showResetForm(Request $request, $token = null)
+    public function showResetForm(Request $request)
     {
-        return view('auth.passwords.reset')->with(
-            ['token' => $token, 'email' => $request->email]
-        );
+        return view('auth.passwords.reset')->with([
+            'email' => $request->query('email')
+        ]);
     }
 
     /**
@@ -64,7 +61,6 @@ trait ResetsPasswords
     protected function rules()
     {
         return [
-            'token' => 'required',
             'email' => 'required|email',
             'password' => 'required|confirmed|min:6',
         ];
@@ -88,9 +84,9 @@ trait ResetsPasswords
      */
     protected function credentials(Request $request)
     {
-        return $request->only(
-            'email', 'password', 'password_confirmation', 'token'
-        );
+        return array_merge($request->only(
+            'email', 'password', 'password_confirmation'
+        ), ['hasValidSignature' => $request->hasValidSignature()]);
     }
 
     /**

@@ -2,18 +2,13 @@
 
 namespace Illuminate\Auth\Notifications;
 
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
 
 class ResetPassword extends Notification
 {
-    /**
-     * The password reset token.
-     *
-     * @var string
-     */
-    public $token;
-
     /**
      * The callback that should be used to build the mail message.
      *
@@ -22,14 +17,21 @@ class ResetPassword extends Notification
     public static $toMailCallback;
 
     /**
+     * The number minutes for which the reset link should be considered valid.
+     *
+     * @var int
+     */
+    protected $expiration;
+
+    /**
      * Create a notification instance.
      *
-     * @param  string  $token
+     * @param  int  $expiration
      * @return void
      */
-    public function __construct($token)
+    public function __construct($expiration = 60)
     {
-        $this->token = $token;
+        $this->expiration = $expiration;
     }
 
     /**
@@ -57,7 +59,9 @@ class ResetPassword extends Notification
 
         return (new MailMessage)
             ->line('You are receiving this email because we received a password reset request for your account.')
-            ->action('Reset Password', url(config('app.url').route('password.reset', $this->token, false)))
+            ->action('Reset Password', URL::signedRoute('password.reset', [
+                'email' => $notifiable->getEmailForPasswordReset()
+            ], Carbon::now()->addMinutes($this->expiration)))
             ->line('If you did not request a password reset, no further action is required.');
     }
 
