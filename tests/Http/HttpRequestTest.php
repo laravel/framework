@@ -551,7 +551,7 @@ class HttpRequestTest extends TestCase
     {
         $payload = '{"foo":[],"bar":{},"foobar":[1,2],"barfoo":{"test":"ok"}}';
         $request = Request::create('/', 'GET', [], [], [], ['CONTENT_TYPE' => 'application/json'], $payload);
-        $data = $request->json(null, null, false)->all();// false give stdClass  . true give array
+        $data = $request->json(null, null, false)->all(); // false give stdClass  . true give array
         $this->assertEquals($payload, json_encode($data));
     }
 
