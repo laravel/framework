@@ -3,8 +3,8 @@
 namespace Illuminate\Redis\Connections;
 
 use Closure;
-use Illuminate\Redis\Events\QueryExecuted;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Redis\Events\CommandExecuted;
 use Illuminate\Redis\Limiters\DurationLimiterBuilder;
 use Illuminate\Redis\Limiters\ConcurrencyLimiterBuilder;
 
@@ -21,18 +21,18 @@ abstract class Connection
     protected $client;
 
     /**
-     * The event dispatcher instance.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher
-     */
-    protected $events;
-
-    /**
      * The Redis connection name.
      *
      * @var string|null
      */
     protected $name;
+
+    /**
+     * The event dispatcher instance.
+     *
+     * @var \Illuminate\Contracts\Events\Dispatcher
+     */
+    protected $events;
 
     /**
      * Subscribe to a set of given channels for messages.
@@ -110,11 +110,13 @@ abstract class Connection
     public function command($method, array $parameters = [])
     {
         $start = microtime(true);
+
         $result = $this->client->{$method}(...$parameters);
+
         $time = round((microtime(true) - $start) * 1000, 2);
 
         if (isset($this->events)) {
-            $this->event(new QueryExecuted($method, $parameters, $time, $this));
+            $this->event(new CommandExecuted($method, $parameters, $time, $this));
         }
 
         return $result;
@@ -134,7 +136,7 @@ abstract class Connection
     }
 
     /**
-     * Register a Redis query listener with the connection.
+     * Register a Redis command listener with the connection.
      *
      * @param  \Closure  $callback
      * @return void
@@ -142,7 +144,7 @@ abstract class Connection
     public function listen(Closure $callback)
     {
         if (isset($this->events)) {
-            $this->events->listen(QueryExecuted::class, $callback);
+            $this->events->listen(CommandExecuted::class, $callback);
         }
     }
 

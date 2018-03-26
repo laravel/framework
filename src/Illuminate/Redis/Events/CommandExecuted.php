@@ -2,7 +2,7 @@
 
 namespace Illuminate\Redis\Events;
 
-class QueryExecuted
+class CommandExecuted
 {
     /**
      * The Redis command that was executed.
@@ -12,14 +12,14 @@ class QueryExecuted
     public $command;
 
     /**
-     * The array of query parameters.
+     * The array of command parameters.
      *
      * @var array
      */
     public $parameters;
 
     /**
-     * The number of milliseconds it took to execute the query.
+     * The number of milliseconds it took to execute the command.
      *
      * @var float
      */

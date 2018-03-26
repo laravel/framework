@@ -44,7 +44,7 @@ class RedisManager implements Factory
      *
      * @var bool
      */
-    protected $events = true;
+    protected $events = false;
 
     /**
      * Create a new Redis manager instance.
@@ -121,7 +121,7 @@ class RedisManager implements Factory
     }
 
     /**
-     * Get the connector instance for the current driver.
+     * Configure the given connection to prepare it for commands.
      *
      * @param  \Illuminate\Redis\Connections\Connection  $connection
      * @param  string  $name
@@ -132,7 +132,7 @@ class RedisManager implements Factory
         $connection->setName($name);
 
         if ($this->events && $this->app->bound('events')) {
-            $connection->setEventDispatcher($this->app['events']);
+            $connection->setEventDispatcher($this->app->make('events'));
         }
 
         return $connection;
@@ -164,23 +164,23 @@ class RedisManager implements Factory
     }
 
     /**
-     * Enable setting event dispatcher on connections.
+     * Enable the firing of Redis command events.
      *
-     * @return array
+     * @return void
      */
     public function enableEvents()
     {
-        return $this->events = true;
+        $this->events = true;
     }
 
     /**
-     * Disable setting event dispatcher on connections.
+     * Disable the firing of Redis command events.
      *
-     * @return array
+     * @return void
      */
     public function disableEvents()
     {
-        return $this->events = false;
+        $this->events = false;
     }
 
     /**
