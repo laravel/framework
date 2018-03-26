@@ -555,7 +555,6 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, json_encode($data));
     }
 
-
     public function testJSONEmulatingPHPBuiltInServer()
     {
         $payload = ['name' => 'taylor'];
