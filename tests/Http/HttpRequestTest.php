@@ -547,6 +547,14 @@ class HttpRequestTest extends TestCase
         $this->assertEquals($payload, $data);
     }
 
+    public function testJSONMethodByString()
+    {
+        $payload = '{"foo":[],"bar":{},"foobar":[1,2],"barfoo":{"test":"ok"}}';
+        $request = Request::create('/', 'GET', [], [], [], ['CONTENT_TYPE' => 'application/json'], $payload);
+        $data = $request->json(null, null, false)->all(); // false give stdClass  . true give array
+        $this->assertEquals($payload, json_encode($data));
+    }
+
     public function testJSONEmulatingPHPBuiltInServer()
     {
         $payload = ['name' => 'taylor'];
