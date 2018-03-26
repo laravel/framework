@@ -380,20 +380,59 @@ class ContainerTest extends TestCase
     public function testResolvingCallbacksAreCalledOnceForImplementations()
     {
         $container = new Container;
-        $resolving_invocations = 0;
-        $after_resolving_invocations = 0;
+        $resolving_contract_invocations = 0;
+        $after_resolving_contract_invocations = 0;
+        $resolving_implementation_invocations = 0;
+        $after_resolving_implementation_invocations = 0;
 
-        $container->resolving(IContainerContractStub::class, function () use (&$resolving_invocations) {
-            $resolving_invocations++;
+        $container->resolving(IContainerContractStub::class, function () use (&$resolving_contract_invocations) {
+            $resolving_contract_invocations++;
         });
-        $container->afterResolving(IContainerContractStub::class, function () use (&$after_resolving_invocations) {
-            $after_resolving_invocations++;
+        $container->afterResolving(IContainerContractStub::class, function () use (&$after_resolving_contract_invocations) {
+            $after_resolving_contract_invocations++;
+        });
+        $container->resolving(ContainerImplementationStub::class, function () use (&$resolving_implementation_invocations) {
+            $resolving_implementation_invocations++;
+        });
+        $container->afterResolving(ContainerImplementationStub::class, function () use (&$after_resolving_implementation_invocations) {
+            $after_resolving_implementation_invocations++;
         });
         $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
         $container->make(IContainerContractStub::class);
 
-        $this->assertEquals(1, $resolving_invocations);
-        $this->assertEquals(1, $after_resolving_invocations);
+        $this->assertEquals(1, $resolving_contract_invocations);
+        $this->assertEquals(1, $after_resolving_contract_invocations);
+        $this->assertEquals(1, $resolving_implementation_invocations);
+        $this->assertEquals(1, $after_resolving_implementation_invocations);
+    }
+
+    public function testResolvingCallbacksAreCalledForNestedDependencies()
+    {
+        $container = new Container;
+        $resolving_dependency_interface_invocations = 0;
+        $resolving_dependency_implementation_invocations = 0;
+        $resolving_dependent_invocations = 0;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->resolving(IContainerContractStub::class, function () use (&$resolving_dependency_interface_invocations) {
+            $resolving_dependency_interface_invocations++;
+        });
+
+        $container->resolving(ContainerImplementationStub::class, function () use (&$resolving_dependency_implementation_invocations) {
+            $resolving_dependency_implementation_invocations++;
+        });
+
+        $container->resolving(ContainerNestedDependentStubTwo::class, function () use (&$resolving_dependent_invocations) {
+            $resolving_dependent_invocations++;
+        });
+
+        $container->make(ContainerNestedDependentStubTwo::class);
+        $container->make(ContainerNestedDependentStubTwo::class);
+
+        $this->assertEquals(4, $resolving_dependency_interface_invocations);
+        $this->assertEquals(4, $resolving_dependency_implementation_invocations);
+        $this->assertEquals(2, $resolving_dependent_invocations);
     }
 
     public function testUnsetRemoveBoundInstances()
@@ -970,6 +1009,19 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
+    public function testInterfaceResolvingCallbacksShouldBeFiredWhenCalledWithAliases()
+    {
+        $container = new Container;
+        $container->alias(IContainerContractStub::class, 'foo');
+        $container->resolving(IContainerContractStub::class, function ($object) {
+            return $object->name = 'taylor';
+        });
+        $container->bind('foo', ContainerImplementationStub::class);
+        $instance = $container->make('foo');
+
+        $this->assertEquals('taylor', $instance->name);
+    }
+
     public function testMakeWithMethodIsAnAliasForMakeMethod()
     {
         $mock = $this->getMockBuilder(Container::class)
@@ -1145,11 +1197,33 @@ class ContainerDependentStub
     }
 }
 
+class ContainerDependentStubTwo
+{
+    public $implA;
+    public $implB;
+
+    public function __construct(IContainerContractStub $implA, IContainerContractStub $implB)
+    {
+        $this->implA = $implA;
+        $this->implB = $implB;
+    }
+}
+
 class ContainerNestedDependentStub
 {
     public $inner;
 
     public function __construct(ContainerDependentStub $inner)
+    {
+        $this->inner = $inner;
+    }
+}
+
+class ContainerNestedDependentStubTwo
+{
+    public $inner;
+
+    public function __construct(ContainerDependentStubTwo $inner)
     {
         $this->inner = $inner;
     }
