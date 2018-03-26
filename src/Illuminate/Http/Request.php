@@ -314,6 +314,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $default
+     * @param  bool   $assoc
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
     public function json($key = null, $default = null, $assoc = true)
