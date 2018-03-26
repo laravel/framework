@@ -686,6 +686,32 @@ if (! function_exists('last')) {
     }
 }
 
+if (! function_exists('memoize')) {
+    /**
+     * Memoize (temporarily cache) the result of a
+     * callback for the duration of the request.
+     *
+     * @param  callable $callback
+     * @return mixed
+     */
+    function memoize($callback)
+    {
+        static $caches = [];
+
+        $reflector = new ReflectionFunction($callback);
+
+        $thumbprint = $reflector->getFilename()
+            .$reflector->getStartLine()
+            .$reflector->getEndLine()
+            .serialize($reflector->getParameters())
+            .serialize($reflector->getStaticVariables());
+
+        $hash = md5($thumbprint);
+
+        return $caches[$hash] = $caches[$hash] ?? $callback();
+    }
+}
+
 if (! function_exists('object_get')) {
     /**
      * Get an item from an object using "dot" notation.

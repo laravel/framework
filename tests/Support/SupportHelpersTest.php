@@ -772,6 +772,55 @@ class SupportHelpersTest extends TestCase
         throw_if(true, RuntimeException::class, 'Test Message');
     }
 
+    public function testMemoize()
+    {
+        $memoized = function () {
+            return memoize(function () {
+                return microtime(true);
+            });
+        };
+
+        $resultFirst = $memoized();
+        $resultCached = $memoized();
+
+        $this->assertEquals($resultFirst, $resultCached);
+    }
+
+    public function testMemoizeWithFalsyReturnValueStillCaches()
+    {
+        $this->memoizeFalsyRunCount = 0;
+
+        $memoized = function () {
+            return memoize(function () {
+                $this->memoizeFalsyRunCount++;
+
+                return false;
+            });
+        };
+
+        $resultFirst = $memoized();
+        $resultCached = $memoized();
+
+        $this->assertEquals($resultFirst, $resultCached);
+        $this->assertEquals(1, $this->memoizeFalsyRunCount);
+    }
+
+    public function testMemoizeWithVaryingParametersDoesntCache()
+    {
+        $memoized = function ($param) {
+            return memoize(function () use ($param) {
+                return $param;
+            });
+        };
+
+        $resultFirst = $memoized('foo');
+        $resultSecond = $memoized('bar');
+        $resultThird = $memoized('foo');
+
+        $this->assertNotEquals($resultFirst, $resultSecond);
+        $this->assertEquals($resultFirst, $resultThird);
+    }
+
     public function testOptional()
     {
         $this->assertNull(optional(null)->something());
