@@ -1,6 +1,6 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.13 (2018-03-26)
 
 ### Added
 - Added `view:cache` command ([9fd1273](https://github.com/laravel/framework/commit/9fd1273ad79a46bb3aa006129109c6bc72766e4b), [2ab8acf](https://github.com/laravel/framework/commit/2ab8acfef5d7e784148b2367b5bcf083a0d0d024))
@@ -12,6 +12,7 @@
 - Support higher order `groupBy()` ([#23608](https://github.com/laravel/framework/pull/23608))
 - Support disabling setting `created_at` in models ([#23667](https://github.com/laravel/framework/pull/23667))
 - Added callback support to `optional()` helper ([#23688](https://github.com/laravel/framework/pull/23688))
+- Added `Eloquent\Collection::loadMorph()` method ([#23626](https://github.com/laravel/framework/pull/23626))
 
 ### Changed
 - Support generating a signed route with a `UrlRoutable` parameter ([#23584](https://github.com/laravel/framework/pull/23584))
