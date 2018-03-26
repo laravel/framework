@@ -1058,7 +1058,7 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($callbacksPerType as $type => $callbacks) {
-            if ($type === $abstract || ( $object instanceof $type && !in_array( $type, $this->resolveStack ) ) ) {
+            if ($type === $abstract || ($object instanceof $type && ! in_array($type, $this->resolveStack))) {
                 $results = array_merge($results, $callbacks);
             }
         }
