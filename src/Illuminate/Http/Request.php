@@ -314,12 +314,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $default
+     * @param  mixed   $assoc
      * @return \Symfony\Component\HttpFoundation\ParameterBag|mixed
      */
-    public function json($key = null, $default = null)
+    public function json($key = null, $default = null, $assoc = true)
     {
         if (! isset($this->json)) {
-            $this->json = new ParameterBag((array) json_decode($this->getContent(), true));
+            $this->json = new ParameterBag((array) json_decode($this->getContent(), $assoc));
         }
 
         if (is_null($key)) {
