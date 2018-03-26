@@ -377,6 +377,25 @@ class ContainerTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
+    public function testResolvingCallbacksAreCalledOnceForImplementations()
+    {
+        $container = new Container;
+        $resolving_invocations = 0;
+        $after_resolving_invocations = 0;
+
+        $container->resolving( IContainerContractStub::class, function( ) use ( &$resolving_invocations ) {
+            $resolving_invocations++;
+        } );
+        $container->afterResolving( IContainerContractStub::class, function( ) use ( &$after_resolving_invocations ) {
+            $after_resolving_invocations++;
+        } );
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class );
+        $container->make( IContainerContractStub::class );
+
+        $this->assertEquals( 1, $resolving_invocations );
+        $this->assertEquals( 1, $after_resolving_invocations );
+    }
+
     public function testUnsetRemoveBoundInstances()
     {
         $container = new Container;
