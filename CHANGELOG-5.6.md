@@ -1,6 +1,6 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.13 (2018-03-26)
 
 ### Added
 - Added `view:cache` command ([9fd1273](https://github.com/laravel/framework/commit/9fd1273ad79a46bb3aa006129109c6bc72766e4b), [2ab8acf](https://github.com/laravel/framework/commit/2ab8acfef5d7e784148b2367b5bcf083a0d0d024))
@@ -8,9 +8,23 @@
 - Added `@elseauth` and `@elseguest` Blade directives ([#23569](https://github.com/laravel/framework/pull/23569))
 - Added support for hashing configuration ([#23573](https://github.com/laravel/framework/pull/23573), [d6e3ca9](https://github.com/laravel/framework/commit/d6e3ca97ff4175ff6a9b270b65b04c0d836a7bec))
 - Allow tagged cache keys to be incremented/decremented ([#23578](https://github.com/laravel/framework/pull/23578))
+- Added `SeeInOrder` constraint to avoid risky test notices ([#23594](https://github.com/laravel/framework/pull/23594), [ca39449](https://github.com/laravel/framework/commit/ca39449c83b0f8d42e1ad1b4086239584fda0967))
+- Support higher order `groupBy()` ([#23608](https://github.com/laravel/framework/pull/23608))
+- Support disabling setting `created_at` in models ([#23667](https://github.com/laravel/framework/pull/23667))
+- Added callback support to `optional()` helper ([#23688](https://github.com/laravel/framework/pull/23688))
+- Added `Eloquent\Collection::loadMorph()` method ([#23626](https://github.com/laravel/framework/pull/23626))
 
 ### Changed
 - Support generating a signed route with a `UrlRoutable` parameter ([#23584](https://github.com/laravel/framework/pull/23584))
+- Use `DIRECTORY_SEPARATOR` in `Application::environmentFilePath()` ([#23596](https://github.com/laravel/framework/pull/23596))
+- Support states on model factory after callbacks ([#23551](https://github.com/laravel/framework/pull/23551), [#23676](https://github.com/laravel/framework/pull/23676))
+- Use `hash_equals()` for verifying URL signatures ([#23618](https://github.com/laravel/framework/pull/23618))
+- Refactored `Exceptions/Handler` ([f9162c9](https://github.com/laravel/framework/commit/f9162c9898c58be18f166e1832699b83602404b1), [6c5d971](https://github.com/laravel/framework/commit/6c5d9717224f970d542333813901220a3e950fad))
+- Changed status code of `InvalidSignatureException` from `401` to `403` ([#23662](https://github.com/laravel/framework/pull/23662), [c99911f](https://github.com/laravel/framework/commit/c99911f45432440beee2a9b6d7b5a19ef8d50997))
+
+### Fixed
+- Revered breaking changes in `ManagesLoops` ([d0a2613](https://github.com/laravel/framework/commit/d0a2613f5af223b67db79d59c21aba33b5cc9cdf))
+- Set exit status in serve command ([#23689](https://github.com/laravel/framework/pull/23689))
 
 
 ## v5.6.12 (2018-03-14)

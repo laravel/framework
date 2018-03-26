@@ -26,7 +26,7 @@ class ServeCommand extends Command
     /**
      * Execute the console command.
      *
-     * @return void
+     * @return int
      *
      * @throws \Exception
      */
@@ -36,7 +36,9 @@ class ServeCommand extends Command
 
         $this->line("<info>Laravel development server started:</info> <http://{$this->host()}:{$this->port()}>");
 
-        passthru($this->serverCommand());
+        passthru($this->serverCommand(), $status);
+
+        return $status;
     }
 
     /**

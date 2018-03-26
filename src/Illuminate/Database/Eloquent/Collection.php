@@ -63,6 +63,30 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Load a set of relationships onto the mixed relationship collection.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorph($relation, $relations)
+    {
+        $this->pluck($relation)
+            ->groupBy(function ($model) {
+                return get_class($model);
+            })
+            ->filter(function ($models, $className) use ($relations) {
+                return Arr::has($relations, $className);
+            })
+            ->each(function ($models, $className) use ($relations) {
+                $className::with($relations[$className])
+                    ->eagerLoadRelations($models->all());
+            });
+
+        return $this;
+    }
+
+    /**
      * Add an item to the collection.
      *
      * @param  mixed  $item
