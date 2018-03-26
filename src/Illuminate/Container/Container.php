@@ -83,6 +83,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $buildStack = [];
 
     /**
+     * The stack of de-aliased abstractions currently being resolved.
+     *
+     * @var array
+     */
+    protected $resolveStack = [];
+
+    /**
      * The parameter override stack.
      *
      * @var array
@@ -624,6 +631,8 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->getAlias($abstract);
 
+        $this->resolveStack[] = $abstract;
+
         $needsContextualBuild = ! empty($parameters) || ! is_null(
             $this->getContextualConcrete($abstract)
         );
@@ -670,6 +679,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->resolved[$abstract] = true;
 
         array_pop($this->with);
+        array_pop($this->resolveStack);
 
         return $object;
     }
@@ -1036,7 +1046,7 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($callbacksPerType as $type => $callbacks) {
-            if ($type === $abstract || $object instanceof $type) {
+            if ($type === $abstract || ( $object instanceof $type && !in_array( $type, $this->resolveStack ) ) ) {
                 $results = array_merge($results, $callbacks);
             }
         }
