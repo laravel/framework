@@ -4,12 +4,20 @@ namespace Illuminate\Redis;
 
 use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
+use Illuminate\Redis\Connections\Connection;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
  */
 class RedisManager implements Factory
 {
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
     /**
      * The name of the default driver.
      *
@@ -32,14 +40,23 @@ class RedisManager implements Factory
     protected $connections;
 
     /**
+     * Indicates whether event dispatcher is set on connections.
+     *
+     * @var bool
+     */
+    protected $events = true;
+
+    /**
      * Create a new Redis manager instance.
      *
+     * @param  \Illuminate\Foundation\Application  $app
      * @param  string  $driver
      * @param  array  $config
      * @return void
      */
-    public function __construct($driver, array $config)
+    public function __construct($app, $driver, array $config)
     {
+        $this->app = $app;
         $this->driver = $driver;
         $this->config = $config;
     }
@@ -58,7 +75,9 @@ class RedisManager implements Factory
             return $this->connections[$name];
         }
 
-        return $this->connections[$name] = $this->resolve($name)->setName($name);
+        return $this->connections[$name] = $this->configure(
+            $this->resolve($name), $name
+        );
     }
 
     /**
@@ -104,6 +123,24 @@ class RedisManager implements Factory
     /**
      * Get the connector instance for the current driver.
      *
+     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @param  string  $name
+     * @return \Illuminate\Redis\Connections\Connection
+     */
+    protected function configure(Connection $connection, $name)
+    {
+        $connection->setName($name);
+
+        if ($this->events && $this->app->bound('events')) {
+            $connection->setEventDispatcher($this->app['events']);
+        }
+
+        return $connection;
+    }
+
+    /**
+     * Get the connector instance for the current driver.
+     *
      * @return \Illuminate\Redis\Connectors\PhpRedisConnector|\Illuminate\Redis\Connectors\PredisConnector
      */
     protected function connector()
@@ -124,6 +161,26 @@ class RedisManager implements Factory
     public function connections()
     {
         return $this->connections;
+    }
+
+    /**
+     * Enable setting event dispatcher on connections.
+     *
+     * @return array
+     */
+    public function enableEvents()
+    {
+        return $this->events = true;
+    }
+
+    /**
+     * Disable setting event dispatcher on connections.
+     *
+     * @return array
+     */
+    public function disableEvents()
+    {
+        return $this->events = false;
     }
 
     /**
