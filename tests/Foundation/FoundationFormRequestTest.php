@@ -27,11 +27,29 @@ class FoundationFormRequestTest extends TestCase
 
     public function test_validated_method_returns_the_validated_data()
     {
-        $request = $this->createRequest(['name' => 'specified', 'with' => 'extras']);
+        $payload = [
+            'name' => 'specified',
+            'nested' => [
+                'foo' => 'bar',
+                'baz' => '',
+            ],
+            'array' => [1, 2],
+            'with' => 'extras',
+        ];
+
+        $request = $this->createRequest($payload);
 
         $request->validateResolved();
 
-        $this->assertEquals(['name' => 'specified'], $request->validated());
+        $expected = [
+            'name' => 'specified',
+            'nested' => [
+                'foo' => 'bar',
+            ],
+            'array' => [1, 2],
+        ];
+
+        $this->assertEquals($expected, $request->validated());
     }
 
     /**
@@ -165,7 +183,11 @@ class FoundationTestFormRequestStub extends FormRequest
 {
     public function rules()
     {
-        return ['name' => 'required'];
+        return [
+            'name' => 'required',
+            'nested.foo' => 'required',
+            'array.*' => 'integer',
+        ];
     }
 
     public function authorize()
