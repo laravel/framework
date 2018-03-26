@@ -5,15 +5,15 @@ namespace Illuminate\Support\Facades;
 use Psr\Log\LoggerInterface;
 
 /**
- * @method static void emergency(string $message, array $context = array())
- * @method static void alert(string $message, array $context = array())
- * @method static void critical(string $message, array $context = array())
- * @method static void error(string $message, array $context = array())
- * @method static void warning(string $message, array $context = array())
- * @method static void notice(string $message, array $context = array())
- * @method static void info(string $message, array $context = array())
- * @method static void debug(string $message, array $context = array())
- * @method static void log($level, string $message, array $context = array())
+ * @method static void emergency(string $message, array $context = [])
+ * @method static void alert(string $message, array $context = [])
+ * @method static void critical(string $message, array $context = [])
+ * @method static void error(string $message, array $context = [])
+ * @method static void warning(string $message, array $context = [])
+ * @method static void notice(string $message, array $context = [])
+ * @method static void info(string $message, array $context = [])
+ * @method static void debug(string $message, array $context = [])
+ * @method static void log($level, string $message, array $context = [])
  *
  * @see \Illuminate\Log\Logger
  */
