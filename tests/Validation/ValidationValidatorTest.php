@@ -3902,6 +3902,21 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
     }
 
+    public function testValidateReturnsValidatedDataNestedRules()
+    {
+        $post = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
+
+        $rules = ['nested.foo' => 'required', 'array.*' => 'integer'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
+        $v->sometimes('type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');
