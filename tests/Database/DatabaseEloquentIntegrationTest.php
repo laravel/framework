@@ -1439,6 +1439,52 @@ class DatabaseEloquentIntegrationTest extends TestCase
         Carbon::setTestNow($before);
     }
 
+    public function testCanNestCallsOfNoTouching()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        EloquentTouchingUser::withoutTouching(function () {
+            EloquentTouchingPost::withoutTouching(function () {
+                EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+            });
+        });
+
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
+    public function testCanPassArrayOfModelsToIgnore()
+    {
+        $before = Carbon::now();
+
+        $user = EloquentTouchingUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        $post = EloquentTouchingPost::create(['id' => 1, 'name' => 'Parent Post', 'user_id' => 1]);
+
+        $this->assertTrue($before->isSameDay($user->updated_at));
+        $this->assertTrue($before->isSameDay($post->updated_at));
+
+        Carbon::setTestNow($future = $before->copy()->addDays(3));
+
+        Model::withoutTouchingOn([EloquentTouchingUser::class, EloquentTouchingPost::class], function () {
+            EloquentTouchingComment::create(['content' => 'Comment content', 'post_id' => 1]);
+        });
+
+        $this->assertTrue($before->isSameDay($post->fresh()->updated_at), 'It is touching models when it should be disabled.');
+        $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
+
+        Carbon::setTestNow($before);
+    }
+
     /**
      * Helpers...
      */

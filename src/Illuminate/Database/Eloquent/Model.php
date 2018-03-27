@@ -205,21 +205,29 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Disables the touching behavior for specific models and
-     * their children for the scope of the given callback.
+     * Disables relationship model touching for the current class during given callback scope.
      *
      * @param $callback
      */
     public static function withoutTouching($callback)
     {
-        $currentClass = static::class;
+        static::withoutTouchingOn([static::class], $callback);
+    }
 
-        static::$ignoreOnTouch[] = $currentClass;
+    /**
+     * Disables relationship model touching for the given model classes during given callback scope.
+     *
+     * @param array $models
+     * @param $callback
+     */
+    public static function withoutTouchingOn(array $models, $callback)
+    {
+        static::$ignoreOnTouch = array_values(array_merge(static::$ignoreOnTouch, $models));
 
         try {
             call_user_func($callback);
         } finally {
-            static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, [$currentClass]));
+            static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, $models));
         }
     }
 
