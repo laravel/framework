@@ -27,6 +27,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Debug\ExceptionHandler as SymfonyExceptionHandler;
 use Illuminate\Contracts\Debug\ExceptionHandler as ExceptionHandlerContract;
@@ -476,6 +477,6 @@ class Handler implements ExceptionHandlerContract
      */
     protected function isHttpException(Exception $e)
     {
-        return $e instanceof HttpException;
+        return $e instanceof HttpExceptionInterface;
     }
 }
