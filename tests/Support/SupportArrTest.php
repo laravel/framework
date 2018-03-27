@@ -506,6 +506,16 @@ class SupportArrTest extends TestCase
         );
     }
 
+    public function testSome()
+    {
+        $needles = ['foo', 'bar'];
+        $haystack = ['bar', 'baz'];
+        $foo = ['baz'];
+
+        $this->assertTrue(Arr::some($needles, $haystack));
+        $this->assertFalse(Arr::some($needles, $foo));
+    }
+
     public function testSort()
     {
         $unsorted = [

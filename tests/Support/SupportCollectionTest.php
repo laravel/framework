@@ -877,6 +877,13 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testSome()
+    {
+        $this->assertTrue((new Collection(['foo', 'bar']))->some(['bar', 'baz']));
+
+        $this->assertFalse((new Collection(['foo', 'bar']))->some(['baz']));
+    }
+
     public function testSort()
     {
         $data = (new Collection([5, 3, 1, 2, 4]))->sort();

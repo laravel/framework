@@ -560,6 +560,24 @@ class Arr
     }
 
     /**
+     * Determine if an array item is inside another array.
+     *
+     * @param  array  $needles
+     * @param  array  $haystack
+     * @return bool
+     */
+    public static function some($needles, $haystack)
+    {
+        foreach ($needles as $value) {
+            if (in_array($value, $haystack)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * Sort the array using the given callback or "dot" notation.
      *
      * @param  array  $array
