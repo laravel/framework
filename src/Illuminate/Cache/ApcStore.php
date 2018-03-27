@@ -96,7 +96,7 @@ class ApcStore extends TaggableStore implements Store
      */
     public function forever($key, $value)
     {
-        $this->put($key, $value, 0);
+        $this->put($this->prefix.$key, $value, 0);
     }
 
     /**
