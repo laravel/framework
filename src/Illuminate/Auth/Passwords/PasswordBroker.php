@@ -12,18 +12,18 @@ use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 class PasswordBroker implements PasswordBrokerContract
 {
     /**
-     * The password token repository.
-     *
-     * @var \Illuminate\Auth\Passwords\TokenRepositoryInterface
-     */
-    protected $tokens;
-
-    /**
      * The user provider implementation.
      *
      * @var \Illuminate\Contracts\Auth\UserProvider
      */
     protected $users;
+
+    /**
+     * The number minutes for which the reset link should be considered valid.
+     *
+     * @var int
+     */
+    protected $expiration;
 
     /**
      * The custom password validator callback.
@@ -35,15 +35,14 @@ class PasswordBroker implements PasswordBrokerContract
     /**
      * Create a new password broker instance.
      *
-     * @param  \Illuminate\Auth\Passwords\TokenRepositoryInterface  $tokens
      * @param  \Illuminate\Contracts\Auth\UserProvider  $users
+     * @param  int  $expiration
      * @return void
      */
-    public function __construct(TokenRepositoryInterface $tokens,
-                                UserProvider $users)
+    public function __construct(UserProvider $users, $expiration = 60)
     {
         $this->users = $users;
-        $this->tokens = $tokens;
+        $this->expiration = $expiration;
     }
 
     /**
@@ -63,18 +62,16 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_USER;
         }
 
-        // Once we have the reset token, we are ready to send the message out to this
+        // Once we have a user instance, we are ready to send the message out to this
         // user with a link to reset their password. We will then redirect back to
         // the current URI having nothing set in the session to indicate errors.
-        $user->sendPasswordResetNotification(
-            $this->tokens->create($user)
-        );
+        $user->sendPasswordResetNotification($this->expiration);
 
         return static::RESET_LINK_SENT;
     }
 
     /**
-     * Reset the password for the given token.
+     * Reset the user's password.
      *
      * @param  array  $credentials
      * @param  \Closure  $callback
@@ -95,10 +92,8 @@ class PasswordBroker implements PasswordBrokerContract
 
         // Once the reset has been validated, we'll call the given callback with the
         // new password. This gives the user an opportunity to store the password
-        // in their persistent storage. Then we'll delete the token and return.
+        // in their persistent storage. Then we will return out a reset result.
         $callback($user, $password);
-
-        $this->tokens->delete($user);
 
         return static::PASSWORD_RESET;
     }
@@ -119,7 +114,7 @@ class PasswordBroker implements PasswordBrokerContract
             return static::INVALID_PASSWORD;
         }
 
-        if (! $this->tokens->exists($user, $credentials['token'])) {
+        if (! ($credentials['hasValidSignature'] ?? false)) {
             return static::INVALID_TOKEN;
         }
 
@@ -185,7 +180,7 @@ class PasswordBroker implements PasswordBrokerContract
      */
     public function getUser(array $credentials)
     {
-        $credentials = Arr::except($credentials, ['token']);
+        $credentials = Arr::except($credentials, ['hasValidSignature']);
 
         $user = $this->users->retrieveByCredentials($credentials);
 
@@ -194,49 +189,5 @@ class PasswordBroker implements PasswordBrokerContract
         }
 
         return $user;
-    }
-
-    /**
-     * Create a new password reset token for the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @return string
-     */
-    public function createToken(CanResetPasswordContract $user)
-    {
-        return $this->tokens->create($user);
-    }
-
-    /**
-     * Delete password reset tokens of the given user.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @return void
-     */
-    public function deleteToken(CanResetPasswordContract $user)
-    {
-        $this->tokens->delete($user);
-    }
-
-    /**
-     * Validate the given password reset token.
-     *
-     * @param  \Illuminate\Contracts\Auth\CanResetPassword $user
-     * @param  string $token
-     * @return bool
-     */
-    public function tokenExists(CanResetPasswordContract $user, $token)
-    {
-        return $this->tokens->exists($user, $token);
-    }
-
-    /**
-     * Get the password reset token repository implementation.
-     *
-     * @return \Illuminate\Auth\Passwords\TokenRepositoryInterface
-     */
-    public function getRepository()
-    {
-        return $this->tokens;
     }
 }
