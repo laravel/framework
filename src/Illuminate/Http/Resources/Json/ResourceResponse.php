@@ -98,7 +98,7 @@ class ResourceResponse implements Responsable
     }
 
     /**
-     * Determine if data has been wrapped
+     * Determine if data has been wrapped.
      * @param  array  $data
      * @return bool
      */
