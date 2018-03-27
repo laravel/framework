@@ -1415,6 +1415,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Determine if an array item is inside another collection.
+     *
+     * @param  array $items
+     * @return bool
+     */
+    public function some($items)
+    {
+        return Arr::some($this->items, $items);
+    }
+
+    /**
      * Sort through each item with a callback.
      *
      * @param  callable|null  $callback

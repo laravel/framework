@@ -277,6 +277,20 @@ if (! function_exists('array_set')) {
     }
 }
 
+if (! function_exists('array_some')) {
+    /**
+     * Determine if an array item is inside another array.
+     *
+     * @param  array  $needles
+     * @param  array  $haystack
+     * @return bool
+     */
+    function array_some($needles, $haystack)
+    {
+        return Arr::some($needles, $haystack);
+    }
+}
+
 if (! function_exists('array_sort')) {
     /**
      * Sort the array by the given callback or attribute name.

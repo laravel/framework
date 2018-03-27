@@ -615,6 +615,16 @@ class SupportHelpersTest extends TestCase
         ], $data);
     }
 
+    public function testArraySome()
+    {
+        $needles = ['foo', 'bar'];
+        $haystack = ['bar', 'baz'];
+        $foo = ['baz'];
+
+        $this->assertTrue(array_some($needles, $haystack));
+        $this->assertFalse(array_some($needles, $foo));
+    }
+
     public function testArraySort()
     {
         $array = [
