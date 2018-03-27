@@ -79,7 +79,7 @@ class ResourceResponse implements Responsable
      */
     protected function haveDefaultWrapperAndDataIsUnwrapped($data)
     {
-        return $this->wrapper() && ! array_key_exists($this->wrapper(), $data);
+        return $this->wrapper() && ! $this->dataIsWrapped($data);
     }
 
     /**
@@ -94,7 +94,17 @@ class ResourceResponse implements Responsable
     {
         return (! empty($with) || ! empty($additional)) &&
                (! $this->wrapper() ||
-                ! array_key_exists($this->wrapper(), $data));
+                ! $this->dataIsWrapped($data));
+    }
+
+    /**
+     * Determine if data has been wrapped
+     * @param  array  $data
+     * @return bool
+     */
+    protected function dataIsWrapped($data)
+    {
+        return array_key_exists($this->wrapper(), $data) && count($data) === 1;
     }
 
     /**
