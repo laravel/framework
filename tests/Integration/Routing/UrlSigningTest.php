@@ -39,6 +39,15 @@ class UrlSigningTest extends TestCase
         $this->assertEquals('invalid', $this->get($url)->original);
     }
 
+    public function test_signed_url_with_url_without_signature_parameter()
+    {
+        Route::get('/foo/{id}', function (Request $request, $id) {
+            return $request->hasValidSignature() ? 'valid' : 'invalid';
+        })->name('foo');
+
+        $this->assertEquals('invalid', $this->get('/foo/1')->original);
+    }
+
     public function test_signed_middleware()
     {
         Route::get('/foo/{id}', function (Request $request, $id) {
