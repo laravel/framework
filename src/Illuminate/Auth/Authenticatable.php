@@ -2,8 +2,6 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Support\Facades\Hash;
-
 trait Authenticatable
 {
     /**
