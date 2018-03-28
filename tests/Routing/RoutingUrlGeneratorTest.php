@@ -450,6 +450,19 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
     }
+
+    public function testFullUrl()
+    {
+        $url = new UrlGenerator(
+            new RouteCollection,
+            Request::create('http://www.foo.com/route?bar=baz#hash')
+        );
+
+        $this->assertEquals('http://www.foo.com/route?bar=baz', $url->full());
+
+        $url->forceScheme('https');
+        $this->assertEquals('https://www.foo.com/route?bar=baz', $url->full());
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable
