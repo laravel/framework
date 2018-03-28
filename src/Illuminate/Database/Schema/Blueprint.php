@@ -391,6 +391,7 @@ class Blueprint
     /**
      * Indicate that the soft delete column should be dropped.
      *
+     * @param  string  $column
      * @return void
      */
     public function dropSoftDeletesTz($column = 'deleted_at')
