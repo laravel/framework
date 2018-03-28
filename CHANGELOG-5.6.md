@@ -1,5 +1,19 @@
 # Release Notes for 5.6.x
 
+## v5.6.14 (2018-03-28)
+
+### Added
+- Added `SlackMessage::info()` method ([#23711](https://github.com/laravel/framework/pull/23711))
+- Added `SessionGuard::logoutOtherDevices()` method ([9c51e49](https://github.com/laravel/framework/commit/9c51e49a56ff15fc47ac1a6bf232c32c25d14fd0))
+
+### Changed
+- Replaced Blade's `or` operator with null-coalescing operator ([13f732e](https://github.com/laravel/framework/commit/13f732ed617e41608e4ae021efc9d13e43375a26))
+
+### Fixed
+- Get Blade compiler from engine resolver ([#23710](https://github.com/laravel/framework/pull/23710))
+- Default to an empty string when validating the URL signatures ([#23721](https://github.com/laravel/framework/pull/23721))
+
+
 ## v5.6.13 (2018-03-26)
 
 ### Added
