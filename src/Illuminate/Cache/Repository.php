@@ -187,10 +187,6 @@ class Repository implements CacheContract, ArrayAccess
      */
     public function put($key, $value, $minutes = null)
     {
-        if (is_array($key)) {
-            return $this->putMany($key, $value);
-        }
-
         if (! is_null($minutes = $this->getMinutes($minutes))) {
             $this->store->put($this->itemKey($key), $value, $minutes);
 
