@@ -550,7 +550,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         return tap($this->user()->forceFill([
-            $attribute => Hash::make($password)
+            $attribute => Hash::make($password),
         ]))->save();
     }
 
