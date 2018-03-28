@@ -347,7 +347,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 
-        return  hash_equals($signature, $request->query('signature')) &&
+        return  hash_equals($signature, $request->query('signature', '')) &&
                ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
 
