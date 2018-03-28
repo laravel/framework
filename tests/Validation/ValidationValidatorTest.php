@@ -550,6 +550,38 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals('should be integer!', $v->messages()->first('validation.custom.1'));
     }
 
+    public function testStringDateGetsTranslated()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'after_or_equal' => ':attribute moet een datum na of gelijk aan :date zijn.',
+            'attributes' => [
+                'start_date' => 'begindatum',
+                'today' => 'vandaag',
+            ],
+        ]);
+        $v = new Validator($trans, ['start_date' => '01-01-2018'], ['start_date' => 'date|after_or_equal:today']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('begindatum moet een datum na of gelijk aan vandaag zijn.', $v->messages()->first('start_date'));
+    }
+
+    public function testDateStringNotGettingTranslated()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $trans->getLoader()->addMessages('en', 'validation', [
+            'after_or_equal' => ':attribute moet een datum na of gelijk aan :date zijn.',
+            'attributes' => [
+                'start_date' => 'begindatum',
+                '01-02-2018' => 'vandaag',
+            ],
+        ]);
+        $v = new Validator($trans, ['start_date' => '01-01-2018'], ['start_date' => 'date|after_or_equal:01-02-2018']);
+        $this->assertFalse($v->passes());
+        $v->messages()->setFormat(':message');
+        $this->assertEquals('begindatum moet een datum na of gelijk aan 01-02-2018 zijn.', $v->messages()->first('start_date'));
+    }
+
     public function testInlineValidationMessagesAreRespected()
     {
         $trans = $this->getIlluminateArrayTranslator();
