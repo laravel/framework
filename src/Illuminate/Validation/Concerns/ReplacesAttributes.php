@@ -307,7 +307,7 @@ trait ReplacesAttributes
      */
     protected function replaceBefore($message, $attribute, $rule, $parameters)
     {
-        if (! (strtotime($parameters[0]))) {
+        if (is_string($parameters[0]) && !is_numeric(substr($parameters[0], 0, 1))) {
             return str_replace(':date', $this->getDisplayableAttribute($parameters[0]), $message);
         }
 
