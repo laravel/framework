@@ -2,6 +2,8 @@
 
 namespace Illuminate\Auth;
 
+use Illuminate\Support\Facades\Hash;
+
 trait Authenticatable
 {
     /**
@@ -10,6 +12,22 @@ trait Authenticatable
      * @var string
      */
     protected $rememberTokenName = 'remember_token';
+
+    /**
+     * Invalid other sessions for the current user.
+     *
+     * The application must be using the AuthenticateSession middleware.
+     *
+     * @param  string  $password
+     * @param  string  $attribute
+     * @return $this
+     */
+    public function logoutOtherDevices($password, $attribute = 'password')
+    {
+        return tap($this->forceFill([
+            $attribute => Hash::make($password)
+        ]))->save();
+    }
 
     /**
      * Get the name of the unique identifier for the user.
