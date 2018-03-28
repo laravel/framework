@@ -24,7 +24,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         Concerns\HasRelationships,
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
-        Concerns\GuardsAttributes;
+        Concerns\GuardsAttributes,
+        Concerns\ModelAnnotations,
+        Concerns\ModelStaticAnnotations;
 
     /**
      * The connection name for the model.
