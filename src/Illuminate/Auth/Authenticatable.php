@@ -25,7 +25,7 @@ trait Authenticatable
     public function logoutOtherDevices($password, $attribute = 'password')
     {
         return tap($this->forceFill([
-            $attribute => Hash::make($password)
+            $attribute => Hash::make($password),
         ]))->save();
     }
 
