@@ -13,7 +13,7 @@ interface ResponseFactory
      * @return \Illuminate\Http\Response
      */
     public function make($content = '', $status = 200, array $headers = []);
-    
+
     /**
      * Return an empty response.
      *
