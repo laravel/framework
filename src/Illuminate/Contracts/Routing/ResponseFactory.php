@@ -13,6 +13,15 @@ interface ResponseFactory
      * @return \Illuminate\Http\Response
      */
     public function make($content = '', $status = 200, array $headers = []);
+    
+    /**
+     * Return an empty response.
+     *
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function noContent($status = 204, array $headers = []);
 
     /**
      * Return a new view response from the application.
