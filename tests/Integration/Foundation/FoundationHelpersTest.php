@@ -8,7 +8,7 @@ use Orchestra\Testbench\TestCase;
 /**
  * @group integration
  */
-class HelpersTest extends TestCase
+class FoundationHelpersTest extends TestCase
 {
     public function test_rescue()
     {

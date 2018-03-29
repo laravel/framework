@@ -9,7 +9,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 
-class QueueFakeTest extends TestCase
+class SupportTestingQueueFakeTest extends TestCase
 {
     protected function setUp()
     {

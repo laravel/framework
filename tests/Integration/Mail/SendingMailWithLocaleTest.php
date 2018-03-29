@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Integration\Mail\SendingMailWithLocale;
+namespace Illuminate\Tests\Integration\Mail;
 
 use Mockery;
 use Illuminate\Mail\Mailable;
