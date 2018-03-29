@@ -56,6 +56,18 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
+     * Return an empty response.
+     *
+     * @param  int  $status
+     * @param  array  $headers
+     * @return \Illuminate\Http\Response
+     */
+    public function noContent($status = 204, array $headers = [])
+    {
+        return $this->make('', $status, $headers);
+    }
+
+    /**
      * Return a new view response from the application.
      *
      * @param  string  $view
