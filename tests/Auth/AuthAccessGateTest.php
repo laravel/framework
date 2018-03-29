@@ -9,7 +9,7 @@ use Illuminate\Container\Container;
 use Illuminate\Auth\Access\Response;
 use Illuminate\Auth\Access\HandlesAuthorization;
 
-class GateTest extends TestCase
+class AuthAccessGateTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
