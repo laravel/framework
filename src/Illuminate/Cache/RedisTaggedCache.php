@@ -55,7 +55,7 @@ class RedisTaggedCache extends TaggedCache
      */
     public function decrement($key, $value = 1)
     {
-        $this->pushStandardKeys($s->tags->getNamespace(), $key);
+        $this->pushStandardKeys($this->tags->getNamespace(), $key);
 
         parent::decrement($key, $value);
     }
