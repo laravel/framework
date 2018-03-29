@@ -204,6 +204,7 @@ class Blueprint
      * Add the fluent commands specified on any columns.
      *
      * @param  \Illuminate\Database\Grammar  $grammar
+     * @return void
      */
     public function addFluentCommands(Grammar $grammar)
     {
