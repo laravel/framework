@@ -21,15 +21,13 @@ use League\Flysystem\Adapter\Local as LocalAdapter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
-use Illuminate\Contracts\Filesystem\ReadStream as ReadStreamContract;
-use Illuminate\Contracts\Filesystem\WriteStream as WriteStreamContract;
 use Illuminate\Contracts\Filesystem\FileExistsException as ContractFileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException as ContractFileNotFoundException;
 
 /**
  * @mixin \League\Flysystem\FilesystemInterface
  */
-class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract, ReadStreamContract, WriteStreamContract
+class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 {
     /**
      * The Flysystem filesystem implementation.
