@@ -149,7 +149,7 @@ trait GuardsAttributes
             return false;
         }
 
-        return empty($this->getFillable()) && $key[0] !== '_';
+        return empty($this->getFillable()) && (empty($key) || $key[0] !== '_');
     }
 
     /**
