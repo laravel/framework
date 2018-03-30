@@ -20,7 +20,8 @@ class WhoopsHandler
 
             $this->registerApplicationPaths($handler)
                  ->registerBlacklist($handler)
-                 ->registerEditor($handler);
+                 ->registerEditor($handler)
+                 ->registerWhoopsCss($handler);
         });
     }
 
@@ -79,6 +80,22 @@ class WhoopsHandler
     {
         if (config('app.editor', false)) {
             $handler->setEditor(config('app.editor'));
+        }
+
+        return $this;
+    }
+
+    /**
+    * Register custom CSS with the handler.
+    *
+    * @param  \Whoops\Handler\PrettyPageHandler $handler
+    * @return $this
+    */
+    protected function registerWhoopsCss($handler)
+    {
+        if (config('app.whoopsCss', false)) {
+            $handler->addCustomCss(substr(strrchr(config('app.whoopsCss'), "/"), 1));
+            $handler->addResourcePath(implode('/', explode('/', config('app.whoopsCss'), -1)));
         }
 
         return $this;
