@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Support\Str;
-
 trait GuardsAttributes
 {
     /**
