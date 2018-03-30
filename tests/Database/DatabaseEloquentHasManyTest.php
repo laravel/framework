@@ -173,6 +173,16 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals('results', $relation->update(['foo' => 'bar']));
     }
 
+    public function testUpdateMethodUpdatesModelsWithNullUpdatedAt()
+    {
+        $relation = $this->getRelation();
+        $relation->getRelated()->shouldReceive('usesTimestamps')->once()->andReturn(true);
+        $relation->getRelated()->shouldReceive('getUpdatedAtColumn')->andReturn(null);
+        $relation->getQuery()->shouldReceive('update')->once()->with(['foo' => 'bar'])->andReturn('results');
+
+        $this->assertEquals('results', $relation->update(['foo' => 'bar']));
+    }
+
     public function testRelationIsProperlyInitialized()
     {
         $relation = $this->getRelation();
