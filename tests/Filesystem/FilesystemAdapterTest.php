@@ -170,8 +170,8 @@ class FilesystemAdapterTest extends TestCase
     public function testStreamToExistingFileThrows()
     {
         $this->expectException(FileExistsException::class);
-        $this->filesystem->write('file.txt', $original_content = 'Hello World');
-        $this->filesystem->write('existing.txt', $original_content = 'Hi John');
+        $this->filesystem->write('file.txt', 'Hello World');
+        $this->filesystem->write('existing.txt', 'Dear Kate');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $readStream = $filesystemAdapter->readStream('file.txt');
         $filesystemAdapter->writeStream('existing.txt', $readStream);
@@ -182,5 +182,12 @@ class FilesystemAdapterTest extends TestCase
         $this->expectException(FileNotFoundException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->readStream('nonexistent.txt');
+    }
+
+    public function testStreamInvalidResourceThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }
 }
