@@ -9,7 +9,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 
-class MailFakeTest extends TestCase
+class SupportTestingMailFakeTest extends TestCase
 {
     protected function setUp()
     {
