@@ -561,11 +561,11 @@ if (! function_exists('mix')) {
     {
         static $manifests = [];
 
-        if (! Str::startsWith($path, '/')) {
+        if ($path[0] !== '/') {
             $path = "/{$path}";
         }
 
-        if ($manifestDirectory && ! Str::startsWith($manifestDirectory, '/')) {
+        if ($manifestDirectory && $manifestDirectory[0] !== '/') {
             $manifestDirectory = "/{$manifestDirectory}";
         }
 
