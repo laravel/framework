@@ -114,6 +114,18 @@ class Factory implements FactoryContract
         });
     }
 
+    public function viewIndexByDefault($view) 
+    {
+        $view = $this->normalizeName($view);
+        $viewIndex = "{$view}.index";
+
+        if(! $this->exists($view))
+        {
+            return $this->exists($viewIndex) ? $viewIndex : $view;
+        }
+        return $view;
+    }
+
     /**
      * Get the evaluated view contents for the given view.
      *
@@ -123,9 +135,9 @@ class Factory implements FactoryContract
      * @return \Illuminate\Contracts\View\View
      */
     public function make($view, $data = [], $mergeData = [])
-    {
+    {        
         $path = $this->finder->find(
-            $view = $this->normalizeName($view)
+            $view = $this->viewIndexByDefault($view)
         );
 
         // Next, we will create the view instance and call the view creator for the view
