@@ -43,7 +43,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new response from the application.
+     * Create a new response instance.
      *
      * @param  string  $content
      * @param  int  $status
@@ -56,7 +56,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return an empty response.
+     * Create a new "no content" response.
      *
      * @param  int  $status
      * @param  array  $headers
@@ -68,7 +68,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new view response from the application.
+     * Create a new response for a given view.
      *
      * @param  string  $view
      * @param  array  $data
@@ -82,7 +82,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new JSON response from the application.
+     * Create a new JSON response instance.
      *
      * @param  mixed  $data
      * @param  int  $status
@@ -96,7 +96,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new JSONP response from the application.
+     * Create a new JSONP response instance.
      *
      * @param  string  $callback
      * @param  mixed  $data
@@ -111,7 +111,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new streamed response from the application.
+     * Create a new streamed response instance.
      *
      * @param  \Closure  $callback
      * @param  int  $status
@@ -124,7 +124,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Return a new streamed response as a file download from the application.
+     * Create a new streamed response instance as a file download.
      *
      * @param  \Closure  $callback
      * @param  string|null  $name
