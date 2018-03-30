@@ -74,7 +74,7 @@ class RedisQueue extends Queue implements QueueContract
         $queue = $this->getQueue($queue);
 
         return $this->getConnection()->eval(
-            LuaScripts::size(), 3, $queue, $queue.':delayed', $queue.':reserved'
+            LuaScripts::size(), 4, $queue, $queue.':front', $queue.':delayed', $queue.':reserved'
         );
     }
 
@@ -101,7 +101,7 @@ class RedisQueue extends Queue implements QueueContract
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
-        $this->getConnection()->rpush($this->getQueue($queue), $payload);
+        $this->getConnection()->lpush($this->getQueue($queue), $payload);
 
         return json_decode($payload, true)['id'] ?? null;
     }
@@ -209,41 +209,41 @@ class RedisQueue extends Queue implements QueueContract
      */
     protected function retrieveNextJob($queue)
     {
-        if (! is_null($this->blockFor)) {
-            return $this->blockingPop($queue);
+        $job = $this->nonBlockingPop($queue);
+        if ($job[0]) {
+            return $job;
         }
 
+        if (! is_null($this->blockFor) && $this->block($queue)) {
+            return $this->nonBlockingPop($queue);
+        }
+
+        return [null, null];
+    }
+
+    /**
+     * Retrieve the next job without blocking.
+     *
+     * @param  string  $queue
+     * @return mixed
+     */
+    protected function nonBlockingPop($queue)
+    {
         return $this->getConnection()->eval(
-            LuaScripts::pop(), 2, $queue, $queue.':reserved',
+            LuaScripts::pop(), 3, $queue, $queue.':front', $queue.':reserved',
             $this->availableAt($this->retryAfter)
         );
     }
 
     /**
-     * Retrieve the next job by blocking-pop.
+     * Block for the next job.
      *
      * @param  string  $queue
-     * @return array
+     * @return string|null
      */
-    protected function blockingPop($queue)
+    protected function block($queue)
     {
-        $rawBody = $this->getConnection()->blpop($queue, $this->blockFor);
-
-        if (! is_null($rawBody)) {
-            $payload = json_decode($rawBody[1], true);
-
-            $payload['attempts']++;
-
-            $reserved = json_encode($payload);
-
-            $this->getConnection()->zadd($queue.':reserved', [
-                $reserved => $this->availableAt($this->retryAfter),
-            ]);
-
-            return [$rawBody[1], $reserved];
-        }
-
-        return [null, null];
+        return $this->getConnection()->brpoplpush($queue, $queue.':front', $this->blockFor);
     }
 
     /**

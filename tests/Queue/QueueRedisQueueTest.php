@@ -17,7 +17,7 @@ class QueueRedisQueueTest extends TestCase
         $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
         $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
         $redis->shouldReceive('connection')->once()->andReturn($redis);
-        $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
+        $redis->shouldReceive('lpush')->once()->with('queues:default', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'id' => 'foo', 'attempts' => 0]));
 
         $id = $queue->push('foo', ['data']);
         $this->assertEquals('foo', $id);
