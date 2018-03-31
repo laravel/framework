@@ -10,6 +10,8 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static void raw(string $text, $callback)
  * @method static void send(string|array|\Illuminate\Contracts\Mail\Mailable $view, array $data = [], \Closure|string $callback = null)
  * @method static array failures()
+ * @method static mixed queue(string|array|\Illuminate\Contracts\Mail\Mailable $view, string $queue = null)
+ * @method static mixed later(\DateTimeInterface|\DateInterval|int $delay, string|array|\Illuminate\Contracts\Mail\Mailable $view, string $queue = null)
  *
  * @see \Illuminate\Mail\Mailer
  */
