@@ -3,6 +3,10 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static \Illuminate\Database\ConnectionInterface connection(string $name = null)
+ * @method static string getDefaultConnection()
+ * @method static void setDefaultConnection(string $name)
+ *
  * @see \Illuminate\Database\DatabaseManager
  * @see \Illuminate\Database\Connection
  */
