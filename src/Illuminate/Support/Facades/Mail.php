@@ -5,6 +5,12 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Support\Testing\Fakes\MailFake;
 
 /**
+ * @method static \Illuminate\Mail\PendingMail to($users)
+ * @method static \Illuminate\Mail\PendingMail bcc($users)
+ * @method static void raw(string $text, $callback)
+ * @method static void send(string|array|\Illuminate\Contracts\Mail\Mailable $view, array $data = [], \Closure|string $callback = null)
+ * @method static array failures()
+ *
  * @see \Illuminate\Mail\Mailer
  */
 class Mail extends Facade
