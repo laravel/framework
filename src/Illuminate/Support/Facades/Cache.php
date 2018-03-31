@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static \Illuminate\Contracts\Cache\Repository  store(string|null $name = null)
+ *
  * @see \Illuminate\Cache\CacheManager
  * @see \Illuminate\Cache\Repository
  */
