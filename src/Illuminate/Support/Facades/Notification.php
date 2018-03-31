@@ -7,6 +7,9 @@ use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 /**
+ * @method static void send(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
+ * @method static void sendNow(\Illuminate\Support\Collection|array|mixed $notifiables, $notification)
+ *
  * @see \Illuminate\Notifications\ChannelManager
  */
 class Notification extends Facade
