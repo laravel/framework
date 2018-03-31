@@ -2213,6 +2213,7 @@ class SupportCollectionTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage You requested 4 items, but there are only 3 items available.
      */
     public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
     {
