@@ -593,6 +593,18 @@ class ContainerTest extends TestCase
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Method should be string or array with length >= 2, array with length [1] given
+     */
+    public function testBindMethodWithOneArrayParam()
+    {
+        $container = new Container;
+        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class], function ($stub) {
+            return $stub->unresolvable('foo', 'bar');
+        });
+    }
+
     public function testContainerCanInjectDifferentImplementationsDependingOnContext()
     {
         $container = new Container;
