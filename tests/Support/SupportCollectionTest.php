@@ -2211,7 +2211,7 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
-    public function testRandomReturnsWhatItHasWhenAmountBiggerThanCollectionSize()
+    public function testRandomReturnsCollectionWhenAmountBiggerThanCollectionSize()
     {
         $data = new Collection([1, 2, 3]);
         $random = $data->random(4);
