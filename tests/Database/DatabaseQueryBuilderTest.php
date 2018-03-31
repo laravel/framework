@@ -2037,6 +2037,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Method Illuminate\Database\Query\Builder::noValidMethodHere does not exist.
      */
     public function testBuilderThrowsExpectedExceptionWithUndefinedMethod()
     {
