@@ -74,6 +74,7 @@ class ViewFileViewFinderTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage View [foo] not found.
      */
     public function testExceptionThrownWhenViewNotFound()
     {
