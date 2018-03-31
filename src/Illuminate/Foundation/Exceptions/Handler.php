@@ -482,7 +482,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * @return \Illuminate\Config\Repository|mixed
      */
-    private function isDebugMode()
+    protected function isDebugMode()
     {
         return config('app.debug');
     }
