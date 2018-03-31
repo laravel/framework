@@ -252,6 +252,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     /**
      * @test
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag].
      */
     public function firstOrFail_method()
     {
@@ -279,6 +280,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     /**
      * @test
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag].
      */
     public function findOrFail_method()
     {
