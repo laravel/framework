@@ -2211,13 +2211,12 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
-    /**
-     * @expectedException \InvalidArgumentException
-     */
-    public function testRandomThrowsAnExceptionUsingAmountBiggerThanCollectionSize()
+    public function testRandomReturnsCollectionWhenAmountBiggerThanCollectionSize()
     {
         $data = new Collection([1, 2, 3]);
-        $data->random(4);
+        $random = $data->random(4);
+        $this->assertInstanceOf(Collection::class, $random);
+        $this->assertCount(3, $random);
     }
 
     public function testPipe()
