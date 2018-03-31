@@ -7,6 +7,7 @@ use ArrayAccess;
 use LogicException;
 use ReflectionClass;
 use ReflectionParameter;
+use InvalidArgumentException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
@@ -285,11 +286,19 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  array|string $method
      * @return string
+     *
+     * @throws InvalidArgumentException
      */
     protected function parseBindMethod($method)
     {
         if (is_array($method)) {
-            return $method[0].'@'.$method[1];
+            if (count($method) > 1) {
+                return $method[0].'@'.$method[1];
+            }
+
+            throw new InvalidArgumentException(
+                sprintf('method should be array with 2 parameters, %s given', count($method))
+            );
         }
 
         return $method;
@@ -354,7 +363,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure  $closure
      * @return void
      *
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      */
     public function extend($abstract, Closure $closure)
     {
