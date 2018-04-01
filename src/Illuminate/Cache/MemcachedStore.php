@@ -45,7 +45,7 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
         $this->setPrefix($prefix);
         $this->memcached = $memcached;
 
-        $this->onVersionThree = (new ReflectionMethod('Memcached', 'getMulti'))
+        $this->onVersionThree = (new ReflectionMethod(Memcached::class, 'getMulti'))
                             ->getNumberOfParameters() == 2;
     }
 
