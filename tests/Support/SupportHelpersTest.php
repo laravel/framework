@@ -752,7 +752,7 @@ class SupportHelpersTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage
+     * @expectedExceptionMessageRegExp /^$/
      */
     public function testThrow()
     {

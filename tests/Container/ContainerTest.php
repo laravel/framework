@@ -1036,7 +1036,7 @@ class ContainerTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Container\EntryNotFoundException
-     * @expectedExceptionMessage
+     * @expectedExceptionMessageRegExp /^$/
      */
     public function testUnknownEntryThrowsException()
     {

@@ -526,7 +526,7 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage
+     * @expectedExceptionMessageRegExp /^$/
      */
     public function testRoutesDontMatchNonMatchingPathsWithLeadingOptionals()
     {
@@ -539,7 +539,7 @@ class RoutingRouteTest extends TestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\NotFoundHttpException
-     * @expectedExceptionMessage
+     * @expectedExceptionMessageRegExp /^$/
      */
     public function testRoutesDontMatchNonMatchingDomain()
     {
