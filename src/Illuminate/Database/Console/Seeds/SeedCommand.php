@@ -104,7 +104,7 @@ class SeedCommand extends Command
         DB::statement('SET FOREIGN_KEY_CHECKS=0;');
 
         $tableNames = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
-        $this->info("Truncate tables...");
+        $this->info('Truncate tables...');
         foreach ($tableNames as $name) {
             //don't truncate migrations
             if ($name == 'migrations') {
@@ -112,7 +112,7 @@ class SeedCommand extends Command
             }
             DB::table($name)->truncate();
         }
-        $this->info("All tables truncated successfuly.");
+        $this->info('All tables truncated successfuly.');
 
         DB::statement('SET FOREIGN_KEY_CHECKS=1;');
     }
