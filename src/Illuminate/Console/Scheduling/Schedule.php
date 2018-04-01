@@ -7,6 +7,7 @@ use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Support\ProcessUtils;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Symfony\Component\Console\Command\Command as SymfonyCommand;
 
 class Schedule
 {
@@ -74,7 +75,7 @@ class Schedule
      */
     public function command($command, array $parameters = [])
     {
-        if (class_exists($command)) {
+        if (is_subclass_of($command, SymfonyCommand::class)) {
             $command = Container::getInstance()->make($command)->getName();
         }
 
