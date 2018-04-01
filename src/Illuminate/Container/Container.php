@@ -287,7 +287,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  array|string $method
      * @return string
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     protected function parseBindMethod($method)
     {
@@ -363,7 +363,7 @@ class Container implements ArrayAccess, ContainerContract
      * @param  \Closure  $closure
      * @return void
      *
-     * @throws InvalidArgumentException
+     * @throws \InvalidArgumentException
      */
     public function extend($abstract, Closure $closure)
     {
