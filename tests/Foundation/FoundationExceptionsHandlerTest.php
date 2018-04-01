@@ -124,6 +124,22 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertNotContains('"line":', $response);
         $this->assertNotContains('"trace":', $response);
     }
+
+    public function testInDebugMode()
+    {
+        // prepare date
+        $reflection = new \ReflectionClass(get_class($this->handler));
+        $method = $reflection->getMethod('inDebugMode');
+        $method->setAccessible(true);
+
+        // app.debug false
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
+        $this->assertFalse($method->invokeArgs($this->handler, []));
+
+        // app.debug true
+        $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(true);
+        $this->assertTrue($method->invokeArgs($this->handler, []));
+    }
 }
 
 class CustomException extends Exception implements Responsable
