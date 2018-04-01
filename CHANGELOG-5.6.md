@@ -1,5 +1,15 @@
 # Release Notes for 5.6.x
 
+## v5.6.15 (2018-03-30)
+
+### Fixed
+- Fixed variable reference in `RedisTaggedCache::decrement()` ([#23736](https://github.com/laravel/framework/pull/23736))
+- Check `updated_at` column existence in `HasOneOrMany::update()` ([#23747](https://github.com/laravel/framework/pull/23747))
+
+### Security
+- Check `iv` length in `Encrypter::validPayload()` ([886d261](https://github.com/laravel/framework/commit/886d261df0854426b4662b7ed5db6a1c575a4279))
+
+
 ## v5.6.14 (2018-03-28)
 
 ### Added

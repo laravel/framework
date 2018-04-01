@@ -1,6 +1,6 @@
 # Release Notes for 5.5.x
 
-## [Unreleased]
+## v5.5.40 (2018-03-30)
 
 ### Changed
 - Only set id on `NotificationFake` if no id is set ([#23474](https://github.com/laravel/framework/pull/23474))
@@ -9,6 +9,9 @@
 ### Fixed
 - Fixed to not mistakenly release mutex ([#23607](https://github.com/laravel/framework/pull/23607))
 - Revert breaking changes in `ManagesLoops` ([#23681](https://github.com/laravel/framework/pull/23681))
+
+### Security
+- Check `iv` length in `Encrypter::validPayload()` ([28e53f2](https://github.com/laravel/framework/commit/28e53f23a76206fb130e9a54eb95aa3f010e79c9))
 
 
 ## v5.5.39 (2018-03-09)
