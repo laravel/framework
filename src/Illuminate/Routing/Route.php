@@ -195,7 +195,7 @@ class Route
         $callable = $this->action['uses'];
 
         return $callable(...array_values($this->resolveMethodDependencies(
-            $this->parametersWithoutNulls(), new ReflectionFunction($this->action['uses'])
+            $this->parametersWithoutNulls(), new ReflectionFunction($callable)
         )));
     }
 
