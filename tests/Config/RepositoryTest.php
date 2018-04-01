@@ -35,6 +35,13 @@ class RepositoryTest extends TestCase
             'x' => [
                 'z' => 'zoo',
             ],
+            'bool' => [
+                'true'   => true,
+                'false'  => false,
+                'string' => [
+                    'true' => 'true',
+                ],
+            ],
         ]);
 
         parent::setUp();
@@ -157,5 +164,12 @@ class RepositoryTest extends TestCase
 
         $this->assertArrayHasKey('associate', $this->repository->all());
         $this->assertNull($this->repository->get('associate'));
+    }
+
+    public function testBoolean()
+    {
+        $this->assertTrue($this->repository['bool.true']);
+        $this->assertFalse($this->repository['bool.false']);
+        $this->assertNotEquals($this->repository['bool.string.true'], true);
     }
 }
