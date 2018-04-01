@@ -61,6 +61,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessageRegExp /No query results for model .+ bar/
      */
     public function testFindOrFailMethodThrowsModelNotFoundException()
     {
@@ -68,11 +69,12 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $result = $builder->findOrFail('bar', ['column']);
+        $builder->findOrFail('bar', ['column']);
     }
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessageRegExp /No query results for model .+ 1, 2/
      */
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
     {
@@ -80,11 +82,12 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
-        $result = $builder->findOrFail([1, 2], ['column']);
+        $builder->findOrFail([1, 2], ['column']);
     }
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model
      */
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
