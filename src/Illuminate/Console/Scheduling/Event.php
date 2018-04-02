@@ -486,9 +486,7 @@ class Event
      */
     protected function ensureOutputIsBeingCapturedForLog()
     {
-        if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
-            $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
-        }
+        $this->ensureOutputIsBeingCapturedForEmail();
     }
 
     /**
