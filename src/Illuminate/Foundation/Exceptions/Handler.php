@@ -276,7 +276,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareResponse($request, Exception $e)
     {
-        if (! $this->isHttpException($e) && config('app.debug')) {
+        if (! $this->isHttpException($e) && $this->inDebugMode()) {
             return $this->toIlluminateResponse($this->convertExceptionToResponse($e), $e);
         }
 
@@ -313,11 +313,11 @@ class Handler implements ExceptionHandlerContract
     protected function renderExceptionContent(Exception $e)
     {
         try {
-            return config('app.debug') && class_exists(Whoops::class)
+            return $this->inDebugMode() && class_exists(Whoops::class)
                         ? $this->renderExceptionWithWhoops($e)
-                        : $this->renderExceptionWithSymfony($e, config('app.debug'));
+                        : $this->renderExceptionWithSymfony($e, $this->inDebugMode());
         } catch (Exception $e) {
-            return $this->renderExceptionWithSymfony($e, config('app.debug'));
+            return $this->renderExceptionWithSymfony($e, $this->inDebugMode());
         }
     }
 
@@ -443,7 +443,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function convertExceptionToArray(Exception $e)
     {
-        return config('app.debug') ? [
+        return $this->inDebugMode() ? [
             'message' => $e->getMessage(),
             'exception' => get_class($e),
             'file' => $e->getFile(),
@@ -477,5 +477,13 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Exception $e)
     {
         return $e instanceof HttpException;
+    }
+
+    /**
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    protected function inDebugMode()
+    {
+        return config('app.debug');
     }
 }
