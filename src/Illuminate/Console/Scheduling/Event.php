@@ -497,7 +497,7 @@ class Event
      * @param  bool  $onlyIfOutputExists
      * @return void
      */
-    protected function logOutput(LogManager $logger, array $channels, bool $onlyIfOutputExists = false): void
+    protected function logOutput(LogManager $logger, array $channels, bool $onlyIfOutputExists = false)
     {
         $output = file_exists($this->output) ? file_get_contents($this->output) : '';
 
