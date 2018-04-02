@@ -3,6 +3,8 @@
 namespace Illuminate\Database\Console\Seeds;
 
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\ConfirmableTrait;
 use Symfony\Component\Console\Input\InputOption;
@@ -59,6 +61,10 @@ class SeedCommand extends Command
 
         $this->resolver->setDefaultConnection($this->getDatabase());
 
+        if ($this->input->getOption('truncate')) {
+            $this->truncateTables();
+        }
+
         Model::unguarded(function () {
             $this->getSeeder()->__invoke();
         });
@@ -89,6 +95,29 @@ class SeedCommand extends Command
     }
 
     /**
+     * Truncate all tables in database.
+     *
+     * @return void
+     */
+    protected function truncateTables()
+    {
+        DB::statement('SET FOREIGN_KEY_CHECKS=0;');
+
+        $tableNames = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
+        $this->info('Truncate tables...');
+        foreach ($tableNames as $name) {
+            //don't truncate migrations
+            if ($name == 'migrations') {
+                continue;
+            }
+            DB::table($name)->truncate();
+        }
+        $this->info('All tables truncated successfuly.');
+
+        DB::statement('SET FOREIGN_KEY_CHECKS=1;');
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -101,6 +130,8 @@ class SeedCommand extends Command
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to seed'],
 
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
+
+            ['truncate', null, InputOption::VALUE_NONE, 'Truncate all tables before seed.'],
         ];
     }
 }
