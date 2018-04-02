@@ -292,13 +292,11 @@ class Container implements ArrayAccess, ContainerContract
     protected function parseBindMethod($method)
     {
         if (is_array($method)) {
-            if (count($method) > 1) {
+            if (($count = count($method)) > 1) {
                 return $method[0].'@'.$method[1];
             }
 
-            throw new InvalidArgumentException(
-                sprintf('method should be array with 2 parameters, %s given', count($method))
-            );
+            throw new InvalidArgumentException("Method should be array with length >= 2, current array length = $count");
         }
 
         return $method;

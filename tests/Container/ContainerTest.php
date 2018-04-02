@@ -595,7 +595,7 @@ class ContainerTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage method should be array with 2 parameters, 1 given
+     * @expectedExceptionMessage Method should be array with length >= 2, current array length = 1
      */
     public function testBindMethodWithOneArrayParam()
     {
