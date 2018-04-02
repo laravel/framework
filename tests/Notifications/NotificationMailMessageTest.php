@@ -7,7 +7,6 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class NotificationMailMessageTest extends TestCase
 {
-
     public function testTemplate()
     {
         $message = new MailMessage;
