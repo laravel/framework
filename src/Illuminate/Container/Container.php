@@ -7,6 +7,7 @@ use ArrayAccess;
 use LogicException;
 use ReflectionClass;
 use ReflectionParameter;
+use InvalidArgumentException;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
@@ -285,11 +286,17 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  array|string $method
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function parseBindMethod($method)
     {
         if (is_array($method)) {
-            return $method[0].'@'.$method[1];
+            if (($count = count($method)) > 1) {
+                return $method[0].'@'.$method[1];
+            }
+
+            throw new InvalidArgumentException("Method should be array with length >= 2, current array length = $count");
         }
 
         return $method;
