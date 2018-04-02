@@ -252,6 +252,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     /**
      * @test
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag].
      */
     public function firstOrFail_method()
     {
@@ -279,12 +280,13 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     /**
      * @test
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest\Tag].
      */
     public function findOrFail_method()
     {
         $post = Post::create(['title' => str_random()]);
 
-        $tag = Tag::create(['name' => str_random()]);
+        Tag::create(['name' => str_random()]);
 
         $post->tags()->attach(Tag::all());
 
