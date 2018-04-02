@@ -293,6 +293,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
     }
 
+    public function testDateBasedOrWheresAcceptsTwoArguments()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '>', 1)->orWhereDate('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` > ? or date(`created_at`) = ?', $builder->toSql());
+    }
+
     public function testDateBasedWheresExpressionIsNotBound()
     {
         $builder = $this->getBuilder();
