@@ -7,11 +7,14 @@ use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\Traits\FindOrFail;
+use Illuminate\Database\Eloquent\Relations\Traits\FirstOrFail;
 
 class BelongsToMany extends Relation
 {
-    use Concerns\InteractsWithPivotTable;
+    use Concerns\InteractsWithPivotTable,
+        FirstOrFail,
+        FindOrFail;
 
     /**
      * The intermediate table for the relation.
@@ -494,30 +497,6 @@ class BelongsToMany extends Relation
     }
 
     /**
-     * Find a related model by its primary key or throw an exception.
-     *
-     * @param  mixed  $id
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
-    public function findOrFail($id, $columns = ['*'])
-    {
-        $result = $this->find($id, $columns);
-
-        if (is_array($id)) {
-            if (count($result) == count(array_unique($id))) {
-                return $result;
-            }
-        } elseif (! is_null($result)) {
-            return $result;
-        }
-
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
-    }
-
-    /**
      * Execute the query and get the first result.
      *
      * @param  array   $columns
@@ -528,23 +507,6 @@ class BelongsToMany extends Relation
         $results = $this->take(1)->get($columns);
 
         return count($results) > 0 ? $results->first() : null;
-    }
-
-    /**
-     * Execute the query and get the first result or throw an exception.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
-     */
-    public function firstOrFail($columns = ['*'])
-    {
-        if (! is_null($model = $this->first($columns))) {
-            return $model;
-        }
-
-        throw (new ModelNotFoundException)->setModel(get_class($this->related));
     }
 
     /**
