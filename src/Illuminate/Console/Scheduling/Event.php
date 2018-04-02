@@ -5,13 +5,13 @@ namespace Illuminate\Console\Scheduling;
 use Closure;
 use Cron\CronExpression;
 use Illuminate\Support\Arr;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Log\LogManager;
 
 class Event
 {
@@ -455,7 +455,7 @@ class Event
      *
      * @throws \LogicException
      */
-    public function logOutputTo($channels, bool $onlyIfOutputExists = false): Event
+    public function logOutputTo($channels, bool $onlyIfOutputExists = false)
     {
         $this->ensureOutputIsBeingCapturedForLog();
 
@@ -474,7 +474,7 @@ class Event
      *
      * @throws \LogicException
      */
-    public function logWrittenOutputTo($channels): Event
+    public function logWrittenOutputTo($channels)
     {
         return $this->logOutputTo($channels, true);
     }
