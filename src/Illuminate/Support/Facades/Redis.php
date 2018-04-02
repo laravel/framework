@@ -3,6 +3,8 @@
 namespace Illuminate\Support\Facades;
 
 /**
+ * @method static \Illuminate\Redis\Connections\Connection connection(string $name = null)
+ *
  * @see \Illuminate\Redis\RedisManager
  * @see \Illuminate\Contracts\Redis\Factory
  */
