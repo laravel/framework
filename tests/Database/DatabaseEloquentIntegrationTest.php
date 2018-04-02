@@ -1201,6 +1201,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The format separator does not match
      */
     public function testTimestampsUsingOldSqlServerDateFormatFailInEdgeCases()
     {

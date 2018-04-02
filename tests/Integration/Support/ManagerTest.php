@@ -8,6 +8,7 @@ class ManagerTest extends TestCase
 {
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unable to resolve NULL driver for [Illuminate\Tests\Integration\Support\Fixtures\NullableManager].
      */
     public function testDefaultDriverCannotBeNull()
     {

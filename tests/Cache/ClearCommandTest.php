@@ -78,6 +78,7 @@ class ClearCommandTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessageRegExp /^$/
      */
     public function testClearWithInvalidStoreArgument()
     {

@@ -20,6 +20,7 @@ class ViewEngineResolverTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Engine [foo] not found.
      */
     public function testResolverThrowsExceptionOnUnknownEngine()
     {

@@ -219,6 +219,7 @@ class FilesystemTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @expectedExceptionMessage File does not exist at path
      */
     public function testGetThrowsExceptionNonexisitingFile()
     {
@@ -235,6 +236,7 @@ class FilesystemTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @expectedExceptionMessage File does not exist at path
      */
     public function testGetRequireThrowsExceptionNonexisitingFile()
     {

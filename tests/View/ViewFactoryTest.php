@@ -69,6 +69,7 @@ class ViewFactoryTest extends TestCase
 
     /**
      * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage None of the views in the given array exist.
      */
     public function testFirstThrowsInvalidArgumentExceptionIfNoneFound()
     {
@@ -463,6 +464,7 @@ class ViewFactoryTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unrecognized extension in file: view.foo
      */
     public function testExceptionIsThrownForUnknownExtension()
     {

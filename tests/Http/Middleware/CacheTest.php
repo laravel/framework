@@ -75,6 +75,7 @@ class CacheTest extends TestCase
 
     /**
      * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Response does not support the following options: "invalid".
      */
     public function testInvalidOption()
     {

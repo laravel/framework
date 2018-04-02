@@ -388,6 +388,7 @@ class RoutingUrlGeneratorTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Routing\Exceptions\UrlGenerationException
+     * @expectedExceptionMessage Missing required parameters for [Route: foo] [URI: foo/{one}/{two?}/{three?}].
      */
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
