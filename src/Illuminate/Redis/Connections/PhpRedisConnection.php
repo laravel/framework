@@ -157,7 +157,6 @@ class PhpRedisConnection extends Connection
 
     /**
      * Removes and returns the first element of the list stored at key.
-     * It is the blocking version of LPOP.
      *
      * @param  dynamic  $arguments
      * @return array|null
@@ -171,7 +170,6 @@ class PhpRedisConnection extends Connection
 
     /**
      * Removes and returns the last element of the list stored at key.
-     * It is the blocking version of RPOP.
      *
      * @param  dynamic  $arguments
      * @return array|null
