@@ -168,13 +168,17 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
-        $parameters = collect($parameters)->prepend($command);
+        if (is_subclass_of($command, SymfonyCommand::class)) {
+            $command = $this->laravel->make($command)->getName();
+        }
+
+        array_unshift($parameters, $command);
 
         $this->lastOutput = $outputBuffer ?: new BufferedOutput;
 
         $this->setCatchExceptions(false);
 
-        $result = $this->run(new ArrayInput($parameters->toArray()), $this->lastOutput);
+        $result = $this->run(new ArrayInput($parameters), $this->lastOutput);
 
         $this->setCatchExceptions(true);
 
