@@ -156,6 +156,34 @@ class PhpRedisConnection extends Connection
     }
 
     /**
+     * Removes and returns the first element of the list stored at key.
+     * It is the blocking version of LPOP.
+     *
+     * @param  dynamic  $arguments
+     * @return array|null
+     */
+    public function blpop(...$arguments)
+    {
+        $result = $this->command('blpop', $arguments);
+
+        return empty($result) ? null : $result;
+    }
+
+    /**
+     * Removes and returns the last element of the list stored at key.
+     * It is the blocking version of RPOP.
+     *
+     * @param  dynamic  $arguments
+     * @return array|null
+     */
+    public function brpop(...$arguments)
+    {
+        $result = $this->command('brpop', $arguments);
+
+        return empty($result) ? null : $result;
+    }
+
+    /**
      * Removes and returns a random element from the set value at key.
      *
      * @param  string  $key
