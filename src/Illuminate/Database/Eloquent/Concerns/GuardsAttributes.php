@@ -2,8 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Support\Str;
-
 trait GuardsAttributes
 {
     /**
@@ -151,8 +149,7 @@ trait GuardsAttributes
             return false;
         }
 
-        return empty($this->getFillable()) &&
-            ! Str::startsWith($key, '_');
+        return empty($this->getFillable()) && (empty($key) || $key[0] !== '_');
     }
 
     /**

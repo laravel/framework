@@ -362,7 +362,7 @@ trait MakesHttpRequests
      */
     protected function prepareUrlForRequest($uri)
     {
-        if (Str::startsWith($uri, '/')) {
+        if ($uri[0] === '/') {
             $uri = substr($uri, 1);
         }
 
