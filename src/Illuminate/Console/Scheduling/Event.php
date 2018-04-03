@@ -5,6 +5,7 @@ namespace Illuminate\Console\Scheduling;
 use Closure;
 use Cron\CronExpression;
 use Illuminate\Support\Arr;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
@@ -145,7 +146,7 @@ class Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @param  string  $command
      * @return void
      */
@@ -180,8 +181,8 @@ class Event
         }
 
         $this->runInBackground
-                    ? $this->runCommandInBackground($container)
-                    : $this->runCommandInForeground($container);
+            ? $this->runCommandInBackground($container)
+            : $this->runCommandInForeground($container);
     }
 
     /**
@@ -275,7 +276,7 @@ class Event
         }
 
         return $this->expressionPasses() &&
-               $this->runsInEnvironment($app->environment());
+            $this->runsInEnvironment($app->environment());
     }
 
     /**
@@ -443,6 +444,78 @@ class Event
         }
 
         return "Scheduled Job Output For [{$this->command}]";
+    }
+
+    /**
+     * Log the results of the scheduled operation.
+     *
+     * @param  array|mixed  $channels
+     * @param  bool  $onlyIfOutputExists
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function logOutputTo($channels, bool $onlyIfOutputExists = false)
+    {
+        $this->ensureOutputIsBeingCapturedForLog();
+
+        $channels = Arr::wrap($channels);
+
+        return $this->then(function (LogManager $logger) use ($channels, $onlyIfOutputExists) {
+            $this->logOutput($logger, $channels, $onlyIfOutputExists);
+        });
+    }
+
+    /**
+     * Send to log the results of the scheduled operation if it produces output.
+     *
+     * @param  array|mixed  $channels
+     * @return $this
+     *
+     * @throws \LogicException
+     */
+    public function logWrittenOutputTo($channels)
+    {
+        return $this->logOutputTo($channels, true);
+    }
+
+    /**
+     * Ensure that output is being captured for log.
+     *
+     * @return void
+     */
+    protected function ensureOutputIsBeingCapturedForLog()
+    {
+        $this->ensureOutputIsBeingCapturedForEmail();
+    }
+
+    /**
+     * Log the output of the event to the channels.
+     *
+     * @param  \Illuminate\Log\LogManager  $logger
+     * @param  array  $channels
+     * @param  bool  $onlyIfOutputExists
+     * @return void
+     */
+    protected function logOutput(LogManager $logger, array $channels, bool $onlyIfOutputExists = false)
+    {
+        $output = file_exists($this->output) ? file_get_contents($this->output) : '';
+
+        if ($onlyIfOutputExists && empty($output)) {
+            return;
+        }
+
+        $logger->stack($channels)->info($this->getLogMessage(), ['output' => $output]);
+    }
+
+    /**
+     * Get the log message for output results.
+     *
+     * @return string
+     */
+    protected function getLogMessage()
+    {
+        return $this->getEmailSubject();
     }
 
     /**
