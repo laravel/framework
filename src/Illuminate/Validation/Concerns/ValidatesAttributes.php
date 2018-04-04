@@ -445,6 +445,44 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is greater than another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateGreaterThan($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'greaterThan');
+
+        $comparedToValue = $this->getValue($parameters[0]);
+
+        $this->requireSameTypeValues($value, $comparedToValue);
+
+        return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
+    }
+
+    /**
+     * Validate that an attribute is less than another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateLessThan($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'greaterThan');
+
+        $comparedToValue = $this->getValue($parameters[0]);
+
+        $this->requireSameTypeValues($value, $comparedToValue);
+
+        return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
+    }
+
+    /**
      * Validate that an attribute has a given number of digits.
      *
      * @param  string  $attribute
@@ -1537,6 +1575,19 @@ trait ValidatesAttributes
     {
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
+        }
+    }
+
+    /**
+     * Require comparison values to be of the same type.
+     *
+     * @param $first
+     * @param $second
+     */
+    protected function requireSameTypeValues($first, $second)
+    {
+        if (gettype($first) != gettype($second)) {
+            throw new InvalidArgumentException('The values under comparison must be of the same type');
         }
     }
 }
