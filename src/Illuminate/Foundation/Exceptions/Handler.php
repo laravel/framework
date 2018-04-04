@@ -11,7 +11,6 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Auth\AuthenticationException;
@@ -391,7 +390,7 @@ class Handler implements ExceptionHandlerContract
     {
         $paths = collect(config('view.paths'));
 
-        View::replaceNamespace('errors', $paths->map(function ($path) {
+        view()->replaceNamespace('errors', $paths->map(function ($path) {
             return "{$path}/errors";
         })->push(__DIR__.'/views')->all());
     }
