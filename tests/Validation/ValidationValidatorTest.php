@@ -1060,7 +1060,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'greater_than:rhs']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1,'string']], ['lhs' => 'greater_than:rhs']);
+        $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'greater_than:rhs']);
         $this->assertTrue($v->fails());
 
         $fileOne = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();
@@ -1080,7 +1080,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'less_than:rhs']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1,'string']], ['lhs' => 'less_than:rhs']);
+        $v = new Validator($trans, ['lhs' => ['string'], 'rhs' => [1, 'string']], ['lhs' => 'less_than:rhs']);
         $this->assertTrue($v->passes());
 
         $fileOne = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\File')->setMethods(['getSize'])->setConstructorArgs([__FILE__, false])->getMock();

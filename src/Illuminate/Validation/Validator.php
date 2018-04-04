@@ -167,7 +167,7 @@ class Validator implements ValidatorContract
     protected $dependentRules = [
         'RequiredWith', 'RequiredWithAll', 'RequiredWithout', 'RequiredWithoutAll',
         'RequiredIf', 'RequiredUnless', 'Confirmed', 'Same', 'Different', 'Unique',
-        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual', 'GreaterThan', 'LessThan'
+        'Before', 'After', 'BeforeOrEqual', 'AfterOrEqual', 'GreaterThan', 'LessThan',
     ];
 
     /**
