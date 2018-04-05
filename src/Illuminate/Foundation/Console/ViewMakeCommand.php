@@ -9,7 +9,6 @@ use Symfony\Component\Console\Input\InputArgument;
 
 class ViewMakeCommand extends Command
 {
-
     /**
      * The filesystem instance.
      *
@@ -50,7 +49,6 @@ class ViewMakeCommand extends Command
      */
     public function handle()
     {
-
         $paths = app('config')->get('view.paths');
         $path = null;
         if (is_string($paths)) {
@@ -65,7 +63,6 @@ class ViewMakeCommand extends Command
                 $answers[] = $path;
             }
             $path = $this->choice('Application has more than 1 directory with views. Please select directory where to create new blade template', $answers);
-
         }
         if (is_null($path)) {
             throw new RuntimeException('Unable to get view path');
