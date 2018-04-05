@@ -86,5 +86,4 @@ class ViewMakeCommand extends Command
             ['name', InputArgument::REQUIRED, 'Enter view name'],
         ];
     }
-
 }
