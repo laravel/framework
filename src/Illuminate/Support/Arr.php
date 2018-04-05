@@ -144,10 +144,6 @@ class Arr
      */
     public static function exists($array, $key)
     {
-        if (is_null($array)) {
-            return false;
-        }
-
         if ($array instanceof ArrayAccess) {
             return $array->offsetExists($key);
         }
