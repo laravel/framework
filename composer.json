@@ -22,6 +22,7 @@
         "dragonmantank/cron-expression": "~2.0",
         "erusev/parsedown": "~1.7",
         "league/flysystem": "^1.0.8",
+        "league/flysystem-cached-adapter": "^1.0",
         "monolog/monolog": "~1.12",
         "nesbot/carbon": "^1.24.1",
         "psr/container": "~1.0",
