@@ -32,7 +32,7 @@ class ViewMakeCommand extends Command
     protected $description = 'Create a new blade template in view directory with given name.';
 
     /**
-     * Create a new controller
+     * Create a new controller.
      *
      * @param  \Illuminate\Filesystem\Filesystem $files
      * @return void
@@ -41,7 +41,6 @@ class ViewMakeCommand extends Command
     {
         parent::__construct();
         $this->files = $files;
-        return;
     }
 
     /**
@@ -71,24 +70,23 @@ class ViewMakeCommand extends Command
         if (is_null($path)) {
             throw new RuntimeException('Unable to get view path');
         }
-        $path .= DIRECTORY_SEPARATOR . str_replace('.', '/', $this->argument('name')) . '.blade.php';
-        if (!$this->files->isDirectory(dirname($path))) {
+        $path .= DIRECTORY_SEPARATOR.str_replace('.', '/', $this->argument('name')).'.blade.php';
+        if (! $this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
-        if ($this->files->exists($path) && !$this->confirm('Blade template with name "' . $this->argument('name') . '" already exists. Overwrite?')) {
+        if ($this->files->exists($path) && ! $this->confirm('Blade template with name "'.$this->argument('name').'" already exists. Overwrite?')) {
             return;
         }
 
         $this->files->put($path, '');
-        $this->info('View created. ' . PHP_EOL . 'Name: ' . $this->argument('name') . PHP_EOL . 'Path: ' . $path);
-
+        $this->info('View created. '.PHP_EOL.'Name: '.$this->argument('name').PHP_EOL.'Path: '.$path);
     }
 
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'Enter view name']
+            ['name', InputArgument::REQUIRED, 'Enter view name'],
         ];
     }
 
