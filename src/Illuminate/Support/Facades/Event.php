@@ -34,6 +34,17 @@ class Event extends Facade
     }
 
     /**
+     * Replace the bound instance with a fake except for model events.
+     *
+     * @param  array|string  $eventsToFake
+     * @return void
+     */
+    public static function fakeExceptModels($eventsToFake = [])
+    {
+        static::swap(new EventFake(static::getFacadeRoot(), $eventsToFake));
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string
