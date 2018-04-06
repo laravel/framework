@@ -32,6 +32,7 @@
     "suggest": {
         "league/flysystem": "Required to use the Flysystem local and FTP drivers (~1.0).",
         "league/flysystem-aws-s3-v3": "Required to use the Flysystem S3 driver (~1.0).",
+        "league/flysystem-cached-adapter": "Required to use the Flysystem cache (~1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (~1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (~1.0)."
     },
