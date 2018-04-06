@@ -82,6 +82,7 @@
         "orchestra/testbench-core": "3.6.*",
         "pda/pheanstalk": "~3.0",
         "phpunit/phpunit": "~7.0",
+        "phpunit/phpunit-mock-objects": "~6.1",
         "predis/predis": "^1.1.1",
         "symfony/css-selector": "~4.0",
         "symfony/dom-crawler": "~4.0"
