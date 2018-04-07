@@ -497,7 +497,7 @@ class TestResponse
      * @param  bool        $exact
      * @return $this
      */
-    public function assertJsonStructure(array $structure = null, &$responseData = null, bool $exact = false)
+    public function assertJsonStructure(array $structure = null, $responseData = null, bool $exact = false)
     {
         if (is_null($structure)) {
             return $this->assertJson($this->json());
@@ -511,25 +511,31 @@ class TestResponse
             if (is_array($value) && $key === '*') {
                 PHPUnit::assertInternalType('array', $responseData);
 
-                foreach ($responseData as &$responseDataItem) {
+                foreach ($responseData as $responseDataItem) {
                     $this->assertJsonStructure($structure['*'], $responseDataItem, $exact);
                 }
+
+                $responseData = [];
             } elseif (is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $responseData);
 
                 $this->assertJsonStructure($structure[$key], $responseData[$key], $exact);
+
+                unset($responseData[$key]);
             } else {
                 PHPUnit::assertArrayHasKey($value, $responseData);
+
+                if ($exact) {
+                    PHPUnit::assertNotInternalType('array', $responseData[$value]);
+                }
 
                 unset($responseData[$value]);
             }
         }
 
         if ($exact) {
-            $responseData = array_filter($responseData);
-
             PHPUnit::assertEmpty(
-                array_flatten($responseData),
+                $responseData,
                 'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
                 key($responseData)
             );

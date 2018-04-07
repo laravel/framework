@@ -211,8 +211,8 @@ class FoundationTestResponseTest extends TestCase
         $response->assertExactJsonStructure([
             'foo',
             'foobar' => ['foobar_foo', 'foobar_bar'],
-            'bars' => ['*' => ['bar', 'foo']],
-            'baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]],
+            'bars'   => ['*' => ['bar', 'foo']],
+            'baz'    => ['*' => ['foo', 'bar' => ['foo', 'bar']]],
             'barfoo' => ['*' => ['bar' => ['bar']]],
         ]);
 
