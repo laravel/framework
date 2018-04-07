@@ -2663,6 +2663,36 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
     }
+
+    public function testSome()
+    {
+        $c = new Collection([]);
+        $this->assertFalse($c->some('key', 'value'));
+        $this->assertFalse($c->some(function () {
+            return true;
+        }));
+
+        $c = new Collection([['age' => 18], ['age' => 20], ['age' => 20]]);
+        $this->assertTrue($c->some('age', 18));
+        $this->assertFalse($c->some('age', '<', 18));
+        $this->assertFalse($c->some(function ($item) {
+            return $item['age'] < 18;
+        }));
+        $this->assertTrue($c->some(function ($item) {
+            return $item['age'] >= 20;
+        }));
+        $this->assertTrue($c->push(['age'=>16])->some('age', '<', 18));
+
+        $c = new Collection(['not null', null]);
+        $this->assertTrue($c->some(function ($item) {
+            return $item === null;
+        }));
+
+        $c = new Collection([['active' => false], ['active' => false]]);
+        $this->assertFalse($c->some('active'));
+        $this->assertFalse($c->some->active);
+        $this->assertTrue($c->push(['active' => true])->some->active);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem

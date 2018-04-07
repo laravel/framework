@@ -35,7 +35,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     protected static $proxies = [
         'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
         'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
-        'reject', 'sortBy', 'sortByDesc', 'sum', 'unique',
+        'reject', 'sortBy', 'sortByDesc', 'some', 'sum', 'unique',
     ];
 
     /**
@@ -1502,6 +1502,31 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function sortKeysDesc($options = SORT_REGULAR)
     {
         return $this->sortKeys($options, true);
+    }
+
+    /**
+     * Determine if at least one item in the collection passes the given test.
+     *
+     * @param  string|callable  $key
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function some($key, $operator = null, $value = null)
+    {
+        if (func_num_args() == 1) {
+            $callback = $this->valueRetriever($key);
+
+            foreach ($this->items as $k => $v) {
+                if ($callback($v, $k)) {
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        return $this->some($this->operatorForWhere(...func_get_args()));
     }
 
     /**
