@@ -494,9 +494,10 @@ class TestResponse
      *
      * @param  array|null  $structure
      * @param  array|null  $responseData
+     * @param  bool        $exact
      * @return $this
      */
-    public function assertJsonStructure(array $structure = null, $responseData = null)
+    public function assertJsonStructure(array $structure = null, $responseData = null, bool $exact = false)
     {
         if (is_null($structure)) {
             return $this->assertJson($this->json());
@@ -511,18 +512,48 @@ class TestResponse
                 PHPUnit::assertInternalType('array', $responseData);
 
                 foreach ($responseData as $responseDataItem) {
-                    $this->assertJsonStructure($structure['*'], $responseDataItem);
+                    $this->assertJsonStructure($structure['*'], $responseDataItem, $exact);
                 }
+
+                $responseData = [];
             } elseif (is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $responseData);
 
-                $this->assertJsonStructure($structure[$key], $responseData[$key]);
+                $this->assertJsonStructure($structure[$key], $responseData[$key], $exact);
+
+                unset($responseData[$key]);
             } else {
                 PHPUnit::assertArrayHasKey($value, $responseData);
+
+                if ($exact) {
+                    PHPUnit::assertNotInternalType('array', $responseData[$value]);
+                }
+
+                unset($responseData[$value]);
             }
         }
 
+        if ($exact) {
+            PHPUnit::assertEmpty(
+                $responseData,
+                'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
+                key($responseData)
+            );
+        }
+
         return $this;
+    }
+
+    /**
+     * Assert that the response has the exact given JSON structure.
+     *
+     * @param  array|null  $structure
+     * @param  array|null  $responseData
+     * @return TestResponse
+     */
+    public function assertExactJsonStructure(array $structure = null, $responseData = null)
+    {
+        return $this->assertJsonStructure($structure, $responseData, true);
     }
 
     /**

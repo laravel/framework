@@ -200,6 +200,28 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
+    public function testAssertExactJsonStructure()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+
+        // Without structure
+        $response->assertExactJsonStructure();
+
+        // Nested after wildcard
+        $response->assertExactJsonStructure([
+            'foo',
+            'foobar' => ['foobar_foo', 'foobar_bar'],
+            'bars'   => ['*' => ['bar', 'foo']],
+            'baz'    => ['*' => ['foo', 'bar' => ['foo', 'bar']]],
+            'barfoo' => ['*' => ['bar' => ['bar']]],
+        ]);
+
+        // Wildcard (repeating structure) at root
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+
+        $response->assertExactJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
+    }
+
     public function testAssertJsonCount()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
@@ -208,8 +230,8 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonCount(3, 'bars');
 
         // With nested key
-        $response->assertJsonCount(1, 'barfoo.0.bar');
-        $response->assertJsonCount(3, 'barfoo.2.bar');
+        $response->assertJsonCount(2, 'baz.0.bar');
+        $response->assertJsonCount(1, 'barfoo.2.bar');
 
         // Without structure
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
@@ -276,8 +298,8 @@ class JsonSerializableMixedResourcesStub implements JsonSerializable
             ],
             'barfoo' => [
                 ['bar' => ['bar' => 'foo 0']],
-                ['bar' => ['bar' => 'foo 0', 'bar' => 'foo 0']],
-                ['bar' => ['foo' => 'bar 0', 'bar' => 'foo 0', 'rab' => 'rab 0']],
+                ['bar' => ['bar' => 'foo 0']],
+                ['bar' => ['bar' => 'foo 0']],
             ],
         ];
     }
