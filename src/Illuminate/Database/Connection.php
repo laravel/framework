@@ -1235,4 +1235,14 @@ class Connection implements ConnectionInterface
     {
         return static::$resolvers[$driver] ?? null;
     }
+
+    /**
+     * Unset the event dispatcher for this connection.
+     *
+     * @return void
+     */
+    public function unsetEventDispatcher()
+    {
+        $this->events = null;
+    }
 }
