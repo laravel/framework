@@ -1299,10 +1299,16 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
 
         $builder = $this->getBuilder();
-        $query = $this->getBuilder()->from('contacts')->where('name', 'foo');
-        $builder->from('users')->joinSub($query, 'sub', 'users.id', '=', 1, 'inner', true);
-        $this->assertEquals('select * from "users" inner join (select * from "contacts" where "name" = ?) as "sub" on "users"."id" = ?', $builder->toSql());
-        $this->assertEquals(['foo', 1], $builder->getRawBindings()['join']);
+        $sub1 = $this->getBuilder()->from('contacts')->where('name', 'foo');
+        $sub2 = $this->getBuilder()->from('contacts')->where('name', 'bar');
+        $builder->from('users')
+            ->joinSub($sub1, 'sub1', 'users.id', '=', 1, 'inner', true)
+            ->joinSub($sub2, 'sub2', 'users.id', '=', 'sub2.user_id');
+        $expected = 'select * from "users" ';
+        $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub1" on "users"."id" = ? ';
+        $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub2" on "users"."id" = "sub2"."user_id"';
+        $this->assertEquals($expected, $builder->toSql());
+        $this->assertEquals(['foo', 1, 'bar'], $builder->getRawBindings()['join']);
     }
 
     public function testLeftJoinSub()
