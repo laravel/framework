@@ -1241,7 +1241,7 @@ class Connection implements ConnectionInterface
      *
      * @return void
      */
-    public static function unsetEventDispatcher()
+    public function unsetEventDispatcher()
     {
         $this->events = null;
     }

@@ -72,7 +72,7 @@ trait RefreshDatabase
         foreach ($this->connectionsToTransact() as $name) {
             $connection = $database->connection($name);
             $dispatcher = $connection->getEventDispatcher();
-            
+
             $connection->unsetEventDispatcher();
             $connection->beginTransaction();
             $connection->setEventDispatcher($dispatcher);
