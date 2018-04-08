@@ -1581,8 +1581,11 @@ trait ValidatesAttributes
     /**
      * Require comparison values to be of the same type.
      *
-     * @param $first
-     * @param $second
+     * @param  mixed  $first
+     * @param  mixed  $second
+     * @return void
+     *
+     * @throws \InvalidArgumentException
      */
     protected function requireSameTypeValues($first, $second)
     {
