@@ -280,6 +280,7 @@ trait ReplacesAttributes
         $other = $this->getDisplayableAttribute($parameters[0]);
 
         $values = [];
+
         foreach (array_slice($parameters, 1) as $value) {
             $values[] = $this->getDisplayableValue($parameters[0], $value);
         }
