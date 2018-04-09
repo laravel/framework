@@ -932,7 +932,7 @@ class Blueprint
     }
     
     /**
-     * Add current creation and update timestamps to the table.
+     * Add current datetime creation and update timestamps to the table.
      *
      * @param  int  $precision
      * @return void
