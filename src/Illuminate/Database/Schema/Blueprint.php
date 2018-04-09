@@ -944,7 +944,6 @@ class Blueprint
         $this->timestamp('updated_at', $precision)->default(date('Y-m-d H:i:s'));
     }
 
-
     /**
      * Add nullable creation and update timestamps to the table.
      *
