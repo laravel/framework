@@ -930,6 +930,20 @@ class Blueprint
 
         $this->timestamp('updated_at', $precision)->nullable();
     }
+    
+    /**
+     * Add current creation and update timestamps to the table.
+     *
+     * @param  int  $precision
+     * @return void
+     */
+    public function currentTimestamps($precision = 0)
+    {
+        $this->timestamp('created_at', $precision)->default(date('Y-m-d H:i:s'));
+
+        $this->timestamp('updated_at', $precision)->default(date('Y-m-d H:i:s'));
+    }
+
 
     /**
      * Add nullable creation and update timestamps to the table.
