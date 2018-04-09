@@ -1,5 +1,20 @@
 # Release Notes for 5.6.x
 
+## v5.6.16 (2018-04-09)
+
+### Added
+- Support executing artisan commands using class names ([#23764](https://github.com/laravel/framework/pull/23764))
+- Make `View` macroable ([#23787](https://github.com/laravel/framework/pull/23787))
+- Added database `Connection::unsetEventDispatcher()` method ([#23832](https://github.com/laravel/framework/pull/23832))
+- Support IAM role session token to be used with SES ([#23766](https://github.com/laravel/framework/pull/23766))
+
+### Changed
+- Added displayable value to `required_unless` rule ([#23833](https://github.com/laravel/framework/pull/23833))
+
+### Fixed
+- Fixed `RedisQueue::blockingPop()` check when using PhpRedis ([#23757](https://github.com/laravel/framework/pull/23757))
+
+
 ## v5.6.15 (2018-03-30)
 
 ### Fixed
