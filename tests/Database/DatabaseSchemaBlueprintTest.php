@@ -97,4 +97,50 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));
     }
+
+    public function testBelongsColumn()
+    {
+        $base = new Blueprint('messages', function ($table) {
+            $table->belongs('users');
+        });
+
+        $commands = $base->getCommands();
+        $columns = $base->getColumns();
+
+        $this->assertArraySubset([
+            'name' => 'foreign',
+            'index' => 'messages_user_id_foreign',
+            'columns' => ['user_id'],
+            'references' => 'id',
+            'on' => 'users',
+        ], $commands[0]->toArray());
+
+        $this->assertArraySubset([
+            'type' => 'integer',
+            'name' => 'user_id',
+            'unsigned' => true,
+        ], $columns[0]->toArray());
+
+        $base = new Blueprint('messages', function ($table) {
+            $table->belongs('users', 'sender_user_uuid', 'uuid', 'custom_index_name')->nullable();
+        });
+
+        $commands = $base->getCommands();
+        $columns = $base->getColumns();
+
+        $this->assertArraySubset([
+            'name' => 'foreign',
+            'index' => 'custom_index_name',
+            'columns' => ['sender_user_uuid'],
+            'references' => 'uuid',
+            'on' => 'users',
+        ], $commands[0]->toArray());
+
+        $this->assertArraySubset([
+            'type' => 'integer',
+            'name' => 'sender_user_uuid',
+            'unsigned' => true,
+            'nullable' => true,
+        ], $columns[0]->toArray());
+    }
 }
