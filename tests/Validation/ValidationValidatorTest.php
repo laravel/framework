@@ -1544,6 +1544,12 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['cat' => ['sub' => [['prod' => [['id' => 2]]], ['prod' => [['id' => 2]]]]]], ['cat.sub.*.prod.*.id' => 'distinct']);
         $this->assertFalse($v->passes());
 
+        $v = new Validator($trans,
+            ['authors' => [['email' => 'e1@test.com'], ['email' => 'e2@test.com'], ['email' => null], ['email' => null], ['email' => ''], ['email' => ''], ['email' => '  '], ['email' => '  ']]],
+            ['authors.*.email' => 'distinct:ignore_empty_values']
+        );
+        $this->assertTrue($v->passes());
+
         $v = new Validator($trans, ['foo' => ['foo', 'foo']], ['foo.*' => 'distinct'], ['foo.*.distinct' => 'There is a duplication!']);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
