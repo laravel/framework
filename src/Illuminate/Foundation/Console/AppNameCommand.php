@@ -74,7 +74,8 @@ class AppNameCommand extends Command
         $this->setConfigNamespaces();
         $this->setComposerNamespace();
         $this->setDatabaseFactoryNamespaces();
-
+        $this->setOtherDirectoryNamespace();
+        
         $this->info('Application namespace set!');
 
         $this->composer->dumpAutoloads();
@@ -87,17 +88,43 @@ class AppNameCommand extends Command
      *
      * @return void
      */
-    protected function setAppDirectoryNamespace()
+    protected function setOtherDirectoryNamespace()
     {
-        $files = Finder::create()
-                            ->in($this->laravel['path'])
-                            ->contains($this->currentRoot)
-                            ->name('*.php');
+        $dirs = [
+            'config',
+            'tests',
+            'database',
+        ];
 
-        foreach ($files as $file) {
-            $this->replaceNamespace($file->getRealPath());
+        foreach($dirs as $dir)
+        {
+            $files = Finder::create()
+                                ->in(base_path($dir))
+                                ->contains($this->currentRoot)
+                                ->name('*.php');
+
+            foreach ($files as $file) {
+                $this->replaceNamespace($file->getRealPath());
+            }
         }
-    }
+    }    
+    
+    /**
+    * Set the namespace on the files in the app directory.
+    *
+    * @return void
+    */
+   protected function setAppDirectoryNamespace()
+   {
+       $files = Finder::create()
+                           ->in($this->laravel['path'])
+                           ->contains($this->currentRoot)
+                           ->name('*.php');
+
+       foreach ($files as $file) {
+           $this->replaceNamespace($file->getRealPath());
+       }
+   }
 
     /**
      * Replace the App namespace at the given path.
