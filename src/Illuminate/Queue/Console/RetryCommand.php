@@ -56,6 +56,10 @@ class RetryCommand extends Command
             $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
         }
 
+        if (! is_array($ids)) {
+            $ids = (array) $ids;
+        }
+
         return $ids;
     }
 
