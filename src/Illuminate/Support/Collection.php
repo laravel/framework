@@ -1432,6 +1432,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Sort through each item in descending order with a callback.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function sortDesc(callable $callback = null)
+    {
+        $items = $this->items;
+
+        $callback
+            ? uasort($items, $callback)
+            : arsort($items);
+
+        return new static($items);
+    }
+
+    /**
      * Sort the collection using the given callback.
      *
      * @param  callable|string  $callback

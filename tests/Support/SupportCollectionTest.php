@@ -902,6 +902,31 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(range(1, 5), array_values($data->all()));
     }
 
+    public function testSortDesc()
+    {
+        $data = (new Collection([5, 3, 1, 2, 4]))->sortDesc();
+        $this->assertEquals([5, 4, 3, 2, 1], $data->values()->all());
+
+        $data = (new Collection([-1, -3, -2, -4, -5, 0, 5, 3, 1, 2, 4]))->sortDesc();
+        $this->assertEquals([5, 4, 3, 2, 1, 0, -1, -2, -3, -4, -5], $data->values()->all());
+
+        $data = (new Collection(['foo', 'bar-10', 'bar-1']))->sortDesc();
+        $this->assertEquals(['foo', 'bar-10', 'bar-1'], $data->values()->all());
+    }
+
+    public function testSortDescWithCallback()
+    {
+        $data = (new Collection([5, 3, 1, 2, 4]))->sortDesc(function ($a, $b) {
+            if ($a === $b) {
+                return 0;
+            }
+
+            return ($a < $b) ? -1 : 1;
+        });
+
+        $this->assertEquals(range(1, 5), array_values($data->all()));
+    }
+
     public function testSortBy()
     {
         $data = new Collection(['taylor', 'dayle']);
