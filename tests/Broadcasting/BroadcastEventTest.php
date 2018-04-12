@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Broadcasting;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\BroadcastEvent;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEventTest extends TestCase
@@ -39,6 +40,20 @@ class BroadcastEventTest extends TestCase
 
         (new BroadcastEvent($event))->handle($broadcaster);
     }
+
+    public function testBroadcastWithHandlesEloquentResource()
+    {
+        app()->instance('request', m::mock(Request::class));
+        $broadcaster = m::mock(Broadcaster::class);
+
+        $broadcaster->shouldReceive('broadcast')->once()->with(
+            ['test-channel'], TestBroadcastEventWithEloquentResource::class, ['id' => 1, 'name' => 'Mohamed', 'socket' => null]
+        );
+
+        $event = new TestBroadcastEventWithEloquentResource;
+
+        (new BroadcastEvent($event))->handle($broadcaster);
+    }
 }
 
 class TestBroadcastEvent
@@ -64,5 +79,30 @@ class TestBroadcastEventWithManualData extends TestBroadcastEvent
     public function broadcastWith()
     {
         return ['name' => 'Taylor'];
+    }
+}
+
+class TestBroadcastEventWithEloquentResource extends TestBroadcastEvent
+{
+    public function broadcastWith()
+    {
+        return new TestEloquentResource(new TestUser);
+    }
+}
+
+class TestUser
+{
+    public $id = 1;
+    public $name = 'Mohamed';
+}
+
+class TestEloquentResource extends JsonResource
+{
+    public function toArray($request)
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+        ];
     }
 }

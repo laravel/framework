@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
 
 class BroadcastEvent implements ShouldQueue
@@ -59,7 +60,7 @@ class BroadcastEvent implements ShouldQueue
     {
         if (method_exists($event, 'broadcastWith')) {
             return array_merge(
-                $event->broadcastWith(), ['socket' => data_get($event, 'socket')]
+                $this->formatBroadcastWith($event->broadcastWith()), ['socket' => data_get($event, 'socket')]
             );
         }
 
@@ -84,6 +85,21 @@ class BroadcastEvent implements ShouldQueue
     {
         if ($value instanceof Arrayable) {
             return $value->toArray();
+        }
+
+        return $value;
+    }
+
+    /**
+     * Format the returned value from the broadcastWith method on the event.
+     *
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function formatBroadcastWith($value)
+    {
+        if ($value instanceof JsonResource) {
+            return $value->toArray(request());
         }
 
         return $value;
