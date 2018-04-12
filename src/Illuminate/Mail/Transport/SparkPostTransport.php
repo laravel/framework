@@ -54,7 +54,7 @@ class SparkPostTransport extends Transport
 
         $message->setBcc([]);
 
-        $response = $this->client->post('https://api.sparkpost.com/api/v1/transmissions', [
+        $response = $this->client->post(config('mail.endpoints.sparkpost', 'https://api.sparkpost.com/api/v1/transmissions'), [
             'headers' => [
                 'Authorization' => $this->key,
             ],
