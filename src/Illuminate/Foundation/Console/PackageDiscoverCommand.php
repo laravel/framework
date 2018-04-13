@@ -32,7 +32,7 @@ class PackageDiscoverCommand extends Command
         $manifest->build();
 
         foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("<info>Discovered Package:</info> {$package}");
+            $this->line("Discovered Package: <info>{$package}</info>");
         }
 
         $this->info('Package manifest generated successfully.');
