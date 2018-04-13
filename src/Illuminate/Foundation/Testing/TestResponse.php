@@ -613,7 +613,10 @@ class TestResponse
     {
         $this->ensureResponseHasView();
 
-        PHPUnit::assertEquals($value, $this->original->getName());
+        PHPUnit::assertEquals(
+            $value, $this->original->getName(),
+            "The view path is not [{$value}]."
+        );
 
         return $this;
     }
@@ -634,11 +637,20 @@ class TestResponse
         $this->ensureResponseHasView();
 
         if (is_null($value)) {
-            PHPUnit::assertArrayHasKey($key, $this->original->getData());
+            PHPUnit::assertArrayHasKey(
+                $key, $this->original->getData(),
+                "The view does not contain the [{$key}] data."
+            );
         } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->$key));
+            PHPUnit::assertTrue(
+                $value($this->original->$key),
+                "The view data [{$key}] does not match the required criteria."
+            );
         } else {
-            PHPUnit::assertEquals($value, $this->original->$key);
+            PHPUnit::assertEquals(
+                $value, $this->original->$key,
+                "The view data [{$key}] does not equal the required value."
+            );
         }
 
         return $this;
