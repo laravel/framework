@@ -80,7 +80,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function createMigration()
     {
-        $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
+        $table = $this->option('table')  ?  trim(trim(trim($this->option('table'), '='), "'"), '"')  :  bStr::plural(Str::snake(class_basename($this->argument('name'))));
 
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
@@ -151,6 +151,33 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model.'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller.'],
+
+            ['table', 't', InputOption::VALUE_REQUIRED, 'Specify the table associated with the model'],
         ];
     }
+    
+    /**
+     * Build the class with the given name.
+     *
+     * @param  string  $name
+     * @return string
+     */
+    protected function buildClass($name)
+    {
+        $output = parent::buildClass($name);
+
+        if( $this->option('table') )
+        {
+            $add = '/**'.PHP_EOL;
+            $add .= '     * The table associated with the model.'.PHP_EOL;
+            $add .= '     *'.PHP_EOL;
+            $add .= '     * @var string'.PHP_EOL;
+            $add .= '     */'.PHP_EOL;
+            $add .= "    protected \$table = '". trim(trim(trim($this->option('table'), '='), "'"), '"') ."';".PHP_EOL.PHP_EOL;
+            $add .= '    //';
+            $output = str_replace('//', $add, $output);
+        }
+
+        return $output;
+    }    
 }
