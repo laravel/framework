@@ -4,8 +4,9 @@ namespace Illuminate\Mail;
 
 use Aws\Ses\SesClient;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
-use Illuminate\Support\Manager;
+use InvalidArgumentException;
 use GuzzleHttp\Client as HttpClient;
 use Swift_SmtpTransport as SmtpTransport;
 use Illuminate\Mail\Transport\LogTransport;
@@ -17,17 +18,54 @@ use Illuminate\Mail\Transport\MandrillTransport;
 use Illuminate\Mail\Transport\SparkPostTransport;
 use Swift_SendmailTransport as SendmailTransport;
 
-class TransportManager extends Manager
+class TransportFactory
 {
+    /**
+     * The application instance.
+     *
+     * @var \Illuminate\Foundation\Application
+     */
+    protected $app;
+
+    /**
+     * Create a new factory instance.
+     *
+     * @param  \Illuminate\Foundation\Application  $app
+     * @return void
+     */
+    public function __construct($app)
+    {
+        $this->app = $app;
+    }
+
+    /**
+     * Create a new transport instance.
+     *
+     * @param  string $driver
+     * @param  array  $config
+     * @return \Swift_Transport
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function create($driver, array $config)
+    {
+        $method = 'create'.Str::studly($driver).'Driver';
+
+        if (method_exists($this, $method)) {
+            return $this->$method($config);
+        }
+
+        throw new InvalidArgumentException("Unsupported driver [{$driver}]");
+    }
+
     /**
      * Create an instance of the SMTP Swift Transport driver.
      *
+     * @param  array $config
      * @return \Swift_SmtpTransport
      */
-    protected function createSmtpDriver()
+    protected function createSmtpDriver(array $config)
     {
-        $config = $this->app->make('config')->get('mail');
-
         // The Swift SMTP transport instance will allow us to use any SMTP backend
         // for delivering mail such as Sendgrid, Amazon SES, or a custom server
         // a developer has available. We will just pass this configured host.
@@ -59,21 +97,23 @@ class TransportManager extends Manager
     /**
      * Create an instance of the Sendmail Swift Transport driver.
      *
+     * @param  array $config
      * @return \Swift_SendmailTransport
      */
-    protected function createSendmailDriver()
+    protected function createSendmailDriver(array $config)
     {
-        return new SendmailTransport($this->app['config']['mail']['sendmail']);
+        return new SendmailTransport($config['path']);
     }
 
     /**
      * Create an instance of the Amazon SES Swift Transport driver.
      *
+     * @param  array $config
      * @return \Illuminate\Mail\Transport\SesTransport
      */
-    protected function createSesDriver()
+    protected function createSesDriver(array $config)
     {
-        $config = array_merge($this->app['config']->get('services.ses', []), [
+        $config = array_merge($config['service'], [
             'version' => 'latest', 'service' => 'email',
         ]);
 
@@ -110,43 +150,40 @@ class TransportManager extends Manager
     /**
      * Create an instance of the Mailgun Swift Transport driver.
      *
+     * @param  array $config
      * @return \Illuminate\Mail\Transport\MailgunTransport
      */
-    protected function createMailgunDriver()
+    protected function createMailgunDriver(array $config)
     {
-        $config = $this->app['config']->get('services.mailgun', []);
-
         return new MailgunTransport(
-            $this->guzzle($config),
-            $config['secret'], $config['domain']
+            $this->guzzle($config['service']),
+            $config['service']['secret'], $config['service']['domain']
         );
     }
 
     /**
      * Create an instance of the Mandrill Swift Transport driver.
      *
+     * @param  array $config
      * @return \Illuminate\Mail\Transport\MandrillTransport
      */
-    protected function createMandrillDriver()
+    protected function createMandrillDriver(array $config)
     {
-        $config = $this->app['config']->get('services.mandrill', []);
-
         return new MandrillTransport(
-            $this->guzzle($config), $config['secret']
+            $this->guzzle($config['service']), $config['service']['secret']
         );
     }
 
     /**
      * Create an instance of the SparkPost Swift Transport driver.
      *
+     * @param  array $config
      * @return \Illuminate\Mail\Transport\SparkPostTransport
      */
-    protected function createSparkPostDriver()
+    protected function createSparkPostDriver(array $config)
     {
-        $config = $this->app['config']->get('services.sparkpost', []);
-
         return new SparkPostTransport(
-            $this->guzzle($config), $config['secret'], $config['options'] ?? []
+            $this->guzzle($config['service']), $config['service']['secret'], $config['service']['options'] ?? []
         );
     }
 
@@ -181,26 +218,5 @@ class TransportManager extends Manager
         return new HttpClient(Arr::add(
             $config['guzzle'] ?? [], 'connect_timeout', 60
         ));
-    }
-
-    /**
-     * Get the default mail driver name.
-     *
-     * @return string
-     */
-    public function getDefaultDriver()
-    {
-        return $this->app['config']['mail.driver'];
-    }
-
-    /**
-     * Set the default mail driver name.
-     *
-     * @param  string  $name
-     * @return void
-     */
-    public function setDefaultDriver($name)
-    {
-        $this->app['config']['mail.driver'] = $name;
     }
 }

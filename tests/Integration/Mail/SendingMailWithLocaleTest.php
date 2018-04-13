@@ -24,7 +24,9 @@ class SendingMailWithLocaleTest extends TestCase
     {
         $app['config']->set('app.debug', 'true');
 
-        $app['config']->set('mail.driver', 'array');
+        $app['config']->set('mail.default', 'array');
+
+        $app['config']->set('mail.connections', ['array' => ['driver' => 'array']]);
 
         $app['config']->set('app.locale', 'en');
 
@@ -50,7 +52,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to('test@mail.com')->send(new TestMail());
 
         $this->assertContains('name',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mail')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -59,7 +61,7 @@ class SendingMailWithLocaleTest extends TestCase
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
 
         $this->assertContains('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mail')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
     }
 
@@ -71,11 +73,11 @@ class SendingMailWithLocaleTest extends TestCase
         $this->assertEquals('en', app('translator')->getLocale());
 
         $this->assertContains('esm',
-            app('swift.transport')->messages()[0]->getBody()
+            app('mail')->getSwiftMailer()->getTransport()->messages()[0]->getBody()
         );
 
         $this->assertContains('name',
-            app('swift.transport')->messages()[1]->getBody()
+            app('mail')->getSwiftMailer()->getTransport()->messages()[1]->getBody()
         );
     }
 }

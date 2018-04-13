@@ -6,7 +6,7 @@ use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
-use Illuminate\Mail\TransportManager;
+use Illuminate\Mail\TransportFactory;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
 
@@ -25,10 +25,12 @@ class MailSesTransportTest extends TestCase
             ]),
         ];
 
-        $manager = new TransportManager($app);
+        $manager = new TransportFactory($app);
 
         /** @var SesTransport $transport */
-        $transport = $manager->driver('ses');
+        $transport = $manager->create('ses', [
+            'service' => $app['config']['services.ses'],
+        ]);
 
         /** @var SesClient $ses */
         $ses = $this->readAttribute($transport, 'ses');
