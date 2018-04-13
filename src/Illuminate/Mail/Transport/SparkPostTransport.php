@@ -27,6 +27,13 @@ class SparkPostTransport extends Transport
      * @var array
      */
     protected $options = [];
+    
+    /**
+     * Serivce API Endpoint.
+     *
+     * @var array
+     */
+    protected $endpoint = 'https://api.sparkpost.com/api/v1/transmissions';
 
     /**
      * Create a new SparkPost transport instance.
@@ -41,6 +48,7 @@ class SparkPostTransport extends Transport
         $this->key = $key;
         $this->client = $client;
         $this->options = $options;
+        $this->endpoint = $options['endpoint'];
     }
 
     /**
@@ -54,7 +62,7 @@ class SparkPostTransport extends Transport
 
         $message->setBcc([]);
 
-        $response = $this->client->post(config('mail.endpoints.sparkpost', 'https://api.sparkpost.com/api/v1/transmissions'), [
+        $response = $this->client->post($this->endpoint, [
             'headers' => [
                 'Authorization' => $this->key,
             ],
