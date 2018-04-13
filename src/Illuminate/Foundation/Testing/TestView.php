@@ -62,9 +62,9 @@ class TestView
     {
         foreach ($bindings as $key => $value) {
             if (is_int($key)) {
-                $this->assertViewHas($value);
+                $this->has($value);
             } else {
-                $this->assertViewHas($key, $value);
+                $this->has($key, $value);
             }
         }
 
