@@ -757,6 +757,18 @@ class Builder
     }
 
     /**
+     * Add a raw where not clause to the query.
+     *
+     * @param  string  $sql
+     * @param  mixed  $bindings
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotRaw($sql, $bindings = [])
+    {
+        return $this->whereRaw("not ($sql)", $bindings, 'and');
+    }
+
+    /**
      * Add a "where in" clause to the query.
      *
      * @param  string  $column

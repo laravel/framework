@@ -505,6 +505,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
     }
 
+    public function testRawNotWheres()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNotRaw('id = ? and email = ?', [1, 'foo']);
+        $this->assertEquals('select * from "users" where not (id = ? and email = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 'foo'], $builder->getBindings());
+    }
+
     public function testRawOrWheres()
     {
         $builder = $this->getBuilder();
