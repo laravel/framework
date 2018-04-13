@@ -604,6 +604,17 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has a view.
+     * @return \Illuminate\Foundation\Testing\TestView
+     */
+    public function assertView()
+    {
+        $this->ensureResponseHasView();
+
+        return new TestView($this);
+    }
+
+    /**
      * Assert that the response view equals the given value.
      *
      * @param  string $value
@@ -611,9 +622,7 @@ class TestResponse
      */
     public function assertViewIs($value)
     {
-        $this->ensureResponseHasView();
-
-        PHPUnit::assertEquals($value, $this->original->getName());
+        $this->assertView()->is($value);
 
         return $this;
     }
@@ -627,19 +636,7 @@ class TestResponse
      */
     public function assertViewHas($key, $value = null)
     {
-        if (is_array($key)) {
-            return $this->assertViewHasAll($key);
-        }
-
-        $this->ensureResponseHasView();
-
-        if (is_null($value)) {
-            PHPUnit::assertArrayHasKey($key, $this->original->getData());
-        } elseif ($value instanceof Closure) {
-            PHPUnit::assertTrue($value($this->original->$key));
-        } else {
-            PHPUnit::assertEquals($value, $this->original->$key);
-        }
+        $this->assertView()->has($key, $value);
 
         return $this;
     }
@@ -652,13 +649,7 @@ class TestResponse
      */
     public function assertViewHasAll(array $bindings)
     {
-        foreach ($bindings as $key => $value) {
-            if (is_int($key)) {
-                $this->assertViewHas($value);
-            } else {
-                $this->assertViewHas($key, $value);
-            }
-        }
+        $this->assertView()->hasAll($bindings);
 
         return $this;
     }
