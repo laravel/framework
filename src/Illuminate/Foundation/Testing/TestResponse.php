@@ -664,6 +664,19 @@ class TestResponse
     }
 
     /**
+     * Explanation here.
+     *
+     * @param string $key
+     * @return \Illuminate\Foundation\Testing\TestData
+     */
+    public function assertViewData($key)
+    {
+        $this->assertViewHas($key);
+
+        return TestData::make($this->original->$key, $this);
+    }
+
+    /**
      * Get a piece of data from the original view.
      *
      * @param  string  $key
