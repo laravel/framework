@@ -757,7 +757,7 @@ class Builder
     }
 
     /**
-     * Add a raw not where clause to the query
+     * Add a raw not where clause to the query.
      *
      * @param string $sql
      * @param mixed $bindings
