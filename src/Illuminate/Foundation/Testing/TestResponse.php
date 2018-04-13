@@ -646,7 +646,7 @@ class TestResponse
                 $value($this->original->$key),
                 "The view data [{$key}] does not match the required criteria."
             );
-        } else {
+        } elseif ($value !== null) {
             PHPUnit::assertEquals(
                 $value, $this->original->$key,
                 "The view data [{$key}] does not equal the required value."
