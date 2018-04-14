@@ -83,10 +83,12 @@ class ServeCommand extends Command
      */
     protected function getOptions()
     {
+        $host = env('SERVE_HOST', '127.0.0.1');
+        $port = env('SERVE_PORT', 8000);
         return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', '127.0.0.1'],
+            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', $host],
 
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000],
+            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', $port],
         ];
     }
 }
