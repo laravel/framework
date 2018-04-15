@@ -920,7 +920,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function isDownForMaintenance()
     {
-        return file_exists($this->storagePath().'/framework/down');
+        return file_exists($this->getMaintenanceFilePath());
+    }
+
+    /**
+     * Get the path to maintance file.
+     *
+     * @return string
+     */
+    public function getMaintenanceFilePath()
+    {
+        return $this->storagePath().'/framework/down';
     }
 
     /**
