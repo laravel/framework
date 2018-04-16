@@ -12,13 +12,6 @@ class PendingResourceRegistration
     protected $registrar;
 
     /**
-     * The resource's registration status.
-     *
-     * @var bool
-     */
-    protected $registered = false;
-
-    /**
      * The resource name.
      *
      * @var string
@@ -38,6 +31,13 @@ class PendingResourceRegistration
      * @var array
      */
     protected $options = [];
+
+    /**
+     * The resource's registration status.
+     *
+     * @var bool
+     */
+    protected $registered = false;
 
     /**
      * Create a new pending resource registration instance.
@@ -150,7 +150,7 @@ class PendingResourceRegistration
     }
 
     /**
-     * Register the Resource.
+     * Register the resource route.
      *
      * @return \Illuminate\Routing\RouteCollection
      */
@@ -158,7 +158,9 @@ class PendingResourceRegistration
     {
         $this->registered = true;
 
-        return $this->registrar->register($this->name, $this->controller, $this->options);
+        return $this->registrar->register(
+            $this->name, $this->controller, $this->options
+        );
     }
 
     /**

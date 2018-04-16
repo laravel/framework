@@ -95,7 +95,9 @@ class ResourceRegistrar
         $collection = new RouteCollection;
 
         foreach ($this->getResourceMethods($defaults, $options) as $m) {
-            $collection->add($this->{'addResource'.ucfirst($m)}($name, $base, $controller, $options));
+            $collection->add($this->{'addResource'.ucfirst($m)}(
+                $name, $base, $controller, $options
+            ));
         }
 
         return $collection;
