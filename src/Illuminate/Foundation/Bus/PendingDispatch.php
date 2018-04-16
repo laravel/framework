@@ -14,7 +14,7 @@ class PendingDispatch
     protected $job;
 
     /**
-     * The job.
+     * The job's dispatching status.
      *
      * @var bool
      */
