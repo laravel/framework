@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
+use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class RouteRegistrarTest extends TestCase
@@ -217,6 +218,22 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');
+    }
+
+    public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
+    {
+        $registrar = new ResourceRegistrar($this->router);
+        $resource = $registrar->register('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+
+        $this->assertCount(7, $resource->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
     public function testCanLimitMethodsOnRegisteredResource()
