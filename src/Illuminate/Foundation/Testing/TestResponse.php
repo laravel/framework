@@ -281,7 +281,7 @@ class TestResponse
      */
     public function assertSee($value)
     {
-        PHPUnit::assertContains($value, $this->getContent());
+        PHPUnit::assertContains((string) $value, $this->getContent());
 
         return $this;
     }
@@ -307,7 +307,7 @@ class TestResponse
      */
     public function assertSeeText($value)
     {
-        PHPUnit::assertContains($value, strip_tags($this->getContent()));
+        PHPUnit::assertContains((string) $value, strip_tags($this->getContent()));
 
         return $this;
     }
@@ -333,7 +333,7 @@ class TestResponse
      */
     public function assertDontSee($value)
     {
-        PHPUnit::assertNotContains($value, $this->getContent());
+        PHPUnit::assertNotContains((string) $value, $this->getContent());
 
         return $this;
     }
@@ -346,7 +346,7 @@ class TestResponse
      */
     public function assertDontSeeText($value)
     {
-        PHPUnit::assertNotContains($value, strip_tags($this->getContent()));
+        PHPUnit::assertNotContains((string) $value, strip_tags($this->getContent()));
 
         return $this;
     }
