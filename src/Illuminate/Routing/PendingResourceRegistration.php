@@ -12,6 +12,13 @@ class PendingResourceRegistration
     protected $registrar;
 
     /**
+     * The resource's registration status.
+     *
+     * @var bool
+     */
+    protected $registered = false;
+
+    /**
      * The resource name.
      *
      * @var string
@@ -143,12 +150,26 @@ class PendingResourceRegistration
     }
 
     /**
+     * Register the Resource.
+     *
+     * @return \Illuminate\Routing\RouteCollection
+     */
+    public function register()
+    {
+        $this->registered = true;
+
+        return $this->registrar->register($this->name, $this->controller, $this->options);
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
      */
     public function __destruct()
     {
-        $this->registrar->register($this->name, $this->controller, $this->options);
+        if (! $this->registered) {
+            $this->register();
+        }
     }
 }

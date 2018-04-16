@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Routing\ResourceRegistrar;
 use Illuminate\Contracts\Events\Dispatcher;
 
 class RouteRegistrarTest extends TestCase
@@ -222,8 +221,9 @@ class RouteRegistrarTest extends TestCase
 
     public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
     {
-        $registrar = new ResourceRegistrar($this->router);
-        $resource = $registrar->register('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub');
+        $resource = $this->router->middleware('resource-middleware')
+                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->register();
 
         $this->assertCount(7, $resource->getRoutes());
 
