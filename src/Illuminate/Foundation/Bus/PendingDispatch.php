@@ -14,6 +14,13 @@ class PendingDispatch
     protected $job;
 
     /**
+     * The job.
+     *
+     * @var bool
+     */
+    protected $dispatched = false;
+
+    /**
      * Create a new pending job dispatch.
      *
      * @param  mixed  $job
@@ -103,12 +110,26 @@ class PendingDispatch
     }
 
     /**
+     * Dispatches the job.
+     *
+     * @return mixed
+     */
+    public function dispatch()
+    {
+        $this->dispatched = true;
+
+        return app(Dispatcher::class)->dispatch($this->job);
+    }
+
+    /**
      * Handle the object's destruction.
      *
      * @return void
      */
     public function __destruct()
     {
-        app(Dispatcher::class)->dispatch($this->job);
+        if (! $this->dispatched) {
+            $this->dispatch();
+        }
     }
 }
