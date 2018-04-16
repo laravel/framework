@@ -334,6 +334,33 @@ class RedisQueueIntegrationTest extends TestCase
     }
 
     /**
+     * @dataProvider redisDriverProvider
+     *
+     * @param string $driver
+     */
+    public function testBulksJobs($driver)
+    {
+        $this->setQueue($driver);
+
+        $jobs = [
+            new RedisQueueIntegrationTestJob(0),
+            new RedisQueueIntegrationTestJob(1),
+            new RedisQueueIntegrationTestJob(2),
+            new RedisQueueIntegrationTestJob(3),
+        ];
+
+        $this->queue->bulk($jobs);
+
+        $this->assertEquals($jobs[0], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[1], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[2], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertEquals($jobs[3], unserialize(json_decode($this->queue->pop()->getRawBody())->data->command));
+        $this->assertNull($this->queue->pop());
+
+        $this->assertEquals(0, $this->redis[$driver]->connection()->llen('queues:default'));
+    }
+
+    /**
      * @param string $driver
      */
     private function setQueue($driver)
