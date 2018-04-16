@@ -183,11 +183,14 @@ class View implements ArrayAccess, ViewContract
     {
         if (is_array($key)) {
             $this->data = array_merge($this->data, $key);
-        } else {
+        }
+
+        if (is_string($key)) {
             $this->data[$key] = $value;
         }
 
         return $this;
+
     }
 
     /**
