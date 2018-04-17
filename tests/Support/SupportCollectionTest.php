@@ -1984,7 +1984,7 @@ class SupportCollectionTest extends TestCase
         }));
         $this->assertEquals(10, $c->min('foo'));
 
-        $c = new Collection([['foo' => 10], ['foo' => 20]]);
+        $c = new Collection([['foo' => 10], ['foo' => 20], ['foo' => null]]);
         $this->assertEquals(10, $c->min('foo'));
 
         $c = new Collection([1, 2, 3, 4, 5]);
