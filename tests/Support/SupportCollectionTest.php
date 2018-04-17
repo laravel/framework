@@ -2053,7 +2053,7 @@ class SupportCollectionTest extends TestCase
         }));
         $this->assertEquals(10, $c->min('foo'));
         $this->assertEquals(10, $c->min->foo);
-    
+
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
         $this->assertEquals(10, $c->min('foo'));
         $this->assertEquals(10, $c->min->foo);
