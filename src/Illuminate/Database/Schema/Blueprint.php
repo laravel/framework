@@ -4,6 +4,7 @@ namespace Illuminate\Database\Schema;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Support\Str;
 use Illuminate\Support\Fluent;
 use Illuminate\Database\Connection;
 use Illuminate\Support\Traits\Macroable;
@@ -1334,5 +1335,25 @@ class Blueprint
         return array_filter($this->columns, function ($column) {
             return (bool) $column->change;
         });
+    }
+
+    /**
+     * Add the proper column and index for a related table.
+     *
+     * @param string      $relatedTable
+     * @param string      $foreignKey
+     * @param string      $ownerKey
+     * @param string|null $indexName
+     *
+     * @return \Illuminate\Support\Fluent
+     */
+    public function belongs($relatedTable, $foreignKey = null, $ownerKey = 'id', $indexName = null)
+    {
+        $relationName = Str::singular($relatedTable);
+        $foreignKey = $foreignKey ?? "{$relationName}_{$ownerKey}";
+
+        $this->foreign($foreignKey, $indexName)->references($ownerKey)->on($relatedTable);
+
+        return $this->unsignedInteger($foreignKey);
     }
 }
