@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Illuminate\Contracts\Pagination\Paginator;
-use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Support\Collection;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Contracts\Pagination\Paginator;
 
 class TestData
 {
@@ -25,6 +25,22 @@ class TestData
         }
 
         return new static($data, $fallback);
+    }
+
+    public function instanceOf($className)
+    {
+        PHPUnit::assertInstanceOf($className, $this->data);
+
+        return $this;
+    }
+
+    public function with($attribute, $value)
+    {
+        PHPUnit::assertSame(
+            $value, $this->data->$attribute ?? null
+        );
+
+        return $this;
     }
 
     public function contains($key)

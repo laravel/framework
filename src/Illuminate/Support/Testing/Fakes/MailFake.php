@@ -4,6 +4,7 @@ namespace Illuminate\Support\Testing\Fakes;
 
 use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Foundation\Testing\TestMailable;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Queue\ShouldQueue;
 
@@ -36,10 +37,14 @@ class MailFake implements Mailer
             return $this->assertSentTimes($mailable, $callback);
         }
 
+        $mailables = $this->sent($mailable, $callback);
+
         PHPUnit::assertTrue(
-            $this->sent($mailable, $callback)->count() > 0,
+            $mailables->count() > 0,
             "The expected [{$mailable}] mailable was not sent."
         );
+
+        return new TestMailable($mailables);
     }
 
     /**
