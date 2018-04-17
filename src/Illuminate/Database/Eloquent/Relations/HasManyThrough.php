@@ -517,4 +517,20 @@ class HasManyThrough extends Relation
     {
         return $this->farParent->qualifyColumn($this->localKey);
     }
+
+    /**
+     * Adds the correct column selection for HasManyThrough before handling dynamic method calls.
+     *
+     * @param  string  $method
+     * @param  array   $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        $this->query->addSelect(
+            $this->shouldSelect(['*'])
+        );
+        return parent::__call($method,$parameters);
+
+    }
 }
