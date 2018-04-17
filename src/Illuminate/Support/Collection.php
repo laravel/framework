@@ -1081,11 +1081,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->filter(function ($value) {
+        return $this->map(function ($value) use ($callback) {
+            return $callback($value);
+        })->filter(function ($value) {
             return ! is_null($value);
-        })->reduce(function ($result, $item) use ($callback) {
-            $value = $callback($item);
-
+        })->reduce(function ($result, $value) {
             return is_null($result) || $value < $result ? $value : $result;
         });
     }
