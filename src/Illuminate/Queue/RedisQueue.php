@@ -121,6 +121,26 @@ class RedisQueue extends Queue implements QueueContract
     }
 
     /**
+     * Push an array of jobs onto the queue.
+     *
+     * @param  array   $jobs
+     * @param  mixed   $data
+     * @param  string  $queue
+     * @return mixed
+     */
+    public function bulk($jobs, $data = '', $queue = null)
+    {
+        return $this->getConnection()->rpush(
+            $this->getQueue($queue),
+            ...collect((array) $jobs)->map(
+                function ($job) use ($data) {
+                    return $this->createPayload($job, $data);
+                }
+            )
+        );
+    }
+
+    /**
      * Push a raw job onto the queue after a delay.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
