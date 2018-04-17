@@ -577,6 +577,12 @@ trait ValidatesAttributes
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
+        if (in_array('ignore_empty_values', $parameters)) {
+            $data = array_filter($data, function ($value) {
+                return ! empty(trim($value));
+            });
+        }
+
         return ! in_array($value, array_values($data));
     }
 
