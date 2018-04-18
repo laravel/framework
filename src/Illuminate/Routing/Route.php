@@ -574,14 +574,16 @@ class Route
     /**
      * Retrieving the current subdomain name.
      *
+     * @param null|int $position The position of the subdomain key in multi-level domain names.
+     *
      * @return string|null
      */
-    public function getSubdomain()
+    public function getSubdomain($position = null)
     {
         $host = explode('.', $this->action['domain']);
 
         if (sizeof($host) >= 2) {
-            return Arr::first($host);
+            return $position ? $host[$position] : $host[0];
         }
 
         return null;
