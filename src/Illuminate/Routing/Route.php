@@ -582,6 +582,22 @@ class Route
     }
 
     /**
+     * Retrieving the current subdomain name.
+     *
+     * @return string|null
+     */
+    public function getSubdomain()
+    {
+        $host = explode('.', $this->action['domain']);
+
+        if (sizeof($host) >= 2) {
+            return Arr::first($host);
+        }
+
+        return null;
+    }
+
+    /**
      * Add a prefix to the route URI.
      *
      * @param  string  $prefix
