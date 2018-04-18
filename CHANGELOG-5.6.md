@@ -1,5 +1,22 @@
 # Release Notes for 5.6.x
 
+## v5.6.17 (2018-04-17)
+
+### Added
+- Added helpers for subquery joins ([#23818](https://github.com/laravel/framework/pull/23818))
+
+### Changed
+- Allow `PendingResourceRegistration` to be fluently registered ([#23890](https://github.com/laravel/framework/pull/23890))
+- Allow asserting an integer with `assertSee*()` ([#23892](https://github.com/laravel/framework/pull/23892))
+- Allow passing `Collection` to `Rule::in()` and `Rule::notIn()` ([#23875](https://github.com/laravel/framework/pull/23875))
+
+### Fixed
+- Lock Carbon version at `1.25.*` ([27b8844](https://github.com/laravel/framework/commit/27b88449805c1e9903fe4088f303c0858336b23b))
+
+### Removed
+- Removed form error for password confirmation ([#23887](https://github.com/laravel/framework/pull/23887))
+
+
 ## v5.6.16 (2018-04-09)
 
 ### Added
