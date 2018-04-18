@@ -583,7 +583,7 @@ class Route
         $host = explode('.', $this->action['domain']);
 
         if (sizeof($host) >= 2) {
-            return $position ? $host[$position] : $host[0];
+            return $position ? ($host[$position] ?? null) : $host[0];
         }
 
         return null;
