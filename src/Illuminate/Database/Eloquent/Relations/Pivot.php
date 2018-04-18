@@ -214,7 +214,9 @@ class Pivot extends Model
      */
     public function getCreatedAtColumn()
     {
-        return ($this->pivotParent) ? $this->pivotParent->getCreatedAtColumn() : parent::getCreatedAtColumn();
+        return ($this->pivotParent)
+                        ? $this->pivotParent->getCreatedAtColumn()
+                        : parent::getCreatedAtColumn();
     }
 
     /**
@@ -224,7 +226,9 @@ class Pivot extends Model
      */
     public function getUpdatedAtColumn()
     {
-        return ($this->pivotParent) ? $this->pivotParent->getUpdatedAtColumn() : parent::getUpdatedAtColumn();
+        return ($this->pivotParent)
+                        ? $this->pivotParent->getUpdatedAtColumn()
+                        : parent::getUpdatedAtColumn();
     }
 
     /**
