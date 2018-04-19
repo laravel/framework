@@ -1260,7 +1260,7 @@ class Builder
         if ($method === 'macro') {
             $this->localMacros[$parameters[0]] = $parameters[1];
 
-            return;
+            return $this;
         }
 
         if (isset($this->localMacros[$method])) {
