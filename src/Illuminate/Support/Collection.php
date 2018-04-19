@@ -139,31 +139,44 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Calculate the quantile of a given key.
+     *
+     * @param  float $quantile
+     * @param  string|array|null $key
+     *
+     * @return int|float|void
+     */
+    public function quantile(float $quantile, $key = null)
+    {
+        $count = $this->count();
+
+        if ($count == 0 || $quantile <= 0 || $quantile >= 1) {
+            return;
+        }
+
+        $values = ($key !== null ? $this->pluck($key) : $this)
+            ->sort()
+            ->values();
+
+        $index = $count * $quantile;
+        $position = floor($index);
+
+        if ($position === $index) {
+            return ($values[$index - 1] + $values[$index]) / 2;
+        }
+
+        return $values[$position];
+    }
+
+    /**
      * Get the median of a given key.
      *
-     * @param  null $key
+     * @param  string|array|null $key
      * @return mixed
      */
     public function median($key = null)
     {
-        $count = $this->count();
-
-        if ($count == 0) {
-            return;
-        }
-
-        $values = (isset($key) ? $this->pluck($key) : $this)
-                    ->sort()->values();
-
-        $middle = (int) ($count / 2);
-
-        if ($count % 2) {
-            return $values->get($middle);
-        }
-
-        return (new static([
-            $values->get($middle - 1), $values->get($middle),
-        ]))->average();
+        return $this->quantile(0.5, $key);
     }
 
     /**

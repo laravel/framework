@@ -2229,6 +2229,84 @@ class SupportCollectionTest extends TestCase
         }));
     }
 
+    public function testQuantileValueWithArrayCollection()
+    {
+        $collection = new Collection([-13, -13, -12, -10, -5, 3, 5, 8, 10]);
+
+        $this->assertEquals(-13, $collection->quantile(.2));
+        $this->assertEquals(-5, $collection->quantile(.45));
+        $this->assertEquals(3, $collection->quantile(.65));
+        $this->assertEquals(10, $collection->quantile(.99));
+    }
+
+    public function testQuantileValueByKey()
+    {
+        $collection = new Collection([
+            (object) ['foo' => -13],
+            (object) ['foo' => -13],
+            (object) ['foo' => -12],
+            (object) ['foo' => -10],
+            (object) ['foo' => -5],
+            (object) ['foo' => 3],
+            (object) ['foo' => 5],
+            (object) ['foo' => 8],
+            (object) ['foo' => 10],
+        ]);
+
+        $this->assertEquals(-13, $collection->quantile(.2, 'foo'));
+        $this->assertEquals(-5, $collection->quantile(.45, 'foo'));
+        $this->assertEquals(3, $collection->quantile(.65, 'foo'));
+        $this->assertEquals(10, $collection->quantile(.99, 'foo'));
+    }
+
+    public function testQuantileCollectionOnEvenIndices()
+    {
+        $collection = new Collection([
+            (object) ['foo' => -13],
+            (object) ['foo' => -13],
+            (object) ['foo' => -5],
+            (object) ['foo' => 8],
+            (object) ['foo' => 10],
+        ]);
+
+        $this->assertEquals(-13, $collection->quantile(.2, 'foo'));
+        $this->assertEquals(-9, $collection->quantile(.4, 'foo'));
+        $this->assertEquals(1.5, $collection->quantile(.6, 'foo'));
+        $this->assertEquals(9, $collection->quantile(.8, 'foo'));
+    }
+
+    public function testQuantileOutOfOrderCollection()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 10],
+            (object) ['foo' => -13],
+            (object) ['foo' => 8],
+            (object) ['foo' => -5],
+            (object) ['foo' => -13],
+        ]);
+
+        $this->assertEquals(-13, $collection->quantile(.2, 'foo'));
+        $this->assertEquals(-13, $collection->quantile(.3, 'foo'));
+        $this->assertEquals(9, $collection->quantile(.8, 'foo'));
+        $this->assertEquals(10, $collection->quantile(.9, 'foo'));
+    }
+
+    public function testQuantileOnEmptyCollectionReturnsNull()
+    {
+        $collection = new Collection;
+
+        $this->assertNull($collection->quantile(0.01));
+        $this->assertNull($collection->quantile(0.99));
+    }
+
+    public function testQuantileNotBetweenOneAndZeroReturnsNull()
+    {
+        $collection = new Collection([1, 2, 3]);
+
+        $this->assertNull($collection->quantile(0));
+        $this->assertNull($collection->quantile(1));
+    }
+
     public function testMedianValueWithArrayCollection()
     {
         $collection = new Collection([1, 2, 2, 4]);
