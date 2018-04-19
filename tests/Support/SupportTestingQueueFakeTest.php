@@ -32,6 +32,15 @@ class SupportTestingQueueFakeTest extends TestCase
         $this->fake->assertPushed(JobStub::class);
     }
 
+    public function testQueueSize()
+    {
+        $this->assertEquals(0, $this->fake->size());
+
+        $this->fake->push($this->job);
+
+        $this->assertEquals(1, $this->fake->size());
+    }
+
     public function testAssertNotPushed()
     {
         $this->fake->assertNotPushed(JobStub::class);
