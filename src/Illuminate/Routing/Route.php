@@ -572,6 +572,20 @@ class Route
     }
 
     /**
+     * Retrieving the current subdomain name.
+     *
+     * @param null|int $position The position of the subdomain key in multi-level domain names.
+     *
+     * @return string|null
+     */
+    public function getSubdomain($position = null)
+    {
+        $host = explode('.', $this->action['domain']);
+
+        return $position ? ($host[$position] ?? null) : $host[0];
+    }
+
+    /**
      * Get the prefix of the route instance.
      *
      * @return string
