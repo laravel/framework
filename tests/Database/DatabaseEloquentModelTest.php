@@ -63,6 +63,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->baz = 30;
 
         $this->assertTrue($model->isDirty());
+        $this->assertTrue($model->isDirty(null));
         $this->assertFalse($model->isDirty('foo'));
         $this->assertTrue($model->isDirty('bar'));
         $this->assertTrue($model->isDirty('foo', 'bar'));
@@ -103,6 +104,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->baz = 30;
 
         $this->assertFalse($model->isClean());
+        $this->assertFalse($model->isClean(null));
         $this->assertTrue($model->isClean('foo'));
         $this->assertFalse($model->isClean('bar'));
         $this->assertFalse($model->isClean('foo', 'bar'));

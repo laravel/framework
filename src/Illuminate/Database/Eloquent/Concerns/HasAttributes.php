@@ -977,7 +977,7 @@ trait HasAttributes
     public function isDirty($attributes = null)
     {
         return $this->hasChanges(
-            $this->getDirty(), is_array($attributes) ? $attributes : func_get_args()
+            $this->getDirty(), is_null($attributes) || is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
@@ -1001,7 +1001,7 @@ trait HasAttributes
     public function wasChanged($attributes = null)
     {
         return $this->hasChanges(
-            $this->getChanges(), is_array($attributes) ? $attributes : func_get_args()
+            $this->getChanges(), is_null($attributes) || is_array($attributes) ? $attributes : func_get_args()
         );
     }
 
