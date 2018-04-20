@@ -242,6 +242,7 @@ class ConnectionFactory
 
         switch ($config['driver']) {
             case 'mysql':
+            case 'mysql8':
                 return new MySqlConnector;
             case 'pgsql':
                 return new PostgresConnector;
@@ -274,6 +275,7 @@ class ConnectionFactory
 
         switch ($driver) {
             case 'mysql':
+            case 'mysql8':
                 return new MySqlConnection($connection, $database, $prefix, $config);
             case 'pgsql':
                 return new PostgresConnection($connection, $database, $prefix, $config);
