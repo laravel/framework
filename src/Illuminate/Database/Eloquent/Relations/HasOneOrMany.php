@@ -276,18 +276,18 @@ abstract class HasOneOrMany extends Relation
     public function saveManyOrFail($models)
     {
         return $this->getConnection()->transaction(function () use ($models) {
-            if (!$this->getParentKey()) {
+            if (! $this->getParentKey()) {
                 $this->parent->save();
             }
-            
+
             foreach ($models as $model) {
                 $this->save($model);
             }
-            
+
             return $models;
         });
     }
-    
+
     /**
      * Create a new instance of the related model.
      *
