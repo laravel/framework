@@ -277,7 +277,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function supportedDrivers()
     {
-        return ['mysql', 'pgsql', 'sqlite', 'sqlsrv'];
+        return ['mysql', 'mysql8', 'pgsql', 'sqlite', 'sqlsrv'];
     }
 
     /**

@@ -147,7 +147,7 @@ class MySqlConnector extends Connector implements ConnectorInterface
             $this->setCustomModes($connection, $config);
         } elseif (isset($config['strict'])) {
             if ($config['strict']) {
-                $connection->prepare($this->strictMode())->execute();
+                $connection->prepare($this->strictMode($config))->execute();
             } else {
                 $connection->prepare("set session sql_mode='NO_ENGINE_SUBSTITUTION'")->execute();
             }
@@ -171,10 +171,15 @@ class MySqlConnector extends Connector implements ConnectorInterface
     /**
      * Get the query to enable strict mode.
      *
+     * @param array $config
      * @return string
      */
-    protected function strictMode()
+    protected function strictMode(array $config)
     {
-        return "set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'";
+        if ($config['driver'] == 'mysql8') {
+            return "set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'";
+        } else {
+            return "set session sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION'";
+        }
     }
 }
