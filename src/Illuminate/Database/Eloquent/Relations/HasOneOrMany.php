@@ -266,6 +266,29 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Attach a collection of models to the parent instance using transaction.
+     *
+     * @param  \Traversable|array  $models
+     * @return \Traversable|array
+     *
+     * @throws \Throwable
+     */
+    public function saveManyOrFail($models)
+    {
+        return $this->getConnection()->transaction(function () use ($models) {
+            if (! $this->getParentKey()) {
+                $this->parent->save();
+            }
+
+            foreach ($models as $model) {
+                $this->save($model);
+            }
+
+            return $models;
+        });
+    }
+
+    /**
      * Create a new instance of the related model.
      *
      * @param  array  $attributes
