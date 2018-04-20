@@ -219,6 +219,23 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('resource-middleware');
     }
 
+    public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
+    {
+        $resource = $this->router->middleware('resource-middleware')
+                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->register();
+
+        $this->assertCount(7, $resource->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
     public function testCanLimitMethodsOnRegisteredResource()
     {
         $this->router->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
