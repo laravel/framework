@@ -664,6 +664,19 @@ class TestResponse
     }
 
     /**
+     * Get a piece of data from the original view.
+     *
+     * @param  string  $key
+     * @return mixed
+     */
+    public function viewData($key)
+    {
+        $this->ensureResponseHasView();
+
+        return $this->original->$key;
+    }
+
+    /**
      * Assert that the response view is missing a piece of bound data.
      *
      * @param  string  $key
