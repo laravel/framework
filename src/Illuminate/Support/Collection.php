@@ -141,12 +141,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Calculate the quantile of a given key.
      *
-     * @param  float $quantile
+     * @param  float|int  $quantile
      * @param  string|array|null $key
      *
      * @return int|float|void
      */
-    public function quantile(float $quantile, $key = null)
+    public function quantile($quantile, $key = null)
     {
         $count = $this->count();
 
