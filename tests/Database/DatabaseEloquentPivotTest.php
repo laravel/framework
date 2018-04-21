@@ -88,6 +88,14 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertFalse($pivot->timestamps);
     }
 
+    public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
+        $parent->shouldReceive('getConnectionName')->andReturn('connection');
+        $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $this->assertTrue($pivot->timestamps);
+    }
+
     public function testKeysCanBeSetProperly()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');

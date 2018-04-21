@@ -84,6 +84,8 @@ class Pivot extends Model
 
         $instance->setRawAttributes($attributes, true);
 
+        $instance->timestamps = $instance->hasTimestampAttributes();
+
         return $instance;
     }
 
