@@ -2582,6 +2582,13 @@ class SupportCollectionTest extends TestCase
         });
 
         $this->assertSame(['michael', 'tom'], $collection->toArray());
+
+        $collection = new Collection(['michael', 'tom']);
+
+        $callback = null;
+        $collection->when($callback !== null, $callback);
+
+        $this->assertSame(['michael', 'tom'], $collection->toArray());
     }
 
     public function testWhenDefault()
