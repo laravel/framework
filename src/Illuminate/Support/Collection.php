@@ -461,7 +461,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable  $default
      * @return mixed
      */
-    public function when($value, callable $callback, callable $default = null)
+    public function when($value, $callback, $default = null)
     {
         if ($value) {
             return $callback($this, $value);
@@ -480,7 +480,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable  $default
      * @return mixed
      */
-    public function unless($value, callable $callback, callable $default = null)
+    public function unless($value, $callback, $default = null)
     {
         return $this->when(! $value, $callback, $default);
     }
