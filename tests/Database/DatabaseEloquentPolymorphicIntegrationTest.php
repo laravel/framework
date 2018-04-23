@@ -47,7 +47,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 
         $this->schema()->create('comments', function ($table) {
             $table->increments('id');
-            $table->integer('commentable_id');
+            $table->integer('commentable_key');
             $table->string('commentable_type');
             $table->integer('user_id');
             $table->text('body');
@@ -56,7 +56,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 
         $this->schema()->create('likes', function ($table) {
             $table->increments('id');
-            $table->integer('likeable_id');
+            $table->integer('likeable_key');
             $table->string('likeable_type');
             $table->timestamps();
         });

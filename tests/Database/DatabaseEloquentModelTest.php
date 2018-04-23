@@ -1000,7 +1000,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->morphOne('Illuminate\Tests\Database\EloquentModelSaveStub', 'morph');
-        $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
+        $this->assertEquals('save_stub.morph_key', $relation->getQualifiedForeignKeyName());
         $this->assertEquals('save_stub.morph_type', $relation->getQualifiedMorphType());
         $this->assertEquals('Illuminate\Tests\Database\EloquentModelStub', $relation->getMorphClass());
     }
@@ -1038,7 +1038,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $this->addMockConnection($model);
         $relation = $model->morphMany('Illuminate\Tests\Database\EloquentModelSaveStub', 'morph');
-        $this->assertEquals('save_stub.morph_id', $relation->getQualifiedForeignKeyName());
+        $this->assertEquals('save_stub.morph_key', $relation->getQualifiedForeignKeyName());
         $this->assertEquals('save_stub.morph_type', $relation->getQualifiedMorphType());
         $this->assertEquals('Illuminate\Tests\Database\EloquentModelStub', $relation->getMorphClass());
     }
@@ -1065,7 +1065,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         // $this->morphTo();
         $relation = $model->morphToStub();
-        $this->assertEquals('morph_to_stub_id', $relation->getForeignKey());
+        $this->assertEquals('morph_to_stub_key', $relation->getForeignKey());
         $this->assertEquals('morph_to_stub_type', $relation->getMorphType());
         $this->assertEquals('morphToStub', $relation->getRelation());
         $this->assertSame($model, $relation->getParent());
@@ -1079,7 +1079,7 @@ class DatabaseEloquentModelTest extends TestCase
 
         // $this->morphTo('someName');
         $relation3 = $model->morphToStubWithName();
-        $this->assertEquals('some_name_id', $relation3->getForeignKey());
+        $this->assertEquals('some_name_key', $relation3->getForeignKey());
         $this->assertEquals('some_name_type', $relation3->getMorphType());
         $this->assertEquals('someName', $relation3->getRelation());
 

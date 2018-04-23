@@ -418,9 +418,9 @@ class Blueprint
      */
     public function dropMorphs($name, $indexName = null)
     {
-        $this->dropIndex($indexName ?: $this->createIndexName('index', ["{$name}_type", "{$name}_id"]));
+        $this->dropIndex($indexName ?: $this->createIndexName('index', ["{$name}_type", "{$name}_key"]));
 
-        $this->dropColumn("{$name}_type", "{$name}_id");
+        $this->dropColumn("{$name}_type", "{$name}_key");
     }
 
     /**
@@ -1137,9 +1137,9 @@ class Blueprint
     {
         $this->string("{$name}_type");
 
-        $this->unsignedBigInteger("{$name}_id");
+        $this->string("{$name}_key");
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_type", "{$name}_key"], $indexName);
     }
 
     /**
@@ -1153,9 +1153,9 @@ class Blueprint
     {
         $this->string("{$name}_type")->nullable();
 
-        $this->unsignedBigInteger("{$name}_id")->nullable();
+        $this->string("{$name}_key")->nullable();
 
-        $this->index(["{$name}_type", "{$name}_id"], $indexName);
+        $this->index(["{$name}_type", "{$name}_key"], $indexName);
     }
 
     /**

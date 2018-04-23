@@ -48,7 +48,7 @@ class DatabaseEloquentPolymorphicRelationsIntegrationTest extends TestCase
 
         $this->schema('default')->create('taggables', function ($table) {
             $table->integer('eloquent_many_to_many_polymorphic_test_tag_id');
-            $table->integer('taggable_id');
+            $table->integer('taggable_key');
             $table->string('taggable_type');
         });
     }
