@@ -16,7 +16,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();
-        $relation->getQuery()->shouldReceive('whereIn')->once()->with('taggables.taggable_id', [1, 2]);
+        $relation->getQuery()->shouldReceive('whereIn')->once()->with('taggables.taggable_key', [1, 2]);
         $relation->getQuery()->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($relation->getParent()));
         $model1 = new EloquentMorphToManyModelStub;
         $model1->id = 1;
@@ -30,7 +30,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\MorphToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
-        $query->shouldReceive('insert')->once()->with([['taggable_id' => 1, 'taggable_type' => get_class($relation->getParent()), 'tag_id' => 2, 'foo' => 'bar']])->andReturn(true);
+        $query->shouldReceive('insert')->once()->with([['taggable_key' => 1, 'taggable_type' => get_class($relation->getParent()), 'tag_id' => 2, 'foo' => 'bar']])->andReturn(true);
         $relation->getQuery()->shouldReceive('getQuery')->andReturn($mockQueryBuilder = m::mock('stdClass'));
         $mockQueryBuilder->shouldReceive('newQuery')->once()->andReturn($query);
         $relation->expects($this->once())->method('touchIfTouching');
@@ -43,7 +43,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\MorphToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('taggable_id', 1)->andReturn($query);
+        $query->shouldReceive('where')->once()->with('taggable_key', 1)->andReturn($query);
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->once()->with('tag_id', [1, 2, 3]);
         $query->shouldReceive('delete')->once()->andReturn(true);
@@ -59,7 +59,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $relation = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\MorphToMany')->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();
         $query = m::mock('stdClass');
         $query->shouldReceive('from')->once()->with('taggables')->andReturn($query);
-        $query->shouldReceive('where')->once()->with('taggable_id', 1)->andReturn($query);
+        $query->shouldReceive('where')->once()->with('taggable_key', 1)->andReturn($query);
         $query->shouldReceive('where')->once()->with('taggable_type', get_class($relation->getParent()))->andReturn($query);
         $query->shouldReceive('whereIn')->never();
         $query->shouldReceive('delete')->once()->andReturn(true);
@@ -74,7 +74,7 @@ class DatabaseEloquentMorphToManyTest extends TestCase
     {
         list($builder, $parent) = $this->getRelationArguments();
 
-        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id');
+        return new MorphToMany($builder, $parent, 'taggable', 'taggables', 'taggable_key', 'tag_id', 'id', 'id');
     }
 
     public function getRelationArguments()
@@ -96,10 +96,10 @@ class DatabaseEloquentMorphToManyTest extends TestCase
         $related->shouldReceive('getMorphClass')->andReturn(get_class($related));
 
         $builder->shouldReceive('join')->once()->with('taggables', 'tags.id', '=', 'taggables.tag_id');
-        $builder->shouldReceive('where')->once()->with('taggables.taggable_id', '=', 1);
+        $builder->shouldReceive('where')->once()->with('taggables.taggable_key', '=', 1);
         $builder->shouldReceive('where')->once()->with('taggables.taggable_type', get_class($parent));
 
-        return [$builder, $parent, 'taggable', 'taggables', 'taggable_id', 'tag_id', 'id', 'id', 'relation_name', false];
+        return [$builder, $parent, 'taggable', 'taggables', 'taggable_key', 'tag_id', 'id', 'id', 'relation_name', false];
     }
 }
 

@@ -54,7 +54,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $this->schema()->create('comments', function ($table) {
             $table->increments('id');
-            $table->integer('owner_id')->nullable();
+            $table->integer('owner_key')->nullable();
             $table->string('owner_type')->nullable();
             $table->integer('post_id');
             $table->string('body');
@@ -534,7 +534,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_key' => $abigail->id,
         ]);
 
         $abigail->delete();
@@ -571,7 +571,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_key' => $abigail->id,
         ]);
 
         TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
@@ -588,7 +588,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_key' => $abigail->id,
         ]);
 
         $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
@@ -607,7 +607,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $comment1 = $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_key' => $abigail->id,
         ]);
 
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
@@ -627,7 +627,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => TestUserWithoutSoftDelete::class,
-            'owner_id' => $taylor->id,
+            'owner_key' => $taylor->id,
         ]);
 
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();

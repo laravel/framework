@@ -478,7 +478,7 @@ trait HasRelationships
         // instances, as well as the relationship instances we need for these.
         $instance = $this->newRelatedInstance($related);
 
-        $foreignPivotKey = $foreignPivotKey ?: $name.'_id';
+        $foreignPivotKey = $foreignPivotKey ?: $name.'_key';
 
         $relatedPivotKey = $relatedPivotKey ?: $instance->getForeignKey();
 
@@ -537,7 +537,7 @@ trait HasRelationships
         // For the inverse of the polymorphic many-to-many relations, we will change
         // the way we determine the foreign and other keys, as it is the opposite
         // of the morph-to-many method since we're figuring out these inverses.
-        $relatedPivotKey = $relatedPivotKey ?: $name.'_id';
+        $relatedPivotKey = $relatedPivotKey ?: $name.'_key';
 
         return $this->morphToMany(
             $related, $name, $table, $foreignPivotKey,
@@ -626,7 +626,7 @@ trait HasRelationships
      */
     protected function getMorphs($name, $type, $id)
     {
-        return [$type ?: $name.'_type', $id ?: $name.'_id'];
+        return [$type ?: $name.'_type', $id ?: $name.'_key'];
     }
 
     /**

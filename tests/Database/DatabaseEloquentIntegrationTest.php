@@ -46,7 +46,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->schema('default')->create('test_orders', function ($table) {
             $table->increments('id');
             $table->string('item_type');
-            $table->integer('item_id');
+            $table->integer('item_key');
             $table->timestamps();
         });
 
@@ -1058,7 +1058,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $item = null;
 
         EloquentTestItem::create(['id' => 1]);
-        EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_id' => 1]);
+        EloquentTestOrder::create(['id' => 1, 'item_type' => EloquentTestItem::class, 'item_key' => 1]);
         try {
             $item = EloquentTestOrder::first()->item;
         } catch (Exception $e) {
@@ -1284,7 +1284,7 @@ class EloquentTestUser extends Eloquent
     public function postWithPhotos()
     {
         return $this->post()->join('photo', function ($join) {
-            $join->on('photo.imageable_id', 'post.id');
+            $join->on('photo.imageable_key', 'post.id');
             $join->where('photo.imageable_type', 'EloquentTestPost');
         });
     }
