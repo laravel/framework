@@ -166,9 +166,7 @@ class Arr
                 return value($default);
             }
 
-            foreach ($array as $item) {
-                return $item;
-            }
+            return reset($array);
         }
 
         foreach ($array as $key => $value) {
