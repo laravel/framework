@@ -577,7 +577,7 @@ trait ValidatesAttributes
             return empty(preg_grep('/^'.preg_quote($value, '/').'$/iu', $data));
         }
 
-        return ! in_array($value, array_values($data));
+        return ! in_array($value, $data);
     }
 
     /**
@@ -1027,8 +1027,8 @@ trait ValidatesAttributes
         }
 
         return ($value instanceof UploadedFile)
-           ? trim(strtolower($value->getClientOriginalExtension())) === 'php'
-           : trim(strtolower($value->getExtension())) === 'php';
+           ? strtolower(trim($value->getClientOriginalExtension())) === 'php'
+           : strtolower(trim($value->getExtension())) === 'php';
     }
 
     /**

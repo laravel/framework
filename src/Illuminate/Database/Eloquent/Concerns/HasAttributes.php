@@ -515,7 +515,7 @@ trait HasAttributes
             return 'custom_datetime';
         }
 
-        return trim(strtolower($this->getCasts()[$key]));
+        return strtolower(trim($this->getCasts()[$key]));
     }
 
     /**
