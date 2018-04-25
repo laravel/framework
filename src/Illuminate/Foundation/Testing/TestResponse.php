@@ -711,7 +711,7 @@ class TestResponse
                 "Session is missing expected key [{$key}]."
             );
         } else {
-            PHPUnit::assertEquals($value, app('session.store')->get($key));
+            PHPUnit::assertEquals($value, $this->session()->get($key));
         }
 
         return $this;
@@ -750,7 +750,7 @@ class TestResponse
 
         $keys = (array) $keys;
 
-        $errors = app('session.store')->get('errors')->getBag($errorBag);
+        $errors = $this->session()->get('errors')->getBag($errorBag);
 
         foreach ($keys as $key => $value) {
             if (is_int($key)) {
