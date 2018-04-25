@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Closure;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
@@ -18,10 +17,10 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int     $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', Closure $callback = null)
+    public function has($relation, $operator = '>=', $count = 1, $boolean = 'and', callable $callback = null)
     {
         if (strpos($relation, '.') !== false) {
             return $this->hasNested($relation, $operator, $count, $boolean, $callback);
@@ -61,7 +60,7 @@ trait QueriesRelationships
      * @param  string  $operator
      * @param  int     $count
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     protected function hasNested($relations, $operator = '>=', $count = 1, $boolean = 'and', $callback = null)
@@ -70,7 +69,7 @@ trait QueriesRelationships
 
         $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
             // In order to nest "has", we need to add count relation constraints on the
-            // callback Closure. We'll do this by simply passing the Closure its own
+            // callback callable. We'll do this by simply passing the callable its own
             // reference to itself so it calls itself recursively on each segment.
             count($relations) > 1
                 ? $q->whereHas(array_shift($relations), $closure)
@@ -98,10 +97,10 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  string  $boolean
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function doesntHave($relation, $boolean = 'and', Closure $callback = null)
+    public function doesntHave($relation, $boolean = 'and', callable $callback = null)
     {
         return $this->has($relation, '<', 1, $boolean, $callback);
     }
@@ -121,12 +120,12 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @param  string  $operator
      * @param  int     $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function whereHas($relation, callable $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'and', $callback);
     }
@@ -135,12 +134,12 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string    $relation
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @param  string    $operator
      * @param  int       $count
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function orWhereHas($relation, callable $callback = null, $operator = '>=', $count = 1)
     {
         return $this->has($relation, $operator, $count, 'or', $callback);
     }
@@ -149,10 +148,10 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses.
      *
      * @param  string  $relation
-     * @param  \Closure|null  $callback
+     * @param  callable|null  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereDoesntHave($relation, Closure $callback = null)
+    public function whereDoesntHave($relation, callable $callback = null)
     {
         return $this->doesntHave($relation, 'and', $callback);
     }
@@ -161,10 +160,10 @@ trait QueriesRelationships
      * Add a relationship count / exists condition to the query with where clauses and an "or".
      *
      * @param  string    $relation
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function orWhereDoesntHave($relation, Closure $callback = null)
+    public function orWhereDoesntHave($relation, callable $callback = null)
     {
         return $this->doesntHave($relation, 'or', $callback);
     }
