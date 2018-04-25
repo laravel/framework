@@ -5,7 +5,7 @@ namespace Illuminate\Support\Facades;
 use Illuminate\Filesystem\Filesystem;
 
 /**
- * @method \Illuminate\Contracts\Filesystem\Filesystem disk(string $name = null)
+ * @method static \Illuminate\Contracts\Filesystem\Filesystem disk(string $name = null)
  *
  * @see \Illuminate\Filesystem\FilesystemManager
  */

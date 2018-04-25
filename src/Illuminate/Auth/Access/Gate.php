@@ -122,7 +122,7 @@ class Gate implements GateContract
      *
      * @param  string  $name
      * @param  string  $class
-     * @param  array   $abilities
+     * @param  array|null   $abilities
      * @return $this
      */
     public function resource($name, $class, array $abilities = null)

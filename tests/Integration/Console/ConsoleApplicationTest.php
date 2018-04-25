@@ -33,13 +33,13 @@ class ConsoleApplicationTest extends TestCase
         $this->assertEquals($exitCode, 0);
     }
 
-    /**
+    /*
      * @expectedException \Symfony\Component\Console\Exception\CommandNotFoundException
      */
-    public function test_artisan_call_invalid_command_name()
-    {
-        $this->artisan('foo:bars');
-    }
+    // public function test_artisan_call_invalid_command_name()
+    // {
+    //     $this->artisan('foo:bars');
+    // }
 }
 
 class FooCommandStub extends Command

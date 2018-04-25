@@ -553,7 +553,7 @@ if (! function_exists('mix')) {
      *
      * @param  string  $path
      * @param  string  $manifestDirectory
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Support\HtmlString|string
      *
      * @throws \Exception
      */
