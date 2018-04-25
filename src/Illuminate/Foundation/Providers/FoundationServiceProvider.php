@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\AggregateServiceProvider;
