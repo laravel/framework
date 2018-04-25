@@ -612,7 +612,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileOffset(Builder $query, $offset)
     {
-        return 'offset '.(int) $offset;
+        return $query->limit ? 'offset '.(int) $offset : '';
     }
 
     /**
