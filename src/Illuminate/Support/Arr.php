@@ -294,11 +294,11 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (static::accessible($array) && static::exists($array, $segment)) {
-                $array = $array[$segment];
-            } else {
-                return value($default);
+            if (!static::accessible($array) && !static::exists($array, $segment)) {
+	            return value($default);
             }
+
+	        $array = $array[$segment];
         }
 
         return $array;
@@ -335,11 +335,11 @@ class Arr
             }
 
             foreach (explode('.', $key) as $segment) {
-                if (static::accessible($subKeyArray) && static::exists($subKeyArray, $segment)) {
-                    $subKeyArray = $subKeyArray[$segment];
-                } else {
-                    return false;
+                if (!static::accessible($subKeyArray) && !static::exists($subKeyArray, $segment)) {
+	                return false;
                 }
+
+	            $subKeyArray = $subKeyArray[$segment];
             }
         }
 
