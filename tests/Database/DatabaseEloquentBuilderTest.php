@@ -7,8 +7,16 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Query\Filters\Where;
+use Illuminate\Database\Query\Filters\WhereIn;
+use Illuminate\Database\Query\Filters\WhereLess;
+use Illuminate\Database\Query\Filters\WhereLike;
+use Illuminate\Database\Query\Filters\WhereNotIn;
+use Illuminate\Database\Query\Filters\WhereEquals;
+use Illuminate\Database\Query\Filters\WhereGreater;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Filters\WhereNotEquals;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
@@ -618,6 +626,110 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($result, $builder);
     }
 
+    public function testCallableObjectClosureWhere()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar', 'or');
+        $result = $builder->when(true, new Where('foo', '=', 'bar', 'or'));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereEquals()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '=', 'bar', 'and');
+        $result = $builder->when(true, new WhereEquals('foo', 'bar'));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereNotEquals()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '!=', 'bar', 'and');
+        $result = $builder->when(true, new WhereNotEquals('foo', 'bar'));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereGreater()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '>', 1, 'and');
+        $result = $builder->when(true, new WhereGreater('foo', 1, false));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereGreaterWithIncludes()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '>=', 1, 'and');
+        $result = $builder->when(true, new WhereGreater('foo', 1, true));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereLess()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '<', 1, 'and');
+        $result = $builder->when(true, new WhereLess('foo', 1, false));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereLessWithIncludes()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', '<=', 1, 'and');
+        $result = $builder->when(true, new WhereLess('foo', 1, true));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo', [1, 2]);
+        $result = $builder->when(true, new WhereIn('foo', [1, 2]));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereNotIn()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('whereNotIn')->once()->with('foo', [1, 2]);
+        $result = $builder->when(true, new WhereNotIn('foo', [1, 2]));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereLikeBoth()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'like', '%bar%', 'and');
+        $result = $builder->when(true, new WhereLike('foo', 'bar', true, true));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereLikeLeft()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'like', '%bar', 'and');
+        $result = $builder->when(true, new WhereLike('foo', 'bar', true, false));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereLikeRight()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'like', 'bar%', 'and');
+        $result = $builder->when(true, new WhereLike('foo', 'bar', false, true));
+        $this->assertEquals($result, $builder);
+    }
+
+    public function testCallableObjectClosureWhereLikeStrong()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo', 'like', 'bar', 'and');
+        $result = $builder->when(true, new WhereLike('foo', 'bar', false, false));
+        $this->assertEquals($result, $builder);
+    }
+
     public function testPostgresOperatorsWhere()
     {
         $builder = $this->getBuilder();
@@ -738,6 +850,17 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where "name" = ? and exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and ("zipcode" = ? or "zipcode" = ?) having "street" = ?) and "age" = ?', $builder->toSql());
         $this->assertEquals(['larry', '90210', '90220', 'fooside dr', 29], $builder->getBindings());
+    }
+
+    public function testWhereHasWithCallableObjectWhere()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+        $this->mockConnectionForModel($model, 'SQLite');
+
+        $builder = $model->whereHas('address', new Where('zipcode', '90210'));
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and "zipcode" = ?)', $builder->toSql());
+        $this->assertEquals(['90210'], $builder->getBindings());
     }
 
     public function testHasWithContraintsAndJoinAndHavingInSubquery()
