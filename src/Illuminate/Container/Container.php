@@ -877,6 +877,13 @@ class Container implements ArrayAccess, ContainerContract
     {
         if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
             return $concrete instanceof Closure ? $concrete($this) : $concrete;
+        } else {
+            $this->buildStack[] = $parameter->getDeclaringClass()->name;
+            if (! is_null($concrete = $this->getContextualConcrete('$'.$parameter->name))) {
+                array_pop($this->buildStack);
+
+                return $concrete instanceof Closure ? $concrete($this) : $concrete;
+            }
         }
 
         if ($parameter->isDefaultValueAvailable()) {
