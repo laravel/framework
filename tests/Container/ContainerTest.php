@@ -1061,6 +1061,41 @@ class ContainerTest extends TestCase
         $child = $container->make(ContainerPrimitiveInjectChild::class);
         $this->assertInstanceOf(ContainerPrimitiveInjectChild::class, $child);
         $this->assertEquals($injectableValue, $child->injectableValue);
+
+        /** @var ContainerPrimitiveInjectGrandChild $child */
+        $child = $container->make(ContainerPrimitiveInjectGrandChild::class);
+        $this->assertInstanceOf(ContainerPrimitiveInjectGrandChild::class, $child);
+        $this->assertEquals($injectableValue, $child->injectableValue);
+    }
+
+    public function testContextBindPrimitiveIntoChild()
+    {
+        $container = new Container;
+        $injectableValue = 28;
+
+        $container->when(ContainerPrimitiveInjectParent::class)
+            ->needs('$injectableValue')
+            ->give($injectableValue);
+
+        /** @var ContainerPrimitiveInjectChild $child */
+        $child = $container->make(ContainerPrimitiveInjectChild::class);
+        $this->assertInstanceOf(ContainerPrimitiveInjectChild::class, $child);
+        $this->assertEquals($injectableValue, $child->injectableValue);
+    }
+
+    public function testContextBindPrimitiveIntoGrandChild()
+    {
+        $container = new Container;
+        $injectableValue = 28;
+
+        $container->when(ContainerPrimitiveInjectParent::class)
+            ->needs('$injectableValue')
+            ->give($injectableValue);
+
+        /** @var ContainerPrimitiveInjectGrandChild $child */
+        $child = $container->make(ContainerPrimitiveInjectGrandChild::class);
+        $this->assertInstanceOf(ContainerPrimitiveInjectGrandChild::class, $child);
+        $this->assertEquals($injectableValue, $child->injectableValue);
     }
 }
 
@@ -1075,6 +1110,10 @@ class ContainerPrimitiveInjectParent
 }
 
 class ContainerPrimitiveInjectChild extends ContainerPrimitiveInjectParent
+{
+}
+
+class ContainerPrimitiveInjectGrandChild extends ContainerPrimitiveInjectChild
 {
 }
 
