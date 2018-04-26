@@ -156,7 +156,7 @@ class ResponseFactory implements FactoryContract
     }
 
     /**
-     * Conver the string to ASCII characters that are equivalent to the given name.
+     * Convert the string to ASCII characters that are equivalent to the given name.
      *
      * @param  string  $name
      * @return string

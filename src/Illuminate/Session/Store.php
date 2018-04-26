@@ -3,6 +3,7 @@
 namespace Illuminate\Session;
 
 use Closure;
+use stdClass;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use SessionHandlerInterface;
@@ -174,8 +175,10 @@ class Store implements Session
      */
     public function exists($key)
     {
-        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
-            return ! Arr::exists($this->attributes, $key);
+        $placeholder = new stdClass();
+
+        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
+            return $this->get($key, $placeholder) === $placeholder;
         });
     }
 
@@ -472,7 +475,9 @@ class Store implements Session
      */
     public function regenerate($destroy = false)
     {
-        return $this->migrate($destroy);
+        return tap($this->migrate($destroy), function () {
+            $this->regenerateToken();
+        });
     }
 
     /**

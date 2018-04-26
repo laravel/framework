@@ -230,9 +230,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             if ($this->isFillable($key)) {
                 $this->setAttribute($key, $value);
             } elseif ($totallyGuarded) {
-                throw new MassAssignmentException(
-                    "Add [{$key}] to fillable property to allow mass assignment."
-                );
+                throw new MassAssignmentException(sprintf(
+                    'Add [%s] to fillable property to allow mass assignment on [%s].',
+                    $key, get_class($this)
+                ));
             }
         }
 
@@ -413,7 +414,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @return int
      */
@@ -426,7 +427,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Decrement a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @return int
      */
@@ -439,7 +440,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Run the increment or decrement method on the model.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @param  string  $method
      * @return int
@@ -463,7 +464,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Increment the underlying attribute value and sync with original.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @param  string  $method
      * @return void
@@ -1303,11 +1304,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         $relations = [];
 
         foreach ($this->getRelations() as $key => $relation) {
-            $relations[] = $key;
+            if (method_exists($this, $key)) {
+                $relations[] = $key;
+            }
 
             if ($relation instanceof QueueableCollection) {
-                foreach ($relation->getQueueableRelations() as $collectionKey => $collectionValue) {
-                    $relations[] = $key.'.'.$collectionKey;
+                foreach ($relation->getQueueableRelations() as $collectionValue) {
+                    $relations[] = $key.'.'.$collectionValue;
                 }
             }
 
@@ -1369,7 +1372,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_'.$this->primaryKey;
+        return Str::snake(class_basename($this)).'_'.$this->getKeyName();
     }
 
     /**

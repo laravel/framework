@@ -201,7 +201,7 @@ class RouteRegistrarTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [missing] does not exist.
+     * @expectedExceptionMessage Method Illuminate\Routing\RouteRegistrar::missing does not exist.
      */
     public function testRegisteringNonApprovedAttributesThrows()
     {
@@ -217,6 +217,23 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');
+    }
+
+    public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
+    {
+        $resource = $this->router->middleware('resource-middleware')
+                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->register();
+
+        $this->assertCount(7, $resource->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
     public function testCanLimitMethodsOnRegisteredResource()

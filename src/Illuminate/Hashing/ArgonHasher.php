@@ -8,13 +8,6 @@ use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 class ArgonHasher implements HasherContract
 {
     /**
-     * The default threads factor.
-     *
-     * @var int
-     */
-    protected $threads = 2;
-
-    /**
      * The default memory cost factor.
      *
      * @var int
@@ -27,6 +20,26 @@ class ArgonHasher implements HasherContract
      * @var int
      */
     protected $time = 2;
+
+    /**
+     * The default threads factor.
+     *
+     * @var int
+     */
+    protected $threads = 2;
+
+    /**
+     * Create a new hasher instance.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    public function __construct(array $options = [])
+    {
+        $this->time = $options['time'] ?? $this->time;
+        $this->memory = $options['memory'] ?? $this->memory;
+        $this->threads = $options['threads'] ?? $this->threads;
+    }
 
     /**
      * Get information about the given hashed value.
@@ -42,8 +55,8 @@ class ArgonHasher implements HasherContract
     /**
      * Hash the given value.
      *
-     * @param  string $value
-     * @param  array $options
+     * @param  string  $value
+     * @param  array  $options
      * @return string
      */
     public function make($value, array $options = [])
@@ -64,9 +77,9 @@ class ArgonHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string $value
-     * @param  string $hashedValue
-     * @param  array $options
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
      * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
@@ -81,8 +94,8 @@ class ArgonHasher implements HasherContract
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string $hashedValue
-     * @param  array $options
+     * @param  string  $hashedValue
+     * @param  array  $options
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])
@@ -95,24 +108,9 @@ class ArgonHasher implements HasherContract
     }
 
     /**
-     * Set the default password threads factor.
-     *
-     * @param int $threads
-     *
-     * @return $this;
-     */
-    public function setThreads(int $threads)
-    {
-        $this->threads = $threads;
-
-        return $this;
-    }
-
-    /**
      * Set the default password memory factor.
      *
-     * @param int $memory
-     *
+     * @param  int  $memory
      * @return $this
      */
     public function setMemory(int $memory)
@@ -125,13 +123,25 @@ class ArgonHasher implements HasherContract
     /**
      * Set the default password timing factor.
      *
-     * @param int $time
-     *
+     * @param  int  $time
      * @return $this
      */
     public function setTime(int $time)
     {
         $this->time = $time;
+
+        return $this;
+    }
+
+    /**
+     * Set the default password threads factor.
+     *
+     * @param  int  $threads
+     * @return $this
+     */
+    public function setThreads(int $threads)
+    {
+        $this->threads = $threads;
 
         return $this;
     }

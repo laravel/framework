@@ -75,22 +75,49 @@ class HttpJsonResponseTest extends TestCase
     }
 
     /**
+     * @param mixed $data
+     *
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Type is not supported
+     *
+     * @dataProvider jsonErrorDataProvider
      */
-    public function testJsonErrorResource()
+    public function testInvalidArgumentExceptionOnJsonError($data)
     {
-        $resource = tmpfile();
-        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource]);
+        new \Illuminate\Http\JsonResponse(['data' => $data]);
     }
 
-    public function testJsonErrorResourceWithPartialOutputOnError()
+    /**
+     * @param mixed $data
+     *
+     * @dataProvider jsonErrorDataProvider
+     */
+    public function testGracefullyHandledSomeJsonErrorsWithPartialOutputOnError($data)
     {
+        new \Illuminate\Http\JsonResponse(['data' => $data], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
+    }
+
+    /**
+     * @return array
+     */
+    public function jsonErrorDataProvider()
+    {
+        // Resources can't be encoded
         $resource = tmpfile();
-        $response = new \Illuminate\Http\JsonResponse(['resource' => $resource], 200, [], JSON_PARTIAL_OUTPUT_ON_ERROR);
-        $data = $response->getData();
-        $this->assertInstanceOf('stdClass', $data);
-        $this->assertNull($data->resource);
+
+        // Recursion can't be encoded
+        $recursiveObject = new \stdClass();
+        $objectB = new \stdClass();
+        $recursiveObject->b = $objectB;
+        $objectB->a = $recursiveObject;
+
+        // NAN or INF can't be encoded
+        $nan = NAN;
+
+        return [
+            [$resource],
+            [$recursiveObject],
+            [$nan],
+        ];
     }
 }
 

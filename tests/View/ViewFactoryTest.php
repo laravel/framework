@@ -555,6 +555,26 @@ class ViewFactoryTest extends TestCase
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
     }
 
+    public function testAddingLoopDoesNotCloseGenerator()
+    {
+        $factory = $this->getFactory();
+
+        $data = (new class {
+            public function generate()
+            {
+                for ($count = 0; $count < 3; $count++) {
+                    yield ['a', 'b'];
+                }
+            }
+        })->generate();
+
+        $factory->addLoop($data);
+
+        foreach ($data as $chunk) {
+            $this->assertEquals(['a', 'b'], $chunk);
+        }
+    }
+
     public function testAddingUncountableLoop()
     {
         $factory = $this->getFactory();

@@ -553,7 +553,7 @@ if (! function_exists('mix')) {
      *
      * @param  string  $path
      * @param  string  $manifestDirectory
-     * @return \Illuminate\Support\HtmlString
+     * @return \Illuminate\Support\HtmlString|string
      *
      * @throws \Exception
      */
@@ -791,9 +791,9 @@ if (! function_exists('route')) {
     /**
      * Generate the URL to a named route.
      *
-     * @param  string  $name
-     * @param  array   $parameters
-     * @param  bool    $absolute
+     * @param  array|string  $name
+     * @param  array  $parameters
+     * @param  bool  $absolute
      * @return string
      */
     function route($name, $parameters = [], $absolute = true)

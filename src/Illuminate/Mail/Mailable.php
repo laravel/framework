@@ -9,13 +9,25 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 
 class Mailable implements MailableContract, Renderable
 {
+    use Localizable;
+
+    /**
+     * The locale of the message.
+     *
+     * @var string
+     */
+    public $locale;
+
     /**
      * The person the message is from.
      *
@@ -122,14 +134,18 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
-        Container::getInstance()->call([$this, 'build']);
+        $translator = Container::getInstance()->make(Translator::class);
 
-        $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
-            $this->buildFrom($message)
-                 ->buildRecipients($message)
-                 ->buildSubject($message)
-                 ->buildAttachments($message)
-                 ->runCallbacks($message);
+        $this->withLocale($this->locale, $translator, function () use ($mailer) {
+            Container::getInstance()->call([$this, 'build']);
+
+            $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
+                $this->buildFrom($message)
+                     ->buildRecipients($message)
+                     ->buildSubject($message)
+                     ->runCallbacks($message)
+                     ->buildAttachments($message);
+            });
         });
     }
 
@@ -346,6 +362,19 @@ class Mailable implements MailableContract, Renderable
         foreach ($this->callbacks as $callback) {
             $callback($message->getSwiftMessage());
         }
+
+        return $this;
+    }
+
+    /**
+     * Set the locale of the message.
+     *
+     * @param  string  $locale
+     * @return $this
+     */
+    public function locale($locale)
+    {
+        $this->locale = $locale;
 
         return $this;
     }
@@ -676,6 +705,38 @@ class Mailable implements MailableContract, Renderable
     }
 
     /**
+     * Attach a file to the message from storage.
+     *
+     * @param  string  $path
+     * @param  string  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachFromStorage($path, $name = null, array $options = [])
+    {
+        return $this->attachFromStorageDisk(null, $path, $name, $options);
+    }
+
+    /**
+     * Attach a file to the message from storage.
+     *
+     * @param  string  $disk
+     * @param  string  $path
+     * @param  string  $name
+     * @param  array  $options
+     * @return $this
+     */
+    public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
+    {
+        $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+
+        return $this->attachData(
+            $storage->get($path), $name ?? basename($path),
+            array_merge(['mime' => $storage->mimeType($path)], $options)
+        );
+    }
+
+    /**
      * Attach in-memory data as an attachment.
      *
      * @param  string  $data
@@ -718,6 +779,8 @@ class Mailable implements MailableContract, Renderable
             return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
         }
 
-        throw new BadMethodCallException("Method [$method] does not exist on mailable.");
+        throw new BadMethodCallException(sprintf(
+            'Method %s::%s does not exist.', static::class, $method
+        ));
     }
 }

@@ -10,6 +10,13 @@ use Illuminate\Database\Query\JsonExpression;
 class MySqlGrammar extends Grammar
 {
     /**
+     * The grammar specific operators.
+     *
+     * @var array
+     */
+    protected $operators = ['sounds like'];
+
+    /**
      * The components that make up a select clause.
      *
      * @var array
@@ -53,9 +60,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileUnion(array $union)
     {
-        $conjuction = $union['all'] ? ' union all ' : ' union ';
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
 
-        return $conjuction.'('.$union['query']->toSql().')';
+        return $conjunction.'('.$union['query']->toSql().')';
     }
 
     /**

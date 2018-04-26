@@ -14,7 +14,7 @@ trait CompilesHelpers
         return '<?php echo csrf_field(); ?>';
     }
 
-    /*
+    /**
      * Compile the "dd" statements into valid PHP.
      *
      * @param  string  $arguments
@@ -25,7 +25,18 @@ trait CompilesHelpers
         return "<?php dd{$arguments}; ?>";
     }
 
-    /*
+    /**
+     * Compile the "dump" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileDump($arguments)
+    {
+        return "<?php dump{$arguments}; ?>";
+    }
+
+    /**
      * Compile the method statements into valid PHP.
      *
      * @param  string  $method

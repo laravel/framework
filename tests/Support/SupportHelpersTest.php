@@ -784,17 +784,31 @@ class SupportHelpersTest extends TestCase
         })->something());
     }
 
+    public function testOptionalWithCallback()
+    {
+        $this->assertNull(optional(null, function () {
+            throw new RuntimeException(
+                'The optional callback should not be called for null'
+            );
+        }));
+
+        $this->assertEquals(10, optional(5, function ($number) {
+            return $number * 2;
+        }));
+    }
+
     public function testOptionalWithArray()
     {
-        $this->assertNull(optional(null)['missing']);
-
         $this->assertEquals('here', optional(['present' => 'here'])['present']);
+        $this->assertNull(optional(null)['missing']);
+        $this->assertNull(optional(['present' => 'here'])->missing);
     }
 
     public function testOptionalReturnsObjectPropertyOrNull()
     {
         $this->assertSame('bar', optional((object) ['foo' => 'bar'])->foo);
         $this->assertNull(optional(['foo' => 'bar'])->foo);
+        $this->assertNull(optional((object) ['foo' => 'bar'])->bar);
     }
 
     public function testOptionalDeterminesWhetherKeyIsSet()
@@ -871,6 +885,57 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals(10, with(5, function ($five) {
             return $five + 5;
         }));
+    }
+
+    public function testEnv()
+    {
+        putenv('foo=bar');
+        $this->assertEquals('bar', env('foo'));
+    }
+
+    public function testEnvWithQuotes()
+    {
+        putenv('foo="bar"');
+        $this->assertEquals('bar', env('foo'));
+    }
+
+    public function testEnvTrue()
+    {
+        putenv('foo=true');
+        $this->assertTrue(env('foo'));
+
+        putenv('foo=(true)');
+        $this->assertTrue(env('foo'));
+    }
+
+    public function testEnvFalse()
+    {
+        putenv('foo=false');
+        $this->assertFalse(env('foo'));
+
+        putenv('foo=(false)');
+        $this->assertFalse(env('foo'));
+    }
+
+    public function testEnvEmpty()
+    {
+        putenv('foo=');
+        $this->assertEquals('', env('foo'));
+
+        putenv('foo=empty');
+        $this->assertEquals('', env('foo'));
+
+        putenv('foo=(empty)');
+        $this->assertEquals('', env('foo'));
+    }
+
+    public function testEnvNull()
+    {
+        putenv('foo=null');
+        $this->assertEquals('', env('foo'));
+
+        putenv('foo=(null)');
+        $this->assertEquals('', env('foo'));
     }
 }
 

@@ -63,9 +63,9 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileUnion(array $union)
     {
-        $conjuction = $union['all'] ? ' union all ' : ' union ';
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
 
-        return $conjuction.'select * from ('.$union['query']->toSql().')';
+        return $conjunction.'select * from ('.$union['query']->toSql().')';
     }
 
     /**
@@ -114,6 +114,18 @@ class SQLiteGrammar extends Grammar
     protected function whereYear(Builder $query, $where)
     {
         return $this->dateBasedWhere('%Y', $query, $where);
+    }
+
+    /**
+     * Compile a "where time" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereTime(Builder $query, $where)
+    {
+        return $this->dateBasedWhere('%H:%M:%S', $query, $where);
     }
 
     /**

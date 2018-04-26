@@ -6,8 +6,6 @@ use Illuminate\Contracts\Console\Kernel;
 
 trait RefreshDatabase
 {
-    use DatabaseTransactions;
-
     /**
      * Define hooks to migrate the database before and after each test.
      *
@@ -60,5 +58,47 @@ trait RefreshDatabase
         }
 
         $this->beginDatabaseTransaction();
+    }
+
+    /**
+     * Begin a database transaction on the testing database.
+     *
+     * @return void
+     */
+    public function beginDatabaseTransaction()
+    {
+        $database = $this->app->make('db');
+
+        foreach ($this->connectionsToTransact() as $name) {
+            $connection = $database->connection($name);
+            $dispatcher = $connection->getEventDispatcher();
+
+            $connection->unsetEventDispatcher();
+            $connection->beginTransaction();
+            $connection->setEventDispatcher($dispatcher);
+        }
+
+        $this->beforeApplicationDestroyed(function () use ($database) {
+            foreach ($this->connectionsToTransact() as $name) {
+                $connection = $database->connection($name);
+                $dispatcher = $connection->getEventDispatcher();
+
+                $connection->unsetEventDispatcher();
+                $connection->rollback();
+                $connection->setEventDispatcher($dispatcher);
+                $connection->disconnect();
+            }
+        });
+    }
+
+    /**
+     * The database connections that should have transactions.
+     *
+     * @return array
+     */
+    protected function connectionsToTransact()
+    {
+        return property_exists($this, 'connectionsToTransact')
+                            ? $this->connectionsToTransact : [null];
     }
 }

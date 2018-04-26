@@ -235,6 +235,20 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Load a set of relationships onto the mixed relationship collection.
+     *
+     * @param  string $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorph($relation, $relations)
+    {
+        $this->getCollection()->loadMorph($relation, $relations);
+
+        return $this;
+    }
+
+    /**
      * Get the slice of items being paginated.
      *
      * @return array
@@ -445,6 +459,17 @@ abstract class AbstractPaginator implements Htmlable
     public static function defaultSimpleView($view)
     {
         static::$defaultSimpleView = $view;
+    }
+
+    /**
+     * Indicate that Bootstrap 3 styling should be used for generated links.
+     *
+     * @return void
+     */
+    public static function useBootstrapThree()
+    {
+        static::defaultView('pagination::default');
+        static::defaultSimpleView('pagination::simple-default');
     }
 
     /**

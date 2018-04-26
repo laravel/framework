@@ -183,7 +183,7 @@ class RouteCollection implements Countable, IteratorAggregate
      * Determine if a route in the array matches the request.
      *
      * @param  array  $routes
-     * @param  \Illuminate\http\Request  $request
+     * @param  \Illuminate\Http\Request  $request
      * @param  bool  $includingMethod
      * @return \Illuminate\Routing\Route|null
      */

@@ -441,8 +441,26 @@ class BladeCompiler extends Compiler implements CompilerInterface
                         : "<?php \$__env->startComponent('{$path}'); ?>";
         });
 
-        $this->directive('end'.$alias, function ($expression) use ($path) {
+        $this->directive('end'.$alias, function ($expression) {
             return '<?php echo $__env->renderComponent(); ?>';
+        });
+    }
+
+    /**
+     * Register an include alias directive.
+     *
+     * @param  string  $path
+     * @param  string  $alias
+     * @return void
+     */
+    public function include($path, $alias = null)
+    {
+        $alias = $alias ?: array_last(explode('.', $path));
+
+        $this->directive($alias, function ($expression) use ($path) {
+            $expression = $this->stripParentheses($expression) ?: '[]';
+
+            return "<?php echo \$__env->make('{$path}', {$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
         });
     }
 
@@ -480,12 +498,22 @@ class BladeCompiler extends Compiler implements CompilerInterface
     }
 
     /**
-     * Set the echo format to double encode entities.
+     * Set the "echo" format to double encode entities.
      *
      * @return void
      */
-    public function doubleEncode()
+    public function withDoubleEncoding()
     {
         $this->setEchoFormat('e(%s, true)');
+    }
+
+    /**
+     * Set the "echo" format to not double encode entities.
+     *
+     * @return void
+     */
+    public function withoutDoubleEncoding()
+    {
+        $this->setEchoFormat('e(%s, false)');
     }
 }

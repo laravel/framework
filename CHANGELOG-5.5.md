@@ -1,5 +1,81 @@
 # Release Notes for 5.5.x
 
+## v5.5.40 (2018-03-30)
+
+### Changed
+- Only set id on `NotificationFake` if no id is set ([#23474](https://github.com/laravel/framework/pull/23474))
+- Removed attribute filling from pivot models ([#23554](https://github.com/laravel/framework/pull/23554))
+
+### Fixed
+- Fixed to not mistakenly release mutex ([#23607](https://github.com/laravel/framework/pull/23607))
+- Revert breaking changes in `ManagesLoops` ([#23681](https://github.com/laravel/framework/pull/23681))
+
+### Security
+- Check `iv` length in `Encrypter::validPayload()` ([28e53f2](https://github.com/laravel/framework/commit/28e53f23a76206fb130e9a54eb95aa3f010e79c9))
+
+
+## v5.5.39 (2018-03-09)
+
+### Fixed
+- Fix for Carbon 1.24.1 ([b3a5608](https://github.com/laravel/framework/commit/b3a5608ff60a3679d51536a65bb525bdc2390fbc), [72286b3](https://github.com/laravel/framework/commit/72286b302e9bf6a29dd5f0e20f4e7c6dbce78a5d))
+
+
+## v5.5.38 (2018-03-09)
+
+### Fixed
+- Fix for Carbon 1.24.0 ([#23459](https://github.com/laravel/framework/pull/23459))
+- Fixed `--force` flag on `GeneratorCommand` ([#23427](https://github.com/laravel/framework/pull/23427))
+
+
+## v5.5.37 (2018-03-07)
+
+### Changed
+- Added `v-pre` to dropdown link in `app.stub` ([987c19f](https://github.com/laravel/framework/commit/987c19fc252a4883ec05e1691b98e7e9e0c74be8))
+
+### Fixed
+- `Queue::bulk()` fake now properly pushes expected jobs ([#23389](https://github.com/laravel/framework/pull/23389))
+- Set up loop variable correctly on all `Traversable` objects ([#23388](https://github.com/laravel/framework/pull/23388))
+- Fixed `SQLiteGrammar::whereTime()` formatting ([#23408](https://github.com/laravel/framework/pull/23408))
+
+
+## v5.5.36 (2018-03-01)
+
+### Changed
+- Upgrade Parsedown to 1.7.0 ([14adb99](https://github.com/laravel/framework/commit/14adb9958729ea778767b9269df485e399fd6178))
+
+### Fixed
+- Fixed `PostgresGrammar::whereTime()` casting ([#23318](https://github.com/laravel/framework/pull/23318))
+
+
+## v5.5.35 (2018-02-22)
+
+### Fixed
+- Fixed an issue with `orWhere*()` arguments ([3368494](https://github.com/laravel/framework/commit/3368494889130585bc6bbf22d8842881f8f4399c))
+- Fixed `tightenco/collect` version ([#23152](https://github.com/laravel/framework/pull/23152), [#23159](https://github.com/laravel/framework/pull/23159))
+
+
+## v5.5.34 (2018-02-06)
+
+### Changed
+- Use path helpers in console commands ([#22971](https://github.com/laravel/framework/pull/22971))
+- Remove unnecessary `escapeshellarg()` call ([#23025](https://github.com/laravel/framework/pull/23025))
+- Use original attribute values in pivot where clauses ([#23031](https://github.com/laravel/framework/pull/23031), [#23035](https://github.com/laravel/framework/pull/23035))
+
+
+## v5.5.33 (2018-01-30)
+
+### Added
+- Added `doesntExist()` method to query builder ([#22836](https://github.com/laravel/framework/pull/22836), [9d2a7ca](https://github.com/laravel/framework/commit/9d2a7ca049e71d39e453ba8c34addb657b71b237))
+- Added `assertHeaderMissing()` assertion ([#22849](https://github.com/laravel/framework/pull/22849), [#22866](https://github.com/laravel/framework/pull/22866))
+- Added support for higher order unique ([#22851](https://github.com/laravel/framework/pull/22851))
+- Added boolean toggle to `withTrashed()` ([#22888](https://github.com/laravel/framework/pull/22888))
+
+### Changed
+- Support Mix HMR with different host/port ([#22826](https://github.com/laravel/framework/pull/22826), [24897d6](https://github.com/laravel/framework/commit/24897d6afbfed70a7383561f31c01bc48927cbda))
+- Make route filtering by method case-insensitive ([#22856](https://github.com/laravel/framework/pull/22856))
+- Added missing PostgreSQL operator for array overlap ([#22903](https://github.com/laravel/framework/pull/22903))
+
+
 ## v5.5.32 (2018-01-18)
 
 ### Fixed

@@ -129,8 +129,6 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $post->tagsWithCustomPivot()->attach($tag->id);
 
-        $post->tagsWithCustomAccessor()->attach($tag->id);
-
         $this->assertInstanceOf(CustomPivot::class, $post->tagsWithCustomPivot[0]->pivot);
         $this->assertEquals('1507630210', $post->tagsWithCustomPivot[0]->pivot->getAttributes()['created_at']);
 
@@ -138,6 +136,14 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             'post_id' => '1',
             'tag_id' => '1',
         ], $post->tagsWithCustomAccessor[0]->tag->toArray());
+
+        $pivot = $post->tagsWithCustomPivot[0]->pivot;
+        $pivot->tag_id = 2;
+        $pivot->save();
+
+        $this->assertEquals(1, CustomPivot::count());
+        $this->assertEquals(1, CustomPivot::first()->post_id);
+        $this->assertEquals(2, CustomPivot::first()->tag_id);
     }
 
     /**
@@ -578,6 +584,44 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertNotEquals('2017-10-10 10:10:10', Tag::find(300)->updated_at);
     }
+
+    /**
+     * @test
+     */
+    public function can_update_existing_pivot()
+    {
+        $tag = Tag::create(['name' => str_random()]);
+        $post = Post::create(['title' => str_random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+        ]);
+
+        $post->tagsWithExtraPivot()->updateExistingPivot($tag->id, ['flag' => 'exclude']);
+
+        foreach ($post->tagsWithExtraPivot as $tag) {
+            $this->assertEquals('exclude', $tag->pivot->flag);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function can_update_existing_pivot_using_model()
+    {
+        $tag = Tag::create(['name' => str_random()]);
+        $post = Post::create(['title' => str_random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+        ]);
+
+        $post->tagsWithExtraPivot()->updateExistingPivot($tag, ['flag' => 'exclude']);
+
+        foreach ($post->tagsWithExtraPivot as $tag) {
+            $this->assertEquals('exclude', $tag->pivot->flag);
+        }
+    }
 }
 
 class Post extends Model
@@ -593,6 +637,12 @@ class Post extends Model
             ->withPivot('flag')
             ->withTimestamps()
             ->wherePivot('flag', '<>', 'exclude');
+    }
+
+    public function tagsWithExtraPivot()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->withPivot('flag');
     }
 
     public function touchingTags()
@@ -655,5 +705,6 @@ class TagWithCustomPivot extends Model
 
 class CustomPivot extends Pivot
 {
+    protected $table = 'posts_tags';
     protected $dateFormat = 'U';
 }

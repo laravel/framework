@@ -15,6 +15,17 @@ class BcryptHasher implements HasherContract
     protected $rounds = 10;
 
     /**
+     * Create a new hasher instance.
+     *
+     * @param  array  $options
+     * @return void
+     */
+    public function __construct(array $options = [])
+    {
+        $this->rounds = $options['rounds'] ?? $this->rounds;
+    }
+
+    /**
      * Get information about the given hashed value.
      *
      * @param  string  $hashedValue

@@ -553,8 +553,6 @@ if (! function_exists('dd')) {
      */
     function dd(...$args)
     {
-        http_response_code(500);
-
         foreach ($args as $x) {
             (new Dumper)->dump($x);
         }
@@ -571,7 +569,7 @@ if (! function_exists('e')) {
      * @param  bool  $doubleEncode
      * @return string
      */
-    function e($value, $doubleEncode = false)
+    function e($value, $doubleEncode = true)
     {
         if ($value instanceof Htmlable) {
             return $value->toHtml();
@@ -626,7 +624,7 @@ if (! function_exists('env')) {
                 return;
         }
 
-        if (strlen($value) > 1 && Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
+        if (($valueLength = strlen($value)) > 1 && $value[0] === '"' && $value[$valueLength - 1] === '"') {
             return substr($value, 1, -1);
         }
 
@@ -718,11 +716,16 @@ if (! function_exists('optional')) {
      * Provide access to optional objects.
      *
      * @param  mixed  $value
+     * @param  callable|null  $callback
      * @return mixed
      */
-    function optional($value = null)
+    function optional($value = null, callable $callback = null)
     {
-        return new Optional($value);
+        if (is_null($callback)) {
+            return new Optional($value);
+        } elseif (! is_null($value)) {
+            return $callback($value);
+        }
     }
 }
 

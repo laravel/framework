@@ -262,15 +262,18 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->hasAny('city'));
         $this->assertFalse($request->hasAny('foo'));
         $this->assertTrue($request->hasAny('name', 'email'));
+        $this->assertTrue($request->hasAny(['name', 'email']));
 
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $this->assertTrue($request->hasAny('name', 'email'));
         $this->assertFalse($request->hasAny('surname', 'password'));
+        $this->assertFalse($request->hasAny(['surname', 'password']));
 
         $request = Request::create('/', 'GET', ['foo' => ['bar' => null, 'baz' => '']]);
         $this->assertTrue($request->hasAny('foo.bar'));
         $this->assertTrue($request->hasAny('foo.baz'));
         $this->assertFalse($request->hasAny('foo.bax'));
+        $this->assertTrue($request->hasAny(['foo.bax', 'foo.baz']));
     }
 
     public function testFilledMethod()
@@ -292,6 +295,32 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', ['foo' => ['bar' => 'baz']]);
         $this->assertTrue($request->filled('foo.bar'));
+    }
+
+    public function testFilledAnyMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+
+        $this->assertTrue($request->anyFilled(['name']));
+        $this->assertTrue($request->anyFilled('name'));
+
+        $this->assertFalse($request->anyFilled(['age']));
+        $this->assertFalse($request->anyFilled('age'));
+
+        $this->assertFalse($request->anyFilled(['foo']));
+        $this->assertFalse($request->anyFilled('foo'));
+
+        $this->assertTrue($request->anyFilled(['age', 'name']));
+        $this->assertTrue($request->anyFilled('age', 'name'));
+
+        $this->assertTrue($request->anyFilled(['foo', 'name']));
+        $this->assertTrue($request->anyFilled('foo', 'name'));
+
+        $this->assertFalse($request->anyFilled('age', 'city'));
+        $this->assertFalse($request->anyFilled('age', 'city'));
+
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
     }
 
     public function testInputMethod()

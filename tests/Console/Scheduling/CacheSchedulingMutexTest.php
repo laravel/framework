@@ -27,6 +27,11 @@ class CacheSchedulingMutexTest extends TestCase
     protected $time;
 
     /**
+     * @var \Illuminate\Contracts\Cache\Factory
+     */
+    protected $cacheFactory;
+
+    /**
      * @var \Illuminate\Contracts\Cache\Repository
      */
     protected $cacheRepository;
@@ -35,15 +40,26 @@ class CacheSchedulingMutexTest extends TestCase
     {
         parent::setUp();
 
+        $this->cacheFactory = m::mock('Illuminate\Contracts\Cache\Factory');
         $this->cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
-        $this->cacheMutex = new CacheSchedulingMutex($this->cacheRepository);
-        $this->event = new Event(new CacheEventMutex($this->cacheRepository), 'command');
+        $this->cacheFactory->shouldReceive('store')->andReturn($this->cacheRepository);
+        $this->cacheMutex = new CacheSchedulingMutex($this->cacheFactory);
+        $this->event = new Event(new CacheEventMutex($this->cacheFactory), 'command');
         $this->time = Carbon::now();
     }
 
     public function testMutexReceviesCorrectCreate()
     {
         $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
+
+        $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
+    }
+
+    public function testCanUseCustomConnection()
+    {
+        $this->cacheFactory->shouldReceive('store')->with('test')->andReturn($this->cacheRepository);
+        $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
+        $this->cacheMutex->useStore('test');
 
         $this->assertTrue($this->cacheMutex->create($this->event, $this->time));
     }
