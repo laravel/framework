@@ -249,6 +249,40 @@ class Builder
     }
 
     /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function latest($column = null)
+    {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        $this->query->latest($column);
+
+        return $this;
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function oldest($column = null)
+    {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        $this->query->oldest($column);
+
+        return $this;
+    }
+
+    /**
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
@@ -786,7 +820,7 @@ class Builder
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @return int
      */
@@ -801,7 +835,7 @@ class Builder
      * Decrement a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @return int
      */

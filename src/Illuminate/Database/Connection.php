@@ -1097,6 +1097,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Unset the event dispatcher for this connection.
+     *
+     * @return void
+     */
+    public function unsetEventDispatcher()
+    {
+        $this->events = null;
+    }
+
+    /**
      * Determine if the connection in a "dry run".
      *
      * @return bool

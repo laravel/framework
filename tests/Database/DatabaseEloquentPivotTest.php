@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentPivotTest extends TestCase
@@ -88,6 +89,14 @@ class DatabaseEloquentPivotTest extends TestCase
         $this->assertFalse($pivot->timestamps);
     }
 
+    public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
+        $parent->shouldReceive('getConnectionName')->andReturn('connection');
+        $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
+        $this->assertTrue($pivot->timestamps);
+    }
+
     public function testKeysCanBeSetProperly()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
@@ -118,6 +127,29 @@ class DatabaseEloquentPivotTest extends TestCase
         $pivot = new Pivot();
 
         $this->assertEquals('pivot', $pivot->getTable());
+    }
+
+    public function testPivotModelWithParentReturnsParentsTimestampColumns()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent->shouldReceive('getCreatedAtColumn')->andReturn('parent_created_at');
+        $parent->shouldReceive('getUpdatedAtColumn')->andReturn('parent_updated_at');
+
+        $pivotWithParent = new Pivot();
+        $pivotWithParent->pivotParent = $parent;
+
+        $this->assertEquals('parent_created_at', $pivotWithParent->getCreatedAtColumn());
+        $this->assertEquals('parent_updated_at', $pivotWithParent->getUpdatedAtColumn());
+    }
+
+    public function testPivotModelWithoutParentReturnsModelTimestampColumns()
+    {
+        $model = new DummyModel();
+
+        $pivotWithoutParent = new Pivot();
+
+        $this->assertEquals($model->getCreatedAtColumn(), $pivotWithoutParent->getCreatedAtColumn());
+        $this->assertEquals($model->getUpdatedAtColumn(), $pivotWithoutParent->getUpdatedAtColumn());
     }
 }
 
@@ -151,4 +183,8 @@ class DatabaseEloquentPivotTestJsonCastStub extends \Illuminate\Database\Eloquen
     protected $casts = [
         'foo' => 'json',
     ];
+}
+
+class DummyModel extends Model
+{
 }

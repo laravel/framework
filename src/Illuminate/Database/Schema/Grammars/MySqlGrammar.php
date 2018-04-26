@@ -114,9 +114,9 @@ class MySqlGrammar extends Grammar
         // added to either this create table blueprint or the configuration for this
         // connection that the query is targeting. We'll add it to this SQL query.
         if (isset($blueprint->collation)) {
-            $sql .= ' collate '.$blueprint->collation;
+            $sql .= " collate '{$blueprint->collation}'";
         } elseif (! is_null($collation = $connection->getConfig('collation'))) {
-            $sql .= ' collate '.$collation;
+            $sql .= " collate '{$collation}'";
         }
 
         return $sql;
@@ -862,7 +862,7 @@ class MySqlGrammar extends Grammar
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->collation)) {
-            return ' collate '.$column->collation;
+            return " collate '{$column->collation}'";
         }
     }
 

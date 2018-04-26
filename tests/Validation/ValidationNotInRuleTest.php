@@ -18,6 +18,10 @@ class ValidationNotInRuleTest extends TestCase
 
         $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);
 
+        $rule = Rule::notIn(collect([1, 2, 3, 4]));
+
+        $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);
+
         $rule = Rule::notIn('1', '2', '3', '4');
 
         $this->assertEquals('not_in:"1","2","3","4"', (string) $rule);

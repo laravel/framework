@@ -25,13 +25,15 @@ trait InteractsWithAuthentication
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  string|null  $driver
-     * @return void
+     * @return $this
      */
     public function be(UserContract $user, $driver = null)
     {
         $this->app['auth']->guard($driver)->setUser($user);
 
         $this->app['auth']->shouldUse($driver);
+
+        return $this;
     }
 
     /**
