@@ -2,4 +2,4 @@
 
 @section('title', 'Service Unavailable')
 
-@section('message', 'Be right back.')
+@section('message', $exception->getMessage() ?: 'Be right back.')
