@@ -1049,6 +1049,12 @@ class ContainerTest extends TestCase
         $injectableValue = 28;
 
         $container->when(ContainerPrimitiveInjectParent::class)
+            ->needs(stdClass::class)
+            ->give(function () {
+                return new stdClass();
+            });
+
+        $container->when(ContainerPrimitiveInjectParent::class)
             ->needs('$injectableValue')
             ->give($injectableValue);
 
@@ -1056,22 +1062,18 @@ class ContainerTest extends TestCase
         $parent = $container->make(ContainerPrimitiveInjectParent::class);
         $this->assertInstanceOf(ContainerPrimitiveInjectParent::class, $parent);
         $this->assertEquals($injectableValue, $parent->injectableValue);
-
-        /** @var ContainerPrimitiveInjectChild $child */
-        $child = $container->make(ContainerPrimitiveInjectChild::class);
-        $this->assertInstanceOf(ContainerPrimitiveInjectChild::class, $child);
-        $this->assertEquals($injectableValue, $child->injectableValue);
-
-        /** @var ContainerPrimitiveInjectGrandChild $child */
-        $child = $container->make(ContainerPrimitiveInjectGrandChild::class);
-        $this->assertInstanceOf(ContainerPrimitiveInjectGrandChild::class, $child);
-        $this->assertEquals($injectableValue, $child->injectableValue);
     }
 
     public function testContextBindPrimitiveIntoChild()
     {
         $container = new Container;
         $injectableValue = 28;
+
+        $container->when(ContainerPrimitiveInjectParent::class)
+            ->needs(stdClass::class)
+            ->give(function () {
+                return new stdClass();
+            });
 
         $container->when(ContainerPrimitiveInjectParent::class)
             ->needs('$injectableValue')
@@ -1089,6 +1091,12 @@ class ContainerTest extends TestCase
         $injectableValue = 28;
 
         $container->when(ContainerPrimitiveInjectParent::class)
+            ->needs(stdClass::class)
+            ->give(function () {
+                return new stdClass();
+            });
+
+        $container->when(ContainerPrimitiveInjectParent::class)
             ->needs('$injectableValue')
             ->give($injectableValue);
 
@@ -1103,7 +1111,7 @@ class ContainerPrimitiveInjectParent
 {
     public $injectableValue;
 
-    public function __construct(int $injectableValue)
+    public function __construct(stdClass $class, int $injectableValue)
     {
         $this->injectableValue = $injectableValue;
     }
