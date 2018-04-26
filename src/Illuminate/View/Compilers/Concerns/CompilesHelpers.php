@@ -46,4 +46,14 @@ trait CompilesHelpers
     {
         return "<?php echo method_field{$method}; ?>";
     }
+    
+    /**
+     * Compile the patch method statements into valid PHP.
+     *
+     * @return string
+     */
+    protected function compilePatch()
+    {
+        return "<?php echo method_field('patch'); ?>";
+    }
 }
