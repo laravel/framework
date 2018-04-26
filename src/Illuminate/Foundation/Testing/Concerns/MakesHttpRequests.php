@@ -158,26 +158,28 @@ trait MakesHttpRequests
      * Visit the given URI with a GET request.
      *
      * @param  string  $uri
+     * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    public function get($uri, array $headers = [])
+    public function get($uri, array $data = [], array $headers = [])
     {
         $server = $this->transformHeadersToServerVars($headers);
 
-        return $this->call('GET', $uri, [], [], [], $server);
+        return $this->call('GET', $uri, $data, [], [], $server);
     }
 
     /**
      * Visit the given URI with a GET request, expecting a JSON response.
      *
      * @param  string  $uri
+     * @param  array  $data
      * @param  array  $headers
      * @return \Illuminate\Foundation\Testing\TestResponse
      */
-    public function getJson($uri, array $headers = [])
+    public function getJson($uri, array $data = [], array $headers = [])
     {
-        return $this->json('GET', $uri, [], $headers);
+        return $this->json('GET', $uri, $data, $headers);
     }
 
     /**
