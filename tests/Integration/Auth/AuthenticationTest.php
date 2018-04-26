@@ -72,7 +72,7 @@ class AuthenticationTest extends TestCase
      */
     public function basic_auth_passes_on_correct_credentials()
     {
-        $response = $this->get('basic', [
+        $response = $this->get('basic', [], [
             'Authorization' => 'Basic '.base64_encode('email:password'),
         ]);
 
@@ -92,11 +92,11 @@ class AuthenticationTest extends TestCase
             'is_active' => false,
         ]);
 
-        $this->get('basicWithCondition', [
+        $this->get('basicWithCondition', [], [
             'Authorization' => 'Basic '.base64_encode('email2:password2'),
         ])->assertStatus(401);
 
-        $this->get('basicWithCondition', [
+        $this->get('basicWithCondition', [], [
             'Authorization' => 'Basic '.base64_encode('email:password'),
         ])->assertStatus(200);
     }
@@ -106,7 +106,7 @@ class AuthenticationTest extends TestCase
      */
     public function basic_auth_fails_on_wrong_credentials()
     {
-        $this->get('basic', [
+        $this->get('basic', [], [
             'Authorization' => 'Basic '.base64_encode('email:wrong_password'),
         ])->assertStatus(401);
     }
