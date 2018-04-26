@@ -106,7 +106,7 @@ trait ManagesTransactions
         if ($this->transactions == 0) {
             try {
                 $this->getPdo()->beginTransaction();
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 $this->handleBeginTransactionException($e);
             }
         } elseif ($this->transactions >= 1 && $this->queryGrammar->supportsSavepoints()) {
@@ -132,7 +132,7 @@ trait ManagesTransactions
      * @param  \Throwable  $e
      * @return void
      *
-     * @throws \Exception
+     * @throws \Throwable
      */
     protected function handleBeginTransactionException($e)
     {
