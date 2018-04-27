@@ -294,7 +294,10 @@ class Arr
         }
 
         foreach (explode('.', $key) as $segment) {
-            if (!static::accessible($array) || !static::exists($array, $segment)) {
+            if (
+            	!static::exists($array, $segment)
+	            || !static::accessible($array)
+            ) {
 	            return value($default);
             }
 
@@ -335,7 +338,10 @@ class Arr
             }
 
             foreach (explode('.', $key) as $segment) {
-                if (!static::accessible($subKeyArray) || !static::exists($subKeyArray, $segment)) {
+                if (
+                	!static::exists($subKeyArray, $segment)
+	                || !static::accessible($subKeyArray)
+                ) {
 	                return false;
                 }
 
