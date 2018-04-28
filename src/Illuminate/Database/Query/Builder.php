@@ -1078,10 +1078,10 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  string  $value
+     * @param  mixed $value
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereDate($column, $operator, $value)
+    public function orWhereDate($column, $operator, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() == 2
