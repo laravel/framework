@@ -46,16 +46,31 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
-    public function testBasicGenerationWithFormatting()
+    public function testBasicGenerationWithHostFormatting()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')
         );
 
-        /*
-         * Empty Named Route
-         */
+        $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
+        $routes->add($route);
+
+        $url->formatHostUsing(function ($host) {
+            return str_replace('foo.com', 'foo.org', $host);
+        });
+
+        $this->assertEquals('http://www.foo.org/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('/named-route', $url->route('plain', [], false));
+    }
+
+    public function testBasicGenerationWithPathFormatting()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
         $routes->add($route);
 
