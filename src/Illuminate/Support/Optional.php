@@ -42,24 +42,6 @@ class Optional implements ArrayAccess
     }
 
     /**
-     * Dynamically pass a method to the underlying object.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        if (static::hasMacro($method)) {
-            return $this->macroCall($method, $parameters);
-        }
-
-        if (is_object($this->value)) {
-            return $this->value->{$method}(...$parameters);
-        }
-    }
-
-    /**
      * Dynamically check a property exists on the underlying object.
      *
      * @param $name
@@ -124,6 +106,24 @@ class Optional implements ArrayAccess
     {
         if (Arr::accessible($this->value)) {
             unset($this->value[$key]);
+        }
+    }
+
+    /**
+     * Dynamically pass a method to the underlying object.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        if (static::hasMacro($method)) {
+            return $this->macroCall($method, $parameters);
+        }
+
+        if (is_object($this->value)) {
+            return $this->value->{$method}(...$parameters);
         }
     }
 }
