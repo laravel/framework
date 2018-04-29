@@ -333,6 +333,23 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('users.index', $this->getRoute()->getName());
     }
 
+    public function testCanSetCustomRouteAction()
+    {
+        $route = $this->router->action('foo', 123)->get('foo');
+
+        $this->assertEquals(123, $route->getAction('foo'));
+
+        $route = $this->router->action(['foo' => 456])->get('bar');
+
+        $this->assertEquals(456, $route->getAction('foo'));
+
+        $this->router->action('foo', 789)->group(function ($router) {
+            $router->get('baz');
+        });
+
+        $this->assertEquals(789, $this->getRoute()->getAction('foo'));
+    }
+
     /**
      * Get the last route registered with the router.
      *

@@ -741,6 +741,24 @@ class Route
     }
 
     /**
+     * Add property to the action array for the route.
+     *
+     * @param  array|string  $action
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function action($action, $value = null)
+    {
+        if (! is_array($action)) {
+            $action = [$action => $value];
+        }
+
+        $this->action = array_merge($this->action, $action);
+
+        return $this;
+    }
+
+    /**
      * Get all middleware, including the ones from the controller.
      *
      * @return array
