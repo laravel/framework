@@ -82,6 +82,24 @@ class RouteRegistrar
     }
 
     /**
+     * Add property to the action array for the route.
+     *
+     * @param  array|string  $action
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function action($action, $value = null)
+    {
+        if (! is_array($action)) {
+            $action = [$action => $value];
+        }
+
+        $this->attributes = array_merge($this->attributes, $action);
+
+        return $this;
+    }
+
+    /**
      * Route a resource to a controller.
      *
      * @param  string  $name

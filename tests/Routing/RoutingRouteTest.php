@@ -310,6 +310,33 @@ class RoutingRouteTest extends TestCase
         $this->assertNull($route->getAction('unknown_property'));
     }
 
+    public function testRouteAddActions()
+    {
+        $route = $this->getRouter()->get('plain')
+            ->name('plain')
+            ->action('foo', 1)
+            ->action(['bar' => 2, 'baz' => 3]);
+
+        $this->assertArraySubset(
+            ['as' => 'plain', 'foo' => 1, 'bar' => 2, 'baz' => 3], $route->getAction()
+        );
+    }
+
+    public function testRegisterRouteWithCustomActions()
+    {
+        $router = $this->getRouter();
+
+        $route = $router->get('foo/bar', ['foo' => 123]);
+        $this->assertEquals(123, $route->getAction('foo'));
+
+        $router->group(['foo' => 456], function () use ($router) {
+            $router->get('bar')->name('bar');
+        });
+
+        $route = last($router->getRoutes()->get());
+        $this->assertEquals(456, $route->getAction('foo'));
+    }
+
     public function testMacro()
     {
         $router = $this->getRouter();
