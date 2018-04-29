@@ -476,6 +476,26 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
+    public function testWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereNot(function ($query) {
+            $query->where('id', 1);
+        });
+        $this->assertEquals('select * from "users" where not("id" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    public function testOrWhereNot()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', 'foo')->orWhereNot(function ($query) {
+            $query->where('id', 1);
+        });
+        $this->assertEquals('select * from "users" where "email" = ? or not("id" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 1], $builder->getBindings());
+    }
+
     public function testWhereBetweens()
     {
         $builder = $this->getBuilder();
