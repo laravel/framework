@@ -135,7 +135,7 @@ class Blueprint
                 );
             }
 
-            if ($this->commandsNamed(['dropForeign'])->count() > 1) {
+            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
                 throw new BadMethodCallException(
                     "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
                 );
