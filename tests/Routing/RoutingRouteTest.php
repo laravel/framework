@@ -643,10 +643,12 @@ class RoutingRouteTest extends TestCase
             return str_replace('foo', 'bar', $path);
         });
 
-        $route = new Route('GET', 'foo/{id}', function () {});
+        $route = new Route('GET', 'foo/{id}', function () {
+        });
         $this->assertFalse($route->matches($request));
 
-        $route = new Route('GET', 'bar/{id}', function () {});
+        $route = new Route('GET', 'bar/{id}', function () {
+        });
         $this->assertTrue($route->matches($request));
         $route->bind($request);
         $this->assertEquals('123', $route->parameter('id'));
