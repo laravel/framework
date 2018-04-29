@@ -60,6 +60,25 @@ class Optional implements ArrayAccess
     }
 
     /**
+     * Dynamically check a property exists on the underlying object.
+     *
+     * @param $name
+     * @return bool
+     */
+    public function __isset($name)
+    {
+        if (is_object($this->value)) {
+            return isset($this->value->{$name});
+        }
+
+        if (is_array($this->value) || $this->value instanceof \ArrayObject) {
+            return isset($this->value[$name]);
+        }
+
+        return false;
+    }
+
+    /**
      * Determine if an item exists at an offset.
      *
      * @param  mixed  $key

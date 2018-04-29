@@ -28,6 +28,25 @@ class SupportOptionalTest extends TestCase
         $this->assertNull($optional->item);
     }
 
+    public function testIssetExistItemOnObject()
+    {
+        $targetObj = new \stdClass;
+        $targetObj->item = '';
+
+        $optional = new Optional($targetObj);
+
+        $this->assertTrue(isset($optional->item));
+    }
+
+    public function testIssetNotExistItemOnObject()
+    {
+        $targetObj = new \stdClass;
+
+        $optional = new Optional($targetObj);
+
+        $this->assertFalse(isset($optional->item));
+    }
+
     public function testGetExistItemOnArray()
     {
         $expected = 'test';
@@ -48,5 +67,25 @@ class SupportOptionalTest extends TestCase
         $optional = new Optional($targetObj);
 
         $this->assertNull($optional['item']);
+    }
+
+    public function testIssetExistItemOnArray()
+    {
+        $targetArr = [
+            'item' => '',
+        ];
+
+        $optional = new Optional($targetArr);
+
+        $this->assertTrue(isset($optional['item']));
+    }
+
+    public function testIssetNotExistItemOnArray()
+    {
+        $targetArr = [];
+
+        $optional = new Optional($targetArr);
+
+        $this->assertFalse(isset($optional['item']));
     }
 }
