@@ -59,12 +59,16 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
         $routes->add($route);
 
-        $url->formatPathUsing(function ($path) {
+        $url->formatPathUsing(function ($path, $route) {
+            if ($route) {
+                return '/something'.$path.'/'.$route->getName();
+            }
+
             return '/something'.$path;
         });
 
         $this->assertEquals('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('/something/named-route', $url->route('plain', [], false));
+        $this->assertEquals('/something/named-route/plain', $url->route('plain', [], false));
     }
 
     public function testBasicRouteGeneration()
