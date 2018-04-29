@@ -48,6 +48,13 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     protected $routeResolver;
 
     /**
+     * The callback to use to format routing path.
+     *
+     * @var \Closure
+     */
+    protected $formatPathForRouting;
+
+    /**
      * Create a new Illuminate HTTP request from server variables.
      *
      * @return static
@@ -148,6 +155,37 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function decodedPath()
     {
         return rawurldecode($this->path());
+    }
+
+    /**
+     * Get the current path info for routing.
+     *
+     * @return string
+     */
+    public function routingPath()
+    {
+        $path = $this->path();
+
+        if ($this->formatPathForRouting) {
+            $path = call_user_func($this->formatPathForRouting, $path);
+        }
+
+        $path = '/'.trim($path, '/');
+
+        return rawurldecode($path);
+    }
+
+    /**
+     * Set a callback to be used to format routing path.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function formatPathForRouting(Closure $callback)
+    {
+        $this->formatPathForRouting = $callback;
+
+        return $this;
     }
 
     /**
