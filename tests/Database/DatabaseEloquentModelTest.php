@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
+use Illuminate\Database\Eloquent\Castable;
+use InvalidArgumentException;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -1483,6 +1485,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
+        $model->customClassAttribute = json_encode(["test_value_1", "test_value_2"]);
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1503,6 +1506,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20', $model->dateAttribute->toDateString());
         $this->assertEquals('1969-07-20 22:56:00', $model->datetimeAttribute->toDateTimeString());
         $this->assertEquals(-14173440, $model->timestampAttribute);
+        $this->assertInstanceOf(CastableAttributeStub::class, $model->customClassAttribute);
 
         $arr = $model->toArray();
         $this->assertInternalType('int', $arr['intAttribute']);
@@ -1521,6 +1525,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('1969-07-20 00:00:00', $arr['dateAttribute']);
         $this->assertEquals('1969-07-20 22:56:00', $arr['datetimeAttribute']);
         $this->assertEquals(-14173440, $arr['timestampAttribute']);
+        $this->assertInstanceOf(CastableAttributeStub::class, $arr['customClassAttribute']);
     }
 
     public function testModelDateAttributeCastingResetsTime()
@@ -1734,6 +1739,25 @@ class DatabaseEloquentModelTest extends TestCase
         $resolver->shouldReceive('connection')->andReturn(m::mock('Illuminate\Database\Connection'));
         $model->getConnection()->shouldReceive('getQueryGrammar')->andReturn(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
         $model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
+    }
+}
+
+class CastableAttributeStub implements Castable {
+    protected $settings;
+
+    public function __construct($value)
+    {
+        $value = json_decode($value);
+        if ($value === false) {
+            throw new InvalidArgumentException("Invalid value");
+        }
+
+        $this->settings = $value;
+    }
+
+    public static function fromModelValue($value)
+    {
+        return new static($value);
     }
 }
 
@@ -2048,6 +2072,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'customClassAttribute' => CastableAttributeStub::class,
     ];
 
     public function jsonAttributeValue()

@@ -2,6 +2,8 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Database\Eloquent\Castable;
+use InvalidArgumentException;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -498,6 +500,8 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'custom_class':
+                return $this->asCustomClass($key, $value);
             default:
                 return $value;
         }
@@ -513,6 +517,11 @@ trait HasAttributes
     {
         if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
             return 'custom_datetime';
+        }
+
+        $castableClassName = $this->getCasts()[$key];
+        if (class_exists($castableClassName) && isset(class_implements($castableClassName)[Castable::class])) {
+            return 'custom_class';
         }
 
         return trim(strtolower($this->getCasts()[$key]));
@@ -557,6 +566,10 @@ trait HasAttributes
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
+        }
+
+        if ($this->isCustomClassCastable($key)) {
+            $value = $this->castAttributeAsCustomClass($key, $value);
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
@@ -657,6 +670,18 @@ trait HasAttributes
         }
 
         return $value;
+    }
+
+    /**
+     * Cast the given attribute to Castable.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function castAttributeAsCustomClass($key, $value)
+    {
+        return $this->asCustomClass($key, $value);
     }
 
     /**
@@ -775,6 +800,22 @@ trait HasAttributes
     }
 
     /**
+     * Return a Castable class from the attribute value.
+     *
+     * @param $key
+     * @param $value
+     * @return Castable
+     */
+    protected function asCustomClass($key, $value)
+    {
+        if ($value instanceof Castable) {
+            return $value;
+        }
+
+        return call_user_func_array([$this->getCasts()[$key], "fromModelValue"], [$value]);
+    }
+
+    /**
      * Prepare a date for array / JSON serialization.
      *
      * @param  \DateTimeInterface  $date
@@ -872,6 +913,17 @@ trait HasAttributes
     protected function isJsonCastable($key)
     {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+    }
+
+    /**
+     * Determine whether a value is custom class castable.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isCustomClassCastable($key)
+    {
+        return $this->hasCast($key, ['custom_class']);
     }
 
     /**
