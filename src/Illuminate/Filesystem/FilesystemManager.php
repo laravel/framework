@@ -337,7 +337,7 @@ class FilesystemManager implements FactoryContract
             unset($this->disks[$name]);
         }
     }
-    
+
     /**
      * Get the filesystem connection configuration.
      *
