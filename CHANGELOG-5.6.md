@@ -3,7 +3,20 @@
 ## [Unreleased]
 
 ### Added
+
+- Support passing `Response` and `Responsable` to `abort()` ([4e29889](https://github.com/laravel/framework/commit/4e298893c746734de7049cc69483ce252f6d93c8))
+
+
+## v5.6.19 (2018-04-30)
+
+### Added
 - Added support for custom SparkPost endpoint ([#23910](https://github.com/laravel/framework/pull/23910))
+- Added `Optional::__isset()` handling ([#24042](https://github.com/laravel/framework/pull/24042))
+- Added support for multiple cc, bcc and reply-to recipients on mail notifications ([#23760](https://github.com/laravel/framework/pull/23760))
+
+### Fixed
+- Accept only two arguments on `orWhereDate()` ([#24043](https://github.com/laravel/framework/pull/24043))
+- Fixed relative route URL generation when using custom host formatter ([#24051](https://github.com/laravel/framework/pull/24051))
 
 
 ## v5.6.18 (2018-04-26)
