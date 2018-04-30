@@ -143,7 +143,7 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('http://foo.com/foo/bar?name=graham', $request->fullUrlWithQuery(['name' => 'graham']));
 
         $request = Request::create('https://foo.com', 'GET');
-        $this->assertEquals('https://foo.com?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
+        $this->assertEquals('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
     }
 
     public function testIsMethod()
