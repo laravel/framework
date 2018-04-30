@@ -51,7 +51,7 @@ class PhpRedisConnector
     {
         return $server['host'].':'.$server['port'].'?'.http_build_query(Arr::only($server, [
             'database', 'password', 'prefix', 'read_timeout',
-        ]));
+        ]), null, '&', PHP_QUERY_RFC3986);
     }
 
     /**

@@ -124,8 +124,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $question = $this->getBaseUrl().$this->getPathInfo() == '/' ? '/?' : '?';
 
         return count($this->query()) > 0
-            ? $this->url().$question.http_build_query(array_merge($this->query(), $query))
-            : $this->fullUrl().$question.http_build_query($query);
+            ? $this->url().$question.http_build_query(array_merge($this->query(), $query), null, '&', PHP_QUERY_RFC3986)
+            : $this->fullUrl().$question.http_build_query($query, null, '&', PHP_QUERY_RFC3986);
     }
 
     /**
