@@ -92,7 +92,7 @@ if (! function_exists('action')) {
      * Generate the URL to a controller action.
      *
      * @param  string  $name
-     * @param  array   $parameters
+     * @param  mixed   $parameters
      * @param  bool    $absolute
      * @return string
      */
@@ -801,7 +801,7 @@ if (! function_exists('route')) {
      * Generate the URL to a named route.
      *
      * @param  array|string  $name
-     * @param  array  $parameters
+     * @param  mixed  $parameters
      * @param  bool  $absolute
      * @return string
      */
