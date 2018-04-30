@@ -811,7 +811,7 @@ trait HasAttributes
             return $value;
         }
 
-        return call_user_func_array([$this->getCasts()[$key], "fromModelValue"], [$value]);
+        return call_user_func_array([$this->getCasts()[$key], 'fromModelValue'], [$value]);
     }
 
     /**

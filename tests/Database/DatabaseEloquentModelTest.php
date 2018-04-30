@@ -1485,7 +1485,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = '1969-07-20';
         $model->datetimeAttribute = '1969-07-20 22:56:00';
         $model->timestampAttribute = '1969-07-20 22:56:00';
-        $model->customClassAttribute = json_encode(["test_value_1", "test_value_2"]);
+        $model->customClassAttribute = json_encode(['test_value_1', 'test_value_2']);
 
         $this->assertInternalType('int', $model->intAttribute);
         $this->assertInternalType('float', $model->floatAttribute);
@@ -1742,14 +1742,15 @@ class DatabaseEloquentModelTest extends TestCase
     }
 }
 
-class CastableAttributeStub implements Castable {
+class CastableAttributeStub implements Castable
+{
     protected $settings;
 
     public function __construct($value)
     {
         $value = json_decode($value);
         if ($value === false) {
-            throw new InvalidArgumentException("Invalid value");
+            throw new InvalidArgumentException('Invalid value');
         }
 
         $this->settings = $value;
