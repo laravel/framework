@@ -3,6 +3,7 @@
 namespace Illuminate\Http;
 
 use ArrayObject;
+use Illuminate\Contracts\Support\Responsable;
 use JsonSerializable;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
-class Response extends BaseResponse
+class Response extends BaseResponse implements Responsable
 {
     use ResponseTrait, Macroable {
         Macroable::__call as macroCall;
@@ -77,5 +78,16 @@ class Response extends BaseResponse
         }
 
         return json_encode($content);
+    }
+
+    /**
+     * Implement the Responsable interface by returning itself.
+     *
+     * @param  Request $request
+     * @return $this
+     */
+    public function toResponse($request)
+    {
+        return $this;
     }
 }
