@@ -83,6 +83,13 @@ class Container implements ArrayAccess, ContainerContract
     protected $buildStack = [];
 
     /**
+     * The stack of de-aliased abstractions currently being resolved.
+     *
+     * @var array
+     */
+    protected $resolveStack = [];
+
+    /**
      * The parameter override stack.
      *
      * @var array
@@ -624,6 +631,8 @@ class Container implements ArrayAccess, ContainerContract
     {
         $abstract = $this->getAlias($abstract);
 
+        $this->resolveStack[] = $abstract;
+
         $needsContextualBuild = ! empty($parameters) || ! is_null(
             $this->getContextualConcrete($abstract)
         );
@@ -632,6 +641,8 @@ class Container implements ArrayAccess, ContainerContract
         // just return an existing instance instead of instantiating new instances
         // so the developer can keep using the same objects instance every time.
         if (isset($this->instances[$abstract]) && ! $needsContextualBuild) {
+            array_pop($this->resolveStack);
+
             return $this->instances[$abstract];
         }
 
@@ -670,6 +681,7 @@ class Container implements ArrayAccess, ContainerContract
         $this->resolved[$abstract] = true;
 
         array_pop($this->with);
+        array_pop($this->resolveStack);
 
         return $object;
     }
@@ -1036,7 +1048,7 @@ class Container implements ArrayAccess, ContainerContract
         $results = [];
 
         foreach ($callbacksPerType as $type => $callbacks) {
-            if ($type === $abstract || $object instanceof $type) {
+            if (! $this->pendingInResolveStack($object) && ($type === $abstract || $object instanceof $type)) {
                 $results = array_merge($results, $callbacks);
             }
         }
@@ -1056,6 +1068,24 @@ class Container implements ArrayAccess, ContainerContract
         foreach ($callbacks as $callback) {
             $callback($object, $this);
         }
+    }
+
+    /**
+     * Check if object or a generalisation is pending in the resolve stack.
+     *
+     * @param   object    $object
+     *
+     * @return  bool
+     */
+    protected function pendingInResolveStack($object)
+    {
+        foreach ($this->resolveStack as $resolving) {
+            if ($resolving !== end($this->resolveStack) && $object instanceof $resolving) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
