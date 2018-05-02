@@ -16,7 +16,7 @@ class DownCommand extends Command
      */
     protected $signature = 'down {--message= : The message for the maintenance mode. }
                                  {--retry= : The number of seconds after which the request may be retried.}
-                                 {--allow=* : Ip or network allowed to use App in the maintenance mode.}';
+                                 {--allow=* : IP or networks allowed to access the application while in maintenance mode.}';
 
     /**
      * The console command description.
