@@ -326,6 +326,19 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Unset the given disks instances.
+     *
+     * @param  array  $names
+     * @return void
+     */
+    public function unset($names)
+    {
+        foreach ($names as $name) {
+            unset($this->disks[$name]);
+        }
+    }
+
+    /**
      * Get the filesystem connection configuration.
      *
      * @param  string  $name
