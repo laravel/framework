@@ -453,6 +453,13 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Dayle', $request->input('buddy'));
     }
 
+    public function testOffsetUnsetMethod()
+    {
+        $request = Request::create('/', 'HEAD', ['name' => 'Taylor']);
+        $request->offsetUnset('name');
+        $this->assertNull($request->input('name'));
+    }
+
     public function testHeaderMethod()
     {
         $request = Request::create('/', 'GET', [], [], [], ['HTTP_DO_THIS' => 'foo']);
