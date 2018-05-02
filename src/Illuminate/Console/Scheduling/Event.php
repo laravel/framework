@@ -472,6 +472,22 @@ class Event
     }
 
     /**
+     * Register a callback to ping a given URL after the job runs if condition is true.
+     *
+     * @param  bool    $condition
+     * @param  string  $url
+     * @return $this
+     */
+    public function thenPingIf(bool $condition, string $url)
+    {
+        if ($condition) {
+            return $this->thenPing($url);
+        }
+
+        return $this;
+    }
+
+    /**
      * State that the command should run in background.
      *
      * @return $this
