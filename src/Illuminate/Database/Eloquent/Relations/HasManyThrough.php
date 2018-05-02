@@ -408,6 +408,23 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Chunk the results of the query.
+     *
+     * @param  int      $count
+     * @param  callable $callback
+     *
+     * @return bool
+     */
+    public function chunk($count, callable $callback)
+    {
+        $this->query->addSelect($this->shouldSelect());
+
+        return $this->query->chunk($count, function ($results) use ($callback) {
+            return $callback($results);
+        });
+    }
+
+    /**
      * Set the select clause for the relation query.
      *
      * @param  array  $columns
