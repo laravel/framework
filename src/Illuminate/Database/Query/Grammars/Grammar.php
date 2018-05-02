@@ -334,6 +334,18 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a where not nested where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereNotNested(Builder $query, $where)
+    {
+        return 'not'.$this->whereNested($query, $where);
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

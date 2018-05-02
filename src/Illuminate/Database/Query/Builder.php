@@ -647,6 +647,18 @@ class Builder
     }
 
     /**
+     * Add a where not clause to the query.
+     *
+     * @param  Closure  $callback
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereNot(Closure $callback, $boolean = 'and')
+    {
+        return $this->whereNotNested($callback, $boolean);
+    }
+
+    /**
      * Add an array of where clauses to the query.
      *
      * @param  array  $column
@@ -730,6 +742,17 @@ class Builder
         );
 
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "or where not" clause to the query.
+     *
+     * @param  Closure  $callback
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNot(Closure $callback)
+    {
+        return $this->whereNot($callback, 'or');
     }
 
     /**
@@ -1266,6 +1289,20 @@ class Builder
     }
 
     /**
+     * Add a nested where not statement to the query.
+     *
+     * @param  \Closure $callback
+     * @param  string   $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotNested(Closure $callback, $boolean = 'and')
+    {
+        call_user_func($callback, $query = $this->forNestedWhere());
+
+        return $this->addNestedWhereNotQuery($query, $boolean);
+    }
+
+    /**
      * Create a new query instance for nested where condition.
      *
      * @return \Illuminate\Database\Query\Builder
@@ -1286,6 +1323,26 @@ class Builder
     {
         if (count($query->wheres)) {
             $type = 'Nested';
+
+            $this->wheres[] = compact('type', 'query', 'boolean');
+
+            $this->addBinding($query->getBindings(), 'where');
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add another query builder as a nested where not to the query builder.
+     *
+     * @param  \Illuminate\Database\Query\Builder|static $query
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function addNestedWhereNotQuery($query, $boolean = 'and')
+    {
+        if (count($query->wheres)) {
+            $type = 'NotNested';
 
             $this->wheres[] = compact('type', 'query', 'boolean');
 
