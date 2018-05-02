@@ -459,19 +459,15 @@ class Event
     }
 
     /**
-     * Register a callback to ping a given URL before the job runs if condition is true.
+     * Register a callback to ping a given URL before the job runs if the given condition is true.
      *
-     * @param  bool    $condition
+     * @param  bool  $value
      * @param  string  $url
      * @return $this
      */
-    public function pingBeforeIf(bool $condition, string $url)
+    public function pingBeforeIf($value, $url)
     {
-        if ($condition) {
-            return $this->pingBefore($url);
-        }
-
-        return $this;
+        return $value ? $this->pingBefore($url) : $this;
     }
 
     /**
@@ -488,19 +484,15 @@ class Event
     }
 
     /**
-     * Register a callback to ping a given URL after the job runs if condition is true.
+     * Register a callback to ping a given URL after the job runs if the given condition is true.
      *
-     * @param  bool    $condition
+     * @param  bool  $value
      * @param  string  $url
      * @return $this
      */
-    public function thenPingIf(bool $condition, string $url)
+    public function thenPingIf($value, $url)
     {
-        if ($condition) {
-            return $this->thenPing($url);
-        }
-
-        return $this;
+        return $value ? $this->thenPing($url) : $this;
     }
 
     /**
