@@ -459,6 +459,22 @@ class Event
     }
 
     /**
+     * Register a callback to ping a given URL before the job runs if condition is true.
+     *
+     * @param  bool    $condition
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingBeforeIf(bool $condition, string $url)
+    {
+        if ($condition) {
+            return $this->pingBefore($url);
+        }
+
+        return $this;
+    }
+
+    /**
      * Register a callback to ping a given URL after the job runs.
      *
      * @param  string  $url
