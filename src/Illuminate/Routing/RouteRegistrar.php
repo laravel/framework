@@ -7,6 +7,21 @@ use BadMethodCallException;
 use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
+/**
+ * @method \Illuminate\Routing\Route get(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route post(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route put(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route delete(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route patch(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route options(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
+ * @method \Illuminate\Routing\RouteRegistrar as(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar domain(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar middleware(array|string|null $middleware)
+ * @method \Illuminate\Routing\RouteRegistrar name(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar namespace(string $value)
+ * @method \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
+ */
 class RouteRegistrar
 {
     /**
