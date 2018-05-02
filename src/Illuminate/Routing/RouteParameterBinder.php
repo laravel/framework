@@ -57,7 +57,7 @@ class RouteParameterBinder
      */
     protected function bindPathParameters($request)
     {
-        preg_match($this->route->compiled->getRegex(), $request->routingPath(), $matches);
+        preg_match($this->route->compiled->getRegex(), $this->route->getRouter()->path(), $matches);
 
         return $this->matchToKeys(array_slice($matches, 1));
     }

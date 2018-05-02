@@ -109,6 +109,13 @@ class Router implements RegistrarContract, BindingRegistrar
     protected $groupStack = [];
 
     /**
+     * The callback to use to format paths.
+     *
+     * @var \Closure
+     */
+    protected $formatPathUsing;
+
+    /**
      * All of the verbs supported by the router.
      *
      * @var array
@@ -589,6 +596,37 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->currentRequest = $request;
 
         return $this->dispatchToRoute($request);
+    }
+
+    /**
+     * Get the current request path info for matching and binding a route.
+     *
+     * @return string
+     */
+    public function path()
+    {
+        $path = $this->currentRequest->path();
+
+        if ($this->formatPathUsing) {
+            $path = call_user_func($this->formatPathUsing, $path);
+        }
+
+        $path = '/'.trim($path, '/');
+
+        return rawurldecode($path);
+    }
+
+    /**
+     * Set a callback to be used to format the path before matching and binding a route.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function formatPathUsing(Closure $callback)
+    {
+        $this->formatPathUsing = $callback;
+
+        return $this;
     }
 
     /**

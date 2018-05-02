@@ -637,21 +637,21 @@ class RoutingRouteTest extends TestCase
 
     public function testMatchesUsingFormattedPath()
     {
-        $request = Request::create('foo/123', 'GET');
+        $router = $this->getRouter();
 
-        $request->formatPathForRouting(function ($path) {
+        $router->formatPathUsing(function ($path) {
             return str_replace('foo', 'bar', $path);
         });
 
-        $route = new Route('GET', 'foo/{id}', function () {
+        $router->get('foo/{param}', function () {
+            $this->fail();
         });
-        $this->assertFalse($route->matches($request));
 
-        $route = new Route('GET', 'bar/{id}', function () {
+        $router->get('bar/{param}', function ($param) {
+            return $param;
         });
-        $this->assertTrue($route->matches($request));
-        $route->bind($request);
-        $this->assertEquals('123', $route->parameter('id'));
+
+        $this->assertEquals('bar-123', $router->dispatch(Request::create('foo/bar-123', 'GET'))->getContent());
     }
 
     public function testWherePatternsProperlyFilter()

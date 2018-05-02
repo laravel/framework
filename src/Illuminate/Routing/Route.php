@@ -855,6 +855,16 @@ class Route
     }
 
     /**
+     * Get the router instance.
+     *
+     * @param  \Illuminate\Routing\Router
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
      * Set the container instance on the route.
      *
      * @param  \Illuminate\Container\Container  $container
