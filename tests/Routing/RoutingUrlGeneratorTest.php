@@ -68,7 +68,7 @@ class RoutingUrlGeneratorTest extends TestCase
     {
         $request = Request::create('http://www.foo.com/subfolder/foo/bar/subfolder/');
 
-        $request->server->set('SCRIPT_FILENAME', '/var/www/subfolder/index.php');
+        $request->server->set('SCRIPT_FILENAME', '/var/www/laravel-project/public/subfolder/index.php');
         $request->server->set('PHP_SELF', '/subfolder/index.php');
 
         $url = new UrlGenerator(
