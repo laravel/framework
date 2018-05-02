@@ -154,14 +154,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function median($key = null)
     {
-        $count = $this->count();
+        $values = (isset($key) ? $this->pluck($key) : $this)
+            ->filter(function ($item) {
+                return ! is_null($item);
+            })->sort()->values();
+
+        $count = $values->count();
 
         if ($count == 0) {
             return;
         }
-
-        $values = (isset($key) ? $this->pluck($key) : $this)
-                    ->sort()->values();
 
         $middle = (int) ($count / 2);
 

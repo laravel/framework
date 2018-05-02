@@ -2258,6 +2258,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(2, $collection->median('foo'));
     }
 
+    public function testMedianOnCollectionWithNull()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 1],
+            (object) ['foo' => 2],
+            (object) ['foo' => 4],
+            (object) ['foo' => null],
+        ]);
+        $this->assertEquals(2, $collection->median('foo'));
+    }
+
     public function testEvenMedianCollection()
     {
         $collection = new Collection([
