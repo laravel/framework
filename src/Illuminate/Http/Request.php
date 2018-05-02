@@ -340,7 +340,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json();
         }
 
-        return $this->getRealMethod() == 'GET' ? $this->query : $this->request;
+        return in_array($this->getRealMethod(), ['GET', 'HEAD']) ? $this->query : $this->request;
     }
 
     /**
@@ -358,8 +358,12 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $content = $request->content;
 
         $request = (new static)->duplicate(
-            $request->query->all(), $request->request->all(), $request->attributes->all(),
-            $request->cookies->all(), $request->files->all(), $request->server->all()
+            $request->query->all(),
+            $request->request->all(),
+            $request->attributes->all(),
+            $request->cookies->all(),
+            $request->files->all(),
+            $request->server->all()
         );
 
         $request->content = $content;
@@ -472,7 +476,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         return sha1(implode('|', array_merge(
-            $route->methods(), [$route->getDomain(), $route->uri(), $this->ip()]
+            $route->methods(),
+            [$route->getDomain(), $route->uri(), $this->ip()]
         )));
     }
 
@@ -558,7 +563,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     public function offsetExists($offset)
     {
         return array_key_exists(
-            $offset, $this->all() + $this->route()->parameters()
+            $offset,
+            $this->all() + $this->route()->parameters()
         );
     }
 
