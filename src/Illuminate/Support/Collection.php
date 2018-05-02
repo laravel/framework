@@ -123,13 +123,13 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function avg($callback = null)
     {
         $callback = $this->valueRetriever($callback);
-        
+
         $items = $this->map(function ($value) use ($callback) {
             return $callback($value);
         })->filter(function ($value) {
             return ! is_null($value);
         });
-        
+
         if ($count = $items->count()) {
             return $items->sum() / $count;
         }
