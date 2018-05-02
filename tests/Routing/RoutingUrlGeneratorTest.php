@@ -59,16 +59,34 @@ class RoutingUrlGeneratorTest extends TestCase
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
         $routes->add($route);
 
-        $url->formatPathUsing(function ($path, $route) {
-            if ($route) {
-                return '/something'.$path.'/'.$route->getName();
-            }
-
+        $url->formatPathUsing(function ($path) {
             return '/something'.$path;
         });
 
         $this->assertEquals('http://www.foo.com/something/foo/bar', $url->to('foo/bar'));
-        $this->assertEquals('/something/named-route/plain', $url->route('plain', [], false));
+        $this->assertEquals('/something/named-route', $url->route('plain', [], false));
+    }
+
+    public function testUrlFormattersShouldReceiveTargetRoute()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://abc.com/')
+        );
+
+        $namedRoute = new Route(['GET'], '/bar', ['as' => 'plain', 'root' => 'bar.com', 'path' => 'foo']);
+        $routes->add($namedRoute);
+
+        $url->formatHostUsing(function ($root, $route) {
+            return $route ? 'http://'.$route->getAction('root') : $root;
+        });
+
+        $url->formatPathUsing(function ($path, $route) {
+            return $route ? '/'.$route->getAction('path') : $path;
+        });
+
+        $this->assertEquals('http://abc.com/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('http://bar.com/foo', $url->route('plain'));
     }
 
     public function testBasicRouteGeneration()
