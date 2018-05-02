@@ -2098,6 +2098,13 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(15, $c->avg('foo'));
         $this->assertEquals(15, $c->avg->foo);
 
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20], (object) ['foo' => null]]);
+        $this->assertEquals(15, $c->avg(function ($item) {
+            return $item->foo;
+        }));
+        $this->assertEquals(15, $c->avg('foo'));
+        $this->assertEquals(15, $c->avg->foo);
+
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
         $this->assertEquals(15, $c->avg('foo'));
         $this->assertEquals(15, $c->avg->foo);
