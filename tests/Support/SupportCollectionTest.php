@@ -2407,6 +2407,42 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testSplitCollectionIntoThreeWithCountOfFour()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c'], ['d']],
+            $collection->split(3)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+            );
+    }
+
+    public function testSplitCollectionIntoThreeWithCountOfFive()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd', 'e']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c', 'd'], ['e']],
+            $collection->split(3)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+            );
+    }
+
+    public function testSplitCollectionIntoSixWithCountOfTen()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i'], ['j']],
+            $collection->split(6)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+            );
+    }
+
     public function testSplitEmptyCollection()
     {
         $collection = new Collection;

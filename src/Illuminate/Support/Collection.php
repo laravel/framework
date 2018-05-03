@@ -1396,9 +1396,25 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static;
         }
 
-        $groupSize = ceil($this->count() / $numberOfGroups);
+        $groups = new static();
 
-        return $this->chunk($groupSize);
+        $groupSize = floor($this->count() / $numberOfGroups);
+
+        $remain = $this->count() % $numberOfGroups;
+
+        $start = 0;
+        for ($i = 0; $i < $numberOfGroups; $i++) {
+            $size = $groupSize;
+            if ($i < $remain) {
+                $size++;
+            }
+            if ($size) {
+                $groups->push(new static(array_slice($this->items, $start, $size)));
+                $start += $size;
+            }
+        }
+
+        return $groups;
     }
 
     /**
