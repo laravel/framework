@@ -424,7 +424,7 @@ class HasManyThrough extends Relation
      */
     public function chunk($count, callable $callback)
     {
-        return $this->prepareQueryBuilder()->chunk($count,$callback);
+        return $this->prepareQueryBuilder()->chunk($count, $callback);
     }
 
     /**
