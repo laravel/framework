@@ -83,7 +83,8 @@ class RouteUrlGenerator
         // will need to throw the exception to let the developers know one was not given.
         $uri = $this->addQueryString($this->url->format(
             $root = $this->replaceRootParameters($route, $domain, $parameters),
-            $this->replaceRouteParameters($route->uri(), $parameters)
+            $this->replaceRouteParameters($route->uri(), $parameters),
+            $route
         ), $parameters);
 
         if (preg_match('/\{.*?\}/', $uri)) {

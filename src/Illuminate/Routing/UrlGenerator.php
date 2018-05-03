@@ -485,18 +485,19 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $root
      * @param  string  $path
+     * @param  \Illuminate\Routing\Route|null  $route
      * @return string
      */
-    public function format($root, $path)
+    public function format($root, $path, $route = null)
     {
         $path = '/'.trim($path, '/');
 
         if ($this->formatHostUsing) {
-            $root = call_user_func($this->formatHostUsing, $root);
+            $root = call_user_func($this->formatHostUsing, $root, $route);
         }
 
         if ($this->formatPathUsing) {
-            $path = call_user_func($this->formatPathUsing, $path);
+            $path = call_user_func($this->formatPathUsing, $path, $route);
         }
 
         return trim($root.$path, '/');
