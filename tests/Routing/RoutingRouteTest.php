@@ -23,6 +23,11 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
 {
+    protected function setUp()
+    {
+        Route::$requestPathFormatter = null;
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
