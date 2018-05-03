@@ -2381,6 +2381,15 @@ class SupportCollectionTest extends TestCase
                 return $chunk->values()->toArray();
             })->toArray()
         );
+
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        $this->assertEquals(
+            [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
     }
 
     public function testSplitCollectionWithAnUndivisableCount()
