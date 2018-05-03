@@ -245,36 +245,6 @@ class HasManyThrough extends Relation
 
         return $instance;
     }
-    /**
-     * Chunk the results of the query.
-     *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @return bool
-     */
-    public function chunk($count, callable $callback)
-    {
-        $builder = $this->getBuilder();
-        return $builder->chunk($count,$callback);
-    }
-
-    /**
-     * Execute a callback over each item while chunking.
-     *
-     * @param  callable  $callback
-     * @param  int  $count
-     * @return bool
-     */
-    public function each(callable $callback, $count = 1000)
-    {
-        return $this->chunk($count, function ($results) use ($callback) {
-            foreach ($results as $key => $value) {
-                if ($callback($value, $key) === false) {
-                    return false;
-                }
-            }
-        });
-    }
 
     /**
      * Execute the query and get the first related model.
@@ -384,7 +354,8 @@ class HasManyThrough extends Relation
      */
     public function get($columns = ['*'])
     {
-        $builder = $this->getBuilder($columns);
+        $builder = $this->prepareQueryBuilder($columns);
+
         $models = $builder->getModels();
 
         // If we actually found models we will also eager load any relationships that
@@ -442,6 +413,49 @@ class HasManyThrough extends Relation
         }
 
         return array_merge($columns, [$this->getQualifiedFirstKeyName()]);
+    }
+
+    /**
+     * Chunk the results of the query.
+     *
+     * @param  int  $count
+     * @param  callable  $callback
+     * @return bool
+     */
+    public function chunk($count, callable $callback)
+    {
+        return $this->prepareQueryBuilder()->chunk($count,$callback);
+    }
+
+    /**
+     * Execute a callback over each item while chunking.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @return bool
+     */
+    public function each(callable $callback, $count = 1000)
+    {
+        return $this->chunk($count, function ($results) use ($callback) {
+            foreach ($results as $key => $value) {
+                if ($callback($value, $key) === false) {
+                    return false;
+                }
+            }
+        });
+    }
+
+    /**
+     * Prepare the query builder for query execution.
+     *
+     * @param  array  $columns
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function prepareQueryBuilder($columns = ['*'])
+    {
+        return $this->query->applyScopes()->addSelect(
+            $this->shouldSelect($this->query->getQuery()->columns ? [] : $columns)
+        );
     }
 
     /**
@@ -538,23 +552,5 @@ class HasManyThrough extends Relation
     public function getQualifiedLocalKeyName()
     {
         return $this->farParent->qualifyColumn($this->localKey);
-    }
-
-    /**
-     * Add the proper select columns onto the query so it is run with the proper
-     * columns. and return a builder instance with the correct columns.
-     *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    private function getBuilder($columns = ['*']){
-
-        $columns = $this->query->getQuery()->columns ? [] : $columns;
-
-        $builder = $this->query->applyScopes();
-
-        return $builder->addSelect(
-            $this->shouldSelect($columns)
-        );
     }
 }
