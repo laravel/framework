@@ -58,7 +58,7 @@ class SupportCarbonTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\Support\Carbon::nonExistingStaticMacro does not exist.
+     * @expectedExceptionMessage nonExistingStaticMacro does not exist.
      */
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
@@ -67,7 +67,7 @@ class SupportCarbonTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method Illuminate\Support\Carbon::nonExistingMacro does not exist.
+     * @expectedExceptionMessage nonExistingMacro does not exist.
      */
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
