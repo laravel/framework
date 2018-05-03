@@ -3,6 +3,7 @@
 namespace Illuminate\Pagination;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
@@ -156,7 +157,7 @@ abstract class AbstractPaginator implements Htmlable
 
         return $this->path
                         .(Str::contains($this->path, '?') ? '&' : '?')
-                        .http_build_query($parameters, null, '&', PHP_QUERY_RFC3986)
+                        .Arr::query($parameters)
                         .$this->buildFragment();
     }
 

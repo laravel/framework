@@ -595,6 +595,17 @@ class Arr
     }
 
     /**
+     * Convert the array into a query string.
+     *
+     * @param  array  $array
+     * @return string
+     */
+    public static function query($array)
+    {
+        return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
+    }
+
+    /**
      * Filter the array using the given callback.
      *
      * @param  array  $array

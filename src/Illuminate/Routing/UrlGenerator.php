@@ -339,11 +339,8 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasValidSignature(Request $request)
     {
-        $original = rtrim($request->url().'?'.http_build_query(
-            Arr::except($request->query(), 'signature'),
-            null,
-            '&',
-            PHP_QUERY_RFC3986
+        $original = rtrim($request->url().'?'.Arr::query(
+            Arr::except($request->query(), 'signature')
         ), '?');
 
         $expires = Arr::get($request->query(), 'expires');

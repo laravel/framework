@@ -261,11 +261,8 @@ class RouteUrlGenerator
             return '';
         }
 
-        $query = http_build_query(
-            $keyed = $this->getStringParameters($parameters),
-            null,
-            '&',
-            PHP_QUERY_RFC3986
+        $query = Arr::query(
+            $keyed = $this->getStringParameters($parameters)
         );
 
         // Lastly, if there are still parameters remaining, we will fetch the numeric
