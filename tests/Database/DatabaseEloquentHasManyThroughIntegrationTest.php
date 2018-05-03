@@ -106,7 +106,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedDefaultData();
         $post = HasManyThroughDefaultTestCountry::first()->posts()->first();
 
-        HasManyThroughDefaultTestCountry::first()->posts()->where('posts_default.id', $post->id)->chunk(1, function ($posts) use ($post){
+        HasManyThroughDefaultTestCountry::first()->posts()->where('posts_default.id', $post->id)->chunk(1, function ($posts) use ($post) {
             $this->assertEquals($post, $posts->first());
         });
     }
