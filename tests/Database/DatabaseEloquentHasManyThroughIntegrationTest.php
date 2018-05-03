@@ -100,6 +100,17 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertCount(2, $posts);
     }
 
+    public function testModelsHydrationOnChunkMethod()
+    {
+        $this->migrateDefault();
+        $this->seedDefaultData();
+        $post = HasManyThroughDefaultTestCountry::first()->posts()->first();
+
+        HasManyThroughDefaultTestCountry::first()->posts()->where('posts_default.id', $post->id)->chunk(1, function ($posts) use ($post){
+            $this->assertEquals($post, $posts->first());
+        });
+    }
+
     public function testEagerLoadingARelationWithCustomIntermediateAndLocalKey()
     {
         $this->seedData();
@@ -145,6 +156,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFirstRetrievesFirstRecord()
     {
+        $this->migrateDefault();
         $this->seedData();
         $post = HasManyThroughTestCountry::first()->posts()->first();
 
