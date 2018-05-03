@@ -458,7 +458,7 @@ trait ValidatesAttributes
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        if (is_null($comparedToValue) && is_numeric($parameters[0])) {
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) > $parameters[0];
         }
 
@@ -481,7 +481,7 @@ trait ValidatesAttributes
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        if (is_null($comparedToValue) && is_numeric($parameters[0])) {
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) < $parameters[0];
         }
 
@@ -504,7 +504,7 @@ trait ValidatesAttributes
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        if (is_null($comparedToValue) && is_numeric($parameters[0])) {
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) >= $parameters[0];
         }
 
@@ -527,7 +527,7 @@ trait ValidatesAttributes
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        if (is_null($comparedToValue) && is_numeric($parameters[0])) {
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) <= $parameters[0];
         }
 
