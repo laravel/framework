@@ -30,7 +30,9 @@ class ThrottleRequestsWithRedisTest extends TestCase
     public function test_lock_opens_immediately_after_decay()
     {
         $this->ifRedisAvailable(function () {
-            Carbon::setTestNow(null);
+            $now = Carbon::now();
+
+            Carbon::setTestNow($now);
 
             resolve('redis')->flushAll();
 
@@ -49,7 +51,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
             $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 
             Carbon::setTestNow(
-                Carbon::now()->addSeconds(58)
+                $now->addSeconds(58)
             );
 
             try {
