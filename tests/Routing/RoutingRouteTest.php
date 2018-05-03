@@ -661,6 +661,25 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('Param: bar-123', $response->getContent());
     }
 
+    public function testClearCustomPathFormatter()
+    {
+        $router = $this->getRouter();
+
+        $router->formatRequestPathUsing(function () {
+            $this->fail('Should never be called.');
+        });
+
+        $router->get('foo', function () {
+            return 'bar';
+        });
+
+        $router->formatRequestPathUsing();
+
+        $response = $router->dispatch(Request::create('foo', 'GET'));
+
+        $this->assertEquals('bar', $response->getContent());
+    }
+
     public function testWherePatternsProperlyFilter()
     {
         $request = Request::create('foo/123', 'GET');

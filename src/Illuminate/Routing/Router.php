@@ -594,10 +594,10 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Set a callback to be used to format the request path when matching and binding a route.
      *
-     * @param  \Closure  $callback
+     * @param  \Closure|null  $callback
      * @return $this
      */
-    public function formatRequestPathUsing(Closure $callback)
+    public function formatRequestPathUsing(Closure $callback = null)
     {
         Route::$requestPathFormatter = $callback;
 
