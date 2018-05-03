@@ -639,7 +639,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
 
-        $router->formatPathUsing(function ($path) {
+        $router->formatRequestPathUsing(function ($path) {
             return str_replace('foo', 'bar', $path);
         });
 

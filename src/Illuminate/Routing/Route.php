@@ -120,6 +120,13 @@ class Route
     public static $validators;
 
     /**
+     * The callback used to format the request path when matching and binding a route.
+     *
+     * @var \Closure
+     */
+    public static $requestPathFormatter;
+
+    /**
      * Create a new Route instance.
      *
      * @param  array|string  $methods
@@ -271,6 +278,25 @@ class Route
         }
 
         return true;
+    }
+
+    /**
+     * Format path of given request for matching and binding a route.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string
+     */
+    public function getRequestPath(Request $request)
+    {
+        $path = $request->path();
+
+        if (static::$requestPathFormatter) {
+            $path = call_user_func(static::$requestPathFormatter, $path);
+        }
+
+        $path = '/'.trim($path, '/');
+
+        return rawurldecode($path);
     }
 
     /**
@@ -852,16 +878,6 @@ class Route
         $this->router = $router;
 
         return $this;
-    }
-
-    /**
-     * Get the router instance.
-     *
-     * @param  \Illuminate\Routing\Router
-     */
-    public function getRouter()
-    {
-        return $this->router;
     }
 
     /**
