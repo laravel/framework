@@ -38,6 +38,12 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $table->timestamps();
         });
 
+        Schema::create('post_approvals', function ($table) {
+            $table->integer('post_id');
+            $table->boolean('approved')->default(false);
+            $table->timestamps();
+        });
+
         Carbon::setTestNow(null);
     }
 
@@ -144,6 +150,27 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $this->assertEquals(1, CustomPivot::count());
         $this->assertEquals(1, CustomPivot::first()->post_id);
         $this->assertEquals(2, CustomPivot::first()->tag_id);
+    }
+
+    /**
+     * @test
+     */
+    public function addSelect_method()
+    {
+        $post = Post::create([ 'title' => str_random() ]);
+        $tag = Tag::create([ 'name' => str_random() ]);
+
+        DB::table('post_approvals')->insert([ 'post_id' => $post->id, 'approved' => true ]);
+
+        $post->tags()->attach($tag);
+
+        $tags = $post->tags()
+            ->join('post_approvals', 'post_approvals.post_id', '=', $post->id)
+            ->addSelect( 'post_approvals.approved')
+            ->get();
+
+        $this->assertEquals($tag->id, $tags->first()->id);
+        $this->assertEquals(true, $tags->first()->approved);
     }
 
     /**
