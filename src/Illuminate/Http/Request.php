@@ -340,7 +340,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $this->json();
         }
 
-        return $this->getRealMethod() == 'GET' ? $this->query : $this->request;
+        return in_array($this->getRealMethod(), ['GET', 'HEAD']) ? $this->query : $this->request;
     }
 
     /**

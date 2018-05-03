@@ -293,6 +293,25 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
     }
 
+    public function testDateBasedOrWheresAcceptsTwoArguments()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereDate('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or date(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereDay('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or day(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereMonth('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or month(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereyear('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or year(`created_at`) = ?', $builder->toSql());
+    }
+
     public function testDateBasedWheresExpressionIsNotBound()
     {
         $builder = $this->getBuilder();

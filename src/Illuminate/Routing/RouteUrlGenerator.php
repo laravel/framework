@@ -97,7 +97,13 @@ class RouteUrlGenerator
         $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
         if (! $absolute) {
-            return '/'.ltrim(str_replace($root, '', $uri), '/');
+            $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
+
+            if ($base = $this->request->getBasePath()) {
+                $uri = preg_replace('#^'.$base.'#i', '', $uri);
+            }
+
+            return '/'.ltrim($uri, '/');
         }
 
         return $uri;

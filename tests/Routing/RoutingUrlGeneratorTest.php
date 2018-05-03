@@ -46,16 +46,50 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('https://www.foo.com/foo/bar', $url->asset('foo/bar', true));
     }
 
-    public function testBasicGenerationWithFormatting()
+    public function testBasicGenerationWithHostFormatting()
     {
         $url = new UrlGenerator(
             $routes = new RouteCollection,
             $request = Request::create('http://www.foo.com/')
         );
 
-        /*
-         * Empty Named Route
-         */
+        $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
+        $routes->add($route);
+
+        $url->formatHostUsing(function ($host) {
+            return str_replace('foo.com', 'foo.org', $host);
+        });
+
+        $this->assertEquals('http://www.foo.org/foo/bar', $url->to('foo/bar'));
+        $this->assertEquals('/named-route', $url->route('plain', [], false));
+    }
+
+    public function testBasicGenerationWithRequestBasePath()
+    {
+        $request = Request::create('http://www.foo.com/subfolder/foo/bar/subfolder/');
+
+        $request->server->set('SCRIPT_FILENAME', '/var/www/laravel-project/public/subfolder/index.php');
+        $request->server->set('PHP_SELF', '/subfolder/index.php');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request
+        );
+
+        $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
+        $routes->add($route);
+
+        $this->assertEquals('/subfolder', $request->getBasePath());
+        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+    }
+
+    public function testBasicGenerationWithPathFormatting()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
         $route = new Route(['GET'], '/named-route', ['as' => 'plain']);
         $routes->add($route);
 

@@ -7,17 +7,56 @@ use Illuminate\Notifications\Messages\MailMessage;
 
 class NotificationMailMessageTest extends TestCase
 {
-    public function setUp()
-    {
-        $this->message = new MailMessage;
-    }
-
     public function testTemplate()
     {
-        $this->assertEquals('notifications::email', $this->message->markdown);
+        $message = new MailMessage;
 
-        $this->message->template('notifications::foo');
+        $this->assertEquals('notifications::email', $message->markdown);
 
-        $this->assertEquals('notifications::foo', $this->message->markdown);
+        $message->template('notifications::foo');
+
+        $this->assertEquals('notifications::foo', $message->markdown);
+    }
+
+    public function testCcIsSetCorrectly()
+    {
+        $message = new MailMessage;
+        $message->cc('test@example.com');
+
+        $this->assertSame([['test@example.com', null]], $message->cc);
+
+        $message = new MailMessage;
+        $message->cc('test@example.com')
+                ->cc('test@example.com', 'Test');
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->cc);
+    }
+
+    public function testBccIsSetCorrectly()
+    {
+        $message = new MailMessage;
+        $message->bcc('test@example.com');
+
+        $this->assertSame([['test@example.com', null]], $message->bcc);
+
+        $message = new MailMessage;
+        $message->bcc('test@example.com')
+                ->bcc('test@example.com', 'Test');
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->bcc);
+    }
+
+    public function testReplyToIsSetCorrectly()
+    {
+        $message = new MailMessage;
+        $message->replyTo('test@example.com');
+
+        $this->assertSame([['test@example.com', null]], $message->replyTo);
+
+        $message = new MailMessage;
+        $message->replyTo('test@example.com')
+                ->replyTo('test@example.com', 'Test');
+
+        $this->assertSame([['test@example.com', null], ['test@example.com', 'Test']], $message->replyTo);
     }
 }

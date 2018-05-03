@@ -1,5 +1,46 @@
 # Release Notes for 5.6.x
 
+## [Unreleased]
+
+### Added
+
+- Support passing `Response` and `Responsable` to `abort()` ([4e29889](https://github.com/laravel/framework/commit/4e298893c746734de7049cc69483ce252f6d93c8))
+
+
+## v5.6.19 (2018-04-30)
+
+### Added
+- Added support for custom SparkPost endpoint ([#23910](https://github.com/laravel/framework/pull/23910))
+- Added `Optional::__isset()` handling ([#24042](https://github.com/laravel/framework/pull/24042))
+- Added support for multiple cc, bcc and reply-to recipients on mail notifications ([#23760](https://github.com/laravel/framework/pull/23760))
+
+### Fixed
+- Accept only two arguments on `orWhereDate()` ([#24043](https://github.com/laravel/framework/pull/24043))
+- Fixed relative route URL generation when using custom host formatter ([#24051](https://github.com/laravel/framework/pull/24051))
+
+
+## v5.6.18 (2018-04-26)
+
+### Added
+- Added support for MySQL 8 ([#23948](https://github.com/laravel/framework/pull/23948))
+- Added support for custom filesystem drivers URLs ([#23964](https://github.com/laravel/framework/pull/23964))
+- Added more PostgreSQL operators ([#23945](https://github.com/laravel/framework/pull/23945))
+- Added support for JSONP callback when broadcasting using Pusher ([#24018](https://github.com/laravel/framework/pull/24018), [b9ab427](https://github.com/laravel/framework/commit/b9ab4272192d079539c32787d66a35a31a7815ce))
+
+### Changed
+- Support chaining using `$this->be()` helper ([#23919](https://github.com/laravel/framework/pull/23919))
+- Improved pagination accessibility ([#23962](https://github.com/laravel/framework/pull/23962))
+- Changed response code of `ValidationException` in `ThrottlesLogins` to `429` ([#24002](https://github.com/laravel/framework/pull/24002))
+- Throw exception if called command doesn't exist ([#23942](https://github.com/laravel/framework/pull/23942))
+- Made notification email translatable ([#23903](https://github.com/laravel/framework/pull/23903))
+
+### Fixed
+- Fixed saving timestamp columns on pivots without parent ([#23917](https://github.com/laravel/framework/pull/23917))
+- Quote collation names in MySQL migrations ([#23989](https://github.com/laravel/framework/pull/23989))
+- Fixed sending plain-text only emails ([#23981](https://github.com/laravel/framework/pull/23981))
+- Fixed counting the number of jobs on `Queue::fake()` ([#23933](https://github.com/laravel/framework/pull/23933))
+
+
 ## v5.6.17 (2018-04-17)
 
 ### Added
