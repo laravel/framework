@@ -64,7 +64,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/named-route', $url->route('plain', [], false));
     }
 
-    public function testBasicGenerationWithRequestBaseUrl()
+    public function testBasicGenerationWithRequestBaseUrlWithSubfolder()
     {
         $request = Request::create('http://www.foo.com/subfolder/foo/bar/subfolder/');
 
@@ -83,7 +83,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
     }
 
-    public function testBasicGenerationWithRequestBaseUrlWithFileSuffix()
+    public function testBasicGenerationWithRequestBaseUrlWithSubfolderAndFileSuffix()
     {
         $request = Request::create('http://www.foo.com/subfolder/index.php');
 
@@ -100,6 +100,26 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $this->assertEquals('/subfolder', $request->getBasePath());
         $this->assertEquals('/subfolder/index.php', $request->getBaseUrl());
+        $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
+    }
+
+    public function testBasicGenerationWithRequestBaseUrlWithFileSuffix()
+    {
+        $request = Request::create('http://www.foo.com/other.php');
+
+        $request->server->set('SCRIPT_FILENAME', '/var/www/laravel-project/public/other.php');
+        $request->server->set('PHP_SELF', '/other.php');
+
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request
+        );
+
+        $route = new Route(['GET'], 'foo/bar/subfolder', ['as' => 'foobar']);
+        $routes->add($route);
+
+        $this->assertEquals('', $request->getBasePath());
+        $this->assertEquals('/other.php', $request->getBaseUrl());
         $this->assertEquals('/foo/bar/subfolder', $url->route('foobar', [], false));
     }
 
