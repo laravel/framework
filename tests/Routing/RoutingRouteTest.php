@@ -644,14 +644,16 @@ class RoutingRouteTest extends TestCase
         });
 
         $router->get('foo/{param}', function () {
-            $this->fail();
+            $this->fail('Matched wrong route.');
         });
 
         $router->get('bar/{param}', function ($param) {
-            return $param;
+            return 'Param: '.$param;
         });
 
-        $this->assertEquals('bar-123', $router->dispatch(Request::create('foo/bar-123', 'GET'))->getContent());
+        $response = $router->dispatch(Request::create('foo/bar-123', 'GET'));
+
+        $this->assertEquals('Param: bar-123', $response->getContent());
     }
 
     public function testWherePatternsProperlyFilter()
