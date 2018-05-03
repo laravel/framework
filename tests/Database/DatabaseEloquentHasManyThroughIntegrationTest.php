@@ -156,7 +156,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
     public function testFirstRetrievesFirstRecord()
     {
-        $this->migrateDefault();
         $this->seedData();
         $post = HasManyThroughTestCountry::first()->posts()->first();
 
