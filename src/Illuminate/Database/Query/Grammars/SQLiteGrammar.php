@@ -138,9 +138,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function dateBasedWhere($type, Builder $query, $where)
     {
-        $value = str_pad($where['value'], 2, '0', STR_PAD_LEFT);
-
-        $value = $this->parameter($value);
+        $value = $this->parameter($where['value']);
 
         return "strftime('{$type}', {$this->wrap($where['column'])}) {$where['operator']} {$value}";
     }

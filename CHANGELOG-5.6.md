@@ -3,8 +3,24 @@
 ## [Unreleased]
 
 ### Added
+- Added `FilesystemManager::forgetDisk()` method ([#24057](https://github.com/laravel/framework/pull/24057), [cbfb4fb](https://github.com/laravel/framework/commit/cbfb4fbf0784ac5eb08ce2effe8727f3428d5812))
+- Added `--allow` parameter to `down` command ([#24003](https://github.com/laravel/framework/pull/24003))
+- Added more comparison validation rules (`gt`, `lt`, `gte`, `lte`) ([#24091](https://github.com/laravel/framework/pull/24091))
 
+### Fixed
+- Fixed unsetting request parameters during `HEAD` requests ([#24092](https://github.com/laravel/framework/pull/24092))
+- Fixed `HasManyThrough` returning incorrect results with `chunk()` ([#24096](https://github.com/laravel/framework/pull/24096), [5d3d98a](https://github.com/laravel/framework/commit/5d3d98a8c620458b9c1f80fbcefa1d88f9490784))
+
+
+## v5.6.20 (2018-05-02)
+
+### Added
 - Support passing `Response` and `Responsable` to `abort()` ([4e29889](https://github.com/laravel/framework/commit/4e298893c746734de7049cc69483ce252f6d93c8))
+- Added `pingBeforeIf` and `thenPingIf` methods to task scheduler ([#24077](https://github.com/laravel/framework/pull/24077), [1bf54d2](https://github.com/laravel/framework/commit/1bf54d23b5d2207d7c60a549584c774f9ff8386b))
+- Added `withDefault()` support to `MorphTo` relationships ([#24061](https://github.com/laravel/framework/pull/24061))
+
+### Fixed
+- Fixed URL generator when request has base path ([#24074](https://github.com/laravel/framework/pull/24074))
 
 
 ## v5.6.19 (2018-04-30)

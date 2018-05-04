@@ -156,7 +156,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     {
         $this->seedData();
         $post = HasManyThroughTestCountry::first()->posts()->first();
-
         $this->assertEquals([
             'id',
             'user_id',
@@ -179,6 +178,45 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             'body',
             'country_id',
         ], array_keys($post->getAttributes()));
+    }
+
+    public function testChunkReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $country->posts()->chunk(10, function ($postsChunk) {
+            $post = $postsChunk->first();
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'country_id', ], array_keys($post->getAttributes()));
+        });
+    }
+
+    public function testEachReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $country->posts()->each(function ($post) {
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'country_id', ], array_keys($post->getAttributes()));
+        });
     }
 
     public function testIntermediateSoftDeletesAreIgnored()
@@ -212,6 +250,26 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                                  ->posts()->createMany([
                 ['title' => 'A title', 'body' => 'A body', 'email' => 'taylorotwell@gmail.com'],
                 ['title' => 'Another title', 'body' => 'Another body', 'email' => 'taylorotwell@gmail.com'],
+            ]);
+    }
+
+    protected function seedDataExtended()
+    {
+        $country = HasManyThroughTestCountry::create(['id' => 2, 'name' => 'United Kingdom', 'shortname' => 'uk']);
+        $country->users()->create(['id' => 2, 'email' => 'example1@gmail.com', 'country_short' => 'uk'])
+            ->posts()->createMany([
+                ['title' => 'Example1 title1', 'body' => 'Example1 body1', 'email' => 'example1post1@gmail.com'],
+                ['title' => 'Example1 title2', 'body' => 'Example1 body2', 'email' => 'example1post2@gmail.com'],
+            ]);
+        $country->users()->create(['id' => 3, 'email' => 'example2@gmail.com', 'country_short' => 'uk'])
+            ->posts()->createMany([
+                ['title' => 'Example2 title1', 'body' => 'Example2 body1', 'email' => 'example2post1@gmail.com'],
+                ['title' => 'Example2 title2', 'body' => 'Example2 body2', 'email' => 'example2post2@gmail.com'],
+            ]);
+        $country->users()->create(['id' => 4, 'email' => 'example3@gmail.com', 'country_short' => 'uk'])
+            ->posts()->createMany([
+                ['title' => 'Example3 title1', 'body' => 'Example3 body1', 'email' => 'example3post1@gmail.com'],
+                ['title' => 'Example3 title2', 'body' => 'Example3 body2', 'email' => 'example3post2@gmail.com'],
             ]);
     }
 
