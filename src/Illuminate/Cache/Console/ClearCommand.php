@@ -72,7 +72,7 @@ class ClearCommand extends Command
             'cache:cleared', [$this->argument('store'), $this->tags()]
         );
 
-        $this->info('Cache cleared successfully.');
+        $this->info('Application cache cleared!');
     }
 
     /**
