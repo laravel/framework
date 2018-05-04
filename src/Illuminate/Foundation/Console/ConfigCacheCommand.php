@@ -43,6 +43,29 @@ class ConfigCacheCommand extends Command
     }
 
     /**
+     * Serialize the records.
+     *
+     * @param  array $data
+     * @return array
+     */
+    public static function transformClosure(array $data)
+    {
+        $serializer = new \SuperClosure\Serializer;
+
+        foreach ($data as $key => $val) {
+            if (is_array($val)) {
+                $data[$key] = static::transformClosure($val);
+            }
+
+            if ($val instanceof \Closure) {
+                $data[$key] = $serializer->serialize($val);
+            }
+        }
+
+        return $data;
+    }
+
+    /**
      * Execute the console command.
      *
      * @return void
@@ -51,7 +74,7 @@ class ConfigCacheCommand extends Command
     {
         $this->call('config:clear');
 
-        $config = $this->getFreshConfiguration();
+        $config = static::transformClosure($this->getFreshConfiguration());
 
         $this->files->put(
             $this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL

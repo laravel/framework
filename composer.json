@@ -21,6 +21,7 @@
         "doctrine/inflector": "^1.1",
         "dragonmantank/cron-expression": "^2.0",
         "erusev/parsedown": "^1.7",
+        "jeremeamia/superclosure": "^2.4",
         "league/flysystem": "^1.0.8",
         "monolog/monolog": "^1.12",
         "nesbot/carbon": "^1.26.3",
