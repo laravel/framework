@@ -38,6 +38,24 @@ class Repository implements ArrayAccess, ConfigContract
     }
 
     /**
+     * Value analyzer and changer.
+     *
+     * @param  mixed $value
+     * @return mixed
+     */
+    public function realValue($value)
+    {
+        if (
+            is_string($value) &&
+            strpos($value, '"SuperClosure\\SerializableClosure"') !== false
+        ) {
+            return (new \SuperClosure\Serializer())->unserialize($value);
+        }
+
+        return $value;
+    }
+
+    /**
      * Get the specified configuration value.
      *
      * @param  array|string  $key
@@ -50,7 +68,7 @@ class Repository implements ArrayAccess, ConfigContract
             return $this->getMany($key);
         }
 
-        return Arr::get($this->items, $key, $default);
+        return $this->realValue(Arr::get($this->items, $key, $default));
     }
 
     /**
@@ -68,7 +86,7 @@ class Repository implements ArrayAccess, ConfigContract
                 list($key, $default) = [$default, null];
             }
 
-            $config[$key] = Arr::get($this->items, $key, $default);
+            $config[$key] = $this->realValue(Arr::get($this->items, $key, $default));
         }
 
         return $config;

@@ -35,6 +35,17 @@ class RepositoryTest extends TestCase
             'x' => [
                 'z' => 'zoo',
             ],
+            'callback_array' => function () {
+                return [
+                    'name' => 'John Doe',
+                ];
+            },
+            'callback_instance' => function () {
+                $std = new \stdClass();
+                $std->name = 'Jane Doe';
+
+                return $std;
+            },
         ]);
 
         parent::setUp();
@@ -58,6 +69,24 @@ class RepositoryTest extends TestCase
     public function testGet()
     {
         $this->assertSame('bar', $this->repository->get('foo'));
+    }
+
+    public function testCallbackArray()
+    {
+        $data = call_user_func(
+            $this->repository->get('callback_array')
+        );
+
+        $this->assertEquals($data['name'], 'John Doe');
+    }
+
+    public function testCallbackInstance()
+    {
+        $data = call_user_func(
+            $this->repository->get('callback_instance')
+        );
+
+        $this->assertEquals($data->name, 'Jane Doe');
     }
 
     public function testGetWithArrayOfKeys()
