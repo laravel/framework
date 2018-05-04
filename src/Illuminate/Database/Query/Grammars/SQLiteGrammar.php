@@ -140,7 +140,7 @@ class SQLiteGrammar extends Grammar
     {
         $value = $this->parameter($where['value']);
 
-        return "strftime('{$type}', {$this->wrap($where['column'])}) {$where['operator']} {$value}";
+        return "strftime('{$type}', {$this->wrap($where['column'])}) {$where['operator']} cast({$value} as text)";
     }
 
     /**
