@@ -75,14 +75,23 @@ class StatusCommand extends BaseCommand
      */
     protected function getStatusFor(array $ran, array $batches)
     {
-        return Collection::make($this->getAllMigrationFiles())
-                    ->map(function ($migration) use ($ran, $batches) {
-                        $migrationName = $this->migrator->getMigrationName($migration);
+        $migrations = [];
 
-                        return in_array($migrationName, $ran)
-                                ? ['<info>Y</info>', $migrationName, $batches[$migrationName]]
-                                : ['<fg=red>N</fg=red>', $migrationName];
-                    });
+        foreach ($batches as $migration => $batch) {
+            $migrations[] = ['<info>Y</info>', $migration, $batch];
+        }
+
+        // Diff to find ones that aren't ran
+        $diff = Collection::make($this->getAllMigrationFiles())
+            ->map(function ($migration) {
+                return $this->migrator->getMigrationName($migration);
+            })->diff($ran);
+
+        foreach ($diff as $migrationName) {
+            $migrations[] = ['<fg=red>N</fg=red>', $migrationName];
+        }
+
+        return Collection::make($migrations);
     }
 
     /**
