@@ -86,14 +86,11 @@ class StatusCommand extends BaseCommand
                 return $this->migrator->getMigrationName($migration);
             })
             ->diff($ran)
-            ->map(function($migrationName) {
+            ->map(function ($migrationName) {
                 return ['<fg=red>N</fg=red>', $migrationName];
             });
 
-        $migrations->merge($diff);
-
-        return $migrations;
-        //return Collection::make($migrations);
+        return $migrations->merge($diff);
     }
 
     /**
