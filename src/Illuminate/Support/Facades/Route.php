@@ -21,7 +21,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\RouteRegistrar domain(string $value)
  * @method static \Illuminate\Routing\RouteRegistrar name(string $value)
  * @method static \Illuminate\Routing\RouteRegistrar namespace(string $value)
- * @method static \Illuminate\Routing\Router group(array $attributes, \Closure|string $routes)
+ * @method static \Illuminate\Routing\Router|\Illuminate\Routing\RouteRegistrar group(array|\Closure|string $attributes, \Closure|string $routes)
  * @method static \Illuminate\Routing\Route redirect(string $uri, string $destination, int $status = 301)
  * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [])
  * @method static void bind(string $key, string|callable $binder)
