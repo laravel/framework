@@ -76,7 +76,7 @@ class StatusCommand extends BaseCommand
     protected function getStatusFor(array $ran, array $batches)
     {
         $migrations = Collection::make($batches)
-            ->map(function ($migration, $batch) {
+            ->map(function ($batch, $migration) {
                 return ['<info>Y</info>', $migration, $batch];
             });
 
