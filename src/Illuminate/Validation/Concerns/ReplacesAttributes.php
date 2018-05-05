@@ -259,7 +259,7 @@ trait ReplacesAttributes
      */
     protected function replaceGreaterThan($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
@@ -273,7 +273,7 @@ trait ReplacesAttributes
      */
     protected function replaceLessThan($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
@@ -287,7 +287,7 @@ trait ReplacesAttributes
      */
     protected function replaceGreaterThanOrEqual($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
@@ -301,7 +301,7 @@ trait ReplacesAttributes
      */
     protected function replaceLessThanOrEqual($message, $attribute, $rule, $parameters)
     {
-        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
