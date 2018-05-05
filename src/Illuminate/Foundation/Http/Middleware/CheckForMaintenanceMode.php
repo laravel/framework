@@ -41,7 +41,9 @@ class CheckForMaintenanceMode
         if ($this->app->isDownForMaintenance()) {
             $data = json_decode(file_get_contents($this->app->storagePath().'/framework/down'), true);
 
-            if (isset($data['allowed']) && IpUtils::checkIp($request->ip(), (array) $data['allowed'])) {
+            $allowedIP = $this->getAllowedIPAddress($data);
+
+            if (! empty($allowedIP) && IpUtils::checkIp($request->ip(), $allowedIP)) {
                 return $next($request);
             }
 
@@ -49,5 +51,31 @@ class CheckForMaintenanceMode
         }
 
         return $next($request);
+    }
+
+    /**
+     * Get list of allowed IP addresses.
+     *
+     * @param array $data
+     *
+     * @return array
+     */
+    protected function getAllowedIPAddress($data)
+    {
+        if (empty($data['allowed'])) {
+            return [];
+        }
+
+        $pattern = '/[,|\n]/';
+
+        if (is_file($data['allowed']) && file_exists($data['allowed'])) {
+            $data['allowed'] = preg_split($pattern, file_get_contents($data['allowed']));
+        } elseif (preg_match($pattern, $data['allowed'])) {
+            $data['allowed'] = preg_split($pattern, $data['allowed']);
+        } else {
+            $data['allowed'] = (array) $data['allowed'];
+        }
+
+        return $data['allowed'];
     }
 }
