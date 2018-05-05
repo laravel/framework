@@ -55,8 +55,6 @@ class MailServiceProvider extends ServiceProvider
     protected function registerIlluminateMailer()
     {
         $this->app->bind('mailer', function ($app, $parameters) {
-            $config = $app->make('config')->get('mail');
-
             // Once we have create the mailer instance, we will set a container instance
             // on the mailer. This allows us to resolve mailer classes via containers
             // for maximum testability on said classes instead of passing Closures.
@@ -72,7 +70,7 @@ class MailServiceProvider extends ServiceProvider
             // for easy unification of all "from" addresses as well as easy debugging
             // of sent messages since they get be sent into a single email address.
             foreach (['from', 'reply_to', 'to'] as $type) {
-                $this->setGlobalAddress($mailer, $config, $type);
+                $this->setGlobalAddress($mailer, $parameters['config'], $type);
             }
 
             return $mailer;
@@ -89,7 +87,7 @@ class MailServiceProvider extends ServiceProvider
      */
     protected function setGlobalAddress($mailer, array $config, $type)
     {
-        $address = Arr::get($config, $type);
+        $address = Arr::get($config, $type, $this->app->make('config')->get('mail.'.$type));
 
         if (is_array($address) && isset($address['address'])) {
             $mailer->{'always'.Str::studly($type)}($address['address'], $address['name']);
