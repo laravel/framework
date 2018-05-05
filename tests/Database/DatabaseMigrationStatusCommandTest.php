@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Database\Migrations\Migrator;
-use Illuminate\Database\Console\Migrations\StatusCommand;
-use Symfony\Component\Console\Application as ConsoleApplication;
 use Symfony\Component\Console\Tester\CommandTester;
+use Illuminate\Database\Console\Migrations\StatusCommand;
+use Illuminate\Database\Migrations\MigrationRepositoryInterface;
+use Symfony\Component\Console\Application as ConsoleApplication;
 
 class DatabaseMigrationStatusCommandTest extends TestCase
 {
@@ -20,7 +20,6 @@ class DatabaseMigrationStatusCommandTest extends TestCase
 
     public function testStatusCommandOutputsMigrationsInCorrectOrder()
     {
-
         $expected = <<<'TABLE'
 +------+------------------------------------------------+-------+
 | Ran? | Migration                                      | Batch |
@@ -56,23 +55,23 @@ TABLE;
         $migrator->expects($this->once())
             ->method('paths')
             ->willReturn([
-                __DIR__ . '/migrations/one',
-                __DIR__ . '/migrations/two',
+                __DIR__.'/migrations/one',
+                __DIR__.'/migrations/two',
             ]);
 
         $migrator->method('getMigrationName')
             ->will($this->returnValueMap([
-                [__DIR__ . '/migrations/one/2016_01_01_000000_create_users_table.php', '2016_01_01_000000_create_users_table'],
-                [__DIR__ . '/migrations/one/2016_01_01_100000_create_password_resets_table.php', '2016_01_01_100000_create_password_resets_table'],
-                [__DIR__ . '/migrations/two/2016_01_01_200000_create_flights_table.php', '2016_01_01_200000_create_flights_table'],
+                [__DIR__.'/migrations/one/2016_01_01_000000_create_users_table.php', '2016_01_01_000000_create_users_table'],
+                [__DIR__.'/migrations/one/2016_01_01_100000_create_password_resets_table.php', '2016_01_01_100000_create_password_resets_table'],
+                [__DIR__.'/migrations/two/2016_01_01_200000_create_flights_table.php', '2016_01_01_200000_create_flights_table'],
             ]));
 
         $migrator->expects($this->once())
             ->method('getMigrationFiles')
             ->will($this->returnValue([
-                '2016_01_01_000000_create_users_table' => __DIR__ . '/migrations/one/2016_01_01_000000_create_users_table.php',
-                '2016_01_01_100000_create_password_resets_table' => __DIR__ . '/migrations/one/2016_01_01_100000_create_password_resets_table.php',
-                '2016_01_01_200000_create_flights_table' => __DIR__ . '/migrations/two/2016_01_01_200000_create_flights_table.php',
+                '2016_01_01_000000_create_users_table' => __DIR__.'/migrations/one/2016_01_01_000000_create_users_table.php',
+                '2016_01_01_100000_create_password_resets_table' => __DIR__.'/migrations/one/2016_01_01_100000_create_password_resets_table.php',
+                '2016_01_01_200000_create_flights_table' => __DIR__.'/migrations/two/2016_01_01_200000_create_flights_table.php',
             ]));
 
         $migrator->expects($this->once())
