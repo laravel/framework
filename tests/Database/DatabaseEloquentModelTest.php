@@ -1607,6 +1607,23 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getAttributes();
     }
 
+    public function testModelAttributesCanUseCustomCasts()
+    {
+        EloquentModelCastingStub::extendCasts('foo', function ($value) {
+            return $value[0];
+        }, function ($value) {
+            return [$value, 'foo'];
+        });
+
+        $model = new EloquentModelCastingStub;
+        $model->fooAttribute = 'some_value';
+
+        $this->assertEquals('some_value', $model->fooAttribute);
+
+        $attributes = $model->getAttributes();
+        $this->assertEquals(['some_value', 'foo'], $attributes['fooAttribute']);
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
@@ -2048,6 +2065,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'fooAttribute' => 'foo',
     ];
 
     public function jsonAttributeValue()

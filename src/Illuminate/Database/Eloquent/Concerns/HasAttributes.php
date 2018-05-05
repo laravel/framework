@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Closure;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -69,6 +70,13 @@ trait HasAttributes
      * @var bool
      */
     public static $snakeAttributes = true;
+
+    /**
+     * The registered custom casts.
+     *
+     * @var array
+     */
+    protected static $customCasts = [];
 
     /**
      * The cache of the mutated attributes for each class.
@@ -471,7 +479,7 @@ trait HasAttributes
             return $value;
         }
 
-        switch ($this->getCastType($key)) {
+        switch ($cast = $this->getCastType($key)) {
             case 'int':
             case 'integer':
                 return (int) $value;
@@ -498,9 +506,13 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
-            default:
-                return $value;
         }
+
+        if ($this->isCustomCast($cast, 'as')) {
+            return $this->customCastValue($cast, $value, 'as');
+        }
+
+        return $value;
     }
 
     /**
@@ -564,6 +576,10 @@ trait HasAttributes
         // attribute in the array's value in the case of deeply nested items.
         if (Str::contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
+        }
+
+        if ($this->isCustomCast($cast = $this->getCastType($key), 'from')) {
+            $value = $this->customCastValue($cast, $value, 'from');
         }
 
         $this->attributes[$key] = $value;
@@ -775,6 +791,21 @@ trait HasAttributes
     }
 
     /**
+     * Custom cast an attribute to a chosen PHP value.
+     *
+     * @param  string  $cast
+     * @param  mixed  $value
+     * @param  string $direction
+     * @return mixed
+     */
+    protected function customCastValue($cast, $value, $direction)
+    {
+        $callback = static::$customCasts[$cast][$direction];
+
+        return $callback->call($this, $value);
+    }
+
+    /**
      * Prepare a date for array / JSON serialization.
      *
      * @param  \DateTimeInterface  $date
@@ -850,6 +881,37 @@ trait HasAttributes
         }
 
         return $this->casts;
+    }
+
+    /**
+     * Register a custom cast Closure.
+     *
+     * @param  string    $cast
+     * @param  \Closure  $as
+     * @param  \Closure|null  $from
+     * @return void
+     */
+    public static function extendCasts($cast, Closure $as = null, Closure $from = null)
+    {
+        if (! is_null($as)) {
+            static::$customCasts[$cast]['as'] = $as;
+        }
+
+        if (! is_null($from)) {
+            static::$customCasts[$cast]['from'] = $from;
+        }
+    }
+
+    /**
+     * Determine whether a cast name is a custom cast for the given direction.
+     *
+     * @param  string  $cast
+     * @param  string  $direction
+     * @return bool
+     */
+    protected function isCustomCast($cast, $direction)
+    {
+        return Arr::has(static::$customCasts, $cast.'.'.$direction);
     }
 
     /**
