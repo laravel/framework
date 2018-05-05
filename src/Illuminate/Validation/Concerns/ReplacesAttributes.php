@@ -249,6 +249,62 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the greater_than rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceGreaterThan($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+    }
+
+    /**
+     * Replace all place-holders for the less_than rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceLessThan($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+    }
+
+    /**
+     * Replace all place-holders for the greater_than_or_equal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceGreaterThanOrEqual($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+    }
+
+    /**
+     * Replace all place-holders for the less_than_or_equal rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceLessThanOrEqual($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $parameters[0]), $message);
+    }
+
+    /**
      * Replace all place-holders for the required_if rule.
      *
      * @param  string  $message
