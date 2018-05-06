@@ -249,7 +249,7 @@ trait ReplacesAttributes
     }
 
     /**
-     * Replace all place-holders for the greater_than rule.
+     * Replace all place-holders for the gt rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -257,13 +257,13 @@ trait ReplacesAttributes
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceGreaterThan($message, $attribute, $rule, $parameters)
+    protected function replaceGt($message, $attribute, $rule, $parameters)
     {
         return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
-     * Replace all place-holders for the less_than rule.
+     * Replace all place-holders for the lt rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -271,13 +271,13 @@ trait ReplacesAttributes
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceLessThan($message, $attribute, $rule, $parameters)
+    protected function replaceLt($message, $attribute, $rule, $parameters)
     {
         return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
-     * Replace all place-holders for the greater_than_or_equal rule.
+     * Replace all place-holders for the gte rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -285,13 +285,13 @@ trait ReplacesAttributes
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceGreaterThanOrEqual($message, $attribute, $rule, $parameters)
+    protected function replaceGte($message, $attribute, $rule, $parameters)
     {
         return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }
 
     /**
-     * Replace all place-holders for the less_than_or_equal rule.
+     * Replace all place-holders for the lte rule.
      *
      * @param  string  $message
      * @param  string  $attribute
@@ -299,7 +299,7 @@ trait ReplacesAttributes
      * @param  array   $parameters
      * @return string
      */
-    protected function replaceLessThanOrEqual($message, $attribute, $rule, $parameters)
+    protected function replaceLte($message, $attribute, $rule, $parameters)
     {
         return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
     }

@@ -834,13 +834,13 @@ trait ValidatesAttributes
      * @param  array   $parameters
      * @return bool
      */
-    public function validateGreaterThan($attribute, $value, $parameters)
+    public function validateGt($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'greater_than');
+        $this->requireParameterCount(1, $parameters, 'gt');
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        $this->shouldBeNumeric($attribute, 'GreaterThan');
+        $this->shouldBeNumeric($attribute, 'Gt');
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) > $parameters[0];
@@ -859,13 +859,13 @@ trait ValidatesAttributes
      * @param  array   $parameters
      * @return bool
      */
-    public function validateLessThan($attribute, $value, $parameters)
+    public function validateLt($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'less_than');
+        $this->requireParameterCount(1, $parameters, 'lt');
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        $this->shouldBeNumeric($attribute, 'LessThan');
+        $this->shouldBeNumeric($attribute, 'Lt');
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) < $parameters[0];
@@ -884,13 +884,13 @@ trait ValidatesAttributes
      * @param  array   $parameters
      * @return bool
      */
-    public function validateGreaterThanOrEqual($attribute, $value, $parameters)
+    public function validateGte($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'greater_than_or_equal');
+        $this->requireParameterCount(1, $parameters, 'gte');
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        $this->shouldBeNumeric($attribute, 'GreaterThanOrEqual');
+        $this->shouldBeNumeric($attribute, 'Gte');
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) >= $parameters[0];
@@ -909,13 +909,13 @@ trait ValidatesAttributes
      * @param  array   $parameters
      * @return bool
      */
-    public function validateLessThanOrEqual($attribute, $value, $parameters)
+    public function validateLte($attribute, $value, $parameters)
     {
-        $this->requireParameterCount(1, $parameters, 'less_than_or_equal');
+        $this->requireParameterCount(1, $parameters, 'lte');
 
         $comparedToValue = $this->getValue($parameters[0]);
 
-        $this->shouldBeNumeric($attribute, 'LessThanOrEqual');
+        $this->shouldBeNumeric($attribute, 'Lte');
 
         if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
             return $this->getSize($attribute, $value) <= $parameters[0];
