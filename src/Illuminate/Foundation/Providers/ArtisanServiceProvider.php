@@ -7,6 +7,7 @@ use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\AuthMakeCommand;
 use Illuminate\Foundation\Console\UpCommand;
 use Illuminate\Foundation\Console\DownCommand;
+use Illuminate\Foundation\Console\ListCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
@@ -138,6 +139,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ExceptionMake' => 'command.exception.make',
         'FactoryMake' => 'command.factory.make',
         'JobMake' => 'command.job.make',
+        'List' => 'command.list',
         'ListenerMake' => 'command.listener.make',
         'MailMake' => 'command.mail.make',
         'MiddlewareMake' => 'command.middleware.make',
@@ -431,10 +433,10 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    protected function registerListenerMakeCommand()
+    protected function registerListCommand()
     {
-        $this->app->singleton('command.listener.make', function ($app) {
-            return new ListenerMakeCommand($app['files']);
+        $this->app->singleton('command.list', function () {
+            return new ListCommand();
         });
     }
 
@@ -443,6 +445,13 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerListenerMakeCommand()
+    {
+        $this->app->singleton('command.listener.make', function ($app) {
+            return new ListenerMakeCommand($app['files']);
+        });
+    }
+
     protected function registerMailMakeCommand()
     {
         $this->app->singleton('command.mail.make', function ($app) {
