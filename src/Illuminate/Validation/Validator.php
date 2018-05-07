@@ -419,6 +419,30 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Get the nested attribute name.
+     *
+     * For example, if "accounts.0.users.1" is given, "accounts.0.users.*" will be returned.
+     *
+     * @param  string  $attribute
+     * @return string
+     */
+    public function getNestedAttribute($attribute)
+    {
+        $keys = $this->getExplicitKeys($attribute);
+
+        if (count($keys) === 1) {
+            return $this->getPrimaryAttribute($attribute);
+        }
+
+        // remove the last result in array
+        array_pop($keys);
+
+        $matches = array_fill(0, count($keys), '/\*/');
+
+        return preg_replace($matches, $keys, $this->getPrimaryAttribute($attribute), 1);
+    }
+
+    /**
      * Replace each field parameter which has asterisks with the given keys.
      *
      * @param  array  $parameters
