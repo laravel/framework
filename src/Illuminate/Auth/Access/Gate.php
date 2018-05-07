@@ -296,9 +296,7 @@ class Gate implements GateContract
      */
     protected function raw($ability, $arguments = [])
     {
-        if (! $user = $this->resolveUser()) {
-            return false;
-        }
+        $user = $this->resolveUser();
 
         $arguments = Arr::wrap($arguments);
 
