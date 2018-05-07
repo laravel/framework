@@ -3,7 +3,11 @@
 namespace Illuminate\Contracts\Foundation;
 
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Foundation\Application as App;
 
+/**
+ * @mixin App
+ */
 interface Application extends Container
 {
     /**
