@@ -23,6 +23,11 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
 {
+    protected function setUp()
+    {
+        Route::$requestPathFormatter = null;
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
@@ -633,6 +638,46 @@ class RoutingRouteTest extends TestCase
         $route = new Route('GET', 'foo/{bar}', ['baz' => true, function () {
         }]);
         $this->assertTrue($route->matches($request));
+    }
+
+    public function testMatchesUsingFormattedPath()
+    {
+        $router = $this->getRouter();
+
+        $router->formatRequestPathUsing(function ($path) {
+            return str_replace('foo', 'bar', $path);
+        });
+
+        $router->get('foo/{param}', function () {
+            $this->fail('Matched wrong route.');
+        });
+
+        $router->get('bar/{param}', function ($param) {
+            return 'Param: '.$param;
+        });
+
+        $response = $router->dispatch(Request::create('foo/bar-123', 'GET'));
+
+        $this->assertEquals('Param: bar-123', $response->getContent());
+    }
+
+    public function testClearCustomPathFormatter()
+    {
+        $router = $this->getRouter();
+
+        $router->formatRequestPathUsing(function () {
+            $this->fail('Should never be called.');
+        });
+
+        $router->get('foo', function () {
+            return 'bar';
+        });
+
+        $router->formatRequestPathUsing();
+
+        $response = $router->dispatch(Request::create('foo', 'GET'));
+
+        $this->assertEquals('bar', $response->getContent());
     }
 
     public function testWherePatternsProperlyFilter()
