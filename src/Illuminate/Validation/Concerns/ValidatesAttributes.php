@@ -563,6 +563,10 @@ trait ValidatesAttributes
     {
         $attributeName = $this->getPrimaryAttribute($attribute);
 
+        if (in_array('strict', $parameters)) {
+            $attributeName = $this->getNestedAttribute($attribute);
+        }
+
         $attributeData = ValidationData::extractDataFromPath(
             ValidationData::getLeadingExplicitAttributePath($attributeName), $this->data
         );
