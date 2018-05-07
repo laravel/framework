@@ -99,7 +99,7 @@ class RouteUrlGenerator
         if (! $absolute) {
             $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
 
-            if ($base = $this->request->getBasePath()) {
+            if ($base = $this->request->getBaseUrl()) {
                 $uri = preg_replace('#^'.$base.'#i', '', $uri);
             }
 

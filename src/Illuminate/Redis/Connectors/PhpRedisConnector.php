@@ -11,7 +11,7 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 class PhpRedisConnector
 {
     /**
-     * Create a new clustered Predis connection.
+     * Create a new clustered PhpRedis connection.
      *
      * @param  array  $config
      * @param  array  $options
@@ -25,7 +25,7 @@ class PhpRedisConnector
     }
 
     /**
-     * Create a new clustered Predis connection.
+     * Create a new clustered PhpRedis connection.
      *
      * @param  array  $config
      * @param  array  $clusterOptions

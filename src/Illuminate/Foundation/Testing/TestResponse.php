@@ -243,6 +243,29 @@ class TestResponse
     }
 
     /**
+     * Asserts that the response contains the given cookie and is not expired.
+     *
+     * @param  string  $cookieName
+     * @return $this
+     */
+    public function assertCookieNotExpired($cookieName)
+    {
+        PHPUnit::assertNotNull(
+            $cookie = $this->getCookie($cookieName),
+            "Cookie [{$cookieName}] not present on response."
+        );
+
+        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+
+        PHPUnit::assertTrue(
+            $expiresAt->greaterThan(Carbon::now()),
+            "Cookie [{$cookieName}] is expired, it expired at [{$expiresAt}]."
+        );
+
+        return $this;
+    }
+
+    /**
      * Asserts that the response does not contains the given cookie.
      *
      * @param  string  $cookieName

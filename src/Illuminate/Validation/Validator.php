@@ -182,7 +182,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $numericRules = ['Numeric', 'Integer', 'Gt', 'Lt', 'Gte', 'Lte'];
+    protected $numericRules = ['Numeric', 'Integer'];
 
     /**
      * Create a new Validator instance.
