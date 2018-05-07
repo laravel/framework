@@ -89,7 +89,7 @@ class ListCommand extends BaseListCommand
 
             foreach ($commands as $command) {
                 $this->output->write(sprintf(
-                    "  <fg=green>%s</>%s%s",
+                    '  <fg=green>%s</>%s%s',
                     $command->getName(),
                     str_repeat(' ', $width - mb_strlen($command->getName()) + 1),
                     $command->getDescription()
