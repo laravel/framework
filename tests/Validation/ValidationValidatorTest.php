@@ -1063,7 +1063,7 @@ class ValidationValidatorTest extends TestCase
     public function testGreaterThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 10], ['lhs' => 'gt:rhs']);
+        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 10], ['lhs' => 'numeric|gt:rhs']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gt:rhs']);
@@ -1079,14 +1079,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'gt:rhs']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'gt:10']);
+        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gt:10']);
         $this->assertTrue($v->passes());
     }
 
     public function testLessThan()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 10], ['lhs' => 'lt:rhs']);
+        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 10], ['lhs' => 'numeric|lt:rhs']);
         $this->assertTrue($v->fails());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lt:rhs']);
@@ -1102,14 +1102,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'lt:rhs']);
         $this->assertTrue($v->fails());
 
-        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'lt:10']);
+        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lt:10']);
         $this->assertTrue($v->fails());
     }
 
     public function testGreaterThanOrEqual()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 15], ['lhs' => 'gte:rhs']);
+        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 15], ['lhs' => 'numeric|gte:rhs']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'gte:rhs']);
@@ -1125,14 +1125,14 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'gte:rhs']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'gte:15']);
+        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|gte:15']);
         $this->assertTrue($v->passes());
     }
 
     public function testLessThanOrEqual()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 15], ['lhs' => 'lte:rhs']);
+        $v = new Validator($trans, ['lhs' => 15, 'rhs' => 15], ['lhs' => 'numeric|lte:rhs']);
         $this->assertTrue($v->passes());
 
         $v = new Validator($trans, ['lhs' => 'longer string', 'rhs' => 'string'], ['lhs' => 'lte:rhs']);
@@ -1148,7 +1148,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['lhs' => $fileOne, 'rhs' => $fileTwo], ['lhs' => 'lte:rhs']);
         $this->assertTrue($v->passes());
 
-        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'lte:10']);
+        $v = new Validator($trans, ['lhs' => 15], ['lhs' => 'numeric|lte:10']);
         $this->assertTrue($v->fails());
     }
 
