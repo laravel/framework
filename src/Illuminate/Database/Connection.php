@@ -569,13 +569,13 @@ class Connection implements ConnectionInterface
      */
     public function beginTransaction()
     {
-        ++$this->transactions;
+        $this->transactions++;
 
         if ($this->transactions == 1) {
             try {
                 $this->getPdo()->beginTransaction();
             } catch (Exception $e) {
-                --$this->transactions;
+                $this->transactions--;
 
                 throw $e;
             }
