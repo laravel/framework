@@ -60,7 +60,7 @@ class ScheduleRunCommand extends Command
 
             $event->run($this->laravel);
 
-            ++$eventsRan;
+            $eventsRan++;
         }
 
         if (count($events) === 0 || $eventsRan === 0) {
