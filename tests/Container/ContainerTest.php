@@ -950,6 +950,13 @@ class ContainerTest extends TestCase
         $this->assertEquals([1, 2, 3], $container->make('foo', [1, 2, 3]));
     }
 
+    public function testResolvingWithArrayOfUnnamedParameters()
+    {
+        $container = new Container;
+        $instance = $container->make(ContainerConstructorParameterLoggingStub::class, ['adam', 'taylor']);
+        $this->assertEquals(['adam', 'taylor'], $instance->receivedParameters);
+    }
+
     public function testResolvingWithUsingAnInterface()
     {
         $container = new Container;
