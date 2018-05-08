@@ -4,7 +4,7 @@ namespace Illuminate\Redis\Connections;
 
 use Redis;
 use Closure;
-use Illuminate\Contracts\Redis\Connections\Connection as ConnectionContract;
+use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 
 /**
  * @mixin \Redis
