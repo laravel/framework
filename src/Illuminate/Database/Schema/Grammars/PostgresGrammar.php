@@ -311,6 +311,21 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile a rename index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  \Illuminate\Support\Fluent $command
+     * @return string
+     */
+    public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter index %s rename to %s',
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
+    }
+
+    /**
      * Compile the command to enable foreign key constraints.
      *
      * @return string

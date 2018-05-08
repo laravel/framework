@@ -68,4 +68,54 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
     }
+
+    public function testRenameIndexWorks()
+    {
+        $this->db->connection()->getSchemaBuilder()->create('users', function ($table) {
+            $table->string('name');
+            $table->string('age');
+        });
+
+        $this->db->connection()->getSchemaBuilder()->table('users', function ($table) {
+            $table->index(['name'], 'index1');
+        });
+
+        $blueprint = new Blueprint('users', function ($table) {
+            $table->renameIndex('index1', 'index2');
+        });
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar);
+
+        $expected = [
+            'DROP INDEX index1',
+            'CREATE INDEX index2 ON users (name)',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SqlServerGrammar());
+
+        $expected = [
+            'sp_rename N\'"users"."index1"\', "index2", N\'INDEX\'',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\MySqlGrammar());
+
+        $expected = [
+            'alter table `users` rename index `index1` to `index2`',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\PostgresGrammar());
+
+        $expected = [
+            'alter index "index1" rename to "index2"',
+        ];
+
+        $this->assertEquals($expected, $queries);
+
+    }
 }

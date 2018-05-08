@@ -279,6 +279,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('rename table `users` to `foo`', $statements[0]);
     }
 
+    public function testRenameIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` rename index `foo` to `bar`', $statements[0]);
+    }
+
     public function testAddingPrimaryKey()
     {
         $blueprint = new Blueprint('users');

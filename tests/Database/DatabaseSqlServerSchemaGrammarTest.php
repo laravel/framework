@@ -204,6 +204,16 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $this->assertEquals('sp_rename "users", "foo"', $statements[0]);
     }
 
+    public function testRenameIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('sp_rename N\'"users"."foo"\', "bar", N\'INDEX\'', $statements[0]);
+    }
+
     public function testAddingPrimaryKey()
     {
         $blueprint = new Blueprint('users');
