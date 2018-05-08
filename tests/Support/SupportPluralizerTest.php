@@ -39,4 +39,11 @@ class SupportPluralizerTest extends TestCase
         $this->assertEquals('IndexFields', Str::plural('IndexField'));
         $this->assertEquals('VertexFields', Str::plural('VertexField'));
     }
+
+    public function testSingularIfPluralCountIsOne()
+    {
+        $this->assertEquals('child', Str::plural('children', 1));
+        $this->assertEquals('biscuit', Str::plural('biscuits', 1));
+        $this->assertEquals('accessory', Str::plural('accessories', 1));
+    }
 }
