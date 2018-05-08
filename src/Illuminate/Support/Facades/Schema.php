@@ -7,6 +7,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Database\Schema\Builder drop(string $table)
  * @method static \Illuminate\Database\Schema\Builder dropIfExists(string $table)
  * @method static \Illuminate\Database\Schema\Builder table(string $table, \Closure $callback)
+ * @method static void defaultStringLength(int $length)
  *
  * @see \Illuminate\Database\Schema\Builder
  */
