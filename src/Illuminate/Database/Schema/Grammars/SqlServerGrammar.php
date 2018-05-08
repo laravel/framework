@@ -287,7 +287,7 @@ class SqlServerGrammar extends Grammar
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
     {
         return sprintf("sp_rename N'%s', %s, N'INDEX'",
-            $this->wrap($blueprint->getTable() . '.' . $command->from),
+            $this->wrap($blueprint->getTable().'.'.$command->from),
             $this->wrap($command->to)
         );
     }

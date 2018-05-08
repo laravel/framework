@@ -116,6 +116,5 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
         ];
 
         $this->assertEquals($expected, $queries);
-
     }
 }
