@@ -29,4 +29,17 @@ class RouteViewTest extends TestCase
         $this->assertContains('Test bar', $this->get('/route/value1/value2')->getContent());
         $this->assertContains('Test bar', $this->get('/route/value1')->getContent());
     }
+
+    public function test_route_view_directory()
+    {
+        Route::viewDir('route', '/', ['foo' => 'bar']);
+
+        View::addLocation(__DIR__ . '/Fixtures');
+
+        $this->assertContains('Index bar', $this->get('/route')->getContent());
+        $this->assertContains('Test bar', $this->get('/route/view')->getContent());
+        $this->assertContains('Sub-index bar', $this->get('/route/sub')->getContent());
+        $this->assertContains('Sub-test bar', $this->get('/route/sub/test')->getContent());
+        $this->assertEquals(404, $this->get('/a/route/sub/nonexistent')->getStatusCode());
+    }
 }
