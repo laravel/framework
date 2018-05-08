@@ -839,9 +839,10 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function hasParameterOverride($dependency)
     {
-        return array_key_exists(
-            $dependency->name, $this->getLastParameterOverride()
-        );
+        $parameterOverrides = $this->getLastParameterOverride();
+        
+        return array_key_exists($dependency->name, $parameterOverrides) ||
+               array_key_exists($dependency->getPosition(), $parameterOverrides);
     }
 
     /**
@@ -852,7 +853,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function getParameterOverride($dependency)
     {
-        return $this->getLastParameterOverride()[$dependency->name];
+        return $this->getLastParameterOverride()[$dependency->name] ??
+               $this->getLastParameterOverride()[$dependency->getPosition()];
     }
 
     /**
