@@ -49,7 +49,7 @@ class PhpRedisConnector
      */
     protected function buildClusterConnectionString(array $server)
     {
-        return $server['host'].':'.$server['port'].'?'.http_build_query(Arr::only($server, [
+        return $server['host'].':'.$server['port'].'?'.Arr::query(Arr::only($server, [
             'database', 'password', 'prefix', 'read_timeout',
         ]));
     }

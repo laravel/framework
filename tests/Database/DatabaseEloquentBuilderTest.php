@@ -969,6 +969,70 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKeyNot($collection);
     }
 
+    public function testLatestWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+
+        $builder->latest();
+    }
+
+    public function testLatestWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+
+        $builder->latest();
+    }
+
+    public function testLatestWithColumn()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+
+        $builder->latest('foo');
+    }
+
+    public function testOldestWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+
+        $builder->oldest();
+    }
+
+    public function testOldestWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('created_at');
+
+        $builder->oldest();
+    }
+
+    public function testOldestWithColumn()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+
+        $builder->oldest('foo');
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
