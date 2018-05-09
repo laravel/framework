@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use RuntimeException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Pipeline implements PipelineContract
@@ -145,9 +146,12 @@ class Pipeline implements PipelineContract
                     $parameters = [$passable, $stack];
                 }
 
-                return method_exists($pipe, $this->method)
+                $response = method_exists($pipe, $this->method)
                                 ? $pipe->{$this->method}(...$parameters)
                                 : $pipe(...$parameters);
+
+                return $response instanceof Responsable ?
+                    $response->toResponse(request()) : $response;
             };
         };
     }
