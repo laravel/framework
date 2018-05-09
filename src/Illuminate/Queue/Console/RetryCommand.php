@@ -96,7 +96,7 @@ class RetryCommand extends Command
     }
 
     /**
-     * get the filtration options
+     * get the filtration options.
      *
      * @return array
      */

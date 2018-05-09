@@ -35,7 +35,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
                             'id_from'           => ['filter_name' => 'id', 'operator' => '>='],
                             'id_to'             => ['filter_name' => 'id', 'operator' => '<'],
                             'failed_at_from'    => ['filter_name' => 'failed_at', 'operator' => '>='],
-                            'failed_at_to'      => ['filter_name' => 'failed_at', 'operator' => '<']
+                            'failed_at_to'      => ['filter_name' => 'failed_at', 'operator' => '<'],
                         ];
 
     protected $filtrationOptions = ['queue', 'id_from', 'id_to', 'failed_at_from', 'failed_at_to'];
@@ -131,7 +131,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     {
         $this->query = $this->getTable();
         foreach ($options as $option => $value) {
-           $this->query = $this->query->where($this->filters[$option]['filter_name'], $this->filters[$option]['operator'], $value);
+            $this->query = $this->query->where($this->filters[$option]['filter_name'], $this->filters[$option]['operator'], $value);
         }
 
         return $this;
