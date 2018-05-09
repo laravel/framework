@@ -492,14 +492,17 @@ trait InteractsWithPivotTable
     }
 
     /**
-     * Cast the given key to an integer if it is numeric.
+     * Cast the given key to convert to primary key type.
      *
      * @param  mixed  $key
      * @return mixed
      */
     protected function castKey($key)
     {
-        return is_numeric($key) ? (int) $key : (string) $key;
+        return $this->getTypeSwapValue(
+            $this->related->getKeyType(),
+            $key
+        );
     }
 
     /**
@@ -513,5 +516,29 @@ trait InteractsWithPivotTable
         return $this->using
                     ? $this->newPivot()->fill($attributes)->getAttributes()
                     : $attributes;
+    }
+
+    /**
+     * Converts a given value to a given type value.
+     *
+     * @param  string $type
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function getTypeSwapValue($type, $value)
+    {
+        switch (strtolower($type)) {
+            case 'int':
+            case 'integer':
+                return (int) $value;
+            case 'real':
+            case 'float':
+            case 'double':
+                return (float) $value;
+            case 'string':
+                return (string) $value;
+            default:
+                return $value;
+        }
     }
 }
