@@ -53,7 +53,6 @@ class RetryCommand extends Command
         if ($this->filtrationOption()) {
             $ids = Arr::pluck($this->laravel['queue.failer']->filter($this->filtrationOption())->get(), 'id');
         } else {
-
             $ids = (array) $this->option('id');
             if (count($ids) === 1 && $ids[0] === 'all') {
                 $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
@@ -106,6 +105,7 @@ class RetryCommand extends Command
         $options = array_filter($options, function ($option) {
             return (bool) $option;
         });
+
         return array_intersect_key($options, array_flip($this->laravel['queue.failer']->getFiltrationOptions()));
     }
 }
