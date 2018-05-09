@@ -1,15 +1,22 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.21 (2018-05-08)
 
 ### Added
 - Added `FilesystemManager::forgetDisk()` method ([#24057](https://github.com/laravel/framework/pull/24057), [cbfb4fb](https://github.com/laravel/framework/commit/cbfb4fbf0784ac5eb08ce2effe8727f3428d5812))
 - Added `--allow` parameter to `down` command ([#24003](https://github.com/laravel/framework/pull/24003))
-- Added more comparison validation rules (`gt`, `lt`, `gte`, `lte`) ([#24091](https://github.com/laravel/framework/pull/24091))
+- Added more comparison validation rules (`gt`, `lt`, `gte`, `lte`) ([#24091](https://github.com/laravel/framework/pull/24091), [#24135](https://github.com/laravel/framework/pull/24135))
+- Added `TestResponse::assertCookieNotExpired()` method ([#24119](https://github.com/laravel/framework/pull/24119))
+
+### Changed
+- Redis connections now implement the `Contracts/Redis/Connection` interface ([#24142](https://github.com/laravel/framework/pull/24142))
 
 ### Fixed
 - Fixed unsetting request parameters during `HEAD` requests ([#24092](https://github.com/laravel/framework/pull/24092))
 - Fixed `HasManyThrough` returning incorrect results with `chunk()` ([#24096](https://github.com/laravel/framework/pull/24096), [5d3d98a](https://github.com/laravel/framework/commit/5d3d98a8c620458b9c1f80fbcefa1d88f9490784))
+- Fixed `dateBasedWhere()` with raw expressions when using SQLite ([#24102](https://github.com/laravel/framework/pull/24102))
+- Fixed `whereYear()` not accepting integers when using SQLite ([#24115](https://github.com/laravel/framework/pull/24115))
+- Remove full base URL from generated paths ([#24101](https://github.com/laravel/framework/pull/24101))
 
 
 ## v5.6.20 (2018-05-02)

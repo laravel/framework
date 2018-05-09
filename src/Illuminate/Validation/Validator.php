@@ -175,7 +175,7 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max', 'Gt', 'Lt', 'Gte', 'Lte'];
 
     /**
      * The numeric related validation rules.

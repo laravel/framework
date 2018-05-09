@@ -4,11 +4,12 @@ namespace Illuminate\Redis\Connections;
 
 use Redis;
 use Closure;
+use Illuminate\Contracts\Redis\Connection as ConnectionContract;
 
 /**
  * @mixin \Redis
  */
-class PhpRedisConnection extends Connection
+class PhpRedisConnection extends Connection implements ConnectionContract
 {
     /**
      * Create a new PhpRedis connection.
