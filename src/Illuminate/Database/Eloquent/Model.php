@@ -405,9 +405,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $relations = is_string($relations) ? func_get_args() : $relations;
 
-        return $this->load(array_filter($relations, function ($relation) {
-            return ! $this->relationLoaded($relation);
-        }));
+        $this->newCollection([$this])->loadMissing($relations);
+
+        return $this;
     }
 
     /**
