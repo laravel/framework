@@ -147,11 +147,12 @@ class Pipeline implements PipelineContract
                 }
 
                 $response = method_exists($pipe, $this->method)
-                                ? $pipe->{$this->method}(...$parameters)
-                                : $pipe(...$parameters);
+                    ? $pipe->{$this->method}(...$parameters)
+                    : $pipe(...$parameters);
 
-                return $response instanceof Responsable ?
-                    $response->toResponse(request()) : $response;
+                return $response instanceof Responsable
+                    ? $response->toResponse(request())
+                    : $response;
             };
         };
     }
