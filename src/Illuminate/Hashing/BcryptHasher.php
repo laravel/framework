@@ -75,7 +75,7 @@ class BcryptHasher implements HasherContract
             return false;
         }
 
-        if ($this->info($hashedValue)['algo'] !== PASSWORD_BCRYPT) {
+        if ($this->info($hashedValue)['algoName'] !== 'bcrypt') {
             throw new Exception('Hashing algorithm mismatch.');
         }
 

@@ -91,7 +91,7 @@ class ArgonHasher implements HasherContract
             return false;
         }
 
-        if ($this->info($hashedValue)['algo'] !== PASSWORD_ARGON2I) {
+        if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
             throw new Exception('Hashing algorithm mismatch.');
         }
 
