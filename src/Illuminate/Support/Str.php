@@ -427,6 +427,9 @@ class Str
         // Replace @ with the word 'at'
         $title = str_replace('@', $separator.'at'.$separator, $title);
 
+        // Replace &amp; with the word 'and'
+        $title = str_replace('&amp;', $separator.'and'.$separator, $title);
+
         // Remove all characters that are not the separator, letters, numbers, or whitespace.
         $title = preg_replace('![^'.preg_quote($separator).'\pL\pN\s]+!u', '', mb_strtolower($title));
 
