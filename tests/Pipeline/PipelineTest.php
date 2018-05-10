@@ -125,7 +125,7 @@ class PipelineTest extends TestCase
 
         $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
-            ->through('Illuminate\Tests\Pipeline\PipelineTestParameterPipe:' . implode(',', $parameters))
+            ->through('Illuminate\Tests\Pipeline\PipelineTestParameterPipe:'.implode(',', $parameters))
             ->then(function ($piped) {
                 return $piped;
             });

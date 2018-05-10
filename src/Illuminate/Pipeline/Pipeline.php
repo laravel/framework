@@ -132,7 +132,7 @@ class Pipeline implements PipelineContract
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
-                } elseif (!is_object($pipe)) {
+                } elseif (! is_object($pipe)) {
                     list($name, $parameters) = $this->parsePipeString($pipe);
 
                     // If the pipe is a string we will parse the string and resolve the class out
@@ -184,7 +184,7 @@ class Pipeline implements PipelineContract
      */
     protected function getContainer()
     {
-        if (!$this->container) {
+        if (! $this->container) {
             throw new RuntimeException('A container instance has not been passed to the Pipeline.');
         }
 
