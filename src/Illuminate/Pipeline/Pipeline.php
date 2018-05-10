@@ -5,6 +5,7 @@ namespace Illuminate\Pipeline;
 use Closure;
 use RuntimeException;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Pipeline implements PipelineContract
@@ -96,7 +97,9 @@ class Pipeline implements PipelineContract
     public function then(Closure $destination)
     {
         $pipeline = array_reduce(
-            array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes),
+            $this->carry(),
+            $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
@@ -145,9 +148,13 @@ class Pipeline implements PipelineContract
                     $parameters = [$passable, $stack];
                 }
 
-                return method_exists($pipe, $this->method)
-                                ? $pipe->{$this->method}(...$parameters)
-                                : $pipe(...$parameters);
+                $response = method_exists($pipe, $this->method)
+                    ? $pipe->{$this->method}(...$parameters)
+                    : $pipe(...$parameters);
+
+                return $response instanceof Responsable
+                    ? $response->toResponse($this->container->make('Illuminate\Http\Request'))
+                    : $response;
             };
         };
     }
