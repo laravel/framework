@@ -36,6 +36,10 @@ class HasherTest extends TestCase
      */
     public function testBasicBcryptVerification()
     {
+        if (! defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('PHP not compiled with argon2 hashing support.');
+        }
+
         $argonHasher = new \Illuminate\Hashing\ArgonHasher;
         $argonHashed = $argonHasher->make('password');
         (new \Illuminate\Hashing\BcryptHasher)->check('password', $argonHashed);
@@ -45,7 +49,7 @@ class HasherTest extends TestCase
      * @expectedException \Exception
      * @expectedExceptionMessage Hashing algorithm mismatch.
      */
-    public function testBasicVerification()
+    public function testBasicArgonVerification()
     {
         $bcryptHasher = new \Illuminate\Hashing\BcryptHasher;
         $bcryptHashed = $bcryptHasher->make('password');
