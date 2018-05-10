@@ -51,7 +51,8 @@ class Comment extends Model
 
     protected $guarded = ['id'];
 
-    public function parent() {
+    public function parent()
+    {
         return $this->belongsTo(Comment::class);
     }
 }
@@ -60,7 +61,8 @@ class Post extends Model
 {
     public $timestamps = false;
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 }

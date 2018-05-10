@@ -136,7 +136,7 @@ class Collection extends BaseCollection implements QueueableCollection
         // Handle *-many relationships.
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
-        };
+        }
 
         // Load the remaining path.
         $this->loadMissingRelation(new static($models), $path);

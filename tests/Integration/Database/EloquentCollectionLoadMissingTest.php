@@ -67,11 +67,13 @@ class Comment extends Model
 
     protected $guarded = ['id'];
 
-    public function parent() {
+    public function parent()
+    {
         return $this->belongsTo(Comment::class);
     }
 
-    public function revisions() {
+    public function revisions()
+    {
         return $this->hasMany(Revision::class);
     }
 }
@@ -82,11 +84,13 @@ class Post extends Model
 
     protected $guarded = ['id'];
 
-    public function comments() {
+    public function comments()
+    {
         return $this->hasMany(Comment::class);
     }
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 }
