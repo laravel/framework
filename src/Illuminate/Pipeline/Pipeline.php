@@ -97,7 +97,9 @@ class Pipeline implements PipelineContract
     public function then(Closure $destination)
     {
         $pipeline = array_reduce(
-            array_reverse($this->pipes), $this->carry(), $this->prepareDestination($destination)
+            array_reverse($this->pipes),
+            $this->carry(),
+            $this->prepareDestination($destination)
         );
 
         return $pipeline($this->passable);
@@ -130,7 +132,7 @@ class Pipeline implements PipelineContract
                     // otherwise we'll resolve the pipes out of the container and call it with
                     // the appropriate method and arguments, returning the results back out.
                     return $pipe($passable, $stack);
-                } elseif (! is_object($pipe)) {
+                } elseif (!is_object($pipe)) {
                     list($name, $parameters) = $this->parsePipeString($pipe);
 
                     // If the pipe is a string we will parse the string and resolve the class out
@@ -151,7 +153,7 @@ class Pipeline implements PipelineContract
                     : $pipe(...$parameters);
 
                 return $response instanceof Responsable
-                    ? $response->toResponse(request())
+                    ? $response->toResponse($this->container->make('Illuminate\Http\Request'))
                     : $response;
             };
         };
@@ -182,7 +184,7 @@ class Pipeline implements PipelineContract
      */
     protected function getContainer()
     {
-        if (! $this->container) {
+        if (!$this->container) {
             throw new RuntimeException('A container instance has not been passed to the Pipeline.');
         }
 
