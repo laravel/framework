@@ -9,7 +9,8 @@ trait RetrievesMultipleKeys
      *
      * Items not found in the cache will have a null value.
      *
-     * @param  array  $keys
+     * @param array $keys
+     *
      * @return array
      */
     public function many(array $keys)
@@ -26,8 +27,9 @@ trait RetrievesMultipleKeys
     /**
      * Store multiple items in the cache for a given number of minutes.
      *
-     * @param  array  $values
-     * @param  float|int  $minutes
+     * @param array     $values
+     * @param float|int $minutes
+     *
      * @return void
      */
     public function putMany(array $values, $minutes)

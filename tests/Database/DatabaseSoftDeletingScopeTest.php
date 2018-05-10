@@ -30,7 +30,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             m::mock('Illuminate\Database\Query\Grammars\Grammar'),
             m::mock('Illuminate\Database\Query\Processors\Processor')
         ));
-        $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope;
+        $scope = new \Illuminate\Database\Eloquent\SoftDeletingScope();
         $scope->extend($builder);
         $callback = $builder->getMacro('restore');
         $givenBuilder = m::mock('Illuminate\Database\Eloquent\Builder');

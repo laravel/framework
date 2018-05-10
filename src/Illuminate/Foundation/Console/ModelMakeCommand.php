@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class ModelMakeCommand extends GeneratorCommand
@@ -36,7 +36,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if (parent::handle() === false && ! $this->option('force')) {
+        if (parent::handle() === false && !$this->option('force')) {
             return;
         }
 
@@ -68,7 +68,7 @@ class ModelMakeCommand extends GeneratorCommand
     protected function createFactory()
     {
         $this->call('make:factory', [
-            'name' => $this->argument('name').'Factory',
+            'name'    => $this->argument('name').'Factory',
             '--model' => $this->argument('name'),
         ]);
     }
@@ -83,7 +83,7 @@ class ModelMakeCommand extends GeneratorCommand
         $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
 
         $this->call('make:migration', [
-            'name' => "create_{$table}_table",
+            'name'     => "create_{$table}_table",
             '--create' => $table,
         ]);
     }
@@ -100,7 +100,7 @@ class ModelMakeCommand extends GeneratorCommand
         $modelName = $this->qualifyClass($this->getNameInput());
 
         $this->call('make:controller', [
-            'name' => "{$controller}Controller",
+            'name'    => "{$controller}Controller",
             '--model' => $this->option('resource') ? $modelName : null,
         ]);
     }
@@ -122,7 +122,8 @@ class ModelMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)

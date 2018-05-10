@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Cache;
 
-use Memcached;
-use Illuminate\Support\Carbon;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
+use Memcached;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -19,7 +19,7 @@ class CacheLockTest extends TestCase
     {
         parent::setUp();
 
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
     }

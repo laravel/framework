@@ -31,7 +31,7 @@ class RefreshCommand extends Command
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -60,8 +60,8 @@ class RefreshCommand extends Command
         // them in succession. We'll also see if we need to re-seed the database.
         $this->call('migrate', [
             '--database' => $database,
-            '--path' => $path,
-            '--force' => $force,
+            '--path'     => $path,
+            '--force'    => $force,
         ]);
 
         if ($this->needsSeeding()) {
@@ -72,36 +72,38 @@ class RefreshCommand extends Command
     /**
      * Run the rollback command.
      *
-     * @param  string  $database
-     * @param  string  $path
-     * @param  bool  $step
-     * @param  bool  $force
+     * @param string $database
+     * @param string $path
+     * @param bool   $step
+     * @param bool   $force
+     *
      * @return void
      */
     protected function runRollback($database, $path, $step, $force)
     {
         $this->call('migrate:rollback', [
             '--database' => $database,
-            '--path' => $path,
-            '--step' => $step,
-            '--force' => $force,
+            '--path'     => $path,
+            '--step'     => $step,
+            '--force'    => $force,
         ]);
     }
 
     /**
      * Run the reset command.
      *
-     * @param  string  $database
-     * @param  string  $path
-     * @param  bool  $force
+     * @param string $database
+     * @param string $path
+     * @param bool   $force
+     *
      * @return void
      */
     protected function runReset($database, $path, $force)
     {
         $this->call('migrate:reset', [
             '--database' => $database,
-            '--path' => $path,
-            '--force' => $force,
+            '--path'     => $path,
+            '--force'    => $force,
         ]);
     }
 
@@ -118,15 +120,16 @@ class RefreshCommand extends Command
     /**
      * Run the database seeder command.
      *
-     * @param  string  $database
+     * @param string $database
+     *
      * @return void
      */
     protected function runSeeder($database)
     {
         $this->call('db:seed', [
             '--database' => $database,
-            '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => $this->option('force'),
+            '--class'    => $this->option('seeder') ?: 'DatabaseSeeder',
+            '--force'    => $this->option('force'),
         ]);
     }
 

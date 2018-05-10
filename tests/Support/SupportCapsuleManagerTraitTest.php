@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\CapsuleManagerTrait;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class SupportCapsuleManagerTraitTest extends TestCase
 {
@@ -19,7 +19,7 @@ class SupportCapsuleManagerTraitTest extends TestCase
     public function testSetupContainerForCapsule()
     {
         $this->container = null;
-        $app = new Container;
+        $app = new Container();
 
         $this->assertNull($this->setupContainer($app));
         $this->assertEquals($app, $this->getContainer());
@@ -29,7 +29,7 @@ class SupportCapsuleManagerTraitTest extends TestCase
     public function testSetupContainerForCapsuleWhenConfigIsBound()
     {
         $this->container = null;
-        $app = new Container;
+        $app = new Container();
         $app['config'] = m::mock('Illuminate\Config\Repository');
 
         $this->assertNull($this->setupContainer($app));

@@ -23,8 +23,9 @@ class Unique
     /**
      * Ignore the given ID during the unique check.
      *
-     * @param  mixed  $id
-     * @param  string  $idColumn
+     * @param mixed  $id
+     * @param string $idColumn
+     *
      * @return $this
      */
     public function ignore($id, $idColumn = 'id')

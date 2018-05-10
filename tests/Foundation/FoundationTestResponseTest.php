@@ -2,21 +2,21 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use JsonSerializable;
-use Illuminate\Http\Response;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Testing\TestResponse;
+use Illuminate\Http\Response;
+use JsonSerializable;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class FoundationTestResponseTest extends TestCase
 {
     public function testAssertViewIs()
     {
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = tap(new Response(), function ($response) {
             $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'hello world',
+                'render'  => 'hello world',
                 'getData' => ['foo' => 'bar'],
                 'getName' => 'dir.my-view',
             ]));
@@ -29,9 +29,9 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertViewHas()
     {
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = tap(new Response(), function ($response) {
             $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'hello world',
+                'render'  => 'hello world',
                 'getData' => ['foo' => 'bar'],
             ]));
         });
@@ -43,7 +43,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertSeeText()
     {
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = tap(new Response(), function ($response) {
             $response->setContent(\Mockery::mock(View::class, [
                 'render' => 'foo<strong>bar</strong>',
             ]));
@@ -56,7 +56,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertHeader()
     {
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = tap(new Response(), function ($response) {
             $response->header('Location', '/foo');
         });
 
@@ -77,7 +77,7 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertHeaderMissing()
     {
-        $baseResponse = tap(new Response, function ($response) {
+        $baseResponse = tap(new Response(), function ($response) {
             $response->header('Location', '/foo');
         });
 
@@ -88,31 +88,31 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonWithArray()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub()));
 
-        $resource = new JsonSerializableSingleResourceStub;
+        $resource = new JsonSerializableSingleResourceStub();
 
         $response->assertJson($resource->jsonSerialize());
     }
 
     public function testAssertJsonWithMixed()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub()));
 
-        $resource = new JsonSerializableMixedResourcesStub;
+        $resource = new JsonSerializableMixedResourcesStub();
 
         $response->assertJson($resource->jsonSerialize());
     }
 
     public function testAssertJsonFragment()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub()));
 
         $response->assertJsonFragment(['foo' => 'foo 0']);
 
         $response->assertJsonFragment(['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0']);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub()));
 
         $response->assertJsonFragment(['foo' => 'bar']);
 
@@ -125,7 +125,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testAssertJsonStructure()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub()));
 
         // Without structure
         $response->assertJsonStructure();
@@ -143,14 +143,14 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonStructure(['baz' => ['*' => ['foo', 'bar' => ['foo', 'bar']]]]);
 
         // Wildcard (repeating structure) at root
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub()));
 
         $response->assertJsonStructure(['*' => ['foo', 'bar', 'foobar']]);
     }
 
     public function testAssertJsonCount()
     {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub()));
 
         // With simple key
         $response->assertJsonCount(3, 'bars');
@@ -160,7 +160,7 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonCount(3, 'barfoo.2.bar');
 
         // Without structure
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub()));
         $response->assertJsonCount(4);
     }
 
@@ -170,7 +170,7 @@ class FoundationTestResponseTest extends TestCase
             return 'bar';
         });
 
-        $response = TestResponse::fromBaseResponse(new Response);
+        $response = TestResponse::fromBaseResponse(new Response());
 
         $this->assertEquals(
             'bar', $response->foo()
@@ -179,7 +179,7 @@ class FoundationTestResponseTest extends TestCase
 
     public function testCanBeCreatedFromBinaryFileResponses()
     {
-        $files = new Filesystem;
+        $files = new Filesystem();
         $tempDir = __DIR__.'/tmp';
         $files->makeDirectory($tempDir, 0755, false, true);
         $files->put($tempDir.'/file.txt', 'Hello World');

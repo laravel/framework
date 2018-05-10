@@ -2,9 +2,9 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use LogicException;
-use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
+use InvalidArgumentException;
+use LogicException;
 
 class CallbackEvent extends Event
 {
@@ -25,16 +25,17 @@ class CallbackEvent extends Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
-     * @param  string  $callback
-     * @param  array  $parameters
-     * @return void
+     * @param \Illuminate\Console\Scheduling\Mutex $mutex
+     * @param string                               $callback
+     * @param array                                $parameters
      *
      * @throws \InvalidArgumentException
+     *
+     * @return void
      */
     public function __construct(Mutex $mutex, $callback, array $parameters = [])
     {
-        if (! is_string($callback) && ! is_callable($callback)) {
+        if (!is_string($callback) && !is_callable($callback)) {
             throw new InvalidArgumentException(
                 'Invalid scheduled callback event. Must be a string or callable.'
             );
@@ -48,15 +49,16 @@ class CallbackEvent extends Event
     /**
      * Run the given event.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
-     * @return mixed
+     * @param \Illuminate\Contracts\Container\Container $container
      *
      * @throws \Exception
+     *
+     * @return mixed
      */
     public function run(Container $container)
     {
         if ($this->description && $this->withoutOverlapping &&
-            ! $this->mutex->create($this)) {
+            !$this->mutex->create($this)) {
             return;
         }
 
@@ -96,12 +98,13 @@ class CallbackEvent extends Event
     /**
      * Do not allow the event to overlap each other.
      *
-     * @param  int  $expiresAt
+     * @param int $expiresAt
+     *
      * @return $this
      */
     public function withoutOverlapping($expiresAt = 1440)
     {
-        if (! isset($this->description)) {
+        if (!isset($this->description)) {
             throw new LogicException(
                 "A scheduled event name is required to prevent overlapping. Use the 'name' method before 'withoutOverlapping'."
             );

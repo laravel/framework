@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
 
 class FoundationApplicationTest extends TestCase
 {
@@ -15,7 +15,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
-        $app = new Application;
+        $app = new Application();
         $app['config'] = $config = m::mock('stdClass');
         $config->shouldReceive('set')->once()->with('app.locale', 'foo');
         $app['translator'] = $trans = m::mock('stdClass');
@@ -31,7 +31,7 @@ class FoundationApplicationTest extends TestCase
         $provider = m::mock('Illuminate\Tests\Foundation\ApplicationBasicServiceProviderStub');
         $class = get_class($provider);
         $provider->shouldReceive('register')->once();
-        $app = new Application;
+        $app = new Application();
         $app->register($provider);
 
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
@@ -42,7 +42,7 @@ class FoundationApplicationTest extends TestCase
         $provider = m::mock('Illuminate\Support\ServiceProvider');
         $class = get_class($provider);
         $provider->shouldReceive('register')->never();
-        $app = new Application;
+        $app = new Application();
         $app->register($provider);
 
         $this->assertTrue(in_array($class, $app->getLoadedProviders()));
@@ -50,7 +50,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testDeferredServicesMarkedAsBound()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertEquals('foo', $app->make('foo'));
@@ -58,7 +58,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testDeferredServicesAreSharedProperly()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredSharedServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $one = $app->make('foo');
@@ -70,7 +70,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testDeferredServicesCanBeExtended()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
         $app->extend('foo', function ($instance, $container) {
             return $instance.'bar';
@@ -80,7 +80,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testDeferredServiceProviderIsRegisteredOnlyOnce()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderCountStub']);
         $obj = $app->make('foo');
         $this->assertInstanceOf('stdClass', $obj);
@@ -90,7 +90,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testDeferredServiceDontRunWhenInstanceSet()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
         $app->instance('foo', 'bar');
         $instance = $app->make('foo');
@@ -100,7 +100,7 @@ class FoundationApplicationTest extends TestCase
     public function testDeferredServicesAreLazilyInitialized()
     {
         ApplicationDeferredServiceProviderStub::$initialized = false;
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationDeferredServiceProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertFalse(ApplicationDeferredServiceProviderStub::$initialized);
@@ -114,7 +114,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testDeferredServicesCanRegisterFactories()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices(['foo' => 'Illuminate\Tests\Foundation\ApplicationFactoryProviderStub']);
         $this->assertTrue($app->bound('foo'));
         $this->assertEquals(1, $app->make('foo'));
@@ -124,7 +124,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testSingleProviderCanProvideMultipleDeferredServices()
     {
-        $app = new Application;
+        $app = new Application();
         $app->setDeferredServices([
             'foo' => 'Illuminate\Tests\Foundation\ApplicationMultiProviderStub',
             'bar' => 'Illuminate\Tests\Foundation\ApplicationMultiProviderStub',
@@ -135,7 +135,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testEnvironment()
     {
-        $app = new Application;
+        $app = new Application();
         $app['env'] = 'foo';
 
         $this->assertEquals('foo', $app->environment());
@@ -153,7 +153,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testMethodAfterLoadingEnvironmentAddsClosure()
     {
-        $app = new Application;
+        $app = new Application();
         $closure = function () {
         };
         $app->afterLoadingEnvironment($closure);
@@ -163,7 +163,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testBeforeBootstrappingAddsClosure()
     {
-        $app = new Application;
+        $app = new Application();
         $closure = function () {
         };
         $app->beforeBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
@@ -173,7 +173,7 @@ class FoundationApplicationTest extends TestCase
 
     public function testAfterBootstrappingAddsClosure()
     {
-        $app = new Application;
+        $app = new Application();
         $closure = function () {
         };
         $app->afterBootstrapping('Illuminate\Foundation\Bootstrap\RegisterFacades', $closure);
@@ -202,7 +202,7 @@ class ApplicationDeferredSharedServiceProviderStub extends \Illuminate\Support\S
     public function register()
     {
         $this->app->singleton('foo', function () {
-            return new \stdClass;
+            return new \stdClass();
         });
     }
 }
@@ -215,7 +215,7 @@ class ApplicationDeferredServiceProviderCountStub extends \Illuminate\Support\Se
     public function register()
     {
         static::$count++;
-        $this->app['foo'] = new \stdClass;
+        $this->app['foo'] = new \stdClass();
     }
 }
 

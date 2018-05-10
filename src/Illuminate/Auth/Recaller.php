@@ -16,7 +16,8 @@ class Recaller
     /**
      * Create a new recaller instance.
      *
-     * @param  string  $recaller
+     * @param string $recaller
+     *
      * @return void
      */
     public function __construct($recaller)

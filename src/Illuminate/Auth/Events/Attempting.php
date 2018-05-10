@@ -21,8 +21,9 @@ class Attempting
     /**
      * Create a new event instance.
      *
-     * @param  array  $credentials
-     * @param  bool  $remember
+     * @param array $credentials
+     * @param bool  $remember
+     *
      * @return void
      */
     public function __construct($credentials, $remember)

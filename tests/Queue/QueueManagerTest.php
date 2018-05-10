@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Queue;
 
+use Illuminate\Queue\QueueManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Queue\QueueManager;
 
 class QueueManagerTest extends TestCase
 {
@@ -17,7 +17,7 @@ class QueueManagerTest extends TestCase
     {
         $app = [
             'config' => [
-                'queue.default' => 'sync',
+                'queue.default'          => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
@@ -40,7 +40,7 @@ class QueueManagerTest extends TestCase
     {
         $app = [
             'config' => [
-                'queue.default' => 'sync',
+                'queue.default'         => 'sync',
                 'queue.connections.foo' => ['driver' => 'bar'],
             ],
             'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),

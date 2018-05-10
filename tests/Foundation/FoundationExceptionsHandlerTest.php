@@ -3,15 +3,15 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use Mockery as m;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
-use Symfony\Component\HttpKernel\Exception\HttpException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -29,7 +29,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->request = m::mock('stdClass');
 
-        $this->container = Container::setInstance(new Container);
+        $this->container = Container::setInstance(new Container());
 
         $this->container->singleton('config', function () {
             return $this->config;
@@ -75,7 +75,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
-        $response = $this->handler->render($this->request, new CustomException)->getContent();
+        $response = $this->handler->render($this->request, new CustomException())->getContent();
 
         $this->assertSame('{"response":"My custom exception response"}', $response);
     }

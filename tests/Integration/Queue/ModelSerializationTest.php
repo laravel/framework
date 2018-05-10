@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Schema;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Orchestra\Testbench\TestCase;
+use Schema;
 
 /**
  * @group integration
@@ -18,15 +18,15 @@ class ModelSerializationTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         $app['config']->set('database.connections.custom', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 

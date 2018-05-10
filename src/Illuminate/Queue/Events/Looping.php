@@ -21,8 +21,9 @@ class Looping
     /**
      * Create a new event instance.
      *
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param string $connectionName
+     * @param string $queue
+     *
      * @return void
      */
     public function __construct($connectionName, $queue)

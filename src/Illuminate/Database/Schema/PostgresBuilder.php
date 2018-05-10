@@ -7,7 +7,8 @@ class PostgresBuilder extends Builder
     /**
      * Determine if the given table exists.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return bool
      */
     public function hasTable($table)
@@ -37,7 +38,7 @@ class PostgresBuilder extends Builder
 
             $table = reset($row);
 
-            if (! in_array($table, $excludedTables)) {
+            if (!in_array($table, $excludedTables)) {
                 $tables[] = $table;
             }
         }
@@ -66,7 +67,8 @@ class PostgresBuilder extends Builder
     /**
      * Get the column listing for a given table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return array
      */
     public function getColumnListing($table)
@@ -85,7 +87,8 @@ class PostgresBuilder extends Builder
     /**
      * Parse the table name and extract the schema and table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return array
      */
     protected function parseSchemaAndTable($table)

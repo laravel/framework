@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Events\CallQueuedListener;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Events\CallQueuedListener;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration

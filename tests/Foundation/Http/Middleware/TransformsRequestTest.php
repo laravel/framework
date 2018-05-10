@@ -2,18 +2,18 @@
 
 namespace Illuminate\Tests\Foundation\Http\Middleware;
 
+use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Http\Middleware\TransformsRequest;
 
 class TransformsRequestTest extends TestCase
 {
     public function testLowerAgeAndAddBeer()
     {
-        $middleware = new ManipulateInput;
+        $middleware = new ManipulateInput();
         $request = new Request(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => 4,
             ],
             ['age' => 28]
@@ -28,10 +28,10 @@ class TransformsRequestTest extends TestCase
 
     public function testAjaxLowerAgeAndAddBeer()
     {
-        $middleware = new ManipulateInput;
+        $middleware = new ManipulateInput();
         $request = new Request(
             [
-                'name' => 'Damian',
+                'name'  => 'Damian',
                 'beers' => 4,
             ],
             [],

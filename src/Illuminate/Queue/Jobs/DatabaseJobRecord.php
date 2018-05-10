@@ -18,7 +18,8 @@ class DatabaseJobRecord
     /**
      * Create a new job record instance.
      *
-     * @param  \stdClass  $record
+     * @param \stdClass $record
+     *
      * @return void
      */
     public function __construct($record)
@@ -53,7 +54,8 @@ class DatabaseJobRecord
     /**
      * Dynamically access the underlying job information.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)

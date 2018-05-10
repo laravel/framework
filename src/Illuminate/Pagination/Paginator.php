@@ -2,15 +2,15 @@
 
 namespace Illuminate\Pagination;
 
-use Countable;
 use ArrayAccess;
-use JsonSerializable;
-use IteratorAggregate;
+use Countable;
+use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Pagination\Paginator as PaginatorContract;
+use IteratorAggregate;
+use JsonSerializable;
 
 class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Countable, IteratorAggregate, JsonSerializable, Jsonable, PaginatorContract
 {
@@ -24,10 +24,11 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Create a new paginator instance.
      *
-     * @param  mixed  $items
-     * @param  int  $perPage
-     * @param  int|null  $currentPage
-     * @param  array  $options (path, query, fragment, pageName)
+     * @param mixed    $items
+     * @param int      $perPage
+     * @param int|null $currentPage
+     * @param array    $options     (path, query, fragment, pageName)
+     *
      * @return void
      */
     public function __construct($items, $perPage, $currentPage = null, array $options = [])
@@ -46,7 +47,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Get the current page for the request.
      *
-     * @param  int  $currentPage
+     * @param int $currentPage
+     *
      * @return int
      */
     protected function setCurrentPage($currentPage)
@@ -59,7 +61,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Set the items for the paginator.
      *
-     * @param  mixed  $items
+     * @param mixed $items
+     *
      * @return void
      */
     protected function setItems($items)
@@ -86,8 +89,9 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
-     * @param  array  $data
+     * @param string|null $view
+     * @param array       $data
+     *
      * @return string
      */
     public function links($view = null, $data = [])
@@ -98,8 +102,9 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Render the paginator using the given view.
      *
-     * @param  string|null  $view
-     * @param  array  $data
+     * @param string|null $view
+     * @param array       $data
+     *
      * @return string
      */
     public function render($view = null, $data = [])
@@ -114,7 +119,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Manually indicate that the paginator does have more pages.
      *
-     * @param  bool  $hasMore
+     * @param bool $hasMore
+     *
      * @return $this
      */
     public function hasMorePagesWhen($hasMore = true)
@@ -142,15 +148,15 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     public function toArray()
     {
         return [
-            'current_page' => $this->currentPage(),
-            'data' => $this->items->toArray(),
+            'current_page'   => $this->currentPage(),
+            'data'           => $this->items->toArray(),
             'first_page_url' => $this->url(1),
-            'from' => $this->firstItem(),
-            'next_page_url' => $this->nextPageUrl(),
-            'path' => $this->path,
-            'per_page' => $this->perPage(),
-            'prev_page_url' => $this->previousPageUrl(),
-            'to' => $this->lastItem(),
+            'from'           => $this->firstItem(),
+            'next_page_url'  => $this->nextPageUrl(),
+            'path'           => $this->path,
+            'per_page'       => $this->perPage(),
+            'prev_page_url'  => $this->previousPageUrl(),
+            'to'             => $this->lastItem(),
         ];
     }
 
@@ -167,7 +173,8 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     /**
      * Convert the object to its JSON representation.
      *
-     * @param  int  $options
+     * @param int $options
+     *
      * @return string
      */
     public function toJson($options = 0)

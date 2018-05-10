@@ -37,8 +37,9 @@ trait DatabaseRule
     /**
      * Create a new rule instance.
      *
-     * @param  string  $table
-     * @param  string  $column
+     * @param string $table
+     * @param string $column
+     *
      * @return void
      */
     public function __construct($table, $column = 'NULL')
@@ -50,8 +51,9 @@ trait DatabaseRule
     /**
      * Set a "where" constraint on the query.
      *
-     * @param  string|\Closure  $column
-     * @param  array|string|null  $value
+     * @param string|\Closure   $column
+     * @param array|string|null $value
+     *
      * @return $this
      */
     public function where($column, $value = null)
@@ -72,8 +74,9 @@ trait DatabaseRule
     /**
      * Set a "where not" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array|string  $value
+     * @param string       $column
+     * @param array|string $value
+     *
      * @return $this
      */
     public function whereNot($column, $value)
@@ -88,7 +91,8 @@ trait DatabaseRule
     /**
      * Set a "where null" constraint on the query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return $this
      */
     public function whereNull($column)
@@ -99,7 +103,8 @@ trait DatabaseRule
     /**
      * Set a "where not null" constraint on the query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return $this
      */
     public function whereNotNull($column)
@@ -110,8 +115,9 @@ trait DatabaseRule
     /**
      * Set a "where in" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array  $values
+     * @param string $column
+     * @param array  $values
+     *
      * @return $this
      */
     public function whereIn($column, array $values)
@@ -124,8 +130,9 @@ trait DatabaseRule
     /**
      * Set a "where not in" constraint on the query.
      *
-     * @param  string  $column
-     * @param  array  $values
+     * @param string $column
+     * @param array  $values
+     *
      * @return $this
      */
     public function whereNotIn($column, array $values)
@@ -138,7 +145,8 @@ trait DatabaseRule
     /**
      * Register a custom query callback.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function using(Closure $callback)

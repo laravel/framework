@@ -3,11 +3,11 @@
 namespace Illuminate\Http;
 
 use ArrayObject;
-use JsonSerializable;
-use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
 use Symfony\Component\HttpFoundation\Response as BaseResponse;
 
 class Response extends BaseResponse
@@ -19,7 +19,8 @@ class Response extends BaseResponse
     /**
      * Set the content on the response.
      *
-     * @param  mixed  $content
+     * @param mixed $content
+     *
      * @return $this
      */
     public function setContent($content)
@@ -50,7 +51,8 @@ class Response extends BaseResponse
     /**
      * Determine if the given content should be turned into JSON.
      *
-     * @param  mixed  $content
+     * @param mixed $content
+     *
      * @return bool
      */
     protected function shouldBeJson($content)
@@ -65,7 +67,8 @@ class Response extends BaseResponse
     /**
      * Morph the given content into JSON.
      *
-     * @param  mixed   $content
+     * @param mixed $content
+     *
      * @return string
      */
     protected function morphToJson($content)

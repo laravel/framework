@@ -34,9 +34,10 @@ abstract class Queue
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $queue
-     * @param  string  $job
-     * @param  mixed   $data
+     * @param string $queue
+     * @param string $job
+     * @param mixed  $data
+     *
      * @return mixed
      */
     public function pushOn($queue, $job, $data = '')
@@ -47,10 +48,11 @@ abstract class Queue
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  string  $queue
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string  $job
-     * @param  mixed   $data
+     * @param string                               $queue
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param string                               $job
+     * @param mixed                                $data
+     *
      * @return mixed
      */
     public function laterOn($queue, $delay, $job, $data = '')
@@ -61,9 +63,10 @@ abstract class Queue
     /**
      * Push an array of jobs onto the queue.
      *
-     * @param  array   $jobs
-     * @param  mixed   $data
-     * @param  string  $queue
+     * @param array  $jobs
+     * @param mixed  $data
+     * @param string $queue
+     *
      * @return mixed
      */
     public function bulk($jobs, $data = '', $queue = null)
@@ -76,11 +79,12 @@ abstract class Queue
     /**
      * Create a payload string from the given job and data.
      *
-     * @param  string  $job
-     * @param  mixed   $data
-     * @return string
+     * @param string $job
+     * @param mixed  $data
      *
      * @throws \Illuminate\Queue\InvalidPayloadException
+     *
+     * @return string
      */
     protected function createPayload($job, $data = '')
     {
@@ -98,8 +102,9 @@ abstract class Queue
     /**
      * Create a payload array from the given job and data.
      *
-     * @param  string  $job
-     * @param  mixed   $data
+     * @param string $job
+     * @param mixed  $data
+     *
      * @return array
      */
     protected function createPayloadArray($job, $data = '')
@@ -112,20 +117,21 @@ abstract class Queue
     /**
      * Create a payload for an object-based queue handler.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return array
      */
     protected function createObjectPayload($job)
     {
         return [
             'displayName' => $this->getDisplayName($job),
-            'job' => 'Illuminate\Queue\CallQueuedHandler@call',
-            'maxTries' => $job->tries ?? null,
-            'timeout' => $job->timeout ?? null,
-            'timeoutAt' => $this->getJobExpiration($job),
-            'data' => [
+            'job'         => 'Illuminate\Queue\CallQueuedHandler@call',
+            'maxTries'    => $job->tries ?? null,
+            'timeout'     => $job->timeout ?? null,
+            'timeoutAt'   => $this->getJobExpiration($job),
+            'data'        => [
                 'commandName' => get_class($job),
-                'command' => serialize(clone $job),
+                'command'     => serialize(clone $job),
             ],
         ];
     }
@@ -133,7 +139,8 @@ abstract class Queue
     /**
      * Get the display name for the given job.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return string
      */
     protected function getDisplayName($job)
@@ -145,12 +152,13 @@ abstract class Queue
     /**
      * Get the expiration timestamp for an object-based queue handler.
      *
-     * @param  mixed  $job
+     * @param mixed $job
+     *
      * @return mixed
      */
     public function getJobExpiration($job)
     {
-        if (! method_exists($job, 'retryUntil') && ! isset($job->timeoutAt)) {
+        if (!method_exists($job, 'retryUntil') && !isset($job->timeoutAt)) {
             return;
         }
 
@@ -163,16 +171,17 @@ abstract class Queue
     /**
      * Create a typical, string based queue payload array.
      *
-     * @param  string  $job
-     * @param  mixed  $data
+     * @param string $job
+     * @param mixed  $data
+     *
      * @return array
      */
     protected function createStringPayload($job, $data)
     {
         return [
             'displayName' => is_string($job) ? explode('@', $job)[0] : null,
-            'job' => $job, 'maxTries' => null,
-            'timeout' => null, 'data' => $data,
+            'job'         => $job, 'maxTries' => null,
+            'timeout'     => null, 'data' => $data,
         ];
     }
 
@@ -189,7 +198,8 @@ abstract class Queue
     /**
      * Set the connection name for the queue.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
     public function setConnectionName($name)
@@ -202,7 +212,8 @@ abstract class Queue
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param \Illuminate\Container\Container $container
+     *
      * @return void
      */
     public function setContainer(Container $container)

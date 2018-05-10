@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\Console\ClearCommand;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Cache\Console\ClearCommand;
 
 class ClearCommandTest extends TestCase
 {
@@ -23,7 +23,7 @@ class ClearCommandTest extends TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
         $files->shouldReceive('files')->andReturn([]);
@@ -43,7 +43,7 @@ class ClearCommandTest extends TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
         $files->shouldReceive('files')->andReturn([]);
@@ -66,7 +66,7 @@ class ClearCommandTest extends TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
         $files->shouldReceive('files')->andReturn([]);
@@ -86,7 +86,7 @@ class ClearCommandTest extends TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
         $files->shouldReceive('files')->andReturn([]);
@@ -107,7 +107,7 @@ class ClearCommandTest extends TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
         $files->shouldReceive('files')->andReturn([]);
@@ -128,7 +128,7 @@ class ClearCommandTest extends TestCase
 
         $cacheRepository = m::mock('Illuminate\Contracts\Cache\Repository');
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $command->setLaravel($app);
         $cacheManager->shouldReceive('store')->once()->with(null)->andReturn($cacheRepository);
@@ -142,7 +142,7 @@ class ClearCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput());
     }
 }
 

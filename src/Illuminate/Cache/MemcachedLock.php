@@ -16,9 +16,10 @@ class MemcachedLock extends Lock implements LockContract
     /**
      * Create a new lock instance.
      *
-     * @param  \Memcached  $memcached
-     * @param  string  $name
-     * @param  int  $seconds
+     * @param \Memcached $memcached
+     * @param string     $name
+     * @param int        $seconds
+     *
      * @return void
      */
     public function __construct($memcached, $name, $seconds)

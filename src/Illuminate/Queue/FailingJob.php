@@ -3,17 +3,18 @@
 namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
-use Illuminate\Queue\Events\JobFailed;
 use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Queue\Events\JobFailed;
 
 class FailingJob
 {
     /**
      * Delete the job, call the "failed" method, and raise the failed job event.
      *
-     * @param  string  $connectionName
-     * @param  \Illuminate\Queue\Jobs\Job  $job
-     * @param  \Exception $e
+     * @param string                     $connectionName
+     * @param \Illuminate\Queue\Jobs\Job $job
+     * @param \Exception                 $e
+     *
      * @return void
      */
     public static function handle($connectionName, $job, $e = null)
@@ -33,7 +34,7 @@ class FailingJob
             $job->failed($e);
         } finally {
             static::events()->dispatch(new JobFailed(
-                $connectionName, $job, $e ?: new ManuallyFailedException
+                $connectionName, $job, $e ?: new ManuallyFailedException()
             ));
         }
     }

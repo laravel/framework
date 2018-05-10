@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Cache;
 
-use DateTime;
 use DateInterval;
-use Mockery as m;
+use DateTime;
 use DateTimeImmutable;
 use Illuminate\Support\Carbon;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase
@@ -160,6 +160,7 @@ class CacheRepositoryTest extends TestCase
 
     /**
      * @dataProvider dataProviderTestGetMinutes
+     *
      * @param mixed $duration
      */
     public function testGetMinutes($duration)
