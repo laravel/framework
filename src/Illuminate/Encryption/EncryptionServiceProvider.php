@@ -2,9 +2,9 @@
 
 namespace Illuminate\Encryption;
 
-use RuntimeException;
-use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\Str;
+use RuntimeException;
 
 class EncryptionServiceProvider extends ServiceProvider
 {
@@ -32,7 +32,8 @@ class EncryptionServiceProvider extends ServiceProvider
     /**
      * Extract the encryption key from the given configuration.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return string
      */
     protected function key(array $config)

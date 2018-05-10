@@ -49,7 +49,7 @@ trait RefreshDatabase
      */
     protected function refreshTestDatabase()
     {
-        if (! RefreshDatabaseState::$migrated) {
+        if (!RefreshDatabaseState::$migrated) {
             $this->artisan('migrate:fresh');
 
             $this->app[Kernel::class]->setArtisan(null);

@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class QueueFakeTest extends TestCase
 {
     protected function setUp()
     {
         parent::setUp();
-        $this->fake = new QueueFake(new Application);
-        $this->job = new JobStub;
+        $this->fake = new QueueFake(new Application());
+        $this->job = new JobStub();
     }
 
     public function testAssertPushed()

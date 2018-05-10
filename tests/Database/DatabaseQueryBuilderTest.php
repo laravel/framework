@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
@@ -1570,7 +1570,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,insert]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
-            new \Illuminate\Database\Query\Grammars\Grammar,
+            new \Illuminate\Database\Query\Grammars\Grammar(),
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ]);
 
@@ -1582,7 +1582,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,update]', [
             m::mock('Illuminate\Database\ConnectionInterface'),
-            new \Illuminate\Database\Query\Grammars\Grammar,
+            new \Illuminate\Database\Query\Grammars\Grammar(),
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ]);
 
@@ -1671,12 +1671,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', []);
         $builder->from('users')->truncate();
 
-        $sqlite = new \Illuminate\Database\Query\Grammars\SQLiteGrammar;
+        $sqlite = new \Illuminate\Database\Query\Grammars\SQLiteGrammar();
         $builder = $this->getBuilder();
         $builder->from('users');
         $this->assertEquals([
             'delete from sqlite_sequence where name = ?' => ['users'],
-            'delete from "users"' => [],
+            'delete from "users"'                        => [],
         ], $sqlite->compileTruncate($builder));
     }
 
@@ -1697,7 +1697,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingJson()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
@@ -1715,7 +1715,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingNestedJson()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
@@ -1733,7 +1733,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWithJsonRemovesBindingsCorrectly()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         $connection = m::mock('Illuminate\Database\ConnectionInterface');
@@ -2298,7 +2298,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->paginate($perPage, $columns, $pageName, $page);
 
         $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
-            'path' => $path,
+            'path'     => $path,
             'pageName' => $pageName,
         ]), $result);
     }
@@ -2329,7 +2329,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->paginate();
 
         $this->assertEquals(new LengthAwarePaginator($results, 2, $perPage, $page, [
-            'path' => $path,
+            'path'     => $path,
             'pageName' => $pageName,
         ]), $result);
     }
@@ -2360,14 +2360,14 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->paginate();
 
         $this->assertEquals(new LengthAwarePaginator($results, 0, $perPage, $page, [
-            'path' => $path,
+            'path'     => $path,
             'pageName' => $pageName,
         ]), $result);
     }
 
     protected function getBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\Grammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -2375,7 +2375,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     protected function getPostgresBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\PostgresGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\PostgresGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -2383,7 +2383,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     protected function getMySqlBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -2391,7 +2391,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     protected function getSQLiteBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\SQLiteGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\SQLiteGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -2399,7 +2399,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     protected function getSqlServerBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\SqlServerGrammar;
+        $grammar = new \Illuminate\Database\Query\Grammars\SqlServerGrammar();
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
@@ -2407,8 +2407,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
     protected function getMySqlBuilderWithProcessor()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = new \Illuminate\Database\Query\Processors\MySqlProcessor;
+        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar();
+        $processor = new \Illuminate\Database\Query\Processors\MySqlProcessor();
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
     }
@@ -2420,7 +2420,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = m::mock('Illuminate\Database\Query\Builder', [
             m::mock('Illuminate\Database\ConnectionInterface'),
-            new \Illuminate\Database\Query\Grammars\Grammar,
+            new \Illuminate\Database\Query\Grammars\Grammar(),
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ])->makePartial();
 

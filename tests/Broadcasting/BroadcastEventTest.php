@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Broadcasting\BroadcastEvent;
 use Illuminate\Contracts\Broadcasting\Broadcaster;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class BroadcastEventTest extends TestCase
 {
@@ -22,7 +22,7 @@ class BroadcastEventTest extends TestCase
             ['test-channel'], TestBroadcastEvent::class, ['firstName' => 'Taylor', 'lastName' => 'Otwell', 'collection' => ['foo' => 'bar']]
         );
 
-        $event = new TestBroadcastEvent;
+        $event = new TestBroadcastEvent();
 
         (new \Illuminate\Broadcasting\BroadcastEvent($event))->handle($broadcaster);
     }
@@ -35,7 +35,7 @@ class BroadcastEventTest extends TestCase
             ['test-channel'], TestBroadcastEventWithManualData::class, ['name' => 'Taylor', 'socket' => null]
         );
 
-        $event = new TestBroadcastEventWithManualData;
+        $event = new TestBroadcastEventWithManualData();
 
         (new BroadcastEvent($event))->handle($broadcaster);
     }

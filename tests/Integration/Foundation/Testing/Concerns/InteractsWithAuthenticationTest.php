@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Integration\Foundation\Testing\Concerns;
 
+use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Http\Request;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Orchestra\Testbench\TestCase;
 
 class InteractsWithAuthenticationTest extends TestCase
 {
@@ -17,9 +17,9 @@ class InteractsWithAuthenticationTest extends TestCase
 
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 
@@ -37,9 +37,9 @@ class InteractsWithAuthenticationTest extends TestCase
         });
 
         AuthenticationTestUser::create([
-            'username' => 'taylorotwell',
-            'email' => 'taylorotwell@laravel.com',
-            'password' => bcrypt('password'),
+            'username'  => 'taylorotwell',
+            'email'     => 'taylorotwell@laravel.com',
+            'password'  => bcrypt('password'),
             'is_active' => true,
         ]);
     }

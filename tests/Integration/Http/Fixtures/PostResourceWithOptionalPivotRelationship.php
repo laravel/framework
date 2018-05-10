@@ -7,7 +7,7 @@ class PostResourceWithOptionalPivotRelationship extends PostResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
+            'id'           => $this->id,
             'subscription' => $this->whenPivotLoaded(Subscription::class, function () {
                 return [
                     'foo' => 'bar',

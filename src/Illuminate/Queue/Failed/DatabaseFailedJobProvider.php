@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Support\Carbon;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface
 {
@@ -31,9 +31,10 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     /**
      * Create a new database failed job provider.
      *
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-     * @param  string  $database
-     * @param  string  $table
+     * @param \Illuminate\Database\ConnectionResolverInterface $resolver
+     * @param string                                           $database
+     * @param string                                           $table
+     *
      * @return void
      */
     public function __construct(ConnectionResolverInterface $resolver, $database, $table)
@@ -46,10 +47,11 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     /**
      * Log a failed job into storage.
      *
-     * @param  string  $connection
-     * @param  string  $queue
-     * @param  string  $payload
-     * @param  \Exception  $exception
+     * @param string     $connection
+     * @param string     $queue
+     * @param string     $payload
+     * @param \Exception $exception
+     *
      * @return int|null
      */
     public function log($connection, $queue, $payload, $exception)
@@ -76,7 +78,8 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     /**
      * Get a single failed job.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return object|null
      */
     public function find($id)
@@ -87,7 +90,8 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     /**
      * Delete a single failed job from storage.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return bool
      */
     public function forget($id)

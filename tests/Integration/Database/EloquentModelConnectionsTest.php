@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -18,15 +18,15 @@ class EloquentModelConnectionsTest extends TestCase
         $app['config']->set('database.default', 'conn1');
 
         $app['config']->set('database.connections.conn1', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         $app['config']->set('database.connections.conn2', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 

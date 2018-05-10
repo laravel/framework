@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Messages\MailMessage;
+use PHPUnit\Framework\TestCase;
 
-class NotificationsMailMessageTest extends TestCase
+class NotificationMailMessageTest extends TestCase
 {
     public function setUp()
     {
-        $this->message = new MailMessage;
+        $this->message = new MailMessage();
     }
 
     public function testTemplate()

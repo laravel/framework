@@ -3,8 +3,8 @@
 namespace Illuminate\Support;
 
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class Composer
 {
@@ -25,8 +25,9 @@ class Composer
     /**
      * Create a new Composer manager instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string|null  $workingPath
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param string|null                       $workingPath
+     *
      * @return void
      */
     public function __construct(Filesystem $files, $workingPath = null)
@@ -38,7 +39,8 @@ class Composer
     /**
      * Regenerate the Composer autoloader files.
      *
-     * @param  string  $extra
+     * @param string $extra
+     *
      * @return void
      */
     public function dumpAutoloads($extra = '')
@@ -68,7 +70,7 @@ class Composer
     protected function findComposer()
     {
         if ($this->files->exists($this->workingPath.'/composer.phar')) {
-            return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)).' composer.phar';
+            return ProcessUtils::escapeArgument((new PhpExecutableFinder())->find(false)).' composer.phar';
         }
 
         return 'composer';
@@ -87,7 +89,8 @@ class Composer
     /**
      * Set the working path used by the class.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return $this
      */
     public function setWorkingPath($path)

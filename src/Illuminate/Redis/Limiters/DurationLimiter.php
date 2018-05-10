@@ -51,10 +51,11 @@ class DurationLimiter
     /**
      * Create a new duration limiter instance.
      *
-     * @param  \Illuminate\Redis\Connections\Connection $redis
-     * @param  string $name
-     * @param  int $maxLocks
-     * @param  int $decay
+     * @param \Illuminate\Redis\Connections\Connection $redis
+     * @param string                                   $name
+     * @param int                                      $maxLocks
+     * @param int                                      $decay
+     *
      * @return void
      */
     public function __construct($redis, $name, $maxLocks, $decay)
@@ -68,18 +69,20 @@ class DurationLimiter
     /**
      * Attempt to acquire the lock for the given number of seconds.
      *
-     * @param  int $timeout
-     * @param  callable|null $callback
-     * @return bool
+     * @param int           $timeout
+     * @param callable|null $callback
+     *
      * @throws \Illuminate\Contracts\Redis\LimiterTimeoutException
+     *
+     * @return bool
      */
     public function block($timeout, $callback = null)
     {
         $starting = time();
 
-        while (! $this->acquire()) {
+        while (!$this->acquire()) {
             if (time() - $timeout >= $starting) {
-                throw new LimiterTimeoutException;
+                throw new LimiterTimeoutException();
             }
 
             usleep(750 * 1000);

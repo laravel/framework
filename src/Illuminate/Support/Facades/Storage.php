@@ -12,7 +12,7 @@ class Storage extends Facade
     /**
      * Replace the given disk with a local testing disk.
      *
-     * @param  string|null  $disk
+     * @param string|null $disk
      *
      * @return void
      */
@@ -20,7 +20,7 @@ class Storage extends Facade
     {
         $disk = $disk ?: self::$app['config']->get('filesystems.default');
 
-        (new Filesystem)->cleanDirectory(
+        (new Filesystem())->cleanDirectory(
             $root = storage_path('framework/testing/disks/'.$disk)
         );
 
@@ -30,7 +30,8 @@ class Storage extends Facade
     /**
      * Replace the given disk with a persistent local testing disk.
      *
-     * @param  string|null  $disk
+     * @param string|null $disk
+     *
      * @return void
      */
     public static function persistentFake($disk = null)

@@ -2,11 +2,11 @@
 
 namespace Illuminate\Cache\Console;
 
-use Illuminate\Console\Command;
 use Illuminate\Cache\CacheManager;
+use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class ClearCommand extends Command
 {
@@ -41,8 +41,9 @@ class ClearCommand extends Command
     /**
      * Create a new cache clear command instance.
      *
-     * @param  \Illuminate\Cache\CacheManager  $cache
-     * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param \Illuminate\Cache\CacheManager    $cache
+     * @param \Illuminate\Filesystem\Filesystem $files
+     *
      * @return void
      */
     public function __construct(CacheManager $cache, Filesystem $files)

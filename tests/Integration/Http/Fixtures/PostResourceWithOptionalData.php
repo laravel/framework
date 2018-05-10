@@ -9,10 +9,10 @@ class PostResourceWithOptionalData extends Resource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'first' => $this->when(false, 'value'),
+            'id'     => $this->id,
+            'first'  => $this->when(false, 'value'),
             'second' => $this->when(true, 'value'),
-            'third' => $this->when(true, function () {
+            'third'  => $this->when(true, function () {
                 return 'value';
             }),
         ];

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\View\Blade;
 
-class BladeIfEmptyStatementsTest extends AbstractBladeTestCase
+class BladeIfIEmptyStatementsTest extends AbstractBladeTestCase
 {
     public function testIfStatementsAreCompiled()
     {

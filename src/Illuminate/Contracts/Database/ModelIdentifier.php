@@ -30,9 +30,10 @@ class ModelIdentifier
     /**
      * Create a new model identifier.
      *
-     * @param  string  $class
-     * @param  mixed  $id
-     * @param  mixed  $connection
+     * @param string $class
+     * @param mixed  $id
+     * @param mixed  $connection
+     *
      * @return void
      */
     public function __construct($class, $id, $connection)

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Pagination;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pagination\UrlWindow;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\UrlWindow;
+use PHPUnit\Framework\TestCase;
 
 class UrlWindowTest extends TestCase
 {

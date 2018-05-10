@@ -7,7 +7,8 @@ trait CompilesIncludes
     /**
      * Compile the each statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileEach($expression)
@@ -18,7 +19,8 @@ trait CompilesIncludes
     /**
      * Compile the include statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileInclude($expression)
@@ -31,7 +33,8 @@ trait CompilesIncludes
     /**
      * Compile the include-if statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeIf($expression)
@@ -44,7 +47,8 @@ trait CompilesIncludes
     /**
      * Compile the include-when statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeWhen($expression)
@@ -57,7 +61,8 @@ trait CompilesIncludes
     /**
      * Compile the include-first statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileIncludeFirst($expression)

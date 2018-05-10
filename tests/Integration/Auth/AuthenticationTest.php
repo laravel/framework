@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -20,9 +20,9 @@ class AuthenticationTest extends TestCase
 
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 
@@ -40,9 +40,9 @@ class AuthenticationTest extends TestCase
         });
 
         AuthenticationTestUser::create([
-            'username' => 'username',
-            'email' => 'email',
-            'password' => bcrypt('password'),
+            'username'  => 'username',
+            'email'     => 'email',
+            'password'  => bcrypt('password'),
             'is_active' => true,
         ]);
 
@@ -84,9 +84,9 @@ class AuthenticationTest extends TestCase
     public function basic_auth_respects_additional_conditions()
     {
         AuthenticationTestUser::create([
-            'username' => 'username2',
-            'email' => 'email2',
-            'password' => bcrypt('password'),
+            'username'  => 'username2',
+            'email'     => 'email2',
+            'password'  => bcrypt('password'),
             'is_active' => false,
         ]);
 
@@ -188,11 +188,11 @@ class AuthenticationTest extends TestCase
         $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
 
         $user = AuthenticationTestUser::create([
-            'username' => 'username2',
-            'email' => 'email2',
-            'password' => bcrypt('password'),
+            'username'       => 'username2',
+            'email'          => 'email2',
+            'password'       => bcrypt('password'),
             'remember_token' => $token = str_random(),
-            'is_active' => false,
+            'is_active'      => false,
         ]);
 
         $this->assertEquals($user->id, $provider->retrieveByToken($user->id, $token)->id);

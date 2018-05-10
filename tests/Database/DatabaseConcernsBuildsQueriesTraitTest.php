@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Concerns\BuildsQueries;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseConcernsBuildsQueriesTraitTest extends TestCase
 {

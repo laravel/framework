@@ -2,15 +2,16 @@
 
 namespace Illuminate\Http\Resources;
 
-use Illuminate\Support\Str;
 use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Str;
 
 trait CollectsResources
 {
     /**
      * Map the given collection resource into its individual resources.
      *
-     * @param  mixed  $resource
+     * @param mixed $resource
+     *
      * @return mixed
      */
     protected function collectResource($resource)
@@ -21,7 +22,7 @@ trait CollectsResources
 
         $collects = $this->collects();
 
-        $this->collection = $collects && ! $resource->first() instanceof $collects
+        $this->collection = $collects && !$resource->first() instanceof $collects
             ? $resource->mapInto($collects)
             : $resource->toBase();
 

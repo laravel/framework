@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Eloquent;
 
 use Faker\Generator as Faker;
-use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
+use InvalidArgumentException;
 
 class FactoryBuilder
 {
@@ -69,11 +69,12 @@ class FactoryBuilder
     /**
      * Create an new builder instance.
      *
-     * @param  string  $class
-     * @param  string  $name
-     * @param  array  $definitions
-     * @param  array  $states
-     * @param  \Faker\Generator  $faker
+     * @param string           $class
+     * @param string           $name
+     * @param array            $definitions
+     * @param array            $states
+     * @param \Faker\Generator $faker
+     *
      * @return void
      */
     public function __construct($class, $name, array $definitions, array $states, Faker $faker)
@@ -88,7 +89,8 @@ class FactoryBuilder
     /**
      * Set the amount of models you wish to create / make.
      *
-     * @param  int  $amount
+     * @param int $amount
+     *
      * @return $this
      */
     public function times($amount)
@@ -101,7 +103,8 @@ class FactoryBuilder
     /**
      * Set the states to be applied to the model.
      *
-     * @param  array|mixed  $states
+     * @param array|mixed $states
+     *
      * @return $this
      */
     public function states($states)
@@ -114,7 +117,8 @@ class FactoryBuilder
     /**
      * Set the database connection on which the model instance should be persisted.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return $this
      */
     public function connection($name)
@@ -127,7 +131,8 @@ class FactoryBuilder
     /**
      * Create a model and persist it in the database if requested.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Closure
      */
     public function lazy(array $attributes = [])
@@ -140,7 +145,8 @@ class FactoryBuilder
     /**
      * Create a collection of models and persist them to the database.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return mixed
      */
     public function create(array $attributes = [])
@@ -159,13 +165,14 @@ class FactoryBuilder
     /**
      * Set the connection name on the results and store them.
      *
-     * @param  \Illuminate\Support\Collection  $results
+     * @param \Illuminate\Support\Collection $results
+     *
      * @return void
      */
     protected function store($results)
     {
         $results->each(function ($model) {
-            if (! isset($this->connection)) {
+            if (!isset($this->connection)) {
                 $model->setConnection($model->newQueryWithoutScopes()->getConnection()->getName());
             }
 
@@ -176,7 +183,8 @@ class FactoryBuilder
     /**
      * Create a collection of models.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return mixed
      */
     public function make(array $attributes = [])
@@ -186,10 +194,10 @@ class FactoryBuilder
         }
 
         if ($this->amount < 1) {
-            return (new $this->class)->newCollection();
+            return (new $this->class())->newCollection();
         }
 
-        return (new $this->class)->newCollection(array_map(function () use ($attributes) {
+        return (new $this->class())->newCollection(array_map(function () use ($attributes) {
             return $this->makeInstance($attributes);
         }, range(1, $this->amount)));
     }
@@ -197,7 +205,8 @@ class FactoryBuilder
     /**
      * Create an array of raw attribute arrays.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return mixed
      */
     public function raw(array $attributes = [])
@@ -218,7 +227,8 @@ class FactoryBuilder
     /**
      * Get a raw attributes array for the model.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return mixed
      */
     protected function getRawAttributes(array $attributes = [])
@@ -236,15 +246,16 @@ class FactoryBuilder
     /**
      * Make an instance of the model with the given attributes.
      *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @param array $attributes
      *
      * @throws \InvalidArgumentException
+     *
+     * @return \Illuminate\Database\Eloquent\Model
      */
     protected function makeInstance(array $attributes = [])
     {
         return Model::unguarded(function () use ($attributes) {
-            if (! isset($this->definitions[$this->class][$this->name])) {
+            if (!isset($this->definitions[$this->class][$this->name])) {
                 throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
             }
 
@@ -263,14 +274,15 @@ class FactoryBuilder
     /**
      * Apply the active states to the model definition array.
      *
-     * @param  array  $definition
-     * @param  array  $attributes
+     * @param array $definition
+     * @param array $attributes
+     *
      * @return array
      */
     protected function applyStates(array $definition, array $attributes = [])
     {
         foreach ($this->activeStates as $state) {
-            if (! isset($this->states[$this->class][$state])) {
+            if (!isset($this->states[$this->class][$state])) {
                 throw new InvalidArgumentException("Unable to locate [{$state}] state for [{$this->class}].");
             }
 
@@ -286,15 +298,16 @@ class FactoryBuilder
     /**
      * Get the state attributes.
      *
-     * @param  string  $state
-     * @param  array  $attributes
+     * @param string $state
+     * @param array  $attributes
+     *
      * @return array
      */
     protected function stateAttributes($state, array $attributes)
     {
         $stateAttributes = $this->states[$this->class][$state];
 
-        if (! is_callable($stateAttributes)) {
+        if (!is_callable($stateAttributes)) {
             return $stateAttributes;
         }
 
@@ -307,13 +320,14 @@ class FactoryBuilder
     /**
      * Expand all attributes to their underlying values.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return array
      */
     protected function expandAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
-            if (is_callable($attribute) && ! is_string($attribute)) {
+            if (is_callable($attribute) && !is_string($attribute)) {
                 $attribute = $attribute($attributes);
             }
 

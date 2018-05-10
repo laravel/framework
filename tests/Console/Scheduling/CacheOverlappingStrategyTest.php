@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
+use Illuminate\Console\Scheduling\CacheMutex;
+use Illuminate\Console\Scheduling\Event;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Console\Scheduling\Event;
-use Illuminate\Console\Scheduling\CacheMutex;
 
-class CacheMutexTest extends TestCase
+class CacheOverlappingStrategyTest extends TestCase
 {
     /**
      * @var CacheMutex

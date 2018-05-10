@@ -14,7 +14,8 @@ trait ManagesTranslations
     /**
      * Start a translation block.
      *
-     * @param  array  $replacements
+     * @param array $replacements
+     *
      * @return void
      */
     public function startTranslation($replacements = [])
