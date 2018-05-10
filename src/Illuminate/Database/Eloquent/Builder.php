@@ -211,8 +211,8 @@ class Builder
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
-     * @param  mixed  $value
+     * @param  mixed   $operator
+     * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
      */
