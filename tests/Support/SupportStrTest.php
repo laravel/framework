@@ -142,6 +142,7 @@ class SupportStrTest extends TestCase
         $this->assertEquals('hello-world', Str::slug('hello_world'));
         $this->assertEquals('hello_world', Str::slug('hello_world', '_'));
         $this->assertEquals('user-at-host', Str::slug('user@host'));
+        $this->assertEquals('user-and-host', Str::slug('user &amp; host'));
     }
 
     public function testFinish()
