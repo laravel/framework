@@ -7,7 +7,8 @@ interface Paginator
     /**
      * Get the URL for a given page.
      *
-     * @param  int  $page
+     * @param int $page
+     *
      * @return string
      */
     public function url($page);
@@ -15,8 +16,9 @@ interface Paginator
     /**
      * Add a set of query string values to the paginator.
      *
-     * @param  array|string  $key
-     * @param  string|null  $value
+     * @param array|string $key
+     * @param string|null  $value
+     *
      * @return $this
      */
     public function appends($key, $value = null);
@@ -24,7 +26,8 @@ interface Paginator
     /**
      * Get / set the URL fragment to be appended to URLs.
      *
-     * @param  string|null  $fragment
+     * @param string|null $fragment
+     *
      * @return $this|string
      */
     public function fragment($fragment = null);
@@ -109,8 +112,9 @@ interface Paginator
     /**
      * Render the paginator using a given view.
      *
-     * @param  string|null  $view
-     * @param  array  $data
+     * @param string|null $view
+     * @param array       $data
+     *
      * @return string
      */
     public function render($view = null, $data = []);

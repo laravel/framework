@@ -19,14 +19,15 @@ class Bootstrap extends Preset
     /**
      * Update the given package array.
      *
-     * @param  array  $packages
+     * @param array $packages
+     *
      * @return array
      */
     protected static function updatePackageArray(array $packages)
     {
         return [
             'bootstrap-sass' => '^3.3.7',
-            'jquery' => '^3.1.1',
+            'jquery'         => '^3.1.1',
         ] + $packages;
     }
 

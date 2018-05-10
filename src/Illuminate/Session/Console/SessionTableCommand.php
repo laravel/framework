@@ -3,8 +3,8 @@
 namespace Illuminate\Session\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Support\Composer;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Composer;
 
 class SessionTableCommand extends Command
 {
@@ -37,8 +37,9 @@ class SessionTableCommand extends Command
     /**
      * Create a new session table command instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  \Illuminate\Support\Composer  $composer
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param \Illuminate\Support\Composer      $composer
+     *
      * @return void
      */
     public function __construct(Filesystem $files, Composer $composer)

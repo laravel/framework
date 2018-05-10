@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Queue;
 
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Queue\DatabaseQueue;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Queue\DatabaseQueue;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
 
 class QueueDatabaseQueueIntegrationTest extends TestCase
 {
@@ -29,7 +29,7 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
 
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -108,13 +108,13 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->connection()
             ->table('jobs')
             ->insert([
-                'id' => 1,
-                'queue' => $mock_queue_name = 'mock_queue_name',
-                'payload' => 'mock_payload',
-                'attempts' => 0,
-                'reserved_at' => null,
+                'id'           => 1,
+                'queue'        => $mock_queue_name = 'mock_queue_name',
+                'payload'      => 'mock_payload',
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
-                'created_at' => Carbon::now()->getTimestamp(),
+                'created_at'   => Carbon::now()->getTimestamp(),
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);
@@ -128,13 +128,13 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
     public function testPoppedJobsIncrementAttempts()
     {
         $job = [
-            'id' => 1,
-            'queue' => 'mock_queue_name',
-            'payload' => 'mock_payload',
-            'attempts' => 0,
-            'reserved_at' => null,
+            'id'           => 1,
+            'queue'        => 'mock_queue_name',
+            'payload'      => 'mock_payload',
+            'attempts'     => 0,
+            'reserved_at'  => null,
             'available_at' => Carbon::now()->subSeconds(1)->getTimestamp(),
-            'created_at' => Carbon::now()->getTimestamp(),
+            'created_at'   => Carbon::now()->getTimestamp(),
         ];
 
         $this->connection()->table('jobs')->insert($job);
@@ -155,13 +155,13 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->connection()
             ->table('jobs')
             ->insert([
-                'id' => 1,
-                'queue' => $mock_queue_name = 'mock_queue_name',
-                'payload' => 'mock_payload',
-                'attempts' => 0,
-                'reserved_at' => null,
+                'id'           => 1,
+                'queue'        => $mock_queue_name = 'mock_queue_name',
+                'payload'      => 'mock_payload',
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => Carbon::now()->addSeconds(60)->getTimestamp(),
-                'created_at' => Carbon::now()->getTimestamp(),
+                'created_at'   => Carbon::now()->getTimestamp(),
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);
@@ -177,13 +177,13 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->connection()
             ->table('jobs')
             ->insert([
-                'id' => 1,
-                'queue' => $mock_queue_name = 'mock_queue_name',
-                'payload' => 'mock_payload',
-                'attempts' => 0,
-                'reserved_at' => Carbon::now()->subDay()->getTimestamp(),
+                'id'           => 1,
+                'queue'        => $mock_queue_name = 'mock_queue_name',
+                'payload'      => 'mock_payload',
+                'attempts'     => 0,
+                'reserved_at'  => Carbon::now()->subDay()->getTimestamp(),
                 'available_at' => Carbon::now()->addDay()->getTimestamp(),
-                'created_at' => Carbon::now()->getTimestamp(),
+                'created_at'   => Carbon::now()->getTimestamp(),
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);
@@ -199,13 +199,13 @@ class QueueDatabaseQueueIntegrationTest extends TestCase
         $this->connection()
             ->table('jobs')
             ->insert([
-                'id' => 1,
-                'queue' => $mock_queue_name = 'mock_queue_name',
-                'payload' => 'mock_payload',
-                'attempts' => 0,
-                'reserved_at' => Carbon::now()->addDay()->getTimestamp(),
+                'id'           => 1,
+                'queue'        => $mock_queue_name = 'mock_queue_name',
+                'payload'      => 'mock_payload',
+                'attempts'     => 0,
+                'reserved_at'  => Carbon::now()->addDay()->getTimestamp(),
                 'available_at' => Carbon::now()->subDay()->getTimestamp(),
-                'created_at' => Carbon::now()->getTimestamp(),
+                'created_at'   => Carbon::now()->getTimestamp(),
             ]);
 
         $popped_job = $this->queue->pop($mock_queue_name);

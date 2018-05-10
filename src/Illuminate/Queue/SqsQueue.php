@@ -3,8 +3,8 @@
 namespace Illuminate\Queue;
 
 use Aws\Sqs\SqsClient;
-use Illuminate\Queue\Jobs\SqsJob;
 use Illuminate\Contracts\Queue\Queue as QueueContract;
+use Illuminate\Queue\Jobs\SqsJob;
 
 class SqsQueue extends Queue implements QueueContract
 {
@@ -32,9 +32,10 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Create a new Amazon SQS queue instance.
      *
-     * @param  \Aws\Sqs\SqsClient  $sqs
-     * @param  string  $default
-     * @param  string  $prefix
+     * @param \Aws\Sqs\SqsClient $sqs
+     * @param string             $default
+     * @param string             $prefix
+     *
      * @return void
      */
     public function __construct(SqsClient $sqs, $default, $prefix = '')
@@ -47,13 +48,14 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Get the size of the queue.
      *
-     * @param  string  $queue
+     * @param string $queue
+     *
      * @return int
      */
     public function size($queue = null)
     {
         $response = $this->sqs->getQueueAttributes([
-            'QueueUrl' => $this->getQueue($queue),
+            'QueueUrl'       => $this->getQueue($queue),
             'AttributeNames' => ['ApproximateNumberOfMessages'],
         ]);
 
@@ -65,9 +67,10 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Push a new job onto the queue.
      *
-     * @param  string  $job
-     * @param  mixed   $data
-     * @param  string  $queue
+     * @param string $job
+     * @param mixed  $data
+     * @param string $queue
+     *
      * @return mixed
      */
     public function push($job, $data = '', $queue = null)
@@ -78,9 +81,10 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Push a raw payload onto the queue.
      *
-     * @param  string  $payload
-     * @param  string  $queue
-     * @param  array   $options
+     * @param string $payload
+     * @param string $queue
+     * @param array  $options
+     *
      * @return mixed
      */
     public function pushRaw($payload, $queue = null, array $options = [])
@@ -93,17 +97,18 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Push a new job onto the queue after a delay.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  string  $job
-     * @param  mixed   $data
-     * @param  string  $queue
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param string                               $job
+     * @param mixed                                $data
+     * @param string                               $queue
+     *
      * @return mixed
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
         return $this->sqs->sendMessage([
-            'QueueUrl' => $this->getQueue($queue),
-            'MessageBody' => $this->createPayload($job, $data),
+            'QueueUrl'     => $this->getQueue($queue),
+            'MessageBody'  => $this->createPayload($job, $data),
             'DelaySeconds' => $this->secondsUntil($delay),
         ])->get('MessageId');
     }
@@ -111,17 +116,18 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Pop the next job off of the queue.
      *
-     * @param  string  $queue
+     * @param string $queue
+     *
      * @return \Illuminate\Contracts\Queue\Job|null
      */
     public function pop($queue = null)
     {
         $response = $this->sqs->receiveMessage([
-            'QueueUrl' => $queue = $this->getQueue($queue),
+            'QueueUrl'       => $queue = $this->getQueue($queue),
             'AttributeNames' => ['ApproximateReceiveCount'],
         ]);
 
-        if (! is_null($response['Messages']) && count($response['Messages']) > 0) {
+        if (!is_null($response['Messages']) && count($response['Messages']) > 0) {
             return new SqsJob(
                 $this->container, $this->sqs, $response['Messages'][0],
                 $this->connectionName, $queue
@@ -132,7 +138,8 @@ class SqsQueue extends Queue implements QueueContract
     /**
      * Get the queue or return the default.
      *
-     * @param  string|null  $queue
+     * @param string|null $queue
+     *
      * @return string
      */
     public function getQueue($queue)

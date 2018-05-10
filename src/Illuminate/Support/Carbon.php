@@ -2,9 +2,9 @@
 
 namespace Illuminate\Support;
 
-use JsonSerializable;
 use Carbon\Carbon as BaseCarbon;
 use Illuminate\Support\Traits\Macroable;
+use JsonSerializable;
 
 class Carbon extends BaseCarbon implements JsonSerializable
 {
@@ -38,7 +38,8 @@ class Carbon extends BaseCarbon implements JsonSerializable
     /**
      * JSON serialize all Carbon instances using the given callback.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return void
      */
     public static function serializeUsing($callback)

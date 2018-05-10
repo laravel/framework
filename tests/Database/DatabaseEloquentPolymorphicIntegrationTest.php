@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
-use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Query\Builder;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',

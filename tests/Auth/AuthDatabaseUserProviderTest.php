@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Auth;
 
+use Illuminate\Auth\DatabaseUserProvider;
+use Illuminate\Auth\GenericUser;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\GenericUser;
-use Illuminate\Auth\DatabaseUserProvider;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {

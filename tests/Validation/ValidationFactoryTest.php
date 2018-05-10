@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
+use Illuminate\Validation\Factory;
+use Illuminate\Validation\PresenceVerifierInterface;
+use Illuminate\Validation\Validator;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Factory;
-use Illuminate\Validation\Validator;
-use Illuminate\Validation\PresenceVerifierInterface;
-use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 
 class ValidationFactoryTest extends TestCase
 {

@@ -16,7 +16,8 @@ class ViewController extends Controller
     /**
      * Create a new controller instance.
      *
-     * @param  \Illuminate\Contracts\View\Factory  $view
+     * @param \Illuminate\Contracts\View\Factory $view
+     *
      * @return void
      */
     public function __construct(ViewFactory $view)
@@ -27,7 +28,8 @@ class ViewController extends Controller
     /**
      * Invoke the controller method.
      *
-     * @param  array  $args
+     * @param array $args
+     *
      * @return \Illuminate\Contracts\View\View
      */
     public function __invoke(...$args)

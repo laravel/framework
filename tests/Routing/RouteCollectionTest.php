@@ -4,8 +4,8 @@ namespace Illuminate\Tests\Routing;
 
 use ArrayIterator;
 use Illuminate\Routing\Route;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\RouteCollection;
+use PHPUnit\Framework\TestCase;
 
 class RouteCollectionTest extends TestCase
 {
@@ -18,7 +18,7 @@ class RouteCollectionTest extends TestCase
     {
         parent::setUp();
 
-        $this->routeCollection = new RouteCollection;
+        $this->routeCollection = new RouteCollection();
     }
 
     public function testRouteCollectionCanBeConstructed()
@@ -30,7 +30,7 @@ class RouteCollectionTest extends TestCase
     {
         $this->routeCollection->add(new Route('GET', 'foo', [
             'uses' => 'FooController@index',
-            'as' => 'foo_index',
+            'as'   => 'foo_index',
         ]));
         $this->assertCount(1, $this->routeCollection);
     }
@@ -39,7 +39,7 @@ class RouteCollectionTest extends TestCase
     {
         $outputRoute = $this->routeCollection->add($inputRoute = new Route('GET', 'foo', [
             'uses' => 'FooController@index',
-            'as' => 'foo_index',
+            'as'   => 'foo_index',
         ]));
         $this->assertInstanceOf(Route::class, $outputRoute);
         $this->assertEquals($inputRoute, $outputRoute);
@@ -49,7 +49,7 @@ class RouteCollectionTest extends TestCase
     {
         $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
-            'as' => 'route_name',
+            'as'   => 'route_name',
         ]));
 
         $this->assertSame('route_name', $routeIndex->getName());
@@ -61,7 +61,7 @@ class RouteCollectionTest extends TestCase
     {
         $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', $action = [
             'uses' => 'FooController@index',
-            'as' => 'route_name',
+            'as'   => 'route_name',
         ]));
 
         $this->assertSame($action, $routeIndex->getAction());
@@ -71,7 +71,7 @@ class RouteCollectionTest extends TestCase
     {
         $this->routeCollection->add(new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
-            'as' => 'foo_index',
+            'as'   => 'foo_index',
         ]));
         $this->assertInstanceOf(ArrayIterator::class, $this->routeCollection->getIterator());
     }
@@ -86,13 +86,13 @@ class RouteCollectionTest extends TestCase
     {
         $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
-            'as' => 'foo_index',
+            'as'   => 'foo_index',
         ]));
         $this->assertCount(1, $this->routeCollection);
 
         $this->routeCollection->add($routeShow = new Route('GET', 'bar/show', [
             'uses' => 'BarController@show',
-            'as' => 'bar_show',
+            'as'   => 'bar_show',
         ]));
         $this->assertCount(2, $this->routeCollection);
 
@@ -103,7 +103,7 @@ class RouteCollectionTest extends TestCase
     {
         $routeIndex = new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
-            'as' => 'foo_index',
+            'as'   => 'foo_index',
         ]);
 
         $this->routeCollection->add($routeIndex);
@@ -116,7 +116,7 @@ class RouteCollectionTest extends TestCase
         // Add a non-existing route
         $this->routeCollection->add(new Route('GET', 'bar/show', [
             'uses' => 'BarController@show',
-            'as' => 'bar_show',
+            'as'   => 'bar_show',
         ]));
         $this->assertCount(2, $this->routeCollection);
     }
@@ -145,17 +145,17 @@ class RouteCollectionTest extends TestCase
     {
         $this->routeCollection->add($routeIndex = new Route('GET', 'foo/index', [
             'uses' => 'FooController@index',
-            'as' => 'foo_index',
+            'as'   => 'foo_index',
         ]));
 
         $this->routeCollection->add($routeShow = new Route('GET', 'foo/show', [
             'uses' => 'FooController@show',
-            'as' => 'foo_show',
+            'as'   => 'foo_show',
         ]));
 
         $this->routeCollection->add($routeNew = new Route('POST', 'bar', [
             'uses' => 'BarController@create',
-            'as' => 'bar_create',
+            'as'   => 'bar_create',
         ]));
 
         $allRoutes = [
@@ -171,15 +171,15 @@ class RouteCollectionTest extends TestCase
         $routesByName = [
             'foo_index' => new Route('GET', 'foo/index', [
                 'uses' => 'FooController@index',
-                'as' => 'foo_index',
+                'as'   => 'foo_index',
             ]),
             'foo_show' => new Route('GET', 'foo/show', [
                 'uses' => 'FooController@show',
-                'as' => 'foo_show',
+                'as'   => 'foo_show',
             ]),
             'bar_create' => new Route('POST', 'bar', [
                 'uses' => 'BarController@create',
-                'as' => 'bar_create',
+                'as'   => 'bar_create',
             ]),
         ];
 

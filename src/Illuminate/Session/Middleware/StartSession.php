@@ -3,11 +3,11 @@
 namespace Illuminate\Session\Middleware;
 
 use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
-use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;
+use Illuminate\Http\Request;
 use Illuminate\Session\CookieSessionHandler;
+use Illuminate\Session\SessionManager;
+use Illuminate\Support\Carbon;
 use Symfony\Component\HttpFoundation\Cookie;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -30,7 +30,8 @@ class StartSession
     /**
      * Create a new session middleware.
      *
-     * @param  \Illuminate\Session\SessionManager  $manager
+     * @param \Illuminate\Session\SessionManager $manager
+     *
      * @return void
      */
     public function __construct(SessionManager $manager)
@@ -41,8 +42,9 @@ class StartSession
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     *
      * @return mixed
      */
     public function handle($request, Closure $next)
@@ -77,13 +79,14 @@ class StartSession
     /**
      * Perform any final actions for the request lifecycle.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
+     * @param \Illuminate\Http\Request                   $request
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     *
      * @return void
      */
     public function terminate($request, $response)
     {
-        if ($this->sessionHandled && $this->sessionConfigured() && ! $this->usingCookieSessions()) {
+        if ($this->sessionHandled && $this->sessionConfigured() && !$this->usingCookieSessions()) {
             $this->manager->driver()->save();
         }
     }
@@ -91,7 +94,8 @@ class StartSession
     /**
      * Start the session for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Contracts\Session\Session
      */
     protected function startSession(Request $request)
@@ -106,7 +110,8 @@ class StartSession
     /**
      * Get the session implementation from the manager.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Contracts\Session\Session
      */
     public function getSession(Request $request)
@@ -119,7 +124,8 @@ class StartSession
     /**
      * Remove the garbage from the session if necessary.
      *
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return void
      */
     protected function collectGarbage(Session $session)
@@ -137,7 +143,8 @@ class StartSession
     /**
      * Determine if the configuration odds hit the lottery.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return bool
      */
     protected function configHitsLottery(array $config)
@@ -148,13 +155,14 @@ class StartSession
     /**
      * Store the current URL for the request if necessary.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param \Illuminate\Http\Request              $request
+     * @param \Illuminate\Contracts\Session\Session $session
+     *
      * @return void
      */
     protected function storeCurrentUrl(Request $request, $session)
     {
-        if ($request->method() === 'GET' && $request->route() && ! $request->ajax()) {
+        if ($request->method() === 'GET' && $request->route() && !$request->ajax()) {
             $session->setPreviousUrl($request->fullUrl());
         }
     }
@@ -162,8 +170,9 @@ class StartSession
     /**
      * Add the session cookie to the application response.
      *
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @param  \Illuminate\Contracts\Session\Session  $session
+     * @param \Symfony\Component\HttpFoundation\Response $response
+     * @param \Illuminate\Contracts\Session\Session      $session
+     *
      * @return void
      */
     protected function addCookieToResponse(Response $response, Session $session)
@@ -210,20 +219,21 @@ class StartSession
      */
     protected function sessionConfigured()
     {
-        return ! is_null($this->manager->getSessionConfig()['driver'] ?? null);
+        return !is_null($this->manager->getSessionConfig()['driver'] ?? null);
     }
 
     /**
      * Determine if the configured session driver is persistent.
      *
-     * @param  array|null  $config
+     * @param array|null $config
+     *
      * @return bool
      */
     protected function sessionIsPersistent(array $config = null)
     {
         $config = $config ?: $this->manager->getSessionConfig();
 
-        return ! in_array($config['driver'], [null, 'array']);
+        return !in_array($config['driver'], [null, 'array']);
     }
 
     /**

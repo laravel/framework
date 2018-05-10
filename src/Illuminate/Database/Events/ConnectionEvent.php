@@ -21,7 +21,8 @@ abstract class ConnectionEvent
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param \Illuminate\Database\Connection $connection
+     *
      * @return void
      */
     public function __construct($connection)

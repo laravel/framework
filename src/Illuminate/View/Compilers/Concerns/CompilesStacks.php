@@ -7,7 +7,8 @@ trait CompilesStacks
     /**
      * Compile the stack statements into the content.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileStack($expression)
@@ -18,7 +19,8 @@ trait CompilesStacks
     /**
      * Compile the push statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compilePush($expression)
@@ -39,7 +41,8 @@ trait CompilesStacks
     /**
      * Compile the prepend statements into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compilePrepend($expression)

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Pheanstalk\Pheanstalk;
 use Illuminate\Container\Container;
-use Pheanstalk\Job as PheanstalkJob;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Pheanstalk\Job as PheanstalkJob;
+use Pheanstalk\Pheanstalk;
 
 class BeanstalkdJob extends Job implements JobContract
 {
@@ -26,11 +26,12 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \Pheanstalk\Pheanstalk  $pheanstalk
-     * @param  \Pheanstalk\Job  $job
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param \Illuminate\Container\Container $container
+     * @param \Pheanstalk\Pheanstalk          $pheanstalk
+     * @param \Pheanstalk\Job                 $job
+     * @param string                          $connectionName
+     * @param string                          $queue
+     *
      * @return void
      */
     public function __construct(Container $container, Pheanstalk $pheanstalk, PheanstalkJob $job, $connectionName, $queue)
@@ -45,7 +46,8 @@ class BeanstalkdJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0)

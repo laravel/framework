@@ -2,10 +2,10 @@
 
 namespace Illuminate\Session;
 
-use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
-use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Carbon;
+use SessionHandlerInterface;
+use Symfony\Component\Finder\Finder;
 
 class FileSessionHandler implements SessionHandlerInterface
 {
@@ -33,9 +33,10 @@ class FileSessionHandler implements SessionHandlerInterface
     /**
      * Create a new file driven handler instance.
      *
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @param  string  $path
-     * @param  int  $minutes
+     * @param \Illuminate\Filesystem\Filesystem $files
+     * @param string                            $path
+     * @param int                               $minutes
+     *
      * @return void
      */
     public function __construct(Filesystem $files, $path, $minutes)

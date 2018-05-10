@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\Events\Failed;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
+use Illuminate\Auth\Events\Failed;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\Request;
 
 class AuthGuardTest extends TestCase
