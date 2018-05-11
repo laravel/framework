@@ -2,7 +2,6 @@
 
 namespace Illuminate\Hashing;
 
-use Exception;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
@@ -59,6 +58,8 @@ class ArgonHasher implements HasherContract
      * @param  string  $value
      * @param  array  $options
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function make($value, array $options = [])
     {
@@ -83,7 +84,7 @@ class ArgonHasher implements HasherContract
      * @param  array  $options
      * @return bool
      *
-     * @throws Exception
+     * @throws \RuntimeException
      */
     public function check($value, $hashedValue, array $options = [])
     {
@@ -92,7 +93,7 @@ class ArgonHasher implements HasherContract
         }
 
         if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
-            throw new Exception('This password does not use the Argon algorithm.');
+            throw new RuntimeException('This password does not use the Argon algorithm.');
         }
 
         return password_verify($value, $hashedValue);
