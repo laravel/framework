@@ -32,7 +32,6 @@ class HasherTest extends TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Hashing algorithm mismatch.
      */
     public function testBasicBcryptVerification()
     {
@@ -47,7 +46,6 @@ class HasherTest extends TestCase
 
     /**
      * @expectedException \Exception
-     * @expectedExceptionMessage Hashing algorithm mismatch.
      */
     public function testBasicArgonVerification()
     {
