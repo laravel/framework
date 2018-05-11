@@ -2,7 +2,6 @@
 
 namespace Illuminate\Hashing;
 
-use Exception;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
@@ -67,7 +66,7 @@ class BcryptHasher implements HasherContract
      * @param  array   $options
      * @return bool
      *
-     * @throws Exception
+     * @throws \RuntimeException
      */
     public function check($value, $hashedValue, array $options = [])
     {
@@ -76,7 +75,7 @@ class BcryptHasher implements HasherContract
         }
 
         if ($this->info($hashedValue)['algoName'] !== 'bcrypt') {
-            throw new Exception('This password does not use the Bcrypt algorithm.');
+            throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
 
         return password_verify($value, $hashedValue);
