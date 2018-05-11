@@ -2,6 +2,7 @@
 
 namespace Illuminate\Hashing;
 
+use Exception;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
@@ -81,11 +82,17 @@ class ArgonHasher implements HasherContract
      * @param  string  $hashedValue
      * @param  array  $options
      * @return bool
+     *
+     * @throws Exception
      */
     public function check($value, $hashedValue, array $options = [])
     {
         if (strlen($hashedValue) === 0) {
             return false;
+        }
+
+        if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
+            throw new Exception('Hashing algorithm mismatch.');
         }
 
         return password_verify($value, $hashedValue);
