@@ -654,7 +654,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\Connection
      */
     protected function connection()
     {
@@ -664,7 +664,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {
