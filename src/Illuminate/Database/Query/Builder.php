@@ -769,7 +769,7 @@ class Builder
      */
     public function addNestedWhereQuery($query, $boolean = 'and')
     {
-        if (!is_null($query->wheres) and count($query->wheres)) {
+        if (! is_null($query->wheres) && count($query->wheres)) {
             $type = 'Nested';
 
             $this->wheres[] = compact('type', 'query', 'boolean');
