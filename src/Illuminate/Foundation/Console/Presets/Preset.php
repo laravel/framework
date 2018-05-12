@@ -25,19 +25,20 @@ class Preset
      *
      * @return void
      */
-    protected static function updatePackages()
+    protected static function updatePackages($devDependency = true)
     {
         if (! file_exists(base_path('package.json'))) {
             return;
         }
 
+        $dependenciesBlock = $devDependency ? 'devDependencies' : 'dependencies';
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
 
-        $packages['devDependencies'] = static::updatePackageArray(
-            $packages['devDependencies']
+        $packages[$dependenciesBlock] = static::updatePackageArray(
+            array_key_exists($dependenciesBlock, $packages) ? $packages[$dependenciesBlock] : []
         );
 
-        ksort($packages['devDependencies']);
+        ksort($packages[$dependenciesBlock]);
 
         file_put_contents(
             base_path('package.json'),
