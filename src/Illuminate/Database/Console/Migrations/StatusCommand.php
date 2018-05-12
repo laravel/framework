@@ -76,7 +76,7 @@ class StatusCommand extends BaseCommand
     protected function getStatusFor(array $ran, array $batches)
     {
         return Collection::make($this->getAllMigrationFiles())
-                    ->filter(function($migration) use ($ran) {
+                    ->filter(function ($migration) use ($ran) {
                         return ! $this->option('pending')
                             || ! in_array($this->migrator->getMigrationName($migration), $ran);
                     })

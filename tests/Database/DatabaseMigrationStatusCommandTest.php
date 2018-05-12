@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Console\Migrations\StatusCommand;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+use Illuminate\Database\Console\Migrations\StatusCommand;
 
 class DatabaseMigrationStatusCommandTest extends TestCase
 {
@@ -70,7 +70,7 @@ class DatabaseMigrationStatusCommandTest extends TestCase
         $tester = new CommandTester($command);
         $tester->execute(['--pending' => true]);
 
-        $expected = <<<OUTPUT
+        $expected = <<<'OUTPUT'
 +------+----------------------------------------+-------+
 | Ran? | Migration                              | Batch |
 +------+----------------------------------------+-------+
