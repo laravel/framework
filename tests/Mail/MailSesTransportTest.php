@@ -1,10 +1,10 @@
 <?php
 
 use Aws\Ses\SesClient;
-use Illuminate\Foundation\Application;
-use Illuminate\Mail\TransportManager;
-use Illuminate\Mail\Transport\SesTransport;
 use Illuminate\Support\Collection;
+use Illuminate\Mail\TransportManager;
+use Illuminate\Foundation\Application;
+use Illuminate\Mail\Transport\SesTransport;
 
 class MailSesTransportTest extends PHPUnit_Framework_TestCase
 {

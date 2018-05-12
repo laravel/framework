@@ -1,7 +1,6 @@
 <?php
 
 use Mockery as m;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 
 class DatabaseConnectionFactoryTest extends PHPUnit_Framework_TestCase

@@ -1,4 +1,17 @@
-# Release Notes
+# Release Notes for 5.2.x
+
+## [Unreleased]
+
+### Fixed
+- Fixed deferring write connection ([#16673](https://github.com/laravel/framework/pull/16673))
+
+
+## v5.2.45 (2016-08-26)
+
+### Fixed
+- Revert changes to Eloquent `Builder` that breaks `firstOr*` methods ([#15018](https://github.com/laravel/framework/pull/15018))
+- Revert aggregate changes in [#14793](https://github.com/laravel/framework/pull/14793) ([#14994](https://github.com/laravel/framework/pull/14994))
+
 
 ## v5.2.44 (2016-08-23)
 
