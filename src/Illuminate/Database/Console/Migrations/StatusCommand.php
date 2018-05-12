@@ -76,6 +76,10 @@ class StatusCommand extends BaseCommand
     protected function getStatusFor(array $ran, array $batches)
     {
         return Collection::make($this->getAllMigrationFiles())
+                    ->filter(function($migration) use ($ran) {
+                        return ! $this->option('pending')
+                            || ! in_array($this->migrator->getMigrationName($migration), $ran);
+                    })
                     ->map(function ($migration) use ($ran, $batches) {
                         $migrationName = $this->migrator->getMigrationName($migration);
 
@@ -108,6 +112,8 @@ class StatusCommand extends BaseCommand
             ['path', null, InputOption::VALUE_OPTIONAL, 'The path to the migrations files to use.'],
 
             ['realpath', null, InputOption::VALUE_NONE, 'Indicate any provided migration file paths are pre-resolved absolute paths.'],
+
+            ['pending', null, InputOption::VALUE_NONE, 'Indicate to only list the migrations that are yet to be migrated.'],
         ];
     }
 }
