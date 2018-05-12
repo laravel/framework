@@ -10,7 +10,7 @@ class HashManager extends Manager implements Hasher
     /**
      * Create an instance of the Bcrypt hash Driver.
      *
-     * @return BcryptHasher
+     * @return \Illuminate\Hashing\BcryptHasher
      */
     public function createBcryptDriver()
     {
@@ -20,7 +20,7 @@ class HashManager extends Manager implements Hasher
     /**
      * Create an instance of the Argon2 hash Driver.
      *
-     * @return ArgonHasher
+     * @return \Illuminate\Hashing\ArgonHasher
      */
     public function createArgonDriver()
     {
