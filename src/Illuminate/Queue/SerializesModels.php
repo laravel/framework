@@ -10,6 +10,11 @@ trait SerializesModels
     use SerializesAndRestoresModelIdentifiers;
 
     /**
+     * @var string
+     */
+    protected $locale;
+
+    /**
      * Prepare the instance for serialization.
      *
      * @return array
@@ -23,6 +28,8 @@ trait SerializesModels
                 $this->getPropertyValue($property)
             ));
         }
+
+        $this->locale = app()->getLocale();
 
         return array_values(array_filter(array_map(function ($p) {
             return $p->isStatic() ? null : $p->getName();
@@ -45,6 +52,8 @@ trait SerializesModels
                 $this->getPropertyValue($property)
             ));
         }
+
+        app()->setLocale($this->locale);
     }
 
     /**
