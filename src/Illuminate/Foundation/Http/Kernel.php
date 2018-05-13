@@ -110,6 +110,9 @@ class Kernel implements KernelContract
      */
     public function handle($request)
     {
+        $this->app['events']->dispatch(
+            new Events\RequestStartHandling($request)
+        );
         try {
             $request->enableHttpMethodParameterOverride();
 
