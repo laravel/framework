@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Pipeline;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Pipeline\Pipeline;
+use Illuminate\Contracts\Support\Responsable;
 
 class PipelineTest extends TestCase
 {
@@ -60,6 +61,23 @@ class PipelineTest extends TestCase
         $this->assertEquals('foo', $_SERVER['__test.pipe.one']);
 
         unset($_SERVER['__test.pipe.one']);
+    }
+
+    public function testPipelineUsageWithResponsableObjects()
+    {
+        $result = (new Pipeline(new \Illuminate\Container\Container))
+            ->send('foo')
+            ->through([new PipelineTestPipeResponsable])
+            ->then(
+                function ($piped) {
+                    return $piped;
+                }
+            );
+
+        $this->assertEquals('bar', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.responsable']);
+
+        unset($_SERVER['__test.pipe.responsable']);
     }
 
     public function testPipelineUsageWithCallable()
@@ -160,6 +178,14 @@ class PipelineTestPipeOne
     }
 }
 
+class PipeResponsable implements Responsable
+{
+    public function toResponse($request)
+    {
+        return 'bar';
+    }
+}
+
 class PipelineTestPipeTwo
 {
     public function __invoke($piped, $next)
@@ -167,6 +193,16 @@ class PipelineTestPipeTwo
         $_SERVER['__test.pipe.one'] = $piped;
 
         return $next($piped);
+    }
+}
+
+class PipelineTestPipeResponsable
+{
+    public function handle($piped, $next)
+    {
+        $_SERVER['__test.pipe.responsable'] = $piped;
+
+        return new PipeResponsable;
     }
 }
 
