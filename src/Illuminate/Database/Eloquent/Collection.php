@@ -44,7 +44,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationships onto the collection.
      *
-     * @param  mixed  $relations
+     * @param  array|string  $relations
      * @return $this
      */
     public function load($relations)
@@ -84,6 +84,62 @@ class Collection extends BaseCollection implements QueueableCollection
             });
 
         return $this;
+    }
+
+    /**
+     * Load a set of relationships onto the collection if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadMissing($relations)
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        foreach ($relations as $relation) {
+            $this->loadMissingRelation($this, explode('.', $relation));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Load a relationship path if it is not already eager loaded.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection  $models
+     * @param  array  $path
+     * @return void
+     */
+    protected function loadMissingRelation(Collection $models, array $path)
+    {
+        // Get the first relationship.
+        $relation = array_shift($path);
+
+        // Handle relationships with specific columns.
+        $name = explode(':', $relation)[0];
+
+        // Load the relationship where missing.
+        $models->filter(function ($model) use ($name) {
+            return ! is_null($model) && ! $model->relationLoaded($name);
+        })->load($relation);
+
+        // End the recursion.
+        if (empty($path)) {
+            return;
+        }
+
+        // Get the models for the next level.
+        $models = $models->pluck($name);
+
+        // Handle *-many relationships.
+        if ($models->first() instanceof BaseCollection) {
+            $models = $models->collapse();
+        }
+
+        // Load the remaining path.
+        $this->loadMissingRelation(new static($models), $path);
     }
 
     /**
