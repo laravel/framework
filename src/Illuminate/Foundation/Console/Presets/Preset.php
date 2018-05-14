@@ -23,22 +23,24 @@ class Preset
     /**
      * Update the "package.json" file.
      *
+     * @param  bool  $dev
      * @return void
      */
-    protected static function updatePackages($devDependency = true)
+    protected static function updatePackages($dev = true)
     {
         if (! file_exists(base_path('package.json'))) {
             return;
         }
 
-        $dependenciesBlock = $devDependency ? 'devDependencies' : 'dependencies';
+        $configurationKey = $dev ? 'devDependencies' : 'dependencies';
+
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
 
-        $packages[$dependenciesBlock] = static::updatePackageArray(
-            array_key_exists($dependenciesBlock, $packages) ? $packages[$dependenciesBlock] : []
+        $packages[$configurationKey] = static::updatePackageArray(
+            array_key_exists($configurationKey, $packages) ? $packages[$configurationKey] : []
         );
 
-        ksort($packages[$dependenciesBlock]);
+        ksort($packages[$configurationKey]);
 
         file_put_contents(
             base_path('package.json'),
