@@ -41,6 +41,8 @@ namespace Illuminate\Support\Facades;
  * @method static mixed offsetGet(string $offset)
  * @method static void offsetSet(string $offset, $value)
  * @method static void offsetUnset(string $offset)
+ * @method static array validate(array $rules, ...$params)
+ * @method static bool hasValidSignature()
  *
  * @see \Illuminate\Http\Request
  */

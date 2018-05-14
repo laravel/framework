@@ -12,6 +12,10 @@ use Illuminate\Contracts\Support\Arrayable;
 use Symfony\Component\HttpFoundation\ParameterBag;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
+/**
+ * @method array validate(array $rules, ...$params)
+ * @method bool hasValidSignature()
+ */
 class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 {
     use Concerns\InteractsWithContentTypes,
