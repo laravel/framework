@@ -74,8 +74,18 @@ class Collection extends BaseCollection implements QueueableCollection
             $relations = func_get_args();
         }
 
-        foreach ($relations as $relation) {
-            $this->loadMissingRelation($this, explode('.', $relation));
+        foreach ($relations as $key => $value) {
+            if (is_numeric($key)) {
+                $key = $value;
+            }
+
+            $path = array_combine($segments = explode('.', $key), $segments);
+
+            if (is_callable($value)) {
+                $path[end($segments)] = $value;
+            }
+
+            $this->loadMissingRelation($this, $path);
         }
 
         return $this;
@@ -90,9 +100,13 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function loadMissingRelation(Collection $models, array $path)
     {
-        $relation = array_shift($path);
+        $relation = array_splice($path, 0, 1);
 
-        $name = explode(':', $relation)[0];
+        $name = explode(':', key($relation))[0];
+
+        if (is_string(reset($relation))) {
+            $relation = reset($relation);
+        }
 
         $models->filter(function ($model) use ($name) {
             return ! is_null($model) && ! $model->relationLoaded($name);
