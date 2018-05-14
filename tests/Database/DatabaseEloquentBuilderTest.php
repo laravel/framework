@@ -59,6 +59,21 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Model', $result);
     }
 
+    public function testFindOrMethodModelFound()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('findOr')->once()->andReturn('baz');
+
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[first]', [$this->getMockQueryBuilder()]);
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
+        $builder->shouldReceive('first')->with(['column'])->andReturn('baz');
+
+        $expected = $model->findOr('bar', ['column']);
+        $result = $builder->find('bar', ['column']);
+        $this->assertEquals($expected, $result);
+    }
+
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
      */
