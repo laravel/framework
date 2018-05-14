@@ -63,30 +63,6 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
-     * Load a set of relationships onto the mixed relationship collection.
-     *
-     * @param  string  $relation
-     * @param  array  $relations
-     * @return $this
-     */
-    public function loadMorph($relation, $relations)
-    {
-        $this->pluck($relation)
-            ->groupBy(function ($model) {
-                return get_class($model);
-            })
-            ->filter(function ($models, $className) use ($relations) {
-                return Arr::has($relations, $className);
-            })
-            ->each(function ($models, $className) use ($relations) {
-                $className::with($relations[$className])
-                    ->eagerLoadRelations($models->all());
-            });
-
-        return $this;
-    }
-
-    /**
      * Load a set of relationships onto the collection if they are not already eager loaded.
      *
      * @param  array|string  $relations
@@ -114,32 +90,49 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     protected function loadMissingRelation(Collection $models, array $path)
     {
-        // Get the first relationship.
         $relation = array_shift($path);
 
-        // Handle relationships with specific columns.
         $name = explode(':', $relation)[0];
 
-        // Load the relationship where missing.
         $models->filter(function ($model) use ($name) {
             return ! is_null($model) && ! $model->relationLoaded($name);
         })->load($relation);
 
-        // End the recursion.
         if (empty($path)) {
             return;
         }
 
-        // Get the models for the next level.
         $models = $models->pluck($name);
 
-        // Handle *-many relationships.
         if ($models->first() instanceof BaseCollection) {
             $models = $models->collapse();
         }
 
-        // Load the remaining path.
         $this->loadMissingRelation(new static($models), $path);
+    }
+
+    /**
+     * Load a set of relationships onto the mixed relationship collection.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorph($relation, $relations)
+    {
+        $this->pluck($relation)
+            ->groupBy(function ($model) {
+                return get_class($model);
+            })
+            ->filter(function ($models, $className) use ($relations) {
+                return Arr::has($relations, $className);
+            })
+            ->each(function ($models, $className) use ($relations) {
+                $className::with($relations[$className])
+                    ->eagerLoadRelations($models->all());
+            });
+
+        return $this;
     }
 
     /**
