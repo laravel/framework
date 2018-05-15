@@ -5,7 +5,6 @@ namespace Illuminate\Foundation\Auth;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 
@@ -102,7 +101,7 @@ trait ResetsPasswords
      */
     protected function resetPassword($user, $password)
     {
-        $user->password = Hash::make($password);
+        $user->password = $password;
 
         $user->setRememberToken(Str::random(60));
 
