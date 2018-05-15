@@ -24,6 +24,26 @@ class Event extends Facade
     }
 
     /**
+     * Replace the bound instance with a fake for the given callable only.
+     *
+     * @param  callable  $callable
+     * @param  array|string  $eventsToFake
+     * @return callable
+     */
+    public static function fakeFor(callable $callable, array $eventsToFake = [])
+    {
+        $initialDispatcher = Event::getFacadeRoot();
+
+        Event::fake($eventsToFake);
+
+        return tap($callable(), function () use ($initialDispatcher) {
+            Model::setEventDispatcher($initialDispatcher);
+
+            Event::swap($initialDispatcher);
+        });
+    }
+
+    /**
      * Get the registered name of the component.
      *
      * @return string
