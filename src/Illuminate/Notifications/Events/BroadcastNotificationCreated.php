@@ -88,7 +88,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         return array_merge($this->data, [
             'id' => $this->notification->id,
-            'type' => $this->broadcastType(),
+            'type' => $this->broadcastAs(),
         ]);
     }
 
@@ -97,7 +97,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
      *
      * @return string
      */
-    public function broadcastType()
+    public function broadcastAs()
     {
         return method_exists($this->notification, 'broadcastType')
                     ? $this->notification->broadcastType()
