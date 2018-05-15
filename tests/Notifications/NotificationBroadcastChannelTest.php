@@ -52,7 +52,7 @@ class NotificationBroadcastChannelTest extends TestCase
             $notifiable, $notification, $notification->toArray($notifiable)
         );
 
-        $eventName = $event->broadcastType();
+        $eventName = $event->broadcastAs();
 
         $this->assertSame('custom.type', $eventName);
     }
@@ -115,7 +115,7 @@ class CustomEventNameTestNotification extends Notification
         return ['invoice_id' => 1];
     }
 
-    public function broadcastType()
+    public function broadcastAs()
     {
         return 'custom.type';
     }
