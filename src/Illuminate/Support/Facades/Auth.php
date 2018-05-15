@@ -39,10 +39,11 @@ class Auth extends Facade
     /**
      * Register the typical authentication routes for an application.
      *
+     * @param string|null $name
      * @return void
      */
-    public static function routes()
+    public static function routes($name = null)
     {
-        static::$app->make('router')->auth();
+        static::$app->make('router')->auth($name);
     }
 }
