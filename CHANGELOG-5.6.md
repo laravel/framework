@@ -1,5 +1,15 @@
 # Release Notes for 5.6.x
 
+## v5.6.22 (2018-05-15)
+
+### Added
+- Added `Collection::loadMissing()` method ([#24166](https://github.com/laravel/framework/pull/24166), [#24215](https://github.com/laravel/framework/pull/24215))
+
+### Changed
+- Support updating NPM dependencies from preset ([#24189](https://github.com/laravel/framework/pull/24189), [a6542b0](https://github.com/laravel/framework/commit/a6542b0972a1a92c1249689d3e1b46b3bc4e59fa))
+- Support returning `Responsable` from middleware ([#24201](https://github.com/laravel/framework/pull/24201))
+
+
 ## v5.6.21 (2018-05-08)
 
 ### Added
