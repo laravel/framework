@@ -305,6 +305,20 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $this->assertNull($abigail->address);
     }
+    
+    /**
+     * @todo move to correct test
+     */
+    public function testBelongsToAssociateWithTap()
+    {
+        $this->createUsers();
+
+        $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
+        $group = SoftDeletesTestGroup::create(['name' => 'admin']);
+        tap($abigail)->group()->associate($group);
+        $abigail->save();
+        $this->assertEquals($abigail->group, $group);
+    }
 
     public function testBelongsToRelationshipCanBeSoftDeleted()
     {
