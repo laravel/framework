@@ -204,6 +204,45 @@ class SupportMessageBagTest extends TestCase
         $this->assertEquals([0 => 'bar', 2 => 'baz'], $container->unique());
     }
 
+    public function testForget()
+    {
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo', 'bar2');
+        $container->add('boom', 'bust');
+        $container->forget('foo');
+        $this->assertEquals([], $container->get('foo'));
+        $this->assertEquals(['bust'], $container->get('boom'));
+
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo', 'bar2');
+        $container->add('boom', 'bust');
+        $container->forget('boom');
+        $this->assertEquals(['bar', 'bar2'], $container->get('foo'));
+        $this->assertEquals([], $container->get('boom'));
+
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo', 'bar2');
+        $container->add('boom', 'bust');
+        $container->forget('foo.0');
+        $this->assertEquals([1 => 'bar2'], $container->get('foo'));
+        $this->assertEquals(['bust'], $container->get('boom'));
+
+        $container = new MessageBag;
+        $container->setFormat(':message');
+        $container->add('foo', 'bar');
+        $container->add('foo', 'bar2');
+        $container->add('boom', 'bust');
+        $container->forget('foo.1');
+        $this->assertEquals(['bar'], $container->get('foo'));
+        $this->assertEquals(['bust'], $container->get('boom'));
+    }
+
     public function testMessageBagReturnsCorrectArray()
     {
         $container = new MessageBag;

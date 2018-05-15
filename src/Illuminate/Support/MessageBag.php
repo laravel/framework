@@ -230,6 +230,17 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
     }
 
     /**
+     * Remove one or many messages from a given array using "dot" notation.
+     *
+     * @param  array|string  $keys
+     * @return void
+     */
+    public function forget($keys)
+    {
+        Arr::forget($this->messages, $keys);
+    }
+
+    /**
      * Format an array of messages.
      *
      * @param  array   $messages
