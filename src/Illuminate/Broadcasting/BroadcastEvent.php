@@ -40,8 +40,13 @@ class BroadcastEvent implements ShouldQueue
      */
     public function handle(Broadcaster $broadcaster)
     {
-        $name = method_exists($this->event, 'broadcastAs')
-                ? $this->event->broadcastAs() : get_class($this->event);
+        if (method_exists($this->event, 'broadcastAs')) {
+            $name = $this->event->broadcastAs();
+        } else if (method_exists($this->event, 'broadcastType')) {
+            $name = $this->event->broadcastType();
+        } else {
+            $name = get_class($this->event);
+        }
 
         $broadcaster->broadcast(
             Arr::wrap($this->event->broadcastOn()), $name,
