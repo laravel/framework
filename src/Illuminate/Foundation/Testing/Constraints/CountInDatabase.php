@@ -88,7 +88,7 @@ class CountInDatabase extends Constraint
             return 'The table is empty';
         }
 
-        $description = 'Found: ' . json_encode($results->take($this->show), JSON_PRETTY_PRINT);
+        $description = 'Found: '.json_encode($results->take($this->show), JSON_PRETTY_PRINT);
 
         if ($results->count() > $this->show) {
             $description .= sprintf(' and %s others', $results->count() - $this->show);

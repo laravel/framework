@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Foundation\Testing\Constraints\CountInDatabase;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
+use Illuminate\Foundation\Testing\Constraints\CountInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
 
