@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Support\Testing\Fakes\EventFake;
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Testing\Fakes\EventFake;
 
 class SupportFacadesEventTest extends TestCase
 {
