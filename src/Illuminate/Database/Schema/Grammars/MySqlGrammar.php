@@ -551,6 +551,17 @@ class MySqlGrammar extends Grammar
     {
         return sprintf('enum(%s)', $this->quoteString($column->allowed));
     }
+    
+    /**
+     * Create the column definition for an set type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeSet(Fluent $column)
+    {
+        return sprintf('set(%s)', $this->quoteString($column->allowed));
+    }
 
     /**
      * Create the column definition for a json type.

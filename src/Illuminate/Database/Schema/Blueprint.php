@@ -812,6 +812,18 @@ class Blueprint
     {
         return $this->addColumn('enum', $column, compact('allowed'));
     }
+    
+    /**
+     * Create a new set column on the table.
+     *
+     * @param  string  $column
+     * @param  array  $allowed
+     * @return \Illuminate\Support\Fluent
+     */
+    public function set($column, array $allowed)
+    {
+        return $this->addColumn('set', $column, compact('allowed'));
+    }
 
     /**
      * Create a new json column on the table.
