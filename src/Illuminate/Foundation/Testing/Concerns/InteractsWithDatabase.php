@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Foundation\Testing\Constraints\CountInDatabase;
 use Illuminate\Foundation\Testing\Constraints\HasInDatabase;
 use PHPUnit\Framework\Constraint\LogicalNot as ReverseConstraint;
 use Illuminate\Foundation\Testing\Constraints\SoftDeletedInDatabase;
@@ -40,6 +41,24 @@ trait InteractsWithDatabase
         );
 
         $this->assertThat($table, $constraint);
+
+        return $this;
+    }
+
+    /**
+     * Assert that a given where condition returns the expected number of results.
+     *
+     * @param  string  $table
+     * @param  array  $data
+     * @param  int  $count
+     * @param  string  $connection
+     * @return $this
+     */
+    protected function assertDatabaseCount($table, array $data, int $count, $connection = null)
+    {
+        $this->assertThat(
+            $table, new CountInDatabase($this->getConnection($connection), $data, $count)
+        );
 
         return $this;
     }

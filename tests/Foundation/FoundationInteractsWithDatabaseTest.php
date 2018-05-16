@@ -120,6 +120,15 @@ class FoundationInteractsWithDatabaseTest extends TestCase
         $this->assertSoftDeleted($this->table, $this->data);
     }
 
+    public function testSeeInDatabaseCountFoundResults()
+    {
+        $builder = $this->mockCountBuilder(2);
+
+        $builder->shouldReceive('get')->andReturn(collect([['title' => 'Spark'], ['title' => 'Spark']]));
+
+        $this->assertDatabaseCount($this->table, $this->data, 2);
+    }
+
     protected function mockCountBuilder($countResult)
     {
         $builder = m::mock(Builder::class);
