@@ -1123,21 +1123,21 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function auth($name = null)
     {
-        $name = $name ? "{$name}." : '';
+        $prefix = $name ? "{$name}." : '';
 
         // Authentication Routes...
-        $this->get('login', 'Auth\LoginController@showLoginForm')->name($name.'login');
+        $this->get('login', 'Auth\LoginController@showLoginForm')->name($prefix.'login');
         $this->post('login', 'Auth\LoginController@login');
-        $this->post('logout', 'Auth\LoginController@logout')->name($name.'logout');
+        $this->post('logout', 'Auth\LoginController@logout')->name($prefix.'logout');
 
         // Registration Routes...
-        $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name($name.'register');
+        $this->get('register', 'Auth\RegisterController@showRegistrationForm')->name($prefix.'register');
         $this->post('register', 'Auth\RegisterController@register');
 
         // Password Reset Routes...
-        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name($name.'password.request');
-        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name($name.'password.email');
-        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name($name.'password.reset');
+        $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name($prefix.'password.request');
+        $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name($prefix.'password.email');
+        $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name($prefix.'password.reset');
         $this->post('password/reset', 'Auth\ResetPasswordController@reset');
     }
 
