@@ -812,7 +812,7 @@ class Blueprint
     {
         return $this->addColumn('enum', $column, compact('allowed'));
     }
-    
+
     /**
      * Create a new set column on the table.
      *

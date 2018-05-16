@@ -551,9 +551,9 @@ class MySqlGrammar extends Grammar
     {
         return sprintf('enum(%s)', $this->quoteString($column->allowed));
     }
-    
+
     /**
-     * Create the column definition for an set type.
+     * Create the column definition for a set type.
      *
      * @param  \Illuminate\Support\Fluent  $column
      * @return string
