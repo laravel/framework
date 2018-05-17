@@ -29,7 +29,7 @@ class CountInDatabase extends Constraint
     protected $data;
 
     /**
-     * The expected count the search will produce in database.
+     * The expected count the search will get from database.
      *
      * @var int
      */
@@ -43,7 +43,7 @@ class CountInDatabase extends Constraint
      * @param  int $count
      * @return void
      */
-    public function __construct(Connection $database, array $data, int $count)
+    public function __construct(Connection $database, array $data, $count)
     {
         $this->data = $data;
 

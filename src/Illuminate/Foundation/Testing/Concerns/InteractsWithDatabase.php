@@ -54,7 +54,7 @@ trait InteractsWithDatabase
      * @param  string  $connection
      * @return $this
      */
-    protected function assertDatabaseCount($table, array $data, int $count, $connection = null)
+    protected function assertDatabaseCount($table, array $data, $count, $connection = null)
     {
         $this->assertThat(
             $table, new CountInDatabase($this->getConnection($connection), $data, $count)
