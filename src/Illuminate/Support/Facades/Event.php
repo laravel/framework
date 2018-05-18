@@ -34,7 +34,7 @@ class Event extends Facade
     }
 
     /**
-     * Replace the bound instance with a fake for the given callable only.
+     * Replace the bound instance with a fake during the given callable's execution.
      *
      * @param  callable  $callable
      * @param  array|string  $eventsToFake
@@ -42,14 +42,14 @@ class Event extends Facade
      */
     public static function fakeFor(callable $callable, array $eventsToFake = [])
     {
-        $initialDispatcher = static::getFacadeRoot();
+        $originalDispatcher = static::getFacadeRoot();
 
         static::fake($eventsToFake);
 
-        return tap($callable(), function () use ($initialDispatcher) {
-            Model::setEventDispatcher($initialDispatcher);
+        return tap($callable(), function () use ($originalDispatcher) {
+            static::swap($originalDispatcher);
 
-            static::swap($initialDispatcher);
+            Model::setEventDispatcher($originalDispatcher);
         });
     }
 
