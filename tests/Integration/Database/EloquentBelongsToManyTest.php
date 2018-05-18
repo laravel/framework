@@ -149,6 +149,27 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     /**
      * @test
      */
+    public function custom_accessor_generated_from_custom_pivot()
+    {
+        $post = Post::create(['title' => str_random()]);
+
+        $tag = TagWithCustomPivot::create(['name' => str_random()]);
+
+        $post->tagsWithCustomPivot()->attach($tag->id);
+
+        $this->assertInstanceOf(
+            CustomPivot::class, $post->tagsWithCustomAccessorGeneratedFromCustomPivot[0]->posts_tags
+        );
+
+        $this->assertEquals([
+            'post_id' => '1',
+            'tag_id' => '1',
+        ], $post->tagsWithCustomAccessorGeneratedFromCustomPivot[0]->posts_tags->toArray());
+    }
+
+    /**
+     * @test
+     */
     public function attach_method()
     {
         $post = Post::create(['title' => str_random()]);
@@ -663,6 +684,12 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(CustomPivot::class)
             ->as('tag');
+    }
+
+    public function tagsWithCustomAccessorGeneratedFromCustomPivot()
+    {
+        return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
+            ->usingAs(CustomPivot::class);
     }
 }
 

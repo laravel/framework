@@ -311,6 +311,17 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Specify the custom pivot model to use for the relationship and to generate the accessor.
+     *
+     * @param  string  $class
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function usingAs($class)
+    {
+        return $this->using($class)->as($class);
+    }
+
+    /**
      * Set a where clause for a pivot table column.
      *
      * @param  string  $column
@@ -685,9 +696,11 @@ class BelongsToMany extends Relation
         // and create a new Pivot model, which is basically a dynamic model that we
         // will set the attributes, table, and connections on it so it will work.
         foreach ($models as $model) {
-            $model->setRelation($this->accessor, $this->newExistingPivot(
-                $this->migratePivotAttributes($model)
-            ));
+            $pivot = $this->newExistingPivot($this->migratePivotAttributes($model));
+
+            $accessor = $pivot instanceof $this->accessor ? $pivot->getTable() : $this->accessor;
+
+            $model->setRelation($accessor, $pivot);
         }
     }
 
