@@ -35,6 +35,7 @@ class ResourceCollection extends JsonResource implements IteratorAggregate
         parent::__construct($resource);
 
         $this->resource = $this->collectResource($resource);
+        $this->resource->appends(request()->all());
     }
 
     /**
