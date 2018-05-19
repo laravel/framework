@@ -12,9 +12,9 @@ class RetryCommand extends Command
      *
      * @var string
      */
-    protected $staticSignature = "queue:retry";
+    protected $staticSignature = 'queue:retry';
 
-     /**
+    /**
      * The console command dynamic part of its signature.
      *
      * @var string

@@ -94,16 +94,15 @@ class Command extends SymfonyCommand
      */
     public function __construct()
     {
-        // If the command has a staticSignature propriety we would 
+        // If the command has a staticSignature propriety we would
         // need to generate the command signature dynamically
-        if(isset($this->staticSignature)) {
-            $dynamicPart = "";
+        if (isset($this->staticSignature)) {
+            $dynamicPart = '';
             foreach ($this->dynamicParameters as $parameter => $description) {
                 $dynamicPart .= $description ? "{--{$parameter}= : {$description}}" : "{--{$parameter}=}";
             }
             $this->signature = "{$this->staticSignature} {$dynamicPart}";
         }
-        
         // We will go ahead and set the name, description, and parameters on console
         // commands just to make things a little easier on the developer. This is
         // so they don't have to all be manually specified in the constructors.
