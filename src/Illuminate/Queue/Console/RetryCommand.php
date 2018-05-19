@@ -8,11 +8,24 @@ use Illuminate\Console\Command;
 class RetryCommand extends Command
 {
     /**
-     * The console command signature.
+     * The console command static part of its signature.
      *
      * @var string
      */
-    protected $signature = 'queue:retry {--id= : The ID of the failed job or "all" to retry all jobs.} {--queue=} {--id_from=} {--id_to=} {--failed_at_from=} {--failed_at_to=}';
+    protected $staticSignature = "queue:retry";
+
+     /**
+     * The console command dynamic part of its signature.
+     *
+     * @var string
+     */
+    protected $dynamicParameters = ['id' => "The ID of the failed job or 'all' to retry all jobs.",
+                                    'queue' => 'retry only the jobs that were in this queue.',
+                                    'id_from' => 'retry jobs that have and ID greater than or equals to id_from.',
+                                    'id_to' => 'retry jobs that have and ID greater than or equals to id_to.',
+                                    'failed_at_from' => 'retry jobs that have failed after this date.',
+                                    'failed_at_to' => 'retry jobs that have failed before this date.',
+                                    ];
 
     /**
      * The console command description.
