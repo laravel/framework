@@ -1152,6 +1152,45 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->fails());
     }
 
+    public function testValidateArrayKeyExist()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['array' => ['key'=>null]], ['array' => 'array_key_exist:key']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['array' => ['key1'=>null]], ['array' => 'array_key_exist:key']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['array' => null], ['array' => 'array_key_exist:key']);
+        $this->assertTrue($v->fails());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $v = new Validator($trans, ['array' => null], ['array' => 'array_key_exist']);
+        $v->passes();
+    }
+
+    public function testValidateArrayKeyNotExist()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['array' => ['key'=>null]], ['array' => 'array_key_not_exist:key']);
+        $this->assertTrue($v->fails());
+
+        $v = new Validator($trans, ['array' => ['key1'=>null]], ['array' => 'array_key_not_exist:key']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['array' => null], ['array' => 'array_key_not_exist:key']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['array' => null], ['array' => 'array|array_key_not_exist:key']);
+        $this->assertTrue($v->fails());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $v = new Validator($trans, ['array' => null], ['array' => 'array_key_not_exist']);
+        $v->passes();
+    }
+
     public function testValidateAccepted()
     {
         $trans = $this->getIlluminateArrayTranslator();

@@ -319,6 +319,40 @@ trait ValidatesAttributes
     }
 
     /**
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
+     * @return bool
+     */
+    public function validateArrayKeyExist($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'array_key_exist');
+        if (! is_array($value)) {
+            return false;
+        }
+
+        return array_key_exists($parameters[0], $value);
+    }
+
+    /**
+     * @param string $attribute
+     * @param mixed  $value
+     * @param array  $parameters
+     *
+     * @return bool
+     */
+    public function validateArrayKeyNotExist($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'array_key_not_exist');
+        if (! is_array($value)) {
+            return true;
+        }
+
+        return ! array_key_exists($parameters[0], $value);
+    }
+
+    /**
      * Validate the size of an attribute is between a set of values.
      *
      * @param  string  $attribute
