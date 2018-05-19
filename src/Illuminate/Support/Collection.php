@@ -350,8 +350,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function diffUsing($items)
     {
         $items = func_get_args();
-        if (!is_callable(end($items))) {
-            throw new InvalidArgumentException("The last parameter is not a callable");
+        if (! is_callable(end($items))) {
+            throw new InvalidArgumentException('The last parameter is not a callable');
         }
 
         $callable = array_pop($items);
@@ -384,8 +384,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function diffAssocUsing($items)
     {
         $items = func_get_args();
-        if (!is_callable(end($items))) {
-            throw new InvalidArgumentException("The last parameter is not a callable");
+        if (! is_callable(end($items))) {
+            throw new InvalidArgumentException('The last parameter is not a callable');
         }
         $callable = array_pop($items);
         $parameters = $this->getAllArrayableItems($items);
@@ -417,8 +417,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function diffKeysUsing($items)
     {
         $items = func_get_args();
-        if (!is_callable(end($items))) {
-            throw new InvalidArgumentException("The last parameter is not a callable");
+        if (! is_callable(end($items))) {
+            throw new InvalidArgumentException('The last parameter is not a callable');
         }
 
         $callable = array_pop($items);
@@ -1134,8 +1134,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $items = $this->getAllArrayableItems(func_get_args());
         array_unshift($items, $this->items);
+
         return new static(array_reduce($items, function ($carry, $item) {
-                return $carry + $item;
+            return $carry + $item;
         }, []));
     }
 
@@ -1912,7 +1913,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function getAllArrayableItems($items)
     {
-        return array_map(array($this, 'getArrayableItems'), $items);
+        return array_map([$this, 'getArrayableItems'], $items);
     }
 
     /**
