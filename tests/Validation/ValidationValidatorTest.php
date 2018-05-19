@@ -3752,10 +3752,6 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['cat' => ['cat1' => ['name' => '1']]], \Illuminate\Validation\ValidationData::extractDataFromPath('cat.cat1.name', $data));
     }
 
-    public function testInlineMessagesMayUseAsteriskForEachRules()
-    {
-    }
-
     public function testUsingSettersWithImplicitRules()
     {
         $trans = $this->getIlluminateArrayTranslator();
