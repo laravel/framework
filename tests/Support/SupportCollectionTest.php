@@ -8,6 +8,7 @@ use ArrayAccess;
 use Mockery as m;
 use ReflectionClass;
 use JsonSerializable;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
@@ -611,6 +612,12 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'World', 'id' => 1], $c->merge(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testMergeMultipleParameters()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1, 'world' => true], $c->merge(['id' => 1], ['world' => true])->all());
+    }
+
     public function testUnionNull()
     {
         $c = new Collection(['name' => 'Hello']);
@@ -629,10 +636,24 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(new Collection(['name' => 'World', 'id' => 1]))->all());
     }
 
+    public function testUnionMultipleParameters()
+    {
+        $c = new Collection(['name' => 'Hello']);
+        $this->assertEquals(['name' => 'Hello', 'id' => 1], $c->union(['name' => 'World'], ['id' => 1])->all());
+    }
+
     public function testDiffCollection()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
         $this->assertEquals(['id' => 1], $c->diff(new Collection(['first_word' => 'Hello', 'last_word' => 'World']))->all());
+    }
+
+    public function testDiffMultipleParameters()
+    {
+        $c = new Collection(['id' => 1, 'first_word' => 'Hello', 'bar' => 'baz']);
+        $c2 = new Collection(['first_word' => 'Hello', 'last_word' => 'World']);
+        $c3 = new Collection(['foo' => 'baz']);
+        $this->assertEquals(['id' => 1], $c->diff($c2, $c3)->all());
     }
 
     public function testDiffUsingWithCollection()
@@ -650,6 +671,20 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['en_GB', 'fr', 'HR'], $c->diffUsing(null, 'strcasecmp')->values()->toArray());
     }
 
+    public function testDiffUsingWithMultipleParameters()
+    {
+        $c = new Collection(['en_GB', 'fr', 'HR']);
+        $this->assertEquals(['fr'], $c->diffUsing(['en_gb'], ['hr'], 'strcasecmp')->values()->toArray());
+    }
+
+    public function testDiffUsingWithExceptions()
+    {
+        $c = new Collection(['en_GB', 'fr', 'HR']);
+        $this->expectException(InvalidArgumentException::class);
+
+        $c->diffUsing(['en_gb'], null);
+    }
+
     public function testDiffNull()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -663,6 +698,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeys($c2)->all());
     }
 
+    public function testDiffKeysWithMultipleParameters()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['foo_bar' => 'Hello']);
+        $c3 = new Collection(['id' => 123]);
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeys($c2, $c3)->all());
+    }
+
     public function testDiffKeysUsing()
     {
         $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -673,11 +716,36 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeysUsing($c2, 'strcasecmp')->all());
     }
 
+    public function testDiffKeysUsingWithMultipleParameters()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['foo_bar' => 'Hello']);
+        $c3 = new Collection(['ID' => 123]);
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffKeysUsing($c2, $c3, 'strcasecmp')->all());
+    }
+
+    public function testDiffKeysUsingWithExceptions()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['foo_bar' => 'Hello']);
+        $this->expectException(InvalidArgumentException::class);
+
+        $c1->diffUsing($c2, null);
+    }
+
     public function testDiffAssoc()
     {
         $c1 = new Collection(['id' => 1, 'first_word' => 'Hello', 'not_affected' => 'value']);
         $c2 = new Collection(['id' => 123, 'foo_bar' => 'Hello', 'not_affected' => 'value']);
         $this->assertEquals(['id' => 1, 'first_word' => 'Hello'], $c1->diffAssoc($c2)->all());
+    }
+
+    public function testDiffAssocMultipleParameters()
+    {
+        $c1 = new Collection(['id' => 1, 'first_word' => 'Hello', 'not_affected' => 'value']);
+        $c2 = new Collection(['id' => 123, 'foo_bar' => 'Hello', 'not_affected' => 'value']);
+        $c3 = new Collection(['id' => 1]);
+        $this->assertEquals(['first_word' => 'Hello'], $c1->diffAssoc($c2, $c3)->all());
     }
 
     public function testDiffAssocUsing()
@@ -688,6 +756,26 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssoc($c2)->all());
         // allow for case insensitive difference
         $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssocUsing($c2, 'strcasecmp')->all());
+    }
+
+    public function testDiffAssocUsingWithMultipleParameters()
+    {
+        $c1 = new Collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+        $c2 = new Collection(['A' => 'green', 'yellow', 'red']);
+        $c3 = new Collection(['Red']);
+        // demonstrate that the case of the keys will affect the output when diffAssoc is used
+        $this->assertEquals(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssoc($c2, $c3)->all());
+        // allow for case insensitive difference
+        $this->assertEquals(['b' => 'brown', 'c' => 'blue', 'red'], $c1->diffAssocUsing($c2, $c3, 'strcasecmp')->all());
+    }
+
+    public function testDiffAssocUsingWithExceptions()
+    {
+        $c1 = new Collection(['a' => 'green', 'b' => 'brown', 'c' => 'blue', 'red']);
+        $c2 = new Collection(['A' => 'green', 'yellow', 'red']);
+        $this->expectException(InvalidArgumentException::class);
+
+        $c1->diffUsing($c2, null);
     }
 
     public function testEach()
@@ -748,6 +836,14 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([], $c->intersect(null)->all());
     }
 
+    public function testIntersectMultipleParameters()
+    {
+        $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
+        $c2 = new Collection(['id' => 1, 'bar' => 'baz']);
+        $c3 = new Collection(['foo' => 1]);
+        $this->assertEquals(['id' => 1], $c->intersect($c2, $c3)->all());
+    }
+
     public function testIntersectCollection()
     {
         $c = new Collection(['id' => 1, 'first_word' => 'Hello']);
@@ -764,6 +860,14 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection(['name' => 'Mateus', 'age' => 18]);
         $this->assertEquals(['name' => 'Mateus'], $c->intersectByKeys(new Collection(['name' => 'Mateus', 'surname' => 'Guimaraes']))->all());
+    }
+
+    public function testIntersectByKeysMultipleParameter()
+    {
+        $c1 = new Collection(['name' => 'Mateus', 'age' => 18]);
+        $c2 = new Collection(['name' => 'Mateus', 'surname' => 'Guimaraes']);
+        $c3 = new Collection(['name' => 'baz', 'age' => 18]);
+        $this->assertEquals(['name' => 'Mateus'], $c1->intersectByKeys($c2, $c3)->all());
     }
 
     public function testUnique()
