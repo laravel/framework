@@ -11,6 +11,7 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
+use InvalidArgumentException;
 use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
@@ -284,7 +285,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function crossJoin(...$lists)
     {
         return new static(Arr::crossJoin(
-            $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
+            $this->items, ...$this->getAllArrayableItems(...$lists)
         ));
     }
 
@@ -319,70 +320,99 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get the items in the collection that are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function diff($items)
+    public function diff(...$items)
     {
-        return new static(array_diff($this->items, $this->getArrayableItems($items)));
+        return new static(array_diff($this->items, ...$this->getAllArrayableItems(...$items)));
     }
 
     /**
      * Get the items in the collection that are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @param  callable  $callback
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
-    public function diffUsing($items, callable $callback)
+    public function diffUsing(...$items)
     {
-        return new static(array_udiff($this->items, $this->getArrayableItems($items), $callback));
+        if (!is_callable(end($items))) {
+            throw new InvalidArgumentException("The last parameter is not a callable");
+        }
+
+        $callable = array_pop($items);
+        $parameters = $this->getAllArrayableItems(...$items);
+        $parameters[] = $callable;
+
+        return new static(array_udiff($this->items, ...$parameters));
     }
 
     /**
      * Get the items in the collection whose keys and values are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function diffAssoc($items)
+    public function diffAssoc(...$items)
     {
-        return new static(array_diff_assoc($this->items, $this->getArrayableItems($items)));
+        return new static(array_diff_assoc($this->items, ...$this->getAllArrayableItems(...$items)));
     }
 
     /**
      * Get the items in the collection whose keys and values are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @param  callable  $callback
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
-    public function diffAssocUsing($items, callable $callback)
+    public function diffAssocUsing(...$items)
     {
-        return new static(array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback));
+        if (!is_callable(end($items))) {
+            throw new InvalidArgumentException("The last parameter is not a callable");
+        }
+        $callable = array_pop($items);
+        $parameters = $this->getAllArrayableItems(...$items);
+        $parameters[] = $callable;
+
+        return new static(array_diff_uassoc($this->items, ...$parameters));
     }
 
     /**
      * Get the items in the collection whose keys are not present in the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function diffKeys($items)
+    public function diffKeys(...$items)
     {
-        return new static(array_diff_key($this->items, $this->getArrayableItems($items)));
+        return new static(array_diff_key($this->items, ...$this->getAllArrayableItems(...$items)));
     }
 
     /**
      * Get the items in the collection whose keys are not present in the given items.
      *
-     * @param  mixed   $items
+     * @param  mixed   ...$items
      * @param  callable  $callback
      * @return static
+     *
+     * @throws \InvalidArgumentException
      */
-    public function diffKeysUsing($items, callable $callback)
+    public function diffKeysUsing(...$items)
     {
-        return new static(array_diff_ukey($this->items, $this->getArrayableItems($items), $callback));
+        if (!is_callable(end($items))) {
+            throw new InvalidArgumentException("The last parameter is not a callable");
+        }
+
+        $callable = array_pop($items);
+        $parameters = $this->getAllArrayableItems(...$items);
+        $parameters[] = $callable;
+
+        return new static(array_diff_ukey($this->items, ...$parameters));
     }
 
     /**
@@ -833,24 +863,24 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Intersect the collection with the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function intersect($items)
+    public function intersect(...$items)
     {
-        return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+        return new static(array_intersect($this->items, ...$this->getAllArrayableItems(...$items)));
     }
 
     /**
      * Intersect the collection with the given items by key.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function intersectByKeys($items)
+    public function intersectByKeys(...$items)
     {
         return new static(array_intersect_key(
-            $this->items, $this->getArrayableItems($items)
+            $this->items, ...$this->getAllArrayableItems(...$items)
         ));
     }
 
@@ -1062,12 +1092,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Merge the collection with the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function merge($items)
+    public function merge(...$items)
     {
-        return new static(array_merge($this->items, $this->getArrayableItems($items)));
+        return new static(array_merge($this->items, ...$this->getAllArrayableItems(...$items)));
     }
 
     /**
@@ -1084,12 +1114,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Union the collection with the given items.
      *
-     * @param  mixed  $items
+     * @param  mixed  ...$items
      * @return static
      */
-    public function union($items)
+    public function union(...$items)
     {
-        return new static($this->items + $this->getArrayableItems($items));
+        $items = $this->getAllArrayableItems(...$items);
+        array_unshift($items, $this->items);
+        return new static(array_reduce($items, function ($carry, $item) {
+                return $carry + $item;
+        }, []));
     }
 
     /**
@@ -1671,11 +1705,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed ...$items
      * @return static
      */
-    public function zip($items)
+    public function zip(...$items)
     {
-        $arrayableItems = array_map(function ($items) {
-            return $this->getArrayableItems($items);
-        }, func_get_args());
+        $arrayableItems = $this->getAllArrayableItems(...$items);
 
         $params = array_merge([function () {
             return new static(func_get_args());
@@ -1837,6 +1869,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function __toString()
     {
         return $this->toJson();
+    }
+
+    /**
+     * Results array of items from Collection or Arrayable from all parameters.
+     *
+     * @param  mixed  ...$items
+     * @return array
+     */
+    protected function getAllArrayableItems(...$items)
+    {
+        return array_map(array($this, 'getArrayableItems'), $items);
     }
 
     /**
