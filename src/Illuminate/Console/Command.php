@@ -96,7 +96,7 @@ class Command extends SymfonyCommand
     {
         // If the command has a staticSignature propriety we would
         // need to generate the command signature dynamically
-        if (isset($this->staticSignature)) {
+        if (isset($this->staticSignature) && isset($this->dynamicParameters)) {
             $dynamicPart = '';
             foreach ($this->dynamicParameters as $parameter => $description) {
                 $dynamicPart .= $description ? "{--{$parameter}= : {$description}}" : "{--{$parameter}=}";
