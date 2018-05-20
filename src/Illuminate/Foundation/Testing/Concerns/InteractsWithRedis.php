@@ -52,7 +52,7 @@ trait InteractsWithRedis
 
     public function configureConnections()
     {
-        if (!$this->redis) {
+        if (! $this->redis) {
             $host = getenv('REDIS_HOST') ?: '127.0.0.1';
             $port = getenv('REDIS_PORT') ?: 6379;
 
@@ -67,7 +67,7 @@ trait InteractsWithRedis
                     ],
                 ]);
 
-                $this->redis[$driver[0]. '-prefixed'] = new RedisManager($driver[0], [
+                $this->redis["{$driver[0]}-prefixed"] = new RedisManager($driver[0], [
                     'cluster' => false,
                     'default' => [
                         'host' => $host,
@@ -82,7 +82,7 @@ trait InteractsWithRedis
     }
 
     /**
-     * Returns the connections for use as dataProvider
+     * Returns the connections for use as dataProvider.
      */
     public function redisConnections()
     {
