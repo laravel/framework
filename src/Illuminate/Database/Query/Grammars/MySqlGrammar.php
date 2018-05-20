@@ -53,6 +53,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        return 'json_contains('.$column.', '.$value.')';
+    }
+
+    /**
      * Compile a single union statement.
      *
      * @param  array  $union

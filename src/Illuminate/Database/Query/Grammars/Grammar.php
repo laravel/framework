@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -511,10 +512,11 @@ class Grammar extends BaseGrammar
      * @param  string  $column
      * @param  string  $value
      * @return string
+     * @throws \RuntimeException
      */
     protected function compileJsonContains($column, $value)
     {
-        return 'json_contains('.$column.', '.$value.')';
+        throw new RuntimeException('The database engine in use is not yet suppported.');
     }
 
     /**
