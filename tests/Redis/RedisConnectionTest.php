@@ -32,572 +32,708 @@ class RedisConnectionTest extends TestCase
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_sets_values_with_expiry()
+    public function it_sets_values_with_expiry($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('one', 'mohamed', 'EX', 5, 'NX');
-            $this->assertEquals('mohamed', $redis->get('one'));
-            $this->assertNotEquals(-1, $redis->ttl('one'));
+        $redis->set('one', 'mohamed', 'EX', 5, 'NX');
+        $this->assertEquals('mohamed', $redis->get('one'));
+        $this->assertNotEquals(-1, $redis->ttl('one'));
 
-            // It doesn't override when NX mode
-            $redis->set('one', 'taylor', 'EX', 5, 'NX');
-            $this->assertEquals('mohamed', $redis->get('one'));
+        // It doesn't override when NX mode
+        $redis->set('one', 'taylor', 'EX', 5, 'NX');
+        $this->assertEquals('mohamed', $redis->get('one'));
 
-            // It overrides when XX mode
-            $redis->set('one', 'taylor', 'EX', 5, 'XX');
-            $this->assertEquals('taylor', $redis->get('one'));
+        // It overrides when XX mode
+        $redis->set('one', 'taylor', 'EX', 5, 'XX');
+        $this->assertEquals('taylor', $redis->get('one'));
 
-            // It fails if XX mode is on and key doesn't exist
-            $redis->set('two', 'taylor', 'PX', 5, 'XX');
-            $this->assertNull($redis->get('two'));
+        // It fails if XX mode is on and key doesn't exist
+        $redis->set('two', 'taylor', 'PX', 5, 'XX');
+        $this->assertNull($redis->get('two'));
 
-            $redis->set('three', 'mohamed', 'PX', 5000);
-            $this->assertEquals('mohamed', $redis->get('three'));
-            $this->assertNotEquals(-1, $redis->ttl('three'));
-            $this->assertNotEquals(-1, $redis->pttl('three'));
+        $redis->set('three', 'mohamed', 'PX', 5000);
+        $this->assertEquals('mohamed', $redis->get('three'));
+        $this->assertNotEquals(-1, $redis->ttl('three'));
+        $this->assertNotEquals(-1, $redis->pttl('three'));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_deletes_keys()
+    public function it_deletes_keys($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('one', 'mohamed');
-            $redis->set('two', 'mohamed');
-            $redis->set('three', 'mohamed');
+        $redis->set('one', 'mohamed');
+        $redis->set('two', 'mohamed');
+        $redis->set('three', 'mohamed');
 
-            $redis->del('one');
-            $this->assertNull($redis->get('one'));
-            $this->assertNotNull($redis->get('two'));
-            $this->assertNotNull($redis->get('three'));
+        $redis->del('one');
+        $this->assertNull($redis->get('one'));
+        $this->assertNotNull($redis->get('two'));
+        $this->assertNotNull($redis->get('three'));
 
-            $redis->del('two', 'three');
-            $this->assertNull($redis->get('two'));
-            $this->assertNull($redis->get('three'));
+        $redis->del('two', 'three');
+        $this->assertNull($redis->get('two'));
+        $this->assertNull($redis->get('three'));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_checks_for_existence()
+    public function it_checks_for_existence($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('one', 'mohamed');
-            $redis->set('two', 'mohamed');
+        $redis->set('one', 'mohamed');
+        $redis->set('two', 'mohamed');
 
-            $this->assertEquals(1, $redis->exists('one'));
-            $this->assertEquals(0, $redis->exists('nothing'));
-            $this->assertEquals(2, $redis->exists('one', 'two'));
-            $this->assertEquals(2, $redis->exists('one', 'two', 'nothing'));
+        $this->assertEquals(1, $redis->exists('one'));
+        $this->assertEquals(0, $redis->exists('nothing'));
+        $this->assertEquals(2, $redis->exists('one', 'two'));
+        $this->assertEquals(2, $redis->exists('one', 'two', 'nothing'));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_expires_keys()
+    public function it_expires_keys($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('one', 'mohamed');
-            $this->assertEquals(-1, $redis->ttl('one'));
-            $this->assertEquals(1, $redis->expire('one', 10));
-            $this->assertNotEquals(-1, $redis->ttl('one'));
+        $redis->set('one', 'mohamed');
+        $this->assertEquals(-1, $redis->ttl('one'));
+        $this->assertEquals(1, $redis->expire('one', 10));
+        $this->assertNotEquals(-1, $redis->ttl('one'));
 
-            $this->assertEquals(0, $redis->expire('nothing', 10));
+        $this->assertEquals(0, $redis->expire('nothing', 10));
 
-            $redis->set('two', 'mohamed');
-            $this->assertEquals(-1, $redis->ttl('two'));
-            $this->assertEquals(1, $redis->pexpire('two', 10));
-            $this->assertNotEquals(-1, $redis->pttl('two'));
+        $redis->set('two', 'mohamed');
+        $this->assertEquals(-1, $redis->ttl('two'));
+        $this->assertEquals(1, $redis->pexpire('two', 10));
+        $this->assertNotEquals(-1, $redis->pttl('two'));
 
-            $this->assertEquals(0, $redis->pexpire('nothing', 10));
+        $this->assertEquals(0, $redis->pexpire('nothing', 10));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_renames_keys()
+    public function it_renames_keys($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('one', 'mohamed');
-            $redis->rename('one', 'two');
-            $this->assertNull($redis->get('one'));
-            $this->assertEquals('mohamed', $redis->get('two'));
+        $redis->set('one', 'mohamed');
+        $redis->rename('one', 'two');
+        $this->assertNull($redis->get('one'));
+        $this->assertEquals('mohamed', $redis->get('two'));
 
-            $redis->set('three', 'adam');
-            $redis->renamenx('two', 'three');
-            $this->assertEquals('mohamed', $redis->get('two'));
-            $this->assertEquals('adam', $redis->get('three'));
+        $redis->set('three', 'adam');
+        $redis->renamenx('two', 'three');
+        $this->assertEquals('mohamed', $redis->get('two'));
+        $this->assertEquals('adam', $redis->get('three'));
 
-            $redis->renamenx('two', 'four');
-            $this->assertNull($redis->get('two'));
-            $this->assertEquals('mohamed', $redis->get('four'));
-            $this->assertEquals('adam', $redis->get('three'));
+        $redis->renamenx('two', 'four');
+        $this->assertNull($redis->get('two'));
+        $this->assertEquals('mohamed', $redis->get('four'));
+        $this->assertEquals('adam', $redis->get('three'));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider redisConnections
      */
-    public function it_adds_members_to_sorted_set()
+    public function it_scans_all_keys($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', 1, 'mohamed');
-            $this->assertEquals(1, $redis->zcard('set'));
+        $redis->set('jeffrey', 1);
+        $redis->set('matt', 5);
+        $redis->set('matthew', 6);
+        $redis->set('taylor', 10);
+        $redis->set('dave', 12);
 
-            $redis->zadd('set', 2, 'taylor', 3, 'adam');
-            $this->assertEquals(3, $redis->zcard('set'));
+        $result = $redis->scan(0);
+        $this->assertCount(2, $result);
+        $this->assertEquals(0, $result[0]);
+        $this->assertCount(5, $result[1]);
 
-            $redis->zadd('set', ['jeffrey' => 4, 'matt' => 5]);
-            $this->assertEquals(5, $redis->zcard('set'));
-
-            $redis->zadd('set', 'NX', 1, 'beric');
-            $this->assertEquals(6, $redis->zcard('set'));
-
-            $redis->zadd('set', 'NX', ['joffrey' => 1]);
-            $this->assertEquals(7, $redis->zcard('set'));
-
-            $redis->zadd('set', 'XX', ['ned' => 1]);
-            $this->assertEquals(7, $redis->zcard('set'));
-
-            $this->assertEquals(1, $redis->zadd('set', ['sansa' => 10]));
-            $this->assertEquals(0, $redis->zadd('set', 'XX', 'CH', ['arya' => 11]));
-
-            $redis->zadd('set', ['mohamed' => 100]);
-            $this->assertEquals(100, $redis->zscore('set', 'mohamed'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider redisConnections
      */
-    public function it_counts_members_in_sorted_set()
+    public function it_scans_all_keys_with_options($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
+        $redis->pipeline(function ($pipe) {
+            for ($x = 0; $x < 1000; $x++) {
+                $pipe->set($x * rand(0, 1000), $x);
+            }
+        });
 
-            $this->assertEquals(1, $redis->zcount('set', 1, 5));
-            $this->assertEquals(2, $redis->zcount('set', '-inf', '+inf'));
-            $this->assertEquals(2, $redis->zcard('set'));
+        $result = $redis->scan(0, ['COUNT' => 10]);
+        $this->assertCount(2, $result);
+        $this->assertGreaterThan(0, $result[0]);
+        $this->assertGreaterThanOrEqual(10, count($result[1]));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
+
+        $redis->set('jeffrey', 1);
+        $redis->set('matt', 5);
+        $redis->set('matthew', 6);
+        $redis->set('taylor', 10);
+        $redis->set('dave', 12);
+
+        $result = $redis->scan(0, ['mAtCh' => 'matt*']);
+        $this->assertCount(2, $result[1]);
+
+        $result = $redis->scan(0, ['MaTcH' => 'dave']);
+        $this->assertCount(1, $result[1]);
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_increments_score_of_sorted_set()
+    public function it_adds_members_to_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
-            $redis->zincrby('set', 2, 'jeffrey');
-            $this->assertEquals(3, $redis->zscore('set', 'jeffrey'));
+        $redis->zadd('set', 1, 'mohamed');
+        $this->assertEquals(1, $redis->zcard('set'));
 
-            $redis->flushall();
-        }
+        $redis->zadd('set', 2, 'taylor', 3, 'adam');
+        $this->assertEquals(3, $redis->zcard('set'));
+
+        $redis->zadd('set', ['jeffrey' => 4, 'matt' => 5]);
+        $this->assertEquals(5, $redis->zcard('set'));
+
+        $redis->zadd('set', 'NX', 1, 'beric');
+        $this->assertEquals(6, $redis->zcard('set'));
+
+        $redis->zadd('set', 'NX', ['joffrey' => 1]);
+        $this->assertEquals(7, $redis->zcard('set'));
+
+        $redis->zadd('set', 'XX', ['ned' => 1]);
+        $this->assertEquals(7, $redis->zcard('set'));
+
+        $this->assertEquals(1, $redis->zadd('set', ['sansa' => 10]));
+        $this->assertEquals(0, $redis->zadd('set', 'XX', 'CH', ['arya' => 11]));
+
+        $redis->zadd('set', ['mohamed' => 100]);
+        $this->assertEquals(100, $redis->zscore('set', 'mohamed'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_sets_key_if_not_exists()
+    public function it_counts_members_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->set('name', 'mohamed');
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
 
-            $this->assertSame(0, $redis->setnx('name', 'taylor'));
-            $this->assertEquals('mohamed', $redis->get('name'));
+        $this->assertEquals(1, $redis->zcount('set', 1, 5));
+        $this->assertEquals(2, $redis->zcount('set', '-inf', '+inf'));
+        $this->assertEquals(2, $redis->zcard('set'));
 
-            $this->assertSame(1, $redis->setnx('boss', 'taylor'));
-            $this->assertEquals('taylor', $redis->get('boss'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_sets_hash_field_if_not_exists()
+    public function it_increments_score_of_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->hset('person', 'name', 'mohamed');
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
+        $redis->zincrby('set', 2, 'jeffrey');
+        $this->assertEquals(3, $redis->zscore('set', 'jeffrey'));
 
-            $this->assertSame(0, $redis->hsetnx('person', 'name', 'taylor'));
-            $this->assertEquals('mohamed', $redis->hget('person', 'name'));
-
-            $this->assertSame(1, $redis->hsetnx('person', 'boss', 'taylor'));
-            $this->assertEquals('taylor', $redis->hget('person', 'boss'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_calculates_intersection_of_sorted_sets_and_stores()
+    public function it_sets_key_if_not_exists($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
-            $redis->zadd('set2', ['jeffrey' => 2, 'matt' => 3]);
+        $redis->set('name', 'mohamed');
 
-            $redis->zinterstore('output', ['set1', 'set2']);
-            $this->assertEquals(2, $redis->zcard('output'));
-            $this->assertEquals(3, $redis->zscore('output', 'jeffrey'));
-            $this->assertEquals(5, $redis->zscore('output', 'matt'));
+        $this->assertSame(0, $redis->setnx('name', 'taylor'));
+        $this->assertEquals('mohamed', $redis->get('name'));
 
-            $redis->zinterstore('output2', ['set1', 'set2'], [
-                'weights' => [3, 2],
-                'aggregate' => 'sum',
-            ]);
-            $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
-            $this->assertEquals(12, $redis->zscore('output2', 'matt'));
+        $this->assertSame(1, $redis->setnx('boss', 'taylor'));
+        $this->assertEquals('taylor', $redis->get('boss'));
 
-            $redis->zinterstore('output3', ['set1', 'set2'], [
-                'weights' => [3, 2],
-                'aggregate' => 'min',
-            ]);
-            $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
-            $this->assertEquals(6, $redis->zscore('output3', 'matt'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_calculates_union_of_sorted_sets_and_stores()
+    public function it_sets_hash_field_if_not_exists($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
-            $redis->zadd('set2', ['jeffrey' => 2, 'matt' => 3]);
+        $redis->hset('person', 'name', 'mohamed');
 
-            $redis->zunionstore('output', ['set1', 'set2']);
-            $this->assertEquals(3, $redis->zcard('output'));
-            $this->assertEquals(3, $redis->zscore('output', 'jeffrey'));
-            $this->assertEquals(5, $redis->zscore('output', 'matt'));
-            $this->assertEquals(3, $redis->zscore('output', 'taylor'));
+        $this->assertSame(0, $redis->hsetnx('person', 'name', 'taylor'));
+        $this->assertEquals('mohamed', $redis->hget('person', 'name'));
 
-            $redis->zunionstore('output2', ['set1', 'set2'], [
-                'weights' => [3, 2],
-                'aggregate' => 'sum',
-            ]);
-            $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
-            $this->assertEquals(12, $redis->zscore('output2', 'matt'));
-            $this->assertEquals(9, $redis->zscore('output2', 'taylor'));
+        $this->assertSame(1, $redis->hsetnx('person', 'boss', 'taylor'));
+        $this->assertEquals('taylor', $redis->hget('person', 'boss'));
 
-            $redis->zunionstore('output3', ['set1', 'set2'], [
-                'weights' => [3, 2],
-                'aggregate' => 'min',
-            ]);
-            $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
-            $this->assertEquals(6, $redis->zscore('output3', 'matt'));
-            $this->assertEquals(9, $redis->zscore('output3', 'taylor'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_returns_range_in_sorted_set()
+    public function it_calculates_intersection_of_sorted_sets_and_stores($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
-            $this->assertEquals(['jeffrey', 'matt'], $redis->zrange('set', 0, 1));
-            $this->assertEquals(['jeffrey', 'matt', 'taylor'], $redis->zrange('set', 0, -1));
+        $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
+        $redis->zadd('set2', ['jeffrey' => 2, 'matt' => 3]);
 
-            $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, 'withscores'));
+        $redis->zinterstore('output', ['set1', 'set2']);
+        $this->assertEquals(2, $redis->zcard('output'));
+        $this->assertEquals(3, $redis->zscore('output', 'jeffrey'));
+        $this->assertEquals(5, $redis->zscore('output', 'matt'));
 
-            $redis->flushall();
-        }
+        $redis->zinterstore('output2', ['set1', 'set2'], [
+            'weights' => [3, 2],
+            'aggregate' => 'sum',
+        ]);
+        $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
+        $this->assertEquals(12, $redis->zscore('output2', 'matt'));
+
+        $redis->zinterstore('output3', ['set1', 'set2'], [
+            'weights' => [3, 2],
+            'aggregate' => 'min',
+        ]);
+        $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
+        $this->assertEquals(6, $redis->zscore('output3', 'matt'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_returns_rev_range_in_sorted_set()
+    public function it_calculates_union_of_sorted_sets_and_stores($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
-            $this->assertEquals(['taylor', 'matt'], $redis->ZREVRANGE('set', 0, 1));
-            $this->assertEquals(['taylor', 'matt', 'jeffrey'], $redis->ZREVRANGE('set', 0, -1));
+        $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
+        $redis->zadd('set2', ['jeffrey' => 2, 'matt' => 3]);
 
-            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, 'withscores'));
+        $redis->zunionstore('output', ['set1', 'set2']);
+        $this->assertEquals(3, $redis->zcard('output'));
+        $this->assertEquals(3, $redis->zscore('output', 'jeffrey'));
+        $this->assertEquals(5, $redis->zscore('output', 'matt'));
+        $this->assertEquals(3, $redis->zscore('output', 'taylor'));
 
-            $redis->flushall();
-        }
+        $redis->zunionstore('output2', ['set1', 'set2'], [
+            'weights' => [3, 2],
+            'aggregate' => 'sum',
+        ]);
+        $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
+        $this->assertEquals(12, $redis->zscore('output2', 'matt'));
+        $this->assertEquals(9, $redis->zscore('output2', 'taylor'));
+
+        $redis->zunionstore('output3', ['set1', 'set2'], [
+            'weights' => [3, 2],
+            'aggregate' => 'min',
+        ]);
+        $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
+        $this->assertEquals(6, $redis->zscore('output3', 'matt'));
+        $this->assertEquals(9, $redis->zscore('output3', 'taylor'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_returns_range_by_score_in_sorted_set()
+    public function it_returns_range_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
-            $this->assertEquals(['jeffrey'], $redis->zrangebyscore('set', 0, 3));
-            $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
-                'withscores' => true,
-                'limit' => [
-                    'offset' => 1,
-                    'count' => 2,
-                ],
-            ]));
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
+        $this->assertEquals(['jeffrey', 'matt'], $redis->zrange('set', 0, 1));
+        $this->assertEquals(['jeffrey', 'matt', 'taylor'], $redis->zrange('set', 0, -1));
 
-            $redis->flushall();
-        }
+        $this->assertEquals(['jeffrey' => 1, 'matt' => 5], $redis->zrange('set', 0, 1, 'withscores'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_returns_rev_range_by_score_in_sorted_set()
+    public function it_returns_rev_range_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
-            $this->assertEquals(['taylor'], $redis->ZREVRANGEBYSCORE('set', 10, 6));
-            $this->assertEquals(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
-                'withscores' => true,
-                'limit' => [
-                    'offset' => 1,
-                    'count' => 2,
-                ],
-            ]));
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
+        $this->assertEquals(['taylor', 'matt'], $redis->ZREVRANGE('set', 0, 1));
+        $this->assertEquals(['taylor', 'matt', 'jeffrey'], $redis->ZREVRANGE('set', 0, -1));
 
-            $redis->flushall();
-        }
+        $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->ZREVRANGE('set', 0, 1, 'withscores'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_returns_rank_in_sorted_set()
+    public function it_returns_range_by_score_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
+        $this->assertEquals(['jeffrey'], $redis->zrangebyscore('set', 0, 3));
+        $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
+            'withscores' => true,
+            'limit' => [
+                'offset' => 1,
+                'count' => 2,
+            ],
+        ]));
 
-            $this->assertEquals(0, $redis->zrank('set', 'jeffrey'));
-            $this->assertEquals(2, $redis->zrank('set', 'taylor'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_returns_score_in_sorted_set()
+    public function it_returns_rev_range_by_score_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
+        $this->assertEquals(['taylor'], $redis->ZREVRANGEBYSCORE('set', 10, 6));
+        $this->assertEquals(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
+            'withscores' => true,
+            'limit' => [
+                'offset' => 1,
+                'count' => 2,
+            ],
+        ]));
 
-            $this->assertEquals(1, $redis->zscore('set', 'jeffrey'));
-            $this->assertEquals(10, $redis->zscore('set', 'taylor'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_removes_members_in_sorted_set()
+    public function it_returns_rank_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
 
-            $redis->zrem('set', 'jeffrey');
-            $this->assertEquals(3, $redis->zcard('set'));
+        $this->assertEquals(0, $redis->zrank('set', 'jeffrey'));
+        $this->assertEquals(2, $redis->zrank('set', 'taylor'));
 
-            $redis->zrem('set', 'matt', 'adam');
-            $this->assertEquals(1, $redis->zcard('set'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_removes_members_by_score_in_sorted_set()
+    public function it_returns_score_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
-            $redis->ZREMRANGEBYSCORE('set', 5, '+inf');
-            $this->assertEquals(1, $redis->zcard('set'));
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
 
-            $redis->flushall();
-        }
+        $this->assertEquals(1, $redis->zscore('set', 'jeffrey'));
+        $this->assertEquals(10, $redis->zscore('set', 'taylor'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_removes_members_by_rank_in_sorted_set()
+    public function it_removes_members_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
-            $redis->ZREMRANGEBYRANK('set', 1, -1);
-            $this->assertEquals(1, $redis->zcard('set'));
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
 
-            $redis->flushall();
-        }
+        $redis->zrem('set', 'jeffrey');
+        $this->assertEquals(3, $redis->zcard('set'));
+
+        $redis->zrem('set', 'matt', 'adam');
+        $this->assertEquals(1, $redis->zcard('set'));
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_sets_multiple_hash_fields()
+    public function it_removes_members_by_score_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
-            $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'], $redis->hgetall('hash'));
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
+        $redis->ZREMRANGEBYSCORE('set', 5, '+inf');
+        $this->assertEquals(1, $redis->zcard('set'));
 
-            $redis->hmset('hash2', 'name', 'mohamed', 'hobby', 'diving');
-            $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'], $redis->hgetall('hash2'));
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_gets_multiple_hash_fields()
+    public function it_removes_members_by_rank_in_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
+        $redis->ZREMRANGEBYRANK('set', 1, -1);
+        $this->assertEquals(1, $redis->zcard('set'));
 
-            $this->assertEquals(['mohamed', 'diving'],
-                $redis->hmget('hash', 'name', 'hobby')
-            );
-
-            $this->assertEquals(['mohamed', 'diving'],
-                $redis->hmget('hash', ['name', 'hobby'])
-            );
-
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_runs_eval()
+    public function it_scans_sorted_set($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
-            $this->assertEquals('mohamed', $redis->get('name'));
+        $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'matthew' => 6, 'taylor' => 10, 'dave' => 12]);
 
-            $redis->flushall();
-        }
+        $result = $redis->zscan('set', 0);
+        $this->assertCount(2, $result);
+        $this->assertEquals(0, $result[0]);
+        $this->assertCount(5, $result[1]);
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_runs_pipes()
+    public function it_scans_sorted_set_with_options($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $result = $redis->pipeline(function ($pipe) {
-                $pipe->set('test:pipeline:1', 1);
-                $pipe->get('test:pipeline:1');
-                $pipe->set('test:pipeline:2', 2);
-                $pipe->get('test:pipeline:2');
-            });
-
-            $this->assertCount(4, $result);
-            $this->assertEquals(1, $result[1]);
-            $this->assertEquals(2, $result[3]);
-
-            $redis->flushall();
+        for ($x = 0; $x < 1000; $x++) {
+            $set[$x] = $x * rand(0, 1000);
         }
+
+        $redis->zadd('set', $set);
+
+        $result = $redis->zscan('set', 0, ['COUNT' => 10]);
+        $this->assertCount(2, $result);
+        $this->assertGreaterThan(0, $result[0]);
+        $this->assertGreaterThanOrEqual(10, count($result[1]));
+
+        $redis->zadd('set2', ['jeffrey' => 1, 'matt' => 5, 'matthew' => 6, 'taylor' => 10, 'dave' => 12]);
+
+        $result = $redis->zscan('set2', 0, ['mAtCh' => 'matt*']);
+        $this->assertEquals(['matt' => '5', 'matthew' => 6], $result[1]);
+
+        $result = $redis->zscan('set2', 0, ['MaTcH' => 'dave']);
+        $this->assertEquals(['dave' => 12], $result[1]);
+
+
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_runs_transactions()
+    public function it_sets_multiple_hash_fields($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $result = $redis->transaction(function ($pipe) {
-                $pipe->set('test:transaction:1', 1);
-                $pipe->get('test:transaction:1');
-                $pipe->set('test:transaction:2', 2);
-                $pipe->get('test:transaction:2');
-            });
+        $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
+        $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'], $redis->hgetall('hash'));
 
-            $this->assertCount(4, $result);
-            $this->assertEquals(1, $result[1]);
-            $this->assertEquals(2, $result[3]);
+        $redis->hmset('hash2', 'name', 'mohamed', 'hobby', 'diving');
+        $this->assertEquals(['name' => 'mohamed', 'hobby' => 'diving'], $redis->hgetall('hash2'));
 
-            $redis->flushall();
-        }
+        $redis->flushall();
     }
 
     /**
      * @test
+     * @dataProvider  redisConnections
      */
-    public function it_runs_raw_command()
+    public function it_gets_multiple_hash_fields($redis)
     {
-        foreach ($this->connections() as $redis) {
-            $redis->executeRaw(['SET', 'test:raw:1', '1']);
+        $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
 
-            $this->assertEquals(
-                1, $redis->executeRaw(['GET', 'test:raw:1'])
-            );
+        $this->assertEquals(['mohamed', 'diving'],
+            $redis->hmget('hash', 'name', 'hobby')
+        );
 
-            $redis->flushall();
-        }
+        $this->assertEquals(['mohamed', 'diving'],
+            $redis->hmget('hash', ['name', 'hobby'])
+        );
+
+        $redis->flushall();
     }
 
-    public function connections()
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_scans_hash_fields($redis)
     {
-        $connections = [
-            $this->redis['predis']->connection(),
-            $this->redis['phpredis']->connection(),
-        ];
+        $redis->hmset('hash', ['foo' => 'bar', 'foobar' => 'baz']);
 
-        if (extension_loaded('redis')) {
-            $host = getenv('REDIS_HOST') ?: '127.0.0.1';
-            $port = getenv('REDIS_PORT') ?: 6379;
+        $this->assertEquals([0, ['foo' => 'bar', 'foobar' => 'baz']],
+            $redis->hscan('hash', 0)
+        );
 
-            $prefixedPhpredis = new RedisManager('phpredis', [
-                'cluster' => false,
-                'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 5,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
-                ],
-            ]);
+        $this->assertEquals([0, []],
+            $redis->hscan('hash_none', 0)
+        );
 
-            $connections[] = $prefixedPhpredis->connection();
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_scans_hash_fields_with_options($redis)
+    {
+        for ($x = 0; $x < 1000; $x++) {
+            $hash[$x] = $x;
         }
 
-        return $connections;
+        $redis->hmset('hash', $hash);
+
+        $result = $redis->hscan('hash', 0, ['COUNT' => 10]);
+        $this->assertCount(2, $result);
+        $this->assertGreaterThan(0, $result[0]);
+        $this->assertGreaterThanOrEqual(10, count($result[1]));
+
+        $redis->hmset('hash2', ['foo' => 'bar', 'foobar' => 'baz', 'bar' => 'baz']);
+
+        $result = $redis->hscan('hash2', 0, ['mAtCh' => 'foo*']);
+        $this->assertEquals(['foo' => 'bar', 'foobar' => 'baz'], $result[1]);
+
+        $result = $redis->hscan('hash2', 0, ['MaTcH' => 'foo']);
+        $this->assertEquals(['foo' => 'bar'], $result[1]);
+
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_scans_unsorted_sets($redis)
+    {
+        $redis->sadd('set', 'foo');
+        $redis->sadd('set', 'bar');
+        $redis->sadd('set', 'foobar');
+        $redis->sadd('set', 'baz');
+
+        $result = $redis->sscan('set', 0);
+
+        $this->assertCount(2, $result);
+        $this->assertEquals(0, $result[0]);
+        $this->assertCount(4, $result[1]);
+
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_scans_unsorted_sets_with_options($redis)
+    {
+        $redis->sadd('set', ...range(0, 1000));
+
+        $result = $redis->sscan('set', 0, ['count' => 10]);
+        $this->assertCount(2, $result);
+        $this->assertGreaterThan(0, $result[0]);
+        $this->assertLessThan(1000, count($result[1]));
+        $this->assertGreaterThanOrEqual(10, count($result[1]));
+
+        $redis->sadd('set2', 'jeffrey', 'matt', 'taylor', 'dave', 'david');
+
+        $result = $redis->sscan('set2', 0, ['mAtCh' => 'd*']);
+        $this->assertEquals(['dave', 'david'], $result[1]);
+
+        $result = $redis->sscan('set2', 0, ['MaTcH' => 'dave']);
+        $this->assertEquals(['dave'], $result[1]);
+
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_runs_eval($redis)
+    {
+        $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
+        $this->assertEquals('mohamed', $redis->get('name'));
+
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_runs_pipes($redis)
+    {
+        $result = $redis->pipeline(function ($pipe) {
+            $pipe->set('test:pipeline:1', 1);
+            $pipe->get('test:pipeline:1');
+            $pipe->set('test:pipeline:2', 2);
+            $pipe->get('test:pipeline:2');
+        });
+
+        $this->assertCount(4, $result);
+        $this->assertEquals(1, $result[1]);
+        $this->assertEquals(2, $result[3]);
+
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_runs_transactions($redis)
+    {
+        $result = $redis->transaction(function ($pipe) {
+            $pipe->set('test:transaction:1', 1);
+            $pipe->get('test:transaction:1');
+            $pipe->set('test:transaction:2', 2);
+            $pipe->get('test:transaction:2');
+        });
+
+        $this->assertCount(4, $result);
+        $this->assertEquals(1, $result[1]);
+        $this->assertEquals(2, $result[3]);
+
+        $redis->flushall();
+    }
+
+    /**
+     * @test
+     * @dataProvider  redisConnections
+     */
+    public function it_runs_raw_command($redis)
+    {
+        $redis->executeRaw(['SET', 'test:raw:1', '1']);
+
+        $this->assertEquals(
+            1, $redis->executeRaw(['GET', 'test:raw:1'])
+        );
+
+        $redis->flushall();
     }
 }

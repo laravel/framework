@@ -83,6 +83,26 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
+     * Runs the given scan type based on parsed options.
+     *
+     * @param  string  $type
+     * @param  string  $key
+     * @param  int  $counter
+     * @param  array  $options
+     * @return array
+     */
+    public function scan($counter, $options = [])
+    {
+        $counter = $counter ?: null;
+        $opts = array_change_key_case($options, CASE_UPPER);
+        $match = array_get($opts, 'MATCH');
+
+        $result = $this->client->scan($counter, $match, array_get($opts, 'COUNT'));
+
+        return [$counter, $result];
+    }
+
+    /**
      * Set the given key if it doesn't exist.
      *
      * @param  string  $key
@@ -128,6 +148,24 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         }
 
         return $this->command('hmset', [$key, $dictionary]);
+    }
+
+    /**
+     * Scan the given hash key for all values.
+     *
+     * @param  string  $key
+     * @param  int  $counter
+     * @return array
+     */
+    public function hscan($key, $counter, $options = [])
+    {
+        $counter = $counter ?: null;
+        $opts = array_change_key_case($options, CASE_UPPER);
+        $match = array_get($opts, 'MATCH');
+
+        $result = $this->client->hscan($key, $counter, $match, array_get($opts, 'COUNT'));
+
+        return [$counter, $result];
     }
 
     /**
@@ -261,6 +299,50 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum'
         );
+    }
+
+    /**
+     * Scan the given set for all values.
+     *
+     * @param  string  $key
+     * @param  int  $counter
+     * @param  array  $options
+     * @return array
+     */
+    public function zscan($key, $counter, $options = [])
+    {
+        $counter = $counter ?: null;
+        $opts = array_change_key_case($options, CASE_UPPER);
+        $match = array_get($opts, 'MATCH');
+
+        $result = $this->client->zscan($key, $counter, $match, array_get($opts, 'COUNT'));
+        if ($result == false) {
+            return [0, []];
+        }
+
+        return [$counter, $result];
+    }
+
+    /**
+     * Scan the given set for all values.
+     *
+     * @param  string  $key
+     * @param  int  $count
+     * @param  array  $options
+     * @return array
+     */
+    public function sscan($key, $counter, $options = [])
+    {
+        $counter = $counter ?: null;
+        $opts = array_change_key_case($options, CASE_UPPER);
+        $match = array_get($opts, 'MATCH');
+
+        $result = $this->client->sscan($key, $counter, $match, array_get($opts, 'COUNT'));
+        if ($result == false) {
+            return [0, []];
+        }
+
+        return [$counter, $result];
     }
 
     /**
