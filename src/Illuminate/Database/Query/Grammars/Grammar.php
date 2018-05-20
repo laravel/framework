@@ -490,6 +490,34 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where JSON contains" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonContains(Builder $query, $where)
+    {
+        $column = $this->wrap($where['column']);
+
+        $value = $this->parameter($where['value']);
+
+        return $this->compileJsonContains($column, $value);
+    }
+
+    /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        return 'json_contains('.$column.', '.$value.')';
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query

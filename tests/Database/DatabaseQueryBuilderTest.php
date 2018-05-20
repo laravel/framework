@@ -2612,6 +2612,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }
 
+    public function testWhereJsonContains()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en']);
+        $this->assertEquals('select * from `users` where json_contains(`options`->\'$."languages"\', ?)', $builder->toSql());
+        $this->assertEquals(['["en"]'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContains('options->languages', new Raw("'[\"en\"]'"));
+        $this->assertEquals('select * from `users` where `id` = ? or json_contains(`options`->\'$."languages"\', \'["en"]\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en']);
+        $this->assertEquals('select * from "users" where ("options"->\'languages\')::jsonb @> ?', $builder->toSql());
+        $this->assertEquals(['["en"]'], $builder->getBindings());
+    }
+
     public function testFromSub()
     {
         $builder = $this->getBuilder();
