@@ -811,7 +811,7 @@ if (! function_exists('route')) {
     }
 }
 
-if (! function_exists('signedRoute')) {
+if (! function_exists('signed_route')) {
     /**
      * Generate the signed URL to a named route.
      *
@@ -820,13 +820,13 @@ if (! function_exists('signedRoute')) {
      * @param  \DateTimeInterface|int  $expiration
      * @return string
      */
-    function signedRoute($name, $parameters = [], $expiration = null)
+    function signed_route($name, $parameters = [], $expiration = null)
     {
         return app('url')->signedRoute($name, $parameters, $expiration);
     }
 }
 
-if (! function_exists('temporarySignedRoute')) {
+if (! function_exists('temporary_signed_route')) {
     /**
      * Generate the temporary signed URL to a named route.
      *
@@ -835,7 +835,7 @@ if (! function_exists('temporarySignedRoute')) {
      * @param  array   $parameters
      * @return string
      */
-    function temporarySignedRoute($name, $expiration, $parameters = [])
+    function temporary_signed_route($name, $expiration, $parameters = [])
     {
         return app('url')->temporarySignedRoute($name, $expiration, $parameters);
     }
