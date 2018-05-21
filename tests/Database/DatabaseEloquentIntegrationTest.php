@@ -3,6 +3,8 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
+use Illuminate\Tests\Integration\Database\Post;
+use Illuminate\Tests\Integration\Database\User;
 use ReflectionObject;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -1483,6 +1485,37 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertTrue($before->isSameDay($user->fresh()->updated_at), 'It is touching models when it should be disabled.');
 
         Carbon::setTestNow($before);
+    }
+
+    public function testWhenBaseModelIsIgnoredAllChildModelsAreIgnored()
+    {
+        $this->assertFalse(Model::isIgnoredOnTouch());
+        $this->assertFalse(User::isIgnoredOnTouch());
+
+        Model::withoutTouching(function () {
+            $this->assertTrue(Model::isIgnoredOnTouch());
+            $this->assertTrue(User::isIgnoredOnTouch());
+        });
+
+        $this->assertFalse(User::isIgnoredOnTouch());
+        $this->assertFalse(Model::isIgnoredOnTouch());
+    }
+
+    public function testChildModelsAreIgnored()
+    {
+        $this->assertFalse(Model::isIgnoredOnTouch());
+        $this->assertFalse(User::isIgnoredOnTouch());
+        $this->assertFalse(Post::isIgnoredOnTouch());
+
+        User::withoutTouching(function () {
+            $this->assertFalse(Model::isIgnoredOnTouch());
+            $this->assertFalse(Post::isIgnoredOnTouch());
+            $this->assertTrue(User::isIgnoredOnTouch());
+        });
+
+        $this->assertFalse(Post::isIgnoredOnTouch());
+        $this->assertFalse(User::isIgnoredOnTouch());
+        $this->assertFalse(Model::isIgnoredOnTouch());
     }
 
     /**

@@ -207,9 +207,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Disables relationship model touching for the current class during given callback scope.
      *
-     * @param $callback
+     * @param callable $callback
      */
-    public static function withoutTouching($callback)
+    public static function withoutTouching(callable $callback)
     {
         static::withoutTouchingOn([static::class], $callback);
     }
@@ -218,9 +218,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Disables relationship model touching for the given model classes during given callback scope.
      *
      * @param array $models
-     * @param $callback
+     * @param callable $callback
      */
-    public static function withoutTouchingOn(array $models, $callback)
+    public static function withoutTouchingOn(array $models, callable $callback)
     {
         static::$ignoreOnTouch = array_values(array_merge(static::$ignoreOnTouch, $models));
 
@@ -229,6 +229,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         } finally {
             static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, $models));
         }
+    }
+
+    /**
+     * @param string $class The class name to check. Defaults to current class.
+     *
+     * @return bool
+     */
+    public static function isIgnoredOnTouch($class = null)
+    {
+        $class = $class ?: static::class;
+
+        foreach (static::$ignoreOnTouch as $ignoredClass) {
+            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
