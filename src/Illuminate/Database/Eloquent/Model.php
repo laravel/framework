@@ -250,22 +250,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * Whether or not the current model is going to be touched.
-     *
-     * @return bool
-     */
-    public function shouldTouch()
-    {
-        foreach (static::$ignoreOnTouch as $ignoredClass) {
-            if ($this instanceof $ignoredClass) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    /**
      * Clear the list of booted models so they will be re-booted.
      *
      * @return void

@@ -1705,15 +1705,11 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-        $this->assertTrue($model->shouldTouch());
-
         EloquentModelStub::withoutTouching(function () use (&$called, $model) {
-            $this->assertFalse($model->shouldTouch());
             $called = true;
         });
 
         $this->assertTrue($called);
-        $this->assertTrue($model->shouldTouch());
     }
 
     public function testWithoutTouchingOnCallback()
@@ -1722,15 +1718,12 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-        $this->assertTrue($model->shouldTouch());
 
         Model::withoutTouchingOn([EloquentModelStub::class], function () use (&$called, $model) {
-            $this->assertFalse($model->shouldTouch());
             $called = true;
         });
 
         $this->assertTrue($called);
-        $this->assertTrue($model->shouldTouch());
     }
 
     protected function addMockConnection($model)

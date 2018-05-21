@@ -30,14 +30,14 @@ class DatabaseEloquentRelationTest extends TestCase
         $builder = m::mock(Builder::class);
         $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
-        $builder->shouldReceive('getModel')->andReturn($related = m::mock(\stdClass::class));
+        $related = m::mock(EloquentNoTouchingModelStub::class)->makePartial();
+        $builder->shouldReceive('getModel')->andReturn($related);
         $builder->shouldReceive('whereNotNull');
         $builder->shouldReceive('where');
         $builder->shouldReceive('withoutGlobalScopes')->andReturn($builder);
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $related->shouldReceive('shouldTouch')->andReturn(true);
         $now = \Illuminate\Support\Carbon::now();
         $related->shouldReceive('freshTimestampString')->andReturn($now);
         $builder->shouldReceive('update')->once()->with(['updated_at' => $now]);
@@ -47,14 +47,15 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testCanDisableParentTouchingForAllModels()
     {
+        /** @var EloquentNoTouchingModelStub $related */
         $related = m::mock(EloquentNoTouchingModelStub::class)->makePartial();
         $related->shouldReceive('getUpdatedAtColumn')->never();
         $related->shouldReceive('freshTimestampString')->never();
 
-        $this->assertTrue($related->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
 
         Model::withoutTouching(function () use ($related) {
-            $this->assertFalse($related->shouldTouch());
+            $this->assertTrue($related::isIgnoredOnTouch());
 
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
@@ -70,7 +71,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $relation->touch();
         });
 
-        $this->assertTrue($related->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
     }
 
     public function testCanDisableTouchingForSpecificModel()
@@ -81,12 +82,12 @@ class DatabaseEloquentRelationTest extends TestCase
 
         $anotherRelated = m::mock(EloquentNoTouchingAnotherModelStub::class)->makePartial();
 
-        $this->assertTrue($related->shouldTouch());
-        $this->assertTrue($anotherRelated->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
+        $this->assertFalse($anotherRelated::isIgnoredOnTouch());
 
         EloquentNoTouchingModelStub::withoutTouching(function () use ($related, $anotherRelated) {
-            $this->assertFalse($related->shouldTouch());
-            $this->assertTrue($anotherRelated->shouldTouch());
+            $this->assertTrue($related::isIgnoredOnTouch());
+            $this->assertFalse($anotherRelated::isIgnoredOnTouch());
 
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
@@ -117,8 +118,8 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherRelation->touch();
         });
 
-        $this->assertTrue($related->shouldTouch());
-        $this->assertTrue($anotherRelated->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
+        $this->assertFalse($anotherRelated::isIgnoredOnTouch());
     }
 
     public function testParentModelIsNotTouchedWhenChildModelIsIgnored()
@@ -131,12 +132,12 @@ class DatabaseEloquentRelationTest extends TestCase
         $relatedChild->shouldReceive('getUpdatedAtColumn')->never();
         $relatedChild->shouldReceive('freshTimestampString')->never();
 
-        $this->assertTrue($related->shouldTouch());
-        $this->assertTrue($relatedChild->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
+        $this->assertFalse($relatedChild::isIgnoredOnTouch());
 
         EloquentNoTouchingModelStub::withoutTouching(function () use ($related, $relatedChild) {
-            $this->assertFalse($related->shouldTouch());
-            $this->assertFalse($relatedChild->shouldTouch());
+            $this->assertTrue($related::isIgnoredOnTouch());
+            $this->assertTrue($relatedChild::isIgnoredOnTouch());
 
             $builder = m::mock(Builder::class);
             $parent = m::mock(Model::class);
@@ -165,8 +166,8 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherRelation->touch();
         });
 
-        $this->assertTrue($related->shouldTouch());
-        $this->assertTrue($relatedChild->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
+        $this->assertFalse($relatedChild::isIgnoredOnTouch());
     }
 
     public function testIgnoredModelsStateIsResetWhenThereAreExceptions()
@@ -179,13 +180,13 @@ class DatabaseEloquentRelationTest extends TestCase
         $relatedChild->shouldReceive('getUpdatedAtColumn')->never();
         $relatedChild->shouldReceive('freshTimestampString')->never();
 
-        $this->assertTrue($related->shouldTouch());
-        $this->assertTrue($relatedChild->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
+        $this->assertFalse($relatedChild::isIgnoredOnTouch());
 
         try {
             EloquentNoTouchingModelStub::withoutTouching(function () use ($related, $relatedChild) {
-                $this->assertFalse($related->shouldTouch());
-                $this->assertFalse($relatedChild->shouldTouch());
+                $this->assertTrue($related::isIgnoredOnTouch());
+                $this->assertTrue($relatedChild::isIgnoredOnTouch());
 
                 throw new \Exception();
             });
@@ -195,8 +196,8 @@ class DatabaseEloquentRelationTest extends TestCase
             // Does nothing.
         }
 
-        $this->assertTrue($related->shouldTouch());
-        $this->assertTrue($relatedChild->shouldTouch());
+        $this->assertFalse($related::isIgnoredOnTouch());
+        $this->assertFalse($relatedChild::isIgnoredOnTouch());
     }
 
     public function testSettingMorphMapWithNumericArrayUsesTheTableNames()
