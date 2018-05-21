@@ -319,16 +319,19 @@ class SQLiteGrammar extends Grammar
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command, Connection $connection)
     {
         $schemaManager = $connection->getDoctrineSchemaManager();
+
         $indexes = $schemaManager->listTableIndexes($this->getTablePrefix().$blueprint->getTable());
+
         $index = array_get($indexes, $command->from);
 
         if (! $index) {
-            throw new RuntimeException("Index '{$command->from}' doesn't seem to exist");
+            throw new RuntimeException("Index [{$command->from}] does not exist.");
         }
 
-        /** @var \Doctrine\DBAL\Schema\Index $index */
-        $newIndex = new Index($command->to, $index->getColumns(), $index->isUnique(), $index->isPrimary(),
-            $index->getFlags(), $index->getOptions());
+        $newIndex = new Index(
+            $command->to, $index->getColumns(), $index->isUnique(),
+            $index->isPrimary(), $index->getFlags(), $index->getOptions()
+        );
 
         $platform = $schemaManager->getDatabasePlatform();
 
