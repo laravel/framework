@@ -167,36 +167,43 @@ class RedisConnectionTest extends TestCase
 
     /**
      * @test
-     * @dataProvider redisConnections
      */
-    public function it_scans_all_keys_with_options($redis)
+    public function it_scans_all_keys_with_options()
     {
-        $redis->pipeline(function ($pipe) {
-            for ($x = 0; $x < 1000; $x++) {
-                $pipe->set($x * rand(0, 1000), $x);
+        foreach ($this->redis as $name => $driver) {
+            if (str_contains($name, 'prefixed')) {
+                return;
             }
-        });
 
-        $result = $redis->scan(0, ['COUNT' => 10]);
-        $this->assertCount(2, $result);
-        $this->assertGreaterThan(0, $result[0]);
-        $this->assertGreaterThanOrEqual(10, count($result[1]));
+            $redis = $driver->connection();
 
-        $redis->flushall();
+            $redis->pipeline(function ($pipe) {
+                for ($x = 0; $x < 1000; $x++) {
+                    $pipe->set($x * rand(0, 1000), $x);
+                }
+            });
 
-        $redis->set('jeffrey', 1);
-        $redis->set('matt', 5);
-        $redis->set('matthew', 6);
-        $redis->set('taylor', 10);
-        $redis->set('dave', 12);
+            $result = $redis->scan(0, ['COUNT' => 10]);
+            $this->assertCount(2, $result);
+            $this->assertGreaterThan(0, $result[0]);
+            $this->assertGreaterThanOrEqual(10, count($result[1]));
 
-        $result = $redis->scan(0, ['mAtCh' => 'matt*']);
-        $this->assertCount(2, $result[1]);
+            $redis->flushall();
 
-        $result = $redis->scan(0, ['MaTcH' => 'dave']);
-        $this->assertCount(1, $result[1]);
+            $redis->set('jeffrey', 1);
+            $redis->set('matt', 5);
+            $redis->set('matthew', 6);
+            $redis->set('taylor', 10);
+            $redis->set('dave', 12);
 
-        $redis->flushall();
+            $result = $redis->scan(0, ['mAtCh' => 'matt*']);
+            $this->assertCount(2, $result[1]);
+
+            $result = $redis->scan(0, ['MaTcH' => 'dave']);
+            $this->assertCount(1, $result[1]);
+
+            $redis->flushall();
+        }
     }
 
     /**
