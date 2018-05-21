@@ -219,9 +219,7 @@ class Builder
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof Closure) {
-            $query = $this->model->newUneagerQueryWithoutScopes();
-
-            $column($query);
+            $column($query = $this->model->newModelQuery());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
