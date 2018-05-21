@@ -3,8 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use Illuminate\Tests\Integration\Database\Post;
-use Illuminate\Tests\Integration\Database\User;
 use ReflectionObject;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -12,6 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Tests\Integration\Database\Post;
+use Illuminate\Tests\Integration\Database\User;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
