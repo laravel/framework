@@ -811,6 +811,36 @@ if (! function_exists('route')) {
     }
 }
 
+if (! function_exists('signedRoute')) {
+    /**
+     * Generate the signed URL to a named route.
+     *
+     * @param  string  $name
+     * @param  array   $parameters
+     * @param  \DateTimeInterface|int  $expiration
+     * @return string
+     */
+    function signedRoute($name, $parameters = [], $expiration = null)
+    {
+        return app('url')->signedRoute($name, $parameters, $expiration);
+    }
+}
+
+if (! function_exists('temporarySignedRoute')) {
+    /**
+     * Generate the temporary signed URL to a named route.
+     *
+     * @param  string  $name
+     * @param  \DateTimeInterface|int  $expiration
+     * @param  array   $parameters
+     * @return string
+     */
+    function temporarySignedRoute($name, $expiration, $parameters = [])
+    {
+        return app('url')->temporarySignedRoute($name, $expiration, $parameters);
+    }
+}
+
 if (! function_exists('secure_asset')) {
     /**
      * Generate an asset path for the application.
