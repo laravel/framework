@@ -1489,33 +1489,33 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
     public function testWhenBaseModelIsIgnoredAllChildModelsAreIgnored()
     {
-        $this->assertFalse(Model::isIgnoredOnTouch());
-        $this->assertFalse(User::isIgnoredOnTouch());
+        $this->assertFalse(Model::isIgnoringTouch());
+        $this->assertFalse(User::isIgnoringTouch());
 
         Model::withoutTouching(function () {
-            $this->assertTrue(Model::isIgnoredOnTouch());
-            $this->assertTrue(User::isIgnoredOnTouch());
+            $this->assertTrue(Model::isIgnoringTouch());
+            $this->assertTrue(User::isIgnoringTouch());
         });
 
-        $this->assertFalse(User::isIgnoredOnTouch());
-        $this->assertFalse(Model::isIgnoredOnTouch());
+        $this->assertFalse(User::isIgnoringTouch());
+        $this->assertFalse(Model::isIgnoringTouch());
     }
 
     public function testChildModelsAreIgnored()
     {
-        $this->assertFalse(Model::isIgnoredOnTouch());
-        $this->assertFalse(User::isIgnoredOnTouch());
-        $this->assertFalse(Post::isIgnoredOnTouch());
+        $this->assertFalse(Model::isIgnoringTouch());
+        $this->assertFalse(User::isIgnoringTouch());
+        $this->assertFalse(Post::isIgnoringTouch());
 
         User::withoutTouching(function () {
-            $this->assertFalse(Model::isIgnoredOnTouch());
-            $this->assertFalse(Post::isIgnoredOnTouch());
-            $this->assertTrue(User::isIgnoredOnTouch());
+            $this->assertFalse(Model::isIgnoringTouch());
+            $this->assertFalse(Post::isIgnoringTouch());
+            $this->assertTrue(User::isIgnoringTouch());
         });
 
-        $this->assertFalse(Post::isIgnoredOnTouch());
-        $this->assertFalse(User::isIgnoredOnTouch());
-        $this->assertFalse(Model::isIgnoredOnTouch());
+        $this->assertFalse(Post::isIgnoringTouch());
+        $this->assertFalse(User::isIgnoringTouch());
+        $this->assertFalse(Model::isIgnoringTouch());
     }
 
     /**

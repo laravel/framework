@@ -236,7 +236,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @return bool
      */
-    public static function isIgnoredOnTouch($class = null)
+    public static function isIgnoringTouch($class = null)
     {
         $class = $class ?: static::class;
 
