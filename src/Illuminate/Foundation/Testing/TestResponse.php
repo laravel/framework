@@ -124,11 +124,24 @@ class TestResponse
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        if (! is_null($uri)) {
-            PHPUnit::assertEquals(
-                app('url')->to($uri), app('url')->to($this->headers->get('Location'))
-            );
+        if (!is_null($uri)) {
+            $this->assertUri($uri);
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert whether the response location is to a given URI.
+     *
+     * @param  string  $uri
+     * @return $this
+     */
+    public function assertUri($uri)
+    {
+        PHPUnit::assertEquals(
+            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
+        );
 
         return $this;
     }
