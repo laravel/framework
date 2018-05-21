@@ -148,9 +148,7 @@ trait ValidatesAttributes
         }
 
         if ($format = $this->getDateFormat($attribute)) {
-            return $this->checkDateTimeOrder(
-                $format, $value, $this->getValue($parameters[0]) ?: $parameters[0], $operator
-            );
+            return $this->checkDateTimeOrder($format, $value, $parameters[0], $operator);
         }
 
         if (! $date = $this->getDateTimestamp($parameters[0])) {
@@ -207,11 +205,13 @@ trait ValidatesAttributes
      */
     protected function checkDateTimeOrder($format, $first, $second, $operator)
     {
-        $first = $this->getDateTimeWithOptionalFormat($format, $first);
+        $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
 
-        $second = $this->getDateTimeWithOptionalFormat($format, $second);
+        if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
+            $secondDate = $this->getDateTimeWithOptionalFormat($format, $this->getValue($second));
+        }
 
-        return ($first && $second) && ($this->compare($first, $second, $operator));
+        return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
     }
 
     /**
