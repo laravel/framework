@@ -125,23 +125,8 @@ class TestResponse
         );
 
         if (! is_null($uri)) {
-            $this->assertUri($uri);
+            $this->assertLocation($uri);
         }
-
-        return $this;
-    }
-
-    /**
-     * Assert whether the response location is to a given URI.
-     *
-     * @param  string  $uri
-     * @return $this
-     */
-    public function assertUri($uri)
-    {
-        PHPUnit::assertEquals(
-            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
-        );
 
         return $this;
     }
@@ -181,6 +166,21 @@ class TestResponse
     {
         PHPUnit::assertFalse(
             $this->headers->has($headerName), "Unexpected header [{$headerName}] is present on response."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the current location header matches the given URI.
+     *
+     * @param  string  $uri
+     * @return $this
+     */
+    public function assertLocation($uri)
+    {
+        PHPUnit::assertEquals(
+            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
         );
 
         return $this;
