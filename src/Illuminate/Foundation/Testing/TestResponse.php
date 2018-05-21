@@ -124,7 +124,7 @@ class TestResponse
             $this->isRedirect(), 'Response status code ['.$this->getStatusCode().'] is not a redirect status code.'
         );
 
-        if (!is_null($uri)) {
+        if (! is_null($uri)) {
             $this->assertUri($uri);
         }
 
