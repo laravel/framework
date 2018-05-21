@@ -303,6 +303,18 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given indexes should be renamed.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return \Illuminate\Support\Fluent
+     */
+    public function renameIndex($from, $to)
+    {
+        return $this->addCommand('renameIndex', compact('from', 'to'));
+    }
+
+    /**
      * Indicate that the given primary key should be dropped.
      *
      * @param  string|array  $index
