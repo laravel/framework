@@ -289,7 +289,26 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         if (is_null($this->cachedSchema)) {
-            $this->cachedSchema = $this->forceScheme ?: $this->request->getScheme().'://';
+
+            // On https proxy http like nginx
+            // If the outer layer is verified for HTTPS.
+            // The inner layer can't get ready scheme
+            // Get from env cache and fixed it
+            if (function_exists('env')) {
+                $appUrl = env('APP_URL');
+            } else {
+                $appUrl = getenv('APP_URL');
+            }
+
+            if (!empty($appUrl)) {
+                $urlInfo = parse_url($appUrl);
+                if ($urlInfo !== false and isset($urlInfo['scheme'])) {
+                    $this->cachedSchema = $urlInfo['scheme'];
+                    return $this->cachedSchema;
+                }
+            }
+
+            $this->cachedSchema = $this->forceScheme ?: $this->request->getScheme() . '://';
         }
 
         return $this->cachedSchema;
