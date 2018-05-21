@@ -1718,7 +1718,6 @@ class DatabaseEloquentModelTest extends TestCase
 
         $called = false;
 
-
         Model::withoutTouchingOn([EloquentModelStub::class], function () use (&$called, $model) {
             $called = true;
         });
