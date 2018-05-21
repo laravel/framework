@@ -491,6 +491,35 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Execute an .SQL file and return the boolean result.
+     *
+     * @param  string  $filename
+     * @param  bool    $continue
+     * @return bool
+     */
+    public function dotsql($filename, $continue)
+    {
+        $sqls = file_get_contents(database_path('/structures/'.$filename));
+        $sqls = explode(';', $sqls);
+        foreach ($sqls as &$sql) {
+            $sql = trim($sql);
+        }
+        $sqls[count($sqls) - 1] = '';
+        $a = true;
+        foreach ($sqls as $a => $sql) {
+            $t = $this->statement($sql);
+            if (! $t and ! $continue) {
+                return false;
+            }
+            if (! $t) {
+                $a = false;
+            }
+        }
+
+        return $a;
+    }
+
+    /**
      * Run a raw, unprepared query against the PDO connection.
      *
      * @param  string  $query
