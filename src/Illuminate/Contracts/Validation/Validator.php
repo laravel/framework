@@ -24,7 +24,7 @@ interface Validator extends MessageProvider
      * Parse the given rules and merge them into current rules.
      *
      * @param  array  $rules
-     * @return void
+     * @return $this
      */
     public function always($rules);
 
