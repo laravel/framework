@@ -308,7 +308,7 @@ class PhpRedisConnection extends Connection
     }
 
     /**
-     * Evaluate a script and retunr its result.
+     * Evaluate a script and return its result.
      *
      * @param  string  $script
      * @param  int  $numberOfKeys
