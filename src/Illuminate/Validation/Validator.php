@@ -816,10 +816,10 @@ class Validator implements ValidatorContract
     public function always($rules)
     {
         $this->addRules($rules);
-        
+
         return $this;
     }
-    
+
     /**
      * Add conditions to a given field based on a Closure.
      *
