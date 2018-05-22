@@ -14,8 +14,7 @@ class Response
     /**
      * Create a new response.
      *
-     * @param  string|null  $message
-     * @return void
+     * @param  string|null $message
      */
     public function __construct($message = null)
     {
