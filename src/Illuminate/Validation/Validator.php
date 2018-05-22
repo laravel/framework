@@ -814,6 +814,19 @@ class Validator implements ValidatorContract
     }
 
     /**
+     * Parse the given rules and merge them into current rules.
+     *
+     * @param  array  $rules
+     * @return $this
+     */
+    public function always($rules)
+    {
+        $this->addRules($rules);
+
+        return $this;
+    }
+
+    /**
      * Add conditions to a given field based on a Closure.
      *
      * @param  string|array  $attribute
