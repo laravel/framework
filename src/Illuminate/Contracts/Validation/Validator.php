@@ -20,6 +20,14 @@ interface Validator extends MessageProvider
      */
     public function failed();
 
+     /**
+     * Parse the given rules and merge them into current rules.
+     *
+     * @param  array  $rules
+     * @return void
+     */
+    public function always($rules);
+
     /**
      * Add conditions to a given field based on a Closure.
      *
@@ -29,7 +37,7 @@ interface Validator extends MessageProvider
      * @return $this
      */
     public function sometimes($attribute, $rules, callable $callback);
-
+    
     /**
      * After an after validation callback.
      *
