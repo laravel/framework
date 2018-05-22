@@ -719,8 +719,8 @@ class Builder
      * Add an "or where" clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string|null  $operator
-     * @param  mixed   $value
+     * @param  mixed  $operator
+     * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -1289,7 +1289,7 @@ class Builder
 
             $this->wheres[] = compact('type', 'query', 'boolean');
 
-            $this->addBinding($query->getBindings(), 'where');
+            $this->addBinding($query->getRawBindings()['where'], 'where');
         }
 
         return $this;

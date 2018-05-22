@@ -194,6 +194,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" rename to "foo"', $statements[0]);
     }
 
+    public function testRenameIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter index "foo" rename to "bar"', $statements[0]);
+    }
+
     public function testAddingPrimaryKey()
     {
         $blueprint = new Blueprint('users');
