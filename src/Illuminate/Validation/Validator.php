@@ -806,8 +806,8 @@ class Validator implements ValidatorContract
             $this->implicitAttributes, $response->implicitAttributes
         );
     }
-    
-     /**
+
+    /**
      * Parse the given rules and merge them into current rules.
      *
      * @param  array  $rules
@@ -819,7 +819,7 @@ class Validator implements ValidatorContract
         
         return $this;
     }
-
+    
     /**
      * Add conditions to a given field based on a Closure.
      *
