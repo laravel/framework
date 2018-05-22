@@ -10,4 +10,11 @@ class RefreshDatabaseState
      * @var bool
      */
     public static $migrated = false;
+
+    /**
+     * Indicates if the test database has been seeded.
+     *
+     * @var bool
+     */
+    public static $seeded = false;
 }
