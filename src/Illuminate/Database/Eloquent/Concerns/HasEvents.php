@@ -38,7 +38,7 @@ trait HasEvents
         $className = $class;
 
         if (is_string($className)) {
-            if (!class_exists($className)) {
+            if (! class_exists($className)) {
                 throw new InvalidArgumentException("Observer $className not found.");
             }
         } else {
