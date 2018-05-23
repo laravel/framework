@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use ReflectionObject;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
