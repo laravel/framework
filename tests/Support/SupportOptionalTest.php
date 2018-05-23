@@ -88,4 +88,28 @@ class SupportOptionalTest extends TestCase
 
         $this->assertFalse(isset($optional['item']));
     }
+
+    public function testWithDefaultReturnsDefaultWhenNull()
+    {
+        $defaultObj = new \stdClass;
+
+        $optional = new Optional(null);
+
+        $result = $optional->withDefault($defaultObj);
+
+        $this->assertSame($result, $defaultObj);
+    }
+
+    public function testWithDefaultReturnsOptionalWhenNotNull()
+    {
+        $targetObj = new \stdClass;
+
+        $defaultObj = new \stdClass;
+
+        $optional = new Optional($targetObj);
+
+        $result = $optional->withDefault($defaultObj);
+
+        $this->assertSame($result, $optional);
+    }
 }
