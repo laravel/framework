@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use InvalidArgumentException;
 use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
@@ -34,7 +35,15 @@ trait HasEvents
     {
         $instance = new static;
 
-        $className = is_string($class) ? $class : get_class($class);
+        $className = $class;
+
+        if (is_string($className)) {
+            if (! class_exists($className)) {
+                throw new InvalidArgumentException("Observer $className not found.");
+            }
+        } else {
+            $className = get_class($className);
+        }
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
