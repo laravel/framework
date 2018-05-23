@@ -9,6 +9,7 @@ use Mockery as m;
 use ReflectionClass;
 use DateTimeImmutable;
 use DateTimeInterface;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -1697,6 +1698,12 @@ class DatabaseEloquentModelTest extends TestCase
         $secondInstance->setConnection('foo');
         $result = $firstInstance->is($secondInstance);
         $this->assertFalse($result);
+    }
+
+    public function testMissingObserverClass()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        EloquentModelStub::observe('foo');
     }
 
     protected function addMockConnection($model)
