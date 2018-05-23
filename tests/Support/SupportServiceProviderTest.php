@@ -156,7 +156,6 @@ class SupportServiceProviderTest extends TestCase
             });
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadViewsFrom('path', 'namespace');
@@ -207,7 +206,6 @@ class SupportServiceProviderTest extends TestCase
         $app->expects($this->never())->method('afterResolving');
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadViewsFrom('path', 'namespace');
@@ -246,7 +244,6 @@ class SupportServiceProviderTest extends TestCase
             });
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadTranslationsFrom('path', 'namespace');
@@ -284,7 +281,6 @@ class SupportServiceProviderTest extends TestCase
         $app->expects($this->never())->method('afterResolving');
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadTranslationsFrom('path', 'namespace');
@@ -314,7 +310,6 @@ class SupportServiceProviderTest extends TestCase
             ->method('resolved')
             ->willReturn(false);
 
-
         $app->expects($this->once())
             ->method('afterResolving')
             ->with('translator', function () {
@@ -324,7 +319,6 @@ class SupportServiceProviderTest extends TestCase
             });
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadJsonTranslationsFrom('path');
@@ -362,7 +356,6 @@ class SupportServiceProviderTest extends TestCase
             ->method('afterResolving');
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadJsonTranslationsFrom('path');
@@ -392,7 +385,6 @@ class SupportServiceProviderTest extends TestCase
             ->method('resolved')
             ->willReturn(false);
 
-
         $app->expects($this->once())
             ->method('afterResolving')
             ->with('migrator', function () {
@@ -402,7 +394,6 @@ class SupportServiceProviderTest extends TestCase
             });
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadMigrationsFrom('migrations_path');
@@ -441,7 +432,6 @@ class SupportServiceProviderTest extends TestCase
             ->method('afterResolving');
 
         $provider = new class($app) extends ServiceProvider {
-
             public function register()
             {
                 $this->loadMigrationsFrom('migrations_path');
