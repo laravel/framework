@@ -29,6 +29,22 @@ class Optional implements ArrayAccess
     }
 
     /**
+     * Returns a default value when the underlying object is null.
+     *
+     * @param  mixed $default
+     *
+     * @return $this|mixed
+     */
+    public function withDefault($default)
+    {
+        if (is_null($this->value)) {
+            return value($default);
+        }
+
+        return $this;
+    }
+
+    /**
      * Dynamically access a property on the underlying object.
      *
      * @param  string  $key
