@@ -1703,7 +1703,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testMissingObserverClass()
     {
         $this->expectException(InvalidArgumentException::class);
-        EloquentModelStub::observe('foo');
+        EloquentModelStub::observe('NonExistentFoo');
     }
 
     protected function addMockConnection($model)
