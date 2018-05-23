@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Support;
 
+use Mockery as m;
+use Illuminate\View\Factory;
+use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Foundation\Application;
 use Illuminate\Translation\Translator;
-use Illuminate\View\Factory;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Database\Migrations\Migrator;
 
 class SupportServiceProviderTest extends TestCase
 {
@@ -149,14 +149,16 @@ class SupportServiceProviderTest extends TestCase
 
         $app->expects($this->once())
             ->method('afterResolving')
-            ->with('view', function () {})
+            ->with('view', function () {
+            })
             ->willReturnCallback(function ($abstract, $callback) use ($view) {
                 $callback($view);
             });
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadViewsFrom('path', 'namespace');
             }
         };
@@ -206,7 +208,8 @@ class SupportServiceProviderTest extends TestCase
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadViewsFrom('path', 'namespace');
             }
         };
@@ -236,14 +239,16 @@ class SupportServiceProviderTest extends TestCase
 
         $app->expects($this->once())
             ->method('afterResolving')
-            ->with('translator', function () {})
+            ->with('translator', function () {
+            })
             ->willReturnCallback(function ($abstract, $callback) use ($translator) {
                 $callback($translator);
             });
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadTranslationsFrom('path', 'namespace');
             }
         };
@@ -280,7 +285,8 @@ class SupportServiceProviderTest extends TestCase
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadTranslationsFrom('path', 'namespace');
             }
         };
@@ -311,14 +317,16 @@ class SupportServiceProviderTest extends TestCase
 
         $app->expects($this->once())
             ->method('afterResolving')
-            ->with('translator', function () {})
+            ->with('translator', function () {
+            })
             ->willReturnCallback(function ($abstract, $callback) use ($translator) {
                 $callback($translator);
             });
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadJsonTranslationsFrom('path');
             }
         };
@@ -355,7 +363,8 @@ class SupportServiceProviderTest extends TestCase
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadJsonTranslationsFrom('path');
             }
         };
@@ -386,14 +395,16 @@ class SupportServiceProviderTest extends TestCase
 
         $app->expects($this->once())
             ->method('afterResolving')
-            ->with('migrator', function () {})
+            ->with('migrator', function () {
+            })
             ->willReturnCallback(function ($abstract, $callback) use ($migrator) {
                 $callback($migrator);
             });
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadMigrationsFrom('migrations_path');
             }
         };
@@ -431,7 +442,8 @@ class SupportServiceProviderTest extends TestCase
 
         $provider = new class($app) extends ServiceProvider {
 
-            public function register() {
+            public function register()
+            {
                 $this->loadMigrationsFrom('migrations_path');
             }
         };

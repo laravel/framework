@@ -2,10 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\View\Factory as ViewFactoryContract;
-use Illuminate\Database\Migrations\Migrator;
 
 abstract class ServiceProvider
 {
@@ -85,7 +85,6 @@ abstract class ServiceProvider
     protected function loadViewsFrom($path, $namespace)
     {
         $callback = function (ViewFactoryContract $view) use ($path, $namespace) {
-
             foreach ((array) $this->app['config']->get('view.paths') as $viewPath) {
                 if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
                     $view->addNamespace($namespace, $appPath);
@@ -109,7 +108,7 @@ abstract class ServiceProvider
     {
         $callback = function (Translator $translator) use ($path, $namespace) {
 
-            /** @var \Illuminate\Translation\Translator $translator */
+            /* @var \Illuminate\Translation\Translator $translator */
             $translator->addNamespace($namespace, $path);
         };
 
@@ -126,7 +125,7 @@ abstract class ServiceProvider
     {
         $callback = function (Translator $translator) use ($path) {
 
-            /** @var \Illuminate\Translation\Translator $translator */
+            /* @var \Illuminate\Translation\Translator $translator */
             $translator->addJsonPath($path);
         };
 
@@ -211,8 +210,8 @@ abstract class ServiceProvider
     protected function applyWhenResolved($abstract, callable $callback): void
     {
         $this->app->resolved($abstract)
-            ?   $callback($this->app[$abstract])
-            :   $this->app->afterResolving($abstract, $callback);
+            ? $callback($this->app[$abstract])
+            : $this->app->afterResolving($abstract, $callback);
     }
 
     /**
