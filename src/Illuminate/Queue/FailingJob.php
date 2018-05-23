@@ -4,7 +4,7 @@ namespace Illuminate\Queue;
 
 use Illuminate\Container\Container;
 use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Events\Dispatcher;
 
 class FailingJob
 {
