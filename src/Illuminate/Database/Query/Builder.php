@@ -1885,17 +1885,11 @@ class Builder
      */
     public function get($columns = ['*'])
     {
-        $original = $this->columns;
-
-        if (is_null($original)) {
-            $this->columns = $columns;
-        }
-
-        $results = $this->processor->processSelect($this, $this->runSelect());
-
-        $this->columns = $original;
-
-        return collect($results);
+        return collect(
+            $this->onceWithColumns($columns, function () {
+                return $this->processor->processSelect($this, $this->runSelect());
+            })
+        );
     }
 
     /**
@@ -2091,15 +2085,52 @@ class Builder
      */
     public function pluck($column, $key = null)
     {
-        $results = $this->get(is_null($key) ? [$column] : [$column, $key]);
+        $queryResult = $this->onceWithColumns(
+            is_null($key) ? [$column] : [$column, $key],
+            function () {
+                return $this->processor->processSelect($this, $this->runSelect());
+            }
+        );
+
+        if (empty($queryResult)) {
+            return collect();
+        }
 
         // If the columns are qualified with a table or have an alias, we cannot use
         // those directly in the "pluck" operations since the results from the DB
         // are only keyed by the column itself. We'll strip the table out here.
-        return $results->pluck(
-            $this->stripTableForPluck($column),
-            $this->stripTableForPluck($key)
-        );
+        $column = $this->stripTableForPluck($column);
+        $key = $this->stripTableForPluck($key);
+
+        if (is_array($queryResult[0])) {
+            return $this->pluckFromArrayColumn($queryResult, $column, $key);
+        } else {
+            return $this->pluckFromObjectColumn($queryResult, $column, $key);
+        }
+    }
+
+    /**
+     * Execute the given callback while selecting the given columns.
+     *
+     * After running the callback, the columns are reset to the original value.
+     *
+     * @param  array     $columns
+     * @param  callable  $callback
+     * @return mixed
+     */
+    protected function onceWithColumns($columns, $callback)
+    {
+        $original = $this->columns;
+
+        if (is_null($original)) {
+            $this->columns = $columns;
+        }
+
+        $result = $callback();
+
+        $this->columns = $original;
+
+        return $result;
     }
 
     /**
@@ -2111,6 +2142,56 @@ class Builder
     protected function stripTableForPluck($column)
     {
         return is_null($column) ? $column : last(preg_split('~\.| ~', $column));
+    }
+
+    /**
+     * Retrieve column values from rows represented as objects.
+     *
+     * @param  array  $queryResult
+     * @param  string $column
+     * @param  string $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function pluckFromObjectColumn($queryResult, $column, $key)
+    {
+        $results = [];
+
+        if (is_null($key)) {
+            foreach ($queryResult as $row) {
+                $results[] = $row->$column;
+            }
+        } else {
+            foreach ($queryResult as $row) {
+                $results[$row->$key] = $row->$column;
+            }
+        }
+
+        return collect($results);
+    }
+
+    /**
+     * Retrieve column values from rows represented as arrays.
+     *
+     * @param  array  $queryResult
+     * @param  string $column
+     * @param  string $key
+     * @return \Illuminate\Support\Collection
+     */
+    protected function pluckFromArrayColumn($queryResult, $column, $key)
+    {
+        $results = [];
+
+        if (is_null($key)) {
+            foreach ($queryResult as $row) {
+                $results[] = $row[$column];
+            }
+        } else {
+            foreach ($queryResult as $row) {
+                $results[$row[$key]] = $row[$column];
+            }
+        }
+
+        return collect($results);
     }
 
     /**
