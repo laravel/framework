@@ -23,7 +23,6 @@ use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 
-
 /**
  * @group integration
  */
