@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Http;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Resources\MergeValue;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
@@ -40,7 +41,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
@@ -81,7 +82,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
@@ -104,7 +105,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertExactJson([
             'data' => [
@@ -127,7 +128,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertExactJson([
             'data' => [
@@ -153,7 +154,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertExactJson([
             'data' => [
@@ -181,7 +182,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertExactJson([
             'data' => [
@@ -205,7 +206,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertExactJson([
             'data' => [
@@ -256,7 +257,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
@@ -278,7 +279,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
         $response->assertHeader('X-Resource', 'True');
     }
 
@@ -333,14 +334,14 @@ class ResourceTest extends TestCase
             return (new PostResource(new Post([
                 'id' => 5,
                 'title' => 'Test Title',
-            ])))->response()->setStatusCode(202)->header('X-Custom', 'True');
+            ])))->response()->setStatusCode(Response::HTTP_ACCEPTED)->header('X-Custom', 'True');
         });
 
         $response = $this->withoutExceptionHandling()->get(
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(202);
+        $response->assertStatus(Response::HTTP_ACCEPTED);
         $response->assertHeader('X-Custom', 'True');
     }
 
@@ -361,7 +362,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(201);
+        $response->assertStatus(Response::HTTP_CREATED);
     }
 
     public function test_collections_are_not_doubled_wrapped()
@@ -377,7 +378,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
@@ -404,7 +405,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
@@ -444,7 +445,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
@@ -485,7 +486,7 @@ class ResourceTest extends TestCase
             '/', ['Accept' => 'application/json']
         );
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
 
         $response->assertJson([
             'data' => [
