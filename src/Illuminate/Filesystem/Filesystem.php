@@ -180,7 +180,7 @@ class Filesystem
 
         foreach ($paths as $path) {
             try {
-                if (! @unlink($path)) {
+                if (! unlink($path)) {
                     $success = false;
                 }
             } catch (ErrorException $e) {
