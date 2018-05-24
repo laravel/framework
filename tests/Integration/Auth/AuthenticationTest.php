@@ -6,6 +6,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
@@ -64,7 +65,7 @@ class AuthenticationTest extends TestCase
      */
     public function basic_auth_protects_route()
     {
-        $this->get('basic')->assertStatus(401);
+        $this->get('basic')->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     /**
@@ -76,7 +77,7 @@ class AuthenticationTest extends TestCase
             'Authorization' => 'Basic '.base64_encode('email:password'),
         ]);
 
-        $response->assertStatus(200);
+        $response->assertStatus(Response::HTTP_OK);
         $this->assertEquals('email', $response->decodeResponseJson()['email']);
     }
 
@@ -94,11 +95,11 @@ class AuthenticationTest extends TestCase
 
         $this->get('basicWithCondition', [
             'Authorization' => 'Basic '.base64_encode('email2:password2'),
-        ])->assertStatus(401);
+        ])->assertStatus(Response::HTTP_UNAUTHORIZED);
 
         $this->get('basicWithCondition', [
             'Authorization' => 'Basic '.base64_encode('email:password'),
-        ])->assertStatus(200);
+        ])->assertStatus(Response::HTTP_OK);
     }
 
     /**
@@ -108,7 +109,7 @@ class AuthenticationTest extends TestCase
     {
         $this->get('basic', [
             'Authorization' => 'Basic '.base64_encode('email:wrong_password'),
-        ])->assertStatus(401);
+        ])->assertStatus(Response::HTTP_UNAUTHORIZED);
     }
 
     /**

@@ -8,6 +8,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Routing\UrlRoutable;
+use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Routing\Middleware\ValidateSignature;
 
 /**
@@ -70,7 +71,7 @@ class UrlSigningTest extends TestCase
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);
-        $response->assertStatus(403);
+        $response->assertStatus(Response::HTTP_FORBIDDEN);
     }
 
     public function test_signed_middleware_with_routable_parameter()
