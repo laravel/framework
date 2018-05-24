@@ -95,25 +95,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Runs the given scan type based on parsed options.
-     *
-     * @param  int  $counter
-     * @param  array  $options
-     * @return array
-     */
-    public function scan($counter, $options = [])
-    {
-        $counter = $counter ?: null;
-
-        $options = array_change_key_case($options, CASE_UPPER);
-
-        return [$counter, $this->client->scan(
-            $counter, array_get($options, 'MATCH'),
-            array_get($options, 'COUNT')
-        )];
-    }
-
-    /**
      * Get the value of the given hash fields.
      *
      * @param  string  $key
@@ -163,26 +144,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scan the given hash key for all values.
-     *
-     * @param  string  $key
-     * @param  int  $counter
-     * @param  array  $options
-     * @return array
-     */
-    public function hscan($key, $counter, $options = [])
-    {
-        $counter = $counter ?: null;
-
-        $options = array_change_key_case($options, CASE_UPPER);
-
-        return [$counter, $this->client->hscan(
-            $key, $counter, array_get($options, 'MATCH'),
-            array_get($options, 'COUNT')
-        )];
-    }
-
-    /**
      * Removes the first count occurrences of the value element from the list.
      *
      * @param  string  $key
@@ -205,28 +166,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function spop($key, $count = null)
     {
         return $this->command('spop', [$key]);
-    }
-
-    /**
-     * Scan the given set for all values.
-     *
-     * @param  string  $key
-     * @param  int  $count
-     * @param  array  $options
-     * @return array
-     */
-    public function sscan($key, $counter, $options = [])
-    {
-        $counter = $counter ?: null;
-
-        $options = array_change_key_case($options, CASE_UPPER);
-
-        $result = $this->client->sscan(
-            $key, $counter, array_get($options, 'MATCH'),
-            array_get($options, 'COUNT')
-        );
-
-        return $result == false ? [0, []] : [$counter, $result];
     }
 
     /**
@@ -322,28 +261,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
             $options['weights'] ?? null,
             $options['aggregate'] ?? 'sum'
         );
-    }
-
-    /**
-     * Scan the given set for all values.
-     *
-     * @param  string  $key
-     * @param  int  $counter
-     * @param  array  $options
-     * @return array
-     */
-    public function zscan($key, $counter, $options = [])
-    {
-        $counter = $counter ?: null;
-
-        $options = array_change_key_case($options, CASE_UPPER);
-
-        $result = $this->client->zscan(
-            $key, $counter, array_get($options, 'MATCH'),
-            array_get($options, 'COUNT')
-        );
-
-        return $result == false ? [0, []] : [$counter, $result];
     }
 
     /**
