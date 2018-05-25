@@ -108,7 +108,7 @@ class Gate implements GateContract
     {
         if (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
-        } elseif (is_string($callback) && Str::contains($callback, '@')) {
+        } elseif (is_string($callback)) {
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
         } else {
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
@@ -151,7 +151,11 @@ class Gate implements GateContract
     protected function buildAbilityCallback($ability, $callback)
     {
         return function () use ($ability, $callback) {
-            list($class, $method) = Str::parseCallback($callback);
+            if (Str::contains($callback, '@')) {
+                list($class, $method) = Str::parseCallback($callback);
+            } else {
+                $class = $callback;
+            }
 
             $policy = $this->resolvePolicy($class);
 
@@ -167,7 +171,9 @@ class Gate implements GateContract
                 return $result;
             }
 
-            return $policy->{$method}(...func_get_args());
+            return isset($method) ?
+                $policy->{$method}(...func_get_args())
+                : $policy(...func_get_args());
         };
     }
 
