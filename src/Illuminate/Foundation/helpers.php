@@ -380,6 +380,19 @@ if (! function_exists('decrypt')) {
     }
 }
 
+if (! function_exists('decryptString')) {
+    /**
+     * Decrypt the given non-serialized value.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    function decryptString($value)
+    {
+        return app('encrypter')->decryptString($value);
+    }
+}
+
 if (! function_exists('dispatch')) {
     /**
      * Dispatch a job to its appropriate handler.
@@ -457,6 +470,19 @@ if (! function_exists('encrypt')) {
     function encrypt($value)
     {
         return app('encrypter')->encrypt($value);
+    }
+}
+
+if (! function_exists('encryptString')) {
+    /**
+     * Encrypt the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    function encryptString($value)
+    {
+        return app('encrypter')->encryptString($value);
     }
 }
 
