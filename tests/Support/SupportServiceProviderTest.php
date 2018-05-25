@@ -3,13 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use Mockery as m;
-use Illuminate\View\Factory;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Config\Repository;
-use Illuminate\Foundation\Application;
-use Illuminate\Translation\Translator;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Database\Migrations\Migrator;
 
 class SupportServiceProviderTest extends TestCase
 {
@@ -109,7 +104,6 @@ class SupportServiceProviderTest extends TestCase
         ];
         $this->assertEquals($expected, $toPublish, 'Service provider does not return expected set of published tagged paths.');
     }
-
 }
 
 class ServiceProviderForTestingOne extends ServiceProvider
