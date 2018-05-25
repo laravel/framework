@@ -1061,12 +1061,13 @@ class Blueprint
     /**
      * Create a new point column on the table.
      *
-     * @param  string  $column
+     * @param  string $column
+     * @param  null|int $srid
      * @return \Illuminate\Support\Fluent
      */
-    public function point($column)
+    public function point($column, $srid = null)
     {
-        return $this->addColumn('point', $column);
+        return $this->addColumn('point', $column, compact('srid'));
     }
 
     /**

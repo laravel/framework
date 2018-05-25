@@ -15,7 +15,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'VirtualAs', 'StoredAs', 'Charset', 'Collate', 'Nullable',
-        'Default', 'Increment', 'Comment', 'After', 'First',
+        'Default', 'Increment', 'Comment', 'After', 'First', 'Srid',
     ];
 
     /**
@@ -963,6 +963,20 @@ class MySqlGrammar extends Grammar
     {
         if (! is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
+        }
+    }
+
+    /**
+     * Get the SQL for a SRID column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifySrid(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->srid) && is_int($column->srid) && $column->srid > 0) {
+            return ' srid '.$column->srid;
         }
     }
 
