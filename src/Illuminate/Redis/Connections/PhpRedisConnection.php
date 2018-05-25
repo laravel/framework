@@ -83,7 +83,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Runs the given scan type based on parsed options.
+     * Scans all keys in the redis database. Note,
+     * $counter is passed-by-reference to scan.
      *
      * @param  int  $counter
      * @param  array  $options
@@ -92,10 +93,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function scan($counter, $options = [])
     {
         $counter = $counter ?: null;
-        $opts = array_change_key_case($options, CASE_UPPER);
-        $match = array_get($opts, 'MATCH');
 
-        $result = $this->client->scan($counter, $match, array_get($opts, 'COUNT'));
+        $options = array_change_key_case($options, CASE_UPPER);
+
+        $result = $this->client->scan(
+            $counter, array_get($options, 'MATCH'),
+            array_get($options, 'COUNT')
+        );
 
         return [$counter, $result];
     }
@@ -162,7 +166,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scan the given hash field for all values.
+     * Scan the given hash field for all values. Note,
+     * that $counter is pass-by-reference to hscan.
      *
      * @param  string  $key
      * @param  int  $counter
@@ -172,10 +177,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function hscan($key, $counter, $options = [])
     {
         $counter = $counter ?: null;
-        $opts = array_change_key_case($options, CASE_UPPER);
-        $match = array_get($opts, 'MATCH');
 
-        $result = $this->client->hscan($key, $counter, $match, array_get($opts, 'COUNT'));
+        $options = array_change_key_case($options, CASE_UPPER);
+
+        $result = $this->client->hscan(
+            $key, $counter, array_get($options, 'MATCH'),
+            array_get($options, 'COUNT')
+        );
 
         return [$counter, $result];
     }
@@ -206,7 +214,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scan the given set for all values.
+     * Scans the given set for all values in set. Note,
+     * that $counter is passed-by-reference to call.
      *
      * @param  string  $key
      * @param  int  $counter
@@ -216,15 +225,15 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function sscan($key, $counter, $options = [])
     {
         $counter = $counter ?: null;
-        $opts = array_change_key_case($options, CASE_UPPER);
-        $match = array_get($opts, 'MATCH');
 
-        $result = $this->client->sscan($key, $counter, $match, array_get($opts, 'COUNT'));
-        if ($result == false) {
-            return [0, []];
-        }
+        $options = array_change_key_case($options, CASE_UPPER);
 
-        return [$counter, $result];
+        $result = $this->client->sscan(
+            $key, $counter, array_get($options, 'MATCH'),
+            array_get($options, 'COUNT')
+        );
+
+        return $result == false ? [0, []] : [$counter, $result];
     }
 
     /**
@@ -323,7 +332,8 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scan the given set for all values.
+     * Scans the given set for all values based on options.
+     * Note, the $counter is pass-by-reference to zscan.
      *
      * @param  string  $key
      * @param  int  $counter
@@ -333,15 +343,15 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     public function zscan($key, $counter, $options = [])
     {
         $counter = $counter ?: null;
-        $opts = array_change_key_case($options, CASE_UPPER);
-        $match = array_get($opts, 'MATCH');
 
-        $result = $this->client->zscan($key, $counter, $match, array_get($opts, 'COUNT'));
-        if ($result == false) {
-            return [0, []];
-        }
+        $options = array_change_key_case($options, CASE_UPPER);
 
-        return [$counter, $result];
+        $result = $this->client->zscan(
+            $key, $counter, array_get($options, 'MATCH'),
+            array_get($options, 'COUNT')
+        );
+
+        return $result == false ? [0, []] : [$counter, $result];
     }
 
     /**
