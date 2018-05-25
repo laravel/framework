@@ -52,12 +52,12 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
 
         \DB::enableQueryLog();
 
-        $posts->loadMissing('comments.parent:id.revisions', 'user:id');
+        $posts->loadMissing('comments.parent.revisions:revisions.comment_id', 'user:id');
 
         $this->assertCount(2, \DB::getQueryLog());
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('revisions'));
-        $this->assertFalse(array_key_exists('post_id', $posts[0]->comments[1]->parent->getAttributes()));
+        $this->assertFalse(array_key_exists('id', $posts[0]->comments[1]->parent->revisions[0]->getAttributes()));
     }
 
     public function testLoadMissingWithClosure()
