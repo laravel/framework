@@ -16,7 +16,7 @@
 - Added support for renaming indices ([#24147](https://github.com/laravel/framework/pull/24147))
 - Added `Event::fakeFor()` method ([#24230](https://github.com/laravel/framework/pull/24230))
 - Added `@canany` Blade directive ([#24137](https://github.com/laravel/framework/pull/24137))
-- Added `TestReponse::assertUri()` method ([#24267](https://github.com/laravel/framework/pull/24267))
+- Added `TestReponse::assertLocation()` method ([#24267](https://github.com/laravel/framework/pull/24267))
 
 ### Changed
 - Validation bypass for `before` and `after` rules when paired with `date_format` rule ([#24191](https://github.com/laravel/framework/pull/24191))
