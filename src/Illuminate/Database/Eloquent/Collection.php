@@ -135,9 +135,7 @@ class Collection extends BaseCollection implements QueueableCollection
     public function loadMorph($relation, $relations)
     {
         $this->pluck($relation)
-            ->reject(function ($value, $key) {
-                return is_null($value);
-            })
+            ->filter()
             ->groupBy(function ($model) {
                 return get_class($model);
             })
