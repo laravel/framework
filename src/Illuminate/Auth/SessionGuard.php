@@ -72,6 +72,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected $events;
 
     /**
+     * Indicates if the singleDeviceLogin method has been called.
+     *
+     * @var bool
+     */
+    protected $singleDeviceLogin = false;
+
+    /**
      * Indicates if the logout method has been called.
      *
      * @var bool
@@ -357,6 +364,10 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         if ($this->hasValidCredentials($user, $credentials)) {
             $this->login($user, $remember);
 
+            if ($this->singleDeviceLogin) {
+                $this->logoutOtherDevices($credentials['password']);
+            }
+
             return true;
         }
 
@@ -622,6 +633,18 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         if (isset($this->events)) {
             $this->events->dispatch(new Events\Failed($user, $credentials));
         }
+    }
+
+    /**
+     * Guides the attempt method to logout other devices on successful attempts.
+     *
+     * @return $this
+     */
+    public function enableSingleDeviceLogin()
+    {
+        $this->singleDeviceLogin = true;
+
+        return $this;
     }
 
     /**
