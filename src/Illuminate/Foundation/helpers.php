@@ -382,7 +382,7 @@ if (! function_exists('decrypt')) {
 
 if (! function_exists('decryptString')) {
     /**
-     * Decrypt the given non-serialized value.
+     * Decrypt the given value without unserialization.
      *
      * @param  string  $value
      * @return string
@@ -475,7 +475,7 @@ if (! function_exists('encrypt')) {
 
 if (! function_exists('encryptString')) {
     /**
-     * Encrypt the given value.
+     * Encrypt the given value without serialization.
      *
      * @param  mixed  $value
      * @return string
