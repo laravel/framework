@@ -76,6 +76,22 @@ class AuthGuardTest extends TestCase
         $guard->attempt(['foo']);
     }
 
+    public function testAttemptCanCallLogoutOtherDevices()
+    {
+        $credentials = ['email' => 'foo', 'password' => 'bar'];
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = $this->getMockBuilder('Illuminate\Auth\SessionGuard')->setMethods(['login', 'logoutOtherDevices'])->setConstructorArgs(['default', $provider, $session, $request])->getMock();
+        $guard->setDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Attempting::class));
+        $user = $this->createMock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard->getProvider()->shouldReceive('retrieveByCredentials')->once()->andReturn($user);
+        $guard->getProvider()->shouldReceive('validateCredentials')->with($user, $credentials)->andReturn(true);
+        $guard->expects($this->once())->method('login')->with($this->equalTo($user));
+        $guard->expects($this->once())->method('logoutOtherDevices')->with('bar');
+
+        $guard->enableSingleDeviceLogin()->attempt($credentials);
+    }
+
     public function testAttemptReturnsUserInterface()
     {
         list($session, $provider, $request, $cookie) = $this->getMocks();
