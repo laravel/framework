@@ -297,6 +297,12 @@ trait HasAttributes
         return $values;
     }
 
+    /**
+     * Determine if the given attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
     public function hasAttribute($key)
     {
         if (! $key) {
