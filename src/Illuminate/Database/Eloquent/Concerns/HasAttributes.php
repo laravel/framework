@@ -310,8 +310,8 @@ trait HasAttributes
         }
 
         // If the attribute exists in the attribute array or has a "get" mutator we will
-        // get the attribute's value. Otherwise, we will proceed as if the developers
-        // are asking for a relationship's value. This covers both types of values.
+        // check if it. Otherwise, we will proceed as if the developers are asking for
+        // a relationship's attribute. This covers both types of values.
         if (array_key_exists($key, $this->attributes) ||
             $this->hasGetMutator($key)) {
             return true;
@@ -325,15 +325,14 @@ trait HasAttributes
         }
 
         // If the key already exists in the relationships array, it just means the
-        // relationship has already been loaded, so we'll just return it out of
-        // here because there is no need to query within the relations twice.
+        // relationship has already been loaded, so we'll just return true out of
+        // here.
         if ($this->relationLoaded($key)) {
             return true;
         }
 
         // If the "attribute" exists as a method on the model, we will just assume
-        // it is a relationship and will load and return results from the query
-        // and hydrate the relationship's value on the "relationships" array.
+        // it is a relationship, so the "attribute" exists.
         if (method_exists($this, $key)) {
             return true;
         }
