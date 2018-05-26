@@ -139,6 +139,9 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse(isset($model['with']));
         $this->assertTrue(isset($model['nullable']));
         $this->assertNull($model['nullable']);
+        $this->assertTrue(isset($model['password']));
+        $this->assertEquals($model['password'], '******');
+        $this->assertTrue(isset($model['belongsToStub']));
     }
 
     public function testOnly()
