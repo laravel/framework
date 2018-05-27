@@ -46,7 +46,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage AES-128-CBC needs exactly 16 characters length key.
      */
     public function testDoNoAllowLongerKey()
     {
@@ -55,7 +55,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage ES-128-CBC needs exactly 16 characters length key.
      */
     public function testWithBadKeyLength()
     {
@@ -64,7 +64,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage Unknown cipher: AES-256-CFB8.
      */
     public function testWithBadKeyLengthAlternativeCipher()
     {
@@ -73,7 +73,7 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.
+     * @expectedExceptionMessage Unknown cipher: AES-256-CFB8.
      */
     public function testWithUnsupportedCipher()
     {
