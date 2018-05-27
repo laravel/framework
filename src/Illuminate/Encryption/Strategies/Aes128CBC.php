@@ -2,7 +2,6 @@
 
 namespace Illuminate\Encryption\Strategies;
 
-
 use Illuminate\Encryption\CipherMethods;
 
 /**
