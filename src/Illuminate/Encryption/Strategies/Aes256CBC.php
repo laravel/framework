@@ -7,10 +7,12 @@
  */
 
 namespace Illuminate\Encryption\Strategies;
+use Illuminate\Encryption\EncryptorMethods;
 
 
 class Aes256CBC implements EncryptStrategy
 {
+    use EncryptorMethods;
     protected $key;
 
     const LENGTH = 32;
@@ -35,16 +37,13 @@ class Aes256CBC implements EncryptStrategy
         return $this->key;
     }
 
+    public function getLength(): int
+    {
+        return self::LENGTH;
+    }
+
     public function generateKey()
     {
         $this->key = random_bytes(self::LENGTH);
-    }
-
-    public function supported()
-    {
-        $length = mb_strlen($this->key, '8bit');
-        if ($length !== self::LENGTH) {
-            throw new \RuntimeException(self::CIPHER.' needs exactly 16 characters length key.');
-        }
     }
 }
