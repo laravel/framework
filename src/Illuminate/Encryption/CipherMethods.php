@@ -1,10 +1,4 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: serabalint
- * Date: 2018. 05. 27.
- * Time: 17:21.
- */
 
 namespace Illuminate\Encryption;
 
