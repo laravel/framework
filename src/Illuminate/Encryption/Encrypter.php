@@ -16,7 +16,7 @@ class Encrypter implements EncrypterContract
     /**
      * Create a new encrypter instance.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string  $cipher
      * @return void
      *
