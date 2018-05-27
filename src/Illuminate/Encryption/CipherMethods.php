@@ -4,14 +4,32 @@ namespace Illuminate\Encryption;
 
 trait CipherMethods
 {
+
+    /**
+     * Get key length.
+     *
+     * @return int
+     */
     abstract public function getLength() :int;
 
+    /**
+     * Get cipher name.
+     *
+     * @return string
+     */
     abstract public function getCipher() :string;
 
+    /**
+     * Get key.
+     *
+     * @return string
+     */
     abstract public function getKey() :string;
 
     /**
-     * Check key length. I kept this name for backward compatibility.
+     * Check for key length (the name is kept for backward compatibility).
+     *
+     * @throws \RuntimeException
      */
     public function supported()
     {
@@ -21,6 +39,11 @@ trait CipherMethods
         }
     }
 
+    /**
+     * Set key.
+     *
+     * @param string $key
+     */
     abstract public function setKey(string $key);
 
     /**
