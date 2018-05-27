@@ -46,6 +46,8 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
+     * Get cipher method's name
+     *
      * @return string
      */
     public function getCipher(): string
@@ -54,6 +56,8 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
+     * Returns the key
+     *
      * @return string
      */
     public function getKey(): string
@@ -62,6 +66,8 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
+     * Set the key
+     *
      * @param string $key
      */
     public function setKey(string $key)
@@ -70,6 +76,8 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
+     * Get key length
+     *
      * @return int
      */
     public function getLength(): int
