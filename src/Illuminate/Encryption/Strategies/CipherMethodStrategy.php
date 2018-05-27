@@ -11,5 +11,4 @@ interface CipherMethodStrategy
     public function generateKey();
 
     public function supported();
-
 }

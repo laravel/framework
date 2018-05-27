@@ -63,6 +63,7 @@ class Encrypter implements EncrypterContract
     public static function generateKey($cipher)
     {
         $strategy = new self(null, $cipher);
+
         return $strategy->getKey();
     }
 

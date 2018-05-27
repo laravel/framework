@@ -2,11 +2,12 @@
 
 namespace Illuminate\Encryption;
 
-
 trait CipherMethods
 {
     abstract public function getLength() :int;
+
     abstract public function getCipher() :string;
+
     abstract public function getKey() :string;
 
     /**
@@ -29,4 +30,5 @@ trait CipherMethods
     {
         $this->setKey(random_bytes($this->getLength()));
     }
+
 }

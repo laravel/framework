@@ -6,7 +6,7 @@ use Illuminate\Encryption\CipherMethods;
 
 
 /**
- * Class Aes256CBC
+ * Class Aes256CBC.
  */
 class Aes256CBC implements CipherMethodStrategy
 {
@@ -77,4 +77,5 @@ class Aes256CBC implements CipherMethodStrategy
     {
         return self::LENGTH;
     }
+
 }
