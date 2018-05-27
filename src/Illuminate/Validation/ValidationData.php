@@ -7,6 +7,13 @@ use Illuminate\Support\Str;
 
 class ValidationData
 {
+    /**
+     * Initialize and gather data for given attribute.
+     *
+     * @param  string  $attribute
+     * @param  array  $masterData
+     * @return array
+     */
     public static function initializeAndGatherData($attribute, $masterData)
     {
         $data = Arr::dot(static::initializeAttributeOnData($attribute, $masterData));
