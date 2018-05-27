@@ -22,8 +22,10 @@ class Encrypter implements EncrypterContract
      *
      * @throws \RuntimeException
      */
-    public function __construct(string $key = null, $cipher = 'AES-128-CBC')
+    public function __construct($key = null, $cipher = 'AES-128-CBC')
     {
+        $key = (string) $key;
+
         switch ($cipher) {
             case 'AES-128-CBC':
                 $this->strategy = new Aes128CBC($key);
@@ -47,7 +49,7 @@ class Encrypter implements EncrypterContract
     public static function supported($key, $cipher)
     {
         // object creation throws RuntimeException if not supported
-        new self($key, $cipher);
+        new static($key, $cipher);
 
         return true;
     }
