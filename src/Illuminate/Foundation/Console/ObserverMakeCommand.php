@@ -81,13 +81,11 @@ class ObserverMakeCommand extends GeneratorCommand
 
         $model = class_basename(trim($model, '\\'));
 
-        $dummyModel = $model;
-
-        $stub = str_replace('DocDummyModel', Str::snake($dummyModel, ' '), $stub);
+        $stub = str_replace('DocDummyModel', Str::snake($model, ' '), $stub);
 
         $stub = str_replace('DummyModel', $model, $stub);
 
-        return str_replace('dummyModel', Str::camel($dummyModel), $stub);
+        return str_replace('dummyModel', Str::camel($model), $stub);
     }
 
     /**
