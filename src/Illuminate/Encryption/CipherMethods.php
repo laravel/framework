@@ -4,7 +4,6 @@ namespace Illuminate\Encryption;
 
 trait CipherMethods
 {
-
     /**
      * Get key length.
      *
