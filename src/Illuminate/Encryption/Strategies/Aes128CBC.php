@@ -4,9 +4,6 @@ namespace Illuminate\Encryption\Strategies;
 
 use Illuminate\Encryption\CipherMethods;
 
-/**
- * Class Aes128CBC.
- */
 class Aes128CBC implements CipherMethodStrategy
 {
     use CipherMethods;
