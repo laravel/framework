@@ -2,7 +2,6 @@
 
 namespace Illuminate\Encryption;
 
-use function GuzzleHttp\Psr7\str;
 use Illuminate\Encryption\Strategies\Aes128CBC;
 use Illuminate\Encryption\Strategies\Aes256CBC;
 use RuntimeException;
