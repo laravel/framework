@@ -64,11 +64,11 @@ class EncrypterTest extends TestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Unknown cipher: AES-256-CFB8.
+     * @expectedExceptionMessage AES-256-CBC needs exactly 16 characters length key.
      */
     public function testWithBadKeyLengthAlternativeCipher()
     {
-        new Encrypter(str_repeat('a', 16), 'AES-256-CFB8');
+        new Encrypter(str_repeat('a', 16), 'AES-256-CBC');
     }
 
     /**

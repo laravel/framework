@@ -14,7 +14,7 @@ class Aes256CBC implements EncryptStrategy
     protected $key;
 
     const LENGTH = 32;
-    const CIPHER = 'AES-256-CFB';
+    const CIPHER = 'AES-256-CBC';
 
     public function __construct(string $key = null)
     {
