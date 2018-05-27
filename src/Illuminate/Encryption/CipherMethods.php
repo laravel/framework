@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: serabalint
  * Date: 2018. 05. 27.
- * Time: 17:21
+ * Time: 17:21.
  */
 
 namespace Illuminate\Encryption;
@@ -11,12 +11,12 @@ namespace Illuminate\Encryption;
 
 trait CipherMethods
 {
-    public abstract function getLength() :int;
-    public abstract function getCipher() :string;
-    public abstract function getKey() :string;
+    abstract public function getLength() :int;
+    abstract public function getCipher() :string;
+    abstract public function getKey() :string;
 
     /**
-     * Check key length. I kept this name for backward compatibility
+     * Check key length. I kept this name for backward compatibility.
      */
     public function supported()
     {
@@ -26,10 +26,10 @@ trait CipherMethods
         }
     }
 
-    public abstract function setKey(string $key);
+    abstract public function setKey(string $key);
 
     /**
-     * Generate a random key
+     * Generate a random key.
      */
     public function generateKey()
     {

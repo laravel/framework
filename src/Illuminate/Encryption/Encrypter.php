@@ -2,9 +2,9 @@
 
 namespace Illuminate\Encryption;
 
+use RuntimeException;
 use Illuminate\Encryption\Strategies\Aes128CBC;
 use Illuminate\Encryption\Strategies\Aes256CBC;
-use RuntimeException;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;

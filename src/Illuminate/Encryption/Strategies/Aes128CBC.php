@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: serabalint
  * Date: 2018. 05. 26.
- * Time: 19:14
+ * Time: 19:14.
  */
 
 namespace Illuminate\Encryption\Strategies;
@@ -12,8 +12,7 @@ namespace Illuminate\Encryption\Strategies;
 use Illuminate\Encryption\CipherMethods;
 
 /**
- * Class Aes128CBC
- * @package Illuminate\Encryption\Strategies
+ * Class Aes128CBC.
  */
 class Aes128CBC implements CipherMethodStrategy
 {
@@ -24,11 +23,11 @@ class Aes128CBC implements CipherMethodStrategy
     protected $key;
 
     /**
-     * Length of key
+     * Length of key.
      */
     const LENGTH = 16;
     /**
-     * Name of this cipher method
+     * Name of this cipher method.
      */
     const CIPHER = 'AES-128-CBC';
 
@@ -46,7 +45,7 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
-     * Get cipher method's name
+     * Get cipher method's name.
      *
      * @return string
      */
@@ -56,7 +55,7 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
-     * Returns the key
+     * Returns the key.
      *
      * @return string
      */
@@ -66,7 +65,7 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
-     * Set the key
+     * Set the key.
      *
      * @param string $key
      */
@@ -76,7 +75,7 @@ class Aes128CBC implements CipherMethodStrategy
     }
 
     /**
-     * Get key length
+     * Get key length.
      *
      * @return int
      */
