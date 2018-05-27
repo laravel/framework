@@ -30,5 +30,4 @@ trait CipherMethods
     {
         $this->setKey(random_bytes($this->getLength()));
     }
-
 }
