@@ -7,17 +7,34 @@
  */
 
 namespace Illuminate\Encryption\Strategies;
-use Illuminate\Encryption\EncryptorMethods;
+use Illuminate\Encryption\CipherMethods;
 
 
-class Aes256CBC implements EncryptStrategy
+/**
+ * Class Aes256CBC
+ * @package Illuminate\Encryption\Strategies
+ */
+class Aes256CBC implements CipherMethodStrategy
 {
-    use EncryptorMethods;
+    use CipherMethods;
+    /**
+     * @var string
+     */
     protected $key;
 
+    /**
+     * Length of key
+     */
     const LENGTH = 32;
+    /**
+     * Name of this cipher method
+     */
     const CIPHER = 'AES-256-CBC';
 
+    /**
+     * Aes256CBC constructor.
+     * @param string|null $key
+     */
     public function __construct(string $key = null)
     {
         if ($key) {
@@ -27,21 +44,41 @@ class Aes256CBC implements EncryptStrategy
         }
     }
 
+    /**
+     * @return string
+     */
     public function getCipher(): string
     {
         return self::CIPHER;
     }
 
+    /**
+     * @return string
+     */
     public function getKey(): string
     {
         return $this->key;
     }
 
+    /**
+     * @param string $key
+     */
+    public function setKey(string $key)
+    {
+        $this->key = $key;
+    }
+
+    /**
+     * @return int
+     */
     public function getLength(): int
     {
         return self::LENGTH;
     }
 
+    /**
+     *
+     */
     public function generateKey()
     {
         $this->key = random_bytes(self::LENGTH);

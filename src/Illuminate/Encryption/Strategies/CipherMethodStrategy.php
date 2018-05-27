@@ -9,7 +9,7 @@
 namespace Illuminate\Encryption\Strategies;
 
 
-interface EncryptStrategy
+interface CipherMethodStrategy
 {
     public function getCipher() :string;
     public function getKey() :string;
