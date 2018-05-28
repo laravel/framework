@@ -584,7 +584,7 @@ trait HasAttributes
 
         $this->attributes[$key] = $this->asJson($this->getArrayAttributeWithValue(
             $path, $key, $value
-        ), $this->getCastType($key) === 'object');
+        ), $this->hasCast($key) && $this->getCastType($key) === 'object');
 
         return $this;
     }
@@ -625,7 +625,7 @@ trait HasAttributes
      */
     protected function castAttributeAsJson($key, $value)
     {
-        $value = $this->asJson($value, $this->getCastType($key) === 'object');
+        $value = $this->asJson($value, $this->hasCast($key) && $this->getCastType($key) === 'object');
 
         if ($value === false) {
             throw JsonEncodingException::forAttribute(
@@ -645,7 +645,7 @@ trait HasAttributes
      */
     protected function asJson($value, $asObject = false)
     {
-        if ($asObject && is_array($value) && !$value) {
+        if ($asObject && is_array($value) && ! $value) {
             return '{}';
         } else {
             return json_encode($value);
