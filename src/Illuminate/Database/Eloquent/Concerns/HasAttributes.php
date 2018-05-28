@@ -2,15 +2,15 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use DateTimeInterface;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Database\Eloquent\JsonEncodingException;
-use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Support\Str;
 use LogicException;
+use DateTimeInterface;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
+use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
 {
@@ -678,7 +678,7 @@ trait HasAttributes
     protected function asJson($value)
     {
         $value = json_encode($value);
-        
+
         return $value === '[]' ? '{}' : $value;
     }
 
