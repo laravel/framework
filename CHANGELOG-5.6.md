@@ -1,5 +1,33 @@
 # Release Notes for 5.6.x
 
+## [Unreleased]
+
+### Changed
+- Optimize query builder's `pluck()` method ([#23482](https://github.com/laravel/framework/pull/23482))
+- Allow passing object instances regardless of the parameter name to method injection ([#24234](https://github.com/laravel/framework/pull/24234))
+
+### Fixed
+- Fixed typo of missing underscore in `not_regexp` rule name ([#24297](https://github.com/laravel/framework/pull/24297))
+
+
+## v5.6.23 (2018-05-24)
+
+### Added
+- Added support for renaming indices ([#24147](https://github.com/laravel/framework/pull/24147))
+- Added `Event::fakeFor()` method ([#24230](https://github.com/laravel/framework/pull/24230))
+- Added `@canany` Blade directive ([#24137](https://github.com/laravel/framework/pull/24137))
+- Added `TestReponse::assertLocation()` method ([#24267](https://github.com/laravel/framework/pull/24267))
+
+### Changed
+- Validation bypass for `before` and `after` rules when paired with `date_format` rule ([#24191](https://github.com/laravel/framework/pull/24191))
+
+### Fixed
+- Fixed an issue with `Cache::increment()` when expiration is `null` ([#24228](https://github.com/laravel/framework/pull/24228))
+- Ignore non-where bindings in nested where constraints ([#24000](https://github.com/laravel/framework/pull/24000))
+- Fixed `withCount()` binding problems ([#24240](https://github.com/laravel/framework/pull/24240))
+
+
+
 ## v5.6.22 (2018-05-15)
 
 ### Added

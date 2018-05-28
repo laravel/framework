@@ -813,6 +813,18 @@ class TestResponse
     }
 
     /**
+     * Assert that the session has no errors.
+     *
+     * @return $this
+     */
+    public function assertSessionHasNoErrors()
+    {
+        $this->assertSessionMissing('errors');
+
+        return $this;
+    }
+
+    /**
      * Assert that the session has the given errors.
      *
      * @param  string  $errorBag
