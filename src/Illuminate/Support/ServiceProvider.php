@@ -2,7 +2,10 @@
 
 namespace Illuminate\Support;
 
+use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\View\Factory as ViewFactoryContract;
 
 abstract class ServiceProvider
 {
@@ -81,15 +84,17 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        if (is_array($this->app->config['view']['paths'])) {
-            foreach ($this->app->config['view']['paths'] as $viewPath) {
+        $callback = function (ViewFactoryContract $view) use ($path, $namespace) {
+            foreach ((array) $this->app['config']->get('view.paths') as $viewPath) {
                 if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
-                    $this->app['view']->addNamespace($namespace, $appPath);
+                    $view->addNamespace($namespace, $appPath);
                 }
             }
-        }
 
-        $this->app['view']->addNamespace($namespace, $path);
+            $view->addNamespace($namespace, $path);
+        };
+
+        $this->applyWhenResolved('view', $callback);
     }
 
     /**
@@ -101,7 +106,13 @@ abstract class ServiceProvider
      */
     protected function loadTranslationsFrom($path, $namespace)
     {
-        $this->app['translator']->addNamespace($namespace, $path);
+        $callback = function (Translator $translator) use ($path, $namespace) {
+
+            /* @var \Illuminate\Translation\Translator $translator */
+            $translator->addNamespace($namespace, $path);
+        };
+
+        $this->applyWhenResolved('translator', $callback);
     }
 
     /**
@@ -112,7 +123,13 @@ abstract class ServiceProvider
      */
     protected function loadJsonTranslationsFrom($path)
     {
-        $this->app['translator']->addJsonPath($path);
+        $callback = function (Translator $translator) use ($path) {
+
+            /* @var \Illuminate\Translation\Translator $translator */
+            $translator->addJsonPath($path);
+        };
+
+        $this->applyWhenResolved('translator', $callback);
     }
 
     /**
@@ -123,11 +140,13 @@ abstract class ServiceProvider
      */
     protected function loadMigrationsFrom($paths)
     {
-        $this->app->afterResolving('migrator', function ($migrator) use ($paths) {
+        $callback = function (Migrator $migrator) use ($paths) {
             foreach ((array) $paths as $path) {
                 $migrator->path($path);
             }
-        });
+        };
+
+        $this->applyWhenResolved('migrator', $callback);
     }
 
     /**
@@ -177,6 +196,22 @@ abstract class ServiceProvider
         static::$publishGroups[$group] = array_merge(
             static::$publishGroups[$group], $paths
         );
+    }
+
+    /**
+     * Apply callback to service when it ready.
+     *
+     * If service resolved, apply now.
+     * If not resolved, apply after resolving.
+     *
+     * @param mixed|string|object $abstract
+     * @param callable $callback
+     */
+    protected function applyWhenResolved($abstract, callable $callback): void
+    {
+        $this->app->resolved($abstract)
+            ? $callback($this->app[$abstract])
+            : $this->app->afterResolving($abstract, $callback);
     }
 
     /**
