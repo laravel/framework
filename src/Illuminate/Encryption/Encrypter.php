@@ -3,45 +3,40 @@
 namespace Illuminate\Encryption;
 
 use RuntimeException;
+use Illuminate\Encryption\Strategies\Aes128CBC;
+use Illuminate\Encryption\Strategies\Aes256CBC;
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Contracts\Encryption\EncryptException;
 use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class Encrypter implements EncrypterContract
 {
-    /**
-     * The encryption key.
-     *
-     * @var string
-     */
-    protected $key;
-
-    /**
-     * The algorithm used for encryption.
-     *
-     * @var string
-     */
-    protected $cipher;
+    private $strategy;
 
     /**
      * Create a new encrypter instance.
      *
-     * @param  string  $key
+     * @param  string|null  $key
      * @param  string  $cipher
      * @return void
      *
      * @throws \RuntimeException
      */
-    public function __construct($key, $cipher = 'AES-128-CBC')
+    public function __construct($key = null, $cipher = 'AES-128-CBC')
     {
         $key = (string) $key;
 
-        if (static::supported($key, $cipher)) {
-            $this->key = $key;
-            $this->cipher = $cipher;
-        } else {
-            throw new RuntimeException('The only supported ciphers are AES-128-CBC and AES-256-CBC with the correct key lengths.');
+        switch ($cipher) {
+            case 'AES-128-CBC':
+                $this->strategy = new Aes128CBC($key);
+                break;
+            case 'AES-256-CBC':
+                $this->strategy = new Aes256CBC($key);
+                break;
+            default:
+                throw new RuntimeException('Unknown cipher: '.$cipher.'.');
         }
+        $this->strategy->supported();
     }
 
     /**
@@ -53,10 +48,10 @@ class Encrypter implements EncrypterContract
      */
     public static function supported($key, $cipher)
     {
-        $length = mb_strlen($key, '8bit');
+        // object creation throws RuntimeException if not supported
+        new static($key, $cipher);
 
-        return ($cipher === 'AES-128-CBC' && $length === 16) ||
-               ($cipher === 'AES-256-CBC' && $length === 32);
+        return true;
     }
 
     /**
@@ -67,7 +62,9 @@ class Encrypter implements EncrypterContract
      */
     public static function generateKey($cipher)
     {
-        return random_bytes($cipher == 'AES-128-CBC' ? 16 : 32);
+        $strategy = new self(null, $cipher);
+
+        return $strategy->getKey();
     }
 
     /**
@@ -81,14 +78,14 @@ class Encrypter implements EncrypterContract
      */
     public function encrypt($value, $serialize = true)
     {
-        $iv = random_bytes(openssl_cipher_iv_length($this->cipher));
+        $iv = random_bytes(openssl_cipher_iv_length($this->strategy->getCipher()));
 
         // First we will encrypt the value using OpenSSL. After this is encrypted we
         // will proceed to calculating a MAC for the encrypted value so that this
         // value can be verified later as not having been changed by the users.
         $value = \openssl_encrypt(
             $serialize ? serialize($value) : $value,
-            $this->cipher, $this->key, 0, $iv
+            $this->strategy->getCipher(), $this->strategy->getKey(), 0, $iv
         );
 
         if ($value === false) {
@@ -139,7 +136,7 @@ class Encrypter implements EncrypterContract
         // we will then unserialize it and return it out to the caller. If we are
         // unable to decrypt this value we will throw out an exception message.
         $decrypted = \openssl_decrypt(
-            $payload['value'], $this->cipher, $this->key, 0, $iv
+            $payload['value'], $this->strategy->getCipher(), $this->strategy->getKey(), 0, $iv
         );
 
         if ($decrypted === false) {
@@ -169,7 +166,7 @@ class Encrypter implements EncrypterContract
      */
     protected function hash($iv, $value)
     {
-        return hash_hmac('sha256', $iv.$value, $this->key);
+        return hash_hmac('sha256', $iv.$value, $this->strategy->getKey());
     }
 
     /**
@@ -207,7 +204,7 @@ class Encrypter implements EncrypterContract
     protected function validPayload($payload)
     {
         return is_array($payload) && isset($payload['iv'], $payload['value'], $payload['mac']) &&
-               strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->cipher);
+               strlen(base64_decode($payload['iv'], true)) === openssl_cipher_iv_length($this->strategy->getCipher());
     }
 
     /**
@@ -246,6 +243,6 @@ class Encrypter implements EncrypterContract
      */
     public function getKey()
     {
-        return $this->key;
+        return $this->strategy->getKey();
     }
 }
