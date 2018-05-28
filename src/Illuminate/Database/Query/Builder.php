@@ -1407,7 +1407,7 @@ class Builder
      */
     public function whereRowValues($columns, $operator, $values, $boolean = 'and')
     {
-        if (count($columns) != count($values)) {
+        if (count($columns) !== count($values)) {
             throw new InvalidArgumentException('The number of columns must match the number of values');
         }
 
