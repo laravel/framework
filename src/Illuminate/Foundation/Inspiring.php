@@ -31,6 +31,11 @@ class Inspiring
             'It is quality rather than quantity that matters. - Lucius Annaeus Seneca',
             'Genius is one percent inspiration and ninety-nine percent perspiration. - Thomas Edison',
             'Computer science is no more about computers than astronomy is about telescopes. - Edsger Dijkstra',
+            'The important thing is not what they think of me, but what I think of them. - Queen Victoria',
+            'We realize the importance of our voices only when we are silenced. - Malala Yousafzai',
+            'Let us make our future now, and let us make our dreams tomorrow\'s reality. - Malala Yousafzai',
+            'Done is better than perfect. - Sheryl Sandberg',
+            'Be less curious about people and more curious about ideas. - Marie Curie',
         ])->random();
     }
 }
