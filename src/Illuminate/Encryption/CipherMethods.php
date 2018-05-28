@@ -39,9 +39,8 @@ trait CipherMethods
     }
 
     /**
-     * Set key.
-     *
      * @param string $key
+     * @return mixed
      */
     abstract public function setKey(string $key);
 
