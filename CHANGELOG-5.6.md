@@ -2,12 +2,20 @@
 
 ## [Unreleased]
 
+### Added
+- Added assertSessionHasNoErrors() test helper ([#24308](https://github.com/laravel/framework/pull/24308))
+- Add support for defining and enforcing a Spatial reference system for a Point column ([#24320](https://github.com/laravel/framework/pull/24320))
+
 ### Changed
 - Optimize query builder's `pluck()` method ([#23482](https://github.com/laravel/framework/pull/23482))
 - Allow passing object instances regardless of the parameter name to method injection ([#24234](https://github.com/laravel/framework/pull/24234))
+- Extract setting mutated attribute into method ([#24307](https://github.com/laravel/framework/pull/24307))
+- Let apiResource support except option ([#24319](https://github.com/laravel/framework/pull/24319))
 
 ### Fixed
 - Fixed typo of missing underscore in `not_regexp` rule name ([#24297](https://github.com/laravel/framework/pull/24297))
+- Cleanup null relationships in loadMorph ([#24322](https://github.com/laravel/framework/pull/24322))
+- Fix loadMissing() relationship parsing ([#24329](https://github.com/laravel/framework/pull/24329))
 
 
 ## v5.6.23 (2018-05-24)
