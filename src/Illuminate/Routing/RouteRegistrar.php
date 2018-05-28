@@ -183,7 +183,7 @@ class RouteRegistrar
         }
 
         if (in_array($method, $this->allowedAttributes)) {
-            if ($method == 'middleware') {
+            if ($method === 'middleware') {
                 return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 
