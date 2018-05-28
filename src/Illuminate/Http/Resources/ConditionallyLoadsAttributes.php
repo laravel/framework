@@ -28,7 +28,10 @@ trait ConditionallyLoadsAttributes
             }
 
             if (is_numeric($key) && $value instanceof MergeValue) {
-                return $this->merge($data, $index, $this->filter($value->data), $numericKeys);
+                return $this->merge(
+                    $data, $index, $this->filter($value->data),
+                    array_values($value->data) === $value->data
+                );
             }
 
             if ($value instanceof self && is_null($value->resource)) {
@@ -80,8 +83,7 @@ trait ConditionallyLoadsAttributes
             }
         }
 
-        return ! empty($data) && is_numeric(array_keys($data)[0])
-                        ? array_values($data) : $data;
+        return $numericKeys ? array_values($data) : $data;
     }
 
     /**
