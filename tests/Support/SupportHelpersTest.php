@@ -43,6 +43,24 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Arr::has($array, 'foo.bar'));
     }
 
+    public function testArrayIncrement()
+    {
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 27], array_increment($array, 'age'));
+
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 28], array_increment($array, 'age', 2));
+    }
+
+    public function testArrayDecrement()
+    {
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 25], array_decrement($array, 'age'));
+
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 24], array_decrement($array, 'age', 2));
+    }
+
     public function testArraySet()
     {
         $array = [];
@@ -613,6 +631,24 @@ class SupportHelpersTest extends TestCase
                 ],
             ],
         ], $data);
+    }
+
+    public function testDataIncrement()
+    {
+        $data = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 27], data_increment($data, 'age'));
+
+        $data = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 28], data_increment($data, 'age', 2));
+    }
+
+    public function testDataDecrement()
+    {
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 25], data_decrement($array, 'age'));
+
+        $array = ['name' => 'taylor', 'age' => 26];
+        $this->assertEquals(['name' => 'taylor', 'age' => 24], data_decrement($array, 'age', 2));
     }
 
     public function testArraySort()

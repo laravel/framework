@@ -277,6 +277,38 @@ if (! function_exists('array_set')) {
     }
 }
 
+if (! function_exists('array_increment')) {
+    /**
+     * Increment an item on an array with a given value using "dot" notation.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  mixed   $startValue
+     * @return array
+     */
+    function array_increment(&$array, $key, $value = 1, $startValue = 0)
+    {
+        return Arr::set($array, $key, Arr::get($array, $key, $startValue) + $value);
+    }
+}
+
+if (! function_exists('array_decrement')) {
+    /**
+     * Decrement an item on an array with a given value using "dot" notation.
+     *
+     * @param  array   $array
+     * @param  string  $key
+     * @param  mixed   $value
+     * @param  mixed   $startValue
+     * @return array
+     */
+    function array_decrement(&$array, $key, $value = 1, $startValue = 0)
+    {
+        return Arr::set($array, $key, Arr::get($array, $key, $startValue) - $value);
+    }
+}
+
 if (! function_exists('array_sort')) {
     /**
      * Sort the array by the given callback or attribute name.
@@ -541,6 +573,38 @@ if (! function_exists('data_set')) {
         }
 
         return $target;
+    }
+}
+
+if (! function_exists('data_increment')) {
+    /**
+     * Increment an item on an array or object with a given value using dot notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @param  mixed  $startValue
+     * @return mixed
+     */
+    function data_increment(&$target, $key, $value = 1, $startValue = 0)
+    {
+        return data_set($target, $key, data_get($target, $key, $startValue) + $value);
+    }
+}
+
+if (! function_exists('data_decrement')) {
+    /**
+     * Decrement an item on an array or object with a given value using dot notation.
+     *
+     * @param  mixed  $target
+     * @param  string|array  $key
+     * @param  mixed  $value
+     * @param  mixed  $startValue
+     * @return mixed
+     */
+    function data_decrement(&$target, $key, $value = 1, $startValue = 0)
+    {
+        return data_set($target, $key, data_get($target, $key, $startValue) - $value);
     }
 }
 
