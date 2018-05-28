@@ -592,7 +592,7 @@ class Builder
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         // If the columns is actually a Closure instance, we will assume the developer
@@ -726,7 +726,7 @@ class Builder
     public function orWhere($column, $operator = null, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->where($column, $operator, $value, 'or');
@@ -1067,7 +1067,7 @@ class Builder
     public function whereDate($column, $operator, $value = null, $boolean = 'and')
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
@@ -1084,7 +1084,7 @@ class Builder
     public function orWhereDate($column, $operator, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereDate($column, $operator, $value, 'or');
@@ -1102,7 +1102,7 @@ class Builder
     public function whereTime($column, $operator, $value = null, $boolean = 'and')
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
@@ -1119,7 +1119,7 @@ class Builder
     public function orWhereTime($column, $operator, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->whereTime($column, $operator, $value, 'or');
@@ -1137,7 +1137,7 @@ class Builder
     public function whereDay($column, $operator, $value = null, $boolean = 'and')
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
@@ -1154,7 +1154,7 @@ class Builder
     public function orWhereDay($column, $operator, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Day', $column, $operator, $value, 'or');
@@ -1172,7 +1172,7 @@ class Builder
     public function whereMonth($column, $operator, $value = null, $boolean = 'and')
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
@@ -1189,7 +1189,7 @@ class Builder
     public function orWhereMonth($column, $operator, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Month', $column, $operator, $value, 'or');
@@ -1207,7 +1207,7 @@ class Builder
     public function whereYear($column, $operator, $value = null, $boolean = 'and')
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
@@ -1224,7 +1224,7 @@ class Builder
     public function orWhereYear($column, $operator, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, 'or');
@@ -1530,7 +1530,7 @@ class Builder
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         // If the given operator is not found in the list of valid operators we will
@@ -1560,7 +1560,7 @@ class Builder
     public function orHaving($column, $operator = null, $value = null)
     {
         list($value, $operator) = $this->prepareValueAndOperator(
-            $value, $operator, func_num_args() == 2
+            $value, $operator, func_num_args() === 2
         );
 
         return $this->having($column, $operator, $value, 'or');
