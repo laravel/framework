@@ -250,7 +250,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function contains($key, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             if ($this->useAsCallable($key)) {
                 $placeholder = new stdClass;
 
@@ -272,7 +272,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function containsStrict($key, $value = null)
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             return $this->contains(function ($item) use ($key, $value) {
                 return data_get($item, $key) === $value;
             });
@@ -437,7 +437,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function every($key, $operator = null, $value = null)
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             $callback = $this->valueRetriever($key);
 
             foreach ($this->items as $k => $v) {
@@ -539,7 +539,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function operatorForWhere($key, $operator, $value = null)
     {
-        if (func_num_args() == 2) {
+        if (func_num_args() === 2) {
             $value = $operator;
 
             $operator = '=';
@@ -1192,7 +1192,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $partitions = [new static, new static];
 
-        $callback = func_num_args() == 1
+        $callback = func_num_args() === 1
                 ? $this->valueRetriever($key)
                 : $this->operatorForWhere(...func_get_args());
 
@@ -1565,7 +1565,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function splice($offset, $length = null, $replacement = [])
     {
-        if (func_num_args() == 1) {
+        if (func_num_args() === 1) {
             return new static(array_splice($this->items, $offset));
         }
 
