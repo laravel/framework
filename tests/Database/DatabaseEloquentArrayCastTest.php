@@ -2,27 +2,27 @@
 
 namespace Illuminate\Tests\Database;
 
+use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentArrayCastTest extends TestCase
 {
     public function setUp()
     {
         $db = new DB;
-        
+
         $db->addConnection([
             'driver' => 'sqlite',
             'database' => ':memory:',
         ]);
-        
+
         $db->bootEloquent();
         $db->setAsGlobal();
-        
+
         $this->createSchema();
     }
-    
+
     /**
      * Setup the database schema.
      *
@@ -36,7 +36,7 @@ class DatabaseEloquentArrayCastTest extends TestCase
             $table->timestamps();
         });
     }
-    
+
     /**
      * Tear down the database schema.
      *
@@ -46,7 +46,7 @@ class DatabaseEloquentArrayCastTest extends TestCase
     {
         $this->schema()->drop('json_table');
     }
-    
+
     /**
      * Tests...
      */
@@ -54,16 +54,16 @@ class DatabaseEloquentArrayCastTest extends TestCase
     {
         /** @var TableWithJsonAttribute $model */
         $model = TableWithJsonAttribute::create([
-            'json_attributes' => ['key1'=>'value1',],
+            'json_attributes' => ['key1'=>'value1'],
         ]);
         $this->assertEquals('{"key1":"value1"}', $model->getOriginal('json_attributes'));
-        
+
         $model = TableWithJsonAttribute::create([
             'json_attributes' => [],
         ]);
         $this->assertEquals('{}', $model->getOriginal('json_attributes'));
     }
-    
+
     /**
      * Get a database connection instance.
      *
@@ -73,7 +73,7 @@ class DatabaseEloquentArrayCastTest extends TestCase
     {
         return Eloquent::getConnectionResolver()->connection();
     }
-    
+
     /**
      * Get a schema builder instance.
      *
@@ -94,12 +94,12 @@ class TableWithJsonAttribute extends Eloquent
      * @var string
      */
     protected $table = 'json_table';
-    
+
     /**
      * @var array
      */
     protected $guarded = [];
-    
+
     /**
      * @var array
      */
