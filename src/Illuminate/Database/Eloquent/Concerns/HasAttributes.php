@@ -677,7 +677,9 @@ trait HasAttributes
      */
     protected function asJson($value)
     {
-        return json_encode($value);
+        $value = json_encode($value);
+
+        return $value === '[]' ? '{}' : $value;
     }
 
     /**
