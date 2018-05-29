@@ -499,11 +499,9 @@ class Grammar extends BaseGrammar
      */
     protected function whereJsonContains(Builder $query, $where)
     {
-        $column = $this->wrap($where['column']);
-
-        $value = $this->parameter($where['value']);
-
-        return $this->compileJsonContains($column, $value);
+        return $this->compileJsonContains(
+            $this->wrap($where['column']), $this->parameter($where['value'])
+        );
     }
 
     /**
@@ -516,7 +514,7 @@ class Grammar extends BaseGrammar
      */
     protected function compileJsonContains($column, $value)
     {
-        throw new RuntimeException('The database engine in use is not yet supported.');
+        throw new RuntimeException('This database engine does not support JSON contains operations.');
     }
 
     /**
