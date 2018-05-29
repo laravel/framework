@@ -175,7 +175,7 @@ class ArtisanServiceProvider extends ServiceProvider
         } else {
             $commands = array_merge(
                 $this->commands, $this->devCommands
-            )
+            );
         }
 
         $this->registerCommands($commands);
