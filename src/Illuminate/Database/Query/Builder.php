@@ -1439,13 +1439,14 @@ class Builder
      * @param  string  $column
      * @param  mixed  $value
      * @param  string  $boolean
+     * @param  bool  $not
      * @return $this
      */
-    public function whereJsonContains($column, $value, $boolean = 'and')
+    public function whereJsonContains($column, $value, $boolean = 'and', $not = false)
     {
         $type = 'JsonContains';
 
-        $this->wheres[] = compact('type', 'column', 'value', 'boolean');
+        $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
 
         if (! $value instanceof Expression) {
             $this->addBinding(json_encode($value));
@@ -1464,6 +1465,31 @@ class Builder
     public function orWhereJsonContains($column, $value)
     {
         return $this->whereJsonContains($column, $value, 'or');
+    }
+
+    /**
+     * Add a "where JSON not contains" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereJsonNotContains($column, $value, $boolean = 'and')
+    {
+        return $this->whereJsonContains($column, $value, $boolean, true);
+    }
+
+    /**
+     * Add a "or where JSON not contains" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereJsonNotContains($column, $value)
+    {
+        return $this->whereJsonNotContains($column, $value, 'or');
     }
 
     /**

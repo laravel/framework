@@ -499,7 +499,9 @@ class Grammar extends BaseGrammar
      */
     protected function whereJsonContains(Builder $query, $where)
     {
-        return $this->compileJsonContains(
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonContains(
             $this->wrap($where['column']), $this->parameter($where['value'])
         );
     }
