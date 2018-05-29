@@ -170,9 +170,15 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->registerCommands(array_merge(
-            $this->commands, $this->devCommands
-        ));
+        if ($this->app->environment('production')) {
+            $commands = $this->commands;
+        } else {
+            $commands = array_merge(
+                $this->commands, $this->devCommands
+            )
+        }
+
+        $this->registerCommands($commands);
     }
 
     /**
