@@ -570,6 +570,35 @@ trait HasAttributes
     }
 
     /**
+     * Unzip serialized attribute
+     *
+     * @param string $key
+     * @return bool
+     */
+    public function unzip($key)
+    {
+        if (!isset($this->attributes[$key])) {
+            return false;
+        }
+
+        $unserialized = @unserialize($this->attributes[$key]);
+
+        if ($unserialized == false) {
+            return false;
+        }
+
+        if (!is_array($unserialized) || empty($unserialized)) {
+            return false;
+        }
+
+        foreach ($unserialized as $keys => $value) {
+            $this->attributes[$keys] = $value;
+        }
+
+        return true;
+    }
+
+    /**
      * Determine if a set mutator exists for an attribute.
      *
      * @param  string  $key

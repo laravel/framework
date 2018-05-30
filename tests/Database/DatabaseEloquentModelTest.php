@@ -1735,6 +1735,26 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getConnection()->shouldReceive('getQueryGrammar')->andReturn(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
         $model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
     }
+
+    public function testAttributesUnzip()
+    {
+        // Correct
+        $model =  new EloquentModelStub(['foo' => 'bar', 'data' => serialize(['bar' => 'foo'])]);
+        $this->assertTrue($model->unzip('data'));
+        $this->assertEquals('foo', $model->bar);
+
+        // Empty string
+        $model1 =  new EloquentModelStub(['foo' => 'bar', 'data' => '']);
+        $this->assertFalse($model1->unzip('data'));
+
+        // Mistake
+        $model2 =  new EloquentModelStub(['foo' => 'bar', 'data' => 'das:1:{s:3:s"bar";s:3:"foo";s}']);
+        $this->assertFalse($model2->unzip('data'));
+
+        // Empty array
+        $model3 =  new EloquentModelStub(['foo' => 'bar', 'data' => serialize([])]);
+        $this->assertFalse($model3->unzip('data'));
+    }
 }
 
 class EloquentTestObserverStub
