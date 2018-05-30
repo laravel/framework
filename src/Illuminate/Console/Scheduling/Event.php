@@ -11,6 +11,7 @@ use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Container\Container;
+use Symfony\Component\Process\Exception\RuntimeException;
 
 class Event
 {
@@ -129,6 +130,13 @@ class Event
     protected $afterCallbacks = [];
 
     /**
+     * The array of callbacks to be run after the event is failed.
+     *
+     * @var array
+     */
+    protected $failCallbacks = [];
+
+    /**
      * The human readable description of the event.
      *
      * @var string
@@ -204,11 +212,15 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
+        try {
+            (new Process(
+                $this->buildCommand(), base_path(), null, null, null
+            ))->run();
 
-        $this->callAfterCallbacks($container);
+            $this->callAfterCallbacks($container);
+        } catch (RuntimeException $e) {
+            $this->callFailCallbacks($container);
+        }
     }
 
     /**
@@ -221,9 +233,13 @@ class Event
     {
         $this->callBeforeCallbacks($container);
 
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
+        try {
+            (new Process(
+                $this->buildCommand(), base_path(), null, null, null
+            ))->run();
+        } catch (RuntimeException $e) {
+            $this->callFailCallbacks($container);
+        }
     }
 
     /**
@@ -248,6 +264,19 @@ class Event
     public function callAfterCallbacks(Container $container)
     {
         foreach ($this->afterCallbacks as $callback) {
+            $container->call($callback);
+        }
+    }
+
+    /**
+     * Call all of the "fail" callbacks for the event.
+     *
+     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @return void
+     */
+    public function callFailCallbacks(Container $container)
+    {
+        foreach ($this->failCallbacks as $callback) {
             $container->call($callback);
         }
     }
@@ -496,6 +525,31 @@ class Event
     }
 
     /**
+     * Register a callback to ping a given URL before the job fails.
+     *
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingFail($url)
+    {
+        return $this->fail(function () use ($url) {
+            (new HttpClient)->get($url);
+        });
+    }
+
+    /**
+     * Register a callback to ping a given URL before the job fails if the given condition is true.
+     *
+     * @param  bool  $value
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingFailIf($value, $url)
+    {
+        return $value ? $this->pingFail($url) : $this;
+    }
+
+    /**
      * State that the command should run in background.
      *
      * @return $this
@@ -558,6 +612,8 @@ class Event
         $this->expiresAt = $expiresAt;
 
         return $this->then(function () {
+            $this->mutex->forget($this);
+        })->fail(function () {
             $this->mutex->forget($this);
         })->skip(function () {
             return $this->mutex->exists($this);
@@ -639,6 +695,19 @@ class Event
     public function then(Closure $callback)
     {
         $this->afterCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Register a callback to be called if fail operation.
+     *
+     * @param  \Closure  $callback
+     * @return $this
+     */
+    public function fail(Closure $callback)
+    {
+        $this->failCallbacks[] = $callback;
 
         return $this;
     }
