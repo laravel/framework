@@ -32,7 +32,7 @@ class RouteAction
 
             if (\is_array($action)) {
                 [$class, $method] = $action;
-                $action = $class . '@' . $method;
+                $action = $class.'@'.$method;
             }
 
             return ['uses' => $action];
