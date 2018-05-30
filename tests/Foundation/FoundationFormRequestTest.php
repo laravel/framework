@@ -200,11 +200,6 @@ class FoundationTestFormRequestNestedStub extends FormRequest
 
 class FoundationTestFormRequestForbiddenStub extends FormRequest
 {
-    public function rules()
-    {
-        return ['name' => 'required'];
-    }
-
     public function authorize()
     {
         return false;
