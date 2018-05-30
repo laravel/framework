@@ -298,6 +298,49 @@ trait HasAttributes
     }
 
     /**
+     * Determine if the given attribute exists.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function hasAttribute($key)
+    {
+        if (! $key) {
+            return false;
+        }
+
+        // If the attribute exists in the attribute array or has a "get" mutator we will
+        // check if it. Otherwise, we will proceed as if the developers are asking for
+        // a relationship's attribute. This covers both types of values.
+        if (array_key_exists($key, $this->attributes) ||
+            $this->hasGetMutator($key)) {
+            return true;
+        }
+
+        // Here we will determine if the model base class itself contains this given key
+        // since we don't want to treat any of those methods as relationships because
+        // they are all intended as helper methods and none of these are relations.
+        if (method_exists(self::class, $key)) {
+            return false;
+        }
+
+        // If the key already exists in the relationships array, it just means the
+        // relationship has already been loaded, so we'll just return true out of
+        // here.
+        if ($this->relationLoaded($key)) {
+            return true;
+        }
+
+        // If the "attribute" exists as a method on the model, we will just assume
+        // it is a relationship, so the "attribute" exists.
+        if (method_exists($this, $key)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Get an attribute from the model.
      *
      * @param  string  $key

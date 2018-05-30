@@ -127,7 +127,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testArrayAccessToAttributes()
     {
-        $model = new EloquentModelStub(['attributes' => 1, 'connection' => 2, 'table' => 3]);
+        $model = new EloquentModelStub(['attributes' => 1, 'connection' => 2, 'table' => 3, 'nullable' => null]);
         unset($model['table']);
 
         $this->assertTrue(isset($model['attributes']));
@@ -137,6 +137,11 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse(isset($model['table']));
         $this->assertEquals($model['table'], null);
         $this->assertFalse(isset($model['with']));
+        $this->assertTrue(isset($model['nullable']));
+        $this->assertNull($model['nullable']);
+        $this->assertTrue(isset($model['password']));
+        $this->assertEquals($model['password'], '******');
+        $this->assertTrue(isset($model['belongsToStub']));
     }
 
     public function testOnly()
