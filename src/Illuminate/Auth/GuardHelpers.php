@@ -47,7 +47,7 @@ trait GuardHelpers
      */
     public function check()
     {
-        return ! is_null($this->user());
+        return ! is_null($this->user);
     }
 
     /**
