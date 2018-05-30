@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use ReflectionObject;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -1151,7 +1150,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             'created_at' => '2017-11-14 08:23:19',
         ]);
 
-        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
         $this->assertEquals('2017-11-14 08:23:19', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
@@ -1164,8 +1162,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             'updated_at' => '2017-11-14 08:23:19.734',
         ]);
 
-        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
-        $this->assertEquals('2017-11-14 08:23:19.734000', $this->getRawDateTimeString($model->getAttribute('updated_at')));
         $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
         $this->assertEquals('2017-11-14 08:23:19.734', $model->fromDateTime($model->getAttribute('updated_at')));
     }
@@ -1180,8 +1176,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             'updated_at' => '2017-11-14 08:23:19.7348',
         ]);
 
-        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
-        $this->assertEquals('2017-11-14 08:23:19.734800', $this->getRawDateTimeString($model->getAttribute('updated_at')));
         // Note: when storing databases would truncate the value to the given precision
         $this->assertEquals('2017-11-14 08:23:19.000000', $model->fromDateTime($model->getAttribute('created_at')));
         $this->assertEquals('2017-11-14 08:23:19.734800', $model->fromDateTime($model->getAttribute('updated_at')));
@@ -1195,7 +1189,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
             'created_at' => '2017-11-14 08:23:19.000',
         ]);
 
-        $this->assertEquals('2017-11-14 08:23:19.000000', $this->getRawDateTimeString($model->getAttribute('created_at')));
         $this->assertEquals('2017-11-14 08:23:19.000', $model->fromDateTime($model->getAttribute('created_at')));
     }
 
@@ -1235,11 +1228,6 @@ class DatabaseEloquentIntegrationTest extends TestCase
     protected function schema($connection = 'default')
     {
         return $this->connection($connection)->getSchemaBuilder();
-    }
-
-    protected function getRawDateTimeString($object)
-    {
-        return (new ReflectionObject($object))->getProperty('date')->getValue($object);
     }
 }
 

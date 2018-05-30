@@ -11,15 +11,6 @@ use Illuminate\Auth\Access\HandlesAuthorization;
 
 class AuthAccessGateTest extends TestCase
 {
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Callback must be a callable or a 'Class@method'
-     */
-    public function test_gate_throws_exception_on_invalid_callback_type()
-    {
-        $this->getBasicGate()->define('foo', 'foo');
-    }
-
     public function test_basic_closures_can_be_defined()
     {
         $gate = $this->getBasicGate();
@@ -167,6 +158,15 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
+
+        $this->assertTrue($gate->check('foo'));
+    }
+
+    public function test_invokable_classes_can_be_defined()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestInvokableClass');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -378,6 +378,14 @@ class AuthAccessGateTest extends TestCase
 class AccessGateTestClass
 {
     public function foo()
+    {
+        return true;
+    }
+}
+
+class AccessGateTestInvokableClass
+{
+    public function __invoke()
     {
         return true;
     }

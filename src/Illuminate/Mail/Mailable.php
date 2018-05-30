@@ -776,7 +776,7 @@ class Mailable implements MailableContract, Renderable
     public function __call($method, $parameters)
     {
         if (Str::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+            return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 
         throw new BadMethodCallException(sprintf(
