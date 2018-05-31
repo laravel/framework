@@ -77,6 +77,8 @@ trait SoftDeletes
         }
 
         $query->update($columns);
+
+        $this->syncOriginal();
     }
 
     /**
