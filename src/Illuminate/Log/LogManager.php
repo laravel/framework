@@ -336,11 +336,15 @@ class LogManager implements LoggerInterface
             );
         }
 
-        $handlers = [$this->prepareHandler(
-            $this->app->make($config['handler'], $config['with'] ?? [])
-        )];
+        $handler = $this->app->make($config['handler'], $config['with'] ?? []);
 
-        return new Monolog($this->parseChannel($config), $handlers);
+        if (!isset($config['formatter'])) {
+            $this->prepareHandler($handler);
+        } elseif ($config['formatter'] !== 'default') {
+            $handler->setFormatter($this->app->make($config['formatter'], $config['formatter_with'] ?? []));
+        }
+
+        return new Monolog($this->parseChannel($config), [$handler]);
     }
 
     /**
