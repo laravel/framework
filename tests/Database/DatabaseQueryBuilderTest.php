@@ -2656,28 +2656,28 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en'])->toSql();
     }
 
-    public function testWhereJsonNotContainsMySql()
+    public function testWhereJsonDoesntContainMySql()
     {
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereJsonNotContains('options->languages', ['en']);
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en']);
         $this->assertEquals('select * from `users` where not json_contains(`options`->\'$."languages"\', ?)', $builder->toSql());
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonNotContains('options->languages', new Raw("'[\"en\"]'"));
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContain('options->languages', new Raw("'[\"en\"]'"));
         $this->assertEquals('select * from `users` where `id` = ? or not json_contains(`options`->\'$."languages"\', \'["en"]\')', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
 
-    public function testWhereJsonNotContainsPostgres()
+    public function testWhereJsonDoesntContainPostgres()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->whereJsonNotContains('options->languages', ['en']);
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en']);
         $this->assertEquals('select * from "users" where not ("options"->\'languages\')::jsonb @> ?', $builder->toSql());
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonNotContains('options->languages', new Raw("'[\"en\"]'"));
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContain('options->languages', new Raw("'[\"en\"]'"));
         $this->assertEquals('select * from "users" where "id" = ? or not ("options"->\'languages\')::jsonb @> \'["en"]\'', $builder->toSql());
         $this->assertEquals([1], $builder->getBindings());
     }
@@ -2685,19 +2685,19 @@ class DatabaseQueryBuilderTest extends TestCase
     /**
      * @expectedException \RuntimeException
      */
-    public function testWhereJsonNotContainsSqlite()
+    public function testWhereJsonDoesntContainSqlite()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->select('*')->from('users')->whereJsonNotContains('options->languages', ['en'])->toSql();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
     }
 
     /**
      * @expectedException \RuntimeException
      */
-    public function testWhereJsonNotContainsSqlServer()
+    public function testWhereJsonDoesntContainSqlServer()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->whereJsonNotContains('options->languages', ['en'])->toSql();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
     }
 
     public function testFromSub()

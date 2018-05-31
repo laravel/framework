@@ -1475,7 +1475,7 @@ class Builder
      * @param  string  $boolean
      * @return $this
      */
-    public function whereJsonNotContains($column, $value, $boolean = 'and')
+    public function whereJsonDoesntContain($column, $value, $boolean = 'and')
     {
         return $this->whereJsonContains($column, $value, $boolean, true);
     }
@@ -1487,9 +1487,9 @@ class Builder
      * @param  mixed  $value
      * @return $this
      */
-    public function orWhereJsonNotContains($column, $value)
+    public function orWhereJsonDoesntContain($column, $value)
     {
-        return $this->whereJsonNotContains($column, $value, 'or');
+        return $this->whereJsonDoesntContain($column, $value, 'or');
     }
 
     /**
