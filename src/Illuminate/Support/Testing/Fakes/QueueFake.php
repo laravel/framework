@@ -238,7 +238,7 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return void
      */
     public function push($job, $data = '', $queue = null)
     {
