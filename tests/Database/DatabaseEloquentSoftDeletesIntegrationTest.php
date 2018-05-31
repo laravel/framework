@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -252,6 +251,37 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals('foo@bar.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
         $this->assertCount(3, SoftDeletesTestUser::withTrashed()->get());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testUpdateModelAfterSoftDeleting()
+    {
+        $now = Carbon::now();
+        $this->createUsers();
+
+        /** @var SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::find(2);
+        $userModel->delete();
+        $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
+        $this->assertNull(SoftDeletesTestUser::find(2));
+        $this->assertEquals($userModel, SoftDeletesTestUser::withTrashed()->find(2));
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testRestoreAfterSoftDelete()
+    {
+        $this->createUsers();
+
+        /** @var SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::find(2);
+        $userModel->delete();
+        $userModel->restore();
+
+        $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
     }
 
     public function testUpdateOrCreate()
