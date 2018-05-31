@@ -43,7 +43,7 @@ class SeeInOrder extends Constraint
         $position = 0;
 
         foreach ($values as $value) {
-            if ($value === null || mb_strlen($value) === 0) {
+            if (empty($value)) {
                 continue;
             }
 
