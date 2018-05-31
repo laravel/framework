@@ -7,7 +7,7 @@ use NamespacedDummyModel;
 class DummyClass
 {
     /**
-     * Listen to the DocDummyModel created event.
+     * Handle to the DocDummyModel "created" event.
      *
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
@@ -18,7 +18,7 @@ class DummyClass
     }
 
     /**
-     * Listen to the DocDummyModel updated event.
+     * Handle the DocDummyModel "updated" event.
      *
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
@@ -29,7 +29,7 @@ class DummyClass
     }
 
     /**
-     * Listen to the DocDummyModel deleted event.
+     * Handle the DocDummyModel "deleted" event.
      *
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
