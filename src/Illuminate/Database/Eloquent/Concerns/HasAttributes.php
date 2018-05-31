@@ -570,29 +570,33 @@ trait HasAttributes
     }
 
     /**
-     * Unzip serialized attribute
+     * Unzip serialized attribute.
      *
-     * @param string $key
+     * @param  string $key
+     * @param  bool $here
+     * @param  null $to
      * @return bool
      */
-    public function unzip($key)
+    public function unzip($key, $here = false, $to = null)
     {
-        if (!isset($this->attributes[$key])) {
+        if (! isset($this->attributes[$key])) {
             return false;
         }
 
         $unserialized = @unserialize($this->attributes[$key]);
 
-        if ($unserialized == false) {
+        if ($unserialized === false || ! is_array($unserialized) || empty($unserialized)) {
             return false;
         }
 
-        if (!is_array($unserialized) || empty($unserialized)) {
-            return false;
+        if ($here) {
+            $this->attributes += $unserialized;
         }
-
-        foreach ($unserialized as $keys => $value) {
-            $this->attributes[$keys] = $value;
+        elseif (! is_null($to)) {
+            $this->attributes[$to] = $unserialized;
+        }
+        else {
+            $this->attributes[$key] = $unserialized;
         }
 
         return true;

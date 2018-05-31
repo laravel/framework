@@ -1739,21 +1739,31 @@ class DatabaseEloquentModelTest extends TestCase
     public function testAttributesUnzip()
     {
         // Correct
-        $model =  new EloquentModelStub(['foo' => 'bar', 'data' => serialize(['bar' => 'foo'])]);
+        $model = new EloquentModelStub(['foo' => 'bar', 'data' => serialize(['bar' => 'foo'])]);
         $this->assertTrue($model->unzip('data'));
-        $this->assertEquals('foo', $model->bar);
+        $this->assertEquals('foo', $model->data['bar']);
 
         // Empty string
-        $model1 =  new EloquentModelStub(['foo' => 'bar', 'data' => '']);
+        $model1 = new EloquentModelStub(['foo' => 'bar', 'data' => '']);
         $this->assertFalse($model1->unzip('data'));
 
         // Mistake
-        $model2 =  new EloquentModelStub(['foo' => 'bar', 'data' => 'das:1:{s:3:s"bar";s:3:"foo";s}']);
+        $model2 = new EloquentModelStub(['foo' => 'bar', 'data' => 'das:1:{s:3:s"bar";s:3:"foo";s}']);
         $this->assertFalse($model2->unzip('data'));
 
         // Empty array
-        $model3 =  new EloquentModelStub(['foo' => 'bar', 'data' => serialize([])]);
+        $model3 = new EloquentModelStub(['foo' => 'bar', 'data' => serialize([])]);
         $this->assertFalse($model3->unzip('data'));
+
+        // Unzip here
+        $model4 = new EloquentModelStub(['foo' => 'bar', 'data' => serialize(['bar' => 'foo'])]);
+        $this->assertTrue($model4->unzip('data', true));
+        $this->assertEquals('foo', $model4->bar);
+
+        // Unzip to
+        $model5 = new EloquentModelStub(['foo' => 'bar', 'data' => serialize(['bar' => 'foo'])]);
+        $this->assertTrue($model5->unzip('data', false, 'seriliazed'));
+        $this->assertEquals('foo', $model5->seriliazed['bar']);
     }
 }
 
