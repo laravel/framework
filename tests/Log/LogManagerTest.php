@@ -13,7 +13,6 @@ use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\LogEntriesHandler;
 use Monolog\Formatter\NormalizerFormatter;
 
-
 class LogManagerTest extends TestCase
 {
     public function testLogManagerCachesLoggerInstances()
@@ -69,7 +68,7 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('logentries');
         $handlers = $logger->getLogger()->getHandlers();
 
-        $logToken = new \ReflectionProperty(get_class($handlers[0]), 'logToken');
+        $logToken = new ReflectionProperty(get_class($handlers[0]), 'logToken');
         $logToken->setAccessible(true);
 
         $this->assertInstanceOf(LogEntriesHandler::class, $handlers[0]);
@@ -83,7 +82,7 @@ class LogManagerTest extends TestCase
             'driver' => 'monolog',
             'name' => 'nr',
             'handler' => NewRelicHandler::class,
-            'formatter' => 'default'
+            'formatter' => 'default',
         ]);
 
         $manager = new LogManager($this->app);
@@ -101,8 +100,8 @@ class LogManagerTest extends TestCase
             'handler' => NewRelicHandler::class,
             'formatter' => HtmlFormatter::class,
             'formatter_with' => [
-                'dateFormat' => 'Y/m/d--test'
-            ]
+                'dateFormat' => 'Y/m/d--test',
+            ],
         ]);
 
         $logger = $manager->channel('newrelic2');
