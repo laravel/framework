@@ -491,6 +491,9 @@ class UrlGenerator implements UrlGeneratorContract
     {
         $path = '/'.trim($path, '/');
 
+        // Remove double and more slashes from patch.
+        $path = preg_replace('/\/{2,}/','/',$path);
+
         if ($this->formatHostUsing) {
             $root = call_user_func($this->formatHostUsing, $root);
         }
