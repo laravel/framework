@@ -443,7 +443,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store
+     * @return \Illuminate\Contracts\Session\Session
      *
      * @throws \RuntimeException
      */
@@ -459,7 +459,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     /**
      * Get the session associated with the request.
      *
-     * @return \Illuminate\Session\Store|null
+     * @return \Illuminate\Contracts\Session\Session|null
      */
     public function getSession()
     {
