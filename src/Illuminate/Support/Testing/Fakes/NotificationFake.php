@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
@@ -175,7 +175,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
 
         foreach ($notifiables as $notifiable) {
             if (! $notification->id) {
-                $notification->id = Uuid::uuid4()->toString();
+                $notification->id = Str::uuid()->toString();
             }
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [

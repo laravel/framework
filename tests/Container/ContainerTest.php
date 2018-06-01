@@ -490,6 +490,14 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('stdClass', $result[0]);
         $this->assertEquals('taylor', $result[1]);
 
+        $stub = new ContainerConcreteStub;
+        $result = $container->call(function (stdClass $foo, ContainerConcreteStub $bar) {
+            return func_get_args();
+        }, [ContainerConcreteStub::class => $stub]);
+
+        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertSame($stub, $result[1]);
+
         /*
          * Wrap a function...
          */
