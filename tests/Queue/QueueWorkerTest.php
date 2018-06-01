@@ -21,7 +21,7 @@ class QueueWorkerTest extends TestCase
     public $events;
     public $exceptionHandler;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->events = Mockery::spy(Dispatcher::class);
         $this->exceptionHandler = Mockery::spy(ExceptionHandler::class);
@@ -32,7 +32,7 @@ class QueueWorkerTest extends TestCase
         $container->instance(ExceptionHandler::class, $this->exceptionHandler);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         Container::setInstance();
     }

@@ -11,7 +11,7 @@ use Illuminate\Console\Scheduling\SchedulingMutex;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -26,7 +26,7 @@ class ConsoleEventSchedulerTest extends TestCase
         );
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

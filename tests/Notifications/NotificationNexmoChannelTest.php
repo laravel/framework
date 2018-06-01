@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\NexmoMessage;
 
 class NotificationNexmoChannelTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Mockery::close();
     }

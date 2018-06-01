@@ -13,7 +13,7 @@ use Illuminate\Support\Optional;
 
 class SupportHelpersTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

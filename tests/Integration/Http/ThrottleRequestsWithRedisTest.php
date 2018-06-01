@@ -16,7 +16,7 @@ class ThrottleRequestsWithRedisTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         Carbon::setTestNow(null);

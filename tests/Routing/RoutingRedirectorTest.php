@@ -14,7 +14,7 @@ class RoutingRedirectorTest extends TestCase
     protected $session;
     protected $redirect;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->headers = m::mock('Symfony\Component\HttpFoundation\HeaderBag');
 
@@ -35,7 +35,7 @@ class RoutingRedirectorTest extends TestCase
         $this->redirect->setSession($this->session);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

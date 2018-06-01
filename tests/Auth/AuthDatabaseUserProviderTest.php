@@ -9,7 +9,7 @@ use Illuminate\Auth\DatabaseUserProvider;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $db = new DB;
 
@@ -62,7 +62,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown()
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');

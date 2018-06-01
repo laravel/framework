@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

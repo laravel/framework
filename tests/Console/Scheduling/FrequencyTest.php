@@ -13,7 +13,7 @@ class FrequencyTest extends TestCase
      */
     protected $event;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->event = new Event(
             m::mock('Illuminate\Console\Scheduling\EventMutex'),

@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\View;
  */
 class SendingMailWithLocaleTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 
@@ -40,7 +40,7 @@ class SendingMailWithLocaleTest extends TestCase
         ]);
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
     }

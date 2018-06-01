@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class QueueRedisJobTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

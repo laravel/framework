@@ -12,13 +12,13 @@ class RedisCacheIntegrationTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
         $this->setUpRedis();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
         m::close();

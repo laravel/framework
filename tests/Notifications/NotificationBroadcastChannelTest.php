@@ -10,7 +10,7 @@ use Illuminate\Notifications\Channels\BroadcastChannel;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Mockery::close();
     }

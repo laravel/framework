@@ -11,7 +11,7 @@ use Illuminate\Pagination\AbstractPaginator as Paginator;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

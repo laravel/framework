@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class DatabaseEloquentMorphTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Relation::morphMap([], false);
 

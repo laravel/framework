@@ -8,7 +8,7 @@ use PHPUnit\Framework\TestCase;
 
 class EncryptedSessionStoreTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
