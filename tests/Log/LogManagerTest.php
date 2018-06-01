@@ -8,7 +8,11 @@ use Illuminate\Log\LogManager;
 use Monolog\Logger as Monolog;
 use Orchestra\Testbench\TestCase;
 use Monolog\Handler\StreamHandler;
+use Monolog\Formatter\HtmlFormatter;
+use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\LogEntriesHandler;
+use Monolog\Formatter\NormalizerFormatter;
+
 
 class LogManagerTest extends TestCase
 {
@@ -65,10 +69,52 @@ class LogManagerTest extends TestCase
         $logger = $manager->channel('logentries');
         $handlers = $logger->getLogger()->getHandlers();
 
-        $logToken = new ReflectionProperty(get_class($handlers[0]), 'logToken');
+        $logToken = new \ReflectionProperty(get_class($handlers[0]), 'logToken');
         $logToken->setAccessible(true);
 
         $this->assertInstanceOf(LogEntriesHandler::class, $handlers[0]);
         $this->assertEquals('123456789', $logToken->getValue($handlers[0]));
+    }
+
+    public function testLogManagerCreatesMonologHandlerWithConfiguredFormatter()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.newrelic', [
+            'driver' => 'monolog',
+            'name' => 'nr',
+            'handler' => NewRelicHandler::class,
+            'formatter' => 'default'
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        // create logger with handler specified from configuration
+        $logger = $manager->channel('newrelic');
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $this->assertInstanceOf(NewRelicHandler::class, $handler);
+        $this->assertInstanceOf(NormalizerFormatter::class, $handler->getFormatter());
+
+        $config->set('logging.channels.newrelic2', [
+            'driver' => 'monolog',
+            'name' => 'nr',
+            'handler' => NewRelicHandler::class,
+            'formatter' => HtmlFormatter::class,
+            'formatter_with' => [
+                'dateFormat' => 'Y/m/d--test'
+            ]
+        ]);
+
+        $logger = $manager->channel('newrelic2');
+        $handler = $logger->getLogger()->getHandlers()[0];
+        $formatter = $handler->getFormatter();
+
+        $this->assertInstanceOf(NewRelicHandler::class, $handler);
+        $this->assertInstanceOf(HtmlFormatter::class, $formatter);
+
+        $dateFormat = new ReflectionProperty(get_class($formatter), 'dateFormat');
+        $dateFormat->setAccessible(true);
+
+        $this->assertEquals('Y/m/d--test', $dateFormat->getValue($formatter));
     }
 }
