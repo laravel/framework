@@ -397,7 +397,7 @@ class Filesystem
     {
         if ($this->exists($directory) && $this->isReadable($directory)) {
             return iterator_to_array(
-                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
+                Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
                 false
             );
         }
@@ -414,7 +414,7 @@ class Filesystem
     {
         if ($this->exists($directory) && $this->isReadable($directory)) {
             return iterator_to_array(
-                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
+                Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
                 false
             );
         }
