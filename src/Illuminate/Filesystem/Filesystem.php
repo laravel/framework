@@ -6,7 +6,6 @@ use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class Filesystem
 {
@@ -30,15 +29,19 @@ class Filesystem
      * @param  bool  $lock
      * @return string
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \ErrorException
      */
     public function get($path, $lock = false)
     {
         if ($this->isFile($path)) {
-            return $lock ? $this->sharedGet($path) : file_get_contents($path);
+            if ($this->isReadable($path)) {
+                return $lock ? $this->sharedGet($path) : file_get_contents($path);
+            }
+
+            throw new ErrorException("Failed to read from {$path}");
         }
 
-        throw new FileNotFoundException("File does not exist at path {$path}");
+        throw new ErrorException("File does not exist at path {$path}");
     }
 
     /**
@@ -76,15 +79,19 @@ class Filesystem
      * @param  string  $path
      * @return mixed
      *
-     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
+     * @throws \ErrorException
      */
     public function getRequire($path)
     {
         if ($this->isFile($path)) {
-            return require $path;
+            if ($this->isReadable($path)) {
+                return require $path;
+            }
+
+            throw new ErrorException("Failed to read from {$path}");
         }
 
-        throw new FileNotFoundException("File does not exist at path {$path}");
+        throw new ErrorException("File does not exist at path {$path}");
     }
 
     /**
@@ -119,7 +126,9 @@ class Filesystem
      */
     public function put($path, $contents, $lock = false)
     {
-        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+        if ($this->isWritable($path)) {
+            return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+        }
     }
 
     /**
@@ -386,10 +395,12 @@ class Filesystem
      */
     public function files($directory, $hidden = false)
     {
-        return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
-            false
-        );
+        if ($this->exists($directory) && $this->isReadable($directory)) {
+            return iterator_to_array(
+                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
+                false
+            );
+        }
     }
 
     /**
@@ -401,10 +412,12 @@ class Filesystem
      */
     public function allFiles($directory, $hidden = false)
     {
-        return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
-            false
-        );
+        if ($this->exists($directory) && $this->isReadable($directory)) {
+            return iterator_to_array(
+                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
+                false
+            );
+        }
     }
 
     /**
@@ -417,8 +430,10 @@ class Filesystem
     {
         $directories = [];
 
-        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
-            $directories[] = $dir->getPathname();
+        if ($this->exists($directory) && $this->isReadable($directory)) {
+            foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+                $directories[] = $dir->getPathname();
+            }
         }
 
         return $directories;
