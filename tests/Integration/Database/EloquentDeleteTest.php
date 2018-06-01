@@ -58,10 +58,10 @@ class EloquentDeleteTest extends TestCase
         }
 
         Post::latest('id')->limit(1)->delete();
-        $this->assertEquals(9, Post::all()->count());
+        $this->assertCount(9, Post::all());
 
         Post::join('comments', 'comments.post_id', '=', 'posts.id')->where('posts.id', '>', 1)->orderBy('posts.id')->limit(1)->delete();
-        $this->assertEquals(8, Post::all()->count());
+        $this->assertCount(8, Post::all());
     }
 
     public function testForceDeletedEventIsFired()
