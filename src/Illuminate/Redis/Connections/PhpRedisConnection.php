@@ -83,8 +83,19 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scans all keys in the redis database. Note,
-     * $counter is passed-by-reference to scan.
+     * Set the given key if it doesn't exist.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return int
+     */
+    public function setnx($key, $value)
+    {
+        return (int) $this->client->setnx($key, $value);
+    }
+
+    /**
+     * Scan all keys in the redis database.
      *
      * @param  int  $counter
      * @param  array  $options
@@ -102,18 +113,6 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         );
 
         return [$counter, $result];
-    }
-
-    /**
-     * Set the given key if it doesn't exist.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return int
-     */
-    public function setnx($key, $value)
-    {
-        return (int) $this->client->setnx($key, $value);
     }
 
     /**
@@ -166,8 +165,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scan the given hash field for all values. Note,
-     * that $counter is pass-by-reference to hscan.
+     * Scan all values in the given hash field.
      *
      * @param  string  $key
      * @param  int  $counter
@@ -214,8 +212,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scans the given set for all values in set. Note,
-     * that $counter is passed-by-reference to call.
+     * Scans all values in the given set.
      *
      * @param  string  $key
      * @param  int  $counter
@@ -332,8 +329,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     }
 
     /**
-     * Scans the given set for all values based on options.
-     * Note, the $counter is pass-by-reference to zscan.
+     * Scans all values in the given set.
      *
      * @param  string  $key
      * @param  int  $counter
