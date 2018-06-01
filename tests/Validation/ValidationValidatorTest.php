@@ -17,7 +17,7 @@ use Illuminate\Contracts\Validation\ImplicitRule;
 
 class ValidationValidatorTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         Carbon::setTestNow();
         m::close();

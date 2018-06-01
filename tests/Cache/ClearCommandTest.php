@@ -49,7 +49,7 @@ class ClearCommandTest extends TestCase
         $this->command->setLaravel($app);
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

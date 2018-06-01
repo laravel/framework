@@ -9,7 +9,7 @@ use Illuminate\Cache\Console\CacheTableCommand;
 
 class CacheTableCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         $db = new DB;
 
@@ -83,7 +83,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      *
      * @return void
      */
-    public function tearDown()
+    protected function tearDown()
     {
         $this->schema()->drop('users');
         $this->schema()->drop('posts');

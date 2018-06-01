@@ -8,12 +8,12 @@ use PHPUnit\Framework\TestCase;
 
 class QueueSqsQueueTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }
 
-    public function setUp()
+    protected function setUp()
     {
         // Use Mockery to mock the SqsClient
         $this->sqs = m::mock('Aws\Sqs\SqsClient');

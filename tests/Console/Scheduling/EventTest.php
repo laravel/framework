@@ -8,7 +8,7 @@ use Illuminate\Console\Scheduling\Event;
 
 class EventTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

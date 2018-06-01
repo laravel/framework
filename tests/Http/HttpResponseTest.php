@@ -12,7 +12,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 class HttpResponseTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

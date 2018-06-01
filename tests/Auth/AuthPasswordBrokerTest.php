@@ -9,7 +9,7 @@ use Illuminate\Contracts\Auth\PasswordBroker;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

@@ -20,14 +20,14 @@ class DatabaseEloquentModelTest extends TestCase
 {
     use InteractsWithTime;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
         Carbon::setTestNow(Carbon::now());
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 

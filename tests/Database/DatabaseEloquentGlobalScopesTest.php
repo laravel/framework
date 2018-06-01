@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
@@ -19,7 +19,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
         ])->bootEloquent();
     }
 
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
 

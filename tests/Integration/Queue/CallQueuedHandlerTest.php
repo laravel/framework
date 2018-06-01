@@ -12,7 +12,7 @@ use Illuminate\Queue\Events\JobFailed;
  */
 class CallQueuedHandlerTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         parent::tearDown();
 

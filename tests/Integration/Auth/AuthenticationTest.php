@@ -28,7 +28,7 @@ class AuthenticationTest extends TestCase
         $app['config']->set('hashing', ['driver' => 'bcrypt']);
     }
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

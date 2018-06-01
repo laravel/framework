@@ -9,7 +9,7 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

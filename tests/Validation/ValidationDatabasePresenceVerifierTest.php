@@ -7,7 +7,7 @@ use PHPUnit\Framework\TestCase;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

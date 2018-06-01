@@ -8,7 +8,7 @@ use Illuminate\Database\Schema\Blueprint;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

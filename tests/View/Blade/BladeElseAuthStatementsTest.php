@@ -8,7 +8,7 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeElseAuthStatementsTest extends TestCase
 {
-    public function tearDown()
+    protected function tearDown()
     {
         m::close();
     }

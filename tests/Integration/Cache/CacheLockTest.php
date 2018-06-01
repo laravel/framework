@@ -15,7 +15,7 @@ class CacheLockTest extends TestCase
 {
     use InteractsWithRedis;
 
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 

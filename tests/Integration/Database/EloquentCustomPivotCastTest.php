@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\Model;
  */
 class EloquentCustomPivotCastTest extends DatabaseTestCase
 {
-    public function setUp()
+    protected function setUp()
     {
         parent::setUp();
 
