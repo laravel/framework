@@ -1840,7 +1840,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Create a new collection instance..
+     * Create a new collection instance.
      *
      * @param  mixed  $items
      * @return $this
