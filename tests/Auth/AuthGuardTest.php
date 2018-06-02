@@ -204,6 +204,19 @@ class AuthGuardTest extends TestCase
         $this->assertSame($user, $mock->user());
     }
 
+    public function testRefreshUserMethodReloadsUser()
+    {
+        $mock = $this->getGuard();
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $updatedUser = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+
+        $mock->setUser($user);
+        $user->shouldReceive('getAuthIdentifier')->once();
+        $mock->getProvider()->shouldReceive('retrieveById')->once()->andReturn($updatedUser);
+
+        $this->assertSame($updatedUser, $mock->refreshUser());
+    }
+
     public function testNullIsReturnedForUserIfNoUserFound()
     {
         $mock = $this->getGuard();
