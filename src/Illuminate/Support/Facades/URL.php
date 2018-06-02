@@ -12,6 +12,8 @@ namespace Illuminate\Support\Facades;
  * @method static string route(string $name, $parameters = [], bool $absolute = true)
  * @method static string action(string $action, $parameters = [], bool $absolute = true)
  * @method static \Illuminate\Contracts\Routing\UrlGenerator setRootControllerNamespace(string $rootNamespace)
+ * @method static string signedRoute(string $name, array $parameters = [], \DateTimeInterface|int $expiration = null)
+ * @method static string temporarySignedRoute(string $name, \DateTimeInterface|int $expiration, array $parameters = [])
  *
  * @see \Illuminate\Routing\UrlGenerator
  */
