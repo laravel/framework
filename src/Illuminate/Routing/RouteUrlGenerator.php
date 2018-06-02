@@ -149,7 +149,7 @@ class RouteUrlGenerator
             return 'https://';
         }
 
-        return $this->url->formatScheme(null);
+        return $this->url->formatScheme();
     }
 
     /**
