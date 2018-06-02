@@ -158,11 +158,11 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $collection = EloquentTestUser::find([]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
-        $this->assertEquals(0, $collection->count());
+        $this->assertCount(0, $collection);
 
         $collection = EloquentTestUser::find([1, 2, 3]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $collection);
-        $this->assertEquals(2, $collection->count());
+        $this->assertCount(2, $collection);
 
         $models = EloquentTestUser::where('id', 1)->cursor();
         foreach ($models as $model) {
@@ -187,7 +187,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $models = EloquentTestUser::oldest('id')->get();
 
-        $this->assertEquals(2, $models->count());
+        $this->assertCount(2, $models);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[1]);
@@ -206,7 +206,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(2, $models->count());
+        $this->assertCount(2, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[1]);
@@ -218,7 +218,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(1, $models->count());
+        $this->assertCount(1, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertEquals('foo@gmail.com', $models[0]->email);
@@ -231,7 +231,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(0, $models->count());
+        $this->assertCount(0, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
 
         Paginator::currentPageResolver(function () {
@@ -239,14 +239,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         });
         $models = EloquentTestUser::oldest('id')->paginate(2);
 
-        $this->assertEquals(0, $models->count());
+        $this->assertCount(0, $models);
     }
 
     public function testPaginatedModelCollectionRetrievalWhenNoElementsAndDefaultPerPage()
     {
         $models = EloquentTestUser::oldest('id')->paginate();
 
-        $this->assertEquals(0, $models->count());
+        $this->assertCount(0, $models);
         $this->assertInstanceOf('Illuminate\Pagination\LengthAwarePaginator', $models);
     }
 
@@ -459,7 +459,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $post2 = $user->posts()->where('name', 'Second Post')->first();
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $posts);
-        $this->assertEquals(2, $posts->count());
+        $this->assertCount(2, $posts);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $posts[0]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $posts[1]);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $post2);
@@ -484,7 +484,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $models[0]);
         $this->assertEquals('abigailotwell@gmail.com', $models[0]->email);
         $this->assertEquals('second_connection', $models[0]->getConnectionName());
-        $this->assertEquals(1, $models->count());
+        $this->assertCount(1, $models);
     }
 
     public function testHasOnSelfReferencingBelongsToManyRelationship()
@@ -744,8 +744,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $user->photos[0]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $post->photos[0]);
-        $this->assertEquals(2, $user->photos->count());
-        $this->assertEquals(2, $post->photos->count());
+        $this->assertCount(2, $user->photos);
+        $this->assertCount(2, $post->photos);
         $this->assertEquals('Avatar 1', $user->photos[0]->name);
         $this->assertEquals('Avatar 2', $user->photos[1]->name);
         $this->assertEquals('Hero 1', $post->photos[0]->name);
@@ -754,7 +754,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $photos = EloquentTestPhoto::orderBy('name')->get();
 
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $photos);
-        $this->assertEquals(4, $photos->count());
+        $this->assertCount(4, $photos);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestUser', $photos[0]->imageable);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPost', $photos[2]->imageable);
         $this->assertEquals('taylorotwell@gmail.com', $photos[1]->imageable->email);
@@ -779,8 +779,8 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $user->photos[0]);
         $this->assertInstanceOf('Illuminate\Database\Eloquent\Collection', $post->photos);
         $this->assertInstanceOf('Illuminate\Tests\Database\EloquentTestPhoto', $post->photos[0]);
-        $this->assertEquals(2, $user->photos->count());
-        $this->assertEquals(2, $post->photos->count());
+        $this->assertCount(2, $user->photos);
+        $this->assertCount(2, $post->photos);
         $this->assertEquals('Avatar 1', $user->photos[0]->name);
         $this->assertEquals('Avatar 2', $user->photos[1]->name);
         $this->assertEquals('Hero 1', $post->photos[0]->name);
