@@ -20,7 +20,7 @@
         "ext-openssl": "*",
         "classpreloader/classpreloader": "~2.0|~3.0",
         "danielstjules/stringy": "~1.8",
-        "doctrine/inflector": "~1.0",
+        "doctrine/inflector": "1.1.*",
         "jeremeamia/superclosure": "~2.0",
         "league/flysystem": "~1.0",
         "monolog/monolog": "~1.11",
