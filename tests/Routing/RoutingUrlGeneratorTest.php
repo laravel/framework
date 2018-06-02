@@ -232,6 +232,31 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('http://en.example.com/foo', $url->route('defaults'));
     }
 
+    public function testRouteGenerationWithNullAndFalseParameters()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        /*
+         * Named Routes with Parameters...
+         */
+        $route = new Route(['GET'], 'foo/bar/{baz}/breeze/{boom}', ['as' => 'bar']);
+        $routes->add($route);
+
+        $route = new Route(['GET'], 'foo/bar/{baz?}/breeze/{boom?}', ['as' => 'baz']);
+        $routes->add($route);
+
+        $this->assertEquals('http://www.foo.com/foo/bar/breeze/wall?diez=sergey', $url->route('bar', ['baz'=>null, 'boom' => 'wall', 'diez'=>'sergey']));
+        $this->assertEquals('http://www.foo.com/foo/bar/breeze?diez=sergey', $url->route('bar', ['baz'=>null, 'boom' => false, 'diez'=>'sergey']));
+        $this->assertEquals('http://www.foo.com/foo/bar/bar/breeze', $url->route('bar', ['baz' => 'bar', 'boom'=>null, 'diez'=>null]));
+
+        $this->assertEquals('http://www.foo.com/foo/bar/breeze/wall?diez=sergey', $url->route('baz', ['baz'=>null, 'boom' => 'wall', 'diez'=>'sergey']));
+        $this->assertEquals('http://www.foo.com/foo/bar/breeze?diez=sergey', $url->route('baz', ['baz'=>null, 'boom' => false, 'diez'=>'sergey']));
+        $this->assertEquals('http://www.foo.com/foo/bar/bar/breeze', $url->route('baz', ['baz' => 'bar', 'boom'=>null, 'diez'=>null]));
+    }
+
     public function testFluentRouteNameDefinitions()
     {
         $url = new UrlGenerator(

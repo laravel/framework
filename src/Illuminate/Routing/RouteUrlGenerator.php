@@ -214,9 +214,9 @@ class RouteUrlGenerator
     protected function replaceNamedParameters($path, &$parameters)
     {
         return preg_replace_callback('/\{(.*?)\??\}/', function ($m) use (&$parameters) {
-            if (isset($parameters[$m[1]])) {
+            if (array_key_exists($m[1], $parameters)) {
                 return Arr::pull($parameters, $m[1]);
-            } elseif (isset($this->defaultParameters[$m[1]])) {
+            } elseif (array_key_exists($m[1], $this->defaultParameters)) {
                 return $this->defaultParameters[$m[1]];
             }
 
@@ -272,8 +272,8 @@ class RouteUrlGenerator
                 '&', $this->getNumericParameters($parameters)
             );
         }
-
-        return '?'.trim($query, '&');
+        $query = trim($query, '&');
+        return '' != $query ? '?'.$query : '';
     }
 
     /**
