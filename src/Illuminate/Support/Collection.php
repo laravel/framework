@@ -194,9 +194,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return $values->get($middle);
         }
 
-        return (new static([
+        return $this->newInstance([
             $values->get($middle - 1), $values->get($middle),
-        ]))->average();
+        ])->average();
     }
 
     /**
@@ -237,7 +237,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function collapse()
     {
-        return new static(Arr::collapse($this->items));
+        return $this->newInstance(Arr::collapse($this->items));
     }
 
     /**
@@ -293,7 +293,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function crossJoin(...$lists)
     {
-        return new static(Arr::crossJoin(
+        return $this->newInstance(Arr::crossJoin(
             $this->items, ...array_map([$this, 'getArrayableItems'], $lists)
         ));
     }
@@ -317,7 +317,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function dump()
     {
-        (new static(func_get_args()))
+        $this->newInstance(func_get_args())
             ->push($this)
             ->each(function ($item) {
                 (new Dumper)->dump($item);
@@ -334,7 +334,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diff($items)
     {
-        return new static(array_diff($this->items, $this->getArrayableItems($items)));
+        return $this->newInstance(array_diff($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -346,7 +346,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffUsing($items, callable $callback)
     {
-        return new static(array_udiff($this->items, $this->getArrayableItems($items), $callback));
+        return $this->newInstance(array_udiff($this->items, $this->getArrayableItems($items), $callback));
     }
 
     /**
@@ -357,7 +357,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffAssoc($items)
     {
-        return new static(array_diff_assoc($this->items, $this->getArrayableItems($items)));
+        return $this->newInstance(array_diff_assoc($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -369,7 +369,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffAssocUsing($items, callable $callback)
     {
-        return new static(array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback));
+        return $this->newInstance(array_diff_uassoc($this->items, $this->getArrayableItems($items), $callback));
     }
 
     /**
@@ -380,7 +380,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffKeys($items)
     {
-        return new static(array_diff_key($this->items, $this->getArrayableItems($items)));
+        return $this->newInstance(array_diff_key($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -392,7 +392,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function diffKeysUsing($items, callable $callback)
     {
-        return new static(array_diff_ukey($this->items, $this->getArrayableItems($items), $callback));
+        return $this->newInstance(array_diff_ukey($this->items, $this->getArrayableItems($items), $callback));
     }
 
     /**
@@ -466,7 +466,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $keys = func_get_args();
         }
 
-        return new static(Arr::except($this->items, $keys));
+        return $this->newInstance(Arr::except($this->items, $keys));
     }
 
     /**
@@ -478,10 +478,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function filter(callable $callback = null)
     {
         if ($callback) {
-            return new static(Arr::where($this->items, $callback));
+            return $this->newInstance(Arr::where($this->items, $callback));
         }
 
-        return new static(array_filter($this->items));
+        return $this->newInstance(array_filter($this->items));
     }
 
     /**
@@ -688,7 +688,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flatten($depth = INF)
     {
-        return new static(Arr::flatten($this->items, $depth));
+        return $this->newInstance(Arr::flatten($this->items, $depth));
     }
 
     /**
@@ -698,7 +698,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function flip()
     {
-        return new static(array_flip($this->items));
+        return $this->newInstance(array_flip($this->items));
     }
 
     /**
@@ -762,14 +762,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 $groupKey = is_bool($groupKey) ? (int) $groupKey : $groupKey;
 
                 if (! array_key_exists($groupKey, $results)) {
-                    $results[$groupKey] = new static;
+                    $results[$groupKey] = $this->newInstance();
                 }
 
                 $results[$groupKey]->offsetSet($preserveKeys ? $key : null, $value);
             }
         }
 
-        $result = new static($results);
+        $result = $this->newInstance($results);
 
         if (! empty($nextGroups)) {
             return $result->map->groupBy($nextGroups, $preserveKeys);
@@ -800,7 +800,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$resolvedKey] = $item;
         }
 
-        return new static($results);
+        return $this->newInstance($results);
     }
 
     /**
@@ -848,7 +848,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function intersect($items)
     {
-        return new static(array_intersect($this->items, $this->getArrayableItems($items)));
+        return $this->newInstance(array_intersect($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -859,7 +859,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function intersectByKeys($items)
     {
-        return new static(array_intersect_key(
+        return $this->newInstance(array_intersect_key(
             $this->items, $this->getArrayableItems($items)
         ));
     }
@@ -902,7 +902,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function keys()
     {
-        return new static(array_keys($this->items));
+        return $this->newInstance(array_keys($this->items));
     }
 
     /**
@@ -926,7 +926,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pluck($value, $key = null)
     {
-        return new static(Arr::pluck($this->items, $value, $key));
+        return $this->newInstance(Arr::pluck($this->items, $value, $key));
     }
 
     /**
@@ -941,7 +941,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $items = array_map($callback, $this->items, $keys);
 
-        return new static(array_combine($keys, $items));
+        return $this->newInstance(array_combine($keys, $items));
     }
 
     /**
@@ -985,7 +985,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $dictionary[$key][] = $value;
         }
 
-        return new static($dictionary);
+        return $this->newInstance($dictionary);
     }
 
     /**
@@ -1023,7 +1023,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             }
         }
 
-        return new static($result);
+        return $this->newInstance($result);
     }
 
     /**
@@ -1077,7 +1077,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function merge($items)
     {
-        return new static(array_merge($this->items, $this->getArrayableItems($items)));
+        return $this->newInstance(array_merge($this->items, $this->getArrayableItems($items)));
     }
 
     /**
@@ -1088,7 +1088,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function combine($values)
     {
-        return new static(array_combine($this->all(), $this->getArrayableItems($values)));
+        return $this->newInstance(array_combine($this->all(), $this->getArrayableItems($values)));
     }
 
     /**
@@ -1099,7 +1099,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function union($items)
     {
-        return new static($this->items + $this->getArrayableItems($items));
+        return $this->newInstance($this->items + $this->getArrayableItems($items));
     }
 
     /**
@@ -1142,7 +1142,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $position++;
         }
 
-        return new static($new);
+        return $this->newInstance($new);
     }
 
     /**
@@ -1154,7 +1154,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function only($keys)
     {
         if (is_null($keys)) {
-            return new static($this->items);
+            return $this->newInstance($this->items);
         }
 
         if ($keys instanceof self) {
@@ -1163,7 +1163,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $keys = is_array($keys) ? $keys : func_get_args();
 
-        return new static(Arr::only($this->items, $keys));
+        return $this->newInstance(Arr::only($this->items, $keys));
     }
 
     /**
@@ -1190,7 +1190,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function partition($key, $operator = null, $value = null)
     {
-        $partitions = [new static, new static];
+        $partitions = [$this->newInstance(), $this->newInstance()];
 
         $callback = func_num_args() === 1
                 ? $this->valueRetriever($key)
@@ -1200,7 +1200,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $partitions[(int) ! $callback($item, $key)][$key] = $item;
         }
 
-        return new static($partitions);
+        return $this->newInstance($partitions);
     }
 
     /**
@@ -1259,7 +1259,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function concat($source)
     {
-        $result = new static($this);
+        $result = $this->newInstance($this);
 
         foreach ($source as $item) {
             $result->push($item);
@@ -1308,7 +1308,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return Arr::random($this->items);
         }
 
-        return new static(Arr::random($this->items, $number));
+        return $this->newInstance(Arr::random($this->items, $number));
     }
 
     /**
@@ -1349,7 +1349,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function reverse()
     {
-        return new static(array_reverse($this->items, true));
+        return $this->newInstance(array_reverse($this->items, true));
     }
 
     /**
@@ -1392,7 +1392,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function shuffle($seed = null)
     {
-        return new static(Arr::shuffle($this->items, $seed));
+        return $this->newInstance(Arr::shuffle($this->items, $seed));
     }
 
     /**
@@ -1404,7 +1404,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function slice($offset, $length = null)
     {
-        return new static(array_slice($this->items, $offset, $length, true));
+        return $this->newInstance(array_slice($this->items, $offset, $length, true));
     }
 
     /**
@@ -1416,7 +1416,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function split($numberOfGroups)
     {
         if ($this->isEmpty()) {
-            return new static;
+            return $this->newInstance();
         }
 
         $groups = new static;
@@ -1453,16 +1453,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function chunk($size)
     {
         if ($size <= 0) {
-            return new static;
+            return $this->newInstance();
         }
 
         $chunks = [];
 
         foreach (array_chunk($this->items, $size, true) as $chunk) {
-            $chunks[] = new static($chunk);
+            $chunks[] = $this->newInstance($chunk);
         }
 
-        return new static($chunks);
+        return $this->newInstance($chunks);
     }
 
     /**
@@ -1479,7 +1479,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             ? uasort($items, $callback)
             : asort($items);
 
-        return new static($items);
+        return $this->newInstance($items);
     }
 
     /**
@@ -1513,7 +1513,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $results[$key] = $this->items[$key];
         }
 
-        return new static($results);
+        return $this->newInstance($results);
     }
 
     /**
@@ -1541,7 +1541,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
         $descending ? krsort($items, $options) : ksort($items, $options);
 
-        return new static($items);
+        return $this->newInstance($items);
     }
 
     /**
@@ -1566,10 +1566,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function splice($offset, $length = null, $replacement = [])
     {
         if (func_num_args() === 1) {
-            return new static(array_splice($this->items, $offset));
+            return $this->newInstance(array_splice($this->items, $offset));
         }
 
-        return new static(array_splice($this->items, $offset, $length, $replacement));
+        return $this->newInstance(array_splice($this->items, $offset, $length, $replacement));
     }
 
     /**
@@ -1614,7 +1614,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function tap(callable $callback)
     {
-        $callback(new static($this->items));
+        $callback($this->newInstance($this->items));
 
         return $this;
     }
@@ -1672,7 +1672,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function values()
     {
-        return new static(array_values($this->items));
+        return $this->newInstance(array_values($this->items));
     }
 
     /**
@@ -1708,10 +1708,10 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }, func_get_args());
 
         $params = array_merge([function () {
-            return new static(func_get_args());
+            return $this->newInstance(func_get_args());
         }, $this->items], $arrayableItems);
 
-        return new static(call_user_func_array('array_map', $params));
+        return $this->newInstance(call_user_func_array('array_map', $params));
     }
 
     /**
@@ -1723,7 +1723,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pad($size, $value)
     {
-        return new static(array_pad($this->items, $size, $value));
+        return $this->newInstance(array_pad($this->items, $size, $value));
     }
 
     /**
@@ -1867,6 +1867,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function __toString()
     {
         return $this->toJson();
+    }
+
+    /**
+     * Create a new collection instance.
+     *
+     * @param  mixed  $items
+     * @return $this
+     */
+    protected function newInstance($items = [])
+    {
+        return new static($items);
     }
 
     /**
