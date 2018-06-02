@@ -153,6 +153,16 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
+     * Reload the authenticated user.
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    public function refreshUser()
+    {
+        return $this->user = $this->provider->retrieveById($this->id());
+    }
+
+    /**
      * Pull a user from the repository by its "remember me" cookie token.
      *
      * @param  \Illuminate\Auth\Recaller  $recaller
