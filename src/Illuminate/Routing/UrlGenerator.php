@@ -282,7 +282,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function formatScheme($secure)
+    public function formatScheme($secure = null)
     {
         if (! is_null($secure)) {
             return $secure ? 'https://' : 'http://';
