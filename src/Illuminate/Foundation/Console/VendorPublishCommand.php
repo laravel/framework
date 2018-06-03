@@ -38,10 +38,10 @@ class VendorPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
-                    {--all : Publish assets for all service providers without prompt.}
-                    {--provider= : The service provider that has assets you want to publish.}
-                    {--tag=* : One or many tags that have assets you want to publish.}';
+    protected $signature = 'vendor:publish {--force : Overwrite any existing files}
+                    {--all : Publish assets for all service providers without prompt}
+                    {--provider= : The service provider that has assets you want to publish}
+                    {--tag=* : One or many tags that have assets you want to publish}';
 
     /**
      * The console command description.
