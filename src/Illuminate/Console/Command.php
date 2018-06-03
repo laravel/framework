@@ -507,7 +507,7 @@ class Command extends SymfonyCommand
      */
     public function alert($string)
     {
-        $length = Str::length(strip_tags($string) + 12);
+        $length = Str::length(strip_tags($string)) + 12;
 
         $this->comment(str_repeat('*', $length));
         $this->comment('*     '.$string.'     *');
