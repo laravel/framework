@@ -250,7 +250,7 @@ class Builder
      */
     public function selectRaw($expression, array $bindings = [])
     {
-        $this->addSelect(new Expression($expression));
+        $this->addSelect(new Expression($expression), false);
 
         if ($bindings) {
             $this->addBinding($bindings, 'select');
@@ -332,11 +332,16 @@ class Builder
      * Add a new select column to the query.
      *
      * @param  array|mixed  $column
+     * @param bool $withWildcard
      * @return $this
      */
-    public function addSelect($column)
+    public function addSelect($column, $withWildcard = true)
     {
         $column = is_array($column) ? $column : func_get_args();
+
+        if (is_null($this->columns) && $withWildcard) {
+            $this->columns = array_merge((array) $this->columns, ['*']);
+        }
 
         $this->columns = array_merge((array) $this->columns, $column);
 

@@ -85,6 +85,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select "foo", "bar", "baz", "boom" from "users"', $builder->toSql());
     }
 
+    public function testAddingSelectsToDefaultQuery()
+    {
+        $builder = $this->getBuilder();
+        $builder->addSelect('bar')->addSelect(['baz', 'boom'])->from('users');
+        $this->assertEquals('select *, "bar", "baz", "boom" from "users"', $builder->toSql());
+    }
+
     public function testBasicSelectWithPrefix()
     {
         $builder = $this->getBuilder();
