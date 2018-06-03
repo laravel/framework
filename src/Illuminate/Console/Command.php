@@ -507,11 +507,11 @@ class Command extends SymfonyCommand
      */
     public function alert($string)
     {
-        $cleanString = strip_tags($string);
+        $length = Str::length(strip_tags($string)) + 12);
 
-        $this->comment(str_repeat('*', Str::length($cleanString) + 12));
+        $this->comment(str_repeat('*', $length);
         $this->comment('*     '.$string.'     *');
-        $this->comment(str_repeat('*', Str::length($cleanString) + 12));
+        $this->comment(str_repeat('*', $length);
 
         $this->output->newLine();
     }
