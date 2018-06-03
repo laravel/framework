@@ -330,7 +330,7 @@ class Builder
 
     /**
      * Add a new select column to the query. Includes the
-     * wildcard '*' to select every column by default
+     * wildcard '*' to select every column by default.
      *
      * @param  array|mixed  $column
      * @return $this
