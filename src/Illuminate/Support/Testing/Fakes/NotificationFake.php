@@ -98,9 +98,8 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Assert the total amount of times a notification was sent.
      *
-     * @param int $expectedCount
-     * @param string $notification
-     *
+     * @param int  $expectedCount
+     * @param string  $notification
      * @return void
      */
     public function assertTimesSent(int $expectedCount, string $notification)
