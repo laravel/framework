@@ -76,7 +76,11 @@ trait SoftDeletes
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }
 
-        $query->update($columns);
+        $updated = $query->update($columns);
+
+        if ($updated) {
+            $this->syncOriginal();
+        }
     }
 
     /**
