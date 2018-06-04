@@ -16,6 +16,7 @@ class FilesystemTest extends TestCase
     public function setUp()
     {
         $this->tempDir = __DIR__.'/tmp';
+        var_dump(exec('whoami'));
         mkdir($this->tempDir);
     }
 
