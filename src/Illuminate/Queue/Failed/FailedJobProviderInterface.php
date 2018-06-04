@@ -44,4 +44,11 @@ interface FailedJobProviderInterface
      * @return void
      */
     public function flush();
+
+    /**
+     * Get all the options we can filter the failed jobs with.
+     *
+     * @return array
+     */
+    public function getFiltrationOptions();
 }

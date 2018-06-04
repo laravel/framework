@@ -28,6 +28,18 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      */
     protected $table;
 
+    protected $query;
+
+    protected $filters = [
+                            'queue'             => ['filter_name' => 'queue', 'operator' => '='],
+                            'id_from'           => ['filter_name' => 'id', 'operator' => '>='],
+                            'id_to'             => ['filter_name' => 'id', 'operator' => '<'],
+                            'failed_at_from'    => ['filter_name' => 'failed_at', 'operator' => '>='],
+                            'failed_at_to'      => ['filter_name' => 'failed_at', 'operator' => '<'],
+                        ];
+
+    protected $filtrationOptions = ['queue', 'id_from', 'id_to', 'failed_at_from', 'failed_at_to'];
+
     /**
      * Create a new database failed job provider.
      *
@@ -113,5 +125,25 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     protected function getTable()
     {
         return $this->resolver->connection($this->database)->table($this->table);
+    }
+
+    public function filter($options)
+    {
+        $this->query = $this->getTable();
+        foreach ($options as $option => $value) {
+            $this->query = $this->query->where($this->filters[$option]['filter_name'], $this->filters[$option]['operator'], $value);
+        }
+
+        return $this;
+    }
+
+    public function get()
+    {
+        return $this->query->orderBy('id', 'desc')->get();
+    }
+
+    public function getFiltrationOptions()
+    {
+        return $this->filtrationOptions;
     }
 }
