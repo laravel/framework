@@ -405,6 +405,7 @@ class FilesystemTest extends TestCase
             if (! $pid) {
                 $files = new Filesystem;
                 $files->put($this->tempDir.'/file.txt', $content, true);
+                var_dump($files->chmod($this->tempDir.'/file.txt'));
                 $read = $files->get($this->tempDir.'/file.txt', true);
 
                 exit(strlen($read) === strlen($content) ? 1 : 0);
