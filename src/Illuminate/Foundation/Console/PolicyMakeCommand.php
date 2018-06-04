@@ -136,7 +136,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to.'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
         ];
     }
 }
