@@ -37,7 +37,6 @@ class DatabaseEloquentModelTest extends TestCase
         \Illuminate\Database\Eloquent\Model::unsetEventDispatcher();
         \Illuminate\Support\Carbon::resetToStringFormat();
 
-
         EloquentModelStub::unboot();
     }
 
@@ -479,10 +478,10 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->exists);
 
         $events->shouldReceive('fire')->once()->withArgs(function ($message, $model = null) {
-            return ($message === 'eloquent.initializing: '.get_class($model) && $model instanceof Model);
+            return $message === 'eloquent.initializing: '.get_class($model) && $model instanceof Model;
         });
         $events->shouldReceive('fire')->once()->withArgs(function ($message, $model = null) {
-            return ($message === 'eloquent.initialized: '.get_class($model) && $model instanceof Model);
+            return $message === 'eloquent.initialized: '.get_class($model) && $model instanceof Model;
         });
 
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentModelStub')->setMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
