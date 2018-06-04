@@ -250,7 +250,7 @@ class Builder
      */
     public function selectRaw($expression, array $bindings = [])
     {
-        $this->addSelect(new Expression($expression));
+        $this->addSelectWithoutWildcard(new Expression($expression));
 
         if ($bindings) {
             $this->addBinding($bindings, 'select');
@@ -329,12 +329,32 @@ class Builder
     }
 
     /**
-     * Add a new select column to the query.
+     * Add a new select column to the query. Includes the
+     * wildcard '*' to select every column by default.
      *
      * @param  array|mixed  $column
      * @return $this
      */
     public function addSelect($column)
+    {
+        $column = is_array($column) ? $column : func_get_args();
+
+        if (is_null($this->columns)) {
+            $this->columns = array_merge((array) $this->columns, ['*']);
+        }
+
+        $this->columns = array_merge((array) $this->columns, $column);
+
+        return $this;
+    }
+
+    /**
+     * Add a new select column to the query.
+     *
+     * @param  array|mixed  $column
+     * @return $this
+     */
+    public function addSelectWithoutWildcard($column)
     {
         $column = is_array($column) ? $column : func_get_args();
 
