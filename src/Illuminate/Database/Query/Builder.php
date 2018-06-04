@@ -1000,9 +1000,9 @@ class Builder
     {
         $type = 'between';
 
-        $this->wheres[] = compact('column', 'type', 'boolean', 'not');
+        $this->wheres[] = compact('type', 'column', 'values', 'boolean', 'not');
 
-        $this->addBinding($values, 'where');
+        $this->addBinding($this->cleanBindings($values), 'where');
 
         return $this;
     }

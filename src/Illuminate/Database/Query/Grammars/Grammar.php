@@ -331,7 +331,11 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        return $this->wrap($where['column']).' '.$between.' ? and ?';
+        $min = $this->parameter(reset($where['values']));
+
+        $max = $this->parameter(end($where['values']));
+
+        return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
 
     /**

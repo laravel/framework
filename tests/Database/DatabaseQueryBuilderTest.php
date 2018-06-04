@@ -546,6 +546,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereNotBetween('id', [1, 2]);
         $this->assertEquals('select * from "users" where "id" not between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [new Raw(1), new Raw(2)]);
+        $this->assertEquals('select * from "users" where "id" between 1 and 2', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testBasicOrWheres()
