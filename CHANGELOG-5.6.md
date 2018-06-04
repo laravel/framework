@@ -1,21 +1,29 @@
 # Release Notes for 5.6.x
 
-## [Unreleased]
+## v5.6.24 (2018-06-04)
 
 ### Added
 - Added assertSessionHasNoErrors() test helper ([#24308](https://github.com/laravel/framework/pull/24308))
-- Add support for defining and enforcing a Spatial reference system for a Point column ([#24320](https://github.com/laravel/framework/pull/24320))
+- Added support for defining and enforcing a Spatial reference system for a Point column ([#24320](https://github.com/laravel/framework/pull/24320))
+- Added Builder::whereJsonDoesntContain() and Builder::orWhereJsonDoesntContain() ([#24367](https://github.com/laravel/framework/pull/24367))
+- Added Queueable, SerializesModels to all notification events ([#24368](https://github.com/laravel/framework/pull/24368))
+- Allow callable array syntax in route definition ([#24385](https://github.com/laravel/framework/pull/24385))
+- Added JSON SELECT queries to SQL Server ([#24397](https://github.com/laravel/framework/pull/24397))
 
 ### Changed
 - Optimize query builder's `pluck()` method ([#23482](https://github.com/laravel/framework/pull/23482))
 - Allow passing object instances regardless of the parameter name to method injection ([#24234](https://github.com/laravel/framework/pull/24234))
 - Extract setting mutated attribute into method ([#24307](https://github.com/laravel/framework/pull/24307))
 - Let apiResource support except option ([#24319](https://github.com/laravel/framework/pull/24319))
+- Skip null/empty values in SeeInOrder ([#24395](https://github.com/laravel/framework/pull/24395))
+- Sync Original modal attributes after soft deletion ([#24400](https://github.com/laravel/framework/pull/24400))
 
 ### Fixed
 - Fixed typo of missing underscore in `not_regexp` rule name ([#24297](https://github.com/laravel/framework/pull/24297))
 - Cleanup null relationships in loadMorph ([#24322](https://github.com/laravel/framework/pull/24322))
 - Fix loadMissing() relationship parsing ([#24329](https://github.com/laravel/framework/pull/24329))
+- Fix FormRequest class authorization validation priority ([#24369](https://github.com/laravel/framework/pull/24369))
+- Fix custom blade conditional ignoring 0 as argument ([#24394](https://github.com/laravel/framework/pull/24394))
 
 
 ## v5.6.23 (2018-05-24)
