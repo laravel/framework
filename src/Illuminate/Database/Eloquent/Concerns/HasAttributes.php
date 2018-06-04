@@ -585,11 +585,13 @@ trait HasAttributes
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return mixed
+     * @return $this
      */
     protected function setMutatedAttributeValue($key, $value)
     {
-        return $this->{'set'.Str::studly($key).'Attribute'}($value);
+        $this->{'set'.Str::studly($key).'Attribute'}($value);
+
+        return $this;
     }
 
     /**
