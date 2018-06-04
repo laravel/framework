@@ -221,6 +221,16 @@ class Connection implements ConnectionInterface
     }
 
     /**
+     * Get the doctrine driver.
+     *
+     * @return \Doctrine\DBAL\Driver
+     */
+    protected function getDoctrineDriver()
+    {
+        //
+    }
+
+    /**
      * Set the query post processor to the default implementation.
      *
      * @return void
