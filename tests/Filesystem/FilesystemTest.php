@@ -16,7 +16,6 @@ class FilesystemTest extends TestCase
     public function setUp()
     {
         $this->tempDir = __DIR__.'/tmp';
-        var_dump(exec('whoami'));
         mkdir($this->tempDir);
     }
 
@@ -405,7 +404,6 @@ class FilesystemTest extends TestCase
             if (! $pid) {
                 $files = new Filesystem;
                 $files->put($this->tempDir.'/file.txt', $content, true);
-                var_dump($files->chmod($this->tempDir.'/file.txt'));
                 $read = $files->get($this->tempDir.'/file.txt', true);
 
                 exit(strlen($read) === strlen($content) ? 1 : 0);

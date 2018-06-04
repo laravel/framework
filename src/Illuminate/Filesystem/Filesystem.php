@@ -34,7 +34,9 @@ class Filesystem
      */
     public function get($path, $lock = false)
     {
-        if ($this->isReadable($path)) {
+        $directory = $this->dirname($path);
+
+        if ($this->isReadable($directory)) {
             return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
 
@@ -121,8 +123,10 @@ class Filesystem
     {
         $result = false;
 
-        if ($this->isWritable($path)) {
-            $result = file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+        $directory = $this->dirname($path);
+
+        if ($this->isWritable($directory)) {
+            return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
         }
 
         return $result;
