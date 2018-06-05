@@ -1367,6 +1367,12 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
     }
 
+    public function testModelsTraitIsInitialized()
+    {
+        $model = new EloquentModelStubWithTrait;
+        $this->assertTrue($model->fooBarIsInitialized);
+    }
+
     public function testAppendingOfAttributes()
     {
         $model = new EloquentModelAppendsStub;
@@ -1851,6 +1857,21 @@ class EloquentModelStub extends Model
     {
         $this->scopesCalled['framework'] = [$framework, $version];
     }
+}
+
+trait FooBarTrait
+{
+    public $fooBarIsInitialized = false;
+
+    public function initializeFooBarTrait()
+    {
+        $this->fooBarIsInitialized = true;
+    }
+}
+
+class EloquentModelStubWithTrait extends EloquentModelStub
+{
+    use FooBarTrait;
 }
 
 class EloquentModelCamelStub extends EloquentModelStub
