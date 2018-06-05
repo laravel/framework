@@ -7,7 +7,6 @@ use ArrayIterator;
 use IteratorAggregate;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\Exception\MethodNotAllowedHttpException;
 
@@ -235,7 +234,7 @@ class RouteCollection implements Countable, IteratorAggregate
     {
         if ($request->method() == 'OPTIONS') {
             return (new Route('OPTIONS', $request->path(), function () use ($methods) {
-                return new Response('', 200, ['Allow' => implode(',', $methods)]);
+                return response()->make('', 200, ['Allow' => implode(',', $methods)]);
             }))->bind($request);
         }
 

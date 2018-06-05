@@ -3,8 +3,6 @@
 namespace Illuminate\Routing;
 
 use Illuminate\Support\Str;
-use Illuminate\Http\Response;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\View\Factory as ViewFactory;
 use Symfony\Component\HttpFoundation\StreamedResponse;
@@ -52,7 +50,7 @@ class ResponseFactory implements FactoryContract
      */
     public function make($content = '', $status = 200, array $headers = [])
     {
-        return new Response($content, $status, $headers);
+        return response()->make($content, $status, $headers);
     }
 
     /**
@@ -80,7 +78,7 @@ class ResponseFactory implements FactoryContract
      */
     public function json($data = [], $status = 200, array $headers = [], $options = 0)
     {
-        return new JsonResponse($data, $status, $headers, $options);
+        return response()->json($data, $status, $headers, $options);
     }
 
     /**
