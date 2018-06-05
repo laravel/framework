@@ -6,28 +6,28 @@ use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
 use Symfony\Component\Console\Input\InputOption;
 
-class PolicyMakeCommand extends GeneratorCommand
+class ObserverMakeCommand extends GeneratorCommand
 {
     /**
      * The console command name.
      *
      * @var string
      */
-    protected $name = 'make:policy';
+    protected $name = 'make:observer';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Create a new policy class';
+    protected $description = 'Create a new observer class';
 
     /**
      * The type of class being generated.
      *
      * @var string
      */
-    protected $type = 'Policy';
+    protected $type = 'Observer';
 
     /**
      * Build the class with the given name.
@@ -37,9 +37,7 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function buildClass($name)
     {
-        $stub = $this->replaceUserNamespace(
-            parent::buildClass($name)
-        );
+        $stub = parent::buildClass($name);
 
         $model = $this->option('model');
 
@@ -47,22 +45,15 @@ class PolicyMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Replace the User model namespace.
+     * Get the stub file for the generator.
      *
-     * @param  string  $stub
      * @return string
      */
-    protected function replaceUserNamespace($stub)
+    protected function getStub()
     {
-        if (! config('auth.providers.users.model')) {
-            return $stub;
-        }
-
-        return str_replace(
-            $this->rootNamespace().'User',
-            config('auth.providers.users.model'),
-            $stub
-        );
+        return $this->option('model')
+                    ? __DIR__.'/stubs/observer.stub'
+                    : __DIR__.'/stubs/observer.plain.stub';
     }
 
     /**
@@ -90,31 +81,11 @@ class PolicyMakeCommand extends GeneratorCommand
 
         $model = class_basename(trim($model, '\\'));
 
-        $dummyUser = class_basename(config('auth.providers.users.model'));
-
-        $dummyModel = Str::camel($model) === 'user' ? 'model' : $model;
-
-        $stub = str_replace('DocDummyModel', Str::snake($dummyModel, ' '), $stub);
+        $stub = str_replace('DocDummyModel', Str::snake($model, ' '), $stub);
 
         $stub = str_replace('DummyModel', $model, $stub);
 
-        $stub = str_replace('dummyModel', Str::camel($dummyModel), $stub);
-
-        $stub = str_replace('DummyUser', $dummyUser, $stub);
-
-        return str_replace('DocDummyPluralModel', Str::snake(Str::plural($dummyModel), ' '), $stub);
-    }
-
-    /**
-     * Get the stub file for the generator.
-     *
-     * @return string
-     */
-    protected function getStub()
-    {
-        return $this->option('model')
-                    ? __DIR__.'/stubs/policy.stub'
-                    : __DIR__.'/stubs/policy.plain.stub';
+        return str_replace('dummyModel', Str::camel($model), $stub);
     }
 
     /**
@@ -125,7 +96,7 @@ class PolicyMakeCommand extends GeneratorCommand
      */
     protected function getDefaultNamespace($rootNamespace)
     {
-        return $rootNamespace.'\Policies';
+        return $rootNamespace.'\Observers';
     }
 
     /**
@@ -136,7 +107,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the policy applies to'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'The model that the observer applies to.'],
         ];
     }
 }

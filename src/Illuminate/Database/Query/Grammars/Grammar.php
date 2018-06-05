@@ -331,7 +331,11 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        return $this->wrap($where['column']).' '.$between.' ? and ?';
+        $min = $this->parameter(reset($where['values']));
+
+        $max = $this->parameter(end($where['values']));
+
+        return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
 
     /**
@@ -499,7 +503,9 @@ class Grammar extends BaseGrammar
      */
     protected function whereJsonContains(Builder $query, $where)
     {
-        return $this->compileJsonContains(
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonContains(
             $this->wrap($where['column']), $this->parameter($where['value'])
         );
     }

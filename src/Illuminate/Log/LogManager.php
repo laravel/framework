@@ -336,11 +336,9 @@ class LogManager implements LoggerInterface
             );
         }
 
-        $handlers = [$this->prepareHandler(
-            $this->app->make($config['handler'], $config['with'] ?? [])
-        )];
-
-        return new Monolog($this->parseChannel($config), $handlers);
+        return new Monolog($this->parseChannel($config), [$this->prepareHandler(
+            $this->app->make($config['handler'], $config['with'] ?? []), $config
+        )]);
     }
 
     /**
@@ -362,11 +360,18 @@ class LogManager implements LoggerInterface
      * Prepare the handler for usage by Monolog.
      *
      * @param  \Monolog\Handler\HandlerInterface  $handler
+     * @param  array  $config
      * @return \Monolog\Handler\HandlerInterface
      */
-    protected function prepareHandler(HandlerInterface $handler)
+    protected function prepareHandler(HandlerInterface $handler, array $config = [])
     {
-        return $handler->setFormatter($this->formatter());
+        if (! isset($config['formatter'])) {
+            $handler->setFormatter($this->formatter());
+        } elseif ($config['formatter'] !== 'default') {
+            $handler->setFormatter($this->app->make($config['formatter'], $config['formatter_with'] ?? []));
+        }
+
+        return $handler;
     }
 
     /**
