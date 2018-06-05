@@ -12,7 +12,7 @@ trait HandlesAuthorization
      */
     protected function allow($message = null)
     {
-        return new Response($message);
+        return response()->make($message);
     }
 
     /**

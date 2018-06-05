@@ -7,9 +7,7 @@ use Throwable;
 use Whoops\Run as Whoops;
 use Illuminate\Support\Arr;
 use Psr\Log\LoggerInterface;
-use Illuminate\Http\Response;
 use Illuminate\Routing\Router;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ViewErrorBag;
@@ -410,7 +408,7 @@ class Handler implements ExceptionHandlerContract
                 $response->getTargetUrl(), $response->getStatusCode(), $response->headers->all()
             );
         } else {
-            $response = new Response(
+            $response = response()->make(
                 $response->getContent(), $response->getStatusCode(), $response->headers->all()
             );
         }
@@ -427,7 +425,7 @@ class Handler implements ExceptionHandlerContract
      */
     protected function prepareJsonResponse($request, Exception $e)
     {
-        return new JsonResponse(
+        return response()->json(
             $this->convertExceptionToArray($e),
             $this->isHttpException($e) ? $e->getStatusCode() : 500,
             $this->isHttpException($e) ? $e->getHeaders() : [],
