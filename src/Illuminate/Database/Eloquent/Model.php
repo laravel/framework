@@ -118,7 +118,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $booted = [];
 
     /**
-     * The array of trait initializers that will be called on each new instance
+     * The array of trait initializers that will be called on each new instance.
      *
      * @var array
      */
