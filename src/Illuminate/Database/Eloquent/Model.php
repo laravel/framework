@@ -118,6 +118,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $booted = [];
 
     /**
+     * The array of trait initializers that will be called on each new instance
+     *
+     * @var array
+     */
+    protected static $traitInitializers = [];
+
+    /**
      * The array of global scopes on the model.
      *
      * @var array
@@ -147,6 +154,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __construct(array $attributes = [])
     {
         $this->bootIfNotBooted();
+
+        $this->initializeTraits();
 
         $this->syncOriginal();
 
@@ -190,10 +199,24 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $class = static::class;
 
+        static::$traitInitializers[$class] = [];
+
         foreach (class_uses_recursive($class) as $trait) {
             if (method_exists($class, $method = 'boot'.class_basename($trait))) {
                 forward_static_call([$class, $method]);
             }
+            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
+                static::$traitInitializers[$class][] = $method;
+            }
+        }
+    }
+
+    protected function initializeTraits()
+    {
+        $class = static::class;
+
+        foreach (static::$traitInitializers[$class] as $method) {
+            $this->{$method}();
         }
     }
 
