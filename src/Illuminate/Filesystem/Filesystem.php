@@ -80,7 +80,7 @@ class Filesystem
      */
     public function getRequire($path)
     {
-        if ($this->isReadable($path)) {
+        if ($this->exists($path)) {
             return require $path;
         }
 
