@@ -480,9 +480,6 @@ class DatabaseEloquentModelTest extends TestCase
         $events->shouldReceive('fire')->once()->withArgs(function ($message, $model = null) {
             return $message === 'eloquent.initializing: '.get_class($model) && $model instanceof Model;
         });
-        $events->shouldReceive('fire')->once()->withArgs(function ($message, $model = null) {
-            return $message === 'eloquent.initialized: '.get_class($model) && $model instanceof Model;
-        });
 
         $model = $this->getMockBuilder('Illuminate\Tests\Database\EloquentModelStub')->setMethods(['newModelQuery', 'updateTimestamps', 'refresh'])->getMock();
         $query = m::mock('Illuminate\Database\Eloquent\Builder');
@@ -1263,7 +1260,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelObserversCanBeAttachedToModels()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->times(6);
+        $events->shouldReceive('fire')->times(4);
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
         $events->shouldReceive('forget');
@@ -1274,7 +1271,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelObserversCanBeAttachedToModelsWithString()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->times(6);
+        $events->shouldReceive('fire')->times(4);
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
         $events->shouldReceive('forget');
@@ -1285,7 +1282,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelObserversCanBeAttachedToModelsThroughAnArray()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->times(6);
+        $events->shouldReceive('fire')->times(4);
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
         $events->shouldReceive('forget');
@@ -1296,7 +1293,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testModelObserversCanBeAttachedToModelsThroughCallingObserveMethodOnlyOnce()
     {
         EloquentModelStub::setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
-        $events->shouldReceive('fire')->times(6);
+        $events->shouldReceive('fire')->times(4);
         $events->shouldReceive('listen')->once()->with('eloquent.creating: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@creating');
         $events->shouldReceive('listen')->once()->with('eloquent.saved: Illuminate\Tests\Database\EloquentModelStub', 'Illuminate\Tests\Database\EloquentTestObserverStub@saved');
 
