@@ -535,7 +535,7 @@ trait HasAttributes
      *
      * @param  string  $key
      * @param  mixed  $value
-     * @return $this
+     * @return mixed
      */
     public function setAttribute($key, $value)
     {
