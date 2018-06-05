@@ -30,19 +30,15 @@ class Filesystem
      * @param  bool  $lock
      * @return string
      *
-     * @throws \ErrorException
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function get($path, $lock = false)
     {
-        if ($this->isFile($path)) {
-            if ($this->isReadable($path)) {
-                return $lock ? $this->sharedGet($path) : file_get_contents($path);
-            }
-
-            throw new ErrorException("Failed to read from {$path}");
+        if ($this->isReadable($path)) {
+            return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
 
-        throw new ErrorException("File does not exist at path {$path}");
+        throw new FileNotFoundException("File does not exist at path {$path}");
     }
 
     /**
@@ -84,13 +80,11 @@ class Filesystem
      */
     public function getRequire($path)
     {
-        if ($this->isFile($path)) {
-            if ($this->isReadable($path)) {
-                return require $path;
-            }
+        if ($this->isReadable($path)) {
+            return require $path;
         }
 
-        throw new FileNotFoundException("File does not exist at path {$path}");
+        throw new FileNotFoundException("File does not exist or not readable at path {$path}");
     }
 
     /**
@@ -121,13 +115,19 @@ class Filesystem
      * @param  string  $path
      * @param  string  $contents
      * @param  bool  $lock
-     * @return int
+     * @return int|bool
      */
     public function put($path, $contents, $lock = false)
     {
-        if ($this->isWritable($path)) {
+        $result = false;
+
+        $directory = $this->dirname($path);
+
+        if ($this->isWritable($directory)) {
             return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
         }
+
+        return $result;
     }
 
     /**
@@ -135,7 +135,7 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return int
+     * @return int|bool
      */
     public function prepend($path, $data)
     {
@@ -151,11 +151,17 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return int
+     * @return int|bool
      */
     public function append($path, $data)
     {
-        return file_put_contents($path, $data, FILE_APPEND);
+        $result = false;
+
+        if ($this->isWritable($path)) {
+            $result = file_put_contents($path, $data, FILE_APPEND);
+        }
+
+        return $result;
     }
 
     /**
@@ -394,12 +400,10 @@ class Filesystem
      */
     public function files($directory, $hidden = false)
     {
-        if ($this->exists($directory) && $this->isReadable($directory)) {
-            return iterator_to_array(
-                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->depth(0)->sortByName(),
-                false
-            );
-        }
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
+            false
+        );
     }
 
     /**
@@ -411,12 +415,10 @@ class Filesystem
      */
     public function allFiles($directory, $hidden = false)
     {
-        if ($this->exists($directory) && $this->isReadable($directory)) {
-            return iterator_to_array(
-                Finder::create()->files()->ignoreDotFiles(!$hidden)->in($directory)->sortByName(),
-                false
-            );
-        }
+        return iterator_to_array(
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
+            false
+        );
     }
 
     /**
@@ -429,10 +431,8 @@ class Filesystem
     {
         $directories = [];
 
-        if ($this->exists($directory) && $this->isReadable($directory)) {
-            foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
-                $directories[] = $dir->getPathname();
-            }
+        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
+            $directories[] = $dir->getPathname();
         }
 
         return $directories;
