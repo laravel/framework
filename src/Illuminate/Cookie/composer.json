@@ -15,10 +15,10 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "illuminate/contracts": "5.6.*",
-        "illuminate/support": "5.6.*",
-        "symfony/http-foundation": "~4.0",
-        "symfony/http-kernel": "~4.0"
+        "illuminate/contracts": "5.7.*",
+        "illuminate/support": "5.7.*",
+        "symfony/http-foundation": "^4.1",
+        "symfony/http-kernel": "^4.1"
     },
     "autoload": {
         "psr-4": {
@@ -27,7 +27,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.6-dev"
+            "dev-master": "5.7-dev"
         }
     },
     "config": {

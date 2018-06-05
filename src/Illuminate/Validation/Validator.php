@@ -306,11 +306,17 @@ class Validator implements ValidatorContract
             throw new ValidationException($this);
         }
 
-        $data = collect($this->getData());
+        $results = [];
 
-        return $data->only(collect($this->getRules())->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
-        })->unique())->toArray();
+        $rules = collect($this->getRules())->keys()->map(function ($rule) {
+            return Str::contains($rule, '*') ? explode('.', $rule)[0] : $rule;
+        })->unique();
+
+        foreach ($rules as $rule) {
+            Arr::set($results, $rule, data_get($this->getData(), $rule));
+        }
+
+        return $results;
     }
 
     /**

@@ -58,6 +58,8 @@ class ArgonHasher implements HasherContract
      * @param  string  $value
      * @param  array  $options
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function make($value, array $options = [])
     {
@@ -81,11 +83,17 @@ class ArgonHasher implements HasherContract
      * @param  string  $hashedValue
      * @param  array  $options
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function check($value, $hashedValue, array $options = [])
     {
         if (strlen($hashedValue) === 0) {
             return false;
+        }
+
+        if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
+            throw new RuntimeException('This password does not use the Argon algorithm.');
         }
 
         return password_verify($value, $hashedValue);
