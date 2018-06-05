@@ -684,11 +684,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Set the cookie creator instance used by the guard.
      *
      * @param  \Illuminate\Contracts\Cookie\QueueingFactory  $cookie
-     * @return void
+     * @return $this
      */
     public function setCookieJar(CookieJar $cookie)
     {
         $this->cookie = $cookie;
+
+        return $this;
     }
 
     /**
@@ -705,11 +707,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * Set the event dispatcher instance.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
+     * @return $this
      */
     public function setDispatcher(Dispatcher $events)
     {
         $this->events = $events;
+
+        return $this;
     }
 
     /**
