@@ -113,9 +113,9 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        $from = $column[0] == '[' ?
-            'openjson('.$column.')' :
-            substr_replace($column, 'openjson', 0, strlen('json_value'));
+        $from = $column[0] == '['
+                ? 'openjson('.$column.')'
+                : substr_replace($column, 'openjson', 0, strlen('json_value'));
 
         return $value.' in (select [value] from '.$from.')';
     }
