@@ -22,7 +22,7 @@ class Logger implements LoggerInterface
     /**
      * The event dispatcher instance.
      *
-     * @var \Illuminate\Contracts\Events\Dispatcher
+     * @var \Illuminate\Contracts\Events\Dispatcher|null
      */
     protected $dispatcher;
 
@@ -186,7 +186,7 @@ class Logger implements LoggerInterface
      */
     public function listen(Closure $callback)
     {
-        if (! isset($this->dispatcher)) {
+        if ($this->dispatcher === null) {
             throw new RuntimeException('Events dispatcher has not been set.');
         }
 
@@ -206,7 +206,7 @@ class Logger implements LoggerInterface
         // If the event dispatcher is set, we will pass along the parameters to the
         // log listeners. These are useful for building profilers or other tools
         // that aggregate all of the log messages for a given "request" cycle.
-        if (isset($this->dispatcher)) {
+        if ($this->dispatcher !== null) {
             $this->dispatcher->dispatch(new MessageLogged($level, $message, $context));
         }
     }
