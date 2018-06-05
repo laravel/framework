@@ -344,7 +344,7 @@ class Factory implements FactoryContract
      */
     public function doneRendering()
     {
-        return $this->renderCount == 0;
+        return $this->renderCount === 0;
     }
 
     /**
