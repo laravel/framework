@@ -238,8 +238,12 @@ class FilesystemTest extends TestCase
      */
     public function testGetRequireThrowsExceptionNonexisitingFile()
     {
+        mkdir($this->tempDir.'/tmp/require', 0700, true);
+        file_put_contents($this->tempDir.'/tmp/require/file.php', '<?php return "Howdy?"; ?>');
+        $mods = chmod($this->tempDir.'/tmp/require/file.php', 0100);
         $files = new Filesystem;
-        $files->getRequire($this->tempDir.'/file.php');
+        var_dump($mods);
+        $files->getRequire($this->tempDir.'/tmp/require/file.php');
     }
 
     public function testAppendAddsDataToFile()

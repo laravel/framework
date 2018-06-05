@@ -34,7 +34,7 @@ class Filesystem
      */
     public function get($path, $lock = false)
     {
-        if ($this->isFile($path)) {
+        if ($this->isReadable($path)) {
             return $lock ? $this->sharedGet($path) : file_get_contents($path);
         }
 
@@ -80,11 +80,11 @@ class Filesystem
      */
     public function getRequire($path)
     {
-        if ($this->isFile($path)) {
+        if ($this->exists($path)) {
             return require $path;
         }
 
-        throw new FileNotFoundException("File does not exist at path {$path}");
+        throw new FileNotFoundException("File does not exist or not readable at path {$path}");
     }
 
     /**
@@ -115,11 +115,19 @@ class Filesystem
      * @param  string  $path
      * @param  string  $contents
      * @param  bool  $lock
-     * @return int
+     * @return int|bool
      */
     public function put($path, $contents, $lock = false)
     {
-        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+        $result = false;
+
+        $directory = $this->dirname($path);
+
+        if ($this->isWritable($directory)) {
+            return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+        }
+
+        return $result;
     }
 
     /**
@@ -127,7 +135,7 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return int
+     * @return int|bool
      */
     public function prepend($path, $data)
     {
@@ -143,11 +151,17 @@ class Filesystem
      *
      * @param  string  $path
      * @param  string  $data
-     * @return int
+     * @return int|bool
      */
     public function append($path, $data)
     {
-        return file_put_contents($path, $data, FILE_APPEND);
+        $result = false;
+
+        if ($this->isWritable($path)) {
+            $result = file_put_contents($path, $data, FILE_APPEND);
+        }
+
+        return $result;
     }
 
     /**
@@ -180,7 +194,7 @@ class Filesystem
 
         foreach ($paths as $path) {
             try {
-                if (! @unlink($path)) {
+                if (! unlink($path)) {
                     $success = false;
                 }
             } catch (ErrorException $e) {
