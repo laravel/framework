@@ -39,6 +39,9 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->put($this->tempDir.'/file.txt', 'Hello World');
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
+        mkdir($this->tempDir.'/not-writable', 0000, true);
+        $this->assertEquals(false, $files->put($this->tempDir.'/not-writable/file.txt', 'Hello World'));
+        chmod($this->tempDir.'/not-writable', 0777);
     }
 
     public function testSetChmod()
@@ -56,8 +59,8 @@ class FilesystemTest extends TestCase
         chmod($this->tempDir.'/file.txt', 0755);
 
         $files = new Filesystem;
-        $filePermisson = $files->chmod($this->tempDir.'/file.txt');
-        $this->assertEquals('0755', $filePermisson);
+        $filePermission = $files->chmod($this->tempDir.'/file.txt');
+        $this->assertEquals('0755', $filePermission);
     }
 
     public function testDeleteRemovesFiles()
@@ -224,6 +227,9 @@ class FilesystemTest extends TestCase
     {
         $files = new Filesystem;
         $files->get($this->tempDir.'/unknown-file.txt');
+        mkdir($this->tempDir . '/tmp/', 0000, true);
+        $files->put($this->tempDir . '/tmp/foo.txt', 'data');
+        $files->get($this->tempDir . '/tmp/foo.txt');
     }
 
     public function testGetRequireReturnsProperly()
@@ -240,6 +246,9 @@ class FilesystemTest extends TestCase
     {
         $files = new Filesystem;
         $files->getRequire($this->tempDir.'/file.php');
+        file_put_contents($this->tempDir.'/file.php', '<?php return "Howdy?"; ?>');
+        chmod($this->tempDir . '/file.php', 0000);
+        $files->getRequire($this->tempDir . '/file.php');
     }
 
     public function testAppendAddsDataToFile()
@@ -250,6 +259,9 @@ class FilesystemTest extends TestCase
         $this->assertEquals(mb_strlen('bar', '8bit'), $bytesWritten);
         $this->assertFileExists($this->tempDir.'/file.txt');
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'foobar');
+        chmod($this->tempDir.'/file.txt', 0000);
+        $bytesWritten = $files->append($this->tempDir.'/file.txt', 'bar');
+        $this->assertEquals(false, $bytesWritten);
     }
 
     public function testMoveMovesFiles()
