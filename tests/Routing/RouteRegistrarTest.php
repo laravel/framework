@@ -219,6 +219,15 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('resource-middleware');
     }
 
+    public function testCanRegisterResourceWithClassNotation()
+    {
+        $this->router->middleware('resource-middleware')
+                     ->resource('users', RouteRegistrarControllerStub::class);
+
+        $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
+        $this->seeMiddleware('resource-middleware');
+    }
+
     public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
     {
         $resource = $this->router->middleware('resource-middleware')

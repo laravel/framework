@@ -76,6 +76,10 @@ class ResourceRegistrar
             $this->parameters = $options['parameters'];
         }
 
+        if (class_exists($controller)) {
+            $controller = '\\'.$controller;
+        }
+
         // If the resource name contains a slash, we will assume the developer wishes to
         // register these resource routes with a prefix so we will set that up out of
         // the box so they don't have to mess with it. Otherwise, we will continue.

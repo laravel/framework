@@ -131,7 +131,8 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('https://foo.com/?a=b', $request->fullUrl());
 
         $request = Request::create('https://foo.com?a=b', 'GET');
-        $this->assertEquals('https://foo.com/?a=b&coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
+        $amp = ini_get('arg_separator.output');
+        $this->assertEquals('https://foo.com/?a=b'.$amp.'coupon=foo', $request->fullUrlWithQuery(['coupon' => 'foo']));
 
         $request = Request::create('https://foo.com?a=b', 'GET');
         $this->assertEquals('https://foo.com/?a=c', $request->fullUrlWithQuery(['a' => 'c']));
