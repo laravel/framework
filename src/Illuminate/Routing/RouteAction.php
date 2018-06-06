@@ -31,6 +31,10 @@ class RouteAction
         if (is_callable($action)) {
             if (is_array($action)) {
                 $action = $action[0].'@'.$action[1];
+                return [
+                    'uses' => $action,
+                    'controller' => $action
+                ];
             }
 
             return ['uses' => $action];
