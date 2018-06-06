@@ -112,4 +112,36 @@ class RouteApiResourceTest extends TestCase
         $this->assertEquals(200, $response->getStatusCode());
         $this->assertEquals('I`m destroy tasks', $response->getContent());
     }
+
+    public function test_api_resources_with_parameters()
+    {
+        Route::apiResources([
+            'tests' => ['use' => ApiResourceTestController::class, 'only' => ['index', 'store']],
+            'tasks' => ['use' => ApiResourceTaskController::class, 'only' => ['index']],
+        ]);
+
+        $response = $this->get('/tests');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('I`m index', $response->getContent());
+
+        $response = $this->post('/tests');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('I`m store', $response->getContent());
+
+        $this->assertEquals(404, $this->get('/tests/1')->getStatusCode());
+        $this->assertEquals(404, $this->put('/tests/1')->getStatusCode());
+        $this->assertEquals(404, $this->patch('/tests/1')->getStatusCode());
+        $this->assertEquals(404, $this->delete('/tests/1')->getStatusCode());
+
+        /////////////////////
+        $response = $this->get('/tasks');
+        $this->assertEquals(200, $response->getStatusCode());
+        $this->assertEquals('I`m index tasks', $response->getContent());
+
+        $this->assertEquals(405, $this->post('/tasks')->getStatusCode());
+        $this->assertEquals(404, $this->get('/tasks/1')->getStatusCode());
+        $this->assertEquals(404, $this->put('/tasks/1')->getStatusCode());
+        $this->assertEquals(404, $this->patch('/tasks/1')->getStatusCode());
+        $this->assertEquals(404, $this->delete('/tasks/1')->getStatusCode());
+    }
 }
