@@ -714,9 +714,7 @@ trait HasRelationships
      */
     public function unsetRelation($relation)
     {
-        if ($this->relationLoaded($relation)) {
-            unset($this->relations[$relation]);
-        }
+        unset($this->relations[$relation]);
 
         return $this;
     }
