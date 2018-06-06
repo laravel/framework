@@ -4,6 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use ArrayObject;
+use LogicException;
 use JsonSerializable;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
@@ -314,8 +315,29 @@ class Router implements RegistrarContract, BindingRegistrar
     public function apiResources(array $resources)
     {
         foreach ($resources as $name => $controller) {
-            $this->apiResource($name, $controller);
+            if (! is_array($controller)) {
+                $this->apiResource($name, $controller);
+            } else {
+                $this->apiResourceWithOptions($name, $controller);
+            }
         }
+    }
+
+    /**
+     * Register a resource with parameters from apiResources.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return void
+     * @throws \LogicException
+     */
+    protected function apiResourceWithOptions($name, array $options)
+    {
+        if (! isset($options['use'])) {
+            throw new LogicException('"use" is required');
+        }
+
+        $this->apiResource($name, $options['use'], $options);
     }
 
     /**
