@@ -5,7 +5,7 @@ namespace Illuminate\Hashing;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
-class ArgonHasher implements HasherContract
+class ArgonHasher extends AbstractHasher implements HasherContract
 {
     /**
      * The default memory cost factor.
@@ -42,17 +42,6 @@ class ArgonHasher implements HasherContract
     }
 
     /**
-     * Get information about the given hashed value.
-     *
-     * @param  string  $hashedValue
-     * @return array
-     */
-    public function info($hashedValue)
-    {
-        return password_get_info($hashedValue);
-    }
-
-    /**
      * Hash the given value.
      *
      * @param  string  $value
@@ -72,23 +61,6 @@ class ArgonHasher implements HasherContract
         }
 
         return $hash;
-    }
-
-    /**
-     * Check the given plain value against a hash.
-     *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
-     * @return bool
-     */
-    public function check($value, $hashedValue, array $options = [])
-    {
-        if (strlen($hashedValue) === 0) {
-            return false;
-        }
-
-        return password_verify($value, $hashedValue);
     }
 
     /**
