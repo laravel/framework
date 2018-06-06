@@ -6,7 +6,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
-use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 
 /**
  * @group integration
@@ -205,26 +205,4 @@ class AuthenticationTest extends TestCase
 
         $this->assertNull($provider->retrieveByToken($user->id, $token));
     }
-}
-
-class AuthenticationTestUser extends Authenticatable
-{
-    public $table = 'users';
-    public $timestamps = false;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array
-     */
-    protected $guarded = ['id'];
-
-    /**
-     * The attributes that should be hidden for arrays.
-     *
-     * @var array
-     */
-    protected $hidden = [
-        'password', 'remember_token',
-    ];
 }
