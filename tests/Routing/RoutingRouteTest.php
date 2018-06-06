@@ -1119,6 +1119,30 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo/{foo}/modifier', $routes->getByName('foo.edit')->uri());
     }
 
+    public function testResourceRoutingWithClassNotation()
+    {
+        $router = $this->getRouter();
+
+        $router->resource('foo', RouteRegistrarControllerStub::class);
+        $router->resource('bar', 'RouteRegistrarControllerStub');
+
+        $router->group(['namespace' => 'App'], function ($router) {
+            $router->group(['namespace' => 'Http'], function ($router) {
+                $router->resource('nsfoo', RouteRegistrarControllerStub::class);
+                $router->resource('nsbar', 'RouteRegistrarControllerStub');
+            });
+        });
+        $routes = $router->getRoutes()->getRoutes();
+        $fooAction = $routes[0]->getAction();
+        $barAction = $routes[7]->getAction();
+        $nsfooAction = $routes[14]->getAction();
+        $nsbarAction = $routes[21]->getAction();
+        $this->assertEquals('\Illuminate\Tests\Routing\RouteRegistrarControllerStub@index', $fooAction['controller']);
+        $this->assertEquals('RouteRegistrarControllerStub@index', $barAction['controller']);
+        $this->assertEquals('\Illuminate\Tests\Routing\RouteRegistrarControllerStub@index', $nsfooAction['controller']);
+        $this->assertEquals('App\Http\RouteRegistrarControllerStub@index', $nsbarAction['controller']);
+    }
+
     public function testResourceRoutingParameters()
     {
         ResourceRegistrar::singularParameters();
