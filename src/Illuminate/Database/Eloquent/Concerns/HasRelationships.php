@@ -707,6 +707,21 @@ trait HasRelationships
     }
 
     /**
+     * Unset an existing relation.
+     *
+     * @param  string  $relation
+     * @return $this
+     */
+    public function unsetRelation($relation)
+    {
+        if ($this->relationLoaded($relation)) {
+            unset($this->relations[$relation]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Set the entire relations array on the model.
      *
      * @param  array  $relations
