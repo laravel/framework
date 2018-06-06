@@ -25,7 +25,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertArrayNotHasKey('foo', $parent->toArray());
     }
 
-    public function testUnsetExistingRelation() 
+    public function testUnsetExistingRelation()
     {
         $parent = new EloquentRelationResetModelStub;
         $relation = new EloquentRelationResetModelStub;
