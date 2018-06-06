@@ -211,11 +211,14 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
     }
 
+    /**
+     * Initialize any initializable traits on the model.
+     *
+     * @return void
+     */
     protected function initializeTraits()
     {
-        $class = static::class;
-
-        foreach (static::$traitInitializers[$class] as $method) {
+        foreach (static::$traitInitializers[static::class] as $method) {
             $this->{$method}();
         }
     }
