@@ -31,7 +31,7 @@ class RouteAction
         if (is_callable($action)) {
             return ! is_array($action) ? ['uses' => $action] : [
                 'uses' => $action[0].'@'.$action[1],
-                'controller' => $action[0].'@'.$action[1]
+                'controller' => $action[0].'@'.$action[1],
             ];
         }
 
