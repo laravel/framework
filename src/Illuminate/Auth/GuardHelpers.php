@@ -99,10 +99,12 @@ trait GuardHelpers
      * Set the user provider used by the guard.
      *
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
-     * @return void
+     * @return $this
      */
     public function setProvider(UserProvider $provider)
     {
         $this->provider = $provider;
+
+        return $this;
     }
 }

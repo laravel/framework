@@ -204,11 +204,13 @@ class AuthManager implements FactoryContract
      * Set the default authentication driver name.
      *
      * @param  string  $name
-     * @return void
+     * @return $this
      */
     public function setDefaultDriver($name)
     {
         $this->app['config']['auth.defaults.guard'] = $name;
+
+        return $this;
     }
 
     /**

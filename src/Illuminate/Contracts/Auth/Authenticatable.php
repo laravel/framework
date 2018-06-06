@@ -36,7 +36,7 @@ interface Authenticatable
      * Set the token value for the "remember me" session.
      *
      * @param  string  $value
-     * @return void
+     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     public function setRememberToken($value);
 

@@ -126,11 +126,13 @@ class PasswordBrokerManager implements FactoryContract
      * Set the default password broker name.
      *
      * @param  string  $name
-     * @return void
+     * @return $this
      */
     public function setDefaultDriver($name)
     {
         $this->app['config']['auth.defaults.passwords'] = $name;
+
+        return $this;
     }
 
     /**

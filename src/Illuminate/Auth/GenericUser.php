@@ -70,11 +70,13 @@ class GenericUser implements UserContract
      * Set the "remember me" token value.
      *
      * @param  string  $value
-     * @return void
+     * @return $this
      */
     public function setRememberToken($value)
     {
         $this->attributes[$this->getRememberTokenName()] = $value;
+
+        return $this;
     }
 
     /**
