@@ -148,7 +148,7 @@ class Factory implements FactoryContract
      */
     public function first(array $views, $data = [], $mergeData = [])
     {
-        $view = collect($views)->first(function ($view) {
+        $view = Arr::first($views, function ($view) {
             return $this->exists($view);
         });
 

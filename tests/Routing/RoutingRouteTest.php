@@ -1289,6 +1289,28 @@ class RoutingRouteTest extends TestCase
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
     }
 
+    public function testControllerRoutingArrayCallable()
+    {
+        unset(
+            $_SERVER['route.test.controller.middleware'], $_SERVER['route.test.controller.except.middleware'],
+            $_SERVER['route.test.controller.middleware.class'],
+            $_SERVER['route.test.controller.middleware.parameters.one'], $_SERVER['route.test.controller.middleware.parameters.two']
+        );
+
+        $router = $this->getRouter();
+
+        $router->get('foo/bar', [RouteTestControllerStub::class, 'index']);
+
+        $this->assertEquals('Hello World', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+        $this->assertTrue($_SERVER['route.test.controller.middleware']);
+        $this->assertEquals(\Illuminate\Http\Response::class, $_SERVER['route.test.controller.middleware.class']);
+        $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
+        $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
+        $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+        $action = $router->getRoutes()->getRoutes()[0]->getAction()['controller'];
+        $this->assertEquals('Illuminate\Tests\Routing\RouteTestControllerStub@index', $action);
+    }
+
     public function testCallableControllerRouting()
     {
         $router = $this->getRouter();

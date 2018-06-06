@@ -38,6 +38,7 @@
     },
     "suggest": {
         "illuminate/filesystem": "Required to use the composer class (5.6.*).",
+        "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
         "symfony/process": "Required to use the composer class (~4.0).",
         "symfony/var-dumper": "Required to use the dd function (~4.0)."
     },
