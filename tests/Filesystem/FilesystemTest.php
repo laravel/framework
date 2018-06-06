@@ -227,9 +227,9 @@ class FilesystemTest extends TestCase
     {
         $files = new Filesystem;
         $files->get($this->tempDir.'/unknown-file.txt');
-        mkdir($this->tempDir . '/tmp/', 0000, true);
-        $files->put($this->tempDir . '/tmp/foo.txt', 'data');
-        $files->get($this->tempDir . '/tmp/foo.txt');
+        mkdir($this->tempDir.'/tmp/', 0000, true);
+        $files->put($this->tempDir.'/tmp/foo.txt', 'data');
+        $files->get($this->tempDir.'/tmp/foo.txt');
     }
 
     public function testGetRequireReturnsProperly()
@@ -247,8 +247,8 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->getRequire($this->tempDir.'/file.php');
         file_put_contents($this->tempDir.'/file.php', '<?php return "Howdy?"; ?>');
-        chmod($this->tempDir . '/file.php', 0000);
-        $files->getRequire($this->tempDir . '/file.php');
+        chmod($this->tempDir.'/file.php', 0000);
+        $files->getRequire($this->tempDir.'/file.php');
     }
 
     public function testAppendAddsDataToFile()
