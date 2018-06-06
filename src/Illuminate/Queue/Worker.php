@@ -552,7 +552,7 @@ class Worker
      */
     public function stop($status = 0)
     {
-        $this->events->dispatch(new Events\WorkerStopping);
+        $this->events->dispatch(new Events\WorkerStopping($status));
 
         exit($status);
     }
@@ -565,7 +565,7 @@ class Worker
      */
     public function kill($status = 0)
     {
-        $this->events->dispatch(new Events\WorkerStopping);
+        $this->events->dispatch(new Events\WorkerStopping($status));
 
         if (extension_loaded('posix')) {
             posix_kill(getmypid(), SIGKILL);
