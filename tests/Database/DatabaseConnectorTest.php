@@ -225,7 +225,7 @@ class DatabaseConnectorTest extends TestCase
     {
         extract($config, EXTR_SKIP);
 
-        if (in_array('dblib', PDO::getAvailableDrivers())) {
+        if (in_array('sqlsrv', PDO::getAvailableDrivers())) {
             $port = isset($config['port']) ? ',' . $port : '';
             $appname = isset($config['appname']) ? ';APP=' . $config['appname'] : '';
             $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
