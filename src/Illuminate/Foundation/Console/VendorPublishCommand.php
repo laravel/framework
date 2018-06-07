@@ -208,6 +208,8 @@ class VendorPublishCommand extends Command
             $this->files->copy($from, $to);
 
             $this->status($from, $to, 'File');
+        } else {
+            $this->status($from, $to, 'File', false);
         }
     }
 
@@ -262,14 +264,20 @@ class VendorPublishCommand extends Command
      * @param  string  $from
      * @param  string  $to
      * @param  string  $type
+     * @param  bool    $status
      * @return void
      */
-    protected function status($from, $to, $type)
+    protected function status($from, $to, $type, $status = true)
     {
         $from = str_replace(base_path(), '', realpath($from));
 
         $to = str_replace(base_path(), '', realpath($to));
 
-        $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
+        if ($status) {
+            $this->line('<info>Copied '.$type.'</info> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment>');
+        } else {
+            $this->line('<error>Could Not Copy '.$type.'</error> <comment>['.$from.']</comment> <info>To</info> <comment>['.$to.']</comment> as this '.lcfirst($type).' already exists');
+            $this->line('Run this command again with --force option to overwrite all files.');
+        }
     }
 }
