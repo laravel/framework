@@ -86,7 +86,7 @@ class VendorPublishCommand extends Command
         if ($this->filesWereSkipped) {
             $this->line('Run command again with --force option to overwrite all files.');
         }
-        
+
         $this->info('Publishing complete.');
     }
 
