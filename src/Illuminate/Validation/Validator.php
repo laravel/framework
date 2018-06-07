@@ -175,14 +175,14 @@ class Validator implements ValidatorContract
      *
      * @var array
      */
-    protected $sizeRules = ['Size', 'Between', 'Min', 'Max'];
+    protected $sizeRules = ['Size', 'Between', 'Min', 'Max', 'Gt', 'Lt', 'Gte', 'Lte'];
 
     /**
      * The numeric related validation rules.
      *
      * @var array
      */
-    protected $numericRules = ['Numeric', 'Integer', 'Gt', 'Lt', 'Gte', 'Lte'];
+    protected $numericRules = ['Numeric', 'Integer'];
 
     /**
      * Create a new Validator instance.

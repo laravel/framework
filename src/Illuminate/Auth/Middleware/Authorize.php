@@ -42,7 +42,7 @@ class Authorize
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
      * @param  string  $ability
-     * @param  array|null  $models
+     * @param  array|null  ...$models
      * @return mixed
      *
      * @throws \Illuminate\Auth\AuthenticationException

@@ -15,8 +15,8 @@ class PostgresGrammar extends Grammar
      */
     protected $operators = [
         '=', '<', '>', '<=', '>=', '<>', '!=',
-        'like', 'not like', 'ilike', 'not ilike',
-        '&', '|', '#', '<<', '>>', '>>=', '=<<',
+        'like', 'not like', 'between', 'ilike', 'not ilike',
+        '~', '&', '|', '#', '<<', '>>', '<<=', '>>=',
         '&&', '@>', '<@', '?', '?|', '?&', '||', '-', '-', '#-',
         'is distinct from', 'is not distinct from',
     ];
@@ -62,6 +62,20 @@ class PostgresGrammar extends Grammar
         $value = $this->parameter($where['value']);
 
         return 'extract('.$type.' from '.$this->wrap($where['column']).') '.$where['operator'].' '.$value;
+    }
+
+    /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        $column = str_replace('->>', '->', $column);
+
+        return '('.$column.')::jsonb @> '.$value;
     }
 
     /**

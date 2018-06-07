@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JoinClause;
@@ -330,7 +331,11 @@ class Grammar extends BaseGrammar
     {
         $between = $where['not'] ? 'not between' : 'between';
 
-        return $this->wrap($where['column']).' '.$between.' ? and ?';
+        $min = $this->parameter(reset($where['values']));
+
+        $max = $this->parameter(end($where['values']));
+
+        return $this->wrap($where['column']).' '.$between.' '.$min.' and '.$max;
     }
 
     /**
@@ -487,6 +492,46 @@ class Grammar extends BaseGrammar
         $values = $this->parameterize($where['values']);
 
         return '('.implode(', ', $where['columns']).') '.$where['operator'].' ('.$values.')';
+    }
+
+    /**
+     * Compile a "where JSON contains" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonContains(Builder $query, $where)
+    {
+        $not = $where['not'] ? 'not ' : '';
+
+        return $not.$this->compileJsonContains(
+            $this->wrap($where['column']), $this->parameter($where['value'])
+        );
+    }
+
+    /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     * @throws \RuntimeException
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        throw new RuntimeException('This database engine does not support JSON contains operations.');
+    }
+
+    /**
+     * Prepare the binding for a "JSON contains" statement.
+     *
+     * @param  mixed  $binding
+     * @return string
+     */
+    public function prepareBindingForJsonContains($binding)
+    {
+        return json_encode($binding);
     }
 
     /**

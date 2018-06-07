@@ -405,9 +405,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $relations = is_string($relations) ? func_get_args() : $relations;
 
-        return $this->load(array_filter($relations, function ($relation) {
-            return ! $this->relationLoaded($relation);
-        }));
+        $this->newCollection([$this])->loadMissing($relations);
+
+        return $this;
     }
 
     /**
@@ -530,7 +530,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function save(array $options = [])
     {
-        $query = $this->newQueryWithoutScopes();
+        $query = $this->newModelQuery();
 
         // If the "saving" event returns false we'll bail out of the save and return
         // false, indicating that the save failed. This provides a chance for any
@@ -815,7 +815,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     protected function performDeleteOnModel()
     {
-        $this->setKeysForSaveQuery($this->newQueryWithoutScopes())->delete();
+        $this->setKeysForSaveQuery($this->newModelQuery())->delete();
 
         $this->exists = false;
     }
@@ -838,6 +838,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function newQuery()
     {
         return $this->registerGlobalScopes($this->newQueryWithoutScopes());
+    }
+
+    /**
+     * Get a new query builder that doesn't have any global scopes or eager loading.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder|static
+     */
+    public function newModelQuery()
+    {
+        return $this->newEloquentBuilder(
+            $this->newBaseQueryBuilder()
+        )->setModel($this);
     }
 
     /**
@@ -874,12 +886,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newQueryWithoutScopes()
     {
-        $builder = $this->newEloquentBuilder($this->newBaseQueryBuilder());
-
-        // Once we have the query builders, we will set the model instances so the
-        // builder can easily access any information it may need from the model
-        // while it is constructing and executing various queries against it.
-        return $builder->setModel($this)
+        return $this->newModelQuery()
                     ->with($this->with)
                     ->withCount($this->withCount);
     }
@@ -892,9 +899,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newQueryWithoutScope($scope)
     {
-        $builder = $this->newQuery();
-
-        return $builder->withoutGlobalScope($scope);
+        return $this->newQuery()->withoutGlobalScope($scope);
     }
 
     /**

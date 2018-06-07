@@ -125,9 +125,7 @@ class TestResponse
         );
 
         if (! is_null($uri)) {
-            PHPUnit::assertEquals(
-                app('url')->to($uri), app('url')->to($this->headers->get('Location'))
-            );
+            $this->assertLocation($uri);
         }
 
         return $this;
@@ -168,6 +166,21 @@ class TestResponse
     {
         PHPUnit::assertFalse(
             $this->headers->has($headerName), "Unexpected header [{$headerName}] is present on response."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Assert that the current location header matches the given URI.
+     *
+     * @param  string  $uri
+     * @return $this
+     */
+    public function assertLocation($uri)
+    {
+        PHPUnit::assertEquals(
+            app('url')->to($uri), app('url')->to($this->headers->get('Location'))
         );
 
         return $this;
@@ -237,6 +250,29 @@ class TestResponse
         PHPUnit::assertTrue(
             $expiresAt->lessThan(Carbon::now()),
             "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
+        );
+
+        return $this;
+    }
+
+    /**
+     * Asserts that the response contains the given cookie and is not expired.
+     *
+     * @param  string  $cookieName
+     * @return $this
+     */
+    public function assertCookieNotExpired($cookieName)
+    {
+        PHPUnit::assertNotNull(
+            $cookie = $this->getCookie($cookieName),
+            "Cookie [{$cookieName}] not present on response."
+        );
+
+        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+
+        PHPUnit::assertTrue(
+            $expiresAt->greaterThan(Carbon::now()),
+            "Cookie [{$cookieName}] is expired, it expired at [{$expiresAt}]."
         );
 
         return $this;
@@ -759,6 +795,18 @@ class TestResponse
                 PHPUnit::assertContains($value, $errors->get($key, $format));
             }
         }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the session has no errors.
+     *
+     * @return $this
+     */
+    public function assertSessionHasNoErrors()
+    {
+        $this->assertSessionMissing('errors');
 
         return $this;
     }

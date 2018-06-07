@@ -15,7 +15,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'VirtualAs', 'StoredAs', 'Charset', 'Collate', 'Nullable',
-        'Default', 'Increment', 'Comment', 'After', 'First',
+        'Default', 'Increment', 'Comment', 'After', 'First', 'Srid',
     ];
 
     /**
@@ -340,6 +340,22 @@ class MySqlGrammar extends Grammar
         $from = $this->wrapTable($blueprint);
 
         return "rename table {$from} to ".$this->wrapTable($command->to);
+    }
+
+    /**
+     * Compile a rename index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  \Illuminate\Support\Fluent $command
+     * @return string
+     */
+    public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s rename index %s to %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
     }
 
     /**
@@ -947,6 +963,20 @@ class MySqlGrammar extends Grammar
     {
         if (! is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
+        }
+    }
+
+    /**
+     * Get the SQL for a SRID column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifySrid(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->srid) && is_int($column->srid) && $column->srid > 0) {
+            return ' srid '.$column->srid;
         }
     }
 

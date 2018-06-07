@@ -483,7 +483,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Determine if the list of items is empty or not.
+     * Determine if the list of items is empty.
      *
      * @return bool
      */

@@ -269,6 +269,31 @@ class RouteRegistrarTest extends TestCase
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
     }
 
+    public function testUserCanRegisterApiResourceWithExceptOption()
+    {
+        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, [
+            'except' => ['destroy'],
+        ]);
+
+        $this->assertCount(4, $this->router->getRoutes());
+
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testUserCanRegisterApiResourceWithOnlyOption()
+    {
+        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, [
+            'only' => ['index', 'show'],
+        ]);
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+    }
+
     public function testCanNameRoutesOnRegisteredResource()
     {
         $this->router->resource('comments', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
