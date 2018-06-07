@@ -2730,6 +2730,13 @@ class SupportCollectionTest extends TestCase
         $collection = new Collection([1, 2, 3]);
         $this->assertNull($collection->get(null));
     }
+
+    public function testCustomCollection()
+    {
+        $collection = new TestCustomCollection([1, 2, 3], 'Meta');
+
+        $this->assertEquals('Meta', $collection->filter()->meta);
+    }
 }
 
 class TestSupportCollectionHigherOrderItem
@@ -2850,4 +2857,21 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class TestCustomCollection extends Collection
+{
+    public $meta;
+
+    public function __construct($items, string $meta)
+    {
+        parent::__construct($items);
+
+        $this->meta = $meta;
+    }
+
+    protected function newInstance($items = [])
+    {
+        return new static($items, $this->meta);
+    }
 }
