@@ -255,16 +255,16 @@ class DatabaseConnectorTest extends TestCase
         extract($config, EXTR_SKIP);
 
         if (in_array('sqlsrv', PDO::getAvailableDrivers())) {
-            $port = isset($config['port']) ? ',' . $port : '';
-            $appname = isset($config['appname']) ? ';APP=' . $config['appname'] : '';
+            $port = isset($config['port']) ? ','.$port : '';
+            $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
             $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
             $pooling = (isset($config['pooling']) && $config['pooling'] == false) ? ';ConnectionPooling=0' : '';
 
             return "sqlsrv:Server={$host}{$port};Database={$database}{$readonly}{$pooling}{$appname}";
         } else {
-            $port = isset($config['port']) ? ':' . $port : '';
-            $appname = isset($config['appname']) ? ';appname=' . $config['appname'] : '';
-            $charset = isset($config['charset']) ? ';charset=' . $config['charset'] : '';
+            $port = isset($config['port']) ? ':'.$port : '';
+            $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
+            $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
 
             return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
         }
