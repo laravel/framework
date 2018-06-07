@@ -75,11 +75,11 @@ abstract class ServiceProvider
     /**
      * Register a view file namespace.
      *
-     * @param  string  $path
+     * @param  string|array  $paths
      * @param  string  $namespace
      * @return void
      */
-    protected function loadViewsFrom($path, $namespace)
+    protected function loadViewsFrom($paths, $namespace)
     {
         if (is_array($this->app->config['view']['paths'])) {
             foreach ($this->app->config['view']['paths'] as $viewPath) {
@@ -89,7 +89,7 @@ abstract class ServiceProvider
             }
         }
 
-        $this->app['view']->addNamespace($namespace, $path);
+        $this->app['view']->addNamespace($namespace, $paths);
     }
 
     /**
