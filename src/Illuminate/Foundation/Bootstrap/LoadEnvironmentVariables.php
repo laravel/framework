@@ -24,8 +24,24 @@ class LoadEnvironmentVariables
 
         $this->checkForSpecificEnvironmentFile($app);
 
+        if ($app->environmentFile() !== '.env') {
+            $this->load($app, '.local'); // .env.[APP_ENV].local
+            $this->load($app); // .env.[APP_ENV]
+        }
+
+        $this->setEnvironmentFilePath($app, '.env');
+
+        $this->load($app, '.local'); // .env.local file
+        $this->load($app); // .env
+    }
+
+    /**
+     * Load the current .env file, optionally with suffix.
+     */
+    protected function load(Application $app, $suffix = '')
+    {
         try {
-            (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
+            (new Dotenv($app->environmentPath(), $app->environmentFile() . $suffix))->load();
         } catch (InvalidPathException $e) {
             //
         } catch (InvalidFileException $e) {
