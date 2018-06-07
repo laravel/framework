@@ -50,11 +50,20 @@ class AuthMakeCommand extends Command
 
         $this->exportViews();
 
-        if (! $this->option('views')) {
-            file_put_contents(
-                app_path('Http/Controllers/HomeController.php'),
-                $this->compileControllerStub()
-            );
+        if (!$this->option('views')) {
+            if (file_exists(app_path('Http/Controllers/HomeController.php')) && !$this->option('force')) {
+                if ($this->confirm('The [HomeController.php] controller already exists. Do you want to replace it?')) {
+                    file_put_contents(
+                        app_path('Http/Controllers/HomeController.php'),
+                        $this->compileControllerStub()
+                    );
+                }
+            } else {
+                file_put_contents(
+                    app_path('Http/Controllers/HomeController.php'),
+                    $this->compileControllerStub()
+                );
+            }
 
             file_put_contents(
                 base_path('routes/web.php'),
