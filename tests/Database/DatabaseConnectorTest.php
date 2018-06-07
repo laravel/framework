@@ -139,7 +139,8 @@ class DatabaseConnectorTest extends TestCase
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
         $dsn = $this->getDsn($config);
-        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])->getMock();
+        $connector->expects($this->atLeastOnce())->method('getAvailableDrivers')->will($this->returnValue(['dblib']));
         $connection = m::mock('stdClass');
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
@@ -152,7 +153,8 @@ class DatabaseConnectorTest extends TestCase
     {
         $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111, 'readonly' => true, 'charset' => 'utf-8', 'pooling' => false, 'appname' => 'baz'];
         $dsn = $this->getDsn($config);
-        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])->getMock();
+        $connector->expects($this->atLeastOnce())->method('getAvailableDrivers')->will($this->returnValue(['dblib']));
         $connection = m::mock('stdClass');
         $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
         $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
@@ -161,23 +163,110 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testSqlsrvDsnHasMorePriorityWhenSqlrvDriverExists()
+    {
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
+        $availableDrivers = ['dblib', 'sqlsrv', 'odbc'];
+        $expectedDsn = 'sqlsrv:Server=foo,111;Database=bar';
+
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')
+            ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
+            ->getMock();
+
+        $connector->expects($this->atLeastOnce())
+            ->method('getAvailableDrivers')
+            ->will($this->returnValue($availableDrivers));
+
+        $connector->expects($this->once())->method('getOptions')
+            ->with($this->equalTo($config))
+            ->will($this->returnValue([]));
+
+        $connection = m::mock('stdClass');
+
+        $connector->expects($this->once())
+            ->method('createConnection')
+            ->with($this->equalTo($expectedDsn), $this->equalTo($config))
+            ->will($this->returnValue($connection));
+
+        $result = $connector->connect($config);
+
+        $this->assertEquals($result, $connection);
+    }
+
+    public function testDblibDsnIsUsedWhenSqlrvDriverDoesNotExists()
+    {
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
+        $availableDrivers = ['dblib', 'odbc'];
+        $expectedDsn = 'dblib:host=foo:111;dbname=bar';
+
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')
+            ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
+            ->getMock();
+
+        $connector->expects($this->atLeastOnce())
+            ->method('getAvailableDrivers')
+            ->will($this->returnValue($availableDrivers));
+
+        $connector->expects($this->once())->method('getOptions')
+            ->with($this->equalTo($config))
+            ->will($this->returnValue([]));
+
+        $connection = m::mock('stdClass');
+
+        $connector->expects($this->once())
+            ->method('createConnection')
+            ->with($this->equalTo($expectedDsn), $this->equalTo($config))
+            ->will($this->returnValue($connection));
+
+        $result = $connector->connect($config);
+
+        $this->assertEquals($result, $connection);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testItThrowsARuntimeExceptionIfNoDriverWasFound()
+    {
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
+        $availableDrivers = [];
+
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')
+            ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
+            ->getMock();
+
+        $connector->expects($this->atLeastOnce())
+            ->method('getAvailableDrivers')
+            ->will($this->returnValue($availableDrivers));
+
+        $connector->expects($this->once())->method('getOptions')
+            ->with($this->equalTo($config))
+            ->will($this->returnValue([]));
+
+        $connection = m::mock('stdClass');
+
+        $connector->expects($this->never())->method('createConnection');
+
+        $result = $connector->connect($config);
+    }
+
     protected function getDsn(array $config)
     {
         extract($config, EXTR_SKIP);
 
-        if (in_array('dblib', PDO::getAvailableDrivers())) {
-            $port = isset($config['port']) ? ':'.$port : '';
-            $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
-            $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
-
-            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
-        } else {
+        if (in_array('sqlsrv', PDO::getAvailableDrivers())) {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
             $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
             $pooling = (isset($config['pooling']) && $config['pooling'] == false) ? ';ConnectionPooling=0' : '';
 
             return "sqlsrv:Server={$host}{$port};Database={$database}{$readonly}{$pooling}{$appname}";
+        } else {
+            $port = isset($config['port']) ? ':'.$port : '';
+            $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
+            $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
+
+            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
         }
     }
 }
