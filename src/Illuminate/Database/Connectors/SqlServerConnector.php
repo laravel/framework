@@ -182,7 +182,7 @@ class SqlServerConnector extends Connector implements ConnectorInterface
      *
      * @return array
      */
-    protected function getAvailableDrivers()
+    public function getAvailableDrivers()
     {
         return PDO::getAvailableDrivers();
     }
