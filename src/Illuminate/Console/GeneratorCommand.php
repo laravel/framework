@@ -113,7 +113,7 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Return the namespace for this type, if any.
+     * Returns the namespace for this type, if overridden.
      *
      * @return mixed
      */
