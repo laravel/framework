@@ -693,7 +693,7 @@ trait HasRelationships
     }
 
     /**
-     * Set the specific relationship in the model.
+     * Set the given relationship on the model.
      *
      * @param  string  $relation
      * @param  mixed  $value
@@ -707,7 +707,7 @@ trait HasRelationships
     }
 
     /**
-     * Unset an existing relation.
+     * Unset a loaded relationship.
      *
      * @param  string  $relation
      * @return $this
