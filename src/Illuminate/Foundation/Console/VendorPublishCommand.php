@@ -208,6 +208,11 @@ class VendorPublishCommand extends Command
             $this->files->copy($from, $to);
 
             $this->status($from, $to, 'File');
+        } else {
+            $to = str_replace(base_path(), '', realpath($to));
+
+            $this->comment('Skipping file ['.$to.'] as it already exists');
+            $this->line('Run command again with --force option to overwrite all files.');
         }
     }
 
