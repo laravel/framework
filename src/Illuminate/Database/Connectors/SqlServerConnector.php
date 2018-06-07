@@ -54,6 +54,8 @@ class SqlServerConnector extends Connector implements ConnectorInterface
         if ($this->prefersOdbc($config)) {
             return $this->getOdbcDsn($config);
         }
+
+        throw new \RuntimeException('The given driver was not found.');
     }
 
     /**

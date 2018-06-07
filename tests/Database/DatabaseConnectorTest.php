@@ -168,23 +168,23 @@ class DatabaseConnectorTest extends TestCase
         $expectedDsn = 'sqlsrv:Server=foo,111;Database=bar';
 
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')
-                          ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
-                          ->getMock();
+            ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
+            ->getMock();
 
-        $connector->expects($this->once())
-                  ->method('getAvailableDrivers')
-                  ->will($this->returnValue($availableDrivers));
+        $connector->expects($this->atLeastOnce())
+            ->method('getAvailableDrivers')
+            ->will($this->returnValue($availableDrivers));
 
         $connector->expects($this->once())->method('getOptions')
-                  ->with($this->equalTo($config))
-                  ->will($this->returnValue([]));
+            ->with($this->equalTo($config))
+            ->will($this->returnValue([]));
 
         $connection = m::mock('stdClass');
 
         $connector->expects($this->once())
-                  ->method('createConnection')
-                  ->with($this->equalTo($expectedDsn), $this->equalTo($config))
-                  ->will($this->returnValue($connection));
+            ->method('createConnection')
+            ->with($this->equalTo($expectedDsn), $this->equalTo($config))
+            ->will($this->returnValue($connection));
 
         $result = $connector->connect($config);
 
@@ -198,27 +198,54 @@ class DatabaseConnectorTest extends TestCase
         $expectedDsn = 'dblib:host=foo:111;dbname=bar';
 
         $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')
-                          ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
-                          ->getMock();
+            ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
+            ->getMock();
 
         $connector->expects($this->atLeastOnce())
-                  ->method('getAvailableDrivers')
-                  ->will($this->returnValue($availableDrivers));
+            ->method('getAvailableDrivers')
+            ->will($this->returnValue($availableDrivers));
 
         $connector->expects($this->once())->method('getOptions')
-                  ->with($this->equalTo($config))
-                  ->will($this->returnValue([]));
+            ->with($this->equalTo($config))
+            ->will($this->returnValue([]));
 
         $connection = m::mock('stdClass');
 
         $connector->expects($this->once())
-                  ->method('createConnection')
-                  ->with($this->equalTo($expectedDsn), $this->equalTo($config))
-                  ->will($this->returnValue($connection));
+            ->method('createConnection')
+            ->with($this->equalTo($expectedDsn), $this->equalTo($config))
+            ->will($this->returnValue($connection));
 
         $result = $connector->connect($config);
 
         $this->assertEquals($result, $connection);
+    }
+
+    /**
+     * @expectedException RuntimeException
+     */
+    public function testItThrowsARuntimeExceptionIfNoDriverWasFound()
+    {
+        $config = ['host' => 'foo', 'database' => 'bar', 'port' => 111];
+        $availableDrivers = [];
+
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')
+            ->setMethods(['createConnection', 'getOptions', 'getAvailableDrivers'])
+            ->getMock();
+
+        $connector->expects($this->atLeastOnce())
+            ->method('getAvailableDrivers')
+            ->will($this->returnValue($availableDrivers));
+
+        $connector->expects($this->once())->method('getOptions')
+            ->with($this->equalTo($config))
+            ->will($this->returnValue([]));
+
+        $connection = m::mock('stdClass');
+
+        $connector->expects($this->never())->method('createConnection');
+
+        $result = $connector->connect($config);
     }
 
     protected function getDsn(array $config)
