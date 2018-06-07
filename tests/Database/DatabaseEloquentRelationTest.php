@@ -25,6 +25,15 @@ class DatabaseEloquentRelationTest extends TestCase
         $this->assertArrayNotHasKey('foo', $parent->toArray());
     }
 
+    public function testUnsetExistingRelation()
+    {
+        $parent = new EloquentRelationResetModelStub;
+        $relation = new EloquentRelationResetModelStub;
+        $parent->setRelation('foo', $relation);
+        $parent->unsetRelation('foo');
+        $this->assertFalse($parent->relationLoaded('foo'));
+    }
+
     public function testTouchMethodUpdatesRelatedTimestamps()
     {
         $builder = m::mock(Builder::class);
