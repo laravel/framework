@@ -107,15 +107,20 @@ class Worker
                 $this->manager->connection($connectionName), $queue
             );
 
-            if ($this->supportsAsyncSignals()) {
-                $this->registerTimeoutHandler($job, $options);
-            }
-
             // If the daemon should run (not in maintenance mode, etc.), then we can run
             // fire off this job for processing. Otherwise, we will need to sleep the
             // worker so no more jobs are processed until they should be processed.
             if ($job) {
+                if ($this->supportsAsyncSignals()) {
+                    $this->setTimeoutAlarm($job, $options);
+                }
+
                 $this->runJob($job, $connectionName, $options);
+
+                // The timeout alarm must be removed while the job finished success.
+                if ($this->supportsAsyncSignals()) {
+                    $this->removeTimeoutAlarm();
+                }
             } else {
                 $this->sleep($options->sleep);
             }
@@ -146,6 +151,16 @@ class Worker
         pcntl_alarm(
             max($this->timeoutForJob($job, $options), 0)
         );
+    }
+
+    /**
+     * Remove the worker timeout alarm.
+     *
+     * @return void
+     */
+    protected function removeTimeoutAlarm()
+    {
+        pcntl_alarm(0);
     }
 
     /**
