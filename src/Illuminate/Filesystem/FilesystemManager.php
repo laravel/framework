@@ -323,7 +323,7 @@ class FilesystemManager implements FactoryContract
     public function set($name, $disk)
     {
         $this->disks[$name] = $disk;
-        
+
         return $this;
     }
 
