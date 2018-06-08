@@ -468,7 +468,7 @@ trait HasAttributes
     protected function castAttribute($key, $value)
     {
         if (is_null($value)) {
-            return $value;
+            return $this->castNullAttribute($key, $value);
         }
 
         switch ($this->getCastType($key)) {
@@ -498,6 +498,23 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
+            default:
+                return $value;
+        }
+    }
+
+    /**
+     * Cast a null attribute.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    protected function castNullAttribute($key, $value)
+    {
+        switch ($this->getCastType($key)) {
+            case 'collection':
+                return new BaseCollection;
             default:
                 return $value;
         }
