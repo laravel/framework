@@ -108,8 +108,6 @@ class FilesystemManager implements FactoryContract
      *
      * @param  string  $name
      * @return \Illuminate\Contracts\Filesystem\Filesystem
-     *
-     * @throws \InvalidArgumentException
      */
     protected function resolve($name)
     {
@@ -119,7 +117,19 @@ class FilesystemManager implements FactoryContract
             return $this->callCustomCreator($config);
         }
 
-        $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
+        return $this->callDriverMethod($config);
+    }
+
+    /**
+     * Call the given driver method
+     *
+     * @param  array $config
+     * @return $this
+     * @throws \InvalidArgumentException
+     */
+    protected function callDriverMethod(array $config)
+    {
+        $driverMethod = $this->getDriverMethodName($config['driver']);
 
         if (method_exists($this, $driverMethod)) {
             return $this->{$driverMethod}($config);
@@ -318,13 +328,28 @@ class FilesystemManager implements FactoryContract
      *
      * @param  string  $name
      * @param  mixed  $disk
-     * @return $this
+     * @return \Illuminate\Contracts\Filesystem\Filesystem
      */
     public function set($name, $disk)
     {
-        $this->disks[$name] = $disk;
+        if ($disk instanceof FilesystemAdapter) {
+            $this->disks[$name] = $disk;
+        } elseif (is_array($disk)) {
+            $this->disks[$name] = $this->callDriverMethod($disk);
+        }
 
-        return $this;
+        return $this->disks[$name];
+    }
+
+    /**
+     * Get driver method name
+     *
+     * @param  string $driver
+     * @return string
+     */
+    protected function getDriverMethodName($driver)
+    {
+        return 'create'.ucfirst($driver).'Driver';
     }
 
     /**
