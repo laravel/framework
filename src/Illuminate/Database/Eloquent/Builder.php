@@ -284,7 +284,7 @@ class Builder
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function hydrate(array $items)
     {
@@ -300,7 +300,7 @@ class Builder
      *
      * @param  string  $query
      * @param  array  $bindings
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function fromQuery($query, $bindings = [])
     {
@@ -330,7 +330,7 @@ class Builder
      *
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function findMany($ids, $columns = ['*'])
     {
@@ -346,7 +346,7 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -372,7 +372,7 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -388,7 +388,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
@@ -404,7 +404,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
@@ -422,7 +422,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -507,7 +507,7 @@ class Builder
      * Get the hydrated models without eager loading.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @return \Illuminate\Database\Eloquent\Model[]|static[]
      */
     public function getModels($columns = ['*'])
     {
@@ -704,7 +704,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string|null  $key
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Support\Collection|static[]
      */
     public function pluck($column, $key = null)
     {
@@ -1093,7 +1093,7 @@ class Builder
      * Create a new instance of the model being queried.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function newModelInstance($attributes = [])
     {
@@ -1236,7 +1236,7 @@ class Builder
     /**
      * Get the model instance being queried.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function getModel()
     {
