@@ -667,19 +667,18 @@ if (! function_exists('redirect')) {
 
 if (! function_exists('report')) {
     /**
-     * Report an exception.
+     * Report a Throwable implementation.
      *
-     * @param  \Exception  $exception
+     * @param  \Throwable  $e
      * @return void
      */
-    function report($exception)
+    function report($e)
     {
-        if ($exception instanceof Throwable &&
-            ! $exception instanceof Exception) {
-            $exception = new FatalThrowableError($exception);
+        if (! $e instanceof Exception) {
+            $e = new FatalThrowableError($e);
         }
 
-        app(ExceptionHandler::class)->report($exception);
+        app(ExceptionHandler::class)->report($e);
     }
 }
 
