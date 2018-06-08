@@ -759,6 +759,18 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "geo" add column "coordinates" multipolygon not null', $statements[0]);
     }
 
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');
