@@ -519,7 +519,7 @@ trait HasAttributes
                 return $value;
         }
     }
-    
+
     /**
      * Get the type of cast for a model attribute.
      *
