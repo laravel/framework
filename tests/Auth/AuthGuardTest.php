@@ -178,6 +178,22 @@ class AuthGuardTest extends TestCase
         $guard->authenticate();
     }
 
+    public function testAlreadyAuthenticatedReturnsFalseWhenUserIsNotNull()
+    {
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $guard = $this->getGuard()->setUser($user);
+
+        $this->assertTrue($guard->alreadyAuthenticated());
+    }
+
+    public function testAlreadyAuthenticatedReturnsFalseWhenUserIsNull()
+    {
+        $guard = $this->getGuard();
+        $guard->getSession()->shouldNotReceive('get');
+
+        $this->assertFalse($guard->alreadyAuthenticated());
+    }
+
     public function testIsAuthedReturnsTrueWhenUserIsNotNull()
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
