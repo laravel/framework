@@ -34,6 +34,13 @@ class VendorPublishCommand extends Command
     protected $tags = [];
 
     /**
+     * Were any files skipped during publishing.
+     *
+     * @var bool
+     */
+    protected $filesWereSkipped = false;
+
+    /**
      * The console command signature.
      *
      * @var string
@@ -74,6 +81,10 @@ class VendorPublishCommand extends Command
 
         foreach ($this->tags ?: [null] as $tag) {
             $this->publishTag($tag);
+        }
+
+        if ($this->filesWereSkipped) {
+            $this->line('Run command again with --force option to overwrite all files.');
         }
 
         $this->info('Publishing complete.');
@@ -208,6 +219,12 @@ class VendorPublishCommand extends Command
             $this->files->copy($from, $to);
 
             $this->status($from, $to, 'File');
+        } else {
+            $this->filesWereSkipped = true;
+
+            $to = str_replace(base_path(), '', realpath($to));
+
+            $this->comment('Skipping file ['.$to.'] as it already exists');
         }
     }
 
