@@ -104,10 +104,10 @@ class CacheFileStoreTest extends TestCase
         $initialValue = $expiration.serialize(1);
         $valueAfterIncrement = $expiration.serialize(2);
         $store = new FileStore($files, __DIR__);
-        $files->expects($this->once())->method('get')->will($this->returnValue($initialValue));
+        $files->method('get')->will($this->returnValue($initialValue));
         $hash = sha1('foo');
         $cache_dir = substr($hash, 0, 2).'/'.substr($hash, 2, 2);
-        $files->expects($this->once())->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
+        $files->method('put')->with($this->equalTo(__DIR__.'/'.$cache_dir.'/'.$hash), $this->equalTo($valueAfterIncrement));
         $store->increment('foo');
     }
 

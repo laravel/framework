@@ -84,15 +84,48 @@ class FileStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return int
+     * @return int | boolean
      */
     public function increment($key, $value = 1)
     {
-        $raw = $this->getPayload($key);
+        $path = $this->path($key);
 
-        return tap(((int) $raw['data']) + $value, function ($newValue) use ($key, $raw) {
-            $this->put($key, $newValue, $raw['time'] ?? 0);
-        });
+        $handle = @fopen($path, 'r+');
+        if ($handle === false) {
+            return false;
+        }
+
+        try {
+            $locked = flock($handle, LOCK_EX);
+            if (! $locked) {
+                return false;
+            }
+
+            clearstatcache(true, $path);
+            $raw = fread($handle, filesize($path));
+            if ($raw === false) {
+                return false;
+            }
+
+            $rawExp = substr($raw, 0, 10);
+            $rawValue = unserialize(substr($raw, 10));
+            $newValue = ((int) $rawValue) + $value;
+
+            if (! ftruncate($handle, 0) || ! rewind($handle)) {
+                return false;
+            }
+
+            if (fwrite($handle, $rawExp.serialize($newValue)) && fflush($handle)) {
+                return $newValue;
+            }
+        } finally {
+            if ($locked) {
+                flock($handle, LOCK_UN);
+            }
+            fclose($handle);
+        }
+
+        return false;
     }
 
     /**
@@ -100,7 +133,7 @@ class FileStore implements Store
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @return int
+     * @return int | boolean
      */
     public function decrement($key, $value = 1)
     {
