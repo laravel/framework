@@ -799,4 +799,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     {
         return new \Illuminate\Database\Schema\Grammars\PostgresGrammar;
     }
+
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
+    }
 }

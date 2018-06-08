@@ -3,9 +3,12 @@
 namespace Illuminate\Database;
 
 use Illuminate\Database\Query\Expression;
+use Illuminate\Support\Traits\Macroable;
 
 abstract class Grammar
 {
+    use Macroable;
+
     /**
      * The grammar table prefix.
      *
