@@ -90,14 +90,14 @@ class FileStore implements Store
     {
         $path = $this->path($key);
 
-        $handle = @fopen($path, "r+");
+        $handle = @fopen($path, 'r+');
         if ($handle === false) {
             return false;
         }
 
         try {
             $locked = flock($handle, LOCK_EX);
-            if (!$locked) {
+            if (! $locked) {
                 return false;
             }
 
@@ -111,7 +111,7 @@ class FileStore implements Store
             $rawValue = unserialize(substr($raw, 10));
             $newValue = ((int) $rawValue) + $value;
 
-            if (!ftruncate($handle, 0) || !rewind($handle)) {
+            if (! ftruncate($handle, 0) || ! rewind($handle)) {
                 return false;
             }
 
