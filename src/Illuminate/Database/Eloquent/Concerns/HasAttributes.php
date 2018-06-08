@@ -9,8 +9,8 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\JsonEncodingException;
 
 trait HasAttributes
@@ -411,7 +411,7 @@ trait HasAttributes
             throw new LogicException(get_class($this).'::'.$method.' must return a relationship instance.');
         }
         
-        // If the foreign key is null then the relation is not setted and we don't 
+        // If the foreign key is null then the relation is not setted and we don't
         // need to perform any query.
         if ($relation instanceof BelongsTo) {
             if (is_null($this->{$relation->getForeignKey()})) {
