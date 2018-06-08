@@ -41,6 +41,16 @@ trait GuardHelpers
     }
 
     /**
+     * Determine if the current user is already authenticated without triggering side effects.
+     *
+     * @return bool
+     */
+    public function alreadyAuthenticated()
+    {
+        return ! is_null($this->user);
+    }
+
+    /**
      * Determine if the current user is authenticated.
      *
      * @return bool
