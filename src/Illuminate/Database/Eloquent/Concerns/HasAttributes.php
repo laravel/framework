@@ -410,7 +410,7 @@ trait HasAttributes
         if (! $relation instanceof Relation) {
             throw new LogicException(get_class($this).'::'.$method.' must return a relationship instance.');
         }
-        
+
         // If the foreign key is null then the relation is not setted and we don't
         // need to perform any query.
         if ($relation instanceof BelongsTo) {
