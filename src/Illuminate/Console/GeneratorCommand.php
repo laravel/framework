@@ -5,6 +5,7 @@ namespace Illuminate\Console;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
+use Illuminate\Contracts\Config\Repository as Config;
 
 abstract class GeneratorCommand extends Command
 {
@@ -23,16 +24,26 @@ abstract class GeneratorCommand extends Command
     protected $type;
 
     /**
+     * The config.
+     *
+     * @var \Illuminate\Contracts\Config\Repository|null
+     */
+    protected $config;
+
+    /**
      * Create a new controller creator command instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
+     * @param  \Illuminate\Contracts\Config\Repository|null  $config
      * @return void
      */
-    public function __construct(Filesystem $files)
+    public function __construct(Filesystem $files, Config $config = null)
     {
         parent::__construct();
 
         $this->files = $files;
+
+        $this->config = $config;
     }
 
     /**
@@ -92,9 +103,25 @@ abstract class GeneratorCommand extends Command
 
         $name = str_replace('/', '\\', $name);
 
-        return $this->qualifyClass(
-            $this->getDefaultNamespace(trim($rootNamespace, '\\')).'\\'.$name
-        );
+        if ($namespace = $this->getConfigNamespace()) {
+            $defaultNamespace = trim($namespace, '\\');
+        } else {
+            $defaultNamespace = $this->getDefaultNamespace(trim($rootNamespace, '\\'));
+        }
+
+        return $this->qualifyClass($defaultNamespace.'\\'.$name);
+    }
+
+    /**
+     * Returns the namespace for this type, if overridden.
+     *
+     * @return mixed
+     */
+    protected function getConfigNamespace()
+    {
+        if ($this->config !== null) {
+            return (string) $this->config->get('generator.'.$this->type);
+        }
     }
 
     /**
