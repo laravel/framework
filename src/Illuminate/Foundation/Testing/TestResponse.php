@@ -73,7 +73,7 @@ class TestResponse
     {
         PHPUnit::assertTrue(
             $this->isOk(),
-            'Response status code [' . $this->getStatusCode() . '] does match expected 200 status code.'
+            'Response status code ['.$this->getStatusCode().'] does match expected 200 status code.'
         );
 
         return $this;
