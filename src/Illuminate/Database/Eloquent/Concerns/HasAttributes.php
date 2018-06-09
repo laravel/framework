@@ -576,7 +576,7 @@ trait HasAttributes
             $value = $this->castAttributeAsJson($key, $value);
         }
 
-        if ($this->isNotNullCollectionCast($key) && is_null($value)) {
+        if ($this->isNotNullCollectionCastable($key) && is_null($value)) {
             $value = collect();
         }
 
@@ -905,6 +905,17 @@ trait HasAttributes
     protected function isJsonCastable($key)
     {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+    }
+
+    /**
+     * Determine whether a value is Not Null Collection castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isNotNullCollectionCastable($key)
+    {
+        return $this->hasCast($key, ['notnull_collection']);
     }
 
     /**
