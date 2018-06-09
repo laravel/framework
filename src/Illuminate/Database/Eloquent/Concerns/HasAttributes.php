@@ -193,6 +193,10 @@ trait HasAttributes
             if ($attributes[$key] && $this->isCustomDateTimeCast($value)) {
                 $attributes[$key] = $attributes[$key]->format(explode(':', $value, 2)[1]);
             }
+
+            if (is_null($attributes[$key]) && $this->isNotNullCollectionCast($value)) {
+                $attributes[$key] = collect();
+            }
         }
 
         return $attributes;
@@ -490,6 +494,7 @@ trait HasAttributes
             case 'json':
                 return $this->fromJson($value);
             case 'collection':
+            case 'notnull_collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
                 return $this->asDate($value);
@@ -514,6 +519,9 @@ trait HasAttributes
         if ($this->isCustomDateTimeCast($this->getCasts()[$key])) {
             return 'custom_datetime';
         }
+        if ($this->isNotNullCollectionCast($this->getCasts()[$key])) {
+            return 'notnull_collection';
+        }
 
         return trim(strtolower($this->getCasts()[$key]));
     }
@@ -528,6 +536,17 @@ trait HasAttributes
     {
         return strncmp($cast, 'date:', 5) === 0 ||
                strncmp($cast, 'datetime:', 9) === 0;
+    }
+
+    /**
+     * Determine if the cast type is a not null collection cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isNotNullCollectionCast($cast)
+    {
+        return $cast === 'collection:notnull';
     }
 
     /**
@@ -555,6 +574,10 @@ trait HasAttributes
 
         if ($this->isJsonCastable($key) && ! is_null($value)) {
             $value = $this->castAttributeAsJson($key, $value);
+        }
+
+        if ($this->isNotNullCollectionCastable($key) && is_null($value)) {
+            $value = collect();
         }
 
         // If this attribute contains a JSON ->, we'll set the proper value in the
@@ -882,6 +905,17 @@ trait HasAttributes
     protected function isJsonCastable($key)
     {
         return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+    }
+
+    /**
+     * Determine whether a value is Not Null Collection castable for inbound manipulation.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    protected function isNotNullCollectionCastable($key)
+    {
+        return $this->hasCast($key, ['notnull_collection']);
     }
 
     /**
