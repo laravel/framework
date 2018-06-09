@@ -6,6 +6,8 @@ use Illuminate\Contracts\Broadcasting\Factory as BroadcastingFactoryContract;
 
 /**
  * @method static void connection($name = null);
+ * @method static \Illuminate\Broadcasting\Broadcasters\Broadcaster channel(string $channel, callable|string  $callback)
+ * @method static mixed auth(\Illuminate\Http\Request $request)
  *
  * @see \Illuminate\Contracts\Broadcasting\Factory
  */
