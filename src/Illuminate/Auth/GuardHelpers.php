@@ -41,7 +41,7 @@ trait GuardHelpers
     }
 
     /**
-     * Determine if the guard has the current user without triggering side effects.
+     * Determine if the guard has a user instance.
      *
      * @return bool
      */
