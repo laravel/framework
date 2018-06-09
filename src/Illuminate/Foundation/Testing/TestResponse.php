@@ -65,6 +65,21 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has an OK status code.
+     *
+     * @return $this
+     */
+    public function assertOk()
+    {
+        PHPUnit::assertTrue(
+            $this->isOk(),
+            'Response status code [' . $this->getStatusCode() . '] is not an OK status code.'
+        );
+
+        return $this;
+    }
+
+    /**
      * Assert that the response has a not found status code.
      *
      * @return $this
