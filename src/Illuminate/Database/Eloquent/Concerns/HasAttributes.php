@@ -494,8 +494,9 @@ trait HasAttributes
             case 'date':
                 return $this->asDate($value);
             case 'datetime':
-            case 'custom_datetime':
                 return $this->asDateTime($value);
+            case 'custom_datetime':
+                return $this->asDateTime($value, $this->getCustomDateTimeCastFormat($key));
             case 'timestamp':
                 return $this->asTimestamp($value);
             default:
@@ -528,6 +529,11 @@ trait HasAttributes
     {
         return strncmp($cast, 'date:', 5) === 0 ||
                strncmp($cast, 'datetime:', 9) === 0;
+    }
+
+    protected function getCustomDateTimeCastFormat($key)
+    {
+        return substr(strstr($this->getCasts()[$key], ':'), 1);
     }
 
     /**
@@ -709,7 +715,7 @@ trait HasAttributes
      * @param  mixed  $value
      * @return \Illuminate\Support\Carbon
      */
-    protected function asDateTime($value)
+    protected function asDateTime($value, $customFormat = null)
     {
         // If this value is already a Carbon instance, we shall just return it as is.
         // This prevents us having to re-instantiate a Carbon instance when we know
@@ -732,6 +738,12 @@ trait HasAttributes
         // when defining your date fields as they might be UNIX timestamps here.
         if (is_numeric($value)) {
             return Carbon::createFromTimestamp($value);
+        }
+        
+        if( $customFormat ) {
+            return Carbon::createFromFormat(
+                str_replace('.v', '.u', $customFormat), $value
+            );
         }
 
         // If the value is in simply year, month, day format, we will instantiate the
