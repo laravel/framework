@@ -174,8 +174,8 @@ class FormRequest extends Request implements ValidatesWhenResolved
     {
         $rules = $this->container->call([$this, 'rules']);
 
-        return $this->only(collect($rules)->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
+        return $this->only(collect(array_dot($this->all()))->keys()->filter(function ($attribute) use ($rules) {
+            return in_array(preg_replace('/\.[0-9]+\./', '.*.', $attribute), array_keys($rules));
         })->unique()->toArray());
     }
 
