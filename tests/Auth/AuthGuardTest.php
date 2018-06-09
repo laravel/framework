@@ -178,7 +178,7 @@ class AuthGuardTest extends TestCase
         $guard->authenticate();
     }
 
-    public function testHasUserReturnsFalseWhenUserIsNotNull()
+    public function testHasUserReturnsTrueWhenUserIsNotNull()
     {
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
         $guard = $this->getGuard()->setUser($user);
