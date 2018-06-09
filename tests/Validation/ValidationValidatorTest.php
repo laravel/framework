@@ -4003,6 +4003,15 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
 
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+
+        // Test array validation...
+        $data = (new Validator(
+            $this->getIlluminateArrayTranslator(),
+            ['name' => ['first' => 'john', 'last' => 'doe']],
+            ['name.first' => 'required']
+        ))->validate();
+
+        $this->assertEquals(['name' => ['first' => 'john']], $data);
     }
 
     protected function getTranslator()
