@@ -65,7 +65,7 @@ class TestResponse
     }
 
     /**
-     * Assert that the response has an OK status code.
+     * Assert that the response has a 200 status code.
      *
      * @return $this
      */
@@ -73,7 +73,7 @@ class TestResponse
     {
         PHPUnit::assertTrue(
             $this->isOk(),
-            'Response status code [' . $this->getStatusCode() . '] is not an OK status code.'
+            'Response status code [' . $this->getStatusCode() . '] does match expected 200 status code.'
         );
 
         return $this;
