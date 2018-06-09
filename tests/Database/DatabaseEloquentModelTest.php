@@ -1752,9 +1752,6 @@ class DatabaseEloquentModelTest extends TestCase
 
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $model->notnullCollectionAttribute);
         $this->assertTrue($model->notnullCollectionAttribute->isEmpty());
-
-        $array = $model->toArray();
-        $this->assertEquals([], $array['notnullCollectionAttribute']);
     }
 }
 
