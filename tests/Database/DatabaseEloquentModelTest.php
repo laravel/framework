@@ -1549,6 +1549,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->dateAttribute = null;
         $model->datetimeAttribute = null;
         $model->timestampAttribute = null;
+        $model->collectionAttribute = null;
 
         $attributes = $model->getAttributes();
 
@@ -1563,6 +1564,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($attributes['dateAttribute']);
         $this->assertNull($attributes['datetimeAttribute']);
         $this->assertNull($attributes['timestampAttribute']);
+        $this->assertNull($attributes['collectionAttribute']);
 
         $this->assertNull($model->intAttribute);
         $this->assertNull($model->floatAttribute);
@@ -1575,6 +1577,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($model->dateAttribute);
         $this->assertNull($model->datetimeAttribute);
         $this->assertNull($model->timestampAttribute);
+        $this->assertNull($model->collectionAttribute);
 
         $array = $model->toArray();
 
@@ -1589,6 +1592,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertNull($array['dateAttribute']);
         $this->assertNull($array['datetimeAttribute']);
         $this->assertNull($array['timestampAttribute']);
+        $this->assertNull($array['collectionAttribute']);
     }
 
     /**
@@ -1734,6 +1738,23 @@ class DatabaseEloquentModelTest extends TestCase
         $resolver->shouldReceive('connection')->andReturn(m::mock('Illuminate\Database\Connection'));
         $model->getConnection()->shouldReceive('getQueryGrammar')->andReturn(m::mock('Illuminate\Database\Query\Grammars\Grammar'));
         $model->getConnection()->shouldReceive('getPostProcessor')->andReturn(m::mock('Illuminate\Database\Query\Processors\Processor'));
+    }
+
+    public function testModelAttributeCastingToNotnullCollectionNeverPreservesNull()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->notnullCollectionAttribute = null;
+
+        $attributes = $model->getAttributes();
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $attributes['notnullCollectionAttribute']);
+        $this->assertTrue($attributes['notnullCollectionAttribute']->isEmpty());
+
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $model->notnullCollectionAttribute);
+        $this->assertTrue($model->notnullCollectionAttribute->isEmpty());
+
+        $array = $model->toArray();
+        $this->assertEqual([], $array['notnullCollectionAttribute']);
     }
 }
 
@@ -2048,6 +2069,8 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'collectionAttribute' => 'collection',
+        'notnullCollectionAttribute' => 'collection:notnull',
     ];
 
     public function jsonAttributeValue()
