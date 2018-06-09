@@ -306,11 +306,10 @@ class Validator implements ValidatorContract
             throw new ValidationException($this);
         }
 
-        $data = collect($this->getData());
-
-        return $data->only(collect($this->getRules())->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
-        })->unique())->toArray();
+        return array_reduce( array_keys($this->getRules()), function($data, $key) {
+            array_set($data, $key, array_get($this->getData(), $key));
+            return $data;
+        }, [] );
     }
 
     /**
