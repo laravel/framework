@@ -1754,7 +1754,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->notnullCollectionAttribute->isEmpty());
 
         $array = $model->toArray();
-        $this->assertEqual([], $array['notnullCollectionAttribute']);
+        $this->assertEquals([], $array['notnullCollectionAttribute']);
     }
 }
 
