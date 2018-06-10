@@ -4,7 +4,7 @@ namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Str;
 
-class MariaDbGrammar extends MySqlGrammar 
+class MariaDbGrammar extends MySqlGrammar
 {
 
     /**
@@ -37,7 +37,7 @@ class MariaDbGrammar extends MySqlGrammar
 
         // in case there is table name in json path then we have
         // to do some additional replacements
-        if(Str::contains($mysqlWrap, '.JSON_EXTRACT')) {
+        if (Str::contains($mysqlWrap, '.JSON_EXTRACT')) {
 
             $path = explode('->', $value);
 
@@ -46,9 +46,8 @@ class MariaDbGrammar extends MySqlGrammar
             })->implode('.');
 
             return sprintf('JSON_EXTRACT(%s, `$.%s`)', $field, collect($path)->map(function ($part) {
-                    return '"'.$part.'"';
-                })->implode('.')
-            );
+                return '"'.$part.'"';
+            })->implode('.'));
         }
 
         return $mysqlWrap;
