@@ -1954,6 +1954,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where JSON_EXTRACT(`items`, `$."price"."in_usd"`) = ?', $builder->toSql());
 
         $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->where('users.items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from `users` where JSON_EXTRACT(`users`.`items`, `$."price"."in_usd"`) = ?', $builder->toSql());
+
+        $builder = $this->getMariaDbBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
         $this->assertEquals('select * from `users` where JSON_EXTRACT(`items`, `$."price"."in_usd"`) = ? and JSON_EXTRACT(`items`, `$."age"`) = ?', $builder->toSql());
     }
