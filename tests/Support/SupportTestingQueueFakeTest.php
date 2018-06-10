@@ -9,7 +9,7 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
 use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 
-class QueueFakeTest extends TestCase
+class SupportTestingQueueFakeTest extends TestCase
 {
     protected function setUp()
     {
@@ -30,6 +30,15 @@ class QueueFakeTest extends TestCase
         $this->fake->push($this->job);
 
         $this->fake->assertPushed(JobStub::class);
+    }
+
+    public function testQueueSize()
+    {
+        $this->assertEquals(0, $this->fake->size());
+
+        $this->fake->push($this->job);
+
+        $this->assertEquals(1, $this->fake->size());
     }
 
     public function testAssertNotPushed()

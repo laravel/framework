@@ -396,13 +396,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $this->conditions[$name] = $callback;
 
         $this->directive($name, function ($expression) use ($name) {
-            return $expression
+            return $expression !== ''
                     ? "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                     : "<?php if (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
 
         $this->directive('else'.$name, function ($expression) use ($name) {
-            return $expression
+            return $expression !== ''
                 ? "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}', {$expression})): ?>"
                 : "<?php elseif (\Illuminate\Support\Facades\Blade::check('{$name}')): ?>";
         });
@@ -433,7 +433,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function component($path, $alias = null)
     {
-        $alias = $alias ?: array_last(explode('.', $path));
+        $alias = $alias ?: Arr::last(explode('.', $path));
 
         $this->directive($alias, function ($expression) use ($path) {
             return $expression
@@ -455,12 +455,12 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function include($path, $alias = null)
     {
-        $alias = $alias ?: array_last(explode('.', $path));
+        $alias = $alias ?: Arr::last(explode('.', $path));
 
         $this->directive($alias, function ($expression) use ($path) {
             $expression = $this->stripParentheses($expression) ?: '[]';
 
-            return "<?php echo \$__env->make('{$path}', {$expression}, array_except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
+            return "<?php echo \$__env->make('{$path}', {$expression}, \Illuminate\Support\Arr::except(get_defined_vars(), array('__data', '__path')))->render(); ?>";
         });
     }
 

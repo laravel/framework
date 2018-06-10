@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Constraints;
+namespace Illuminate\Tests\Foundation\Testing\Constraints;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Tests\Foundation\FoundationTestResponseTest;

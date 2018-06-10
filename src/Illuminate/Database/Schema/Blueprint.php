@@ -128,11 +128,18 @@ class Blueprint
      */
     protected function ensureCommandsAreValid(Connection $connection)
     {
-        if ($connection instanceof SQLiteConnection &&
-            $this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
-            throw new BadMethodCallException(
-                "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
-            );
+        if ($connection instanceof SQLiteConnection) {
+            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
+                throw new BadMethodCallException(
+                    "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
+                );
+            }
+
+            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
+                throw new BadMethodCallException(
+                    "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
+                );
+            }
         }
     }
 
@@ -152,7 +159,7 @@ class Blueprint
     /**
      * Add the commands that are implied by the blueprint's state.
      *
-     * @param  \Illuminate\Database\Grammar  $grammer
+     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
      * @return void
      */
     protected function addImpliedCommands(Grammar $grammar)
@@ -203,8 +210,8 @@ class Blueprint
     /**
      * Add the fluent commands specified on any columns.
      *
-     * @param  \Illuminate\Database\Grammar  $grammer
-     * @param
+     * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
+     * @return void
      */
     public function addFluentCommands(Grammar $grammar)
     {
@@ -358,6 +365,18 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given indexes should be renamed.
+     *
+     * @param  string  $from
+     * @param  string  $to
+     * @return \Illuminate\Support\Fluent
+     */
+    public function renameIndex($from, $to)
+    {
+        return $this->addCommand('renameIndex', compact('from', 'to'));
+    }
+
+    /**
      * Indicate that the timestamp columns should be dropped.
      *
      * @return void
@@ -380,21 +399,23 @@ class Blueprint
     /**
      * Indicate that the soft delete column should be dropped.
      *
+     * @param  string  $column
      * @return void
      */
-    public function dropSoftDeletes()
+    public function dropSoftDeletes($column = 'deleted_at')
     {
-        $this->dropColumn('deleted_at');
+        $this->dropColumn($column);
     }
 
     /**
      * Indicate that the soft delete column should be dropped.
      *
+     * @param  string  $column
      * @return void
      */
-    public function dropSoftDeletesTz()
+    public function dropSoftDeletesTz($column = 'deleted_at')
     {
-        $this->dropSoftDeletes();
+        $this->dropSoftDeletes($column);
     }
 
     /**
@@ -972,12 +993,13 @@ class Blueprint
     /**
      * Add a "deleted at" timestampTz for the table.
      *
+     * @param  string  $column
      * @param  int  $precision
      * @return \Illuminate\Support\Fluent
      */
-    public function softDeletesTz($precision = 0)
+    public function softDeletesTz($column = 'deleted_at', $precision = 0)
     {
-        return $this->timestampTz('deleted_at', $precision)->nullable();
+        return $this->timestampTz($column, $precision)->nullable();
     }
 
     /**
@@ -1050,11 +1072,12 @@ class Blueprint
      * Create a new point column on the table.
      *
      * @param  string  $column
+     * @param  null|int  $srid
      * @return \Illuminate\Support\Fluent
      */
-    public function point($column)
+    public function point($column, $srid = null)
     {
-        return $this->addColumn('point', $column);
+        return $this->addColumn('point', $column, compact('srid'));
     }
 
     /**

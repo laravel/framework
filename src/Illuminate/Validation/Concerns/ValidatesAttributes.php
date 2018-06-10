@@ -148,9 +148,7 @@ trait ValidatesAttributes
         }
 
         if ($format = $this->getDateFormat($attribute)) {
-            return $this->checkDateTimeOrder(
-                $format, $value, $this->getValue($parameters[0]) ?: $parameters[0], $operator
-            );
+            return $this->checkDateTimeOrder($format, $value, $parameters[0], $operator);
         }
 
         if (! $date = $this->getDateTimestamp($parameters[0])) {
@@ -207,11 +205,13 @@ trait ValidatesAttributes
      */
     protected function checkDateTimeOrder($format, $first, $second, $operator)
     {
-        $first = $this->getDateTimeWithOptionalFormat($format, $first);
+        $firstDate = $this->getDateTimeWithOptionalFormat($format, $first);
 
-        $second = $this->getDateTimeWithOptionalFormat($format, $second);
+        if (! $secondDate = $this->getDateTimeWithOptionalFormat($format, $second)) {
+            $secondDate = $this->getDateTimeWithOptionalFormat($format, $this->getValue($second));
+        }
 
-        return ($first && $second) && ($this->compare($first, $second, $operator));
+        return ($firstDate && $secondDate) && ($this->compare($firstDate, $secondDate, $operator));
     }
 
     /**
@@ -824,6 +824,106 @@ trait ValidatesAttributes
         }
 
         return true;
+    }
+
+    /**
+     * Validate that an attribute is greater than another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateGt($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'gt');
+
+        $comparedToValue = $this->getValue($parameters[0]);
+
+        $this->shouldBeNumeric($attribute, 'Gt');
+
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+            return $this->getSize($attribute, $value) > $parameters[0];
+        }
+
+        $this->requireSameType($value, $comparedToValue);
+
+        return $this->getSize($attribute, $value) > $this->getSize($attribute, $comparedToValue);
+    }
+
+    /**
+     * Validate that an attribute is less than another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateLt($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'lt');
+
+        $comparedToValue = $this->getValue($parameters[0]);
+
+        $this->shouldBeNumeric($attribute, 'Lt');
+
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+            return $this->getSize($attribute, $value) < $parameters[0];
+        }
+
+        $this->requireSameType($value, $comparedToValue);
+
+        return $this->getSize($attribute, $value) < $this->getSize($attribute, $comparedToValue);
+    }
+
+    /**
+     * Validate that an attribute is greater than or equal another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateGte($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'gte');
+
+        $comparedToValue = $this->getValue($parameters[0]);
+
+        $this->shouldBeNumeric($attribute, 'Gte');
+
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+            return $this->getSize($attribute, $value) >= $parameters[0];
+        }
+
+        $this->requireSameType($value, $comparedToValue);
+
+        return $this->getSize($attribute, $value) >= $this->getSize($attribute, $comparedToValue);
+    }
+
+    /**
+     * Validate that an attribute is less than or equal another attribute.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function validateLte($attribute, $value, $parameters)
+    {
+        $this->requireParameterCount(1, $parameters, 'lte');
+
+        $comparedToValue = $this->getValue($parameters[0]);
+
+        $this->shouldBeNumeric($attribute, 'Lte');
+
+        if (is_null($comparedToValue) && (is_numeric($value) && is_numeric($parameters[0]))) {
+            return $this->getSize($attribute, $value) <= $parameters[0];
+        }
+
+        $this->requireSameType($value, $comparedToValue);
+
+        return $this->getSize($attribute, $value) <= $this->getSize($attribute, $comparedToValue);
     }
 
     /**
@@ -1537,6 +1637,37 @@ trait ValidatesAttributes
     {
         if (count($parameters) < $count) {
             throw new InvalidArgumentException("Validation rule $rule requires at least $count parameters.");
+        }
+    }
+
+    /**
+     * Require comparison values to be of the same type.
+     *
+     * @param  mixed  $first
+     * @param  mixed  $second
+     * @return void
+     *
+     * @throws \InvalidArgumentException
+     */
+    protected function requireSameType($first, $second)
+    {
+        if (gettype($first) != gettype($second)) {
+            throw new InvalidArgumentException('The values under comparison must be of the same type');
+        }
+    }
+
+    /**
+     * Adds the existing rule to the numericRules array if the attribute's value is numeric.
+     *
+     * @param  string  $attribute
+     * @param  string  $rule
+     *
+     * @return void
+     */
+    protected function shouldBeNumeric($attribute, $rule)
+    {
+        if (is_numeric($this->getValue($attribute))) {
+            $this->numericRules[] = $rule;
         }
     }
 }

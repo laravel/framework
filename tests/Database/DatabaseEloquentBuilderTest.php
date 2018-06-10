@@ -575,7 +575,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $nestedRawQuery = $this->getMockQueryBuilder();
         $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
         $model = $this->getMockModel()->makePartial();
-        $model->shouldReceive('newQueryWithoutScopes')->once()->andReturn($nestedQuery);
+        $model->shouldReceive('newModelQuery')->once()->andReturn($nestedQuery);
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('from');
         $builder->setModel($model);
@@ -967,6 +967,70 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->getQuery()->shouldReceive('whereNotIn')->once()->with($keyName, $collection);
 
         $builder->whereKeyNot($collection);
+    }
+
+    public function testLatestWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+
+        $builder->latest();
+    }
+
+    public function testLatestWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('created_at');
+
+        $builder->latest();
+    }
+
+    public function testLatestWithColumn()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('latest')->once()->with('foo');
+
+        $builder->latest('foo');
+    }
+
+    public function testOldestWithoutColumnWithCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn('foo');
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+
+        $builder->oldest();
+    }
+
+    public function testOldestWithoutColumnWithoutCreatedAt()
+    {
+        $model = $this->getMockModel();
+        $model->shouldReceive('getCreatedAtColumn')->andReturn(null);
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('created_at');
+
+        $builder->oldest();
+    }
+
+    public function testOldestWithColumn()
+    {
+        $model = $this->getMockModel();
+        $builder = $this->getBuilder()->setModel($model);
+
+        $builder->getQuery()->shouldReceive('oldest')->once()->with('foo');
+
+        $builder->oldest('foo');
     }
 
     protected function mockConnectionForModel($model, $database)

@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
@@ -153,7 +152,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\Connection
      */
     protected function connection()
     {

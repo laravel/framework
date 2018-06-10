@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Blade;
+namespace Illuminate\Tests\View\Blade;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;

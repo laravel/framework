@@ -108,9 +108,9 @@ class NotificationMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists.'],
+            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the notification already exists'],
 
-            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification.'],
+            ['markdown', 'm', InputOption::VALUE_OPTIONAL, 'Create a new Markdown template for the notification'],
         ];
     }
 }

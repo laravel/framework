@@ -2,8 +2,10 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\RedisManager;
+use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 class RedisConnectionTest extends TestCase
@@ -573,6 +575,29 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    /**
+     * @test
+     */
+    public function it_dispatches_query_event()
+    {
+        foreach ($this->connections() as $redis) {
+            $redis->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+
+            $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
+                $this->assertEquals('get', $event->command);
+                $this->assertEquals(['foobar'], $event->parameters);
+                $this->assertEquals('default', $event->connectionName);
+                $this->assertInstanceOf('\Illuminate\Redis\Connections\Connection', $event->connection);
+
+                return true;
+            }));
+
+            $redis->get('foobar');
+
+            $redis->unsetEventDispatcher();
+        }
+    }
+
     public function connections()
     {
         $connections = [
@@ -584,7 +609,7 @@ class RedisConnectionTest extends TestCase
             $host = getenv('REDIS_HOST') ?: '127.0.0.1';
             $port = getenv('REDIS_PORT') ?: 6379;
 
-            $prefixedPhpredis = new RedisManager('phpredis', [
+            $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [
                     'host' => $host,

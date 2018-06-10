@@ -9,7 +9,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
-class NotificationFakeTest extends TestCase
+class SupportTestingNotificationFakeTest extends TestCase
 {
     protected function setUp()
     {

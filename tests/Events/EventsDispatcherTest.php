@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Events;
 
+use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;

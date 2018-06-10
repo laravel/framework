@@ -65,11 +65,17 @@ class BcryptHasher implements HasherContract
      * @param  string  $hashedValue
      * @param  array   $options
      * @return bool
+     *
+     * @throws \RuntimeException
      */
     public function check($value, $hashedValue, array $options = [])
     {
         if (strlen($hashedValue) === 0) {
             return false;
+        }
+
+        if ($this->info($hashedValue)['algoName'] !== 'bcrypt') {
+            throw new RuntimeException('This password does not use the Bcrypt algorithm.');
         }
 
         return password_verify($value, $hashedValue);

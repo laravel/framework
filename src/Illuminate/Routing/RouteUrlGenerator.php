@@ -83,7 +83,8 @@ class RouteUrlGenerator
         // will need to throw the exception to let the developers know one was not given.
         $uri = $this->addQueryString($this->url->format(
             $root = $this->replaceRootParameters($route, $domain, $parameters),
-            $this->replaceRouteParameters($route->uri(), $parameters)
+            $this->replaceRouteParameters($route->uri(), $parameters),
+            $route
         ), $parameters);
 
         if (preg_match('/\{.*?\}/', $uri)) {
@@ -96,7 +97,13 @@ class RouteUrlGenerator
         $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
         if (! $absolute) {
-            return '/'.ltrim(str_replace($root, '', $uri), '/');
+            $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
+
+            if ($base = $this->request->getBaseUrl()) {
+                $uri = preg_replace('#^'.$base.'#i', '', $uri);
+            }
+
+            return '/'.ltrim($uri, '/');
         }
 
         return $uri;
@@ -142,7 +149,7 @@ class RouteUrlGenerator
             return 'https://';
         }
 
-        return $this->url->formatScheme(null);
+        return $this->url->formatScheme();
     }
 
     /**
@@ -254,7 +261,7 @@ class RouteUrlGenerator
             return '';
         }
 
-        $query = http_build_query(
+        $query = Arr::query(
             $keyed = $this->getStringParameters($parameters)
         );
 

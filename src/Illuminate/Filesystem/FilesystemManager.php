@@ -357,6 +357,21 @@ class FilesystemManager implements FactoryContract
     }
 
     /**
+     * Unset the given disk instances.
+     *
+     * @param  array|string  $disk
+     * @return $this
+     */
+    public function forgetDisk($disk)
+    {
+        foreach ((array) $disk as $diskName) {
+            unset($this->disks[$diskName]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param  string    $driver

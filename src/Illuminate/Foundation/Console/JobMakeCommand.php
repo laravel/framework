@@ -59,7 +59,7 @@ class JobMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous.'],
+            ['sync', null, InputOption::VALUE_NONE, 'Indicates that job should be synchronous'],
         ];
     }
 }

@@ -236,7 +236,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
-    public function redirect($uri, $destination, $status = 301)
+    public function redirect($uri, $destination, $status = 302)
     {
         return $this->any($uri, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
@@ -328,8 +328,14 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function apiResource($name, $controller, array $options = [])
     {
+        $only = ['index', 'show', 'store', 'update', 'destroy'];
+
+        if (isset($options['except'])) {
+            $only = array_diff($only, (array) $options['except']);
+        }
+
         return $this->resource($name, $controller, array_merge([
-            'only' => ['index', 'show', 'store', 'update', 'destroy'],
+            'only' => $only,
         ], $options));
     }
 
@@ -620,8 +626,8 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Return the response for the given route.
      *
-     * @param  Route  $route
-     * @param  Request  $request
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Routing\Route  $route
      * @return mixed
      */
     protected function runRoute(Request $request, Route $route)
@@ -1135,7 +1141,7 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
         $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
         $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset');
+        $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
     }
 
     /**

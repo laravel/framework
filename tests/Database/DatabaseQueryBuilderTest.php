@@ -289,8 +289,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where month(`created_at`) = ?', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereyear('created_at', 1);
+        $builder->select('*')->from('users')->whereYear('created_at', 1);
         $this->assertEquals('select * from `users` where year(`created_at`) = ?', $builder->toSql());
+    }
+
+    public function testDateBasedOrWheresAcceptsTwoArguments()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereDate('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or date(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereDay('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or day(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereMonth('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or month(`created_at`) = ?', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', 1)->orWhereyear('created_at', 1);
+        $this->assertEquals('select * from `users` where `id` = ? or year(`created_at`) = ?', $builder->toSql());
     }
 
     public function testDateBasedWheresExpressionIsNotBound()
@@ -298,6 +317,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'))->where('admin', true);
         $this->assertEquals([true], $builder->getBindings());
+    }
+
+    public function testWhereDateMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-12-21');
+        $this->assertEquals('select * from `users` where date(`created_at`) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2015-12-21'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', '=', new Raw('NOW()'));
+        $this->assertEquals('select * from `users` where date(`created_at`) = NOW()', $builder->toSql());
     }
 
     public function testWhereDayMySql()
@@ -378,6 +409,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-12-21');
         $this->assertEquals('select * from "users" where "created_at"::date = ?', $builder->toSql());
         $this->assertEquals([0 => '2015-12-21'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'));
+        $this->assertEquals('select * from "users" where "created_at"::date = NOW()', $builder->toSql());
     }
 
     public function testWhereDayPostgres()
@@ -412,11 +447,23 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereDateSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-12-21');
+        $this->assertEquals('select * from "users" where strftime(\'%Y-%m-%d\', "created_at") = cast(? as text)', $builder->toSql());
+        $this->assertEquals([0 => '2015-12-21'], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'));
+        $this->assertEquals('select * from "users" where strftime(\'%Y-%m-%d\', "created_at") = cast(NOW() as text)', $builder->toSql());
+    }
+
     public function testWhereDaySqlite()
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereDay('created_at', '=', 1);
-        $this->assertEquals('select * from "users" where strftime(\'%d\', "created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where strftime(\'%d\', "created_at") = cast(? as text)', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
@@ -424,7 +471,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereMonth('created_at', '=', 5);
-        $this->assertEquals('select * from "users" where strftime(\'%m\', "created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where strftime(\'%m\', "created_at") = cast(? as text)', $builder->toSql());
         $this->assertEquals([0 => 5], $builder->getBindings());
     }
 
@@ -432,7 +479,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereYear('created_at', '=', 2014);
-        $this->assertEquals('select * from "users" where strftime(\'%Y\', "created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where strftime(\'%Y\', "created_at") = cast(? as text)', $builder->toSql());
         $this->assertEquals([0 => 2014], $builder->getBindings());
     }
 
@@ -440,7 +487,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '>=', '22:00');
-        $this->assertEquals('select * from "users" where strftime(\'%H:%M:%S\', "created_at") >= ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where strftime(\'%H:%M:%S\', "created_at") >= cast(? as text)', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
@@ -448,8 +495,20 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getSQLiteBuilder();
         $builder->select('*')->from('users')->whereTime('created_at', '22:00');
-        $this->assertEquals('select * from "users" where strftime(\'%H:%M:%S\', "created_at") = ?', $builder->toSql());
+        $this->assertEquals('select * from "users" where strftime(\'%H:%M:%S\', "created_at") = cast(? as text)', $builder->toSql());
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
+    }
+
+    public function testWhereDateSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', '=', '2015-12-21');
+        $this->assertEquals('select * from [users] where cast([created_at] as date) = ?', $builder->toSql());
+        $this->assertEquals([0 => '2015-12-21'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereDate('created_at', new Raw('NOW()'));
+        $this->assertEquals('select * from [users] where cast([created_at] as date) = NOW()', $builder->toSql());
     }
 
     public function testWhereDaySqlServer()
@@ -487,6 +546,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereNotBetween('id', [1, 2]);
         $this->assertEquals('select * from "users" where "id" not between ? and ?', $builder->toSql());
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereBetween('id', [new Raw(1), new Raw(2)]);
+        $this->assertEquals('select * from "users" where "id" between 1 and 2', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
     }
 
     public function testBasicOrWheres()
@@ -980,6 +1044,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
     }
 
+    public function testNestedWhereBindings()
+    {
+        $builder = $this->getBuilder();
+        $builder->where('email', '=', 'foo')->where(function ($q) {
+            $q->selectRaw('?', ['ignore'])->where('name', '=', 'bar');
+        });
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
     public function testFullSubSelects()
     {
         $builder = $this->getBuilder();
@@ -1286,6 +1359,45 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['1', 10000], $builder->getBindings());
     }
 
+    public function testJoinSub()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->joinSub('select * from "contacts"', 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->from('users')->joinSub(function ($q) {
+            $q->from('contacts');
+        }, 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $sub1 = $this->getBuilder()->from('contacts')->where('name', 'foo');
+        $sub2 = $this->getBuilder()->from('contacts')->where('name', 'bar');
+        $builder->from('users')
+            ->joinSub($sub1, 'sub1', 'users.id', '=', 1, 'inner', true)
+            ->joinSub($sub2, 'sub2', 'users.id', '=', 'sub2.user_id');
+        $expected = 'select * from "users" ';
+        $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub1" on "users"."id" = ? ';
+        $expected .= 'inner join (select * from "contacts" where "name" = ?) as "sub2" on "users"."id" = "sub2"."user_id"';
+        $this->assertEquals($expected, $builder->toSql());
+        $this->assertEquals(['foo', 1, 'bar'], $builder->getRawBindings()['join']);
+    }
+
+    public function testLeftJoinSub()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->leftJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "users" left join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+    }
+
+    public function testRightJoinSub()
+    {
+        $builder = $this->getBuilder();
+        $builder->from('users')->rightJoinSub($this->getBuilder()->from('contacts'), 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "users" right join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+    }
+
     public function testRawExpressionsInSelect()
     {
         $builder = $this->getBuilder();
@@ -1315,7 +1427,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
-    public function testListMethodsGetsArrayOfColumnValues()
+    public function testPluckMethodGetsCollectionOfColumnValues()
     {
         $builder = $this->getBuilder();
         $builder->getConnection()->shouldReceive('select')->once()->andReturn([['foo' => 'bar'], ['foo' => 'baz']]);
@@ -1962,6 +2074,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where JSON_EXTRACT(`items`, `$."price"."in_usd"`) = ? and JSON_EXTRACT(`items`, `$."age"`) = ?', $builder->toSql());
     }
 
+    public function testSqlServerWrappingJson()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select json_value([items], \'$."price"\') from [users] where json_value([items], \'$."price"\') = ? order by json_value([items], \'$."price"\') asc', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from [users] where json_value([items], \'$."price"."in_usd"\') = ?', $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
+        $this->assertEquals('select * from [users] where json_value([items], \'$."price"."in_usd"\') = ? and json_value([items], \'$."age"\') = ?', $builder->toSql());
+    }
+
     public function testSQLiteOrderBy()
     {
         $builder = $this->getSQLiteBuilder();
@@ -2526,6 +2653,94 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
+    }
+
+    public function testWhereJsonContainsMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en']);
+        $this->assertEquals('select * from `users` where json_contains(`options`->\'$."languages"\', ?)', $builder->toSql());
+        $this->assertEquals(['["en"]'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContains('options->languages', new Raw("'[\"en\"]'"));
+        $this->assertEquals('select * from `users` where `id` = ? or json_contains(`options`->\'$."languages"\', \'["en"]\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    public function testWhereJsonContainsPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en']);
+        $this->assertEquals('select * from "users" where ("options"->\'languages\')::jsonb @> ?', $builder->toSql());
+        $this->assertEquals(['["en"]'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonContains('options->languages', new Raw("'[\"en\"]'"));
+        $this->assertEquals('select * from "users" where "id" = ? or ("options"->\'languages\')::jsonb @> \'["en"]\'', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWhereJsonContainsSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en'])->toSql();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWhereJsonContainsSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en'])->toSql();
+    }
+
+    public function testWhereJsonDoesntContainMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en']);
+        $this->assertEquals('select * from `users` where not json_contains(`options`->\'$."languages"\', ?)', $builder->toSql());
+        $this->assertEquals(['["en"]'], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContain('options->languages', new Raw("'[\"en\"]'"));
+        $this->assertEquals('select * from `users` where `id` = ? or not json_contains(`options`->\'$."languages"\', \'["en"]\')', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    public function testWhereJsonDoesntContainPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en']);
+        $this->assertEquals('select * from "users" where not ("options"->\'languages\')::jsonb @> ?', $builder->toSql());
+        $this->assertEquals(['["en"]'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonDoesntContain('options->languages', new Raw("'[\"en\"]'"));
+        $this->assertEquals('select * from "users" where "id" = ? or not ("options"->\'languages\')::jsonb @> \'["en"]\'', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWhereJsonDoesntContainSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testWhereJsonDoesntContainSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereJsonDoesntContain('options->languages', ['en'])->toSql();
     }
 
     public function testFromSub()

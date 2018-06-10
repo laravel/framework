@@ -290,7 +290,7 @@ class AppNameCommand extends Command
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The desired namespace.'],
+            ['name', InputArgument::REQUIRED, 'The desired namespace'],
         ];
     }
 }

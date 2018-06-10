@@ -91,7 +91,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      * @param  string  $name
      * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
      * @param  \Illuminate\Contracts\Session\Session  $session
-     * @param  \Symfony\Component\HttpFoundation\Request  $request
+     * @param  \Symfony\Component\HttpFoundation\Request|null  $request
      * @return void
      */
     public function __construct($name,
@@ -535,13 +535,13 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Invalid other sessions for the current user.
+     * Invalidate other sessions for the current user.
      *
      * The application must be using the AuthenticateSession middleware.
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return $this
+     * @return null|bool
      */
     public function logoutOtherDevices($password, $attribute = 'password')
     {

@@ -8,7 +8,7 @@ If you need support, please use the forums:
 
 Alternatively, you may use Slack (https://larachat.co/) or Stack Overflow (http://stackoverflow.com/questions/tagged/laravel).
 
-If you would like to propose new Laravel features, please make a pull request, or open an issue at https://github.com/laravel/internals/issues.
+If you would like to propose new Laravel features, please make a pull request, or open an issue at https://github.com/laravel/ideas/issues.
 -->
 
 - Laravel Version: #.#.#

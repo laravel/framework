@@ -84,9 +84,9 @@ class ServeCommand extends Command
     protected function getOptions()
     {
         return [
-            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', '127.0.0.1'],
+            ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on', '127.0.0.1'],
 
-            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000],
+            ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on', 8000],
         ];
     }
 }
