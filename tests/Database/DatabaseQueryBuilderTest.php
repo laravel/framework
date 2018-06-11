@@ -2051,6 +2051,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" where "items"->\'price\'->>\'in_usd\' = ? and "items"->>\'age\' = ?', $builder->toSql());
     }
 
+    public function testMariaDbWrappingJson()
+    {
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->whereRaw('JSON_EXTRACT(items, \'$."price"\') = 1');
+        $this->assertEquals('select * from `users` where JSON_EXTRACT(items, \'$."price"\') = 1', $builder->toSql());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select JSON_EXTRACT(`items`, `$."price"`) from `users` where JSON_EXTRACT(`items`, `$."price"`) = ? order by JSON_EXTRACT(`items`, `$."price"`) asc', $builder->toSql());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from `users` where JSON_EXTRACT(`items`, `$."price"."in_usd"`) = ?', $builder->toSql());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->where('users.items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from `users` where JSON_EXTRACT(`users`.`items`, `$."price"."in_usd"`) = ?', $builder->toSql());
+
+        $builder = $this->getMariaDbBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
+        $this->assertEquals('select * from `users` where JSON_EXTRACT(`items`, `$."price"."in_usd"`) = ? and JSON_EXTRACT(`items`, `$."age"`) = ?', $builder->toSql());
+    }
+
     public function testSqlServerWrappingJson()
     {
         $builder = $this->getSqlServerBuilder();
@@ -2796,6 +2819,14 @@ class DatabaseQueryBuilderTest extends TestCase
     protected function getMySqlBuilder()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
+        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+
+        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+    }
+
+    protected function getMariaDbBuilder()
+    {
+        $grammar = new \Illuminate\Database\Query\Grammars\MariaDbGrammar;
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
 
         return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);

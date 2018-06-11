@@ -241,6 +241,7 @@ class ConnectionFactory
         }
 
         switch ($config['driver']) {
+            case 'mariadb':
             case 'mysql':
                 return new MySqlConnector;
             case 'pgsql':
@@ -275,6 +276,8 @@ class ConnectionFactory
         switch ($driver) {
             case 'mysql':
                 return new MySqlConnection($connection, $database, $prefix, $config);
+            case 'mariadb':
+                return new MariaDbConnection($connection, $database, $prefix, $config);
             case 'pgsql':
                 return new PostgresConnection($connection, $database, $prefix, $config);
             case 'sqlite':
