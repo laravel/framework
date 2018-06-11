@@ -1,5 +1,19 @@
 # Release Notes for 5.6.x
 
+## v5.6.25 (pre-release)
+
+### Added
+- Added whereJsonContains() to SQL Server ([#24448](https://github.com/laravel/framework/pull/24448))
+- Added Model::unsetRelation() ([#24486](https://github.com/laravel/framework/pull/24486))
+- Added Auth::hasUser() ([#24518](https://github.com/laravel/framework/pull/24518))
+- add assertOk() response assertion ([#24536](https://github.com/laravel/framework/pull/24536))
+
+### Changed
+- Set the controller name on the action array when callable array syntax is used ([#24468](https://github.com/laravel/framework/pull/24468))
+- Make database grammars macroable ([#24513](https://github.com/laravel/framework/pull/24513))
+- Allow "app" migrations to override package migrations ([#24521](https://github.com/laravel/framework/pull/24521))
+
+
 ## v5.6.24 (2018-06-04)
 
 ### Added
@@ -9,6 +23,10 @@
 - Added Queueable, SerializesModels to all notification events ([#24368](https://github.com/laravel/framework/pull/24368))
 - Allow callable array syntax in route definition ([#24385](https://github.com/laravel/framework/pull/24385))
 - Added JSON SELECT queries to SQL Server ([#24397](https://github.com/laravel/framework/pull/24397))
+- Added whereJsonContains() to SQL Server ([#24448](https://github.com/laravel/framework/pull/24448))
+- Added Model::unsetRelation() ([#24486](https://github.com/laravel/framework/pull/24486))
+- Added Auth::hasUser() ([#24518](https://github.com/laravel/framework/pull/24518))
+- add assertOk() response assertion ([#24536](https://github.com/laravel/framework/pull/24536))
 
 ### Changed
 - Optimize query builder's `pluck()` method ([#23482](https://github.com/laravel/framework/pull/23482))
@@ -17,6 +35,9 @@
 - Let apiResource support except option ([#24319](https://github.com/laravel/framework/pull/24319))
 - Skip null/empty values in SeeInOrder ([#24395](https://github.com/laravel/framework/pull/24395))
 - Sync Original modal attributes after soft deletion ([#24400](https://github.com/laravel/framework/pull/24400))
+- Set the controller name on the action array when callable array syntax is used ([#24468](https://github.com/laravel/framework/pull/24468))
+- Make database grammars macroable ([#24513](https://github.com/laravel/framework/pull/24513))
+- Allow "app" migrations to override package migrations ([#24521](https://github.com/laravel/framework/pull/24521))
 
 ### Fixed
 - Fixed typo of missing underscore in `not_regexp` rule name ([#24297](https://github.com/laravel/framework/pull/24297))
