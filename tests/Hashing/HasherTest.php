@@ -31,7 +31,7 @@ class HasherTest extends TestCase
     }
 
     /**
-     * @expectedException \Exception
+     * @expectedException \RuntimeException
      */
     public function testBasicBcryptVerification()
     {

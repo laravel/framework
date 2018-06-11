@@ -5,7 +5,7 @@ namespace Illuminate\Hashing;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
-class ArgonHasher implements HasherContract
+class ArgonHasher extends AbstractHasher implements HasherContract
 {
     /**
      * The default memory cost factor.
@@ -42,17 +42,6 @@ class ArgonHasher implements HasherContract
     }
 
     /**
-     * Get information about the given hashed value.
-     *
-     * @param  string  $hashedValue
-     * @return array
-     */
-    public function info($hashedValue)
-    {
-        return password_get_info($hashedValue);
-    }
-
-    /**
      * Hash the given value.
      *
      * @param  string  $value
@@ -83,20 +72,14 @@ class ArgonHasher implements HasherContract
      * @param  string  $hashedValue
      * @param  array  $options
      * @return bool
-     *
-     * @throws \RuntimeException
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        if (strlen($hashedValue) === 0) {
-            return false;
-        }
-
         if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
             throw new RuntimeException('This password does not use the Argon algorithm.');
         }
 
-        return password_verify($value, $hashedValue);
+        return parent::check($value, $hashedValue, $options);
     }
 
     /**

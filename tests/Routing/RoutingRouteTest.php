@@ -1326,6 +1326,8 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
         $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+        $action = $router->getRoutes()->getRoutes()[0]->getAction()['controller'];
+        $this->assertEquals('Illuminate\Tests\Routing\RouteTestControllerStub@index', $action);
     }
 
     public function testCallableControllerRouting()

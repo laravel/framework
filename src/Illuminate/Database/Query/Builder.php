@@ -1449,7 +1449,7 @@ class Builder
         $this->wheres[] = compact('type', 'column', 'value', 'boolean', 'not');
 
         if (! $value instanceof Expression) {
-            $this->addBinding(json_encode($value));
+            $this->addBinding($this->grammar->prepareBindingForJsonContains($value));
         }
 
         return $this;
