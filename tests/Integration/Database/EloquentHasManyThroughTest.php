@@ -27,7 +27,6 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         });
     }
 
-    
     public function test_basic_create_and_retrieve()
     {
         $user = User::create(['name' => str_random()]);

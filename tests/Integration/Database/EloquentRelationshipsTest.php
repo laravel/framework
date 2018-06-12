@@ -21,7 +21,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class EloquentRelationshipsTest extends TestCase
 {
     /**
-     *
      * @group f
      */
     public function test_standard_relationships()
@@ -40,7 +39,6 @@ class EloquentRelationshipsTest extends TestCase
     }
 
     /**
-     *
      * @group f
      */
     public function test_overridden_relationships()
