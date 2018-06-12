@@ -11,6 +11,7 @@ use Monolog\Handler\StreamHandler;
 use Monolog\Formatter\HtmlFormatter;
 use Monolog\Handler\NewRelicHandler;
 use Monolog\Handler\LogEntriesHandler;
+use Monolog\Handler\RotatingFileHandler;
 use Monolog\Formatter\NormalizerFormatter;
 
 class LogManagerTest extends TestCase
@@ -115,5 +116,43 @@ class LogManagerTest extends TestCase
         $dateFormat->setAccessible(true);
 
         $this->assertEquals('Y/m/d--test', $dateFormat->getValue($formatter));
+    }
+
+    public function testLogManagerCreateDailyDriver()
+    {
+        $config = $this->app['config'];
+        $config->set('logging.channels.daily', [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => 'debug',
+            'max_files' => 7,
+        ]);
+
+        $manager = new LogManager($this->app);
+
+        $logger = $manager->channel('daily');
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $this->assertInstanceOf(RotatingFileHandler::class, $handler);
+
+        $maxFiles = new ReflectionProperty(get_class($handler), 'maxFiles');
+        $maxFiles->setAccessible(true);
+        $this->assertEquals(7, $maxFiles->getValue($handler));
+
+        $config = $this->app['config'];
+        $config->set('logging.channels.daily_without_max_files', [
+            'driver' => 'daily',
+            'path' => storage_path('logs/laravel.log'),
+            'level' => 'debug',
+        ]);
+
+        $logger = $manager->channel('daily_without_max_files');
+        $handler = $logger->getLogger()->getHandlers()[0];
+
+        $this->assertInstanceOf(RotatingFileHandler::class, $handler);
+
+        $maxFiles = new ReflectionProperty(get_class($handler), 'maxFiles');
+        $maxFiles->setAccessible(true);
+        $this->assertEquals(0, $maxFiles->getValue($handler));
     }
 }
