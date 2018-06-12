@@ -365,6 +365,25 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertFalse($model->wasRecentlyCreated);
     }
 
+    public function testChunkByIdWithNonIncrementingKey()
+    {
+        EloquentTestNonIncrementingSecond::create(['name' => ' First']);
+        EloquentTestNonIncrementingSecond::create(['name' => ' Second']);
+        EloquentTestNonIncrementingSecond::create(['name' => ' Third']);
+
+        $i = 0;
+        EloquentTestNonIncrementingSecond::query()->chunkById(2, function (Collection $users) use (&$i) {
+            if (! $i) {
+                $this->assertEquals(' First', $users[0]->name);
+                $this->assertEquals(' Second', $users[1]->name);
+            } else {
+                $this->assertEquals(' Third', $users[0]->name);
+            }
+            $i++;
+        }, 'name');
+        $this->assertEquals(2, $i);
+    }
+
     public function testPluck()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1293,6 +1312,11 @@ class EloquentTestNonIncrementing extends Eloquent
     protected $guarded = [];
     public $incrementing = false;
     public $timestamps = false;
+}
+
+class EloquentTestNonIncrementingSecond extends EloquentTestNonIncrementing
+{
+    protected $connection = 'second_connection';
 }
 
 class EloquentTestUserWithGlobalScope extends EloquentTestUser

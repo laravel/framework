@@ -1805,7 +1805,7 @@ class Builder
      * Constrain the query to the next "page" of results after a given ID.
      *
      * @param  int  $perPage
-     * @param  int  $lastId
+     * @param  int|null  $lastId
      * @param  string  $column
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1813,8 +1813,11 @@ class Builder
     {
         $this->orders = $this->removeExistingOrdersFor($column);
 
-        return $this->where($column, '>', $lastId)
-                    ->orderBy($column, 'asc')
+        if (! is_null($lastId)) {
+            $this->where($column, '>', $lastId);
+        }
+
+        return $this->orderBy($column, 'asc')
                     ->take($perPage);
     }
 
@@ -2088,7 +2091,7 @@ class Builder
     {
         $alias = $alias ?: $column;
 
-        $lastId = 0;
+        $lastId = null;
 
         do {
             $clone = clone $this;
