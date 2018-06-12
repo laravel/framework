@@ -99,10 +99,20 @@ class Str
      *
      * @param  string  $haystack
      * @param  string|array  $needles
+     * @param  bool  $caseSensitive
      * @return bool
      */
-    public static function contains($haystack, $needles)
+    public static function contains($haystack, $needles, $caseSensitive = true)
     {
+        // Normalise case if the check is case insensitive
+        if ($caseSensitive === false) {
+            $haystack = strtolower($haystack);
+
+            $needles = collect($needles)->map(function ($item) {
+                return strtolower($item);
+            })->toArray();
+        }
+
         foreach ((array) $needles as $needle) {
             if ($needle !== '' && mb_strpos($haystack, $needle) !== false) {
                 return true;

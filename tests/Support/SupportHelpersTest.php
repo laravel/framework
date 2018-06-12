@@ -281,6 +281,11 @@ class SupportHelpersTest extends TestCase
         $this->assertFalse(Str::contains('taylor', 'xxx'));
         $this->assertFalse(Str::contains('taylor', ['xxx']));
         $this->assertTrue(Str::contains('taylor', ['xxx', 'taylor']));
+
+        $this->assertFalse(Str::contains('taylor', ['xxx', 'TAYLOR']));
+        $this->assertFalse(Str::contains('taylor', 'TAYLOR'));
+        $this->assertTrue(Str::contains('taylor', ['xxx', 'TAYLOR'], false));
+        $this->assertTrue(Str::contains('taylor', 'TAYLOR', false));
     }
 
     public function testStrFinish()
