@@ -1813,7 +1813,7 @@ class Builder
     {
         $this->orders = $this->removeExistingOrdersFor($column);
 
-        if ($lastId !== null) {
+        if (! is_null($lastId)) {
             $this->where($column, '>', $lastId);
         }
 
