@@ -84,7 +84,7 @@ class HasInDatabase extends Constraint
         $description = 'Found: '.json_encode($results->take($this->show), JSON_PRETTY_PRINT);
 
         if ($results->count() > $this->show) {
-            $description .= sprintf(' and %s others', $results->count() - $this->show);
+            $description .= sprintf(' and %d others', $results->count() - $this->show);
         }
 
         return $description;
