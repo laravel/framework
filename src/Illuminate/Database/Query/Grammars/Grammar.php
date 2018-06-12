@@ -39,58 +39,6 @@ class Grammar extends BaseGrammar
     ];
 
     /**
-     * Wrap a value in keyword identifiers.
-     *
-     * @param  \Illuminate\Database\Query\Expression|string  $value
-     * @param  bool    $prefixAlias
-     * @return string
-     */
-    public function wrap($value, $prefixAlias = false)
-    {
-        if ($this->isExpression($value)) {
-            return $this->getValue($value);
-        }
-
-        // If the value being wrapped has a column alias we will need to separate out
-        // the pieces so we can wrap each of the segments of the expression on its
-        // own, and then join these both back together using the "as" connector.
-        if (strpos(strtolower($value), ' as ') !== false) {
-            return $this->wrapAliasedValue($value, $prefixAlias);
-        }
-
-        // If the given value is a JSON selector we will wrap it differently than a
-        // traditional value. We will need to split this path and wrap each part
-        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
-        if ($this->isJsonSelector($value)) {
-            return $this->wrapJsonSelector($value);
-        }
-
-        return $this->wrapSegments(explode('.', $value));
-    }
-
-    /**
-     * Wrap the given JSON selector.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function wrapJsonSelector($value)
-    {
-        throw new RuntimeException('This database engine does not support JSON operations.');
-    }
-
-    /**
-     * Determine if the given string is a JSON selector.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected function isJsonSelector($value)
-    {
-        return Str::contains($value, '->');
-    }
-
-    /**
      * Compile a select query into SQL.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -939,6 +887,58 @@ class Grammar extends BaseGrammar
     public function compileSavepointRollBack($name)
     {
         return 'ROLLBACK TO SAVEPOINT '.$name;
+    }
+
+    /**
+     * Wrap a value in keyword identifiers.
+     *
+     * @param  \Illuminate\Database\Query\Expression|string  $value
+     * @param  bool    $prefixAlias
+     * @return string
+     */
+    public function wrap($value, $prefixAlias = false)
+    {
+        if ($this->isExpression($value)) {
+            return $this->getValue($value);
+        }
+
+        // If the value being wrapped has a column alias we will need to separate out
+        // the pieces so we can wrap each of the segments of the expression on its
+        // own, and then join these both back together using the "as" connector.
+        if (strpos(strtolower($value), ' as ') !== false) {
+            return $this->wrapAliasedValue($value, $prefixAlias);
+        }
+
+        // If the given value is a JSON selector we will wrap it differently than a
+        // traditional value. We will need to split this path and wrap each part
+        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
+        if ($this->isJsonSelector($value)) {
+            return $this->wrapJsonSelector($value);
+        }
+
+        return $this->wrapSegments(explode('.', $value));
+    }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        throw new RuntimeException('This database engine does not support JSON operations.');
+    }
+
+    /**
+     * Determine if the given string is a JSON selector.
+     *
+     * @param  string  $value
+     * @return bool
+     */
+    protected function isJsonSelector($value)
+    {
+        return Str::contains($value, '->');
     }
 
     /**
