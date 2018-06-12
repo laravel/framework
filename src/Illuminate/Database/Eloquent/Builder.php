@@ -622,7 +622,7 @@ class Builder
 
         $alias = is_null($alias) ? $column : $alias;
 
-        $lastId = 0;
+        $lastId = null;
 
         do {
             $clone = clone $this;
