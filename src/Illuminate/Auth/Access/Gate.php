@@ -364,10 +364,24 @@ class Gate implements GateContract
      */
     protected function policyAllowsGuests($policy, $ability, $arguments)
     {
-        try {
-            $reflection = new ReflectionClass($policy);
+        return $this->methodAllowsGuests(
+            $policy, $this->formatAbilityToMethod($ability)
+        );
+    }
 
-            $method = $reflection->getMethod($this->formatAbilityToMethod($ability));
+    /**
+     * Determine if the given class method allows guests.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return bool
+     */
+    protected function methodAllowsGuests($class, $method)
+    {
+        try {
+            $reflection = new ReflectionClass($class);
+
+            $method = $reflection->getMethod($method);
         } catch (Exception $e) {
             return false;
         }
@@ -390,7 +404,19 @@ class Gate implements GateContract
      */
     protected function abilityAllowsGuests($ability, $arguments)
     {
-        $parameters = (new ReflectionFunction($this->abilities[$ability]))->getParameters();
+        return $this->callbackAllowsGuests($this->abilities[$ability]);
+    }
+
+    /**
+     * Determine if the callback allows guests.
+     *
+     * @param  callable  $callback
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function callbackAllowsGuests($callback)
+    {
+        $parameters = (new ReflectionFunction($callback))->getParameters();
 
         return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
     }
@@ -435,6 +461,10 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
+            if (is_null($user) && ! $this->callbackAllowsGuests($before)) {
+                continue;
+            }
+
             if (! is_null($result = $before(...$arguments))) {
                 return $result;
             }
@@ -455,6 +485,10 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
+            if (is_null($user) && ! $this->callbackAllowsGuests($after)) {
+                continue;
+            }
+
             $after(...$arguments);
         }
     }
@@ -578,7 +612,8 @@ class Gate implements GateContract
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
-        if (method_exists($policy, 'before')) {
+        if (method_exists($policy, 'before') &&
+            (! is_null($user) || $this->methodAllowsGuests($policy, 'before'))) {
             return $policy->before($user, $ability, ...$arguments);
         }
     }
