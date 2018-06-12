@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 
 class SqlServerGrammar extends Grammar
@@ -113,11 +112,13 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        $from = $column[0] == '['
-                ? 'openjson('.$column.')'
-                : substr_replace($column, 'openjson', 0, strlen('json_value'));
+        $parts = explode('->', $column, 2);
 
-        return $value.' in (select [value] from '.$from.')';
+        $field = $this->wrap($parts[0]);
+
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+
+        return $value.' in (select [value] from openjson('.$field.$path.'))';
     }
 
     /**
@@ -439,18 +440,7 @@ class SqlServerGrammar extends Grammar
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') {
-            return $value;
-        }
-
-        // If the given value is a JSON selector we will wrap it differently than a
-        // traditional value. We will need to split this path and wrap each part
-        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
-        if (Str::contains($value, '->')) {
-            return $this->wrapJsonSelector($value);
-        }
-
-        return '['.str_replace(']', ']]', $value).']';
+        return $value === '*' ? $value : '['.str_replace(']', ']]', $value).']';
     }
 
     /**
@@ -461,13 +451,22 @@ class SqlServerGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $path = explode('->', $value);
+        $parts = explode('->', $value, 2);
 
-        $field = $this->wrapValue(array_shift($path));
+        $field = $this->wrapSegments(explode('.', array_shift($parts)));
 
-        return sprintf('json_value(%s, \'$.%s\')', $field, collect($path)->map(function ($part) {
-            return '"'.$part.'"';
-        })->implode('.'));
+        return 'json_value('.$field.', '.$this->wrapJsonPath($parts[0]).')';
+    }
+
+    /**
+     * Wrap the given JSON path.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonPath($value)
+    {
+        return '\'$."'.str_replace('->', '"."', $value).'"\'';
     }
 
     /**
