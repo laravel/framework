@@ -462,6 +462,29 @@ class Arr
     }
 
     /**
+     * Add a value to an existing key.
+     *
+     * @param  array  $array
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     */
+    public static function push(&$array, $key, $value)
+    {
+        if ($key === null || trim($key) === '') {
+            return $array = [];
+        }
+
+        $previous = static::get($array, $key, []);
+        $previous = is_array($previous) ? $previous : [];
+        $previous[] = $value;
+
+        static::set($array, $key, $previous);
+
+        return $array;
+    }
+
+    /**
      * Get one or a specified number of random values from an array.
      *
      * @param  array  $array

@@ -419,6 +419,32 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['emails' => ['joe@example.com' => 'Joe', 'jane@localhost' => 'Jane']], $array);
     }
 
+    public function testPush()
+    {
+        $array = ['key' => [['xxx' => 'yyy']]];
+        Arr::push($array, null, ['foo' => 'bar']);
+        $this->assertSame([], $array);
+        Arr::push($array, '', ['foo' => 'bar']);
+        $this->assertSame([], $array);
+
+        $array = [];
+        Arr::push($array, 'key', ['foo' => 'bar']);
+        $this->assertSame('bar', Arr::get($array, 'key.0.foo'));
+
+        $array = ['key' => []];
+        Arr::push($array, 'key', ['foo' => 'bar']);
+        $this->assertSame('bar', Arr::get($array, 'key.0.foo'));
+
+        $array = ['key' => [['xxx' => 'yyy']]];
+        Arr::push($array, 'key', ['foo' => 'bar']);
+        $this->assertSame('yyy', Arr::get($array, 'key.0.xxx'));
+        $this->assertSame('bar', Arr::get($array, 'key.1.foo'));
+
+        $array = ['key' => true];
+        Arr::push($array, 'key', ['foo' => 'bar']);
+        $this->assertSame('bar', Arr::get($array, 'key.0.foo'));
+    }
+
     public function testRandom()
     {
         $random = Arr::random(['foo', 'bar', 'baz']);
