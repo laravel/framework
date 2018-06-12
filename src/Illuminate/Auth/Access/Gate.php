@@ -2,6 +2,9 @@
 
 namespace Illuminate\Auth\Access;
 
+use Exception;
+use ReflectionClass;
+use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -302,7 +305,8 @@ class Gate implements GateContract
      */
     protected function raw($ability, $arguments = [])
     {
-        if (! $user = $this->resolveUser()) {
+        if (! ($user = $this->resolveUser()) &&
+            ! $this->allowsGuests($ability, Arr::wrap($arguments))) {
             return false;
         }
 
@@ -327,6 +331,80 @@ class Gate implements GateContract
         );
 
         return $result;
+    }
+
+    /**
+     * Determine if the given ability allows guests.
+     *
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function allowsGuests($ability, $arguments)
+    {
+        if (isset($arguments[0]) &&
+            ! is_null($policy = $this->getPolicyFor($arguments[0]))) {
+            return $this->policyAllowsGuests($policy, $ability, $arguments);
+        }
+
+        if (isset($this->abilities[$ability])) {
+            return $this->abilityAllowsGuests($ability, $arguments);
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the given policy method allows guests.
+     *
+     * @param  string  $policy
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function policyAllowsGuests($policy, $ability, $arguments)
+    {
+        try {
+            $reflection = new ReflectionClass($policy);
+
+            $method = $reflection->getMethod($this->formatAbilityToMethod($ability));
+        } catch (Exception $e) {
+            return false;
+        }
+
+        if ($method) {
+            $parameters = $method->getParameters();
+
+            return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the ability allows guests.
+     *
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function abilityAllowsGuests($ability, $arguments)
+    {
+        $parameters = (new ReflectionFunction($this->abilities[$ability]))->getParameters();
+
+        return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
+    }
+
+    /**
+     * Determine if the given parameter allows guests.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return bool
+     */
+    protected function parameterAllowsGuests($parameter)
+    {
+        return ($parameter->getClass() && $parameter->allowsNull()) ||
+               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
     /**
