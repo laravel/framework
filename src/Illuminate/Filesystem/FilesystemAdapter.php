@@ -255,7 +255,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @param  string  $data
      * @param  string  $separator
-     * @return int
+     * @return bool
      */
     public function prepend($path, $data, $separator = PHP_EOL)
     {
@@ -272,7 +272,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  string  $path
      * @param  string  $data
      * @param  string  $separator
-     * @return int
+     * @return bool
      */
     public function append($path, $data, $separator = PHP_EOL)
     {
