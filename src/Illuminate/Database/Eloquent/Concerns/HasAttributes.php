@@ -467,10 +467,6 @@ trait HasAttributes
      */
     protected function castAttribute($key, $value)
     {
-        if (is_null($value)) {
-            return $value;
-        }
-
         switch ($this->getCastType($key)) {
             case 'int':
             case 'integer':
