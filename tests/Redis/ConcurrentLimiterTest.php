@@ -21,10 +21,7 @@ class ConcurrentLimiterTest extends TestCase
         $this->setUpRedis();
     }
 
-    /**
-     * @test
-     */
-    public function it_locks_tasks_when_no_slot_available()
+    public function test_it_locks_tasks_when_no_slot_available()
     {
         $store = [];
 
@@ -49,10 +46,7 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1, 2, 4], $store);
     }
 
-    /**
-     * @test
-     */
-    public function it_releases_lock_after_task_finishes()
+    public function test_it_releases_lock_after_task_finishes()
     {
         $store = [];
 
@@ -65,10 +59,7 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1, 2, 3, 4], $store);
     }
 
-    /**
-     * @test
-     */
-    public function it_releases_lock_if_task_took_too_long()
+    public function test_it_releases_lock_if_task_took_too_long()
     {
         $store = [];
 
@@ -95,10 +86,7 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1, 3], $store);
     }
 
-    /**
-     * @test
-     */
-    public function it_fails_immediately_or_retries_for_a_while_based_on_a_given_timeout()
+    public function test_it_fails_immediately_or_retries_for_a_while_based_on_a_given_timeout()
     {
         $store = [];
 
@@ -123,10 +111,7 @@ class ConcurrentLimiterTest extends TestCase
         $this->assertEquals([1, 3], $store);
     }
 
-    /**
-     * @test
-     */
-    public function it_fails_after_retry_timeout()
+    public function test_it_fails_after_retry_timeout()
     {
         $store = [];
 

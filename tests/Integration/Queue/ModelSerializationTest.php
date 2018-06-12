@@ -59,10 +59,7 @@ class ModelSerializationTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function it_serialize_user_on_default_connection()
+    public function test_it_serialize_user_on_default_connection()
     {
         $user = ModelSerializationTestUser::create([
             'email' => 'mohamed@laravel.com',
@@ -89,10 +86,7 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
-    /**
-     * @test
-     */
-    public function it_serialize_user_on_different_connection()
+    public function test_it_serialize_user_on_different_connection()
     {
         $user = ModelSerializationTestUser::on('custom')->create([
             'email' => 'mohamed@laravel.com',
@@ -120,11 +114,10 @@ class ModelSerializationTest extends TestCase
     }
 
     /**
-     * @test
      * @expectedException \LogicException
      * @expectedExceptionMessage  Queueing collections with multiple model connections is not supported.
      */
-    public function it_fails_if_models_on_multi_connections()
+    public function test_it_fails_if_models_on_multi_connections()
     {
         $user = ModelSerializationTestUser::on('custom')->create([
             'email' => 'mohamed@laravel.com',
@@ -141,10 +134,7 @@ class ModelSerializationTest extends TestCase
         unserialize($serialized);
     }
 
-    /**
-     * @test
-     */
-    public function it_reloads_relationships()
+    public function test_it_reloads_relationships()
     {
         $order = tap(Order::create(), function (Order $order) {
             $order->wasRecentlyCreated = false;
@@ -164,10 +154,7 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
     }
 
-    /**
-     * @test
-     */
-    public function it_reloads_nested_relationships()
+    public function test_it_reloads_nested_relationships()
     {
         $order = tap(Order::create(), function (Order $order) {
             $order->wasRecentlyCreated = false;
@@ -187,8 +174,7 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
-    /** @test */
-    public function it_serializes_an_empty_collection()
+    public function test_it_serializes_an_empty_collection()
     {
         $serialized = serialize(new ModelSerializationTestClass(
             new \Illuminate\Database\Eloquent\Collection([])
