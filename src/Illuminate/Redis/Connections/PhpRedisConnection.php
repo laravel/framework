@@ -361,7 +361,21 @@ class PhpRedisConnection extends Connection implements ConnectionContract
     {
         //
     }
+    
+    /**
+     * Scan the keyspace for keys.
+     * @param  int    $iterator
+     * @param  string $pattern
+     * @param  int    $count
+     * @return array|bool
+     */
+    public function scan($iterator, $pattern = null, $count = 0)
+    {
+        static $iterator;
 
+        return $this->client->scan($iterator, $pattern, $count);
+    }
+    
     /**
      * Execute a raw command.
      *
