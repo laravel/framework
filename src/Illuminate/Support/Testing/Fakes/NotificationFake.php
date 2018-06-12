@@ -96,6 +96,28 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     }
 
     /**
+     * Assert the total amount of times a notification was sent.
+     *
+     * @param int  $expectedCount
+     * @param string  $notification
+     * @return void
+     */
+    public function assertTimesSent(int $expectedCount, string $notification)
+    {
+        $actualCount = collect($this->notifications)
+            ->flatten(1)
+            ->reduce(function ($count, $sent) use ($notification) {
+                return $count + count($sent[$notification] ?? []);
+            }, 0);
+
+        PHPUnit::assertSame(
+            $expectedCount,
+            $actualCount,
+            "[{$notification}] was not sent as many times as expected."
+        );
+    }
+
+    /**
      * Get all of the notifications matching a truth-test callback.
      *
      * @param  mixed  $notifiable
