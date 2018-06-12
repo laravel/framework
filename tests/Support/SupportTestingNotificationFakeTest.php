@@ -66,6 +66,19 @@ class SupportTestingNotificationFakeTest extends TestCase
         $this->assertNotNull($notification->id);
         $this->assertNotSame($id, $notification->id);
     }
+
+    public function testAssertTimesSent()
+    {
+        $this->fake->assertTimesSent(0, NotificationStub::class);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->send(new UserStub, new NotificationStub);
+
+        $this->fake->assertTimesSent(3, NotificationStub::class);
+    }
 }
 
 class NotificationStub extends Notification
