@@ -57,7 +57,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     {
         PHPUnit::assertTrue(
             ($count = $this->sent($notifiable, $notification)->count()) === $times,
-            "The expected [{$notification}] notification was sent {$count} times instead of {$times} times."
+            "Expected [{$notification}] to be sent {$count} times, but was sent {$times} times."
         );
     }
 
@@ -98,11 +98,11 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Assert the total amount of times a notification was sent.
      *
-     * @param int  $expectedCount
-     * @param string  $notification
+     * @param  int  $expectedCount
+     * @param  string  $notification
      * @return void
      */
-    public function assertTimesSent(int $expectedCount, string $notification)
+    public function assertTimesSent($expectedCount, $notification)
     {
         $actualCount = collect($this->notifications)
             ->flatten(1)
@@ -111,9 +111,8 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
             }, 0);
 
         PHPUnit::assertSame(
-            $expectedCount,
-            $actualCount,
-            "[{$notification}] was not sent as many times as expected."
+            $expectedCount, $actualCount,
+            "Expected [{$notification}] to be sent {$expectedCount} times, but was sent {$actualCount} times."
         );
     }
 
