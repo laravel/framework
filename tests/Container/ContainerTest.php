@@ -286,9 +286,7 @@ class ContainerTest extends TestCase
             $_SERVER['_test_rebind'] = true;
         });
         $container->bind('foo', function () {
-            $obj = new stdClass;
-
-            return $obj;
+            return new stdClass;
         });
 
         $this->assertFalse($_SERVER['_test_rebind']);
