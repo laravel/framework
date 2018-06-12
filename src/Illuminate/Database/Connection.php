@@ -929,7 +929,7 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        if ($this->getConfig('sticky') && $this->recordsModified) {
+        if ($this->recordsModified && $this->getConfig('sticky')) {
             return $this->getPdo();
         }
 
