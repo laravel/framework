@@ -422,10 +422,8 @@ class SupportArrTest extends TestCase
     public function testPush()
     {
         $array = ['key' => [['xxx' => 'yyy']]];
-        Arr::push($array, null, ['foo' => 'bar']);
-        $this->assertSame([], $array);
-        Arr::push($array, '', ['foo' => 'bar']);
-        $this->assertSame([], $array);
+        $this->assertSame($array, Arr::push($array, null, ['foo' => 'bar']));
+        $this->assertSame($array, Arr::push($array, '', ['foo' => 'bar']));
 
         $array = [];
         Arr::push($array, 'key', ['foo' => 'bar']);

@@ -472,7 +472,7 @@ class Arr
     public static function push(&$array, $key, $value)
     {
         if ($key === null || trim($key) === '') {
-            return $array = [];
+            return $array;
         }
 
         $previous = static::get($array, $key, []);
