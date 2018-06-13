@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Exception;
 use ArrayAccess;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -468,7 +469,8 @@ class Arr
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
-     * @throws \InvalidArgumentException
+     *
+     * @throws \Exception
      */
     public static function stack(&$array, $key, $value)
     {
@@ -479,7 +481,7 @@ class Arr
         $previous = static::get($array, $key, []);
 
         if (is_array($previous) === false) {
-            throw new InvalidArgumentException;
+            throw new Exception;
         }
 
         $previous[] = $value;

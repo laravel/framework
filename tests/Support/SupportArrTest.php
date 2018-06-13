@@ -440,7 +440,7 @@ class SupportArrTest extends TestCase
     }
 
     /**
-     * @expectedException \InvalidArgumentException
+     * @expectedException \Exception
      */
     public function testStackThrowsAnException()
     {
