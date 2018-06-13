@@ -469,7 +469,7 @@ class Arr
      * @param  mixed  $value
      * @return mixed
      */
-    public static function push(&$array, $key, $value)
+    public static function stack(&$array, $key, $value)
     {
         if ($key === null || trim($key) === '') {
             return $array;
