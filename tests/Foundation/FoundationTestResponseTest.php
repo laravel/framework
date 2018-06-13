@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Exception;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
@@ -215,6 +216,40 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
         $response->assertJsonCount(4);
     }
+
+    public function testAssertJsonMissingValidationErrors()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['errors' => [
+                    'foo' => [],
+                    'bar' => ['one', 'two'],
+                ]]
+            ));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertJsonMissingValidationErrors('foo');
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        try {
+            $response->assertJsonMissingValidationErrors('bar');
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        $response->assertJsonMissingValidationErrors('baz');
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['foo' => 'bar']));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertJsonMissingValidationErrors('foo');
+    }    
 
     public function testMacroable()
     {
