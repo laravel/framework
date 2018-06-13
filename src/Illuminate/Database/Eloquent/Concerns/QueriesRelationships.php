@@ -124,11 +124,12 @@ trait QueriesRelationships
      * @param  \Closure|null  $callback
      * @param  string  $operator
      * @param  int     $count
+     * @param  string  $boolean
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1)
+    public function whereHas($relation, Closure $callback = null, $operator = '>=', $count = 1, $boolean = 'and')
     {
-        return $this->has($relation, $operator, $count, 'and', $callback);
+        return $this->has($relation, $operator, $count, $boolean, $callback);
     }
 
     /**
@@ -150,11 +151,12 @@ trait QueriesRelationships
      *
      * @param  string  $relation
      * @param  \Closure|null  $callback
+     * @param  string  $boolean
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
-    public function whereDoesntHave($relation, Closure $callback = null)
+    public function whereDoesntHave($relation, Closure $callback = null, $boolean = 'and')
     {
-        return $this->doesntHave($relation, 'and', $callback);
+        return $this->doesntHave($relation, $boolean, $callback);
     }
 
     /**
