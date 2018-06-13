@@ -623,6 +623,33 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has no JSON validation errors for the given keys.
+     *
+     * @param  string|array  $keys
+     * @return $this
+     */
+    public function assertJsonMissingValidationErrors($keys)
+    {
+        $json = $this->json();
+
+        if (! array_key_exists('errors', $json)) {
+            PHPUnit::assertArrayNotHasKey('errors', $json);
+            return $this;
+        }
+
+        $errors = $json['errors'];
+
+        foreach (Arr::wrap($keys) as $key) {
+            PHPUnit::assertFalse(
+                isset($errors[$key]),
+                "Found a validation error in the response for key: '{$key}'"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key
@@ -808,6 +835,37 @@ class TestResponse
                 PHPUnit::assertTrue($errors->has($value), "Session missing error: $value");
             } else {
                 PHPUnit::assertContains($value, $errors->get($key, $format));
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert that the session does not have the given errors.
+     *
+     * @param  string|array  $keys
+     * @param  mixed  $format
+     * @param  string  $errorBag
+     * @return $this
+     */
+    public function assertSessionMissingErrors($keys = [], $format = null, $errorBag = 'default')
+    {
+        if (!$this->session()->has('errors')) {
+             PhpUnit::assertEmpty($this->session()->has('errors'));
+             
+             return $this;
+        }
+
+        $keys = (array) $keys;
+
+        $errors = $this->session()->get('errors')->getBag($errorBag);
+
+        foreach ($keys as $key => $value) {
+            if (is_int($key)) {
+                PHPUnit::assertFalse($errors->has($value), "Session has error: $value");
+            } else {
+                PHPUnit::assertNotContains($value, $errors->get($key, $format));
             }
         }
 
