@@ -249,7 +249,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertJsonMissingValidationErrors('foo');
-    }    
+    }
 
     public function testMacroable()
     {

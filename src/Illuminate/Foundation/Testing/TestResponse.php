@@ -622,7 +622,6 @@ class TestResponse
         return $this;
     }
 
-
     /**
      * Assert that the response has no JSON validation errors for the given keys.
      *
@@ -632,7 +631,7 @@ class TestResponse
     public function assertJsonMissingValidationErrors($keys)
     {
         $json = $this->json();
-        
+
         if (! array_key_exists('errors', $json)) {
             PHPUnit::assertArrayNotHasKey('errors', $json);
 
