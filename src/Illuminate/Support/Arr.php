@@ -486,9 +486,7 @@ class Arr
 
         $previous[] = $value;
 
-        static::set($array, $key, $previous);
-
-        return $array;
+        return static::set($array, $key, $previous);
     }
 
     /**
