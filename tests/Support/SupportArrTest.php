@@ -437,10 +437,15 @@ class SupportArrTest extends TestCase
         Arr::stack($array, 'key', ['foo' => 'bar']);
         $this->assertSame('yyy', Arr::get($array, 'key.0.xxx'));
         $this->assertSame('bar', Arr::get($array, 'key.1.foo'));
+    }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testStackThrowsAnException()
+    {
         $array = ['key' => true];
         Arr::stack($array, 'key', ['foo' => 'bar']);
-        $this->assertSame('bar', Arr::get($array, 'key.0.foo'));
     }
 
     public function testRandom()

@@ -468,6 +468,7 @@ class Arr
      * @param  string  $key
      * @param  mixed  $value
      * @return mixed
+     * @throws \InvalidArgumentException
      */
     public static function stack(&$array, $key, $value)
     {
@@ -476,7 +477,11 @@ class Arr
         }
 
         $previous = static::get($array, $key, []);
-        $previous = is_array($previous) ? $previous : [];
+
+        if (is_array($previous) === false) {
+            throw new InvalidArgumentException;
+        }
+
         $previous[] = $value;
 
         static::set($array, $key, $previous);
