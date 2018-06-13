@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support;
 
+use Exception;
 use ArrayAccess;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -459,6 +460,33 @@ class Arr
         static::forget($array, $key);
 
         return $value;
+    }
+
+    /**
+     * Add a value to an existing key.
+     *
+     * @param  array  $array
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public static function stack(&$array, $key, $value)
+    {
+        if ($key === null || trim($key) === '') {
+            return $array;
+        }
+
+        $previous = static::get($array, $key, []);
+
+        if (is_array($previous) === false) {
+            throw new Exception;
+        }
+
+        $previous[] = $value;
+
+        return static::set($array, $key, $previous);
     }
 
     /**

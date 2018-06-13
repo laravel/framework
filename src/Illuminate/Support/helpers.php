@@ -304,6 +304,23 @@ if (! function_exists('array_sort_recursive')) {
     }
 }
 
+if (! function_exists('array_stack')) {
+    /**
+     * Add a value to an existing key.
+     *
+     * @param  array  $array
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return array
+     *
+     * @throws \Exception
+     */
+    function array_stack($array, $key, $value)
+    {
+        return Arr::stack($array, $key, $value);
+    }
+}
+
 if (! function_exists('array_where')) {
     /**
      * Filter the array using the given callback.
