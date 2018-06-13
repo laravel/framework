@@ -42,6 +42,11 @@ class RouteAction
             $action['uses'] = static::findCallable($action);
         }
 
+        if (\is_array($action['uses']) && \is_callable($action['uses'])) {
+            $action['uses'] = implode('@', $action['uses']);
+            $action['controller'] = $action['uses'];
+        }
+
         if (is_string($action['uses']) && ! Str::contains($action['uses'], '@')) {
             $action['uses'] = static::makeInvokable($action['uses']);
         }
