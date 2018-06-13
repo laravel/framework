@@ -248,9 +248,17 @@ class Handler implements ExceptionHandlerContract
      */
     protected function invalid($request, ValidationException $exception)
     {
-        return redirect($exception->redirectTo ?? url()->previous())
-                    ->withInput($request->except($this->dontFlash))
-                    ->withErrors($exception->errors(), $exception->errorBag);
+        $url = $exception->redirectTo ?? url()->previous();
+
+        if ($request->isMethod('get') && strtok($url, '?') === url()->current()) {
+            $this->registerErrorViewPaths();
+
+            return response()->view('errors::validation', ['message' => $exception->getMessage()]);
+        }
+
+        return redirect($url)
+            ->withInput($request->except($this->dontFlash))
+            ->withErrors($exception->errors(), $exception->errorBag);
     }
 
     /**
