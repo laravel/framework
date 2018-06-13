@@ -11,13 +11,13 @@ class MailMailableDataTest extends TestCase
     {
         $testData = ['first_name' => 'James'];
 
-        $mailable = new MailableStub;
+        $mailable = new MailableQueableStub;
         $mailable->build(function ($m) use ($testData) {
             $m->view('view', $testData);
         });
         $this->assertSame($testData, $mailable->buildViewData());
 
-        $mailable = new MailableStub;
+        $mailable = new MailableQueableStub;
         $mailable->build(function ($m) use ($testData) {
             $m->view('view', $testData)
               ->text('text-view');
