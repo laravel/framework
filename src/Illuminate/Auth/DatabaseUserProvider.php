@@ -111,7 +111,7 @@ class DatabaseUserProvider implements UserProvider
 
         foreach ($credentials as $key => $value) {
             if (! Str::contains($key, 'password')) {
-                $query->where($key, $value);
+                is_array($value) ? $query->whereIn($key, $value) : $query->where($key, $value);
             }
         }
 
