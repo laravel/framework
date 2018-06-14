@@ -162,8 +162,9 @@ class RouteListCommand extends Command
     protected function filterRoute(array $route)
     {
         if (($this->option('name') && ! Str::contains($route['name'], $this->option('name'))) ||
-             $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
-             $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method')))) {
+            $this->option('path') && ! Str::contains($route['uri'], $this->option('path')) ||
+            $this->option('method') && ! Str::contains($route['method'], strtoupper($this->option('method'))) ||
+            $this->option('action') && ! Str::contains($route['action'], $this->option('action'))) {
             return;
         }
 
@@ -183,6 +184,8 @@ class RouteListCommand extends Command
             ['name', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by name'],
 
             ['path', null, InputOption::VALUE_OPTIONAL, 'Filter the routes by path'],
+
+            ['action', null, InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Filter the routes by action'],
 
             ['reverse', 'r', InputOption::VALUE_NONE, 'Reverse the ordering of the routes'],
 
