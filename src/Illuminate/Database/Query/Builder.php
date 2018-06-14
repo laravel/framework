@@ -260,6 +260,26 @@ class Builder
     }
 
     /**
+     * Add a dynamic "select" clause to the query.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return $this
+     */
+    public function dynamicSelect($method, array $parameters)
+    {
+        $function = Str::snake(substr($method, 6));
+
+        $column = $this->grammar->wrap($parameters[0]);
+
+        $as = isset($parameters[1]) ? ' as '.$this->grammar->wrap($parameters[1]) : '';
+
+        $expression = $function.'('.$column.')'.$as;
+
+        return $this->addSelect(new Expression($expression));
+    }
+
+    /**
      * Makes "from" fetch from a subquery.
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
@@ -1496,7 +1516,7 @@ class Builder
      * Handles dynamic "where" clauses to the query.
      *
      * @param  string  $method
-     * @param  string  $parameters
+     * @param  array  $parameters
      * @return $this
      */
     public function dynamicWhere($method, $parameters)
@@ -2807,6 +2827,10 @@ class Builder
     {
         if (static::hasMacro($method)) {
             return $this->macroCall($method, $parameters);
+        }
+
+        if (Str::startsWith($method, 'select')) {
+            return $this->dynamicSelect($method, $parameters);
         }
 
         if (Str::startsWith($method, 'where')) {
