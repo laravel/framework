@@ -2777,6 +2777,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['1520652582'], $builder->getBindings());
     }
 
+    public function testDynamicSelect()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('user_id')->selectCount('*')->from('purchases')->groupBy('user_id');
+        $this->assertEquals('select `user_id`, count(*) from `purchases` group by `user_id`', $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('user_id')->selectVarSamp('purchases.amount', 'var')->from('purchases')->groupBy('user_id');
+        $this->assertEquals('select `user_id`, var_samp(`purchases`.`amount`) as `var` from `purchases` group by `user_id`', $builder->toSql());
+    }
+
     protected function getBuilder()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
