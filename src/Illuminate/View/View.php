@@ -151,13 +151,9 @@ class View implements ArrayAccess, ViewContract
     {
         $data = array_merge($this->factory->getShared(), $this->data);
 
-        foreach ($data as $key => $value) {
-            if ($value instanceof Renderable) {
-                $data[$key] = $value->render();
-            }
-        }
-
-        return $data;
+        return array_map(function($value) {
+            return $value instanceof Renderable ? $value->render() : $value;
+        }, $data);
     }
 
     /**
