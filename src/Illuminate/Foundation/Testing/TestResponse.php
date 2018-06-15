@@ -643,7 +643,7 @@ class TestResponse
         foreach (Arr::wrap($keys) as $key) {
             PHPUnit::assertFalse(
                 isset($errors[$key]),
-                "Found a validation error in the response for key: '{$key}'"
+                "Found unexpected validation error for key: '{$key}'"
             );
         }
 
