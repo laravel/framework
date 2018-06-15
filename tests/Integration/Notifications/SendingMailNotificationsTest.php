@@ -198,10 +198,10 @@ class NotifiableUserWithNamedAddress extends NotifiableUser
 {
     public function routeNotificationForMail($notification)
     {
-    	return [
-    		$this->email => $this->name,
-    		'foo_'.$this->email,
-    	];
+        return [
+            $this->email => $this->name,
+            'foo_'.$this->email,
+        ];
     }
 }
 
