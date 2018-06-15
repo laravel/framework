@@ -7,13 +7,20 @@ use Illuminate\Database\Migrations\Migration;
 class DummyClass extends Migration
 {
     /**
+     * The name for the table.
+     *
+     * @var string
+     */
+    protected $tableName = 'DummyTable';
+
+    /**
      * Run the migrations.
      *
      * @return void
      */
     public function up()
     {
-        Schema::create('DummyTable', function (Blueprint $table) {
+        Schema::create($this->tableName, function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
         });
@@ -26,6 +33,6 @@ class DummyClass extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('DummyTable');
+        Schema::dropIfExists($this->tableName);
     }
 }
