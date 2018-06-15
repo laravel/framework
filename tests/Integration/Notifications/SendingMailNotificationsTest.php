@@ -59,6 +59,7 @@ class SendingMailNotificationsTest extends TestCase
         Schema::create('users', function ($table) {
             $table->increments('id');
             $table->string('email');
+            $table->string('name')->nullable();
         });
     }
 
@@ -80,6 +81,47 @@ class SendingMailNotificationsTest extends TestCase
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
                 $message->shouldReceive('to')->once()->with(['taylor@laravel.com']);
+
+                $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
+
+                $message->shouldReceive('bcc')->once()->with('bcc@deepblue.com', 'bcc');
+
+                $message->shouldReceive('from')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+
+                $message->shouldReceive('replyTo')->once()->with('jack@deepblue.com', 'Jacques Mayol');
+
+                $message->shouldReceive('subject')->once()->with('Test Mail Notification');
+
+                $message->shouldReceive('setPriority')->once()->with(1);
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
+    public function test_mail_is_sent_to_named_address()
+    {
+        $notification = new TestMailNotification;
+
+        $user = NotifiableUserWithNamedAddress::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
+        $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html' => 'htmlContent', 'text' => 'textContent'],
+            $notification->toMail($user)->toArray(),
+            Mockery::on(function ($closure) {
+                $message = Mockery::mock(\Illuminate\Mail\Message::class);
+
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
 
                 $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
 
@@ -150,6 +192,17 @@ class NotifiableUser extends Model
 
     public $table = 'users';
     public $timestamps = false;
+}
+
+class NotifiableUserWithNamedAddress extends NotifiableUser
+{
+    public function routeNotificationForMail($notification)
+    {
+    	return [
+    		$this->email => $this->name,
+    		'foo_'.$this->email,
+    	];
+    }
 }
 
 class TestMailNotification extends Notification
