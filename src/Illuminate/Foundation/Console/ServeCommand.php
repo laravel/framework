@@ -48,12 +48,25 @@ class ServeCommand extends Command
      */
     protected function serverCommand()
     {
-        return sprintf('%s -S %s:%s %s',
-            ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)),
-            $this->host(),
-            $this->port(),
-            ProcessUtils::escapeArgument(base_path('server.php'))
-        );
+        if (empty($this->ini()))
+        {
+            return sprintf('%s -S %s:%s %s',
+                ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)),
+                $this->host(),
+                $this->port(),
+                ProcessUtils::escapeArgument(base_path('server.php'))
+            );
+        }
+        else 
+        {
+            return sprintf('%s -c %s -S %s:%s %s',
+                ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false)),
+                $this->ini(),
+                $this->host(),
+                $this->port(),
+                ProcessUtils::escapeArgument(base_path('server.php'))
+            );
+        }
     }
 
     /**
@@ -76,6 +89,16 @@ class ServeCommand extends Command
         return $this->input->getOption('port');
     }
 
+     /**
+     * Get the php.ini file for the command.
+     *
+     * @return string
+     */
+    protected function ini()
+    {
+        return $this->input->getOption('ini');
+    }
+    
     /**
      * Get the console command options.
      *
@@ -87,6 +110,8 @@ class ServeCommand extends Command
             ['host', null, InputOption::VALUE_OPTIONAL, 'The host address to serve the application on.', '127.0.0.1'],
 
             ['port', null, InputOption::VALUE_OPTIONAL, 'The port to serve the application on.', 8000],
+            
+            ['ini', null, InputOption::VALUE_OPTIONAL, 'The php.ini file to use.', ''],
         ];
     }
 }
