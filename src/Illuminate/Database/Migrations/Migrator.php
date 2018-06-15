@@ -219,9 +219,9 @@ class Migrator
     {
         if (($steps = $options['step'] ?? 0) > 0) {
             return $this->repository->getMigrations($steps);
-        } else {
-            return $this->repository->getLast();
         }
+        
+        return $this->repository->getLast();
     }
 
     /**
