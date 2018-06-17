@@ -5,8 +5,8 @@ namespace Illuminate\Pipeline;
 use Closure;
 use RuntimeException;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Contracts\Container\Container;
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Contracts\Pipeline\Pipeline as PipelineContract;
 
 class Pipeline implements PipelineContract
@@ -151,9 +151,7 @@ class Pipeline implements PipelineContract
                                 ? $pipe->{$this->method}(...$parameters)
                                 : $pipe(...$parameters);
 
-                return $response instanceof Responsable
-                            ? $response->toResponse($this->container->make(Request::class))
-                            : $response;
+                return Router::resolveResponsable($response, $this->container->make(Request::class));
             };
         };
     }

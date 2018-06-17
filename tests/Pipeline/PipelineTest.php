@@ -67,6 +67,23 @@ class PipelineTest extends TestCase
     {
         $result = (new Pipeline(new \Illuminate\Container\Container))
             ->send('foo')
+            ->through([new PipelineTestPipeResponsableWithNestedChild])
+            ->then(
+                function ($piped) {
+                    return $piped;
+                }
+            );
+
+        $this->assertEquals('bar', $result);
+        $this->assertEquals('foo', $_SERVER['__test.pipe.responsable_with_nested_child']);
+
+        unset($_SERVER['__test.pipe.responsable_with_nested_child']);
+    }
+
+    public function testPipelineUsageWithResponsableObjectsWithNestedChild()
+    {
+        $result = (new Pipeline(new \Illuminate\Container\Container))
+            ->send('foo')
             ->through([new PipelineTestPipeResponsable])
             ->then(
                 function ($piped) {
@@ -186,6 +203,14 @@ class PipeResponsable implements Responsable
     }
 }
 
+class PineResponsableWithNestedChild implements Responsable
+{
+    public function toResponse($request)
+    {
+        return new PipeResponsable;
+    }
+}
+
 class PipelineTestPipeTwo
 {
     public function __invoke($piped, $next)
@@ -203,6 +228,16 @@ class PipelineTestPipeResponsable
         $_SERVER['__test.pipe.responsable'] = $piped;
 
         return new PipeResponsable;
+    }
+}
+
+class PipelineTestPipeResponsableWithNestedChild
+{
+    public function handle($piped, $next)
+    {
+        $_SERVER['__test.pipe.responsable_with_nested_child'] = $piped;
+
+        return new PineResponsableWithNestedChild;
     }
 }
 
