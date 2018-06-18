@@ -2830,12 +2830,10 @@ class DatabaseQueryBuilderTest extends TestCase
      */
     protected function getMockQueryBuilder()
     {
-        $builder = m::mock('Illuminate\Database\Query\Builder', [
+        return m::mock('Illuminate\Database\Query\Builder', [
             m::mock('Illuminate\Database\ConnectionInterface'),
             new \Illuminate\Database\Query\Grammars\Grammar,
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ])->makePartial();
-
-        return $builder;
     }
 }

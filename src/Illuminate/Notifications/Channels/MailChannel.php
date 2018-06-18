@@ -184,8 +184,10 @@ class MailChannel
             $recipients = [$recipients];
         }
 
-        return collect($recipients)->map(function ($recipient) {
-            return is_string($recipient) ? $recipient : $recipient->email;
+        return collect($recipients)->mapWithKeys(function ($recipient, $email) {
+            return is_numeric($email)
+                    ? [(is_string($recipient) ? $recipient : $recipient->email)]
+                    : [$email => $recipient];
         })->all();
     }
 

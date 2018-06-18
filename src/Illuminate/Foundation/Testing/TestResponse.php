@@ -623,6 +623,34 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has no JSON validation errors for the given keys.
+     *
+     * @param  string|array  $keys
+     * @return $this
+     */
+    public function assertJsonMissingValidationErrors($keys)
+    {
+        $json = $this->json();
+
+        if (! array_key_exists('errors', $json)) {
+            PHPUnit::assertArrayNotHasKey('errors', $json);
+
+            return $this;
+        }
+
+        $errors = $json['errors'];
+
+        foreach (Arr::wrap($keys) as $key) {
+            PHPUnit::assertFalse(
+                isset($errors[$key]),
+                "Found unexpected validation error for key: '{$key}'"
+            );
+        }
+
+        return $this;
+    }
+
+    /**
      * Validate and return the decoded response JSON.
      *
      * @param  string|null  $key
