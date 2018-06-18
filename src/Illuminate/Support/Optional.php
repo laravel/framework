@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use ArrayAccess;
 use ArrayObject;
+use InvalidArgumentException;
 
 class Optional implements ArrayAccess
 {
@@ -127,4 +128,18 @@ class Optional implements ArrayAccess
             return $this->value->{$method}(...$parameters);
         }
     }
+
+	/**
+	 * Get the string value of the underlying object, if it is a string.
+	 *
+	 * @return string
+	 */
+	public function __toString()
+	{
+		if (is_string($this->value)) {
+			return (string) $this->value;
+		}
+
+		throw new InvalidArgumentException('Object of class Illuminate\Support\Optional could not be converted to string');
+	}
 }

@@ -88,4 +88,13 @@ class SupportOptionalTest extends TestCase
 
         $this->assertFalse(isset($optional['item']));
     }
+
+	public function testGetStringNoMethodCall()
+	{
+		$targetArr = 'Hello, world';
+
+		$optional = new Optional($targetArr);
+
+		$this->assertEquals('Hello, world',$optional);
+	}
 }
