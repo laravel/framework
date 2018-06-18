@@ -75,7 +75,7 @@ abstract class ServiceProvider
     /**
      * Register a view file namespace.
      *
-     * @param  string  $path
+     * @param  string|array  $path
      * @param  string  $namespace
      * @return void
      */
