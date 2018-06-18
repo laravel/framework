@@ -80,6 +80,13 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My custom exception response"}', $response);
     }
 
+    public function testReturnsCustomResponseWhenExceptionImplementsResponsableAndHasNestedResponsableChildren()
+    {
+        $response = $this->handler->render($this->request, new CustomExceptionWithNestedResponsableChild)->getContent();
+
+        $this->assertSame('{"response":"My custom exception response"}', $response);
+    }
+
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
@@ -131,5 +138,13 @@ class CustomException extends Exception implements Responsable
     public function toResponse($request)
     {
         return response()->json(['response' => 'My custom exception response']);
+    }
+}
+
+class CustomExceptionWithNestedResponsableChild extends Exception implements Responsable
+{
+    public function toResponse($request)
+    {
+        return new CustomException;
     }
 }

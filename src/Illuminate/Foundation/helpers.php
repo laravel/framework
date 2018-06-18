@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Str;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
@@ -38,7 +39,7 @@ if (! function_exists('abort')) {
         if ($code instanceof Response) {
             throw new HttpResponseException($code);
         } elseif ($code instanceof Responsable) {
-            throw new HttpResponseException($code->toResponse(request()));
+            throw new HttpResponseException(Router::resolveResponsable($code), request());
         }
 
         app()->abort($code, $message, $headers);

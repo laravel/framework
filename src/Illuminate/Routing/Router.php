@@ -714,9 +714,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public static function toResponse($request, $response)
     {
-        if ($response instanceof Responsable) {
-            $response = $response->toResponse($request);
-        }
+        $response = static::resolveResponsable($response, $request);
 
         if ($response instanceof PsrResponseInterface) {
             $response = (new HttpFoundationFactory)->createResponse($response);
@@ -738,6 +736,15 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         return $response->prepare($request);
+    }
+
+    public static function resolveResponsable($response, $request)
+    {
+        while ($response instanceof Responsable) {
+            $response = $response->toResponse($request);
+        }
+
+        return $response;
     }
 
     /**

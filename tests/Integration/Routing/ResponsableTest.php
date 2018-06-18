@@ -23,6 +23,19 @@ class ResponsableTest extends TestCase
         $this->assertEquals('Taylor', $response->headers->get('X-Test-Header'));
         $this->assertEquals('hello world', $response->getContent());
     }
+
+    public function test_nested_responsable_objects_are_rendered()
+    {
+        Route::get('/responsable', function () {
+            return new TestResponsableResponseWithNestedChild;
+        });
+
+        $response = $this->get('/responsable');
+
+        $this->assertEquals(201, $response->status());
+        $this->assertEquals('Taylor', $response->headers->get('X-Test-Header'));
+        $this->assertEquals('hello world', $response->getContent());
+    }
 }
 
 class TestResponsableResponse implements Responsable
@@ -30,5 +43,13 @@ class TestResponsableResponse implements Responsable
     public function toResponse($request)
     {
         return response('hello world', 201, ['X-Test-Header' => 'Taylor']);
+    }
+}
+
+class TestResponsableResponseWithNestedChild implements Responsable
+{
+    public function toResponse($request)
+    {
+        return new TestResponsableResponse;
     }
 }
