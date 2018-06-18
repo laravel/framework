@@ -3,7 +3,7 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
@@ -118,11 +118,7 @@ class EloquentUserProvider implements UserProvider
                 continue;
             }
 
-            if ($value instanceof Arrayable || $value instanceof Collection) {
-                $value = $value->toArray();
-            }
-
-            if (is_array($value)) {
+            if (is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } else {
                 $query->where($key, $value);
