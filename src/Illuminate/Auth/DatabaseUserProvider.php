@@ -3,8 +3,8 @@
 namespace Illuminate\Auth;
 
 use Illuminate\Support\Str;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\Authenticatable as UserContract;
