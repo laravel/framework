@@ -1016,6 +1016,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
     }
 
+    public function testValidateConfirmedCustom()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['password' => 'foo'], ['password' => 'Confirmed:custom']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['password' => 'foo', 'password_custom' => 'bar'], ['password' => 'Confirmed:custom']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['password' => 'foo', 'password_custom' => 'foo'], ['password' => 'Confirmed:custom']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['password' => '1e2', 'password_custom' => '100'], ['password' => 'Confirmed:custom']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateSame()
     {
         $trans = $this->getIlluminateArrayTranslator();
