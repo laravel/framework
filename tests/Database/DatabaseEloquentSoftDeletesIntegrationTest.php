@@ -15,6 +15,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     public function setUp()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $db = new DB;
 
         $db->addConnection([
@@ -84,6 +86,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function tearDown()
     {
+        Carbon::setTestNow(null);
+
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
@@ -258,11 +262,13 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function testUpdateModelAfterSoftDeleting()
     {
+        $now = Carbon::now();
         $this->createUsers();
 
         /** @var SoftDeletesTestUser $userModel */
         $userModel = SoftDeletesTestUser::find(2);
         $userModel->delete();
+        $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
         $this->assertNull(SoftDeletesTestUser::find(2));
         $this->assertEquals($userModel, SoftDeletesTestUser::withTrashed()->find(2));
     }
