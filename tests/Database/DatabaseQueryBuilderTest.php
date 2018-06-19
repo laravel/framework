@@ -1881,6 +1881,22 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" where "foo" is not null', $builder->toSql());
     }
 
+    public function testProvidingEmptyStringAsOperatorBuildsCorrectly()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', '', 'bar');
+        $this->assertEquals('select * from "users" where "foo" = ?', $builder->toSql());
+        $this->assertEquals(['bar'], $builder->getBindings());
+    }
+
+    public function testProvidingInvalidOperatorBuildsCorrectly()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('foo', 'invalid', 'bar');
+        $this->assertEquals('select * from "users" where "foo" = ?', $builder->toSql());
+        $this->assertEquals(['bar'], $builder->getBindings());
+    }
+
     public function testDynamicWhere()
     {
         $method = 'whereFooBarAndBazOrQux';

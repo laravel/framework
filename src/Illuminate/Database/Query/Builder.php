@@ -512,7 +512,7 @@ class Builder
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
-            list($value, $operator) = [$operator, '='];
+            list($value, $operator) = [$value, '='];
         }
 
         // If the value is a Closure, it means the developer is performing an entire
