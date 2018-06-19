@@ -912,6 +912,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testUnderscorePropertiesAreNotFilled()
     {
         $model = new EloquentModelStub;
+        $model->guard(['_*']);
         $model->fill(['_method' => 'PUT']);
         $this->assertEquals([], $model->getAttributes());
     }

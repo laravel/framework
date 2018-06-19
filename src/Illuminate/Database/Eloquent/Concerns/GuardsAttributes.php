@@ -151,8 +151,7 @@ trait GuardsAttributes
             return false;
         }
 
-        return empty($this->getFillable()) &&
-            ! Str::startsWith($key, '_');
+        return empty($this->getFillable());
     }
 
     /**
@@ -163,7 +162,7 @@ trait GuardsAttributes
      */
     public function isGuarded($key)
     {
-        return in_array($key, $this->getGuarded()) || $this->getGuarded() == ['*'];
+        return Str::is($this->getGuarded(), $key);
     }
 
     /**
