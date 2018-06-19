@@ -277,6 +277,20 @@ if (! function_exists('array_set')) {
     }
 }
 
+if (! function_exists('array_shuffle')) {
+    /**
+     * Shuffle the given array and return the result.
+     *
+     * @param  array  $array
+     * @param  int|null  $seed
+     * @return array
+     */
+    function array_shuffle($array, $seed = null)
+    {
+        return Arr::shuffle($array, $seed);
+    }
+}
+
 if (! function_exists('array_sort')) {
     /**
      * Sort the array by the given callback or attribute name.
