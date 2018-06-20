@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use Exception;
-use ReflectionObject;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
