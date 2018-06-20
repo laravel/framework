@@ -211,9 +211,22 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Clear the list of booted models so they will be re-booted.
+     *
+     * @return void
+     */
+    public static function clearBootedModels()
+    {
+        static::$booted = [];
+
+        static::$globalScopes = [];
+    }
+
+    /**
      * Disables relationship model touching for the current class during given callback scope.
      *
-     * @param callable $callback
+     * @param  callable  $callback
+     * @return void
      */
     public static function withoutTouching(callable $callback)
     {
@@ -223,8 +236,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Disables relationship model touching for the given model classes during given callback scope.
      *
-     * @param array $models
-     * @param callable $callback
+     * @param  array  $models
+     * @param  callable  $callback
+     * @return void
      */
     public static function withoutTouchingOn(array $models, callable $callback)
     {
@@ -238,8 +252,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
-     * @param string $class The class name to check. Defaults to current class.
+     * Determine if the given model is ignoring touches.
      *
+     * @param  string|null  $class
      * @return bool
      */
     public static function isIgnoringTouch($class = null)
@@ -253,18 +268,6 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         }
 
         return false;
-    }
-
-    /**
-     * Clear the list of booted models so they will be re-booted.
-     *
-     * @return void
-     */
-    public static function clearBootedModels()
-    {
-        static::$booted = [];
-
-        static::$globalScopes = [];
     }
 
     /**
