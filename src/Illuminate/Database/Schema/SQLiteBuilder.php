@@ -23,6 +23,20 @@ class SQLiteBuilder extends Builder
     }
 
     /**
+     * Drop all views from the database.
+     *
+     * @return void
+     */
+    public function dropAllViews()
+    {
+        $this->connection->select($this->grammar->compileEnableWriteableSchema());
+
+        $this->connection->select($this->grammar->compileDropAllViews());
+
+        $this->connection->select($this->grammar->compileDisableWriteableSchema());
+    }
+
+    /**
      * Empty the database file.
      *
      * @return void
