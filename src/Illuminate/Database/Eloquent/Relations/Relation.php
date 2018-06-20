@@ -165,7 +165,7 @@ abstract class Relation
 
         if (! $model::isIgnoringTouch()) {
             $this->rawUpdate([
-                $model->getUpdatedAtColumn() => $model->freshTimestampString()
+                $model->getUpdatedAtColumn() => $model->freshTimestampString(),
             ]);
         }
     }
