@@ -46,6 +46,6 @@ trait VerifiesEmails
     {
         $request->user()->sendEmailVerificationNotification();
 
-        return back();
+        return back()->with('resent', true);
     }
 }
