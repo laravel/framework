@@ -35,4 +35,17 @@ trait VerifiesEmails
 
         return redirect($this->redirectPath());
     }
+
+    /**
+     * Resend the email verification notification.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function resend(Request $request)
+    {
+        $request->user()->sendEmailVerificationNotification();
+
+        return back();
+    }
 }
