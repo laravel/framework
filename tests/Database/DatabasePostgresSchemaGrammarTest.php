@@ -790,6 +790,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('drop table "alpha","beta","gamma" cascade', $statement);
     }
 
+    public function testDropAllViewsEscapesTableNames()
+    {
+        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop view "alpha","beta","gamma" cascade', $statement);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');

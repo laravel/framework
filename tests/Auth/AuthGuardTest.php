@@ -66,6 +66,18 @@ class AuthGuardTest extends TestCase
         $guard->basic('email', ['active' => 1]);
     }
 
+    public function testBasicWithExtraArrayConditions()
+    {
+        list($session, $provider, $request, $cookie) = $this->getMocks();
+        $guard = m::mock('Illuminate\Auth\SessionGuard[check,attempt]', ['default', $provider, $session]);
+        $guard->shouldReceive('check')->once()->andReturn(false);
+        $guard->shouldReceive('attempt')->once()->with(['email' => 'foo@bar.com', 'password' => 'secret', 'active' => 1, 'type' => [1, 2, 3]])->andReturn(true);
+        $request = \Symfony\Component\HttpFoundation\Request::create('/', 'GET', [], [], [], ['PHP_AUTH_USER' => 'foo@bar.com', 'PHP_AUTH_PW' => 'secret']);
+        $guard->setRequest($request);
+
+        $guard->basic('email', ['active' => 1, 'type' => [1, 2, 3]]);
+    }
+
     public function testAttemptCallsRetrieveByCredentials()
     {
         $guard = $this->getGuard();

@@ -370,6 +370,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all views.
+     *
+     * @param  array  $views
+     * @return string
+     */
+    public function compileDropAllViews($views)
+    {
+        return 'drop view '.implode(',', $this->wrapArray($views));
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @return string
@@ -377,6 +388,16 @@ class MySqlGrammar extends Grammar
     public function compileGetAllTables()
     {
         return 'SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'SHOW FULL TABLES WHERE table_type = \'VIEW\'';
     }
 
     /**
