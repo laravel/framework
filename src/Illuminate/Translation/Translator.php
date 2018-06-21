@@ -135,7 +135,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             return $line;
         }
 
-        return $key;
+        return $item;
     }
 
     /**
