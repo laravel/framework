@@ -141,7 +141,7 @@ trait ConditionallyLoadsAttributes
         }
 
         if (! $this->resource->relationLoaded($relationship)) {
-            return $default;
+            return value($default);
         }
 
         if (func_num_args() === 1) {

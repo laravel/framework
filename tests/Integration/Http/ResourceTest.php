@@ -20,6 +20,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 
 /**
@@ -88,6 +89,8 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'second' => 'value',
                 'third' => 'value',
+                'fourth' => 'default',
+                'fifth' => 'default',
             ],
         ]);
     }
@@ -188,6 +191,29 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'author' => null,
                 'author_name' => null,
+            ],
+        ]);
+    }
+
+    public function test_resources_may_have_optional_relationships_with_default_values()
+    {
+        Route::get('/', function () {
+            return new AuthorResourceWithOptionalRelationship(new Author([
+                'name' => 'jrrmartin',
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'name' => 'jrrmartin',
+                'posts_count' => 'not loaded',
+                'latest_post_title' => 'not loaded',
             ],
         ]);
     }
