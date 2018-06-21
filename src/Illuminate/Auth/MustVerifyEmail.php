@@ -2,6 +2,8 @@
 
 namespace Illuminate\Auth;
 
+use DateTime;
+
 trait MustVerifyEmail
 {
     /**
@@ -11,7 +13,7 @@ trait MustVerifyEmail
      */
     public function hasVerifiedEmail()
     {
-        return (bool) $this->email_verified;
+        return ! is_null($this->email_verified_at);
     }
 
     /**
@@ -21,7 +23,7 @@ trait MustVerifyEmail
      */
     public function markEmailAsVerified()
     {
-        $this->forceFill(['email_verified' => true])->save();
+        $this->forceFill(['email_verified_at' => new DateTime])->save();
     }
 
     /**
