@@ -1153,7 +1153,6 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Register the typical email verification routes for an application.
      *
-     * @param  array  $options
      * @return void
      */
     public function emailVerification()
