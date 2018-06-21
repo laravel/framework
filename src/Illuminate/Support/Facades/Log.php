@@ -17,6 +17,9 @@ use Psr\Log\LoggerInterface;
  * @method static mixed channel(string $channel = null)
  * @method static \Psr\Log\LoggerInterface stack(array $channels, string $channel = null)
  *
+ * @method static self channel(string $channel)
+ * @method static self stack(array $channels)
+ *
  * @see \Illuminate\Log\Logger
  */
 class Log extends Facade

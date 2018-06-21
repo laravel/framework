@@ -24,7 +24,7 @@ class Blueprint
     /**
      * The columns that should be added to the table.
      *
-     * @var \Illuminate\Support\Fluent[]
+     * @var \Illuminate\Database\Schema\ColumnDefinition[]
      */
     protected $columns = [];
 
@@ -128,11 +128,18 @@ class Blueprint
      */
     protected function ensureCommandsAreValid(Connection $connection)
     {
-        if ($connection instanceof SQLiteConnection &&
-            $this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
-            throw new BadMethodCallException(
-                "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
-            );
+        if ($connection instanceof SQLiteConnection) {
+            if ($this->commandsNamed(['dropColumn', 'renameColumn'])->count() > 1) {
+                throw new BadMethodCallException(
+                    "SQLite doesn't support multiple calls to dropColumn / renameColumn in a single modification."
+                );
+            }
+
+            if ($this->commandsNamed(['dropForeign'])->count() > 0) {
+                throw new BadMethodCallException(
+                    "SQLite doesn't support dropping foreign keys (you would need to re-create the table)."
+                );
+            }
         }
     }
 
@@ -392,21 +399,23 @@ class Blueprint
     /**
      * Indicate that the soft delete column should be dropped.
      *
+     * @param  string  $column
      * @return void
      */
-    public function dropSoftDeletes()
+    public function dropSoftDeletes($column = 'deleted_at')
     {
-        $this->dropColumn('deleted_at');
+        $this->dropColumn($column);
     }
 
     /**
      * Indicate that the soft delete column should be dropped.
      *
+     * @param  string  $column
      * @return void
      */
-    public function dropSoftDeletesTz()
+    public function dropSoftDeletesTz($column = 'deleted_at')
     {
-        $this->dropSoftDeletes();
+        $this->dropSoftDeletes($column);
     }
 
     /**
@@ -511,7 +520,7 @@ class Blueprint
      * Create a new auto-incrementing integer (4-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function increments($column)
     {
@@ -522,7 +531,7 @@ class Blueprint
      * Create a new auto-incrementing tiny integer (1-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function tinyIncrements($column)
     {
@@ -533,7 +542,7 @@ class Blueprint
      * Create a new auto-incrementing small integer (2-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function smallIncrements($column)
     {
@@ -544,7 +553,7 @@ class Blueprint
      * Create a new auto-incrementing medium integer (3-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function mediumIncrements($column)
     {
@@ -555,7 +564,7 @@ class Blueprint
      * Create a new auto-incrementing big integer (8-byte) column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function bigIncrements($column)
     {
@@ -567,7 +576,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $length
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function char($column, $length = null)
     {
@@ -581,7 +590,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $length
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function string($column, $length = null)
     {
@@ -594,7 +603,7 @@ class Blueprint
      * Create a new text column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function text($column)
     {
@@ -605,7 +614,7 @@ class Blueprint
      * Create a new medium text column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function mediumText($column)
     {
@@ -616,7 +625,7 @@ class Blueprint
      * Create a new long text column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function longText($column)
     {
@@ -629,7 +638,7 @@ class Blueprint
      * @param  string  $column
      * @param  bool  $autoIncrement
      * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function integer($column, $autoIncrement = false, $unsigned = false)
     {
@@ -642,7 +651,7 @@ class Blueprint
      * @param  string  $column
      * @param  bool  $autoIncrement
      * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function tinyInteger($column, $autoIncrement = false, $unsigned = false)
     {
@@ -655,7 +664,7 @@ class Blueprint
      * @param  string  $column
      * @param  bool  $autoIncrement
      * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function smallInteger($column, $autoIncrement = false, $unsigned = false)
     {
@@ -668,7 +677,7 @@ class Blueprint
      * @param  string  $column
      * @param  bool  $autoIncrement
      * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
     {
@@ -681,7 +690,7 @@ class Blueprint
      * @param  string  $column
      * @param  bool  $autoIncrement
      * @param  bool  $unsigned
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function bigInteger($column, $autoIncrement = false, $unsigned = false)
     {
@@ -693,7 +702,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function unsignedInteger($column, $autoIncrement = false)
     {
@@ -705,7 +714,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function unsignedTinyInteger($column, $autoIncrement = false)
     {
@@ -717,7 +726,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function unsignedSmallInteger($column, $autoIncrement = false)
     {
@@ -729,7 +738,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function unsignedMediumInteger($column, $autoIncrement = false)
     {
@@ -741,7 +750,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  bool  $autoIncrement
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function unsignedBigInteger($column, $autoIncrement = false)
     {
@@ -754,7 +763,7 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function float($column, $total = 8, $places = 2)
     {
@@ -767,7 +776,7 @@ class Blueprint
      * @param  string  $column
      * @param  int|null  $total
      * @param  int|null  $places
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function double($column, $total = null, $places = null)
     {
@@ -780,7 +789,7 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function decimal($column, $total = 8, $places = 2)
     {
@@ -793,7 +802,7 @@ class Blueprint
      * @param  string  $column
      * @param  int  $total
      * @param  int  $places
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function unsignedDecimal($column, $total = 8, $places = 2)
     {
@@ -806,7 +815,7 @@ class Blueprint
      * Create a new boolean column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function boolean($column)
     {
@@ -818,7 +827,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  array  $allowed
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function enum($column, array $allowed)
     {
@@ -829,7 +838,7 @@ class Blueprint
      * Create a new json column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function json($column)
     {
@@ -840,7 +849,7 @@ class Blueprint
      * Create a new jsonb column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function jsonb($column)
     {
@@ -851,7 +860,7 @@ class Blueprint
      * Create a new date column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function date($column)
     {
@@ -863,7 +872,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function dateTime($column, $precision = 0)
     {
@@ -875,7 +884,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function dateTimeTz($column, $precision = 0)
     {
@@ -887,7 +896,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function time($column, $precision = 0)
     {
@@ -899,7 +908,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timeTz($column, $precision = 0)
     {
@@ -911,7 +920,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timestamp($column, $precision = 0)
     {
@@ -923,7 +932,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function timestampTz($column, $precision = 0)
     {
@@ -974,7 +983,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function softDeletes($column = 'deleted_at', $precision = 0)
     {
@@ -984,19 +993,20 @@ class Blueprint
     /**
      * Add a "deleted at" timestampTz for the table.
      *
+     * @param  string  $column
      * @param  int  $precision
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
-    public function softDeletesTz($precision = 0)
+    public function softDeletesTz($column = 'deleted_at', $precision = 0)
     {
-        return $this->timestampTz('deleted_at', $precision)->nullable();
+        return $this->timestampTz($column, $precision)->nullable();
     }
 
     /**
      * Create a new year column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function year($column)
     {
@@ -1007,7 +1017,7 @@ class Blueprint
      * Create a new binary column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function binary($column)
     {
@@ -1018,7 +1028,7 @@ class Blueprint
      * Create a new uuid column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function uuid($column)
     {
@@ -1029,7 +1039,7 @@ class Blueprint
      * Create a new IP address column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function ipAddress($column)
     {
@@ -1040,7 +1050,7 @@ class Blueprint
      * Create a new MAC address column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function macAddress($column)
     {
@@ -1051,7 +1061,7 @@ class Blueprint
      * Create a new geometry column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function geometry($column)
     {
@@ -1063,7 +1073,7 @@ class Blueprint
      *
      * @param  string  $column
      * @param  null|int  $srid
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function point($column, $srid = null)
     {
@@ -1074,7 +1084,7 @@ class Blueprint
      * Create a new linestring column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function lineString($column)
     {
@@ -1085,7 +1095,7 @@ class Blueprint
      * Create a new polygon column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function polygon($column)
     {
@@ -1096,7 +1106,7 @@ class Blueprint
      * Create a new geometrycollection column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function geometryCollection($column)
     {
@@ -1107,7 +1117,7 @@ class Blueprint
      * Create a new multipoint column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function multiPoint($column)
     {
@@ -1118,7 +1128,7 @@ class Blueprint
      * Create a new multilinestring column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function multiLineString($column)
     {
@@ -1129,7 +1139,7 @@ class Blueprint
      * Create a new multipolygon column on the table.
      *
      * @param  string  $column
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function multiPolygon($column)
     {
@@ -1171,7 +1181,7 @@ class Blueprint
     /**
      * Adds the `remember_token` column to the table.
      *
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function rememberToken()
     {
@@ -1243,11 +1253,11 @@ class Blueprint
      * @param  string  $type
      * @param  string  $name
      * @param  array  $parameters
-     * @return \Illuminate\Support\Fluent
+     * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function addColumn($type, $name, array $parameters = [])
     {
-        $this->columns[] = $column = new Fluent(
+        $this->columns[] = $column = new ColumnDefinition(
             array_merge(compact('type', 'name'), $parameters)
         );
 
@@ -1308,7 +1318,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return \Illuminate\Database\Schema\ColumnDefinition[]
      */
     public function getColumns()
     {
@@ -1328,7 +1338,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be added.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return \Illuminate\Database\Schema\ColumnDefinition[]
      */
     public function getAddedColumns()
     {
@@ -1340,7 +1350,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be changed.
      *
-     * @return \Illuminate\Support\Fluent[]
+     * @return \Illuminate\Database\Schema\ColumnDefinition[]
      */
     public function getChangedColumns()
     {

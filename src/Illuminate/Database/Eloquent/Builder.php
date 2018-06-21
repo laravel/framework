@@ -247,6 +247,40 @@ class Builder
     }
 
     /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function latest($column = null)
+    {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        $this->query->latest($column);
+
+        return $this;
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function oldest($column = null)
+    {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        $this->query->oldest($column);
+
+        return $this;
+    }
+
+    /**
      * Create a collection of models from plain arrays.
      *
      * @param  array  $items
@@ -312,7 +346,7 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -338,7 +372,7 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -354,7 +388,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
@@ -370,7 +404,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
@@ -388,7 +422,7 @@ class Builder
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -473,7 +507,7 @@ class Builder
      * Get the hydrated models without eager loading.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @return \Illuminate\Database\Eloquent\Model[]|static[]
      */
     public function getModels($columns = ['*'])
     {
@@ -1059,7 +1093,7 @@ class Builder
      * Create a new instance of the model being queried.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function newModelInstance($attributes = [])
     {
@@ -1202,7 +1236,7 @@ class Builder
     /**
      * Get the model instance being queried.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function getModel()
     {

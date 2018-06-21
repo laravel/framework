@@ -47,7 +47,7 @@ class ConsoleApplicationTest extends TestCase
 
     protected function getMockConsole(array $methods)
     {
-        $app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.6']);
+        $app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.7']);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher', ['dispatch' => null]);
 
         return $this->getMockBuilder('Illuminate\Console\Application')->setMethods($methods)->setConstructorArgs([
