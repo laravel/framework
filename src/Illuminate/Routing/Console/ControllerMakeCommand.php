@@ -109,7 +109,11 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (! class_exists($parentModelClass)) {
             if ($this->confirm("A {$parentModelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $parentModelClass]);
+                if($this->confirm("Do you want to add migration?", true)) {
+                    $this->call('make:model', ['name' => $parentModelClass,'--migration' => true]);
+                }else {
+                    $this->call('make:model', ['name' => $parentModelClass]);
+                }
             }
         }
 
@@ -132,7 +136,11 @@ class ControllerMakeCommand extends GeneratorCommand
 
         if (! class_exists($modelClass)) {
             if ($this->confirm("A {$modelClass} model does not exist. Do you want to generate it?", true)) {
-                $this->call('make:model', ['name' => $modelClass]);
+                if($this->confirm("Do you want to add migration?", true)) {
+                    $this->call('make:model', ['name' => $modelClass,'--migration' => true]);
+                }else {
+                    $this->call('make:model', ['name' => $modelClass]);                    
+                }
             }
         }
 
