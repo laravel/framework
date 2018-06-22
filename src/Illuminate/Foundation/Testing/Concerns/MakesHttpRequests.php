@@ -439,6 +439,7 @@ trait MakesHttpRequests
     protected function followRedirects($response)
     {
         while ($response->isRedirect()) {
+            $this->refreshAuthenticated();
             $response = $this->get($response->headers->get('Location'));
         }
 
