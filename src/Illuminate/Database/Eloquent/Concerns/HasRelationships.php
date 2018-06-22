@@ -571,8 +571,8 @@ trait HasRelationships
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
         $models = [
-            $instance ? $instance->joiningTablePortion() : Str::snake(class_basename($related)),
-            $this->joiningTablePortion(),
+            $instance ? $instance->joiningTableSegment() : Str::snake(class_basename($related)),
+            $this->joiningTableSegment(),
         ];
 
         // Now that we have the model names in an array we can just sort them and
@@ -588,7 +588,7 @@ trait HasRelationships
      *
      * @return string
      */
-    public function joiningTablePortion()
+    public function joiningTableSegment()
     {
         return Str::snake(class_basename($this));
     }
