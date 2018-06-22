@@ -1557,6 +1557,25 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testMapWithKeysOverwritingKeys()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 1, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name']];
+        });
+        $this->assertSame(
+            [
+                1 => 'C',
+                2 => 'B',
+            ],
+            $data->all()
+        );
+    }
+
     public function testMapInto()
     {
         $data = new Collection([
