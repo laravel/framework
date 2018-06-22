@@ -37,6 +37,21 @@ trait InteractsWithAuthentication
     }
 
     /**
+     * Refresh the logged in user, it may have gone stale
+     *
+     * @return $this
+     */
+    public function refreshAuthenticated()
+    {
+        $user = $this->app->make('auth')->guard()->user();
+        if ($user) {
+            $this->app['auth']->guard()->setUser($user->fresh());
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the user is authenticated.
      *
      * @param  string|null  $guard
