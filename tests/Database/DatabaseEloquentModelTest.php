@@ -857,6 +857,13 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertArrayNotHasKey('age', $array);
     }
 
+    public function testAccessingJsonAttributes()
+    {
+        $model = new EloquentModelCastingStub;
+        $model->setRawAttributes(['jsonAttribute' => json_encode(['meta' => ['name' => 'foo']])]);
+        $this->assertEquals('foo', $model->{'jsonAttribute->meta->name'});
+    }
+
     public function testFillable()
     {
         $model = new EloquentModelStub;
