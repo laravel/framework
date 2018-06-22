@@ -1013,13 +1013,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mapWithKeys(callable $callback)
     {
-        $result = [];
+        $values = array_map($callback, $this->items, array_keys($this->items));
 
-        foreach ($this->items as $key => $value) {
-            $result += $callback($value, $key);
-        }
-
-        return new static($result);
+        return new static(array_replace(...$values));
     }
 
     /**
