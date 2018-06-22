@@ -306,55 +306,60 @@ class Blueprint
      * Indicate that the given primary key should be dropped.
      *
      * @param  string|array  $index
+     * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function dropPrimary($index = null)
+    public function dropPrimary($index = null, $name = null)
     {
-        return $this->dropIndexCommand('dropPrimary', 'primary', $index);
+        return $this->dropIndexCommand('dropPrimary', 'primary', $index, $name);
     }
 
     /**
      * Indicate that the given unique key should be dropped.
      *
      * @param  string|array  $index
+     * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function dropUnique($index)
+    public function dropUnique($index, $name = null)
     {
-        return $this->dropIndexCommand('dropUnique', 'unique', $index);
+        return $this->dropIndexCommand('dropUnique', 'unique', $index, $null);
     }
 
     /**
      * Indicate that the given index should be dropped.
      *
      * @param  string|array  $index
+     * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function dropIndex($index)
+    public function dropIndex($index, $name = null)
     {
-        return $this->dropIndexCommand('dropIndex', 'index', $index);
+        return $this->dropIndexCommand('dropIndex', 'index', $index, $name);
     }
 
     /**
      * Indicate that the given spatial index should be dropped.
      *
      * @param  string|array  $index
+     * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function dropSpatialIndex($index)
+    public function dropSpatialIndex($index, $name)
     {
-        return $this->dropIndexCommand('dropSpatialIndex', 'spatialIndex', $index);
+        return $this->dropIndexCommand('dropSpatialIndex', 'spatialIndex', $index, $name);
     }
 
     /**
      * Indicate that the given foreign key should be dropped.
      *
      * @param  string|array  $index
+     * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    public function dropForeign($index)
+    public function dropForeign($index, $name = null)
     {
-        return $this->dropIndexCommand('dropForeign', 'foreign', $index);
+        return $this->dropIndexCommand('dropForeign', 'foreign', $index, $name);
     }
 
     /**
@@ -1207,18 +1212,15 @@ class Blueprint
      * @param  string  $command
      * @param  string  $type
      * @param  string|array  $index
+     * @param  string  $name
      * @return \Illuminate\Support\Fluent
      */
-    protected function dropIndexCommand($command, $type, $index)
+    protected function dropIndexCommand($command, $type, $index, $name = null)
     {
         $columns = [];
 
-        // If the given "index" is actually an array of columns, the developer means
-        // to drop an index merely by specifying the columns involved without the
-        // conventional name, so we will build the index name from the columns.
-        if (is_array($index)) {
-            $index = $this->createIndexName($type, $columns = $index);
-        }
+        // If no name was specified, create one as in $this->indexCommand()
+        $index = $name ?: $this->createIndexName($type, $columns = $index);
 
         return $this->indexCommand($command, $columns, $index);
     }
