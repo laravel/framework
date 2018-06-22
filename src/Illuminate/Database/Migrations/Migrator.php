@@ -498,6 +498,16 @@ class Migrator
     }
 
     /**
+     * Get the default connection name.
+     *
+     * @return string
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Resolve the database connection instance.
      *
      * @param  string  $connection
