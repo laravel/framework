@@ -212,15 +212,18 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function fullUrlIs(...$patterns)
     {
-        $url = $this->fullUrl();
+        $matchingPatterns = array_filter($patterns, [$this, 'isPatternMatchingCurrentUrl']);
 
-        foreach ($patterns as $pattern) {
-            if (Str::is($pattern, $url)) {
-                return true;
-            }
-        }
+        return count($matchingPatterns) > 0;
+    }
 
-        return false;
+    /**
+     * @param string $pattern
+     * @return bool
+     */
+    private function isPatternMatchingCurrentUrl($pattern)
+    {
+        return Str::is($pattern, $this->fullUrl());
     }
 
     /**
