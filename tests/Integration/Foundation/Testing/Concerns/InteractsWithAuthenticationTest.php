@@ -75,6 +75,33 @@ class InteractsWithAuthenticationTest extends TestCase
             ->assertSuccessful()
             ->assertSeeText('Hello taylorotwell');
     }
+
+    public function test_acting_as_refreshes_user_on_redirect()
+    {
+        Route::get('update-name', function (Request $request) {
+            AuthenticationTestUser::where('username', '=', 'taylorotwell')
+                ->update([
+                    'username' => 'otto',
+                ]);
+            return redirect('/me');
+        })->middleware(['auth:api']);
+
+        Route::get('me', function (Request $request) {
+            return 'Hello '.$request->user()->username;
+        })->middleware(['auth:api']);
+
+        Auth::viaRequest('api', function ($request) {
+            return $request->user();
+        });
+
+        $user = AuthenticationTestUser::where('username', '=', 'taylorotwell')->first();
+
+        $this->followingRedirects();
+        $this->actingAs($user, 'api')
+            ->get('/update-name')
+            ->assertSuccessful()
+            ->assertSeeText('Hello otto');
+    }
 }
 
 class AuthenticationTestUser extends Authenticatable
