@@ -203,13 +203,15 @@ class HasManyThrough extends Relation
      */
     protected function buildDictionary(Collection $results)
     {
+        $firstKey = explode('->', $this->firstKey)[0];
+
         $dictionary = [];
 
         // First we will create a dictionary of models keyed by the foreign key of the
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
         foreach ($results as $result) {
-            $dictionary[$result->{$this->firstKey}][] = $result;
+            $dictionary[$result->$firstKey][] = $result;
         }
 
         return $dictionary;
@@ -412,7 +414,9 @@ class HasManyThrough extends Relation
             $columns = [$this->related->getTable().'.*'];
         }
 
-        return array_merge($columns, [$this->getQualifiedFirstKeyName()]);
+        $alias = explode('->', $this->firstKey)[0];
+
+        return array_merge($columns, [$this->getQualifiedFirstKeyName().' as '.$alias]);
     }
 
     /**

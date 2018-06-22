@@ -312,7 +312,7 @@ trait HasAttributes
         // If the attribute exists in the attribute array or has a "get" mutator we will
         // get the attribute's value. Otherwise, we will proceed as if the developers
         // are asking for a relationship's value. This covers both types of values.
-        if (array_key_exists($key, $this->attributes) ||
+        if (array_key_exists(explode('->', $key)[0], $this->attributes) ||
             $this->hasGetMutator($key)) {
             return $this->getAttributeValue($key);
         }
@@ -335,6 +335,15 @@ trait HasAttributes
      */
     public function getAttributeValue($key)
     {
+        // If this attribute contains a JSON ->, we'll get the proper value in the
+        // attribute's underlying array. This takes care of properly nesting an
+        // attribute in the array's value in the case of deeply nested items.
+        if (Str::contains($key, '->')) {
+            list($key, $path) = explode('->', $key, 2);
+
+            return Arr::get($this->getAttributeValue($key), str_replace('->', '.', $path));
+        }
+
         $value = $this->getAttributeFromArray($key);
 
         // If the attribute has a get mutator, we will call that then return what
