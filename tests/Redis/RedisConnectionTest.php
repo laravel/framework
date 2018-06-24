@@ -615,7 +615,7 @@ class RedisConnectionTest extends TestCase
                     'options' => ['prefix' => 'laravel:'],
                     'timeout' => 0.5,
                     'persistent' => true,
-                    'persistent_id' => 'laravel'
+                    'persistent_id' => 'laravel',
                 ],
             ]);
 

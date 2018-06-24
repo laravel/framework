@@ -92,7 +92,7 @@ class PhpRedisConnector
      */
     protected function establishConnection($client, array $config)
     {
-        if($config['persistent'] ?? false) {
+        if ($config['persistent'] ?? false) {
             $this->establishPersistentConnection($client, $config);
         } else {
             $this->establishRegularConnection($client, $config);
@@ -112,7 +112,7 @@ class PhpRedisConnector
             $config['host'],
             $config['port'],
             Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'persistent_id', NULL)
+            Arr::get($config, 'persistent_id', null)
         );
     }
 
@@ -129,7 +129,7 @@ class PhpRedisConnector
             $config['host'],
             $config['port'],
             Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'reserved', NULL),
+            Arr::get($config, 'reserved', null),
             Arr::get($config, 'retry_interval', 0)
         );
     }
