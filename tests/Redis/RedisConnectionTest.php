@@ -573,6 +573,17 @@ class RedisConnectionTest extends TestCase
         }
     }
 
+    /**
+     * @test
+     */
+    public function it_persists_connection()
+    {
+        $this->assertEquals(
+            'laravel',
+            $this->connections()['persistent']->getPersistentID()
+        );
+    }
+
     public function connections()
     {
         $connections = [
@@ -595,7 +606,21 @@ class RedisConnectionTest extends TestCase
                 ],
             ]);
 
+            $persistentPhpRedis = new RedisManager('phpredis', [
+                'cluster' => false,
+                'default' => [
+                    'host' => $host,
+                    'port' => $port,
+                    'database' => 6,
+                    'options' => ['prefix' => 'laravel:'],
+                    'timeout' => 0.5,
+                    'persistent' => true,
+                    'persistent_id' => 'laravel'
+                ],
+            ]);
+
             $connections[] = $prefixedPhpredis->connection();
+            $connections['persistent'] = $persistentPhpRedis->connection();
         }
 
         return $connections;
