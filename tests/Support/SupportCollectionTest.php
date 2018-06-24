@@ -1586,6 +1586,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['d'], $data->nth(4, 3)->all());
     }
 
+    public function testMapWithKeysOverwritingKeys()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 1, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name']];
+        });
+        $this->assertSame(
+            [
+                1 => 'C',
+                2 => 'B',
+            ],
+            $data->all()
+        );
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
