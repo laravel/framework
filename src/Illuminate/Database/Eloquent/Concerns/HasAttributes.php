@@ -649,7 +649,7 @@ trait HasAttributes
     }
 
     /**
-     * Alias for fromJson.
+     * Convert an attribute to an array.
      *
      * @param  string  $value
      * @return mixed
