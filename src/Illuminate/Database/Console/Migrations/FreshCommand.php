@@ -50,6 +50,7 @@ class FreshCommand extends Command
         $this->call('migrate', [
             '--database' => $database,
             '--path' => $this->input->getOption('path'),
+            '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
         ]);
 
