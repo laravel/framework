@@ -626,7 +626,11 @@ class Route
      */
     public function getName()
     {
-        return $this->action['as'] ?? null;
+        return isset($this->action['as'])
+            ? Str::endsWith($this->action['as'], '.')
+                ? substr($this->action['as'], 0 , -1)
+                : $this->action['as']
+            : null;
     }
 
     /**
