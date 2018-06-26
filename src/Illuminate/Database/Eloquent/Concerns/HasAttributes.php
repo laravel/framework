@@ -649,7 +649,7 @@ trait HasAttributes
     }
 
     /**
-     * Convert an attribute to an array.
+     * Convert the given value for an array attribute.
      *
      * @param  string  $value
      * @return mixed
