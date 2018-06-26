@@ -649,14 +649,14 @@ trait HasAttributes
     }
 
     /**
-     * Alias for fromJson
+     * Alias for fromJson.
      *
      * @param  string  $value
      * @return mixed
      */
     public function fromArray($value)
     {
-        return $this->fromJson($value, false);
+        return $this->fromJson($value);
     }
 
     /**
