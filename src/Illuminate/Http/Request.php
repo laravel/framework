@@ -330,6 +330,23 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Get an input element from any bag.
+     *
+     * @param  string  $key
+     * @param  mixed|null  $default
+     *
+     * @return mixed
+     */
+    public function get($key, $default = null)
+    {
+        if ($this->isJson() && $this->hasJson()) {
+            return data_get($this->getJson()->all(), $key, $default);
+        }
+
+        return parent::get($key, $default);
+    }
+
+    /**
      * Get the input source for the request.
      *
      * @return \Symfony\Component\HttpFoundation\ParameterBag
@@ -536,6 +553,26 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $this->json = $json;
 
         return $this;
+    }
+
+    /**
+     * Get the JSON payload for the request.
+     *
+     * @return null|ParameterBag
+     */
+    public function getJson()
+    {
+        return $this->json;
+    }
+
+    /**
+     * Determine if the request contains JSON payload.
+     *
+     * @return bool
+     */
+    public function hasJson()
+    {
+        return isset($this->json);
     }
 
     /**

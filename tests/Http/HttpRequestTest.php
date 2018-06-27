@@ -904,6 +904,16 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(empty($request->undefined), true);
     }
 
+    public function testGetMethodRetrievesMergedParametersInJsonRequest()
+    {
+        $payload = ['name' => 'Taylor'];
+        $request = Request::create('/', 'GET', [], [], [], ['CONTENT_TYPE' => 'application/json'], json_encode($payload));
+        $merge = ['buddy' => 'Dayle'];
+        $request->merge($merge);
+        $this->assertEquals('Taylor', $request->get('name'));
+        $this->assertEquals('Dayle', $request->get('buddy'));
+    }
+
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
     {
         $session = m::mock('Illuminate\Session\Store');
