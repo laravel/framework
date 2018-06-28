@@ -1,6 +1,20 @@
 # Release Notes for 5.6.x
 
-## v5.6.25 (pre-release)
+## v5.6.26 (2018-06-20)
+
+### Added
+- Added two Azure SQL server connection lost messages ([#24566](https://github.com/laravel/framework/pull/24566))
+- Allowed passing of recipient name in Mail notifications ([#24606](https://github.com/laravel/framework/pull/24606))
+- Started passing table name to the post migration create hooks ([#24621](https://github.com/laravel/framework/pull/24621))
+- Allowed array/collections in Auth::attempt method ([#24620](https://github.com/laravel/framework/pull/24620))
+
+### Changed
+- Prevent calling the bootable trait boot method multiple times ([#24556](https://github.com/laravel/framework/pull/24556))
+- Make chunkById() work for non-incrementing/non-integer ids as well ([#24563](https://github.com/laravel/framework/pull/24563))
+- Make ResetPassword Notification translatable ([#24534](https://github.com/laravel/framework/pull/24534))
+
+
+## v5.6.25 (2018-06-12)
 
 ### Added
 - Added whereJsonContains() to SQL Server ([#24448](https://github.com/laravel/framework/pull/24448))
