@@ -110,4 +110,11 @@ interface Application extends Container
      * @return string
      */
     public function getCachedPackagesPath();
+    
+    /**
+     * Terminate the application.
+     *
+     * @return void
+     */
+    public function terminate();
 }
