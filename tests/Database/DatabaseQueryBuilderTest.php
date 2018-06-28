@@ -2024,8 +2024,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from `users` where items->\'$."price"\' = 1', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select `items`->\'$."price"\' from `users` where `items`->\'$."price"\' = ? order by `items`->\'$."price"\' asc', $builder->toSql());
+        $builder->select('items->price')->from('users')->where('users.items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select `items`->\'$."price"\' from `users` where `users`.`items`->\'$."price"\' = ? order by `items`->\'$."price"\' asc', $builder->toSql());
 
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
@@ -2039,8 +2039,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testPostgresWrappingJson()
     {
         $builder = $this->getPostgresBuilder();
-        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select "items"->>\'price\' from "users" where "items"->>\'price\' = ? order by "items"->>\'price\' asc', $builder->toSql());
+        $builder->select('items->price')->from('users')->where('users.items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select "items"->>\'price\' from "users" where "users"."items"->>\'price\' = ? order by "items"->>\'price\' asc', $builder->toSql());
 
         $builder = $this->getPostgresBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
@@ -2054,8 +2054,8 @@ class DatabaseQueryBuilderTest extends TestCase
     public function testSqlServerWrappingJson()
     {
         $builder = $this->getSqlServerBuilder();
-        $builder->select('items->price')->from('users')->where('items->price', '=', 1)->orderBy('items->price');
-        $this->assertEquals('select json_value([items], \'$."price"\') from [users] where json_value([items], \'$."price"\') = ? order by json_value([items], \'$."price"\') asc', $builder->toSql());
+        $builder->select('items->price')->from('users')->where('users.items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select json_value([items], \'$."price"\') from [users] where json_value([users].[items], \'$."price"\') = ? order by json_value([items], \'$."price"\') asc', $builder->toSql());
 
         $builder = $this->getSqlServerBuilder();
         $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
@@ -2640,8 +2640,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
-        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en']);
-        $this->assertEquals('select * from `users` where json_contains(`options`->\'$."languages"\', ?)', $builder->toSql());
+        $builder->select('*')->from('users')->whereJsonContains('users.options->languages', ['en']);
+        $this->assertEquals('select * from `users` where json_contains(`users`.`options`->\'$."languages"\', ?)', $builder->toSql());
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getMySqlBuilder();
@@ -2658,8 +2658,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
-        $builder->select('*')->from('users')->whereJsonContains('options->languages', ['en']);
-        $this->assertEquals('select * from "users" where ("options"->\'languages\')::jsonb @> ?', $builder->toSql());
+        $builder->select('*')->from('users')->whereJsonContains('users.options->languages', ['en']);
+        $this->assertEquals('select * from "users" where ("users"."options"->\'languages\')::jsonb @> ?', $builder->toSql());
         $this->assertEquals(['["en"]'], $builder->getBindings());
 
         $builder = $this->getPostgresBuilder();
@@ -2685,8 +2685,8 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['true'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
-        $builder->select('*')->from('users')->whereJsonContains('options->languages', 'en');
-        $this->assertEquals('select * from [users] where ? in (select [value] from openjson([options], \'$."languages"\'))', $builder->toSql());
+        $builder->select('*')->from('users')->whereJsonContains('users.options->languages', 'en');
+        $this->assertEquals('select * from [users] where ? in (select [value] from openjson([users].[options], \'$."languages"\'))', $builder->toSql());
         $this->assertEquals(['en'], $builder->getBindings());
 
         $builder = $this->getSqlServerBuilder();
@@ -2830,12 +2830,10 @@ class DatabaseQueryBuilderTest extends TestCase
      */
     protected function getMockQueryBuilder()
     {
-        $builder = m::mock('Illuminate\Database\Query\Builder', [
+        return m::mock('Illuminate\Database\Query\Builder', [
             m::mock('Illuminate\Database\ConnectionInterface'),
             new \Illuminate\Database\Query\Grammars\Grammar,
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ])->makePartial();
-
-        return $builder;
     }
 }

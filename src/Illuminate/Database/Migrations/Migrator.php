@@ -481,6 +481,16 @@ class Migrator
     }
 
     /**
+     * Get the default connection name.
+     *
+     * @return string
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Set the default connection name.
      *
      * @param  string  $name

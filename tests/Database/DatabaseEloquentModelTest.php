@@ -1728,6 +1728,32 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertFalse($result);
     }
 
+    public function testWithoutTouchingCallback()
+    {
+        $model = new EloquentModelStub(['id' => 1]);
+
+        $called = false;
+
+        EloquentModelStub::withoutTouching(function () use (&$called, $model) {
+            $called = true;
+        });
+
+        $this->assertTrue($called);
+    }
+
+    public function testWithoutTouchingOnCallback()
+    {
+        $model = new EloquentModelStub(['id' => 1]);
+
+        $called = false;
+
+        Model::withoutTouchingOn([EloquentModelStub::class], function () use (&$called, $model) {
+            $called = true;
+        });
+
+        $this->assertTrue($called);
+    }
+
     protected function addMockConnection($model)
     {
         $model->setConnectionResolver($resolver = m::mock('Illuminate\Database\ConnectionResolverInterface'));

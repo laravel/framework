@@ -125,6 +125,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $globalScopes = [];
 
     /**
+     * The list of models classes that should not be affected with touch.
+     *
+     * @var array
+     */
+    protected static $ignoreOnTouch = [];
+
+    /**
      * The name of the "created at" column.
      *
      * @var string
@@ -190,9 +197,15 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     {
         $class = static::class;
 
+        $booted = [];
+
         foreach (class_uses_recursive($class) as $trait) {
-            if (method_exists($class, $method = 'boot'.class_basename($trait))) {
+            $method = 'boot'.class_basename($trait);
+
+            if (method_exists($class, $method) && ! in_array($method, $booted)) {
                 forward_static_call([$class, $method]);
+
+                $booted[] = $method;
             }
         }
     }
@@ -207,6 +220,54 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         static::$booted = [];
 
         static::$globalScopes = [];
+    }
+
+    /**
+     * Disables relationship model touching for the current class during given callback scope.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function withoutTouching(callable $callback)
+    {
+        static::withoutTouchingOn([static::class], $callback);
+    }
+
+    /**
+     * Disables relationship model touching for the given model classes during given callback scope.
+     *
+     * @param  array  $models
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function withoutTouchingOn(array $models, callable $callback)
+    {
+        static::$ignoreOnTouch = array_values(array_merge(static::$ignoreOnTouch, $models));
+
+        try {
+            call_user_func($callback);
+        } finally {
+            static::$ignoreOnTouch = array_values(array_diff(static::$ignoreOnTouch, $models));
+        }
+    }
+
+    /**
+     * Determine if the given model is ignoring touches.
+     *
+     * @param  string|null  $class
+     * @return bool
+     */
+    public static function isIgnoringTouch($class = null)
+    {
+        $class = $class ?: static::class;
+
+        foreach (static::$ignoreOnTouch as $ignoredClass) {
+            if ($class === $ignoredClass || is_subclass_of($class, $ignoredClass)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
