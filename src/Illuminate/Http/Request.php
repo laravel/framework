@@ -310,7 +310,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
-     * Symfony's Request get() method.
+     * Symfony's Request get() method. Do not use.
      *
      * You should not use this method in your Laravel application. This can
      * introduce subtle bugs. Use Laravel's Request input() method instead.
