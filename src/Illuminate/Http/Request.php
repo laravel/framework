@@ -310,6 +310,17 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
     }
 
     /**
+     * Symfony's Request get() method.
+     *
+     * You should not use this method in your Laravel application. This can
+     * introduce subtle bugs. Use Laravel's Request input() method instead.
+     */
+    public function get(...$args)
+    {
+        return parent::get(...$args);
+    }
+
+    /**
      * Get the JSON payload for the request.
      *
      * @param  string  $key
