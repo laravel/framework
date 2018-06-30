@@ -107,6 +107,17 @@ class FoundationTestResponseTest extends TestCase
         }
     }
 
+    public function testAssertSeeException()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setExceptionHeader(new \Exception('foo'));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeException(\Exception::class);
+    }
+
     public function testAssertHeader()
     {
         $baseResponse = tap(new Response, function ($response) {
