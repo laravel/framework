@@ -377,6 +377,24 @@ class TestResponse
     }
 
     /**
+     * Assert that the response has an Exception. You may specify a specific Exception class.
+     *
+     * @param null $exception_name
+     * @return $this
+     */
+    public function assertSeeException($exception_name = null)
+    {
+        $actual = $this->headers->get('x-laravel-exception');
+        if ($exception_name === null) {
+            PHPUnit::assertTrue(strlen($actual) > 0, 'Expected to see an exception but did not');
+        } else {
+            PHPUnit::assertSame($exception_name, $actual, 'Did not see expected exception: '.$exception_name.'. Instead saw '.$actual);
+        }
+
+        return $this;
+    }
+
+    /**
      * Assert that the given string is not contained within the response.
      *
      * @param  string  $value
@@ -400,6 +418,33 @@ class TestResponse
         PHPUnit::assertNotContains((string) $value, strip_tags($this->getContent()));
 
         return $this;
+    }
+
+    /**
+     * Assert the requested page did not have an uncaught exception
+     * Alias of `assertNoException`.
+     *
+     * @return this
+     */
+    public function assertDontSeeException()
+    {
+        $exception = $this->headers->get('x-laravel-exception');
+        if ($exception !== null) {
+            PHPUnit::fail('Laravel exception: '.$this->headers->get('x-laravel-exception').' : '.$this->headers->get('x-laravel-exception-msg'));
+        }
+
+        return $this;
+    }
+
+    /**
+     * Assert the requested page did not have an uncaught exception
+     * Alias of `assertDontSeeException`.
+     *
+     * @return $this
+     */
+    public function assertNoException()
+    {
+        return $this->assertDontSeeException();
     }
 
     /**
