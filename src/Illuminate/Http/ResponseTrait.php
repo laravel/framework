@@ -126,6 +126,39 @@ trait ResponseTrait
     {
         $this->exception = $e;
 
+        // During unit tests, expose information about this exception
+        //if (app()->runningUnitTests() === true) {
+            $this->setExceptionHeader($e);
+        //}
+
+        return $this;
+    }
+
+    /**
+     * Expose an exception as a header on the response.
+     *
+     * @param \Exception $e
+     * @return $this
+     */
+    public function setExceptionHeader(Exception $e)
+    {
+        $msg = $e->getMessage();
+        if ($e instanceof \Illuminate\Validation\ValidationException) {
+            $msg = $e->getMessage().' : '.$e->validator->errors()->toJson();
+        }
+
+        // Strip newlines from exception messages
+        $msg = preg_replace('/[\r\n]/', ' ', $msg);
+
+        $headers = [
+            'x-laravel-exception' => get_class($e),
+            'x-laravel-exception-msg' => substr($msg, 0, 1024),
+            'x-laravel-exception-line' => $e->getFile().':'.$e->getLine(),
+        ];
+
+        // Add these headers to the response
+        $this->withHeaders($headers);
+
         return $this;
     }
 

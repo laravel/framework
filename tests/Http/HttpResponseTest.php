@@ -196,6 +196,21 @@ class HttpResponseTest extends TestCase
         $response = new RedirectResponse('foo.bar');
         $response->doesNotExist('bar');
     }
+
+    public function testSetExceptionHeader()
+    {
+        $response = new \Illuminate\Http\Response('');
+
+        $response->setExceptionHeader(new \Exception('foo'));
+
+        $this->assertSame($response->headers->get('x-laravel-exception'), \Exception::class);
+        $this->assertSame($response->headers->get('x-laravel-exception-msg'), 'foo');
+
+        $response->withException(new \Illuminate\Validation\UnauthorizedException('bar'));
+
+        $this->assertSame($response->headers->get('x-laravel-exception'), \Illuminate\Validation\UnauthorizedException::class);
+        $this->assertSame($response->headers->get('x-laravel-exception-msg'), 'bar');
+    }
 }
 
 class ArrayableStub implements Arrayable
