@@ -92,11 +92,9 @@ class PhpRedisConnector
      */
     protected function establishConnection($client, array $config)
     {
-        if ($config['persistent'] ?? false) {
-            $this->establishPersistentConnection($client, $config);
-        } else {
-            $this->establishRegularConnection($client, $config);
-        }
+        ($config['persistent'] ?? false)
+                ? $this->establishPersistentConnection($client, $config)
+                : $this->establishRegularConnection($client, $config);
     }
 
     /**
