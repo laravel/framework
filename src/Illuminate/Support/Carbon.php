@@ -14,9 +14,8 @@ class Carbon extends BaseCarbon
      */
     public function immutable()
     {
-        return MutableDateTime::createFromFormat(
-            'Y-m-d H:i:s',
-            $this->toDateTimeString(),
+        return MutableDateTime::createFromTimestamp(
+            $this->getTimestamp(),
             $this->getTimezone()
         )->toImmutable();
     }

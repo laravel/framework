@@ -122,5 +122,6 @@ class SupportCarbonTest extends TestCase
 
         $this->assertInstanceOf(Chronos::class, $immutable);
         $this->assertSame($this->now->getTimestamp(), $immutable->getTimestamp());
+        $this->assertEquals($this->now->getTimezone(), $immutable->getTimezone());
     }
 }
