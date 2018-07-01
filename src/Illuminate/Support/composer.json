@@ -37,6 +37,7 @@
         }
     },
     "suggest": {
+        "cakephp/chronos": "Required to use immutable datetimes (^1.1).",
         "illuminate/filesystem": "Required to use the composer class (5.7.*).",
         "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
         "symfony/process": "Required to use the composer class (^4.1).",
