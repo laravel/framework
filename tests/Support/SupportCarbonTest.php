@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Support;
 
 use DateTime;
 use DateTimeInterface;
+use Cake\Chronos\Chronos;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon as BaseCarbon;
@@ -112,5 +113,15 @@ class SupportCarbonTest extends TestCase
         $deserialized = eval($serialized);
 
         $this->assertInstanceOf(Carbon::class, $deserialized);
+    }
+
+    public function testImmutable()
+    {
+        $immutable = $this->now->immutable();
+        $immutable->addYear();
+
+        $this->assertInstanceOf(Chronos::class, $immutable);
+        $this->assertSame($this->now->getTimestamp(), $immutable->getTimestamp());
+        $this->assertEquals($this->now->getTimezone(), $immutable->getTimezone());
     }
 }
