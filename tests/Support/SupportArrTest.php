@@ -331,6 +331,19 @@ class SupportArrTest extends TestCase
         $this->assertFalse(Arr::isAssoc(['a', 'b']));
     }
 
+    public function testKeysExists()
+    {
+        $neededOnModel = ['api_key' => '', 'secret' => ''];
+        $providedInRequest = ['api_key' => 'somerandomkey', 'secret' => 'somesecret'];
+
+        $this->assertTrue(Arr::keysExists($neededOnModel, $providedInRequest));
+
+        $neededOnModel = ['api_key' => '', 'secret' => ''];
+        $providedInRequest = ['api_key' => 'somerandomkey'];
+
+        $this->assertFalse(Arr::keysExists($neededOnModel, $providedInRequest));
+    }
+
     public function testOnly()
     {
         $array = ['name' => 'Desk', 'price' => 100, 'orders' => 10];

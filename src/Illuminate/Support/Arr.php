@@ -362,6 +362,26 @@ class Arr
     }
 
     /**
+     * Determines if keys of the provided array exist in another array.
+     *
+     * @param  array  $needed
+     * @param  array  $provided
+     * @return bool
+     *
+     * @throws \InvalidArgumentException
+     */
+    public static function keysExists(array $needed, array $provided)
+    {
+        if (static::isAssoc($needed) && static::isAssoc($provided)) {
+            return $needed === array_intersect_key($needed, $provided);
+        }
+
+        throw new InvalidArgumentException(
+            'Arrays passed should be associative arrays'
+        );
+    }
+
+    /**
      * Get a subset of the items from the given array.
      *
      * @param  array  $array

@@ -172,6 +172,20 @@ if (! function_exists('array_has')) {
     }
 }
 
+if (! function_exists('array_keys_exits')) {
+    /**
+     * Determines if keys of the provided array exist in another array.
+     *
+     * @param  array  $needed
+     * @param  array  $provided
+     * @return bool
+     */
+    function array_keys_exits($needed, $provided)
+    {
+        return Arr::keysExists($needed, $provided);
+    }
+}
+
 if (! function_exists('array_last')) {
     /**
      * Return the last element in an array passing a given truth test.
