@@ -65,7 +65,7 @@ class ConfigCacheCommand extends Command
             $this->files->delete($configPath);
             throw new LogicException('Unable to cache Laravel configuration.', 0, $e);
         }
-        
+
         $this->info('Configuration cached successfully!');
     }
 
