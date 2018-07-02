@@ -635,7 +635,7 @@ class RedisConnectionTest extends TestCase
                 ],
             ]);
 
-            $persistentPhpRedis = new RedisManager('phpredis', [
+            $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
                 'cluster' => false,
                 'default' => [
                     'host' => $host,
