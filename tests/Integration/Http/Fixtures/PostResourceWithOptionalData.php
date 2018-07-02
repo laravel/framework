@@ -15,6 +15,10 @@ class PostResourceWithOptionalData extends JsonResource
             'third' => $this->when(true, function () {
                 return 'value';
             }),
+            'fourth' => $this->when(false, 'value', 'default'),
+            'fifth' => $this->when(false, 'value', function () {
+                return 'default';
+            }),
         ];
     }
 }

@@ -878,6 +878,19 @@ class SupportHelpersTest extends TestCase
         }));
     }
 
+    public function testTransformDefaultWhenBlank()
+    {
+        $this->assertEquals('baz', transform(null, function () {
+            return 'bar';
+        }, 'baz'));
+
+        $this->assertEquals('baz', transform('', function () {
+            return 'bar';
+        }, function () {
+            return 'baz';
+        }));
+    }
+
     public function testWith()
     {
         $this->assertEquals(10, with(10));
