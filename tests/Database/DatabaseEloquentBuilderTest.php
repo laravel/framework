@@ -848,6 +848,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertContains('"self_alias_hash"."id" = "self_related_stubs"."parent_id"', $sql);
     }
 
+    public function testSelfHasWithCustomOwnerKey()
+    {
+        $model = new EloquentBuilderTestModelSelfRelatedStub;
+
+        $sql = $model->has('parentBar')->toSql();
+
+        $this->assertRegExp('/"laravel_reserved_\d"\."owner_key"/', $sql);
+    }
+
     public function testDoesntHave()
     {
         $model = new EloquentBuilderTestModelParentStub;
@@ -1096,6 +1105,11 @@ class EloquentBuilderTestModelSelfRelatedStub extends \Illuminate\Database\Eloqu
     public function parentFoo()
     {
         return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'id', 'parent');
+    }
+
+    public function parentBar()
+    {
+        return $this->belongsTo('Illuminate\Tests\Database\EloquentBuilderTestModelSelfRelatedStub', 'parent_id', 'owner_key', 'parent');
     }
 
     public function childFoo()
