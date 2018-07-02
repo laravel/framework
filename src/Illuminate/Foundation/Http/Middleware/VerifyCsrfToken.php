@@ -35,7 +35,7 @@ class VerifyCsrfToken
     protected $except = [];
 
     /**
-     * If you're client-side scripts need the XSRF-TOKEN cookie, enable this setting.
+     * If your client-side scripts need the XSRF-TOKEN cookie, enable this setting.
      *
      * @var bool
      */
