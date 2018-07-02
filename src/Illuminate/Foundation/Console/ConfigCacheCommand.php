@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use LogicException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Console\Kernel as ConsoleKernelContract;
@@ -52,11 +53,19 @@ class ConfigCacheCommand extends Command
         $this->call('config:clear');
 
         $config = $this->getFreshConfiguration();
+        $configPath = $this->laravel->getCachedConfigPath();
 
         $this->files->put(
-            $this->laravel->getCachedConfigPath(), '<?php return '.var_export($config, true).';'.PHP_EOL
+            $configPath, '<?php return '.var_export($config, true).';'.PHP_EOL
         );
 
+        try {
+            require $configPath;
+        } catch (\Throwable $e) {
+            $this->files->delete($configPath);
+            throw new LogicException('Unable to cache Laravel configuration.', 0, $e);
+        }
+        
         $this->info('Configuration cached successfully!');
     }
 
