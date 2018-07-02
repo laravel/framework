@@ -35,6 +35,13 @@ class VerifyCsrfToken
     protected $except = [];
 
     /**
+     * If you're client-side scripts need the XSRF-TOKEN cookie, enable this setting.
+     *
+     * @var bool
+     */
+    protected $addHttpCookie = false;
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
@@ -64,7 +71,13 @@ class VerifyCsrfToken
             $this->inExceptArray($request) ||
             $this->tokensMatch($request)
         ) {
-            return $this->addCookieToResponse($request, $next($request));
+            $response = $next($request);
+
+            if ($this->addHttpCookie) {
+                $this->addCookieToResponse($request, $response);
+            }
+
+            return $response;
         }
 
         throw new TokenMismatchException;
