@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Throwable;
 use LogicException;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
@@ -61,9 +62,10 @@ class ConfigCacheCommand extends Command
 
         try {
             require $configPath;
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->files->delete($configPath);
-            throw new LogicException('Unable to cache Laravel configuration.', 0, $e);
+
+            throw new LogicException('Your configuration files are not serializable.', 0, $e);
         }
 
         $this->info('Configuration cached successfully!');
