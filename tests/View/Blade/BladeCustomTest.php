@@ -155,7 +155,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input', 'input');
 
         $string = '@input';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Illuminate\Support\Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -164,7 +164,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input', 'input');
 
         $string = '@input([\'type\' => \'email\'])';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [\'type\' => \'email\'], \Illuminate\Support\Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -173,7 +173,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.input');
 
         $string = '@input';
-        $expected = '<?php echo $__env->make(\'app.includes.input\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.input\', [], \Illuminate\Support\Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 
@@ -182,7 +182,7 @@ class BladeCustomTest extends AbstractBladeTestCase
         $this->compiler->include('app.includes.foreach');
 
         $string = '@foreach';
-        $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], array_except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
+        $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Illuminate\Support\Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
 }

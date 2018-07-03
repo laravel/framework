@@ -80,20 +80,20 @@ class SupportViewErrorBagTest extends TestCase
     {
         $viewErrorBag = new ViewErrorBag();
         $viewErrorBag->put('default', new MessageBag(['message', 'second']));
-        $this->assertEquals(2, $viewErrorBag->count());
+        $this->assertCount(2, $viewErrorBag);
     }
 
     public function testCountWithNoMessagesInMessageBag()
     {
         $viewErrorBag = new ViewErrorBag();
         $viewErrorBag->put('default', new MessageBag());
-        $this->assertEquals(0, $viewErrorBag->count());
+        $this->assertCount(0, $viewErrorBag);
     }
 
     public function testCountWithNoMessageBags()
     {
         $viewErrorBag = new ViewErrorBag();
-        $this->assertEquals(0, $viewErrorBag->count());
+        $this->assertCount(0, $viewErrorBag);
     }
 
     public function testDynamicCallToDefaultMessageBag()

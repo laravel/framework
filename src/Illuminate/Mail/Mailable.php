@@ -12,7 +12,6 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
@@ -134,9 +133,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
-        $translator = Container::getInstance()->make(Translator::class);
-
-        $this->withLocale($this->locale, $translator, function () use ($mailer) {
+        $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
@@ -776,7 +773,7 @@ class Mailable implements MailableContract, Renderable
     public function __call($method, $parameters)
     {
         if (Str::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+            return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 
         throw new BadMethodCallException(sprintf(

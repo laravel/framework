@@ -930,7 +930,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $blueprint->string('foo')->comment("Escape ' when using words like it's");
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
 
-        $this->assertEquals(1, count($statements));
+        $this->assertCount(1, $statements);
         $this->assertEquals("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
     }
 

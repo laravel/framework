@@ -53,7 +53,7 @@ class EloquentUpdateTest extends TestCase
 
         TestUpdateModel1::where('title', 'Ms.')->delete();
 
-        $this->assertEquals(0, TestUpdateModel1::all()->count());
+        $this->assertCount(0, TestUpdateModel1::all());
     }
 
     public function testUpdateWithLimitsAndOrders()
@@ -105,7 +105,7 @@ class EloquentUpdateTest extends TestCase
                 ->where('test_model1.title', '=', 'Mr.');
         })->delete();
 
-        $this->assertEquals(0, TestUpdateModel2::all()->count());
+        $this->assertCount(0, TestUpdateModel2::all());
     }
 }
 

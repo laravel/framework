@@ -87,10 +87,11 @@ class AuthDatabaseUserProviderTest extends TestCase
         $conn = m::mock('Illuminate\Database\Connection');
         $conn->shouldReceive('table')->once()->with('foo')->andReturn($conn);
         $conn->shouldReceive('where')->once()->with('username', 'dayle');
+        $conn->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
         $conn->shouldReceive('first')->once()->andReturn(['id' => 1, 'name' => 'taylor']);
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
         $provider = new DatabaseUserProvider($conn, $hasher, 'foo');
-        $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo']);
+        $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo', 'group' => ['one', 'two']]);
 
         $this->assertInstanceOf('Illuminate\Auth\GenericUser', $user);
         $this->assertEquals(1, $user->getAuthIdentifier());
