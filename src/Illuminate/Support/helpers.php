@@ -172,7 +172,7 @@ if (! function_exists('array_has')) {
     }
 }
 
-if (! function_exists('array_keys_exits')) {
+if (! function_exists('array_keys_exists')) {
     /**
      * Determines if keys of the provided array exist in another array.
      *
@@ -180,7 +180,7 @@ if (! function_exists('array_keys_exits')) {
      * @param  array  $provided
      * @return bool
      */
-    function array_keys_exits($needed, $provided)
+    function array_keys_exists($needed, $provided)
     {
         return Arr::keysExists($needed, $provided);
     }
