@@ -45,6 +45,10 @@ class CheckForMaintenanceMode
                 return $next($request);
             }
 
+            if (isset($data['except']) && in_array($request->getRequestUri(), (array) $data['except'])) {
+                return $next($request);
+            }
+
             throw new MaintenanceModeException($data['time'], $data['retry'], $data['message']);
         }
 
