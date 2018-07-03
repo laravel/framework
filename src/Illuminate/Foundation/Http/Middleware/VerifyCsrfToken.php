@@ -35,11 +35,11 @@ class VerifyCsrfToken
     protected $except = [];
 
     /**
-     * If your client-side scripts need the XSRF-TOKEN cookie, enable this setting.
+     * Indicates whether the XSRF-TOKEN cookie should be set on the response.
      *
      * @var bool
      */
-    protected $addHttpCookie = false;
+    protected $addHttpCookie = true;
 
     /**
      * Create a new middleware instance.
@@ -71,13 +71,11 @@ class VerifyCsrfToken
             $this->inExceptArray($request) ||
             $this->tokensMatch($request)
         ) {
-            $response = $next($request);
-
-            if ($this->addHttpCookie) {
-                $this->addCookieToResponse($request, $response);
-            }
-
-            return $response;
+            return tap($next($request), function ($response) {
+                if ($this->addHttpCookie) {
+                    $this->addCookieToResponse($request, $response);
+                }
+            });
         }
 
         throw new TokenMismatchException;
