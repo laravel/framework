@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Query\JoinClause;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
@@ -754,6 +755,48 @@ class DatabaseQueryBuilderTest extends TestCase
         }));
         $this->assertEquals('select * from "users" union select * from "dogs" inner join "breeds" on "dogs"."breed_id" = "breeds"."id" and "breeds"."is_native" = ?', $builder->toSql());
         $this->assertEquals([0 => 1], $builder->getBindings());
+    }
+
+    /**
+     *
+     * @group current
+     */
+    public function testJoinOnce()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')
+            ->from('users')
+            ->join('profiles', 'profiles.user_id', '=', 'users.id')
+            ->joinOnce('profiles', function (JoinClause $join) {
+                // this join will be ignored
+                $join
+                    ->on('profiles.user_id', '=', 'users.id')
+                    ->where('users.status', 'active');
+            });
+
+        $this->assertSame(
+            'select * from "users" inner join "profiles" on "profiles"."user_id" = "users"."id"',
+            $builder->toSql()
+        );
+    }
+
+    public function testJoinOnceWithReplace()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')
+            ->from('users')
+            ->join('profiles', 'profiles.user_id', '=', 'users.id') // this join will be removed
+            ->joinOnceWithReplace('profiles', function (JoinClause $join) {
+                $join
+                    ->on('profiles.user_id', '=', 'users.id')
+                    ->where('users.status', 'active');
+            });
+
+        $this->assertSame(
+            'select * from "users" inner join "profiles" on "profiles"."user_id" = "users"."id" and "users"."status" = ?',
+            $builder->toSql()
+        );
+        $this->assertSame([0 => 'active'], $builder->getBindings());
     }
 
     public function testMySqlUnionOrderBys()
