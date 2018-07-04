@@ -220,7 +220,7 @@ class FilesystemManager implements FactoryContract
         $config += ['version' => 'latest'];
 
         if ($config['key'] && $config['secret']) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
         return $config;
