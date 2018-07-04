@@ -207,7 +207,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerAuthMakeCommand()
     {
-        $this->app->singleton('command.auth.make', function ($app) {
+        $this->app->singleton('command.auth.make', function () {
             return new AuthMakeCommand;
         });
     }
@@ -622,7 +622,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerPackageDiscoverCommand()
     {
-        $this->app->singleton('command.package.discover', function ($app) {
+        $this->app->singleton('command.package.discover', function () {
             return new PackageDiscoverCommand;
         });
     }
@@ -966,7 +966,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerViewCacheCommand()
     {
-        $this->app->singleton('command.view.cache', function ($app) {
+        $this->app->singleton('command.view.cache', function () {
             return new ViewCacheCommand;
         });
     }
