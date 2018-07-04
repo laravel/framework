@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Database\Query\BuilderDebugger;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
@@ -1233,6 +1234,14 @@ class Builder
     public function qualifyColumn($column)
     {
         return $this->model->qualifyColumn($column);
+    }
+
+    /**
+     * @return BuilderDebugger
+     */
+    public function debugger(): BuilderDebugger
+    {
+        return new BuilderDebugger($this);
     }
 
     /**
