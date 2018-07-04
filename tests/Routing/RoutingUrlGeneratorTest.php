@@ -244,6 +244,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals('/foo/bar/taylor/breeze/otwell?fly=wall', $url->route('bar', ['taylor', 'otwell', 'fly' => 'wall'], false));
         $this->assertEquals('https://www.foo.com/foo/baz', $url->route('baz'));
         $this->assertEquals('http://www.foo.com/foo/bam', $url->action('foo@bar'));
+        $this->assertEquals('http://www.foo.com/foo/bam', $url->action(['foo', 'bar']));
         $this->assertEquals('http://www.foo.com/foo/invoke', $url->action('InvokableActionStub'));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['wall', 'woz', 'boom' => 'otwell', 'baz' => 'taylor']));
         $this->assertEquals('http://www.foo.com/foo/bar/taylor/breeze/otwell?wall&woz', $url->route('bar', ['taylor', 'otwell', 'wall', 'woz']));
