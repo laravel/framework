@@ -2723,6 +2723,14 @@ class Builder
     }
 
     /**
+     * @return BuilderDebugger
+     */
+    public function debugger(): BuilderDebugger
+    {
+        return new BuilderDebugger($this);
+    }
+
+    /**
      * Get the database connection instance.
      *
      * @return \Illuminate\Database\ConnectionInterface
