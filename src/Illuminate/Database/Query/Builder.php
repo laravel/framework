@@ -91,7 +91,7 @@ class Builder
     /**
      * The table joins for the query.
      *
-     * @var array
+     * @var array|JoinClause[]
      */
     public $joins;
 
@@ -406,6 +406,56 @@ class Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Add a join clause to the query only once for one table.
+     * If table was joined already - ignore current one, use only previous join clause.
+     *
+     * @param  string  $table
+     * @param  string|callable  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $type
+     * @param  bool    $where
+     * @return $this
+     */
+    public function joinOnce($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    {
+        foreach ($this->joins as $join) {
+            if ($join->table === $table) {
+                // This table was joined already, nothing to join
+                // Return builder instance without any changes.
+
+                return $this;
+            }
+        }
+
+        return $this->join($table, $first, $operator, $second, $type, $where);
+    }
+
+    /**
+     * Add a join clause to the query only once for one table.
+     * If table was joined already - remove previous join and use current one.
+     *
+     * @param  string  $table
+     * @param  string|callable  $first
+     * @param  string|null  $operator
+     * @param  string|null  $second
+     * @param  string  $type
+     * @param  bool    $where
+     * @return $this
+     */
+    public function replaceJoin($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    {
+        foreach ($this->joins as $index => $join) {
+            if ($join->table === $table) {
+                // This table was joined already, so remove previous join
+                unset($this->joins[$index]);
+            }
+        }
+
+        return $this->join($table, $first, $operator, $second, $type, $where);
     }
 
     /**
