@@ -15,7 +15,7 @@ class EnsureRequestIsSecure
      */
     public function handle($request, Closure $next)
     {
-        if (config('app.https') && !$request->secure()) {
+        if (config('app.https') && ! $request->secure()) {
             return redirect()->secure($request->getRequestUri(), 301);
         }
 
