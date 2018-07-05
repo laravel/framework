@@ -372,7 +372,7 @@ class Builder
      * Add a join clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  string|callable  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
@@ -383,11 +383,11 @@ class Builder
     {
         $join = new JoinClause($this, $type, $table);
 
-        // If the first "column" of the join is really a Closure instance the developer
+        // If the first "column" of the join is really a Closure instance or callable, the developer
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call a Closure with the query.
-        if ($first instanceof Closure) {
-            call_user_func($first, $join);
+        if (\is_callable($first)) {
+            $first($join);
 
             $this->joins[] = $join;
 
