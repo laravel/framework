@@ -446,14 +446,8 @@ class Builder
      * @param  bool    $where
      * @return $this
      */
-    public function joinOnceWithReplace(
-        $table,
-        $first,
-        $operator = null,
-        $second = null,
-        $type = 'inner',
-        $where = false
-    ) {
+    public function replaceJoin($table, $first, $operator = null, $second = null, $type = 'inner', $where = false)
+    {
         foreach ($this->joins as $index => $join) {
             if ($join->table === $table) {
                 // This table was joined already, so remove previous join

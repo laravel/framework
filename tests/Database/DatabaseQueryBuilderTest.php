@@ -780,13 +780,13 @@ class DatabaseQueryBuilderTest extends TestCase
         );
     }
 
-    public function testJoinOnceWithReplace()
+    public function testReplaceJoin()
     {
         $builder = $this->getBuilder();
         $builder->select('*')
             ->from('users')
             ->join('profiles', 'profiles.user_id', '=', 'users.id') // this join will be removed
-            ->joinOnceWithReplace('profiles', function (JoinClause $join) {
+            ->replaceJoin('profiles', function (JoinClause $join) {
                 $join
                     ->on('profiles.user_id', '=', 'users.id')
                     ->where('users.status', 'active');
