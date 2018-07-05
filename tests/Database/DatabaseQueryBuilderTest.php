@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Query\JoinClause;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\JoinClause;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
@@ -757,10 +757,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
-    /**
-     *
-     * @group current
-     */
     public function testJoinOnce()
     {
         $builder = $this->getBuilder();
