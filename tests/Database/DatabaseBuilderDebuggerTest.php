@@ -17,7 +17,6 @@ class DatabaseBuilderDebuggerTest extends TestCase
 {
     /**
      * @throws \ReflectionException
-     * @group current
      */
     public function testGetRawSql()
     {
@@ -33,7 +32,7 @@ class DatabaseBuilderDebuggerTest extends TestCase
             ;
 
         $this->assertSame(
-            "select * from `users` where `users`.`status` = 'active' and `users`.`age` > 18 and users.locale = 'en' and `users`.`group` in (1, 2, 3, 'string') and users.something_else = 'unnamed_binding_value\"with\'quotes'",
+            "select * from `users` where `users`.`status` = 'active' and `users`.`age` > 18 and users.locale = 'en' and `users`.`group` in (1, 2, 3, 'string') and users.something_else = 'unnamed_binding_value\"with\'quotes\'",
             $builder->debugger()->getRawSql()
         );
     }
