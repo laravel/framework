@@ -4,11 +4,11 @@ namespace Illuminate\Database\Eloquent;
 
 use Closure;
 use BadMethodCallException;
-use Illuminate\Database\Query\BuilderDebugger;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Database\Query\BuilderDebugger;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;

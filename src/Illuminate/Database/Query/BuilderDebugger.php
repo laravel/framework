@@ -32,7 +32,6 @@ class BuilderDebugger
         $pattern = '/\:\w+|\?/';
 
         foreach ($bindings as $index => $binding) {
-
             $replace = is_numeric($binding)
                 ? $binding
                 : sprintf("'%s'", str_replace("'", "\'", $binding));
