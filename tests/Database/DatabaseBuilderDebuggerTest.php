@@ -22,7 +22,7 @@ class DatabaseBuilderDebuggerTest extends TestCase
             ->where('users.status', 'active')
             ->where('users.age', '>', 18)
             ->whereRaw('users.locale = :locale', ['locale' => 'en'])
-            ->whereIn('users.group', [1 ,2 , 3, 'string'])
+            ->whereIn('users.group', [1, 2, 3, 'string'])
             ->whereRaw('users.something_else = :binding', ['unnamed_binding_value"with\'quotes']);
 
         $this->assertSame(
