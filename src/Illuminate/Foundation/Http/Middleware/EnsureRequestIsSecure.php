@@ -4,7 +4,7 @@ namespace Illuminate\Foundation\Http\Middleware;
 
 use Closure;
 
-class SecuresRequest
+class EnsureRequestIsSecure
 {
     /**
      * Handle an incoming request.
