@@ -71,7 +71,7 @@ class VerifyCsrfToken
             $this->inExceptArray($request) ||
             $this->tokensMatch($request)
         ) {
-            return tap($next($request), function ($response) {
+            return tap($next($request), function ($response) use ($request) {
                 if ($this->addHttpCookie) {
                     $this->addCookieToResponse($request, $response);
                 }
