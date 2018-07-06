@@ -7,6 +7,8 @@ use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Query;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
@@ -410,15 +412,21 @@ trait HasAttributes
     {
         $relation = $this->$method();
 
-        if (! $relation instanceof Relation) {
+        if (! $relation instanceof Relation && ! $relation instanceof Query && ! $relation instanceof Builder) {
             throw new LogicException(sprintf(
-                '%s::%s must return a relationship instance.', static::class, $method
+                '%s::%s must return a relationship or query or builder instance.', static::class, $method
             ));
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
-            $this->setRelation($method, $results);
-        });
+        if ($relation instanceof Relation) {
+            return tap($relation->getResults(), function ($results) use ($method) {
+                $this->setRelation($method, $results);
+            });
+        } elseif ($relation instanceof Query || $relation instanceof Builder) {
+            return tap($relation->get(), function ($results) use ($method) {
+                $this->setRelation($method, $results);
+            });
+        }
     }
 
     /**
