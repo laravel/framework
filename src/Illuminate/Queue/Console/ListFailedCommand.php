@@ -81,7 +81,7 @@ class ListFailedCommand extends Command
     {
         $payload = json_decode($payload, true);
 
-        if ($payload && (! isset($payload['data']['command']))) {
+        if ($payload && ! isset($payload['data']['command'])) {
             return $payload['job'] ?? null;
         } elseif ($payload && isset($payload['data']['command'])) {
             return $this->matchJobName($payload);

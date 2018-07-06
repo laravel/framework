@@ -72,7 +72,7 @@ class ConcurrentLimiterTest extends TestCase
     {
         $store = [];
 
-        $lock = (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 1));
+        $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 1);
 
         $lock->block(2, function () use (&$store) {
             $store[] = 1;
@@ -102,7 +102,7 @@ class ConcurrentLimiterTest extends TestCase
     {
         $store = [];
 
-        $lock = (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 2));
+        $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 2);
 
         $lock->block(2, function () use (&$store) {
             $store[] = 1;
@@ -130,7 +130,7 @@ class ConcurrentLimiterTest extends TestCase
     {
         $store = [];
 
-        $lock = (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 10));
+        $lock = new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 1, 10);
 
         $lock->block(2, function () use (&$store) {
             $store[] = 1;

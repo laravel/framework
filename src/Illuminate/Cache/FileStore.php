@@ -227,7 +227,7 @@ class FileStore implements Store
     {
         $time = $this->availableAt((int) ($minutes * 60));
 
-        return $minutes === 0 || $time > 9999999999 ? 9999999999 : (int) $time;
+        return $minutes === 0 || $time > 9999999999 ? 9999999999 : $time;
     }
 
     /**
