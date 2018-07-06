@@ -1057,7 +1057,7 @@ if (! function_exists('throw_if')) {
     function throw_if($condition, $exception, ...$parameters)
     {
         if ($condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+            throw is_string($exception) ? new $exception(...$parameters) : $exception;
         }
 
         return $condition;
@@ -1077,7 +1077,7 @@ if (! function_exists('throw_unless')) {
     function throw_unless($condition, $exception, ...$parameters)
     {
         if (! $condition) {
-            throw (is_string($exception) ? new $exception(...$parameters) : $exception);
+            throw is_string($exception) ? new $exception(...$parameters) : $exception;
         }
 
         return $condition;

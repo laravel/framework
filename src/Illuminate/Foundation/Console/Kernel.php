@@ -198,9 +198,7 @@ class Kernel implements KernelContract
     {
         $paths = array_unique(Arr::wrap($paths));
 
-        $paths = array_filter($paths, function ($path) {
-            return is_dir($path);
-        });
+        $paths = array_filter($paths, 'is_dir');
 
         if (empty($paths)) {
             return;
