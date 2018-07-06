@@ -145,6 +145,8 @@ class Factory implements FactoryContract
      * @param  array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
+     *
+     * @throws \InvalidArgumentException
      */
     public function first(array $views, $data = [], $mergeData = [])
     {
