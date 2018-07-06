@@ -147,12 +147,13 @@ class FactoryBuilder
      * Create a model and persist it in the database if requested.
      *
      * @param  array  $attributes
+     * @param  mixed  ...$extraParams
      * @return \Closure
      */
-    public function lazy(array $attributes = [])
+    public function lazy(array $attributes = [], ...$extraParams)
     {
-        return function () use ($attributes) {
-            return $this->create($attributes);
+        return function () use ($attributes, $extraParams) {
+            return $this->create($attributes, ...$extraParams);
         };
     }
 
@@ -160,11 +161,12 @@ class FactoryBuilder
      * Create a collection of models and persist them to the database.
      *
      * @param  array  $attributes
+     * @param  mixed  ...$extraParams
      * @return mixed
      */
-    public function create(array $attributes = [])
+    public function create(array $attributes = [], ...$extraParams)
     {
-        $results = $this->make($attributes);
+        $results = $this->make($attributes, ...$extraParams);
 
         if ($results instanceof Model) {
             $this->store(collect([$results]));
@@ -200,12 +202,13 @@ class FactoryBuilder
      * Create a collection of models.
      *
      * @param  array  $attributes
+     * @param  mixed  ...$extraParams
      * @return mixed
      */
-    public function make(array $attributes = [])
+    public function make(array $attributes = [], ...$extraParams)
     {
         if ($this->amount === null) {
-            return tap($this->makeInstance($attributes), function ($instance) {
+            return tap($this->makeInstance($attributes, $extraParams), function ($instance) {
                 $this->callAfterMaking(collect([$instance]));
             });
         }
@@ -214,8 +217,8 @@ class FactoryBuilder
             return (new $this->class)->newCollection();
         }
 
-        $instances = (new $this->class)->newCollection(array_map(function () use ($attributes) {
-            return $this->makeInstance($attributes);
+        $instances = (new $this->class)->newCollection(array_map(function () use ($attributes, $extraParams) {
+            return $this->makeInstance($attributes, $extraParams);
         }, range(1, $this->amount)));
 
         $this->callAfterMaking($instances);
@@ -227,20 +230,21 @@ class FactoryBuilder
      * Create an array of raw attribute arrays.
      *
      * @param  array  $attributes
+     * @param  mixed  ...$extraParams
      * @return mixed
      */
-    public function raw(array $attributes = [])
+    public function raw(array $attributes = [], ...$extraParams)
     {
         if ($this->amount === null) {
-            return $this->getRawAttributes($attributes);
+            return $this->getRawAttributes($attributes, $extraParams);
         }
 
         if ($this->amount < 1) {
             return [];
         }
 
-        return array_map(function () use ($attributes) {
-            return $this->getRawAttributes($attributes);
+        return array_map(function () use ($attributes, $extraParams) {
+            return $this->getRawAttributes($attributes, $extraParams);
         }, range(1, $this->amount));
     }
 
@@ -248,11 +252,12 @@ class FactoryBuilder
      * Get a raw attributes array for the model.
      *
      * @param  array  $attributes
+     * @param  array  $extraParams
      * @return mixed
      *
      * @throws \InvalidArgumentException
      */
-    protected function getRawAttributes(array $attributes = [])
+    protected function getRawAttributes(array $attributes = [], array $extraParams = [])
     {
         if (! isset($this->definitions[$this->class][$this->name])) {
             throw new InvalidArgumentException("Unable to locate factory with name [{$this->name}] [{$this->class}].");
@@ -260,11 +265,11 @@ class FactoryBuilder
 
         $definition = call_user_func(
             $this->definitions[$this->class][$this->name],
-            $this->faker, $attributes
+            $this->faker, $attributes, ...$extraParams
         );
 
         return $this->expandAttributes(
-            array_merge($this->applyStates($definition, $attributes), $attributes)
+            array_merge($this->applyStates($definition, $attributes, $extraParams), $attributes)
         );
     }
 
@@ -272,13 +277,14 @@ class FactoryBuilder
      * Make an instance of the model with the given attributes.
      *
      * @param  array  $attributes
+     * @param  array  $extraParams
      * @return \Illuminate\Database\Eloquent\Model
      */
-    protected function makeInstance(array $attributes = [])
+    protected function makeInstance(array $attributes = [], array $extraParams = [])
     {
-        return Model::unguarded(function () use ($attributes) {
+        return Model::unguarded(function () use ($attributes, $extraParams) {
             $instance = new $this->class(
-                $this->getRawAttributes($attributes)
+                $this->getRawAttributes($attributes, $extraParams)
             );
 
             if (isset($this->connection)) {
@@ -294,9 +300,10 @@ class FactoryBuilder
      *
      * @param  array  $definition
      * @param  array  $attributes
+     * @param  array  $extraParams
      * @return array
      */
-    protected function applyStates(array $definition, array $attributes = [])
+    protected function applyStates(array $definition, array $attributes = [], array $extraParams = [])
     {
         foreach ($this->activeStates as $state) {
             if (! isset($this->states[$this->class][$state])) {
@@ -309,7 +316,7 @@ class FactoryBuilder
 
             $definition = array_merge(
                 $definition,
-                $this->stateAttributes($state, $attributes)
+                $this->stateAttributes($state, $attributes, $extraParams)
             );
         }
 
@@ -321,9 +328,10 @@ class FactoryBuilder
      *
      * @param  string  $state
      * @param  array  $attributes
+     * @param  array  $extraParams
      * @return array
      */
-    protected function stateAttributes($state, array $attributes)
+    protected function stateAttributes($state, array $attributes, array $extraParams = [])
     {
         $stateAttributes = $this->states[$this->class][$state];
 
@@ -333,7 +341,7 @@ class FactoryBuilder
 
         return call_user_func(
             $stateAttributes,
-            $this->faker, $attributes
+            $this->faker, $attributes, ...$extraParams
         );
     }
 

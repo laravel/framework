@@ -97,6 +97,12 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->state(FactoryBuildableServer::class, 'inline', ['status' => 'inline']);
 
+        $factory->state(FactoryBuildableUser::class, 'complex', function (Generator $faker, array $attributes, string $namePrefix = '') {
+            return [
+                'name' => $namePrefix.$faker->name,
+            ];
+        });
+
         $app->singleton(Factory::class, function ($app) use ($factory) {
             return $factory;
         });
@@ -282,6 +288,17 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
+    }
+
+    /** @test */
+    public function making_models_with_passing_extra_params()
+    {
+        $prefix = bin2hex(random_bytes(2));
+        $users = factory(FactoryBuildableUser::class, 2)->states('complex')->make([], $prefix);
+
+        $users->each(function (FactoryBuildableUser $user) use ($prefix) {
+            $this->assertEquals(0, strpos($user->name, $prefix));
+        });
     }
 }
 
