@@ -6,9 +6,9 @@ use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Database\Query;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Carbon;
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
@@ -412,7 +412,7 @@ trait HasAttributes
     {
         $relation = $this->$method();
 
-        if (! $relation instanceof Relation && ! $relation instanceof Query && ! $relation instanceof Builder) {
+        if (! $relation instanceof Relation && ! $relation instanceof QueryBuilder && ! $relation instanceof EloquentBuilder) {
             throw new LogicException(sprintf(
                 '%s::%s must return a relationship or query or builder instance.', static::class, $method
             ));
@@ -422,7 +422,7 @@ trait HasAttributes
             return tap($relation->getResults(), function ($results) use ($method) {
                 $this->setRelation($method, $results);
             });
-        } elseif ($relation instanceof Query || $relation instanceof Builder) {
+        } elseif ($relation instanceof QueryBuilder || $relation instanceof EloquentBuilder) {
             return tap($relation->get(), function ($results) use ($method) {
                 $this->setRelation($method, $results);
             });
