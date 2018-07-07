@@ -58,8 +58,10 @@ class VerifyEmail extends Notification
      */
     protected function verificationUrl($notifiable)
     {
+        $minutes = config('auth.email_verification.minutes', 60);
+
         return URL::temporarySignedRoute(
-            'verification.verify', Carbon::now()->addMinutes(60), ['id' => $notifiable->getKey()]
+            'verification.verify', Carbon::now()->addMinutes($minutes), ['id' => $notifiable->getKey()]
         );
     }
 
