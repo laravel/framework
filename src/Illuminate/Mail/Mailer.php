@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail;
 
+
 use Swift_Mailer;
 use InvalidArgumentException;
 use Illuminate\Support\HtmlString;
@@ -190,7 +191,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array  $view
      * @param  array  $data
-     * @return string
+     * @return string|array
      */
     public function render($view, array $data = [])
     {
@@ -201,7 +202,15 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['message'] = $this->createMessage();
 
-        return $this->renderView($view ?: $plain, $data);
+
+        //if there is only one view type (html or text) setted return the rendered view
+        if(!$plain)
+            return $this->renderView($view,$data);
+        if(!$view)
+            return $this->renderView($plain,$data);
+
+        //otherwise return both rendere views
+        return [$this->renderView($view,$data),$this->renderView($plain,$data)];
     }
 
     /**
