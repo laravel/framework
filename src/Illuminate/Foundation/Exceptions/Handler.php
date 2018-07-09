@@ -99,7 +99,7 @@ class Handler implements ExceptionHandlerContract
         }
 
         if (method_exists($e, 'report')) {
-            return $e->report();
+            return $this->container->call([$e, 'report']);
         }
 
         try {
