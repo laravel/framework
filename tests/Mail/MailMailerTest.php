@@ -43,7 +43,7 @@ class MailMailerTest extends TestCase
         $this->assertEquals($renderedTextView, $rendered);
     }
 
-    public function testMailerRenderAnArrayWhenCalledWithBothHtmlAndTextViews()
+    public function testMailerRenderHtmlAndTextViewsWhenBothAreDefined()
     {
         $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')
             ->setMethods(['createMessage', 'renderView', 'parseView'])
@@ -62,7 +62,7 @@ class MailMailerTest extends TestCase
 
         $rendered = $mailer->render('html,text', []);
 
-        $this->assertEquals([$renderedHtmlView, $renderedTextView], $rendered);
+        $this->assertEquals($renderedHtmlView . $renderedTextView, $rendered);
     }
 
     public function testMailerSendSendsMessageWithProperViewContent()

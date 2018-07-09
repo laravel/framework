@@ -191,7 +191,7 @@ class Mailer implements MailerContract, MailQueueContract
      *
      * @param  string|array  $view
      * @param  array  $data
-     * @return string|array
+     * @return string
      */
     public function render($view, array $data = [])
     {
@@ -204,13 +204,13 @@ class Mailer implements MailerContract, MailQueueContract
 
 
         //if there is only one view type (html or text) setted return the rendered view
-        if(!$plain)
+        if(! $plain)
             return $this->renderView($view,$data);
-        if(!$view)
+        if(! $view)
             return $this->renderView($plain,$data);
 
-        //otherwise return both rendere views
-        return [$this->renderView($view,$data),$this->renderView($plain,$data)];
+        //otherwise return both rendered views
+        return $this->renderView($view, $data) . $this->renderView($plain, $data);
     }
 
     /**
