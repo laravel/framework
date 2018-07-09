@@ -6,8 +6,6 @@ use Closure;
 use Illuminate\Database\Query\Builder;
 
 /**
- * Trait DecoratesQueryBuilder
- *
  * @property Builder $query
  */
 trait DecoratesQueryBuilder

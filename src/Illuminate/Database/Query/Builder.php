@@ -11,13 +11,13 @@ use InvalidArgumentException;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Contracts\Database\Builder as BuilderContract;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Contracts\Database\Builder as BuilderContract;
 
 class Builder implements BuilderContract
 {
