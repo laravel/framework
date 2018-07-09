@@ -67,11 +67,11 @@ class ListenerMakeCommand extends GeneratorCommand
             return $this->option('event')
                         ? __DIR__.'/stubs/listener-queued.stub'
                         : __DIR__.'/stubs/listener-queued-duck.stub';
-        } else {
-            return $this->option('event')
-                        ? __DIR__.'/stubs/listener.stub'
-                        : __DIR__.'/stubs/listener-duck.stub';
         }
+
+        return $this->option('event')
+                    ? __DIR__.'/stubs/listener.stub'
+                    : __DIR__.'/stubs/listener-duck.stub';
     }
 
     /**
@@ -104,9 +104,9 @@ class ListenerMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['event', 'e', InputOption::VALUE_OPTIONAL, 'The event class being listened for.'],
+            ['event', 'e', InputOption::VALUE_OPTIONAL, 'The event class being listened for'],
 
-            ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued.'],
+            ['queued', null, InputOption::VALUE_NONE, 'Indicates the event listener should be queued'],
         ];
     }
 }

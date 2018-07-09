@@ -504,7 +504,7 @@ class Connection implements ConnectionInterface
             }
 
             $this->recordsHaveBeenModified(
-                $change = ($this->getPdo()->exec($query) === false ? false : true)
+                $change = $this->getPdo()->exec($query) !== false
             );
 
             return $change;
@@ -593,8 +593,8 @@ class Connection implements ConnectionInterface
             // so we'll just ask the grammar for the format to get from the date.
             if ($value instanceof DateTimeInterface) {
                 $bindings[$key] = $value->format($grammar->getDateFormat());
-            } elseif ($value === false) {
-                $bindings[$key] = 0;
+            } elseif (is_bool($value)) {
+                $bindings[$key] = (int) $value;
             }
         }
 
@@ -929,7 +929,7 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        if ($this->getConfig('sticky') && $this->recordsModified) {
+        if ($this->recordsModified && $this->getConfig('sticky')) {
             return $this->getPdo();
         }
 
@@ -958,7 +958,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection used for reading.
      *
-     * @param  \PDO||\Closure|null  $pdo
+     * @param  \PDO|\Closure|null  $pdo
      * @return $this
      */
     public function setReadPdo($pdo)
@@ -1026,11 +1026,13 @@ class Connection implements ConnectionInterface
      * Set the query grammar used by the connection.
      *
      * @param  \Illuminate\Database\Query\Grammars\Grammar  $grammar
-     * @return void
+     * @return $this
      */
     public function setQueryGrammar(Query\Grammars\Grammar $grammar)
     {
         $this->queryGrammar = $grammar;
+
+        return $this;
     }
 
     /**
@@ -1047,11 +1049,13 @@ class Connection implements ConnectionInterface
      * Set the schema grammar used by the connection.
      *
      * @param  \Illuminate\Database\Schema\Grammars\Grammar  $grammar
-     * @return void
+     * @return $this
      */
     public function setSchemaGrammar(Schema\Grammars\Grammar $grammar)
     {
         $this->schemaGrammar = $grammar;
+
+        return $this;
     }
 
     /**
@@ -1068,11 +1072,13 @@ class Connection implements ConnectionInterface
      * Set the query post processor used by the connection.
      *
      * @param  \Illuminate\Database\Query\Processors\Processor  $processor
-     * @return void
+     * @return $this
      */
     public function setPostProcessor(Processor $processor)
     {
         $this->postProcessor = $processor;
+
+        return $this;
     }
 
     /**
@@ -1089,11 +1095,23 @@ class Connection implements ConnectionInterface
      * Set the event dispatcher instance on the connection.
      *
      * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @return void
+     * @return $this
      */
     public function setEventDispatcher(Dispatcher $events)
     {
         $this->events = $events;
+
+        return $this;
+    }
+
+    /**
+     * Unset the event dispatcher for this connection.
+     *
+     * @return void
+     */
+    public function unsetEventDispatcher()
+    {
+        $this->events = null;
     }
 
     /**
@@ -1170,11 +1188,13 @@ class Connection implements ConnectionInterface
      * Set the name of the connected database.
      *
      * @param  string  $database
-     * @return string
+     * @return $this
      */
     public function setDatabaseName($database)
     {
         $this->database = $database;
+
+        return $this;
     }
 
     /**
@@ -1191,13 +1211,15 @@ class Connection implements ConnectionInterface
      * Set the table prefix in use by the connection.
      *
      * @param  string  $prefix
-     * @return void
+     * @return $this
      */
     public function setTablePrefix($prefix)
     {
         $this->tablePrefix = $prefix;
 
         $this->getQueryGrammar()->setTablePrefix($prefix);
+
+        return $this;
     }
 
     /**

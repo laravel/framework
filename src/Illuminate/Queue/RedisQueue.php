@@ -38,18 +38,27 @@ class RedisQueue extends Queue implements QueueContract
     protected $retryAfter = 60;
 
     /**
+     * The maximum number of seconds to block for a job.
+     *
+     * @var int|null
+     */
+    protected $blockFor = null;
+
+    /**
      * Create a new Redis queue instance.
      *
      * @param  \Illuminate\Contracts\Redis\Factory  $redis
      * @param  string  $default
      * @param  string  $connection
      * @param  int  $retryAfter
+     * @param  int|null  $blockFor
      * @return void
      */
-    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60)
+    public function __construct(Redis $redis, $default = 'default', $connection = null, $retryAfter = 60, $blockFor = null)
     {
         $this->redis = $redis;
         $this->default = $default;
+        $this->blockFor = $blockFor;
         $this->connection = $connection;
         $this->retryAfter = $retryAfter;
     }
@@ -200,10 +209,41 @@ class RedisQueue extends Queue implements QueueContract
      */
     protected function retrieveNextJob($queue)
     {
+        if (! is_null($this->blockFor)) {
+            return $this->blockingPop($queue);
+        }
+
         return $this->getConnection()->eval(
             LuaScripts::pop(), 2, $queue, $queue.':reserved',
             $this->availableAt($this->retryAfter)
         );
+    }
+
+    /**
+     * Retrieve the next job by blocking-pop.
+     *
+     * @param  string  $queue
+     * @return array
+     */
+    protected function blockingPop($queue)
+    {
+        $rawBody = $this->getConnection()->blpop($queue, $this->blockFor);
+
+        if (! empty($rawBody)) {
+            $payload = json_decode($rawBody[1], true);
+
+            $payload['attempts']++;
+
+            $reserved = json_encode($payload);
+
+            $this->getConnection()->zadd($queue.':reserved', [
+                $reserved => $this->availableAt($this->retryAfter),
+            ]);
+
+            return [$rawBody[1], $reserved];
+        }
+
+        return [null, null];
     }
 
     /**

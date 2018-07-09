@@ -224,7 +224,7 @@ class AppNameCommand extends Command
     protected function setDatabaseFactoryNamespaces()
     {
         $files = Finder::create()
-                            ->in($this->laravel->databasePath().'/factories')
+                            ->in(database_path('factories'))
                             ->contains($this->currentRoot)
                             ->name('*.php');
 
@@ -268,7 +268,7 @@ class AppNameCommand extends Command
      */
     protected function getComposerPath()
     {
-        return $this->laravel->basePath().'/composer.json';
+        return base_path('composer.json');
     }
 
     /**
@@ -290,7 +290,7 @@ class AppNameCommand extends Command
     protected function getArguments()
     {
         return [
-            ['name', InputArgument::REQUIRED, 'The desired namespace.'],
+            ['name', InputArgument::REQUIRED, 'The desired namespace'],
         ];
     }
 }

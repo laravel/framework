@@ -40,6 +40,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->index('foo');
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo');
+        $blueprint->spatialIndex('coordinates');
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDropIndexDefaultNames()
@@ -53,6 +58,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->dropIndex(['foo']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDefaultCurrentTimestamp()
@@ -67,7 +77,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
 
         $blueprint = clone $base;
-        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP(0) not null'], $blueprint->toSql($connection, new PostgresGrammar));
+        $this->assertEquals(['alter table "users" add column "created" timestamp(0) without time zone default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new PostgresGrammar));
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table "users" add column "created" datetime default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new SQLiteGrammar));

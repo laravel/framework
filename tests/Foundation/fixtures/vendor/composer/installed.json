@@ -25,6 +25,9 @@
         "providers": [
           "bar",
           "baz"
+        ],
+        "dont-discover": [
+            "vendor_a/package_e"
         ]
       }
     }
@@ -39,6 +42,16 @@
       "laravel": {
         "providers": [
           "bazinga"
+        ]
+      }
+    }
+  },
+  {
+    "name": "vendor_a/package_e",
+    "extra": {
+      "laravel": {
+        "providers": [
+          "pennypennypenny"
         ]
       }
     }

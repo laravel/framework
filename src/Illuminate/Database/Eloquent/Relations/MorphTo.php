@@ -88,7 +88,7 @@ class MorphTo extends BelongsTo
      */
     public function getResults()
     {
-        return $this->ownerKey ? $this->query->first() : null;
+        return $this->ownerKey ? parent::getResults() : null;
     }
 
     /**

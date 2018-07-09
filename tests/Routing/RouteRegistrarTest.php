@@ -28,6 +28,37 @@ class RouteRegistrarTest extends TestCase
         m::close();
     }
 
+    public function testMiddlewareFluentRegistration()
+    {
+        $this->router->middleware(['one', 'two'])->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['one', 'two'], $this->getRoute()->middleware());
+
+        $this->router->middleware('three', 'four')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['three', 'four'], $this->getRoute()->middleware());
+
+        $this->router->get('users', function () {
+            return 'all-users';
+        })->middleware('five', 'six');
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['five', 'six'], $this->getRoute()->middleware());
+
+        $this->router->middleware('seven')->get('users', function () {
+            return 'all-users';
+        });
+
+        $this->seeResponse('all-users', Request::create('users', 'GET'));
+        $this->assertEquals(['seven'], $this->getRoute()->middleware());
+    }
+
     public function testCanRegisterGetRouteWithClosureAction()
     {
         $this->router->middleware('get-middleware')->get('users', function () {
@@ -170,7 +201,7 @@ class RouteRegistrarTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method [missing] does not exist.
+     * @expectedExceptionMessage Method Illuminate\Routing\RouteRegistrar::missing does not exist.
      */
     public function testRegisteringNonApprovedAttributesThrows()
     {
@@ -186,6 +217,23 @@ class RouteRegistrarTest extends TestCase
 
         $this->seeResponse('deleted', Request::create('users/1', 'DELETE'));
         $this->seeMiddleware('resource-middleware');
+    }
+
+    public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
+    {
+        $resource = $this->router->middleware('resource-middleware')
+                     ->resource('users', 'Illuminate\Tests\Routing\RouteRegistrarControllerStub')
+                     ->register();
+
+        $this->assertCount(7, $resource->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.store'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
     public function testCanLimitMethodsOnRegisteredResource()
@@ -219,6 +267,31 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.create'));
         $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
+    }
+
+    public function testUserCanRegisterApiResourceWithExceptOption()
+    {
+        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, [
+            'except' => ['destroy'],
+        ]);
+
+        $this->assertCount(4, $this->router->getRoutes());
+
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.create'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.edit'));
+        $this->assertFalse($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testUserCanRegisterApiResourceWithOnlyOption()
+    {
+        $this->router->apiResource('users', \Illuminate\Tests\Routing\RouteRegistrarControllerStub::class, [
+            'only' => ['index', 'show'],
+        ]);
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.index'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.show'));
     }
 
     public function testCanNameRoutesOnRegisteredResource()

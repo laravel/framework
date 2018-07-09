@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Console;
 
+use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 use League\Flysystem\MountManager;
 use Illuminate\Filesystem\Filesystem;
@@ -37,10 +38,10 @@ class VendorPublishCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'vendor:publish {--force : Overwrite any existing files.}
-                    {--all : Publish assets for all service providers without prompt.}
-                    {--provider= : The service provider that has assets you want to publish.}
-                    {--tag=* : One or many tags that have assets you want to publish.}';
+    protected $signature = 'vendor:publish {--force : Overwrite any existing files}
+                    {--all : Publish assets for all service providers without prompt}
+                    {--provider= : The service provider that has assets you want to publish}
+                    {--tag=* : One or many tags that have assets you want to publish}';
 
     /**
      * The console command description.
@@ -126,15 +127,15 @@ class VendorPublishCommand extends Command
     {
         return array_merge(
             ['<comment>Publish files from all providers and tags listed below</comment>'],
-            preg_filter('/^/', '<comment>Provider: </comment>', ServiceProvider::publishableProviders()),
-            preg_filter('/^/', '<comment>Tag: </comment>', ServiceProvider::publishableGroups())
+            preg_filter('/^/', '<comment>Provider: </comment>', Arr::sort(ServiceProvider::publishableProviders())),
+            preg_filter('/^/', '<comment>Tag: </comment>', Arr::sort(ServiceProvider::publishableGroups()))
         );
     }
 
     /**
      * Parse the answer that was given via the prompt.
      *
-     * @param string $choice
+     * @param  string  $choice
      * @return void
      */
     protected function parseChoice($choice)
