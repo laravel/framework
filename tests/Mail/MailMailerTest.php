@@ -2,16 +2,67 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
 use Illuminate\Mail\Mailer;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class MailMailerTest extends TestCase
 {
     public function tearDown()
     {
         m::close();
+    }
+
+
+    public function testMailerRenderAStringWhenCalledWithHtmlView()
+    {
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage', 'renderView', 'parseView'])->setConstructorArgs($this->getMocks())->getMock();
+        $message = m::mock('Swift_Mime_SimpleMessage');
+        $renderedHtmlView = '<p>view</p>';
+        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('parseView')->will($this->returnValue(['view', null, null]));
+        $mailer->expects($this->once())->method('renderView')->with('view')->will($this->returnValue($renderedHtmlView));
+
+        $rendered = $mailer->render('view', []);
+
+        $this->assertEquals($renderedHtmlView, $rendered);
+    }
+
+    public function testMailerRenderAStringWhenCalledWithTextView()
+    {
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')->setMethods(['createMessage', 'renderView', 'parseView'])->setConstructorArgs($this->getMocks())->getMock();
+        $message = m::mock('Swift_Mime_SimpleMessage');
+        $renderedTextView = 'view';
+        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('parseView')->will($this->returnValue([null, 'text', null]));
+        $mailer->expects($this->once())->method('renderView')->with('text')->will($this->returnValue($renderedTextView));
+
+        $rendered = $mailer->render('view', []);
+
+        $this->assertEquals($renderedTextView, $rendered);
+    }
+
+    public function testMailerRenderHtmlAndTextViewsWhenBothAreDefined()
+    {
+        $mailer = $this->getMockBuilder('Illuminate\Mail\Mailer')
+            ->setMethods(['createMessage', 'renderView', 'parseView'])
+            ->setConstructorArgs($this->getMocks())->getMock();
+
+        $message = m::mock('Swift_Mime_SimpleMessage');
+        $renderedHtmlView = '<p>view</p>';
+        $renderedTextView = 'view';
+        $mailer->expects($this->once())->method('createMessage')->will($this->returnValue($message));
+        $mailer->expects($this->once())->method('parseView')->will($this->returnValue(['view', 'text', null]));
+        $mailer->expects($this->exactly(2))->method('renderView')->will($this->returnValueMap(
+            [
+                ['view', ['message' => $message], $renderedHtmlView],
+                ['text', ['message' => $message], $renderedTextView]
+            ]));
+
+        $rendered = $mailer->render('html,text', []);
+
+        $this->assertEquals($renderedHtmlView . $renderedTextView, $rendered);
     }
 
     public function testMailerSendSendsMessageWithProperViewContent()

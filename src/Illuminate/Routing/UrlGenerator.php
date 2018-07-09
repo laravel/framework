@@ -282,7 +282,7 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  bool|null  $secure
      * @return string
      */
-    public function formatScheme($secure)
+    public function formatScheme($secure = null)
     {
         if (! is_null($secure)) {
             return $secure ? 'https://' : 'http://';
@@ -341,7 +341,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     public function hasValidSignature(Request $request)
     {
-        $original = rtrim($request->url().'?'.http_build_query(
+        $original = rtrim($request->url().'?'.Arr::query(
             Arr::except($request->query(), 'signature')
         ), '?');
 
@@ -392,7 +392,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL to a controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @param  mixed   $parameters
      * @param  bool    $absolute
      * @return string
@@ -411,11 +411,15 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the given controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @return string
      */
     protected function formatAction($action)
     {
+        if (is_array($action)) {
+            $action = implode('@', $action);
+        }
+
         if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
             return $this->rootNamespace.'\\'.$action;
         } else {
@@ -487,18 +491,19 @@ class UrlGenerator implements UrlGeneratorContract
      *
      * @param  string  $root
      * @param  string  $path
+     * @param  \Illuminate\Routing\Route|null  $route
      * @return string
      */
-    public function format($root, $path)
+    public function format($root, $path, $route = null)
     {
         $path = '/'.trim($path, '/');
 
         if ($this->formatHostUsing) {
-            $root = call_user_func($this->formatHostUsing, $root);
+            $root = call_user_func($this->formatHostUsing, $root, $route);
         }
 
         if ($this->formatPathUsing) {
-            $path = call_user_func($this->formatPathUsing, $path);
+            $path = call_user_func($this->formatPathUsing, $path, $route);
         }
 
         return trim($root.$path, '/');

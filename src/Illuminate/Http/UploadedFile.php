@@ -99,7 +99,7 @@ class UploadedFile extends SymfonyUploadedFile
             $file->getPathname(),
             $file->getClientOriginalName(),
             $file->getClientMimeType(),
-            $file->getClientSize(),
+            $file->getSize(),
             $file->getError(),
             $test
         );

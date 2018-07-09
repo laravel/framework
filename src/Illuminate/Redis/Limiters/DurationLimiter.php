@@ -99,9 +99,9 @@ class DurationLimiter
      */
     public function acquire()
     {
-        $results = $this->redis->eval($this->luaScript(), 1,
-            $this->name, microtime(true), time(), $this->decay, $this->maxLocks
-        );
+        $results = $this->redis->command('eval', [
+            $this->luaScript(), 1, $this->name, microtime(true), time(), $this->decay, $this->maxLocks,
+        ]);
 
         $this->decaysAt = $results[1];
 
