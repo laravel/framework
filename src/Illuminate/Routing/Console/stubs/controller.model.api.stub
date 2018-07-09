@@ -1,0 +1,65 @@
+<?php
+
+namespace DummyNamespace;
+
+use DummyFullModelClass;
+use Illuminate\Http\Request;
+use DummyRootNamespaceHttp\Controllers\Controller;
+
+class DummyClass extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     *
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function show(DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+
+    /**
+     * Update the specified resource in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function update(Request $request, DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  \DummyFullModelClass  $DummyModelVariable
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy(DummyModelClass $DummyModelVariable)
+    {
+        //
+    }
+}

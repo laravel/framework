@@ -58,7 +58,7 @@ class SupportCarbonTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method nonExistingStaticMacro does not exist.
+     * @expectedExceptionMessage nonExistingStaticMacro does not exist.
      */
     public function testCarbonRaisesExceptionWhenStaticMacroIsNotFound()
     {
@@ -67,7 +67,7 @@ class SupportCarbonTest extends TestCase
 
     /**
      * @expectedException \BadMethodCallException
-     * @expectedExceptionMessage Method nonExistingMacro does not exist.
+     * @expectedExceptionMessage nonExistingMacro does not exist.
      */
     public function testCarbonRaisesExceptionWhenMacroIsNotFound()
     {
@@ -92,5 +92,25 @@ class SupportCarbonTest extends TestCase
             'timezone_type' => 3,
             'timezone' => 'UTC',
         ], $this->now->jsonSerialize());
+    }
+
+    public function testSetStateReturnsCorrectType()
+    {
+        $carbon = Carbon::__set_state([
+            'date' => '2017-06-27 13:14:15.000000',
+            'timezone_type' => 3,
+            'timezone' => 'UTC',
+        ]);
+
+        $this->assertInstanceOf(Carbon::class, $carbon);
+    }
+
+    public function testDeserializationOccursCorrectly()
+    {
+        $carbon = new Carbon('2017-06-27 13:14:15.000000');
+        $serialized = 'return '.var_export($carbon, true).';';
+        $deserialized = eval($serialized);
+
+        $this->assertInstanceOf(Carbon::class, $deserialized);
     }
 }

@@ -120,6 +120,10 @@ abstract class TestCase extends BaseTestCase
             $this->disableEventsForAllTests();
         }
 
+        if (isset($uses[WithFaker::class])) {
+            $this->setUpFaker();
+        }
+
         return $uses;
     }
 

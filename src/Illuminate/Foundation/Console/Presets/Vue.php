@@ -30,7 +30,7 @@ class Vue extends Preset
      */
     protected static function updatePackageArray(array $packages)
     {
-        return ['vue' => '^2.1.10'] + Arr::except($packages, [
+        return ['vue' => '^2.5.7'] + Arr::except($packages, [
             'babel-preset-react',
             'react',
             'react-dom',
@@ -59,8 +59,8 @@ class Vue extends Preset
         );
 
         copy(
-            __DIR__.'/vue-stubs/Example.vue',
-            resource_path('assets/js/components/Example.vue')
+            __DIR__.'/vue-stubs/ExampleComponent.vue',
+            resource_path('assets/js/components/ExampleComponent.vue')
         );
     }
 

@@ -29,10 +29,12 @@ class EventGenerateCommand extends Command
      */
     public function handle()
     {
-        $provider = $this->laravel->getProvider(EventServiceProvider::class);
+        $providers = $this->laravel->getProviders(EventServiceProvider::class);
 
-        foreach ($provider->listens() as $event => $listeners) {
-            $this->makeEventAndListeners($event, $listeners);
+        foreach ($providers as $provider) {
+            foreach ($provider->listens() as $event => $listeners) {
+                $this->makeEventAndListeners($event, $listeners);
+            }
         }
 
         $this->info('Events and listeners generated successfully!');

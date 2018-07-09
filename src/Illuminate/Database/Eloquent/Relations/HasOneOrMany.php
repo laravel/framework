@@ -162,18 +162,11 @@ abstract class HasOneOrMany extends Relation
      */
     protected function buildDictionary(Collection $results)
     {
-        $dictionary = [];
-
         $foreign = $this->getForeignKeyName();
 
-        // First we will create a dictionary of models keyed by the foreign key of the
-        // relationship as this will allow us to quickly access all of the related
-        // models without having to do nested looping which will be quite slow.
-        foreach ($results as $result) {
-            $dictionary[$result->{$foreign}][] = $result;
-        }
-
-        return $dictionary;
+        return $results->mapToDictionary(function ($result) use ($foreign) {
+            return [$result->{$foreign} => $result];
+        })->all();
     }
 
     /**
@@ -323,7 +316,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function update(array $attributes)
     {
-        if ($this->related->usesTimestamps()) {
+        if ($this->related->usesTimestamps() && ! is_null($this->relatedUpdatedAt())) {
             $attributes[$this->relatedUpdatedAt()] = $this->related->freshTimestampString();
         }
 
@@ -403,7 +396,7 @@ abstract class HasOneOrMany extends Relation
      */
     public function getQualifiedParentKeyName()
     {
-        return $this->parent->getTable().'.'.$this->localKey;
+        return $this->parent->qualifyColumn($this->localKey);
     }
 
     /**

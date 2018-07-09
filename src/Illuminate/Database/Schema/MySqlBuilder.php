@@ -65,6 +65,30 @@ class MySqlBuilder extends Builder
     }
 
     /**
+     * Drop all views from the database.
+     *
+     * @return void
+     */
+    public function dropAllViews()
+    {
+        $views = [];
+
+        foreach ($this->getAllViews() as $row) {
+            $row = (array) $row;
+
+            $views[] = reset($row);
+        }
+
+        if (empty($views)) {
+            return;
+        }
+
+        $this->connection->statement(
+            $this->grammar->compileDropAllViews($views)
+        );
+    }
+
+    /**
      * Get all of the table names for the database.
      *
      * @return array
@@ -73,6 +97,18 @@ class MySqlBuilder extends Builder
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables()
+        );
+    }
+
+    /**
+     * Get all of the view names for the database.
+     *
+     * @return array
+     */
+    protected function getAllViews()
+    {
+        return $this->connection->select(
+            $this->grammar->compileGetAllViews()
         );
     }
 }

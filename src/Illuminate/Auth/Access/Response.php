@@ -15,6 +15,7 @@ class Response
      * Create a new response.
      *
      * @param  string|null  $message
+     * @return void
      */
     public function __construct($message = null)
     {
@@ -34,7 +35,7 @@ class Response
     /**
      * Get the string representation of the message.
      *
-     * @return string
+     * @return string|null
      */
     public function __toString()
     {

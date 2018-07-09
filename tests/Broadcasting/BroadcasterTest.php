@@ -46,7 +46,7 @@ class BroadcasterTest extends TestCase
         $container = new Container;
         Container::setInstance($container);
         $binder = m::mock(BindingRegistrar::class);
-        $binder->shouldReceive('getBindingCallback')->with('model')->andReturn(function () {
+        $binder->shouldReceive('getBindingCallback')->times(2)->with('model')->andReturn(function () {
             return 'bound';
         });
         $container->instance(BindingRegistrar::class, $binder);
@@ -57,9 +57,35 @@ class BroadcasterTest extends TestCase
         Container::setInstance(new Container);
     }
 
+    public function testCanUseChannelClasses()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $parameters = $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', DummyBroadcastingChannel::class);
+        $this->assertEquals(['model.1.instance', 'something'], $parameters);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testUnknownChannelAuthHandlerTypeThrowsException()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
+    }
+
+    public function testCanRegisterChannelsAsClasses()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('something', function () {
+        });
+        $broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
+    }
+
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\HttpException
-     * @expectedExceptionMessage
      */
     public function testNotFoundThrowsHttpException()
     {
@@ -125,6 +151,14 @@ class BroadcasterTestEloquentModelNotFoundStub extends Model
     }
 
     public function first()
+    {
+        //
+    }
+}
+
+class DummyBroadcastingChannel
+{
+    public function join($user, BroadcasterTestEloquentModelStub $model, $nonModel)
     {
         //
     }

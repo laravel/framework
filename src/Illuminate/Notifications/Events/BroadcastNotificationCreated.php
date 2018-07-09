@@ -64,19 +64,6 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     }
 
     /**
-     * Get the data that should be sent with the broadcasted event.
-     *
-     * @return array
-     */
-    public function broadcastWith()
-    {
-        return array_merge($this->data, [
-            'id' => $this->notification->id,
-            'type' => get_class($this->notification),
-        ]);
-    }
-
-    /**
      * Get the broadcast channel name for the event.
      *
      * @return string
@@ -90,5 +77,30 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         $class = str_replace('\\', '.', get_class($this->notifiable));
 
         return $class.'.'.$this->notifiable->getKey();
+    }
+
+    /**
+     * Get the data that should be sent with the broadcasted event.
+     *
+     * @return array
+     */
+    public function broadcastWith()
+    {
+        return array_merge($this->data, [
+            'id' => $this->notification->id,
+            'type' => $this->broadcastType(),
+        ]);
+    }
+
+    /**
+     * Get the type of the notification being broadcast.
+     *
+     * @return string
+     */
+    public function broadcastType()
+    {
+        return method_exists($this->notification, 'broadcastType')
+                    ? $this->notification->broadcastType()
+                    : get_class($this->notification);
     }
 }

@@ -14,9 +14,6 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Concerns\DecoratesQueryBuilder;
 use Illuminate\Contracts\Database\Builder as BuilderContract;
 
-/**
- * @mixin \Illuminate\Database\Query\Builder
- */
 class Builder implements BuilderContract
 {
     use BuildsQueries, Concerns\QueriesRelationships, DecoratesQueryBuilder;
@@ -203,17 +200,15 @@ class Builder implements BuilderContract
      * Add a basic where clause to the query.
      *
      * @param  string|array|\Closure  $column
-     * @param  string  $operator
-     * @param  mixed  $value
+     * @param  mixed   $operator
+     * @param  mixed   $value
      * @param  string  $boolean
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
         if ($column instanceof Closure) {
-            $query = $this->model->newQueryWithoutScopes();
-
-            $column($query);
+            $column($query = $this->model->newModelQuery());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
         } else {
@@ -227,13 +222,51 @@ class Builder implements BuilderContract
      * Add an "or where" clause to the query.
      *
      * @param  \Closure|array|string  $column
-     * @param  string  $operator
+     * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
     {
+        list($value, $operator) = $this->query->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
         return $this->where($column, $operator, $value, 'or');
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function latest($column = null)
+    {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        $this->query->latest($column);
+
+        return $this;
+    }
+
+    /**
+     * Add an "order by" clause for a timestamp to the query.
+     *
+     * @param  string  $column
+     * @return $this
+     */
+    public function oldest($column = null)
+    {
+        if (is_null($column)) {
+            $column = $this->model->getCreatedAtColumn() ?? 'created_at';
+        }
+
+        $this->query->oldest($column);
+
+        return $this;
     }
 
     /**
@@ -302,7 +335,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
@@ -311,7 +344,7 @@ class Builder implements BuilderContract
         $result = $this->find($id, $columns);
 
         if (is_array($id)) {
-            if (count($result) == count(array_unique($id))) {
+            if (count($result) === count(array_unique($id))) {
                 return $result;
             }
         } elseif (! is_null($result)) {
@@ -328,7 +361,7 @@ class Builder implements BuilderContract
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function findOrNew($id, $columns = ['*'])
     {
@@ -344,7 +377,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
@@ -360,7 +393,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
@@ -378,7 +411,7 @@ class Builder implements BuilderContract
      *
      * @param  array  $attributes
      * @param  array  $values
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function updateOrCreate(array $attributes, array $values = [])
     {
@@ -463,7 +496,7 @@ class Builder implements BuilderContract
      * Get the hydrated models without eager loading.
      *
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model[]
+     * @return \Illuminate\Database\Eloquent\Model[]|static[]
      */
     public function getModels($columns = ['*'])
     {
@@ -612,7 +645,7 @@ class Builder implements BuilderContract
 
         $alias = is_null($alias) ? $column : $alias;
 
-        $lastId = 0;
+        $lastId = null;
 
         do {
             $clone = clone $this;
@@ -774,7 +807,7 @@ class Builder implements BuilderContract
      * Increment a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @return int
      */
@@ -789,7 +822,7 @@ class Builder implements BuilderContract
      * Decrement a column's value by a given amount.
      *
      * @param  string  $column
-     * @param  int  $amount
+     * @param  float|int  $amount
      * @param  array  $extra
      * @return int
      */
@@ -1049,7 +1082,7 @@ class Builder implements BuilderContract
      * Create a new instance of the model being queried.
      *
      * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function newModelInstance($attributes = [])
     {
@@ -1192,7 +1225,7 @@ class Builder implements BuilderContract
     /**
      * Get the model instance being queried.
      *
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function getModel()
     {
@@ -1212,6 +1245,17 @@ class Builder implements BuilderContract
         $this->query->from($model->getTable());
 
         return $this;
+    }
+
+    /**
+     * Qualify the given column name by the model's table.
+     *
+     * @param  string  $column
+     * @return string
+     */
+    public function qualifyColumn($column)
+    {
+        return $this->model->qualifyColumn($column);
     }
 
     /**
@@ -1246,12 +1290,12 @@ class Builder implements BuilderContract
             return $this->localMacros[$method](...$parameters);
         }
 
-        if (isset(static::$macros[$method]) and static::$macros[$method] instanceof Closure) {
-            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
-        }
-
         if (isset(static::$macros[$method])) {
-            return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+            if (static::$macros[$method] instanceof Closure) {
+                return call_user_func_array(static::$macros[$method]->bindTo($this, static::class), $parameters);
+            }
+
+            return call_user_func_array(static::$macros[$method], $parameters);
         }
 
         if (method_exists($this->model, $scope = 'scope'.ucfirst($method))) {
@@ -1281,7 +1325,9 @@ class Builder implements BuilderContract
         }
 
         if (! isset(static::$macros[$method])) {
-            throw new BadMethodCallException("Method {$method} does not exist.");
+            throw new BadMethodCallException(sprintf(
+                'Method %s::%s does not exist.', static::class, $method
+            ));
         }
 
         if (static::$macros[$method] instanceof Closure) {

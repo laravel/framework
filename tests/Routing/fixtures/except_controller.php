@@ -5,7 +5,7 @@ class FooController extends \BaseController
     /**
      * Show the form for creating a new resource.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function create()
     {
@@ -15,7 +15,7 @@ class FooController extends \BaseController
     /**
      * Store a newly created resource in storage.
      *
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function store()
     {
@@ -26,7 +26,7 @@ class FooController extends \BaseController
      * Show the form for editing the specified resource.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function edit($id)
     {
@@ -37,7 +37,7 @@ class FooController extends \BaseController
      * Update the specified resource in storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function update($id)
     {
@@ -48,7 +48,7 @@ class FooController extends \BaseController
      * Remove the specified resource from storage.
      *
      * @param  int  $id
-     * @return Response
+     * @return \Illuminate\Http\Response
      */
     public function destroy($id)
     {

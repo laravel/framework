@@ -22,7 +22,7 @@ class RedisTaggedCache extends TaggedCache
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTime|float|int  $minutes
+     * @param  \DateTime|float|int|null  $minutes
      * @return void
      */
     public function put($key, $value, $minutes = null)
@@ -30,6 +30,34 @@ class RedisTaggedCache extends TaggedCache
         $this->pushStandardKeys($this->tags->getNamespace(), $key);
 
         parent::put($key, $value, $minutes);
+    }
+
+    /**
+     * Increment the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function increment($key, $value = 1)
+    {
+        $this->pushStandardKeys($this->tags->getNamespace(), $key);
+
+        parent::increment($key, $value);
+    }
+
+    /**
+     * Decrement the value of an item in the cache.
+     *
+     * @param  string  $key
+     * @param  mixed   $value
+     * @return void
+     */
+    public function decrement($key, $value = 1)
+    {
+        $this->pushStandardKeys($this->tags->getNamespace(), $key);
+
+        parent::decrement($key, $value);
     }
 
     /**

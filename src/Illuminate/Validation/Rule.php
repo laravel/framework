@@ -2,6 +2,7 @@
 
 namespace Illuminate\Validation;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
 
 class Rule
@@ -34,22 +35,30 @@ class Rule
     /**
      * Get an in constraint builder instance.
      *
-     * @param  array|string  $values
+     * @param  array|string|\Illuminate\Support\Collection  $values
      * @return \Illuminate\Validation\Rules\In
      */
     public static function in($values)
     {
+        if ($values instanceof Collection) {
+            $values = $values->toArray();
+        }
+
         return new Rules\In(is_array($values) ? $values : func_get_args());
     }
 
     /**
      * Get a not_in constraint builder instance.
      *
-     * @param  array|string  $values
+     * @param  array|string|\Illuminate\Support\Collection  $values
      * @return \Illuminate\Validation\Rules\NotIn
      */
     public static function notIn($values)
     {
+        if ($values instanceof Collection) {
+            $values = $values->toArray();
+        }
+
         return new Rules\NotIn(is_array($values) ? $values : func_get_args());
     }
 

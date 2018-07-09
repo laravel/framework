@@ -72,7 +72,7 @@ class ClearCommand extends Command
             'cache:cleared', [$this->argument('store'), $this->tags()]
         );
 
-        $this->info('Cache cleared successfully.');
+        $this->info('Application cache cleared!');
     }
 
     /**
@@ -82,7 +82,11 @@ class ClearCommand extends Command
      */
     public function flushFacades()
     {
-        foreach ($this->files->files(storage_path('framework/cache')) as $file) {
+        if (! $this->files->exists($storagePath = storage_path('framework/cache'))) {
+            return;
+        }
+
+        foreach ($this->files->files($storagePath) as $file) {
             if (preg_match('/facade-.*\.php$/', $file)) {
                 $this->files->delete($file);
             }
@@ -119,7 +123,7 @@ class ClearCommand extends Command
     protected function getArguments()
     {
         return [
-            ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear.'],
+            ['store', InputArgument::OPTIONAL, 'The name of the store you would like to clear'],
         ];
     }
 
@@ -131,7 +135,7 @@ class ClearCommand extends Command
     protected function getOptions()
     {
         return [
-            ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear.', null],
+            ['tags', null, InputOption::VALUE_OPTIONAL, 'The cache tags you would like to clear', null],
         ];
     }
 }

@@ -13,6 +13,8 @@ class Inspiring
      *
      * May McGinnis always control the board. #LaraconUS2015
      *
+     * RIP Charlie - Feb 6, 2018
+     *
      * @return string
      */
     public static function quote()

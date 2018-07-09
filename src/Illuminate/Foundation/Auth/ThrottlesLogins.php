@@ -20,7 +20,7 @@ trait ThrottlesLogins
     protected function hasTooManyLoginAttempts(Request $request)
     {
         return $this->limiter()->tooManyAttempts(
-            $this->throttleKey($request), $this->maxAttempts(), $this->decayMinutes()
+            $this->throttleKey($request), $this->maxAttempts()
         );
     }
 
@@ -52,7 +52,7 @@ trait ThrottlesLogins
 
         throw ValidationException::withMessages([
             $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
-        ])->status(423);
+        ])->status(429);
     }
 
     /**

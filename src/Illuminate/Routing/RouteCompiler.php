@@ -36,7 +36,7 @@ class RouteCompiler
         $uri = preg_replace('/\{(\w+?)\?\}/', '{$1}', $this->route->uri());
 
         return (
-            new SymfonyRoute($uri, $optionals, $this->route->wheres, [], $this->route->getDomain() ?: '')
+            new SymfonyRoute($uri, $optionals, $this->route->wheres, ['utf8' => true], $this->route->getDomain() ?: '')
         )->compile();
     }
 

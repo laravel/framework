@@ -210,7 +210,7 @@ class Kernel implements KernelContract
                 continue;
             }
 
-            list($name, $parameters) = $this->parseMiddleware($middleware);
+            list($name) = $this->parseMiddleware($middleware);
 
             $instance = $this->app->make($name);
 
