@@ -9,13 +9,12 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Concerns\DecoratesQueryBuilder;
+use Illuminate\Contracts\Database\Builder as BuilderContract;
 
-/**
- * @mixin \Illuminate\Database\Eloquent\Builder
- */
-abstract class Relation
+abstract class Relation implements BuilderContract
 {
-    use Macroable {
+    use DecoratesQueryBuilder, Macroable {
         __call as macroCall;
     }
 
@@ -373,15 +372,5 @@ abstract class Relation
         }
 
         return $result;
-    }
-
-    /**
-     * Force a clone of the underlying query builder when cloning.
-     *
-     * @return void
-     */
-    public function __clone()
-    {
-        $this->query = clone $this->query;
     }
 }

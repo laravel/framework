@@ -17,8 +17,9 @@ use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Contracts\Database\Builder as BuilderContract;
 
-class Builder
+class Builder implements BuilderContract
 {
     use BuildsQueries, Macroable {
         __call as macroCall;
