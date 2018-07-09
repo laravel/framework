@@ -4,6 +4,8 @@ namespace Illuminate\Database\Eloquent;
 
 use Closure;
 use BadMethodCallException;
+use Illuminate\Contracts\Database\Builder as BuilderContract;
+use Illuminate\Database\Concerns\DecoratesQueryBuilder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
@@ -15,9 +17,9 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
 /**
  * @mixin \Illuminate\Database\Query\Builder
  */
-class Builder
+class Builder implements BuilderContract
 {
-    use BuildsQueries, Concerns\QueriesRelationships;
+    use BuildsQueries, Concerns\QueriesRelationships, DecoratesQueryBuilder;
 
     /**
      * The base query builder instance.
@@ -60,16 +62,6 @@ class Builder
      * @var \Closure
      */
     protected $onDelete;
-
-    /**
-     * The methods that should be returned from query builder.
-     *
-     * @var array
-     */
-    protected $passthru = [
-        'insert', 'insertGetId', 'getBindings', 'toSql',
-        'exists', 'count', 'min', 'max', 'avg', 'sum', 'getConnection',
-    ];
 
     /**
      * Applied global scopes.
@@ -1266,10 +1258,6 @@ class Builder
             return $this->callScope([$this->model, $scope], $parameters);
         }
 
-        if (in_array($method, $this->passthru)) {
-            return $this->toBase()->{$method}(...$parameters);
-        }
-
         $this->query->{$method}(...$parameters);
 
         return $this;
@@ -1301,15 +1289,5 @@ class Builder
         }
 
         return call_user_func_array(static::$macros[$method], $parameters);
-    }
-
-    /**
-     * Force a clone of the underlying query builder when cloning.
-     *
-     * @return void
-     */
-    public function __clone()
-    {
-        $this->query = clone $this->query;
     }
 }
