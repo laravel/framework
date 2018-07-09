@@ -57,6 +57,20 @@ class DatabaseEloquentMorphToTest extends TestCase
         $relation->associate($associate);
     }
 
+    public function testAssociateMethodIgnoresNullValue()
+    {
+        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
+
+        $relation = $this->getRelationAssociate($parent);
+
+        $parent->shouldReceive('setAttribute')->once()->with('foreign_key', null);
+        $parent->shouldReceive('setAttribute')->once()->with('morph_type', null);
+        $parent->shouldReceive('setRelation')->once()->with('relation', null);
+
+        $relation->associate(null);
+    }
+
     public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel()
     {
         $parent = m::mock('Illuminate\Database\Eloquent\Model');

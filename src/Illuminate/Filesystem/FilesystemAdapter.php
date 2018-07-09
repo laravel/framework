@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Carbon\Carbon;
 use RuntimeException;
 use Illuminate\Http\File;
 use Illuminate\Support\Str;
@@ -13,6 +14,7 @@ use PHPUnit\Framework\Assert as PHPUnit;
 use League\Flysystem\FilesystemInterface;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use League\Flysystem\FileNotFoundException;
+use League\Flysystem\Rackspace\RackspaceAdapter;
 use League\Flysystem\Adapter\Local as LocalAdapter;
 use Illuminate\Contracts\Filesystem\Cloud as CloudFilesystemContract;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemContract;
@@ -330,6 +332,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
             return $adapter->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsUrl($adapter, $path);
+        } elseif ($adapter instanceof RackspaceAdapter) {
+            return $this->getRackspaceUrl($adapter, $path);
         } elseif ($adapter instanceof LocalAdapter) {
             return $this->getLocalUrl($path);
         } else {
@@ -349,6 +353,18 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         return $adapter->getClient()->getObjectUrl(
             $adapter->getBucket(), $adapter->getPathPrefix().$path
         );
+    }
+
+    /**
+     * Get the URL for the file at the given path.
+     *
+     * @param  \League\Flysystem\Rackspace\RackspaceAdapter $adapter
+     * @param  string $path
+     * @return string
+     */
+    protected function getRackspaceUrl($adapter, $path)
+    {
+        return (string) $adapter->getContainer()->getObject($path)->getPublicUrl();
     }
 
     /**
@@ -394,10 +410,26 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (method_exists($adapter, 'getTemporaryUrl')) {
             return $adapter->getTemporaryUrl($path, $expiration, $options);
-        } elseif (! $adapter instanceof AwsS3Adapter) {
+        } elseif ($adapter instanceof AwsS3Adapter) {
+            return $this->getAwsTemporaryUrl($adapter, $path, $expiration, $options);
+        } elseif ($adapter instanceof RackspaceAdapter) {
+            return $this->getRackspaceTemporaryUrl($adapter, $path, $expiration, $options);
+        } else {
             throw new RuntimeException('This driver does not support creating temporary URLs.');
         }
+    }
 
+    /**
+     * Get a temporary URL for the file at the given path.
+     *
+     * @param  \League\Flysystem\AwsS3v3\AwsS3Adapter  $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  array $options
+     * @return string
+     */
+    public function getAwsTemporaryUrl($adapter, $path, $expiration, $options)
+    {
         $client = $adapter->getClient();
 
         $command = $client->getCommand('GetObject', array_merge([
@@ -408,6 +440,24 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
         return (string) $client->createPresignedRequest(
             $command, $expiration
         )->getUri();
+    }
+
+    /**
+     * Get a temporary URL for the file at the given path.
+     *
+     * @param  \League\Flysystem\Rackspace\RackspaceAdapter $adapter
+     * @param  string $path
+     * @param  \DateTimeInterface $expiration
+     * @param  $options
+     * @return string
+     */
+    public function getRackspaceTemporaryUrl($adapter, $path, $expiration, $options)
+    {
+        return $adapter->getContainer()->getObject($path)->getTemporaryUrl(
+            Carbon::now()->diffInSeconds($expiration),
+            $options['method'] ?? 'GET',
+            $options['forcePublicUrl'] ?? true
+        );
     }
 
     /**

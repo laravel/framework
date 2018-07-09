@@ -8,12 +8,16 @@ trait CompilesJson
      * Compile the JSON statement into valid PHP.
      *
      * @param  string  $expression
-     * @param  int  $options
-     * @param  int  $depth
      * @return string
      */
-    protected function compileJson($expression, $options = 0, $depth = 512)
+    protected function compileJson($expression)
     {
-        return "<?php echo json_encode($expression, $options, $depth) ?>";
+        $parts = explode(',', $this->stripParentheses($expression));
+
+        $options = $parts[1] ?? 0;
+
+        $depth = $parts[2] ?? 512;
+
+        return "<?php echo json_encode($parts[0], $options, $depth) ?>";
     }
 }

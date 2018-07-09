@@ -118,7 +118,7 @@ class Str
     public static function endsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if (substr($haystack, -strlen($needle)) === (string) $needle) {
+            if (mb_substr($haystack, -mb_strlen($needle)) === (string) $needle) {
                 return true;
             }
         }
@@ -328,10 +328,10 @@ class Str
             return $subject;
         }
 
-        $position = strpos($subject, $search);
+        $position = mb_strpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
         }
 
         return $subject;
@@ -347,10 +347,10 @@ class Str
      */
     public static function replaceLast($search, $replace, $subject)
     {
-        $position = strrpos($subject, $search);
+        $position = mb_strrpos($subject, $search);
 
         if ($position !== false) {
-            return substr_replace($subject, $replace, $position, strlen($search));
+            return mb_substr($subject, 0, $position).$replace.mb_substr($subject, $position + mb_strlen($search));
         }
 
         return $subject;
@@ -466,7 +466,7 @@ class Str
     public static function startsWith($haystack, $needles)
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && mb_substr($haystack, 0, mb_strlen($needle)) === (string) $needle) {
                 return true;
             }
         }

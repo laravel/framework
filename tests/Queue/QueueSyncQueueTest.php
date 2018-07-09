@@ -61,6 +61,11 @@ class SyncQueueTestEntity implements \Illuminate\Contracts\Queue\QueueableEntity
     {
         //
     }
+
+    public function getQueueableRelations()
+    {
+        //
+    }
 }
 
 class SyncQueueTestHandler

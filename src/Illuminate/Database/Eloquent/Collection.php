@@ -159,7 +159,8 @@ class Collection extends BaseCollection implements QueueableCollection
             ->getDictionary();
 
         return $this->map(function ($model) use ($freshModels) {
-            return $model->exists ? $freshModels[$model->getKey()] : null;
+            return $model->exists && isset($freshModels[$model->getKey()])
+                    ? $freshModels[$model->getKey()] : null;
         });
     }
 
@@ -395,6 +396,16 @@ class Collection extends BaseCollection implements QueueableCollection
     public function getQueueableIds()
     {
         return $this->modelKeys();
+    }
+
+    /**
+     * Get the relationships of the entities being queued.
+     *
+     * @return array
+     */
+    public function getQueueableRelations()
+    {
+        return $this->isNotEmpty() ? $this->first()->getRelations() : [];
     }
 
     /**

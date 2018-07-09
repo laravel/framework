@@ -16,6 +16,7 @@ use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
 use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
 
@@ -85,6 +86,28 @@ class ResourceTest extends TestCase
                 'id' => 5,
                 'second' => 'value',
                 'third' => 'value',
+            ],
+        ]);
+    }
+
+    public function test_resources_may_have_optional_Merges()
+    {
+        Route::get('/', function () {
+            return new PostResourceWithOptionalMerging(new Post([
+                'id' => 5,
+            ]));
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'second' => 'value',
             ],
         ]);
     }

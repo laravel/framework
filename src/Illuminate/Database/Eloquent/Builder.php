@@ -882,7 +882,7 @@ class Builder
             }
 
             // Next we'll pass the scope callback to the callScope method which will take
-            // care of groping the "wheres" correctly so the logical order doesn't get
+            // care of grouping the "wheres" properly so the logical order doesn't get
             // messed up when adding scopes. Then we'll return back out the builder.
             $builder = $builder->callScope(
                 [$this->model, 'scope'.ucfirst($scope)],
