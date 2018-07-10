@@ -490,7 +490,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
-     * @return mixed
+     * @return static|mixed
      */
     public function when($value, callable $callback, callable $default = null)
     {
@@ -509,7 +509,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  bool  $value
      * @param  callable  $callback
      * @param  callable  $default
-     * @return mixed
+     * @return static|mixed
      */
     public function unless($value, callable $callback, callable $default = null)
     {
@@ -1304,7 +1304,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get one or a specified number of items randomly from the collection.
      *
      * @param  int|null  $number
-     * @return mixed
+     * @return static|mixed
      *
      * @throws \InvalidArgumentException
      */
