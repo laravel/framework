@@ -57,7 +57,7 @@ trait GuardHelpers
      */
     public function check()
     {
-        return ! is_null($this->user());
+        return ! $this->guest();
     }
 
     /**
@@ -67,7 +67,7 @@ trait GuardHelpers
      */
     public function guest()
     {
-        return ! $this->check();
+        return is_null($this->user());
     }
 
     /**
