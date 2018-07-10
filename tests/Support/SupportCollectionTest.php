@@ -483,6 +483,12 @@ class SupportCollectionTest extends TestCase
             [['v' => 'hello']],
             $c->where('v', new \Illuminate\Support\HtmlString('hello'))->values()->all()
         );
+
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => null]]);
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2]],
+            $c->where('v')->values()->all()
+        );
     }
 
     public function testWhereStrict()
