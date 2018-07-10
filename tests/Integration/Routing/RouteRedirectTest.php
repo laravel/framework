@@ -10,29 +10,28 @@ use Illuminate\Support\Facades\Route;
  */
 class RouteRedirectTest extends TestCase
 {
-    public function test_route_redirect()
+    /**
+     * @dataProvider  routeRedirectDataSets
+     *
+     * @param  string  $redirectFrom
+     * @param  string  $redirectTo
+     * @param  string  $responseUri
+     */
+    public function testRouteRedirect($redirectFrom, $redirectTo, $responseUri)
     {
-        Route::redirect('from', 'to', 301);
+        Route::redirect($redirectFrom, $redirectTo, 301);
 
-        $response = $this->get('/from');
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('to', $response->headers->get('Location'));
+        $response = $this->get($responseUri);
+        $response->assertRedirect($redirectTo);
+        $response->assertStatus(301);
     }
 
-    public function test_route_redirect_with_params()
+    public function routeRedirectDataSets(): array
     {
-        Route::redirect('from/{param}/{param2?}', 'to', 301);
-
-        $response = $this->get('/from/value1/value2');
-        $response->assertRedirect('to');
-
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('to', $response->headers->get('Location'));
-
-        $response = $this->get('/from/value1');
-        $response->assertRedirect('to');
-
-        $this->assertEquals(301, $response->getStatusCode());
-        $this->assertEquals('to', $response->headers->get('Location'));
+        return [
+            'route redirect with no parameters' => ['from', 'to', '/from'],
+            'route redirect with one parameter' => ['from/{param}/{param2?}', 'to', '/from/value1'],
+            'route redirect with two parameters' => ['from/{param}/{param2?}', 'to', '/from/value1/value2'],
+        ];
     }
 }
