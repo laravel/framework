@@ -1346,7 +1346,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     /**
      * @expectedException \LogicException
-     * @expectedExceptionMessage Illuminate\Tests\Database\EloquentModelStub::incorrectRelationStub must return a relationship instance.
+     * @expectedExceptionMessage Illuminate\Tests\Database\EloquentModelStub::incorrectRelationStub must return a relationship or query or builder instance.
      */
     public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
     {

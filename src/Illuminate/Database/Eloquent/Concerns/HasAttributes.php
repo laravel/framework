@@ -10,7 +10,9 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 trait HasAttributes
 {
@@ -410,15 +412,21 @@ trait HasAttributes
     {
         $relation = $this->$method();
 
-        if (! $relation instanceof Relation) {
+        if (! $relation instanceof Relation && ! $relation instanceof QueryBuilder && ! $relation instanceof EloquentBuilder) {
             throw new LogicException(sprintf(
-                '%s::%s must return a relationship instance.', static::class, $method
+                '%s::%s must return a relationship or query or builder instance.', static::class, $method
             ));
         }
 
-        return tap($relation->getResults(), function ($results) use ($method) {
-            $this->setRelation($method, $results);
-        });
+        if ($relation instanceof Relation) {
+            return tap($relation->getResults(), function ($results) use ($method) {
+                $this->setRelation($method, $results);
+            });
+        } elseif ($relation instanceof QueryBuilder || $relation instanceof EloquentBuilder) {
+            return tap($relation->get(), function ($results) use ($method) {
+                $this->setRelation($method, $results);
+            });
+        }
     }
 
     /**
