@@ -82,5 +82,4 @@ class CheckForMaintenanceMode
 
         return false;
     }
-
 }
