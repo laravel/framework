@@ -123,4 +123,28 @@ trait HasTimestamps
     {
         return static::UPDATED_AT;
     }
+
+    /**
+     * Disable timestamps for the model.
+     *
+     * @return $this
+     */
+    public function disableTimestamps()
+    {
+        $this->timestamps = false;
+
+        return $this;
+    }
+
+    /**
+     * Enable timestamps for the model.
+     *
+     * @return $this
+     */
+    public function enableTimestamps()
+    {
+        $this->timestamps = true;
+
+        return $this;
+    }
 }
