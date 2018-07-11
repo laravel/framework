@@ -83,4 +83,22 @@ class LengthAwarePaginatorTest extends TestCase
         $this->assertEquals('http://website.com/test?foo=1',
                             $this->p->url($this->p->currentPage() - 2));
     }
+
+    public function testLengthAwarePaginatorWhenApplyCollectionChangesStillKeepWithLengthAwarePaginator()
+    {
+        $data = ['marcos', 'felipe'];
+
+        $lengthAwarePaginator = new LengthAwarePaginator($data, 2, 1);
+        $lengthAwarePaginatorTransformed = $lengthAwarePaginator->map(function ($value) {
+            return strrev($value);
+        });
+
+        $this->assertInstanceOf(LengthAwarePaginator::class, $lengthAwarePaginatorTransformed);
+
+        foreach ($lengthAwarePaginatorTransformed as $key => $value) {
+            $oldValue = $data[$key];
+
+            $this->assertEquals(strrev($oldValue), $value);
+        }
+    }
 }

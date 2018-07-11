@@ -50,6 +50,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
         $this->currentPage = $this->setCurrentPage($currentPage, $this->pageName);
         $this->items = $items instanceof Collection ? $items : Collection::make($items);
+        $this->options = $options;
     }
 
     /**
@@ -195,5 +196,19 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
     public function toJson($options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
+    }
+
+    /**
+     * Make dynamic calls into the collection.
+     *
+     * @param  string  $method
+     * @param  array  $parameters
+     * @return mixed
+     */
+    public function __call($method, $parameters)
+    {
+        $collectionResult = parent::__call($method, $parameters);
+
+        return new static($collectionResult, $this->total, $this->perPage, $this->currentPage, $this->options);
     }
 }

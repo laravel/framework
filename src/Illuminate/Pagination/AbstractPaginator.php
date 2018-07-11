@@ -62,6 +62,13 @@ abstract class AbstractPaginator implements Htmlable
     protected $pageName = 'page';
 
     /**
+     * Additional Instance Options.
+     *
+     * @var array
+     */
+    protected $options = [];
+
+    /**
      * The current path resolver callback.
      *
      * @var \Closure
