@@ -491,7 +491,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $formatter = new $class($value, $key);
 
             if (! $formatter instanceof Formatter) {
-                throw new \Exception('The given class to format the data is not instance of Formatter');
+                throw new \Exception('The given class to format the data is not instance of Illuminate\Contracts\Support\Formatter');
             }
 
             $valueFormatted = $formatter->format();
