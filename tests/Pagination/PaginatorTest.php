@@ -52,7 +52,7 @@ class PaginatorTest extends TestCase
         $data = ['marcos', 'felipe'];
 
         $paginator = new Paginator($data, 2, 1);
-        $paginatorTransformed = $paginator->map(function($value) {
+        $paginatorTransformed = $paginator->map(function ($value) {
             return strrev($value);
         });
 

@@ -89,7 +89,7 @@ class LengthAwarePaginatorTest extends TestCase
         $data = ['marcos', 'felipe'];
 
         $lengthAwarePaginator = new LengthAwarePaginator($data, 2, 1);
-        $lengthAwarePaginatorTransformed = $lengthAwarePaginator->map(function($value) {
+        $lengthAwarePaginatorTransformed = $lengthAwarePaginator->map(function ($value) {
             return strrev($value);
         });
 
