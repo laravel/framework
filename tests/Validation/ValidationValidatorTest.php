@@ -2065,6 +2065,8 @@ class ValidationValidatorTest extends TestCase
             ['https://laravel.com#'],
             ['https://laravel.com#fragment'],
             ['https://laravel.com/#fragment'],
+            ['https://localdomain1/index'],
+            ['http://2017-18/view-page.php'],
         ];
     }
 
@@ -2077,6 +2079,9 @@ class ValidationValidatorTest extends TestCase
             ['http ://google.com'],
             ['http:/google.com'],
             ['http://goog_le.com'],
+            ['http://-google.com'],
+            ['http://google-'],
+            ['http://%g#o$gle%'],
             ['http://google.com::aa'],
             ['http://google.com:aa'],
             ['http://127.0.0.1:aa'],
