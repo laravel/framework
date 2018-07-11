@@ -12,6 +12,8 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Formatter;
+use Illuminate\Contracts\Support\FormatterWithKeys;
 
 class SupportCollectionTest extends TestCase
 {
@@ -980,6 +982,32 @@ class SupportCollectionTest extends TestCase
     {
         $data = new Collection(['name' => 'taylor', 'framework' => 'laravel']);
         $this->assertEquals(['taylor' => 'name', 'laravel' => 'framework'], $data->flip()->toArray());
+    }
+
+    public function testFormat()
+    {
+        $valueOne = "felipe";
+        $valueTwo = "marcos";
+
+        $data = new Collection([$valueOne, $valueTwo]);
+
+        $this->assertEquals([strrev($valueOne), strrev($valueTwo)], $data->format(TestCollectionFormatValues::class)->toArray());
+    }
+
+    public function testFormatWithKeys()
+    {
+        $data = new Collection([
+            ['name' => 'Blastoise', 'type' => 'Water', 'idx' => 9],
+            ['name' => 'Charmander', 'type' => 'Fire', 'idx' => 4],
+            ['name' => 'Dragonair', 'type' => 'Dragon', 'idx' => 148],
+        ]);
+
+        $data = $data->format(TestCollectionFormatValuesWithKeys::class);
+
+        $this->assertEquals(
+            ['Blastoise' => 'Water', 'Charmander' => 'Fire', 'Dragonair' => 'Dragon'],
+            $data->all()
+        );
     }
 
     public function testChunk()
@@ -2783,4 +2811,64 @@ class TestCollectionMapIntoObject
 class TestCollectionSubclass extends Collection
 {
     //
+}
+
+class TestCollectionFormatValues implements Formatter
+{
+    /**
+     * @var string Value to be formatted.
+     */
+    protected $value;
+
+    /**
+     * TestCollectionFormatValues constructor.
+     *
+     * @param $value
+     * @param $key
+     */
+    public function __construct($value, $key)
+    {
+        $this->value = $value;
+    }
+
+
+    /**
+     * Format the data.
+     *
+     * @return mixed
+     */
+    public function format()
+    {
+        return strrev($this->value);
+    }
+}
+
+class TestCollectionFormatValuesWithKeys implements FormatterWithKeys
+{
+    /**
+     * @var string Value to be formatted.
+     */
+    protected $value;
+
+    /**
+     * TestCollectionFormatValues constructor.
+     *
+     * @param $value
+     * @param $key
+     */
+    public function __construct($value, $key)
+    {
+        $this->value = $value;
+    }
+
+
+    /**
+     * Format the data.
+     *
+     * @return mixed
+     */
+    public function format()
+    {
+        return [$this->value['name'] => $this->value['type']];
+    }
 }
