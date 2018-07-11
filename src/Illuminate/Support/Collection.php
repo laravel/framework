@@ -15,6 +15,8 @@ use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Formatter;
+use Illuminate\Contracts\Support\FormatterWithKeys;
 
 /**
  * @property-read HigherOrderCollectionProxy $average
@@ -472,6 +474,40 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         }
 
         return new static(array_filter($this->items));
+    }
+
+    /**
+     * Apply the format in formatter given class.
+     *
+     * @param $class
+     * @return Collection
+     * @throws Exception
+     */
+    public function format($class)
+    {
+        $result = [];
+
+        foreach ($this->items as $key => $value) {
+            $formatter = new $class($value, $key);
+
+            if (! $formatter instanceof Formatter) {
+                throw new \Exception('The given class to format the data is not instance of Illuminate\Contracts\Support\Formatter');
+            }
+
+            $valueFormatted = $formatter->format();
+
+            if (! $formatter instanceof FormatterWithKeys) {
+                $result[$key] = $valueFormatted;
+
+                continue;
+            }
+
+            foreach ($valueFormatted as $mapKey => $mapValue) {
+                $result[$mapKey] = $mapValue;
+            }
+        }
+
+        return new static($result);
     }
 
     /**
