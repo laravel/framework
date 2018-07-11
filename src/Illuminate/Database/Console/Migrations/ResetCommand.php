@@ -64,16 +64,9 @@ class ResetCommand extends BaseCommand
             return $this->comment('Migration table not found.');
         }
 
-        $this->migrator->reset(
+        $this->migrator->setOutput($this->output)->reset(
             $this->getMigrationPaths(), $this->option('pretend')
         );
-
-        // Once the migrator has run we will grab the note output and send it out to
-        // the console screen, since the migrator itself functions without having
-        // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note) {
-            $this->output->writeln($note);
-        }
     }
 
     /**

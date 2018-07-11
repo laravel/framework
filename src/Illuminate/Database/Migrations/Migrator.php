@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Migrations;
 
+use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
@@ -39,18 +40,18 @@ class Migrator
     protected $connection;
 
     /**
-     * The notes for the current operation.
-     *
-     * @var array
-     */
-    protected $notes = [];
-
-    /**
      * The paths to all of the migration files.
      *
      * @var array
      */
     protected $paths = [];
+
+    /**
+     * The output interface implementation.
+     *
+     * @var \Illuminate\Console\OutputStyle
+     */
+    protected $output;
 
     /**
      * Create a new migrator instance.
@@ -67,6 +68,20 @@ class Migrator
         $this->files = $files;
         $this->resolver = $resolver;
         $this->repository = $repository;
+    }
+
+    /**
+     * Set output.
+     *
+     * @param \Illuminate\Console\OutputStyle $output
+     *
+     * @return $this
+     */
+    public function setOutput(OutputStyle $output)
+    {
+        $this->output = $output;
+
+        return $this;
     }
 
     /**
@@ -573,16 +588,6 @@ class Migrator
      */
     protected function note($message)
     {
-        $this->notes[] = $message;
-    }
-
-    /**
-     * Get the notes for the last operation.
-     *
-     * @return array
-     */
-    public function getNotes()
-    {
-        return $this->notes;
+        $this->output->writeln($message);
     }
 }
