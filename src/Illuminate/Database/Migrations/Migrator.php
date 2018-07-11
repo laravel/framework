@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Migrations;
 
-use Illuminate\Console\OutputStyle;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
+use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 

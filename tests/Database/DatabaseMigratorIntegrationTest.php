@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Str;
 use Mockery;
+use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Migrations\Migrator;
