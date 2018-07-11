@@ -986,8 +986,8 @@ class SupportCollectionTest extends TestCase
 
     public function testFormat()
     {
-        $valueOne = "felipe";
-        $valueTwo = "marcos";
+        $valueOne = 'felipe';
+        $valueTwo = 'marcos';
 
         $data = new Collection([$valueOne, $valueTwo]);
 
@@ -2831,7 +2831,6 @@ class TestCollectionFormatValues implements Formatter
         $this->value = $value;
     }
 
-
     /**
      * Format the data.
      *
@@ -2860,7 +2859,6 @@ class TestCollectionFormatValuesWithKeys implements FormatterWithKeys
     {
         $this->value = $value;
     }
-
 
     /**
      * Format the data.

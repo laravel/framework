@@ -2,7 +2,6 @@
 
 namespace Illuminate\Support;
 
-use Illuminate\Contracts\Support\FormatterWithKeys;
 use stdClass;
 use Countable;
 use Exception;
@@ -17,6 +16,7 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Formatter;
+use Illuminate\Contracts\Support\FormatterWithKeys;
 
 /**
  * @property-read HigherOrderCollectionProxy $average
@@ -491,7 +491,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $formatter = new $class($value, $key);
 
             if (! $formatter instanceof Formatter) {
-                throw new \Exception("The given class to format the data is not instance of Formatter");
+                throw new \Exception('The given class to format the data is not instance of Formatter');
             }
 
             $valueFormatted = $formatter->format();
