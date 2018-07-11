@@ -11,6 +11,8 @@ trait ValidatesWhenResolvedTrait
      * Validate the class instance.
      *
      * @return void
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function validate()
     {
