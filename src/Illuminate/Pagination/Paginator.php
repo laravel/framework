@@ -39,6 +39,7 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
         $this->perPage = $perPage;
         $this->currentPage = $this->setCurrentPage($currentPage);
         $this->path = $this->path !== '/' ? rtrim($this->path, '/') : $this->path;
+        $this->options = $options;
 
         $this->setItems($items);
     }
@@ -173,5 +174,12 @@ class Paginator extends AbstractPaginator implements Arrayable, ArrayAccess, Cou
     public function toJson($options = 0)
     {
         return json_encode($this->jsonSerialize(), $options);
+    }
+
+    public function __call($method, $parameters)
+    {
+        $collectionResult = parent::__call($method, $parameters);
+
+        return new static($collectionResult, $this->perPage, $this->currentPage, $this->options);
     }
 }

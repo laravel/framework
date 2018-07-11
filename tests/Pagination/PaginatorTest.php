@@ -46,4 +46,22 @@ class PaginatorTest extends TestCase
 
         $this->assertEquals('http://website.com/test?page=1', $p->previousPageUrl());
     }
+
+    public function testPaginatorWhenApplyCollectionChangesStillKeepWithPaginator()
+    {
+        $data = ['marcos', 'felipe'];
+
+        $paginator = new Paginator($data, 2, 1);
+        $paginatorTransformed = $paginator->map(function($value) {
+            return strrev($value);
+        });
+
+        $this->assertInstanceOf(Paginator::class, $paginatorTransformed);
+
+        foreach ($paginatorTransformed as $key => $value) {
+            $oldValue = $data[$key];
+
+            $this->assertEquals(strrev($oldValue), $value);
+        }
+    }
 }
