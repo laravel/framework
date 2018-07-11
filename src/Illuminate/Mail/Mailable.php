@@ -118,11 +118,11 @@ class Mailable implements MailableContract, Renderable
      */
     public $rawAttachments = [];
 
-	/**
-	 * The attachments coming from storage disk
-	 *
-	 * @var array
-	 */
+    /**
+     * The attachments coming from storage disk.
+     *
+     * @var array
+     */
     public $diskAttachments = [];
 
     /**
@@ -353,12 +353,12 @@ class Mailable implements MailableContract, Renderable
         }
 
         foreach ($this->diskAttachments as $attachment) {
-	        $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($attachment['disk']);
+            $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($attachment['disk']);
 
-	        return $message->attachData(
-		        $storage->get($attachment['path']), $attachment['name'] ?? basename($attachment['path']),
-		        array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
-	        );
+            return $message->attachData(
+                $storage->get($attachment['path']), $attachment['name'] ?? basename($attachment['path']),
+                array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
+            );
         }
 
         return $this;
@@ -741,8 +741,8 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-    	$name = $name ?? basename($path);
-	    $this->diskAttachments[] = compact('disk', 'path', 'name', 'options');
+        $name = $name ?? basename($path);
+        $this->diskAttachments[] = compact('disk', 'path', 'name', 'options');
 
         return $this;
     }
