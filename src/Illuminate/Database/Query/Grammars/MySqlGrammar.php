@@ -305,7 +305,7 @@ class MySqlGrammar extends Grammar
 
         $field = $this->wrapSegments(explode('.', array_shift($path)));
 
-        return sprintf('%s->\'$.%s\'', $field, collect($path)->map(function ($part) {
+        return sprintf('%s->>\'$.%s\'', $field, collect($path)->map(function ($part) {
             return '"'.$part.'"';
         })->implode('.'));
     }
