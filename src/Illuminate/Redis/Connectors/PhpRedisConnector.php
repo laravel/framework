@@ -94,7 +94,7 @@ class PhpRedisConnector
     {
         ($config['persistent'] ?? false)
                 ? $this->establishPersistentConnection($client, $config)
-                : $this->establishRegularConnection($client, $config);
+                : $this->establishTemporaryConnection($client, $config);
     }
 
     /**
@@ -110,7 +110,9 @@ class PhpRedisConnector
             $config['host'],
             $config['port'],
             Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'persistent_id', null)
+            Arr::get($config, 'persistent_id', null),
+            Arr::get($config, 'retry_interval', null),
+            Arr::get($config, 'read_timeout', null)
         );
     }
 
@@ -121,14 +123,15 @@ class PhpRedisConnector
      * @param  array  $config
      * @return void
      */
-    protected function establishRegularConnection($client, array $config)
+    protected function establishTemporaryConnection($client, array $config)
     {
         $client->connect(
             $config['host'],
             $config['port'],
             Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'reserved', null),
-            Arr::get($config, 'retry_interval', 0)
+            null,
+            Arr::get($config, 'retry_interval', 0),
+            Arr::get($config, 'read_timeout', 0.0)
         );
     }
 
