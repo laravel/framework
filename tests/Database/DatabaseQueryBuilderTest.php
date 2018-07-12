@@ -2022,7 +2022,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
         $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true and `items`->\'$."active"\' = false and `items`->\'$."number_available"\' = ?', $builder->toSql());
     }
-    
+
     public function testMySqlWrappingJsonWithoutQuote()
     {
         $builder = $this->getMySqlBuilder();
