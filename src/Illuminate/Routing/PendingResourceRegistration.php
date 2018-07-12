@@ -59,7 +59,7 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  array|string|dynamic  $methods
+     * @param  array|...string  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function only($methods)
@@ -72,7 +72,7 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  array|string|dynamic  $methods
+     * @param  array|...string  $methods
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function except($methods)
