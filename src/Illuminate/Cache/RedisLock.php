@@ -2,9 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\Lock as LockContract;
-
-class RedisLock extends Lock implements LockContract
+class RedisLock extends Lock
 {
     /**
      * The Redis factory implementation.
