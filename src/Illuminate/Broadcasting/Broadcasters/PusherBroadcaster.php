@@ -8,9 +8,7 @@ use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Psr\Log\LoggerInterface;
-use Psr\Log\LogLevel;
 use Illuminate\Container\Container;
-use Illuminate\Config\Repository as ConfigRepository;
 
 class PusherBroadcaster extends Broadcaster
 {
@@ -31,18 +29,14 @@ class PusherBroadcaster extends Broadcaster
     {
         $this->pusher = $pusher;
 
-        $this->pusher->set_logger(new class() {
-            public function log($message)
-            {
-                $app = Container::getInstance();
-                $config = $app->make(ConfigRepository::class);
+        $container = Container::getInstance();
 
-                if ($config->get('app.debug')) {
-                    return $app->make(LoggerInterface::class)
-                            ->log(LogLevel::INFO, $message);
-                }
-            }
-        });
+        if (version_compare($this->pusher::$VERSION, '3.0.0', '>=') &&
+            $container->make('config')->get('app.debug')) {
+            $this->pusher->setLogger(
+                $container->make(LoggerInterface::class)
+            );
+        }
     }
 
     /**
