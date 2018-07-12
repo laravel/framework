@@ -262,22 +262,17 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $field
      * @param  array  $extraConditions
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return void
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
     public function basic($field = 'email', $extraConditions = [])
     {
-        if ($this->check()) {
-            return;
-        }
-
         // If a username is set on the HTTP basic request, we will return out without
         // interrupting the request lifecycle. Otherwise, we'll need to generate a
         // request indicating that the given credentials were invalid for login.
-        if ($this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
-            return;
+        if (! $this->check() && ! $this->attemptBasic($this->getRequest(), $field, $extraConditions)) {
+            $this->failedBasicResponse();
         }
-
-        return $this->failedBasicResponse();
     }
 
     /**
@@ -285,14 +280,15 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $field
      * @param  array  $extraConditions
-     * @return \Symfony\Component\HttpFoundation\Response|null
+     * @return void
+     * @throws \Symfony\Component\HttpKernel\Exception\UnauthorizedHttpException
      */
     public function onceBasic($field = 'email', $extraConditions = [])
     {
         $credentials = $this->basicCredentials($this->getRequest(), $field);
 
         if (! $this->once(array_merge($credentials, $extraConditions))) {
-            return $this->failedBasicResponse();
+            $this->failedBasicResponse();
         }
     }
 
