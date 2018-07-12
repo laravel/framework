@@ -58,10 +58,10 @@ class NotificationSender
         $notifiables = $this->formatNotifiables($notifiables);
 
         if ($notification instanceof ShouldQueue) {
-            return $this->queueNotification($notifiables, $notification);
+            $this->queueNotification($notifiables, $notification);
+        } else {
+            $this->sendNow($notifiables, $notification);
         }
-
-        return $this->sendNow($notifiables, $notification);
     }
 
     /**
