@@ -770,7 +770,7 @@ class Container implements ArrayAccess, ContainerContract
         // an abstract type such as an Interface of Abstract Class and there is
         // no binding registered for the abstractions so we need to bail out.
         if (! $reflector->isInstantiable()) {
-            return $this->notInstantiable($concrete);
+            throw $this->notInstantiable($concrete);
         }
 
         $this->buildStack[] = $concrete;
@@ -916,9 +916,7 @@ class Container implements ArrayAccess, ContainerContract
      * Throw an exception that the concrete is not instantiable.
      *
      * @param  string  $concrete
-     * @return void
-     *
-     * @throws \Illuminate\Contracts\Container\BindingResolutionException
+     * @return \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function notInstantiable($concrete)
     {
@@ -930,7 +928,7 @@ class Container implements ArrayAccess, ContainerContract
             $message = "Target [$concrete] is not instantiable.";
         }
 
-        throw new BindingResolutionException($message);
+        return new BindingResolutionException($message);
     }
 
     /**
