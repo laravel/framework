@@ -2022,6 +2022,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
         $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true and `items`->\'$."active"\' = false and `items`->\'$."number_available"\' = ?', $builder->toSql());
     }
+    
+    public function testMySqlWrappingJsonWithoutQuote()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->>sku', '=', 'foo-bar');
+        $this->assertEquals('select * from `users` where `items`->>\'$."sku"\' = ?', $builder->toSql());
+        $this->assertCount(1, $builder->getRawBindings()['where']);
+        $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
+    }
 
     public function testMySqlWrappingJson()
     {
