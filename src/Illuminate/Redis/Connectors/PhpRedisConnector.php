@@ -92,44 +92,13 @@ class PhpRedisConnector
      */
     protected function establishConnection($client, array $config)
     {
-        ($config['persistent'] ?? false)
-                ? $this->establishPersistentConnection($client, $config)
-                : $this->establishTemporaryConnection($client, $config);
-    }
+        $persistent = $config['persistent'] ?? false;
 
-    /**
-     * Establish a persistent connection with the Redis host.
-     *
-     * @param  \Redis  $client
-     * @param  array  $config
-     * @return void
-     */
-    protected function establishPersistentConnection($client, array $config)
-    {
-        $client->pconnect(
+        $client->{($persistent ? 'pconnect' : 'connect')}(
             $config['host'],
             $config['port'],
             Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'persistent_id', null),
-            Arr::get($config, 'retry_interval', null),
-            Arr::get($config, 'read_timeout', null)
-        );
-    }
-
-    /**
-     * Establish a regular connection with the Redis host.
-     *
-     * @param  \Redis  $client
-     * @param  array  $config
-     * @return void
-     */
-    protected function establishTemporaryConnection($client, array $config)
-    {
-        $client->connect(
-            $config['host'],
-            $config['port'],
-            Arr::get($config, 'timeout', 0.0),
-            null,
+            $persistent ? Arr::get($config, 'persistent_id', null) : null,
             Arr::get($config, 'retry_interval', 0),
             Arr::get($config, 'read_timeout', 0.0)
         );
