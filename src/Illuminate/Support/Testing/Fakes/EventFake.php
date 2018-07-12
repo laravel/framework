@@ -53,13 +53,13 @@ class EventFake implements Dispatcher
     public function assertDispatched($event, $callback = null)
     {
         if (is_int($callback)) {
-            return $this->assertDispatchedTimes($event, $callback);
+            $this->assertDispatchedTimes($event, $callback);
+        } else {
+            PHPUnit::assertTrue(
+                $this->dispatched($event, $callback)->count() > 0,
+                "The expected [{$event}] event was not dispatched."
+            );
         }
-
-        PHPUnit::assertTrue(
-            $this->dispatched($event, $callback)->count() > 0,
-            "The expected [{$event}] event was not dispatched."
-        );
     }
 
     /**
@@ -188,11 +188,11 @@ class EventFake implements Dispatcher
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
-     * @return array|null
+     * @return void
      */
     public function fire($event, $payload = [], $halt = false)
     {
-        return $this->dispatch($event, $payload, $halt);
+        $this->dispatch($event, $payload, $halt);
     }
 
     /**
@@ -201,7 +201,7 @@ class EventFake implements Dispatcher
      * @param  string|object  $event
      * @param  mixed  $payload
      * @param  bool  $halt
-     * @return array|null
+     * @return void
      */
     public function dispatch($event, $payload = [], $halt = false)
     {
@@ -255,6 +255,6 @@ class EventFake implements Dispatcher
      */
     public function until($event, $payload = [])
     {
-        return $this->dispatch($event, $payload, true);
+        $this->dispatch($event, $payload, true);
     }
 }

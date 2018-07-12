@@ -25,13 +25,13 @@ class QueueFake extends QueueManager implements Queue
     public function assertPushed($job, $callback = null)
     {
         if (is_numeric($callback)) {
-            return $this->assertPushedTimes($job, $callback);
+            $this->assertPushedTimes($job, $callback);
+        } else {
+            PHPUnit::assertTrue(
+                $this->pushed($job, $callback)->count() > 0,
+                "The expected [{$job}] job was not pushed."
+            );
         }
-
-        PHPUnit::assertTrue(
-            $this->pushed($job, $callback)->count() > 0,
-            "The expected [{$job}] job was not pushed."
-        );
     }
 
     /**
@@ -59,7 +59,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function assertPushedOn($queue, $job, $callback = null)
     {
-        return $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
+        $this->assertPushed($job, function ($job, $pushedQueue) use ($callback, $queue) {
             if ($pushedQueue !== $queue) {
                 return false;
             }
@@ -146,10 +146,10 @@ class QueueFake extends QueueManager implements Queue
      */
     protected function isChainOfObjects($chain)
     {
-        return collect($chain)->count() == collect($chain)
-                    ->filter(function ($job) {
+        return collect($chain)
+                    ->reject(function ($job) {
                         return is_object($job);
-                    })->count();
+                    })->isEmpty();
     }
 
     /**
@@ -207,7 +207,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function hasPushed($job)
     {
-        return isset($this->jobs[$job]) && ! empty($this->jobs[$job]);
+        return ! empty($this->jobs[$job]);
     }
 
     /**
@@ -238,7 +238,7 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return void
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -254,7 +254,7 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $payload
      * @param  string  $queue
      * @param  array   $options
-     * @return mixed
+     * @return void
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -268,11 +268,11 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return void
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
-        return $this->push($job, $data, $queue);
+        $this->push($job, $data, $queue);
     }
 
     /**
@@ -281,11 +281,11 @@ class QueueFake extends QueueManager implements Queue
      * @param  string  $queue
      * @param  string  $job
      * @param  mixed   $data
-     * @return mixed
+     * @return void
      */
     public function pushOn($queue, $job, $data = '')
     {
-        return $this->push($job, $data, $queue);
+        $this->push($job, $data, $queue);
     }
 
     /**
@@ -295,18 +295,18 @@ class QueueFake extends QueueManager implements Queue
      * @param  \DateTime|int  $delay
      * @param  string  $job
      * @param  mixed   $data
-     * @return mixed
+     * @return void
      */
     public function laterOn($queue, $delay, $job, $data = '')
     {
-        return $this->push($job, $data, $queue);
+        $this->push($job, $data, $queue);
     }
 
     /**
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return void
      */
     public function pop($queue = null)
     {
@@ -319,7 +319,7 @@ class QueueFake extends QueueManager implements Queue
      * @param  array $jobs
      * @param  mixed $data
      * @param  string $queue
-     * @return mixed
+     * @return void
      */
     public function bulk($jobs, $data = '', $queue = null)
     {
@@ -331,7 +331,7 @@ class QueueFake extends QueueManager implements Queue
     /**
      * Get the connection name for the queue.
      *
-     * @return string
+     * @return void
      */
     public function getConnectionName()
     {

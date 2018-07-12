@@ -36,13 +36,13 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
         }
 
         if (is_numeric($callback)) {
-            return $this->assertSentToTimes($notifiable, $notification, $callback);
+            $this->assertSentToTimes($notifiable, $notification, $callback);
+        } else {
+            PHPUnit::assertTrue(
+                $this->sent($notifiable, $notification, $callback)->count() > 0,
+                "The expected [{$notification}] notification was not sent."
+            );
         }
-
-        PHPUnit::assertTrue(
-            $this->sent($notifiable, $notification, $callback)->count() > 0,
-            "The expected [{$notification}] notification was not sent."
-        );
     }
 
     /**
@@ -178,7 +178,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function send($notifiables, $notification)
     {
-        return $this->sendNow($notifiables, $notification);
+        $this->sendNow($notifiables, $notification);
     }
 
     /**
@@ -211,7 +211,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      * Get a channel instance by name.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return void
      */
     public function channel($name = null)
     {
