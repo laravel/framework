@@ -286,11 +286,11 @@ class Gate implements GateContract
     {
         $result = $this->raw($ability, $arguments);
 
-        if ($result instanceof Response) {
-            return $result;
+        if (! $result) {
+            $this->deny();
         }
 
-        return $result ? $this->allow() : $this->deny();
+        return $result instanceof Response ? $result : $this->allow();
     }
 
     /**
