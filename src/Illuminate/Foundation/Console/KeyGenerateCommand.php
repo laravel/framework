@@ -36,7 +36,9 @@ class KeyGenerateCommand extends Command
         $key = $this->generateRandomKey();
 
         if ($this->option('show')) {
-            return $this->line('<comment>'.$key.'</comment>');
+            $this->line('<comment>'.$key.'</comment>');
+
+            return;
         }
 
         // Next, we will replace the application key in the environment file so it is
