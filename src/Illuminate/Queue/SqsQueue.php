@@ -68,7 +68,7 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return string
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -81,7 +81,7 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  string  $queue
      * @param  array   $options
-     * @return mixed
+     * @return string
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -97,7 +97,7 @@ class SqsQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return string
      */
     public function later($delay, $job, $data = '', $queue = null)
     {

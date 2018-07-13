@@ -64,7 +64,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return int
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -77,7 +77,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  string  $queue
      * @param  array   $options
-     * @return mixed
+     * @return int
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -93,7 +93,7 @@ class BeanstalkdQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return int
      */
     public function later($delay, $job, $data = '', $queue = null)
     {

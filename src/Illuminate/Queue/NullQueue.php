@@ -23,7 +23,7 @@ class NullQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return void
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -36,7 +36,7 @@ class NullQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  string  $queue
      * @param  array   $options
-     * @return mixed
+     * @return void
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -50,7 +50,7 @@ class NullQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return void
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
@@ -61,7 +61,7 @@ class NullQueue extends Queue implements QueueContract
      * Pop the next job off of the queue.
      *
      * @param  string  $queue
-     * @return \Illuminate\Contracts\Queue\Job|null
+     * @return void
      */
     public function pop($queue = null)
     {
