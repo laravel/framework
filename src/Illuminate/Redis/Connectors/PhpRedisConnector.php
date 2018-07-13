@@ -92,44 +92,21 @@ class PhpRedisConnector
      */
     protected function establishConnection($client, array $config)
     {
-        ($config['persistent'] ?? false)
-                ? $this->establishPersistentConnection($client, $config)
-                : $this->establishRegularConnection($client, $config);
-    }
+        $persistent = $config['persistent'] ?? false;
 
-    /**
-     * Establish a persistent connection with the Redis host.
-     *
-     * @param  \Redis  $client
-     * @param  array  $config
-     * @return void
-     */
-    protected function establishPersistentConnection($client, array $config)
-    {
-        $client->pconnect(
+        $parameters = [
             $config['host'],
             $config['port'],
             Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'persistent_id', null)
-        );
-    }
+            $persistent ? Arr::get($config, 'persistent_id', null) : null,
+            Arr::get($config, 'retry_interval', 0),
+        ];
 
-    /**
-     * Establish a regular connection with the Redis host.
-     *
-     * @param  \Redis  $client
-     * @param  array  $config
-     * @return void
-     */
-    protected function establishRegularConnection($client, array $config)
-    {
-        $client->connect(
-            $config['host'],
-            $config['port'],
-            Arr::get($config, 'timeout', 0.0),
-            Arr::get($config, 'reserved', null),
-            Arr::get($config, 'retry_interval', 0)
-        );
+        if (version_compare(phpversion('redis'), '3.1.3', '>=')) {
+            $parameters[] = Arr::get($config, 'read_timeout', 0.0);
+        }
+
+        $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
     }
 
     /**
