@@ -24,13 +24,13 @@ class BusFake implements Dispatcher
     public function assertDispatched($command, $callback = null)
     {
         if (is_numeric($callback)) {
-            return $this->assertDispatchedTimes($command, $callback);
+            $this->assertDispatchedTimes($command, $callback);
+        } else {
+            PHPUnit::assertTrue(
+                $this->dispatched($command, $callback)->count() > 0,
+                "The expected [{$command}] job was not dispatched."
+            );
         }
-
-        PHPUnit::assertTrue(
-            $this->dispatched($command, $callback)->count() > 0,
-            "The expected [{$command}] job was not dispatched."
-        );
     }
 
     /**
