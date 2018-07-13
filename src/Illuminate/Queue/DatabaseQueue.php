@@ -74,7 +74,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return mixed
+     * @return int
      */
     public function push($job, $data = '', $queue = null)
     {
@@ -87,7 +87,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  string  $queue
      * @param  array   $options
-     * @return mixed
+     * @return int
      */
     public function pushRaw($payload, $queue = null, array $options = [])
     {
@@ -101,7 +101,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $job
      * @param  mixed   $data
      * @param  string  $queue
-     * @return void
+     * @return int
      */
     public function later($delay, $job, $data = '', $queue = null)
     {
@@ -135,7 +135,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $queue
      * @param  \Illuminate\Queue\Jobs\DatabaseJobRecord  $job
      * @param  int  $delay
-     * @return mixed
+     * @return int
      */
     public function release($queue, $job, $delay)
     {
@@ -149,7 +149,7 @@ class DatabaseQueue extends Queue implements QueueContract
      * @param  string  $payload
      * @param  \DateTimeInterface|\DateInterval|int  $delay
      * @param  int  $attempts
-     * @return mixed
+     * @return int
      */
     protected function pushToDatabase($queue, $payload, $delay = 0, $attempts = 0)
     {

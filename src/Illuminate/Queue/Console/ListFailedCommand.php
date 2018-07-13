@@ -35,11 +35,11 @@ class ListFailedCommand extends Command
      */
     public function handle()
     {
-        if (count($jobs = $this->getFailedJobs()) == 0) {
-            return $this->info('No failed jobs!');
+        if (count($jobs = $this->getFailedJobs()) === 0) {
+            $this->info('No failed jobs!');
+        } else {
+            $this->displayFailedJobs($jobs);
         }
-
-        $this->displayFailedJobs($jobs);
     }
 
     /**

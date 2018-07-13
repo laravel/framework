@@ -225,11 +225,11 @@ class Worker
         // If we're able to pull a job off of the stack, we will process it and then return
         // from this method. If there is no job on the queue, we will "sleep" the worker
         // for the specified number of seconds, then keep processing jobs after sleep.
-        if ($job) {
-            return $this->runJob($job, $connectionName, $options);
+        if (! $job) {
+            $this->sleep($options->sleep);
         }
 
-        $this->sleep($options->sleep);
+        $this->runJob($job, $connectionName, $options);
     }
 
     /**
@@ -269,7 +269,7 @@ class Worker
     protected function runJob($job, $connectionName, WorkerOptions $options)
     {
         try {
-            return $this->process($connectionName, $job, $options);
+            $this->process($connectionName, $job, $options);
         } catch (Exception $e) {
             $this->exceptions->report($e);
 
@@ -432,7 +432,7 @@ class Worker
      */
     protected function failJob($connectionName, $job, $e)
     {
-        return FailingJob::handle($connectionName, $job, $e);
+        FailingJob::handle($connectionName, $job, $e);
     }
 
     /**
