@@ -137,6 +137,17 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
         $this->assertTrue($likes[1]->likeable->relationLoaded('comments'));
     }
 
+    public function testItLoadsRelationshipsWithCustomName()
+    {
+        $this->seedData();
+
+        $like = TestLike::with('likeableWithName')->first();
+
+        $this->assertTrue($like->relationLoaded('likeable_custom'));
+        $this->assertFalse($like->relationLoaded('likeableWithName'));
+        $this->assertEquals(TestComment::first(), $like->likeable_custom);
+    }
+
     /**
      * Helpers...
      */
@@ -241,6 +252,11 @@ class TestLike extends Eloquent
     public function likeable()
     {
         return $this->morphTo();
+    }
+
+    public function likeableWithName()
+    {
+        return $this->morphTo('likeable_custom', 'likeable_type', 'likeable_id');
     }
 }
 
