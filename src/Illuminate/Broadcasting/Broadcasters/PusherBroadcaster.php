@@ -7,13 +7,11 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Broadcasting\BroadcastException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Psr\Log\LoggerInterface;
-use Illuminate\Container\Container;
 
 class PusherBroadcaster extends Broadcaster
 {
     /**
-     * The Pusher SDK instance. 
+     * The Pusher SDK instance.
      *
      * @var \Pusher\Pusher
      */
@@ -28,15 +26,6 @@ class PusherBroadcaster extends Broadcaster
     public function __construct(Pusher $pusher)
     {
         $this->pusher = $pusher;
-
-        $container = Container::getInstance();
-
-        if (version_compare($this->pusher::$VERSION, '3.0.0', '>=') &&
-            $container->make('config')->get('app.debug')) {
-            $this->pusher->setLogger(
-                $container->make(LoggerInterface::class)
-            );
-        }
     }
 
     /**
