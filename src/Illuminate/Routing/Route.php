@@ -645,7 +645,7 @@ class Route
     /**
      * Determine whether the route's name matches the given patterns.
      *
-     * @param  dynamic  $patterns
+     * @param  ...string  $patterns
      * @return bool
      */
     public function named(...$patterns)
