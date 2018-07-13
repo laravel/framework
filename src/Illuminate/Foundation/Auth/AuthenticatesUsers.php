@@ -1,3 +1,4 @@
+
 <?php
 
 namespace Illuminate\Foundation\Auth;
@@ -63,7 +64,7 @@ trait AuthenticatesUsers
     {
         $this->validate($request, [
             $this->username() => 'required|string',
-            'password' => 'required|string',
+            $this->password() => 'required|string',
         ]);
     }
 
@@ -88,7 +89,7 @@ trait AuthenticatesUsers
      */
     protected function credentials(Request $request)
     {
-        return $request->only($this->username(), 'password');
+        return $request->only($this->username(), $this->password());
     }
 
     /**
@@ -142,6 +143,16 @@ trait AuthenticatesUsers
     public function username()
     {
         return 'email';
+    }
+
+    /**
+     * Get the login password to be used by the controller.
+     *
+     * @return string
+     */
+    public function password()
+    {
+        return 'password';
     }
 
     /**

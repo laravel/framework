@@ -38,7 +38,17 @@ trait Authenticatable
      */
     public function getAuthPassword()
     {
-        return $this->password;
+        return $this[$this->getAuthPasswordField()];
+    }
+
+    /**
+     * Get the password field for the user.
+     *
+     * @return string
+     */
+    public function getAuthPasswordField()
+    {
+        return 'password';
     }
 
     /**
