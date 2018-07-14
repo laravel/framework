@@ -15,6 +15,7 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Illuminate\Log\Events\LoggerResolved;
 
 class LogManager implements LoggerInterface
 {
@@ -188,7 +189,9 @@ class LogManager implements LoggerInterface
         $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
         if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($config);
+            return tap($this->{$driverMethod}($config), function ($logger) {
+                $this->app['events']->dispatch(new LoggerResolved($logger));
+            });
         }
 
         throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
