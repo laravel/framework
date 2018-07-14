@@ -3,6 +3,7 @@
 namespace Illuminate\Log;
 
 use Closure;
+use Illuminate\Log\Events\LoggerResolved;
 use Throwable;
 use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
@@ -188,7 +189,9 @@ class LogManager implements LoggerInterface
         $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
         if (method_exists($this, $driverMethod)) {
-            return $this->{$driverMethod}($config);
+            return tap($this->{$driverMethod}($config), function($logger) {
+                $this->app['events']->dispatch(new LoggerResolved($logger));
+            });
         }
 
         throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
