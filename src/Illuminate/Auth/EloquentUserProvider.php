@@ -102,19 +102,21 @@ class EloquentUserProvider implements UserProvider
      */
     public function retrieveByCredentials(array $credentials)
     {
+        $model = $this->createModel();
+
         if (empty($credentials) ||
            (count($credentials) === 1 &&
-            array_key_exists('password', $credentials))) {
+            array_key_exists($model->getAuthPasswordField(), $credentials))) {
             return;
         }
 
         // First we will add each credential element to the query as a where clause.
         // Then we can execute the query and, if we found a user, return it in a
         // Eloquent User "model" that will be utilized by the Guard instances.
-        $query = $this->createModel()->newQuery();
+        $query = $model->newQuery();
 
         foreach ($credentials as $key => $value) {
-            if (Str::contains($key, 'password')) {
+            if (Str::contains($key, $this->getAuthPasswordField())) {
                 continue;
             }
 
@@ -137,7 +139,7 @@ class EloquentUserProvider implements UserProvider
      */
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        $plain = $credentials['password'];
+        $plain = $credentials[$user->getAuthPasswordField()];
 
         return $this->hasher->check($plain, $user->getAuthPassword());
     }
