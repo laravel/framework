@@ -43,15 +43,15 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = '/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             $stub = '/stubs/controller.model.stub';
-        } elseif ($this->option('action')) {
-            $stub = '/stubs/controller.action.stub';
+        } elseif ($this->option('invokable')) {
+            $stub = '/stubs/controller.invokable.stub';
         } elseif ($this->option('resource')) {
             $stub = '/stubs/controller.stub';
         }
 
         if ($this->option('api') && is_null($stub)) {
             $stub = '/stubs/controller.api.stub';
-        } elseif ($this->option('api') && ! is_null($stub) && ! $this->option('action')) {
+        } elseif ($this->option('api') && ! is_null($stub) && ! $this->option('invokable')) {
             $stub = str_replace('.stub', '.api.stub', $stub);
         }
 
@@ -178,7 +178,7 @@ class ControllerMakeCommand extends GeneratorCommand
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
 
-            ['action', null, InputOption::VALUE_NONE, 'Generate a single action controller class.'],
+            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single action controller class.'],
 
             ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
 
