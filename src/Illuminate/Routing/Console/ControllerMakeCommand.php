@@ -43,7 +43,7 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = '/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             $stub = '/stubs/controller.model.stub';
-        } else if ($this->option('action')) {
+        } elseif ($this->option('action')) {
             $stub = '/stubs/controller.action.stub';
         } elseif ($this->option('resource')) {
             $stub = '/stubs/controller.stub';
