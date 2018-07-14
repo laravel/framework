@@ -215,8 +215,7 @@ class BroadcastManager implements FactoryContract
         $pusher = new Pusher($config['key'], $config['secret'],
             $config['app_id'], $config['options'] ?? []);
 
-        if (version_compare($pusher::$VERSION, '3.0.0', '>=') &&
-            $this->app->make('config')->get('app.debug')) {
+        if ($this->app->make('config')->get('app.debug')) {
             $pusher->setLogger(
                 $this->app->make(LoggerInterface::class)
             );
