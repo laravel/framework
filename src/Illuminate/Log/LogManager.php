@@ -3,7 +3,6 @@
 namespace Illuminate\Log;
 
 use Closure;
-use Illuminate\Log\Events\LoggerResolved;
 use Throwable;
 use Illuminate\Support\Str;
 use Psr\Log\LoggerInterface;
@@ -16,6 +15,7 @@ use Monolog\Handler\ErrorLogHandler;
 use Monolog\Handler\HandlerInterface;
 use Monolog\Handler\RotatingFileHandler;
 use Monolog\Handler\SlackWebhookHandler;
+use Illuminate\Log\Events\LoggerResolved;
 
 class LogManager implements LoggerInterface
 {
@@ -189,7 +189,7 @@ class LogManager implements LoggerInterface
         $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
         if (method_exists($this, $driverMethod)) {
-            return tap($this->{$driverMethod}($config), function($logger) {
+            return tap($this->{$driverMethod}($config), function ($logger) {
                 $this->app['events']->dispatch(new LoggerResolved($logger));
             });
         }
