@@ -91,6 +91,17 @@ class MigrateMakeCommand extends BaseCommand
             }
         }
 
+        // Next, we will attempt to guess the table name if this the migration has
+        // "to", "from", "in" in the name. This will allow us to provide a convenient
+        // way of creating migrations that modify tables in the application.
+        if (! $table) {
+            if (preg_match('/_(to|from|in)_(\w+)_table$/', $name, $matches)) {
+                $table = $matches[2];
+
+                $create = false;
+            }
+        }
+
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
