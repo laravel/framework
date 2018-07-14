@@ -84,22 +84,7 @@ class MigrateMakeCommand extends BaseCommand
         // "create" in the name. This will allow us to provide a convenient way
         // of creating migrations that create new tables for the application.
         if (! $table) {
-            if (preg_match('/^create_(\w+)_table$/', $name, $matches)) {
-                $table = $matches[1];
-
-                $create = true;
-            }
-        }
-
-        // Next, we will attempt to guess the table name if this the migration has
-        // "to", "from", "in" in the name. This will allow us to provide a convenient
-        // way of creating migrations that modify tables in the application.
-        if (! $table) {
-            if (preg_match('/_(to|from|in)_(\w+)_table$/', $name, $matches)) {
-                $table = $matches[2];
-
-                $create = false;
-            }
+            [$table, $create] = TableGuesser::guess($name);
         }
 
         // Now we are ready to write the migration out to disk. Once we've written
