@@ -212,10 +212,16 @@ class BroadcastManager implements FactoryContract
      */
     protected function createPusherDriver(array $config)
     {
-        return new PusherBroadcaster(
-            new Pusher($config['key'], $config['secret'],
-            $config['app_id'], $config['options'] ?? [])
-        );
+        $pusher = new Pusher($config['key'], $config['secret'],
+            $config['app_id'], $config['options'] ?? []);
+
+        if ($this->app->make('config')->get('app.debug')) {
+            $pusher->setLogger(
+                $this->app->make(LoggerInterface::class)
+            );
+        }
+
+        return new PusherBroadcaster($pusher);
     }
 
     /**
