@@ -57,19 +57,12 @@ class RollbackCommand extends BaseCommand
 
         $this->migrator->setConnection($this->option('database'));
 
-        $this->migrator->rollback(
+        $this->migrator->setOutput($this->output)->rollback(
             $this->getMigrationPaths(), [
                 'pretend' => $this->option('pretend'),
                 'step' => (int) $this->option('step'),
             ]
         );
-
-        // Once the migrator has run we will grab the note output and send it out to
-        // the console screen, since the migrator itself functions without having
-        // any instances of the OutputInterface contract passed into the class.
-        foreach ($this->migrator->getNotes() as $note) {
-            $this->output->writeln($note);
-        }
     }
 
     /**
