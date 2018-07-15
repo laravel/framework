@@ -471,7 +471,7 @@ class TestResponse
             PHPUnit::assertTrue(
                 Str::contains($actual, $expected),
                 'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
-                "[". json_encode([$key => $value]) ."]".PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
                 'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
@@ -503,7 +503,7 @@ class TestResponse
             PHPUnit::assertFalse(
                 Str::contains($actual, $unexpected),
                 'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-                "[".json_encode([$key => $value])."]".PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
                 'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
@@ -555,9 +555,9 @@ class TestResponse
         $needle = substr(json_encode([$key => $value]), 1, -1);
 
         return [
-            $needle . ']',
-            $needle . '}',
-            $needle . ',',
+            $needle.']',
+            $needle.'}',
+            $needle.',',
         ];
     }
 
