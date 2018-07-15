@@ -301,11 +301,15 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $path = explode('->', $value);
+        $delimiter = str_contains($value, '->>')
+            ? '->>'
+            : '->';
+
+        $path = explode($delimiter, $value);
 
         $field = $this->wrapSegments(explode('.', array_shift($path)));
 
-        return sprintf('%s->\'$.%s\'', $field, collect($path)->map(function ($part) {
+        return sprintf('%s'.$delimiter.'\'$.%s\'', $field, collect($path)->map(function ($part) {
             return '"'.$part.'"';
         })->implode('.'));
     }

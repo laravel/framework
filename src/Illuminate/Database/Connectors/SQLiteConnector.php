@@ -31,7 +31,7 @@ class SQLiteConnector extends Connector implements ConnectorInterface
         // as the developer probably wants to know if the database exists and this
         // SQLite driver will not throw any exception if it does not by default.
         if ($path === false) {
-            throw new InvalidArgumentException("Database (${config['database']}) does not exist.");
+            throw new InvalidArgumentException("Database ({$config['database']}) does not exist.");
         }
 
         return $this->createConnection("sqlite:{$path}", $config, $options);

@@ -228,6 +228,17 @@ class CacheRepositoryTest extends TestCase
         $repo->deleteMultiple(['a-key', 'a-second-key']);
     }
 
+    public function testAllTagsArePassedToTaggableStore()
+    {
+        $store = m::mock('Illuminate\Cache\ArrayStore');
+        $repo = new \Illuminate\Cache\Repository($store);
+
+        $taggedCache = m::mock();
+        $taggedCache->shouldReceive('setDefaultCacheTime');
+        $store->shouldReceive('tags')->once()->with(['foo', 'bar', 'baz'])->andReturn($taggedCache);
+        $repo->tags('foo', 'bar', 'baz');
+    }
+
     protected function getRepository()
     {
         $dispatcher = new \Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
