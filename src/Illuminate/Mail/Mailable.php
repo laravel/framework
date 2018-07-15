@@ -119,6 +119,13 @@ class Mailable implements MailableContract, Renderable
     public $rawAttachments = [];
 
     /**
+     * The attachments coming from storage disk.
+     *
+     * @var array
+     */
+    public $diskAttachments = [];
+
+    /**
      * The callbacks for the message.
      *
      * @var array
@@ -342,6 +349,15 @@ class Mailable implements MailableContract, Renderable
         foreach ($this->rawAttachments as $attachment) {
             $message->attachData(
                 $attachment['data'], $attachment['name'], $attachment['options']
+            );
+        }
+
+        foreach ($this->diskAttachments as $attachment) {
+            $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($attachment['disk']);
+
+            return $message->attachData(
+                $storage->get($attachment['path']), $attachment['name'] ?? basename($attachment['path']),
+                array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
             );
         }
 
@@ -725,12 +741,10 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-        $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+        $name = $name ?? basename($path);
+        $this->diskAttachments[] = compact('disk', 'path', 'name', 'options');
 
-        return $this->attachData(
-            $storage->get($path), $name ?? basename($path),
-            array_merge(['mime' => $storage->mimeType($path)], $options)
-        );
+        return $this;
     }
 
     /**
