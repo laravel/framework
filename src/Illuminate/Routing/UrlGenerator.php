@@ -311,6 +311,8 @@ class UrlGenerator implements UrlGeneratorContract
             $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
         }
 
+        ksort($parameters);
+
         $key = call_user_func($this->keyResolver);
 
         return $this->route($name, $parameters + [
@@ -390,7 +392,7 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Get the URL to a controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @param  mixed   $parameters
      * @param  bool    $absolute
      * @return string
@@ -409,11 +411,15 @@ class UrlGenerator implements UrlGeneratorContract
     /**
      * Format the given controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @return string
      */
     protected function formatAction($action)
     {
+        if (is_array($action)) {
+            $action = implode('@', $action);
+        }
+
         if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {
             return $this->rootNamespace.'\\'.$action;
         } else {

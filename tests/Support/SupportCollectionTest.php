@@ -483,6 +483,12 @@ class SupportCollectionTest extends TestCase
             [['v' => 'hello']],
             $c->where('v', new \Illuminate\Support\HtmlString('hello'))->values()->all()
         );
+
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => null]]);
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2]],
+            $c->where('v')->values()->all()
+        );
     }
 
     public function testWhereStrict()
@@ -1584,6 +1590,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['b', 'f'], $data->nth(4, 1)->all());
         $this->assertEquals(['c'], $data->nth(4, 2)->all());
         $this->assertEquals(['d'], $data->nth(4, 3)->all());
+    }
+
+    public function testMapWithKeysOverwritingKeys()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 1, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name']];
+        });
+        $this->assertSame(
+            [
+                1 => 'C',
+                2 => 'B',
+            ],
+            $data->all()
+        );
     }
 
     public function testTransform()

@@ -84,7 +84,8 @@
         "phpunit/phpunit": "^7.0",
         "predis/predis": "^1.1.1",
         "symfony/css-selector": "^4.1",
-        "symfony/dom-crawler": "^4.1"
+        "symfony/dom-crawler": "^4.1",
+        "true/punycode": "^2.1"
     },
     "autoload": {
         "files": [

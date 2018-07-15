@@ -941,6 +941,13 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('drop table `alpha`,`beta`,`gamma`', $statement);
     }
 
+    public function testDropAllViews()
+    {
+        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop view `alpha`,`beta`,`gamma`', $statement);
+    }
+
     public function testGrammarsAreMacroable()
     {
         // compileReplace macro.

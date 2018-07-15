@@ -206,6 +206,17 @@ class PostgresGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all views.
+     *
+     * @param  string  $views
+     * @return string
+     */
+    public function compileDropAllViews($views)
+    {
+        return 'drop view "'.implode('","', $views).'" cascade';
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @param  string  $schema
@@ -214,6 +225,17 @@ class PostgresGrammar extends Grammar
     public function compileGetAllTables($schema)
     {
         return "select tablename from pg_catalog.pg_tables where schemaname = '{$schema}'";
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @param  string  $schema
+     * @return string
+     */
+    public function compileGetAllViews($schema)
+    {
+        return "select viewname from pg_catalog.pg_views where schemaname = '{$schema}'";
     }
 
     /**

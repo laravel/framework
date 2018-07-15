@@ -78,9 +78,10 @@ class AuthEloquentUserProviderTest extends TestCase
         $mock = m::mock('stdClass');
         $mock->shouldReceive('newQuery')->once()->andReturn($mock);
         $mock->shouldReceive('where')->once()->with('username', 'dayle');
+        $mock->shouldReceive('whereIn')->once()->with('group', ['one', 'two']);
         $mock->shouldReceive('first')->once()->andReturn('bar');
         $provider->expects($this->once())->method('createModel')->will($this->returnValue($mock));
-        $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo']);
+        $user = $provider->retrieveByCredentials(['username' => 'dayle', 'password' => 'foo', 'group' => ['one', 'two']]);
 
         $this->assertEquals('bar', $user);
     }

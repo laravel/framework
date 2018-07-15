@@ -476,6 +476,43 @@ class AuthAccessGateTest extends TestCase
 
         $this->assertFalse($gate->check(['edit', 'update'], new AccessGateTestDummy));
     }
+
+    /**
+     * @dataProvider hasAbilitiesTestDataProvider
+     *
+     * @param array $abilitiesToSet
+     * @param array|string $abilitiesToCheck
+     * @param bool $expectedHasValue
+     */
+    public function test_has_abilities($abilitiesToSet, $abilitiesToCheck, $expectedHasValue)
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->resource('test', AccessGateTestResource::class, $abilitiesToSet);
+
+        $this->assertEquals($expectedHasValue, $gate->has($abilitiesToCheck));
+    }
+
+    public function hasAbilitiesTestDataProvider()
+    {
+        $abilities = ['foo' => 'foo', 'bar' => 'bar'];
+        $noAbilities = [];
+
+        return [
+            [$abilities, ['test.foo', 'test.bar'], true],
+            [$abilities, ['test.bar', 'test.foo'], true],
+            [$abilities, ['test.bar', 'test.foo', 'test.baz'], false],
+            [$abilities, ['test.bar'], true],
+            [$abilities, ['baz'], false],
+            [$abilities, [''], false],
+            [$abilities, [], true],
+            [$abilities, 'test.bar', true],
+            [$abilities, 'test.foo', true],
+            [$abilities, '', false],
+            [$noAbilities, '', false],
+            [$noAbilities, [], true],
+        ];
+    }
 }
 
 class AccessGateTestClass

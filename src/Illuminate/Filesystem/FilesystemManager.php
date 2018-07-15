@@ -220,7 +220,7 @@ class FilesystemManager implements FactoryContract
         $config += ['version' => 'latest'];
 
         if ($config['key'] && $config['secret']) {
-            $config['credentials'] = Arr::only($config, ['key', 'secret']);
+            $config['credentials'] = Arr::only($config, ['key', 'secret', 'token']);
         }
 
         return $config;
@@ -236,7 +236,7 @@ class FilesystemManager implements FactoryContract
     {
         $client = new Rackspace($config['endpoint'], [
             'username' => $config['username'], 'apiKey' => $config['key'],
-        ]);
+        ], $config['options'] ?? []);
 
         $root = $config['root'] ?? null;
 

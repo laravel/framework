@@ -143,13 +143,11 @@ class AuthPasswordBrokerTest extends TestCase
 
     protected function getMocks()
     {
-        $mocks = [
+        return [
             'tokens' => m::mock('Illuminate\Auth\Passwords\TokenRepositoryInterface'),
             'users'  => m::mock('Illuminate\Contracts\Auth\UserProvider'),
             'mailer' => m::mock('Illuminate\Contracts\Mail\Mailer'),
             'view'   => 'resetLinkView',
         ];
-
-        return $mocks;
     }
 }

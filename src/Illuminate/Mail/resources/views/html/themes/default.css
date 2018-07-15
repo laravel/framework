@@ -218,7 +218,8 @@ img {
     -webkit-text-size-adjust: none;
 }
 
-.button-blue {
+.button-blue,
+.button-primary {
     background-color: #3097D1;
     border-top: 10px solid #3097D1;
     border-right: 18px solid #3097D1;
@@ -226,7 +227,8 @@ img {
     border-left: 18px solid #3097D1;
 }
 
-.button-green {
+.button-green,
+.button-success {
     background-color: #2ab27b;
     border-top: 10px solid #2ab27b;
     border-right: 18px solid #2ab27b;
@@ -234,7 +236,8 @@ img {
     border-left: 18px solid #2ab27b;
 }
 
-.button-red {
+.button-red,
+.button-error {
     background-color: #bf5329;
     border-top: 10px solid #bf5329;
     border-right: 18px solid #bf5329;

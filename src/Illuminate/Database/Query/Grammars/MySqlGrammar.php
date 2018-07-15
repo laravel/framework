@@ -276,7 +276,7 @@ class MySqlGrammar extends Grammar
     {
         $joins = ' '.$this->compileJoins($query, $query->joins);
 
-        $alias = strpos(strtolower($table), ' as ') !== false
+        $alias = stripos($table, ' as ') !== false
                 ? explode(' as ', $table)[1] : $table;
 
         return trim("delete {$alias} from {$table}{$joins} {$where}");
@@ -301,11 +301,15 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $path = explode('->', $value);
+        $delimiter = str_contains($value, '->>')
+            ? '->>'
+            : '->';
+
+        $path = explode($delimiter, $value);
 
         $field = $this->wrapSegments(explode('.', array_shift($path)));
 
-        return sprintf('%s->\'$.%s\'', $field, collect($path)->map(function ($part) {
+        return sprintf('%s'.$delimiter.'\'$.%s\'', $field, collect($path)->map(function ($part) {
             return '"'.$part.'"';
         })->implode('.'));
     }

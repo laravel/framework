@@ -8,6 +8,7 @@ use Illuminate\Database\Query\Builder;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression as Raw;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseQueryBuilderTest extends TestCase
 {
@@ -1372,6 +1373,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
 
         $builder = $this->getBuilder();
+        $eloquentBuilder = new EloquentBuilder($this->getBuilder()->from('contacts'));
+        $builder->from('users')->joinSub($eloquentBuilder, 'sub', 'users.id', '=', 'sub.id');
+        $this->assertEquals('select * from "users" inner join (select * from "contacts") as "sub" on "users"."id" = "sub"."id"', $builder->toSql());
+
+        $builder = $this->getBuilder();
         $sub1 = $this->getBuilder()->from('contacts')->where('name', 'foo');
         $sub2 = $this->getBuilder()->from('contacts')->where('name', 'bar');
         $builder->from('users')
@@ -2015,6 +2021,15 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->select('*')->from('users')->where('items->available', '=', true)->where('items->active', '=', false)->where('items->number_available', '=', 0);
         $this->assertEquals('select * from `users` where `items`->\'$."available"\' = true and `items`->\'$."active"\' = false and `items`->\'$."number_available"\' = ?', $builder->toSql());
+    }
+
+    public function testMySqlWrappingJsonWithoutQuote()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('items->>sku', '=', 'foo-bar');
+        $this->assertEquals('select * from `users` where `items`->>\'$."sku"\' = ?', $builder->toSql());
+        $this->assertCount(1, $builder->getRawBindings()['where']);
+        $this->assertEquals('foo-bar', $builder->getRawBindings()['where'][0]);
     }
 
     public function testMySqlWrappingJson()
@@ -2830,12 +2845,10 @@ class DatabaseQueryBuilderTest extends TestCase
      */
     protected function getMockQueryBuilder()
     {
-        $builder = m::mock('Illuminate\Database\Query\Builder', [
+        return m::mock('Illuminate\Database\Query\Builder', [
             m::mock('Illuminate\Database\ConnectionInterface'),
             new \Illuminate\Database\Query\Grammars\Grammar,
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ])->makePartial();
-
-        return $builder;
     }
 }

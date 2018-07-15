@@ -15,6 +15,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     public function setUp()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $db = new DB;
 
         $db->addConnection([
@@ -84,6 +86,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function tearDown()
     {
+        Carbon::setTestNow(null);
+
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
