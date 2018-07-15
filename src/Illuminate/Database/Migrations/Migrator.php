@@ -71,20 +71,6 @@ class Migrator
     }
 
     /**
-     * Set output.
-     *
-     * @param \Illuminate\Console\OutputStyle $output
-     *
-     * @return $this
-     */
-    public function setOutput(OutputStyle $output)
-    {
-        $this->output = $output;
-
-        return $this;
-    }
-
-    /**
      * Run the pending migrations at a given path.
      *
      * @param  array|string  $paths
@@ -581,7 +567,20 @@ class Migrator
     }
 
     /**
-     * Raise a note event for the migrator.
+     * Set the output implementation that should be used by the console.
+     *
+     * @param  \Illuminate\Console\OutputStyle  $output
+     * @return $this
+     */
+    public function setOutput(OutputStyle $output)
+    {
+        $this->output = $output;
+
+        return $this;
+    }
+
+    /**
+     * Write a note to the conosle's output.
      *
      * @param  string  $message
      * @return void
