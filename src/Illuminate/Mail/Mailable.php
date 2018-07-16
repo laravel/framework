@@ -12,7 +12,6 @@ use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Contracts\Queue\Factory as Queue;
-use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
@@ -120,6 +119,13 @@ class Mailable implements MailableContract, Renderable
     public $rawAttachments = [];
 
     /**
+     * The attachments from a storage disk.
+     *
+     * @var array
+     */
+    public $diskAttachments = [];
+
+    /**
      * The callbacks for the message.
      *
      * @var array
@@ -134,9 +140,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function send(MailerContract $mailer)
     {
-        $translator = Container::getInstance()->make(Translator::class);
-
-        $this->withLocale($this->locale, $translator, function () use ($mailer) {
+        $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
 
             $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
@@ -348,7 +352,30 @@ class Mailable implements MailableContract, Renderable
             );
         }
 
+        $this->buildDiskAttachments($message);
+
         return $this;
+    }
+
+    /**
+     * Add all of the disk attachments to the message.
+     *
+     * @param  \Illuminate\Mail\Message  $message
+     * @return void
+     */
+    protected function buildDiskAttachments($message)
+    {
+        foreach ($this->diskAttachments as $attachment) {
+            $storage = Container::getInstance()->make(
+                FilesystemFactory::class
+            )->disk($attachment['disk']);
+
+            return $message->attachData(
+                $storage->get($attachment['path']),
+                $attachment['name'] ?? basename($attachment['path']),
+                array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
+            );
+        }
     }
 
     /**
@@ -728,12 +755,14 @@ class Mailable implements MailableContract, Renderable
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
     {
-        $storage = Container::getInstance()->make(FilesystemFactory::class)->disk($disk);
+        $this->diskAttachments[] = [
+            'disk' => $disk,
+            'path' => $path,
+            'name' => $name ?? basename($path),
+            'options' => $options,
+        ];
 
-        return $this->attachData(
-            $storage->get($path), $name ?? basename($path),
-            array_merge(['mime' => $storage->mimeType($path)], $options)
-        );
+        return $this;
     }
 
     /**
@@ -776,7 +805,7 @@ class Mailable implements MailableContract, Renderable
     public function __call($method, $parameters)
     {
         if (Str::startsWith($method, 'with')) {
-            return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
+            return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 
         throw new BadMethodCallException(sprintf(

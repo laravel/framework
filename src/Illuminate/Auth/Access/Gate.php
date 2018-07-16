@@ -2,6 +2,9 @@
 
 namespace Illuminate\Auth\Access;
 
+use Exception;
+use ReflectionClass;
+use ReflectionFunction;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -108,7 +111,7 @@ class Gate implements GateContract
     {
         if (is_callable($callback)) {
             $this->abilities[$ability] = $callback;
-        } elseif (is_string($callback) && Str::contains($callback, '@')) {
+        } elseif (is_string($callback)) {
             $this->abilities[$ability] = $this->buildAbilityCallback($ability, $callback);
         } else {
             throw new InvalidArgumentException("Callback must be a callable or a 'Class@method' string.");
@@ -151,7 +154,11 @@ class Gate implements GateContract
     protected function buildAbilityCallback($ability, $callback)
     {
         return function () use ($ability, $callback) {
-            list($class, $method) = Str::parseCallback($callback);
+            if (Str::contains($callback, '@')) {
+                [$class, $method] = Str::parseCallback($callback);
+            } else {
+                $class = $callback;
+            }
 
             $policy = $this->resolvePolicy($class);
 
@@ -167,7 +174,9 @@ class Gate implements GateContract
                 return $result;
             }
 
-            return $policy->{$method}(...func_get_args());
+            return isset($method)
+                    ? $policy->{$method}(...func_get_args())
+                    : $policy(...func_get_args());
         };
     }
 
@@ -296,7 +305,8 @@ class Gate implements GateContract
      */
     protected function raw($ability, $arguments = [])
     {
-        if (! $user = $this->resolveUser()) {
+        if (! ($user = $this->resolveUser()) &&
+            ! $this->allowsGuests($ability, Arr::wrap($arguments))) {
             return false;
         }
 
@@ -321,6 +331,106 @@ class Gate implements GateContract
         );
 
         return $result;
+    }
+
+    /**
+     * Determine if the given ability allows guests.
+     *
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function allowsGuests($ability, $arguments)
+    {
+        if (isset($arguments[0]) &&
+            ! is_null($policy = $this->getPolicyFor($arguments[0]))) {
+            return $this->policyAllowsGuests($policy, $ability, $arguments);
+        }
+
+        if (isset($this->abilities[$ability])) {
+            return $this->abilityAllowsGuests($ability, $arguments);
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the given policy method allows guests.
+     *
+     * @param  string  $policy
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function policyAllowsGuests($policy, $ability, $arguments)
+    {
+        return $this->methodAllowsGuests(
+            $policy, $this->formatAbilityToMethod($ability)
+        );
+    }
+
+    /**
+     * Determine if the given class method allows guests.
+     *
+     * @param  string  $class
+     * @param  string  $method
+     * @return bool
+     */
+    protected function methodAllowsGuests($class, $method)
+    {
+        try {
+            $reflection = new ReflectionClass($class);
+
+            $method = $reflection->getMethod($method);
+        } catch (Exception $e) {
+            return false;
+        }
+
+        if ($method) {
+            $parameters = $method->getParameters();
+
+            return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
+        }
+
+        return false;
+    }
+
+    /**
+     * Determine if the ability allows guests.
+     *
+     * @param  string  $ability
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function abilityAllowsGuests($ability, $arguments)
+    {
+        return $this->callbackAllowsGuests($this->abilities[$ability]);
+    }
+
+    /**
+     * Determine if the callback allows guests.
+     *
+     * @param  callable  $callback
+     * @param  array  $arguments
+     * @return bool
+     */
+    protected function callbackAllowsGuests($callback)
+    {
+        $parameters = (new ReflectionFunction($callback))->getParameters();
+
+        return isset($parameters[0]) && $this->parameterAllowsGuests($parameters[0]);
+    }
+
+    /**
+     * Determine if the given parameter allows guests.
+     *
+     * @param  \ReflectionParameter  $parameter
+     * @return bool
+     */
+    protected function parameterAllowsGuests($parameter)
+    {
+        return ($parameter->getClass() && $parameter->allowsNull()) ||
+               ($parameter->isDefaultValueAvailable() && is_null($parameter->getDefaultValue()));
     }
 
     /**
@@ -351,6 +461,10 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability], [$arguments]);
 
         foreach ($this->beforeCallbacks as $before) {
+            if (is_null($user) && ! $this->callbackAllowsGuests($before)) {
+                continue;
+            }
+
             if (! is_null($result = $before(...$arguments))) {
                 return $result;
             }
@@ -371,6 +485,10 @@ class Gate implements GateContract
         $arguments = array_merge([$user, $ability, $result], [$arguments]);
 
         foreach ($this->afterCallbacks as $after) {
+            if (is_null($user) && ! $this->callbackAllowsGuests($after)) {
+                continue;
+            }
+
             $after(...$arguments);
         }
     }
@@ -494,7 +612,8 @@ class Gate implements GateContract
      */
     protected function callPolicyBefore($policy, $user, $ability, $arguments)
     {
-        if (method_exists($policy, 'before')) {
+        if (method_exists($policy, 'before') &&
+            (! is_null($user) || $this->methodAllowsGuests($policy, 'before'))) {
             return $policy->before($user, $ability, ...$arguments);
         }
     }

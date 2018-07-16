@@ -29,4 +29,28 @@ class HasherTest extends TestCase
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
     }
+
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testBasicBcryptVerification()
+    {
+        if (! defined('PASSWORD_ARGON2I')) {
+            $this->markTestSkipped('PHP not compiled with argon2 hashing support.');
+        }
+
+        $argonHasher = new \Illuminate\Hashing\ArgonHasher;
+        $argonHashed = $argonHasher->make('password');
+        (new \Illuminate\Hashing\BcryptHasher)->check('password', $argonHashed);
+    }
+
+    /**
+     * @expectedException \Exception
+     */
+    public function testBasicArgonVerification()
+    {
+        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher;
+        $bcryptHashed = $bcryptHasher->make('password');
+        (new \Illuminate\Hashing\ArgonHasher)->check('password', $bcryptHashed);
+    }
 }
