@@ -602,6 +602,20 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->hasRule('bar', 'Required'));
     }
 
+    public function testValidateAllowedWithout()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['phone' => '911'], ['phone' => 'allowed_without:email']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['phone' => '911', 'email' => 'unnecessary@email.com'], ['phone' => 'allowed_without:email']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['phone' => null, 'email' => null], ['phone' => 'allowed_without:email']);
+        $this->assertFalse($v->passes());
+    }
+
     public function testValidateArray()
     {
         $trans = $this->getIlluminateArrayTranslator();
