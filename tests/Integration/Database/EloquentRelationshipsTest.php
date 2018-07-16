@@ -22,7 +22,6 @@ class EloquentRelationshipsTest extends TestCase
 {
     /**
      * @test
-     * @group f
      */
     public function standard_relationships()
     {
@@ -41,7 +40,6 @@ class EloquentRelationshipsTest extends TestCase
 
     /**
      * @test
-     * @group f
      */
     public function overridden_relationships()
     {
