@@ -37,14 +37,23 @@ class PusherBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user()) {
-            throw new AccessDeniedHttpException;
+        $channelName = Str::startsWith($request->channel_name, 'private-')
+            ? Str::replaceFirst('private-', '', $request->channel_name)
+            : Str::replaceFirst('presence-', '', $request->channel_name);
+
+        $options = [];
+        foreach ($this->channelsOptions as $pattern => $opts) {
+            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channelName)) {
+                continue;
+            }
+
+            $options = $opts;
         }
 
-        $channelName = Str::startsWith($request->channel_name, 'private-')
-                            ? Str::replaceFirst('private-', '', $request->channel_name)
-                            : Str::replaceFirst('presence-', '', $request->channel_name);
+        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
+            ! $request->user($options['guard'] ?? null)) {
+            throw new AccessDeniedHttpException;
+        }
 
         return parent::verifyUserCanAccessChannel(
             $request, $channelName
