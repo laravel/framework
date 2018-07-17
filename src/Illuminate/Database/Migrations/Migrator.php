@@ -587,6 +587,8 @@ class Migrator
      */
     protected function note($message)
     {
-        $this->output->writeln($message);
+        if ($this->output) {
+            $this->output->writeln($message);
+        }
     }
 }
