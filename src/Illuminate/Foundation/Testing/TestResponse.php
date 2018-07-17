@@ -541,13 +541,10 @@ class TestResponse
     }
 
     /**
-     * TestResponse::assertJsonFragment and TestResponse::assertJsonMissing search for
-     * JSON encoded strings in the Response. This function returns the set of strings to
-     * be searched for in the response, explicitly adding all of the possible characters
-     * which could follow $value in the response.
+     * Get the strings we need to search for when examining the JSON.
      *
-     * @param $key
-     * @param $value
+     * @param  string  $key
+     * @param  string  $value
      * @return array
      */
     protected function jsonSearchStrings($key, $value)
