@@ -30,9 +30,9 @@ class FileFactory
      */
     public function image($name, $width = 10, $height = 10)
     {
-        $type = Str::endsWith($name, ['.jpg', '.jpeg']) ? 'jpeg' : 'png';
-
-        return new File($name, $this->generateImage($width, $height, $type));
+        return new File($name, $this->generateImage(
+            $width, $height, Str::endsWith(Str::lower($name), ['.jpg', '.jpeg']) ? 'jpeg' : 'png'
+        ));
     }
 
     /**
@@ -40,6 +40,7 @@ class FileFactory
      *
      * @param  int  $width
      * @param  int  $height
+     * @param  string  $type
      * @return resource
      */
     protected function generateImage($width, $height, $type)
