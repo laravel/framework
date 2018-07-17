@@ -11,7 +11,14 @@ class MigratorTest extends TestCase
         $app['config']->set('app.debug', 'true');
 
         $app['config']->set('database.default', 'testbench');
+
         $app['config']->set('database.connections.testbench', [
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => '',
+        ]);
+
+        $app['config']->set('database.connections.tenant', [
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => '',
@@ -30,6 +37,28 @@ class MigratorTest extends TestCase
         $migrator->run([__DIR__.'/fixtures']);
 
         $this->assertTrue($this->tableExists('members'));
+    }
+
+    /**
+     * @test
+     */
+    public function migrator_will_not_modify_the_default_database_connection()
+    {
+        $migrator = $this->app->make('migrator');
+
+        $migrator->setConnection('tenant');
+
+        $migrator->getRepository()->createRepository();
+
+        $migrator->run([__DIR__.'/fixtures']);
+
+        $databaseManager = $this->app->make('db');
+
+        $connection = $databaseManager->connection();
+
+        $this->assertSame('testbench', $this->app['config']->get('database.default'));
+
+        $this->assertSame('testbench', $connection->getName());
     }
 
     private function tableExists($table): bool
