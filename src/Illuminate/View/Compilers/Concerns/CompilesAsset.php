@@ -7,8 +7,7 @@ trait CompilesAsset
     /**
      * Generate an asset path for the application.
      *
-     * @param  string  $path
-     * @param  bool    $secure
+     * @param  string  $arguments
      * @return string
      */
     protected function compileAsset($arguments)
