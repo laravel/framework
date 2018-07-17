@@ -7,7 +7,8 @@ use Illuminate\Support\Str;
 
 class BladeCompiler extends Compiler implements CompilerInterface
 {
-    use Concerns\CompilesAuthorizations,
+    use Concerns\CompilesAsset,
+        Concerns\CompilesAuthorizations,
         Concerns\CompilesComments,
         Concerns\CompilesComponents,
         Concerns\CompilesConditionals,
