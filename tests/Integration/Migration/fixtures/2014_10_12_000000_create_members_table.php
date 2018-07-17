@@ -1,5 +1,7 @@
 <?php
 
+namespace Illuminate\Tests\Integration\Migration\fixtures;
+
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
