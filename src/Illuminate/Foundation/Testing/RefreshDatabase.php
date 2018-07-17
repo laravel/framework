@@ -52,11 +52,11 @@ trait RefreshDatabase
         if (! RefreshDatabaseState::$migrated) {
             $options = [];
 
-            if( $this->shouldDropViews()       ) {
+            if ($this->shouldDropViews()) {
                 $options['--drop-views'] = true;
             }
 
-            if( $this->shouldSeedWithRefresh() ) {
+            if ($this->shouldSeedWithRefresh()) {
                 $options['--seed'] = true;
             }
 
