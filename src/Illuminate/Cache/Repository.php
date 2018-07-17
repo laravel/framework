@@ -182,7 +182,7 @@ class Repository implements CacheContract, ArrayAccess
      *
      * @param  string  $key
      * @param  mixed   $value
-     * @param  \DateTimeInterface|\DateInterval|float|int  $minutes
+     * @param  \DateTimeInterface|\DateInterval|float|int|null  $minutes
      * @return void
      */
     public function put($key, $value, $minutes = null)
@@ -419,7 +419,7 @@ class Repository implements CacheContract, ArrayAccess
             throw new BadMethodCallException('This cache store does not support tagging.');
         }
 
-        $cache = $this->store->tags($names);
+        $cache = $this->store->tags(is_array($names) ? $names : func_get_args());
 
         if (! is_null($this->events)) {
             $cache->setEventDispatcher($this->events);

@@ -201,7 +201,7 @@ class Mailer implements MailerContract, MailQueueContract
 
         $data['message'] = $this->createMessage();
 
-        return $this->renderView($view, $data);
+        return $this->renderView($view ?: $plain, $data);
     }
 
     /**

@@ -21,17 +21,11 @@ class RoutingServiceProvider extends ServiceProvider
     public function register()
     {
         $this->registerRouter();
-
         $this->registerUrlGenerator();
-
         $this->registerRedirector();
-
         $this->registerPsrRequest();
-
         $this->registerPsrResponse();
-
         $this->registerResponseFactory();
-
         $this->registerControllerDispatcher();
     }
 
@@ -68,8 +62,15 @@ class RoutingServiceProvider extends ServiceProvider
                 )
             );
 
+            // Next we will set a few service resolvers on the URL generator so it can
+            // get the information it needs to function. This just provides some of
+            // the convenience features to this URL generator like "signed" URLs.
             $url->setSessionResolver(function () {
                 return $this->app['session'];
+            });
+
+            $url->setKeyResolver(function () {
+                return $this->app->make('config')->get('app.key');
             });
 
             // If the route collection is "rebound", for example, when the routes stay

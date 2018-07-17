@@ -498,6 +498,14 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['products' => ['desk' => ['price' => 200]]], $array);
     }
 
+    public function testShuffleWithSeed()
+    {
+        $this->assertEquals(
+            Arr::shuffle(range(0, 100, 10), 1234),
+            Arr::shuffle(range(0, 100, 10), 1234)
+        );
+    }
+
     public function testSort()
     {
         $unsorted = [

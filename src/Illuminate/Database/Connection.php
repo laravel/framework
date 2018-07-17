@@ -504,7 +504,7 @@ class Connection implements ConnectionInterface
             }
 
             $this->recordsHaveBeenModified(
-                $change = ($this->getPdo()->exec($query) === false ? false : true)
+                $change = $this->getPdo()->exec($query) !== false
             );
 
             return $change;
@@ -929,7 +929,7 @@ class Connection implements ConnectionInterface
             return $this->getPdo();
         }
 
-        if ($this->getConfig('sticky') && $this->recordsModified) {
+        if ($this->recordsModified && $this->getConfig('sticky')) {
             return $this->getPdo();
         }
 
@@ -958,7 +958,7 @@ class Connection implements ConnectionInterface
     /**
      * Set the PDO connection used for reading.
      *
-     * @param  \PDO||\Closure|null  $pdo
+     * @param  \PDO|\Closure|null  $pdo
      * @return $this
      */
     public function setReadPdo($pdo)
@@ -1094,6 +1094,16 @@ class Connection implements ConnectionInterface
     public function setEventDispatcher(Dispatcher $events)
     {
         $this->events = $events;
+    }
+
+    /**
+     * Unset the event dispatcher for this connection.
+     *
+     * @return void
+     */
+    public function unsetEventDispatcher()
+    {
+        $this->events = null;
     }
 
     /**

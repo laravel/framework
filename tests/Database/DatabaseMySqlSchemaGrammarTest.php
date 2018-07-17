@@ -28,7 +28,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
+        $this->assertEquals("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->increments('id');
@@ -58,7 +58,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
+        $this->assertEquals("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB", $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -73,7 +73,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate utf8_unicode_ci engine = InnoDB', $statements[0]);
+        $this->assertEquals("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8 collate 'utf8_unicode_ci' engine = InnoDB", $statements[0]);
     }
 
     public function testCharsetCollationCreateTable()
@@ -91,7 +91,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate utf8mb4_unicode_ci', $statements[0]);
+        $this->assertEquals("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) not null) default character set utf8mb4 collate 'utf8mb4_unicode_ci'", $statements[0]);
 
         $blueprint = new Blueprint('users');
         $blueprint->create();
@@ -106,7 +106,7 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statements = $blueprint->toSql($conn, $this->getGrammar());
 
         $this->assertCount(1, $statements);
-        $this->assertEquals('create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate utf8mb4_unicode_ci not null) default character set utf8 collate utf8_unicode_ci', $statements[0]);
+        $this->assertEquals("create table `users` (`id` int unsigned not null auto_increment primary key, `email` varchar(255) character set utf8mb4 collate 'utf8mb4_unicode_ci' not null) default character set utf8 collate 'utf8_unicode_ci'", $statements[0]);
     }
 
     public function testBasicCreateTableWithPrefix()
@@ -258,6 +258,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` drop `created_at`, drop `updated_at`', $statements[0]);
     }
 
+    public function testDropMorphs()
+    {
+        $blueprint = new Blueprint('photos');
+        $blueprint->dropMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `photos` drop index `photos_imageable_type_imageable_id_index`', $statements[0]);
+        $this->assertEquals('alter table `photos` drop `imageable_type`, drop `imageable_id`', $statements[1]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
@@ -266,6 +277,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('rename table `users` to `foo`', $statements[0]);
+    }
+
+    public function testRenameIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` rename index `foo` to `bar`', $statements[0]);
     }
 
     public function testAddingPrimaryKey()
@@ -918,6 +939,25 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $statement = $this->getGrammar()->compileDropAllTables(['alpha', 'beta', 'gamma']);
 
         $this->assertEquals('drop table `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testDropAllViews()
+    {
+        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop view `alpha`,`beta`,`gamma`', $statement);
+    }
+
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
     }
 
     protected function getConnection()

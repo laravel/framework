@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Foundation\Http\Middleware;
+namespace Illuminate\Tests\Foundation\Testing\Concerns;
 
 use Orchestra\Testbench\TestCase;
 

@@ -49,7 +49,7 @@ trait SoftDeletes
         if ($this->forceDeleting) {
             $this->exists = false;
 
-            return $this->newQueryWithoutScopes()->where($this->getKeyName(), $this->getKey())->forceDelete();
+            return $this->newModelQuery()->where($this->getKeyName(), $this->getKey())->forceDelete();
         }
 
         return $this->runSoftDelete();
@@ -62,7 +62,7 @@ trait SoftDeletes
      */
     protected function runSoftDelete()
     {
-        $query = $this->newQueryWithoutScopes()->where($this->getKeyName(), $this->getKey());
+        $query = $this->newModelQuery()->where($this->getKeyName(), $this->getKey());
 
         $time = $this->freshTimestamp();
 
@@ -76,7 +76,9 @@ trait SoftDeletes
             $columns[$this->getUpdatedAtColumn()] = $this->fromDateTime($time);
         }
 
-        $query->update($columns);
+        if ($query->update($columns)) {
+            $this->syncOriginal();
+        }
     }
 
     /**

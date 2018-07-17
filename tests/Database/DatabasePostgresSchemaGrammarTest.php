@@ -173,6 +173,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" drop column "created_at", drop column "updated_at"', $statements[0]);
     }
 
+    public function testDropMorphs()
+    {
+        $blueprint = new Blueprint('photos');
+        $blueprint->dropMorphs('imageable');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('drop index "photos_imageable_type_imageable_id_index"', $statements[0]);
+        $this->assertEquals('alter table "photos" drop column "imageable_type", drop column "imageable_id"', $statements[1]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
@@ -181,6 +192,16 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "users" rename to "foo"', $statements[0]);
+    }
+
+    public function testRenameIndex()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->renameIndex('foo', 'bar');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter index "foo" rename to "bar"', $statements[0]);
     }
 
     public function testAddingPrimaryKey()
@@ -769,6 +790,13 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
         $this->assertEquals('drop table "alpha","beta","gamma" cascade', $statement);
     }
 
+    public function testDropAllViewsEscapesTableNames()
+    {
+        $statement = $this->getGrammar()->compileDropAllViews(['alpha', 'beta', 'gamma']);
+
+        $this->assertEquals('drop view "alpha","beta","gamma" cascade', $statement);
+    }
+
     protected function getConnection()
     {
         return m::mock('Illuminate\Database\Connection');
@@ -777,5 +805,17 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
     public function getGrammar()
     {
         return new \Illuminate\Database\Schema\Grammars\PostgresGrammar;
+    }
+
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
     }
 }

@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 /**
  * @group integration
@@ -26,7 +27,7 @@ class ThrottleRequestsTest extends TestCase
 
     public function test_lock_opens_immediately_after_decay()
     {
-        Carbon::setTestNow(null);
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 0));
 
         Route::get('/', function () {
             return 'yes';
@@ -42,13 +43,12 @@ class ThrottleRequestsTest extends TestCase
         $this->assertEquals(2, $response->headers->get('X-RateLimit-Limit'));
         $this->assertEquals(0, $response->headers->get('X-RateLimit-Remaining'));
 
-        Carbon::setTestNow(
-            Carbon::now()->addSeconds(58)
-        );
+        Carbon::setTestNow(Carbon::create(2018, 1, 1, 0, 0, 58));
 
         try {
             $this->withoutExceptionHandling()->get('/');
         } catch (Throwable $e) {
+            $this->assertInstanceOf(ThrottleRequestsException::class, $e);
             $this->assertEquals(429, $e->getStatusCode());
             $this->assertEquals(2, $e->getHeaders()['X-RateLimit-Limit']);
             $this->assertEquals(0, $e->getHeaders()['X-RateLimit-Remaining']);

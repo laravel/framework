@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Exception;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
@@ -173,6 +174,16 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonFragment(['foobar' => ['foobar_foo' => 'foo', 'foobar_bar' => 'bar']]);
 
         $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
+
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub()));
+
+        $response->assertJsonFragment(['id' => 10]);
+
+        try {
+            $response->assertJsonFragment(['id' => 1]);
+            $this->fail('Asserting id => 1, existsing in JsonSerializableSingleResourceWithIntegersStub should fail');
+        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        }
     }
 
     public function testAssertJsonStructure()
@@ -214,6 +225,47 @@ class FoundationTestResponseTest extends TestCase
         // Without structure
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
         $response->assertJsonCount(4);
+    }
+
+    public function testAssertJsonMissing()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonMissing(['id' => 2]);
+    }
+
+    public function testAssertJsonMissingValidationErrors()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['errors' => [
+                    'foo' => [],
+                    'bar' => ['one', 'two'],
+                ]]
+            ));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertJsonMissingValidationErrors('foo');
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        try {
+            $response->assertJsonMissingValidationErrors('bar');
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        $response->assertJsonMissingValidationErrors('baz');
+
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['foo' => 'bar']));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response->assertJsonMissingValidationErrors('foo');
     }
 
     public function testMacroable()
@@ -292,6 +344,18 @@ class JsonSerializableSingleResourceStub implements JsonSerializable
             ['foo' => 'foo 1', 'bar' => 'bar 1', 'foobar' => 'foobar 1'],
             ['foo' => 'foo 2', 'bar' => 'bar 2', 'foobar' => 'foobar 2'],
             ['foo' => 'foo 3', 'bar' => 'bar 3', 'foobar' => 'foobar 3'],
+        ];
+    }
+}
+
+class JsonSerializableSingleResourceWithIntegersStub implements JsonSerializable
+{
+    public function jsonSerialize()
+    {
+        return [
+            ['id' => 10, 'foo' => 'bar'],
+            ['id' => 20, 'foo' => 'bar'],
+            ['id' => 30, 'foo' => 'bar'],
         ];
     }
 }

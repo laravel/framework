@@ -204,7 +204,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function putFileAs($path, $file, $name, $options = [])
     {
-        $stream = fopen($file->getRealPath(), 'r+');
+        $stream = fopen($file->getRealPath(), 'r');
 
         // Next, we will format the path of the file and store the file using a stream since
         // they provide better performance than alternatives. Once we write the file this
@@ -379,6 +379,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
 
         if (method_exists($adapter, 'getUrl')) {
             return $adapter->getUrl($path);
+        } elseif (method_exists($this->driver, 'getUrl')) {
+            return $this->driver->getUrl($path);
         } elseif ($adapter instanceof AwsS3Adapter) {
             return $this->getAwsUrl($adapter, $path);
         } elseif ($adapter instanceof RackspaceAdapter) {

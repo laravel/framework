@@ -235,6 +235,20 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
+     * Load a set of relationships onto the mixed relationship collection.
+     *
+     * @param  string $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorph($relation, $relations)
+    {
+        $this->getCollection()->loadMorph($relation, $relations);
+
+        return $this;
+    }
+
+    /**
      * Get the slice of items being paginated.
      *
      * @return array
@@ -469,7 +483,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Determine if the list of items is empty or not.
+     * Determine if the list of items is empty.
      *
      * @return bool
      */

@@ -15,7 +15,7 @@ class MySqlGrammar extends Grammar
      */
     protected $modifiers = [
         'Unsigned', 'VirtualAs', 'StoredAs', 'Charset', 'Collate', 'Nullable',
-        'Default', 'Increment', 'Comment', 'After', 'First',
+        'Default', 'Increment', 'Comment', 'After', 'First', 'Srid',
     ];
 
     /**
@@ -114,9 +114,9 @@ class MySqlGrammar extends Grammar
         // added to either this create table blueprint or the configuration for this
         // connection that the query is targeting. We'll add it to this SQL query.
         if (isset($blueprint->collation)) {
-            $sql .= ' collate '.$blueprint->collation;
+            $sql .= " collate '{$blueprint->collation}'";
         } elseif (! is_null($collation = $connection->getConfig('collation'))) {
-            $sql .= ' collate '.$collation;
+            $sql .= " collate '{$collation}'";
         }
 
         return $sql;
@@ -343,6 +343,22 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a rename index command.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param  \Illuminate\Support\Fluent $command
+     * @return string
+     */
+    public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
+    {
+        return sprintf('alter table %s rename index %s to %s',
+            $this->wrapTable($blueprint),
+            $this->wrap($command->from),
+            $this->wrap($command->to)
+        );
+    }
+
+    /**
      * Compile the SQL needed to drop all tables.
      *
      * @param  array  $tables
@@ -354,6 +370,17 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile the SQL needed to drop all views.
+     *
+     * @param  array  $views
+     * @return string
+     */
+    public function compileDropAllViews($views)
+    {
+        return 'drop view '.implode(',', $this->wrapArray($views));
+    }
+
+    /**
      * Compile the SQL needed to retrieve all table names.
      *
      * @return string
@@ -361,6 +388,16 @@ class MySqlGrammar extends Grammar
     public function compileGetAllTables()
     {
         return 'SHOW FULL TABLES WHERE table_type = \'BASE TABLE\'';
+    }
+
+    /**
+     * Compile the SQL needed to retrieve all view names.
+     *
+     * @return string
+     */
+    public function compileGetAllViews()
+    {
+        return 'SHOW FULL TABLES WHERE table_type = \'VIEW\'';
     }
 
     /**
@@ -862,7 +899,7 @@ class MySqlGrammar extends Grammar
     protected function modifyCollate(Blueprint $blueprint, Fluent $column)
     {
         if (! is_null($column->collation)) {
-            return ' collate '.$column->collation;
+            return " collate '{$column->collation}'";
         }
     }
 
@@ -947,6 +984,20 @@ class MySqlGrammar extends Grammar
     {
         if (! is_null($column->comment)) {
             return " comment '".addslashes($column->comment)."'";
+        }
+    }
+
+    /**
+     * Get the SQL for a SRID column modifier.
+     *
+     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string|null
+     */
+    protected function modifySrid(Blueprint $blueprint, Fluent $column)
+    {
+        if (! is_null($column->srid) && is_int($column->srid) && $column->srid > 0) {
+            return ' srid '.$column->srid;
         }
     }
 

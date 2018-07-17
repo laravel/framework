@@ -4,6 +4,7 @@ namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use Cron\CronExpression;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
@@ -144,7 +145,7 @@ class Event
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Console\Scheduling\Mutex  $mutex
+     * @param  \Illuminate\Console\Scheduling\EventMutex  $mutex
      * @param  string  $command
      * @return void
      */
@@ -377,7 +378,7 @@ class Event
     {
         $this->ensureOutputIsBeingCapturedForEmail();
 
-        $addresses = is_array($addresses) ? $addresses : [$addresses];
+        $addresses = Arr::wrap($addresses);
 
         return $this->then(function (Mailer $mailer) use ($addresses, $onlyIfOutputExists) {
             $this->emailOutput($mailer, $addresses, $onlyIfOutputExists);
@@ -458,6 +459,18 @@ class Event
     }
 
     /**
+     * Register a callback to ping a given URL before the job runs if the given condition is true.
+     *
+     * @param  bool  $value
+     * @param  string  $url
+     * @return $this
+     */
+    public function pingBeforeIf($value, $url)
+    {
+        return $value ? $this->pingBefore($url) : $this;
+    }
+
+    /**
      * Register a callback to ping a given URL after the job runs.
      *
      * @param  string  $url
@@ -468,6 +481,18 @@ class Event
         return $this->then(function () use ($url) {
             (new HttpClient)->get($url);
         });
+    }
+
+    /**
+     * Register a callback to ping a given URL after the job runs if the given condition is true.
+     *
+     * @param  bool  $value
+     * @param  string  $url
+     * @return $this
+     */
+    public function thenPingIf($value, $url)
+    {
+        return $value ? $this->thenPing($url) : $this;
     }
 
     /**

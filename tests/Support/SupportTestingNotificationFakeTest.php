@@ -9,7 +9,7 @@ use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
 
-class NotificationFakeTest extends TestCase
+class SupportTestingNotificationFakeTest extends TestCase
 {
     protected function setUp()
     {
@@ -45,6 +45,39 @@ class NotificationFakeTest extends TestCase
         } catch (ExpectationFailedException $e) {
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\NotificationStub] notification was sent.'));
         }
+    }
+
+    public function testResettingNotificationId()
+    {
+        $notification = new NotificationStub();
+
+        $this->fake->send($this->user, $notification);
+
+        $id = $notification->id;
+
+        $this->fake->send($this->user, $notification);
+
+        $this->assertSame($id, $notification->id);
+
+        $notification->id = null;
+
+        $this->fake->send($this->user, $notification);
+
+        $this->assertNotNull($notification->id);
+        $this->assertNotSame($id, $notification->id);
+    }
+
+    public function testAssertTimesSent()
+    {
+        $this->fake->assertTimesSent(0, NotificationStub::class);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->send($this->user, new NotificationStub);
+
+        $this->fake->send(new UserStub, new NotificationStub);
+
+        $this->fake->assertTimesSent(3, NotificationStub::class);
     }
 }
 

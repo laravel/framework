@@ -495,6 +495,12 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testWhereInstanceOf()
+    {
+        $c = new Collection([new stdClass, new stdClass, new Collection, new stdClass]);
+        $this->assertCount(3, $c->whereInstanceOf(stdClass::class));
+    }
+
     public function testWhereIn()
     {
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => 3], ['v' => '3'], ['v' => 4]]);
@@ -2026,9 +2032,11 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(20, $c->max('foo'));
+        $this->assertEquals(20, $c->max->foo);
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
         $this->assertEquals(20, $c->max('foo'));
+        $this->assertEquals(20, $c->max->foo);
 
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(5, $c->max());
@@ -2044,9 +2052,11 @@ class SupportCollectionTest extends TestCase
             return $item->foo;
         }));
         $this->assertEquals(10, $c->min('foo'));
+        $this->assertEquals(10, $c->min->foo);
 
         $c = new Collection([['foo' => 10], ['foo' => 20]]);
         $this->assertEquals(10, $c->min('foo'));
+        $this->assertEquals(10, $c->min->foo);
 
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(1, $c->min());
@@ -2387,6 +2397,26 @@ class SupportCollectionTest extends TestCase
         );
     }
 
+    public function testHigherOrderCollectionGroupBy()
+    {
+        $collection = collect([
+            new TestSupportCollectionHigherOrderItem,
+            new TestSupportCollectionHigherOrderItem('TAYLOR'),
+            new TestSupportCollectionHigherOrderItem('foo'),
+        ]);
+
+        $this->assertEquals([
+            'taylor' => [$collection[0]],
+            'TAYLOR' => [$collection[1]],
+            'foo' => [$collection[2]],
+        ], $collection->groupBy->name->toArray());
+
+        $this->assertEquals([
+            'TAYLOR' => [$collection[0], $collection[1]],
+            'FOO' => [$collection[2]],
+        ], $collection->groupBy->uppercase()->toArray());
+    }
+
     public function testHigherOrderCollectionMap()
     {
         $person1 = (object) ['name' => 'Taylor'];
@@ -2637,11 +2667,16 @@ class SupportCollectionTest extends TestCase
 
 class TestSupportCollectionHigherOrderItem
 {
-    public $name = 'taylor';
+    public $name;
+
+    public function __construct($name = 'taylor')
+    {
+        $this->name = $name;
+    }
 
     public function uppercase()
     {
-        $this->name = strtoupper($this->name);
+        return $this->name = strtoupper($this->name);
     }
 }
 

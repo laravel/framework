@@ -142,6 +142,47 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table "users" rename to "foo"', $statements[0]);
     }
 
+    public function testRenameIndex()
+    {
+        if (! class_exists('Doctrine\DBAL\Schema\SqliteSchemaManager')) {
+            $this->markTestSkipped('Doctrine should be installed to run renameIndex tests');
+        }
+
+        $db = new \Illuminate\Database\Capsule\Manager;
+
+        $db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => 'prefix_',
+        ]);
+
+        $schema = $db->getConnection()->getSchemaBuilder();
+
+        $schema->create('users', function (Blueprint $table) {
+            $table->string('name');
+            $table->string('email');
+        });
+
+        $schema->table('users', function (Blueprint $table) {
+            $table->index(['name', 'email'], 'index1');
+        });
+
+        $manager = $db->getConnection()->getDoctrineSchemaManager();
+        $details = $manager->listTableDetails('prefix_users');
+        $this->assertTrue($details->hasIndex('index1'));
+        $this->assertFalse($details->hasIndex('index2'));
+
+        $schema->table('users', function (Blueprint $table) {
+            $table->renameIndex('index1', 'index2');
+        });
+
+        $details = $manager->listTableDetails('prefix_users');
+        $this->assertFalse($details->hasIndex('index1'));
+        $this->assertTrue($details->hasIndex('index2'));
+
+        $this->assertEquals(['name', 'email'], $details->getIndex('index2')->getUnquotedColumns());
+    }
+
     public function testAddingPrimaryKey()
     {
         $blueprint = new Blueprint('users');
@@ -716,6 +757,18 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table "geo" add column "coordinates" multipolygon not null', $statements[0]);
+    }
+
+    public function testGrammarsAreMacroable()
+    {
+        // compileReplace macro.
+        $this->getGrammar()::macro('compileReplace', function () {
+            return true;
+        });
+
+        $c = $this->getGrammar()::compileReplace();
+
+        $this->assertTrue($c);
     }
 
     protected function getConnection()

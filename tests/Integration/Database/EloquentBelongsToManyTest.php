@@ -584,6 +584,44 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertNotEquals('2017-10-10 10:10:10', Tag::find(300)->updated_at);
     }
+
+    /**
+     * @test
+     */
+    public function can_update_existing_pivot()
+    {
+        $tag = Tag::create(['name' => str_random()]);
+        $post = Post::create(['title' => str_random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+        ]);
+
+        $post->tagsWithExtraPivot()->updateExistingPivot($tag->id, ['flag' => 'exclude']);
+
+        foreach ($post->tagsWithExtraPivot as $tag) {
+            $this->assertEquals('exclude', $tag->pivot->flag);
+        }
+    }
+
+    /**
+     * @test
+     */
+    public function can_update_existing_pivot_using_model()
+    {
+        $tag = Tag::create(['name' => str_random()]);
+        $post = Post::create(['title' => str_random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+        ]);
+
+        $post->tagsWithExtraPivot()->updateExistingPivot($tag, ['flag' => 'exclude']);
+
+        foreach ($post->tagsWithExtraPivot as $tag) {
+            $this->assertEquals('exclude', $tag->pivot->flag);
+        }
+    }
 }
 
 class Post extends Model
@@ -599,6 +637,12 @@ class Post extends Model
             ->withPivot('flag')
             ->withTimestamps()
             ->wherePivot('flag', '<>', 'exclude');
+    }
+
+    public function tagsWithExtraPivot()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id')
+            ->withPivot('flag');
     }
 
     public function touchingTags()

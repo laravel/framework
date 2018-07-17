@@ -102,4 +102,19 @@ class EncrypterTest extends TestCase
         $b = new Encrypter(str_repeat('b', 16));
         $b->decrypt($a->encrypt('baz'));
     }
+
+    /**
+     * @expectedException \Illuminate\Contracts\Encryption\DecryptException
+     * @expectedExceptionMessage The payload is invalid.
+     */
+    public function testExceptionThrownWhenIvIsTooLong()
+    {
+        $e = new Encrypter(str_repeat('a', 16));
+        $payload = $e->encrypt('foo');
+        $data = json_decode(base64_decode($payload), true);
+        $data['iv'] .= $data['value'][0];
+        $data['value'] = substr($data['value'], 1);
+        $modified_payload = base64_encode(json_encode($data));
+        $e->decrypt($modified_payload);
+    }
 }

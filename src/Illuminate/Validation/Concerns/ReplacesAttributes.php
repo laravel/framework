@@ -249,6 +249,62 @@ trait ReplacesAttributes
     }
 
     /**
+     * Replace all place-holders for the gt rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceGt($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
+    }
+
+    /**
+     * Replace all place-holders for the lt rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceLt($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
+    }
+
+    /**
+     * Replace all place-holders for the gte rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceGte($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
+    }
+
+    /**
+     * Replace all place-holders for the lte rule.
+     *
+     * @param  string  $message
+     * @param  string  $attribute
+     * @param  string  $rule
+     * @param  array   $parameters
+     * @return string
+     */
+    protected function replaceLte($message, $attribute, $rule, $parameters)
+    {
+        return str_replace(':value', $this->getSize($parameters[0], $this->getValue($parameters[0])), $message);
+    }
+
+    /**
      * Replace all place-holders for the required_if rule.
      *
      * @param  string  $message
@@ -277,9 +333,15 @@ trait ReplacesAttributes
      */
     protected function replaceRequiredUnless($message, $attribute, $rule, $parameters)
     {
-        $other = $this->getDisplayableAttribute(array_shift($parameters));
+        $other = $this->getDisplayableAttribute($parameters[0]);
 
-        return str_replace([':other', ':values'], [$other, implode(', ', $parameters)], $message);
+        $values = [];
+
+        foreach (array_slice($parameters, 1) as $value) {
+            $values[] = $this->getDisplayableValue($parameters[0], $value);
+        }
+
+        return str_replace([':other', ':values'], [$other, implode(', ', $values)], $message);
     }
 
     /**

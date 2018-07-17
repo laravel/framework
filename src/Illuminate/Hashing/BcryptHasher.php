@@ -5,7 +5,7 @@ namespace Illuminate\Hashing;
 use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 
-class BcryptHasher implements HasherContract
+class BcryptHasher extends AbstractHasher implements HasherContract
 {
     /**
      * The default cost factor.
@@ -15,14 +15,14 @@ class BcryptHasher implements HasherContract
     protected $rounds = 10;
 
     /**
-     * Get information about the given hashed value.
+     * Create a new hasher instance.
      *
-     * @param  string  $hashedValue
-     * @return array
+     * @param  array  $options
+     * @return void
      */
-    public function info($hashedValue)
+    public function __construct(array $options = [])
     {
-        return password_get_info($hashedValue);
+        $this->rounds = $options['rounds'] ?? $this->rounds;
     }
 
     /**
@@ -45,23 +45,6 @@ class BcryptHasher implements HasherContract
         }
 
         return $hash;
-    }
-
-    /**
-     * Check the given plain value against a hash.
-     *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array   $options
-     * @return bool
-     */
-    public function check($value, $hashedValue, array $options = [])
-    {
-        if (strlen($hashedValue) === 0) {
-            return false;
-        }
-
-        return password_verify($value, $hashedValue);
     }
 
     /**

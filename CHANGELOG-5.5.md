@@ -1,5 +1,52 @@
 # Release Notes for 5.5.x
 
+## v5.5.40 (2018-03-30)
+
+### Changed
+- Only set id on `NotificationFake` if no id is set ([#23474](https://github.com/laravel/framework/pull/23474))
+- Removed attribute filling from pivot models ([#23554](https://github.com/laravel/framework/pull/23554))
+
+### Fixed
+- Fixed to not mistakenly release mutex ([#23607](https://github.com/laravel/framework/pull/23607))
+- Revert breaking changes in `ManagesLoops` ([#23681](https://github.com/laravel/framework/pull/23681))
+
+### Security
+- Check `iv` length in `Encrypter::validPayload()` ([28e53f2](https://github.com/laravel/framework/commit/28e53f23a76206fb130e9a54eb95aa3f010e79c9))
+
+
+## v5.5.39 (2018-03-09)
+
+### Fixed
+- Fix for Carbon 1.24.1 ([b3a5608](https://github.com/laravel/framework/commit/b3a5608ff60a3679d51536a65bb525bdc2390fbc), [72286b3](https://github.com/laravel/framework/commit/72286b302e9bf6a29dd5f0e20f4e7c6dbce78a5d))
+
+
+## v5.5.38 (2018-03-09)
+
+### Fixed
+- Fix for Carbon 1.24.0 ([#23459](https://github.com/laravel/framework/pull/23459))
+- Fixed `--force` flag on `GeneratorCommand` ([#23427](https://github.com/laravel/framework/pull/23427))
+
+
+## v5.5.37 (2018-03-07)
+
+### Changed
+- Added `v-pre` to dropdown link in `app.stub` ([987c19f](https://github.com/laravel/framework/commit/987c19fc252a4883ec05e1691b98e7e9e0c74be8))
+
+### Fixed
+- `Queue::bulk()` fake now properly pushes expected jobs ([#23389](https://github.com/laravel/framework/pull/23389))
+- Set up loop variable correctly on all `Traversable` objects ([#23388](https://github.com/laravel/framework/pull/23388))
+- Fixed `SQLiteGrammar::whereTime()` formatting ([#23408](https://github.com/laravel/framework/pull/23408))
+
+
+## v5.5.36 (2018-03-01)
+
+### Changed
+- Upgrade Parsedown to 1.7.0 ([14adb99](https://github.com/laravel/framework/commit/14adb9958729ea778767b9269df485e399fd6178))
+
+### Fixed
+- Fixed `PostgresGrammar::whereTime()` casting ([#23318](https://github.com/laravel/framework/pull/23318))
+
+
 ## v5.5.35 (2018-02-22)
 
 ### Fixed

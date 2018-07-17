@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use Illuminate\Support\Arr;
 use Illuminate\Contracts\Events\Dispatcher;
 
 trait HasEvents
@@ -25,21 +26,34 @@ trait HasEvents
     protected $observables = [];
 
     /**
-     * Register an observer with the Model.
+     * Register observers with the model.
      *
-     * @param  object|string  $class
+     * @param  object|array|string  $classes
      * @return void
      */
-    public static function observe($class)
+    public static function observe($classes)
     {
         $instance = new static;
 
+        foreach (Arr::wrap($classes) as $class) {
+            $instance->registerObserver($class);
+        }
+    }
+
+    /**
+     * Register a single observer with the model.
+     *
+     * @param  object|string $class
+     * @return void
+     */
+    protected function registerObserver($class)
+    {
         $className = is_string($class) ? $class : get_class($class);
 
         // When registering a model observer, we will spin through the possible events
         // and determine if this observer has that method. If it does, we will hook
         // it into the model's event system, making it convenient to watch these.
-        foreach ($instance->getObservableEvents() as $event) {
+        foreach ($this->getObservableEvents() as $event) {
             if (method_exists($class, $event)) {
                 static::registerModelEvent($event, $className.'@'.$event);
             }

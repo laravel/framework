@@ -2,7 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Ramsey\Uuid\Uuid;
+use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
@@ -57,7 +57,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     {
         PHPUnit::assertTrue(
             ($count = $this->sent($notifiable, $notification)->count()) === $times,
-            "The expected [{$notification}] notification was sent {$count} times instead of {$times} times."
+            "Expected [{$notification}] to be sent {$count} times, but was sent {$times} times."
         );
     }
 
@@ -93,6 +93,27 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     public function assertNothingSent()
     {
         PHPUnit::assertEmpty($this->notifications, 'Notifications were sent unexpectedly.');
+    }
+
+    /**
+     * Assert the total amount of times a notification was sent.
+     *
+     * @param  int  $expectedCount
+     * @param  string  $notification
+     * @return void
+     */
+    public function assertTimesSent($expectedCount, $notification)
+    {
+        $actualCount = collect($this->notifications)
+            ->flatten(1)
+            ->reduce(function ($count, $sent) use ($notification) {
+                return $count + count($sent[$notification] ?? []);
+            }, 0);
+
+        PHPUnit::assertSame(
+            $expectedCount, $actualCount,
+            "Expected [{$notification}] to be sent {$expectedCount} times, but was sent {$actualCount} times."
+        );
     }
 
     /**
@@ -174,7 +195,9 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
         }
 
         foreach ($notifiables as $notifiable) {
-            $notification->id = Uuid::uuid4()->toString();
+            if (! $notification->id) {
+                $notification->id = Str::uuid()->toString();
+            }
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,

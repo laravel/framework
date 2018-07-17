@@ -297,6 +297,32 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->filled('foo.bar'));
     }
 
+    public function testFilledAnyMethod()
+    {
+        $request = Request::create('/', 'GET', ['name' => 'Taylor', 'age' => '', 'city' => null]);
+
+        $this->assertTrue($request->anyFilled(['name']));
+        $this->assertTrue($request->anyFilled('name'));
+
+        $this->assertFalse($request->anyFilled(['age']));
+        $this->assertFalse($request->anyFilled('age'));
+
+        $this->assertFalse($request->anyFilled(['foo']));
+        $this->assertFalse($request->anyFilled('foo'));
+
+        $this->assertTrue($request->anyFilled(['age', 'name']));
+        $this->assertTrue($request->anyFilled('age', 'name'));
+
+        $this->assertTrue($request->anyFilled(['foo', 'name']));
+        $this->assertTrue($request->anyFilled('foo', 'name'));
+
+        $this->assertFalse($request->anyFilled('age', 'city'));
+        $this->assertFalse($request->anyFilled('age', 'city'));
+
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
+        $this->assertFalse($request->anyFilled('foo', 'bar'));
+    }
+
     public function testInputMethod()
     {
         $request = Request::create('/', 'GET', ['name' => 'Taylor']);
@@ -454,6 +480,13 @@ class HttpRequestTest extends TestCase
         $request->replace($replace);
         $this->assertNull($request->input('name'));
         $this->assertEquals('Dayle', $request->input('buddy'));
+    }
+
+    public function testOffsetUnsetMethod()
+    {
+        $request = Request::create('/', 'HEAD', ['name' => 'Taylor']);
+        $request->offsetUnset('name');
+        $this->assertNull($request->input('name'));
     }
 
     public function testHeaderMethod()

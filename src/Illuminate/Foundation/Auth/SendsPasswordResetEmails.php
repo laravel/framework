@@ -70,9 +70,9 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
-        return back()->withErrors(
-            ['email' => trans($response)]
-        );
+        return back()
+                ->withInput($request->only('email'))
+                ->withErrors(['email' => trans($response)]);
     }
 
     /**

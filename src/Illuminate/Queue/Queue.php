@@ -18,13 +18,6 @@ abstract class Queue
     protected $container;
 
     /**
-     * The encrypter implementation.
-     *
-     * @var \Illuminate\Contracts\Encryption\Encrypter
-     */
-    protected $encrypter;
-
-    /**
      * The connection name for the queue.
      *
      * @var string

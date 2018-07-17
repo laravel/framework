@@ -29,7 +29,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.6.7';
+    const VERSION = '5.6.28';
 
     /**
      * The base path for the Laravel installation.
@@ -468,7 +468,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function environmentFilePath()
     {
-        return $this->environmentPath().'/'.$this->environmentFile();
+        return $this->environmentPath().DIRECTORY_SEPARATOR.$this->environmentFile();
     }
 
     /**
@@ -481,13 +481,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         if (func_num_args() > 0) {
             $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 
-            foreach ($patterns as $pattern) {
-                if (Str::is($pattern, $this['env'])) {
-                    return true;
-                }
-            }
-
-            return false;
+            return Str::is($patterns, $this['env']);
         }
 
         return $this['env'];
@@ -523,7 +517,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningInConsole()
     {
-        return php_sapi_name() == 'cli' || php_sapi_name() == 'phpdbg';
+        return php_sapi_name() === 'cli' || php_sapi_name() === 'phpdbg';
     }
 
     /**
@@ -533,7 +527,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningUnitTests()
     {
-        return $this['env'] == 'testing';
+        return $this['env'] === 'testing';
     }
 
     /**

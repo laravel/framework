@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Connection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,6 +15,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
     public function setUp()
     {
+        Carbon::setTestNow(Carbon::now());
+
         $db = new DB;
 
         $db->addConnection([
@@ -85,6 +86,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
      */
     public function tearDown()
     {
+        Carbon::setTestNow(null);
+
         $this->schema()->drop('users');
         $this->schema()->drop('posts');
         $this->schema()->drop('comments');
@@ -252,6 +255,55 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertEquals('foo@bar.com', $result->email);
         $this->assertCount(2, SoftDeletesTestUser::all());
         $this->assertCount(3, SoftDeletesTestUser::withTrashed()->get());
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testUpdateModelAfterSoftDeleting()
+    {
+        $now = Carbon::now();
+        $this->createUsers();
+
+        /** @var SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::find(2);
+        $userModel->delete();
+        $this->assertEquals($now->toDateTimeString(), $userModel->getOriginal('deleted_at'));
+        $this->assertNull(SoftDeletesTestUser::find(2));
+        $this->assertEquals($userModel, SoftDeletesTestUser::withTrashed()->find(2));
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testRestoreAfterSoftDelete()
+    {
+        $this->createUsers();
+
+        /** @var SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::find(2);
+        $userModel->delete();
+        $userModel->restore();
+
+        $this->assertEquals($userModel->id, SoftDeletesTestUser::find(2)->id);
+    }
+
+    /**
+     * @throws \Exception
+     */
+    public function testSoftDeleteAfterRestoring()
+    {
+        $this->createUsers();
+
+        /** @var SoftDeletesTestUser $userModel */
+        $userModel = SoftDeletesTestUser::withTrashed()->find(1);
+        $userModel->restore();
+        $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::find(1)->deleted_at);
+        $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::find(1)->deleted_at);
+        $userModel->delete();
+        $this->assertNull(SoftDeletesTestUser::find(1));
+        $this->assertEquals($userModel->deleted_at, SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
+        $this->assertEquals($userModel->getOriginal('deleted_at'), SoftDeletesTestUser::withTrashed()->find(1)->deleted_at);
     }
 
     public function testUpdateOrCreate()
@@ -654,7 +706,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     /**
      * Get a database connection instance.
      *
-     * @return Connection
+     * @return \Illuminate\Database\Connection
      */
     protected function connection()
     {
@@ -664,7 +716,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     /**
      * Get a schema builder instance.
      *
-     * @return Schema\Builder
+     * @return \Illuminate\Database\Schema\Builder
      */
     protected function schema()
     {

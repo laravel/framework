@@ -80,9 +80,11 @@ class Pivot extends Model
      */
     public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        $instance = static::fromAttributes($parent, $attributes, $table, $exists);
+        $instance = static::fromAttributes($parent, [], $table, $exists);
 
         $instance->setRawAttributes($attributes, true);
+
+        $instance->timestamps = $instance->hasTimestampAttributes();
 
         return $instance;
     }
@@ -214,7 +216,9 @@ class Pivot extends Model
      */
     public function getCreatedAtColumn()
     {
-        return $this->pivotParent->getCreatedAtColumn();
+        return ($this->pivotParent)
+                        ? $this->pivotParent->getCreatedAtColumn()
+                        : parent::getCreatedAtColumn();
     }
 
     /**
@@ -224,7 +228,9 @@ class Pivot extends Model
      */
     public function getUpdatedAtColumn()
     {
-        return $this->pivotParent->getUpdatedAtColumn();
+        return ($this->pivotParent)
+                        ? $this->pivotParent->getUpdatedAtColumn()
+                        : parent::getUpdatedAtColumn();
     }
 
     /**

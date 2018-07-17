@@ -69,6 +69,90 @@ class QueueFake extends QueueManager implements Queue
     }
 
     /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    public function assertPushedWithChain($job, $expectedChain = [], $callback = null)
+    {
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->isNotEmpty(),
+            "The expected [{$job}] job was not pushed."
+        );
+
+        PHPUnit::assertTrue(
+            collect($expectedChain)->isNotEmpty(),
+            'The expected chain can not be empty.'
+        );
+
+        $this->isChainOfObjects($expectedChain)
+                ? $this->assertPushedWithChainOfObjects($job, $expectedChain, $callback)
+                : $this->assertPushedWithChainOfClasses($job, $expectedChain, $callback);
+    }
+
+    /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    protected function assertPushedWithChainOfObjects($job, $expectedChain, $callback)
+    {
+        $chain = collect($expectedChain)->map(function ($job) {
+            return serialize($job);
+        })->all();
+
+        PHPUnit::assertTrue(
+            $this->pushed($job, $callback)->filter(function ($job) use ($chain) {
+                return $job->chained == $chain;
+            })->isNotEmpty(),
+            'The expected chain was not pushed.'
+        );
+    }
+
+    /**
+     * Assert if a job was pushed with chained jobs based on a truth-test callback.
+     *
+     * @param  string $job
+     * @param  array $expectedChain
+     * @param  callable|null $callback
+     * @return void
+     */
+    protected function assertPushedWithChainOfClasses($job, $expectedChain, $callback)
+    {
+        $matching = $this->pushed($job, $callback)->map->chained->map(function ($chain) {
+            return collect($chain)->map(function ($job) {
+                return get_class(unserialize($job));
+            });
+        })->filter(function ($chain) use ($expectedChain) {
+            return $chain->all() === $expectedChain;
+        });
+
+        PHPUnit::assertTrue(
+            $matching->isNotEmpty(), 'The expected chain was not pushed.'
+        );
+    }
+
+    /**
+     * Determine if the given chain is entirely composed of objects.
+     *
+     * @param  array  $chain
+     * @return bool
+     */
+    protected function isChainOfObjects($chain)
+    {
+        return collect($chain)->count() == collect($chain)
+                    ->filter(function ($job) {
+                        return is_object($job);
+                    })->count();
+    }
+
+    /**
      * Determine if a job was pushed based on a truth-test callback.
      *
      * @param  string  $job
@@ -145,7 +229,7 @@ class QueueFake extends QueueManager implements Queue
      */
     public function size($queue = null)
     {
-        return 0;
+        return count($this->jobs);
     }
 
     /**

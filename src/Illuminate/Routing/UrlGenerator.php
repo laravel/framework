@@ -7,13 +7,15 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Routing\UrlGenerator as UrlGeneratorContract;
 
 class UrlGenerator implements UrlGeneratorContract
 {
-    use Macroable;
+    use InteractsWithTime, Macroable;
 
     /**
      * The route collection.
@@ -70,6 +72,13 @@ class UrlGenerator implements UrlGeneratorContract
      * @var callable
      */
     protected $sessionResolver;
+
+    /**
+     * The encryption key resolver callable.
+     *
+     * @var callable
+     */
+    protected $keyResolver;
 
     /**
      * The callback to use to format hosts.
@@ -284,6 +293,64 @@ class UrlGenerator implements UrlGeneratorContract
         }
 
         return $this->cachedSchema;
+    }
+
+    /**
+     * Create a signed route URL for a named route.
+     *
+     * @param  string  $name
+     * @param  array  $parameters
+     * @param  \DateTimeInterface|int  $expiration
+     * @return string
+     */
+    public function signedRoute($name, $parameters = [], $expiration = null)
+    {
+        $parameters = $this->formatParameters($parameters);
+
+        if ($expiration) {
+            $parameters = $parameters + ['expires' => $this->availableAt($expiration)];
+        }
+
+        ksort($parameters);
+
+        $key = call_user_func($this->keyResolver);
+
+        return $this->route($name, $parameters + [
+            'signature' => hash_hmac('sha256', $this->route($name, $parameters), $key),
+        ]);
+    }
+
+    /**
+     * Create a temporary signed route URL for a named route.
+     *
+     * @param  string  $name
+     * @param  \DateTimeInterface|int  $expiration
+     * @param  array  $parameters
+     * @return string
+     */
+    public function temporarySignedRoute($name, $expiration, $parameters = [])
+    {
+        return $this->signedRoute($name, $parameters, $expiration);
+    }
+
+    /**
+     * Determine if the given request has a valid signature.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return bool
+     */
+    public function hasValidSignature(Request $request)
+    {
+        $original = rtrim($request->url().'?'.http_build_query(
+            Arr::except($request->query(), 'signature')
+        ), '?');
+
+        $expires = Arr::get($request->query(), 'expires');
+
+        $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
+
+        return  hash_equals($signature, $request->query('signature', '')) &&
+               ! ($expires && Carbon::now()->getTimestamp() > $expires);
     }
 
     /**
@@ -610,6 +677,19 @@ class UrlGenerator implements UrlGeneratorContract
     public function setSessionResolver(callable $sessionResolver)
     {
         $this->sessionResolver = $sessionResolver;
+
+        return $this;
+    }
+
+    /**
+     * Set the encryption key resolver.
+     *
+     * @param  callable  $keyResolver
+     * @return $this
+     */
+    public function setKeyResolver(callable $keyResolver)
+    {
+        $this->keyResolver = $keyResolver;
 
         return $this;
     }

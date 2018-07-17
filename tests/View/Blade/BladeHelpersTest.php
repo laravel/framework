@@ -10,5 +10,6 @@ class BladeHelpersTest extends AbstractBladeTestCase
         $this->assertEquals('<?php echo method_field(\'patch\'); ?>', $this->compiler->compileString("@method('patch')"));
         $this->assertEquals('<?php dd($var1); ?>', $this->compiler->compileString('@dd($var1)'));
         $this->assertEquals('<?php dd($var1, $var2); ?>', $this->compiler->compileString('@dd($var1, $var2)'));
+        $this->assertEquals('<?php dump($var1, $var2); ?>', $this->compiler->compileString('@dump($var1, $var2)'));
     }
 }

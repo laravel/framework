@@ -35,15 +35,22 @@ class FreshCommand extends Command
             return;
         }
 
-        $this->dropAllTables(
-            $database = $this->input->getOption('database')
-        );
+        $database = $this->input->getOption('database');
+
+        if ($this->option('drop-views')) {
+            $this->dropAllViews($database);
+
+            $this->info('Dropped all views successfully.');
+        }
+
+        $this->dropAllTables($database);
 
         $this->info('Dropped all tables successfully.');
 
         $this->call('migrate', [
             '--database' => $database,
             '--path' => $this->input->getOption('path'),
+            '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
         ]);
 
@@ -63,6 +70,19 @@ class FreshCommand extends Command
         $this->laravel['db']->connection($database)
                     ->getSchemaBuilder()
                     ->dropAllTables();
+    }
+
+    /**
+     * Drop all of the database views.
+     *
+     * @param  string  $database
+     * @return void
+     */
+    protected function dropAllViews($database)
+    {
+        $this->laravel['db']->connection($database)
+                    ->getSchemaBuilder()
+                    ->dropAllViews();
     }
 
     /**
@@ -99,6 +119,8 @@ class FreshCommand extends Command
     {
         return [
             ['database', null, InputOption::VALUE_OPTIONAL, 'The database connection to use.'],
+
+            ['drop-views', null, InputOption::VALUE_NONE, 'Drop all tables and views.'],
 
             ['force', null, InputOption::VALUE_NONE, 'Force the operation to run when in production.'],
 

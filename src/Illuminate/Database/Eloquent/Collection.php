@@ -4,6 +4,7 @@ namespace Illuminate\Database\Eloquent;
 
 use LogicException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
@@ -44,7 +45,7 @@ class Collection extends BaseCollection implements QueueableCollection
     /**
      * Load a set of relationships onto the collection.
      *
-     * @param  mixed  $relations
+     * @param  array|string  $relations
      * @return $this
      */
     public function load($relations)
@@ -58,6 +59,100 @@ class Collection extends BaseCollection implements QueueableCollection
 
             $this->items = $query->eagerLoadRelations($this->items);
         }
+
+        return $this;
+    }
+
+    /**
+     * Load a set of relationships onto the collection if they are not already eager loaded.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadMissing($relations)
+    {
+        if (is_string($relations)) {
+            $relations = func_get_args();
+        }
+
+        foreach ($relations as $key => $value) {
+            if (is_numeric($key)) {
+                $key = $value;
+            }
+
+            $segments = explode('.', explode(':', $key)[0]);
+
+            if (Str::contains($key, ':')) {
+                $segments[count($segments) - 1] .= ':'.explode(':', $key)[1];
+            }
+
+            $path = array_combine($segments, $segments);
+
+            if (is_callable($value)) {
+                $path[end($segments)] = $value;
+            }
+
+            $this->loadMissingRelation($this, $path);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Load a relationship path if it is not already eager loaded.
+     *
+     * @param  \Illuminate\Database\Eloquent\Collection  $models
+     * @param  array  $path
+     * @return void
+     */
+    protected function loadMissingRelation(Collection $models, array $path)
+    {
+        $relation = array_splice($path, 0, 1);
+
+        $name = explode(':', key($relation))[0];
+
+        if (is_string(reset($relation))) {
+            $relation = reset($relation);
+        }
+
+        $models->filter(function ($model) use ($name) {
+            return ! is_null($model) && ! $model->relationLoaded($name);
+        })->load($relation);
+
+        if (empty($path)) {
+            return;
+        }
+
+        $models = $models->pluck($name);
+
+        if ($models->first() instanceof BaseCollection) {
+            $models = $models->collapse();
+        }
+
+        $this->loadMissingRelation(new static($models), $path);
+    }
+
+    /**
+     * Load a set of relationships onto the mixed relationship collection.
+     *
+     * @param  string  $relation
+     * @param  array  $relations
+     * @return $this
+     */
+    public function loadMorph($relation, $relations)
+    {
+        $this->pluck($relation)
+            ->filter()
+            ->groupBy(function ($model) {
+                return get_class($model);
+            })
+            ->filter(function ($models, $className) use ($relations) {
+                return Arr::has($relations, $className);
+            })
+            ->each(function ($models, $className) use ($relations) {
+                $className::with($relations[$className])
+                    ->eagerLoadRelations($models->all());
+            });
 
         return $this;
     }

@@ -286,9 +286,7 @@ class ContainerTest extends TestCase
             $_SERVER['_test_rebind'] = true;
         });
         $container->bind('foo', function () {
-            $obj = new stdClass;
-
-            return $obj;
+            return new stdClass;
         });
 
         $this->assertFalse($_SERVER['_test_rebind']);
@@ -489,6 +487,14 @@ class ContainerTest extends TestCase
 
         $this->assertInstanceOf('stdClass', $result[0]);
         $this->assertEquals('taylor', $result[1]);
+
+        $stub = new ContainerConcreteStub;
+        $result = $container->call(function (stdClass $foo, ContainerConcreteStub $bar) {
+            return func_get_args();
+        }, [ContainerConcreteStub::class => $stub]);
+
+        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertSame($stub, $result[1]);
 
         /*
          * Wrap a function...

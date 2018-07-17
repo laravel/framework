@@ -26,6 +26,17 @@ trait CompilesHelpers
     }
 
     /**
+     * Compile the "dump" statements into valid PHP.
+     *
+     * @param  string  $arguments
+     * @return string
+     */
+    protected function compileDump($arguments)
+    {
+        return "<?php dump{$arguments}; ?>";
+    }
+
+    /**
      * Compile the method statements into valid PHP.
      *
      * @param  string  $method

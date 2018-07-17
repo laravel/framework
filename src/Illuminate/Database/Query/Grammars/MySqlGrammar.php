@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -53,6 +52,18 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON contains" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonContains($column, $value)
+    {
+        return 'json_contains('.$this->wrap($column).', '.$value.')';
+    }
+
+    /**
      * Compile a single union statement.
      *
      * @param  array  $union
@@ -60,9 +71,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileUnion(array $union)
     {
-        $conjuction = $union['all'] ? ' union all ' : ' union ';
+        $conjunction = $union['all'] ? ' union all ' : ' union ';
 
-        return $conjuction.'('.$union['query']->toSql().')';
+        return $conjunction.'('.$union['query']->toSql().')';
     }
 
     /**
@@ -265,7 +276,7 @@ class MySqlGrammar extends Grammar
     {
         $joins = ' '.$this->compileJoins($query, $query->joins);
 
-        $alias = strpos(strtolower($table), ' as ') !== false
+        $alias = stripos($table, ' as ') !== false
                 ? explode(' as ', $table)[1] : $table;
 
         return trim("delete {$alias} from {$table}{$joins} {$where}");
@@ -279,18 +290,7 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapValue($value)
     {
-        if ($value === '*') {
-            return $value;
-        }
-
-        // If the given value is a JSON selector we will wrap it differently than a
-        // traditional value. We will need to split this path and wrap each part
-        // wrapped, etc. Otherwise, we will simply wrap the value as a string.
-        if ($this->isJsonSelector($value)) {
-            return $this->wrapJsonSelector($value);
-        }
-
-        return '`'.str_replace('`', '``', $value).'`';
+        return $value === '*' ? $value : '`'.str_replace('`', '``', $value).'`';
     }
 
     /**
@@ -301,23 +301,16 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $path = explode('->', $value);
+        $delimiter = str_contains($value, '->>')
+            ? '->>'
+            : '->';
 
-        $field = $this->wrapValue(array_shift($path));
+        $path = explode($delimiter, $value);
 
-        return sprintf('%s->\'$.%s\'', $field, collect($path)->map(function ($part) {
+        $field = $this->wrapSegments(explode('.', array_shift($path)));
+
+        return sprintf('%s'.$delimiter.'\'$.%s\'', $field, collect($path)->map(function ($part) {
             return '"'.$part.'"';
         })->implode('.'));
-    }
-
-    /**
-     * Determine if the given string is a JSON selector.
-     *
-     * @param  string  $value
-     * @return bool
-     */
-    protected function isJsonSelector($value)
-    {
-        return Str::contains($value, '->');
     }
 }

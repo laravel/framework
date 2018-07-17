@@ -21,6 +21,7 @@ use Illuminate\Foundation\Console\TestMakeCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Foundation\Console\ViewCacheCommand;
 use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Foundation\Console\PolicyMakeCommand;
@@ -38,6 +39,7 @@ use Illuminate\Foundation\Console\StorageLinkCommand;
 use Illuminate\Routing\Console\ControllerMakeCommand;
 use Illuminate\Routing\Console\MiddlewareMakeCommand;
 use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\ObserverMakeCommand;
 use Illuminate\Foundation\Console\ProviderMakeCommand;
 use Illuminate\Foundation\Console\ResourceMakeCommand;
 use Illuminate\Foundation\Console\ClearCompiledCommand;
@@ -116,6 +118,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ScheduleRun' => ScheduleRunCommand::class,
         'StorageLink' => 'command.storage.link',
         'Up' => 'command.up',
+        'ViewCache' => 'command.view.cache',
         'ViewClear' => 'command.view.clear',
     ];
 
@@ -143,6 +146,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'ModelMake' => 'command.model.make',
         'NotificationMake' => 'command.notification.make',
         'NotificationTable' => 'command.notification.table',
+        'ObserverMake' => 'command.observer.make',
         'PolicyMake' => 'command.policy.make',
         'ProviderMake' => 'command.provider.make',
         'QueueFailedTable' => 'command.queue.failed-table',
@@ -203,7 +207,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerAuthMakeCommand()
     {
-        $this->app->singleton('command.auth.make', function ($app) {
+        $this->app->singleton('command.auth.make', function () {
             return new AuthMakeCommand;
         });
     }
@@ -592,10 +596,46 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerNotificationTableCommand()
+    {
+        $this->app->singleton('command.notification.table', function ($app) {
+            return new NotificationTableCommand($app['files'], $app['composer']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerObserverMakeCommand()
+    {
+        $this->app->singleton('command.observer.make', function ($app) {
+            return new ObserverMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerPackageDiscoverCommand()
     {
-        $this->app->singleton('command.package.discover', function ($app) {
+        $this->app->singleton('command.package.discover', function () {
             return new PackageDiscoverCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerPolicyMakeCommand()
+    {
+        $this->app->singleton('command.policy.make', function ($app) {
+            return new PolicyMakeCommand($app['files']);
         });
     }
 
@@ -924,34 +964,22 @@ class ArtisanServiceProvider extends ServiceProvider
      *
      * @return void
      */
+    protected function registerViewCacheCommand()
+    {
+        $this->app->singleton('command.view.cache', function () {
+            return new ViewCacheCommand;
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
     protected function registerViewClearCommand()
     {
         $this->app->singleton('command.view.clear', function ($app) {
             return new ViewClearCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerPolicyMakeCommand()
-    {
-        $this->app->singleton('command.policy.make', function ($app) {
-            return new PolicyMakeCommand($app['files']);
-        });
-    }
-
-    /**
-     * Register the command.
-     *
-     * @return void
-     */
-    protected function registerNotificationTableCommand()
-    {
-        $this->app->singleton('command.notification.table', function ($app) {
-            return new NotificationTableCommand($app['files'], $app['composer']);
         });
     }
 

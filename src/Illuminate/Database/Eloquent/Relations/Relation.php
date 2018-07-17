@@ -161,9 +161,13 @@ abstract class Relation
      */
     public function touch()
     {
-        $column = $this->getRelated()->getUpdatedAtColumn();
+        $model = $this->getRelated();
 
-        $this->rawUpdate([$column => $this->getRelated()->freshTimestampString()]);
+        if (! $model::isIgnoringTouch()) {
+            $this->rawUpdate([
+                $model->getUpdatedAtColumn() => $model->freshTimestampString(),
+            ]);
+        }
     }
 
     /**
@@ -346,9 +350,7 @@ abstract class Relation
      */
     public static function getMorphedModel($alias)
     {
-        return array_key_exists($alias, self::$morphMap)
-                        ? self::$morphMap[$alias]
-                        : null;
+        return self::$morphMap[$alias] ?? null;
     }
 
     /**

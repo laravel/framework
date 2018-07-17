@@ -82,7 +82,7 @@ class RouteUrlGenerator
         // has been constructed, we'll make sure we don't have any missing parameters or we
         // will need to throw the exception to let the developers know one was not given.
         $uri = $this->addQueryString($this->url->format(
-            $root = $this->replaceRootParameters($route, $domain, $parameters),
+            $this->replaceRootParameters($route, $domain, $parameters),
             $this->replaceRouteParameters($route->uri(), $parameters)
         ), $parameters);
 
@@ -96,7 +96,13 @@ class RouteUrlGenerator
         $uri = strtr(rawurlencode($uri), $this->dontEncode);
 
         if (! $absolute) {
-            return '/'.ltrim(str_replace($root, '', $uri), '/');
+            $uri = preg_replace('#^(//|[^/?])+#', '', $uri);
+
+            if ($base = $this->request->getBaseUrl()) {
+                $uri = preg_replace('#^'.$base.'#i', '', $uri);
+            }
+
+            return '/'.ltrim($uri, '/');
         }
 
         return $uri;

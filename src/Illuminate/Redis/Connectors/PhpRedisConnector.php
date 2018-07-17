@@ -11,7 +11,7 @@ use Illuminate\Redis\Connections\PhpRedisClusterConnection;
 class PhpRedisConnector
 {
     /**
-     * Create a new clustered Predis connection.
+     * Create a new clustered PhpRedis connection.
      *
      * @param  array  $config
      * @param  array  $options
@@ -25,7 +25,7 @@ class PhpRedisConnector
     }
 
     /**
-     * Create a new clustered Predis connection.
+     * Create a new clustered PhpRedis connection.
      *
      * @param  array  $config
      * @param  array  $clusterOptions
@@ -92,9 +92,21 @@ class PhpRedisConnector
      */
     protected function establishConnection($client, array $config)
     {
-        $client->{($config['persistent'] ?? false) === true ? 'pconnect' : 'connect'}(
-            $config['host'], $config['port'], Arr::get($config, 'timeout', 0)
-        );
+        $persistent = $config['persistent'] ?? false;
+
+        $parameters = [
+            $config['host'],
+            $config['port'],
+            Arr::get($config, 'timeout', 0.0),
+            $persistent ? Arr::get($config, 'persistent_id', null) : null,
+            Arr::get($config, 'retry_interval', 0),
+        ];
+
+        if (version_compare(phpversion('redis'), '3.1.3', '>=')) {
+            $parameters[] = Arr::get($config, 'read_timeout', 0.0);
+        }
+
+        $client->{($persistent ? 'pconnect' : 'connect')}(...$parameters);
     }
 
     /**
