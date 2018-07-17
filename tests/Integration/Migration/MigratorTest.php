@@ -27,7 +27,7 @@ class MigratorTest extends TestCase
 
         $migrator->getRepository()->createRepository();
 
-        $migrator->run([__DIR__ . '/fixtures']);
+        $migrator->run([__DIR__.'/fixtures']);
 
         $this->assertTrue($this->tableExists('members'));
     }
@@ -42,5 +42,4 @@ class MigratorTest extends TestCase
 
         return true;
     }
-
 }
