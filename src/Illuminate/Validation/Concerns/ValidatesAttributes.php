@@ -70,7 +70,7 @@ trait ValidatesAttributes
      */
     public function ValidateAllowedWithout($attribute, $value, $parameters)
     {
-        return !($this->validateRequired($attribute, $value) === $this->validateRequired($parameters[0], $this->getValue($parameters[0])));
+        return ! ($this->validateRequired($attribute, $value) === $this->validateRequired($parameters[0], $this->getValue($parameters[0])));
     }
 
     /**
