@@ -61,6 +61,19 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is an active URL.
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @param  array   $parameters
+     * @return bool
+     */
+    public function ValidateAllowedWithout($attribute, $value, $parameters)
+    {
+        return ! ($this->validateRequired($attribute, $value) === $this->validateRequired($parameters[0], $this->getValue($parameters[0])));
+    }
+
+    /**
      * "Break" on first validation fail.
      *
      * Always returns true, just lets us put "bail" in rules.
