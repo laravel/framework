@@ -38,4 +38,26 @@ class DummyClass
     {
         //
     }
+
+    /**
+     * Handle the DocDummyModel "restored" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function restored(DummyModel $dummyModel)
+    {
+        //
+    }
+
+    /**
+     * Handle the DocDummyModel "force deleted" event.
+     *
+     * @param  \NamespacedDummyModel  $dummyModel
+     * @return void
+     */
+    public function forceDeleted(DummyModel $dummyModel)
+    {
+        //
+    }
 }
