@@ -84,7 +84,7 @@ class SupportTestingEventFakeTest extends TestCase
             'Foo',
             function ($event, $payload) {
                 return $event === 'Bar' && $payload['id'] === 1;
-            }
+            },
         ]);
 
         $fake->dispatch('Foo');
