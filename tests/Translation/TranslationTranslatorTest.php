@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Translation;
 
+use Illuminate\Events\Dispatcher;
+use Illuminate\Translation\Events\TranslationNotFound;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +20,7 @@ class TranslationTranslatorTest extends TestCase
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->will($this->returnValue('foo'));
         $this->assertFalse($t->has('foo', 'bar'));
 
-        $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en', 'sp'])->getMock();
+        $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
         $t->expects($this->once())->method('get')->with($this->equalTo('foo'), $this->equalTo([]), $this->equalTo('bar'))->will($this->returnValue('bar'));
         $this->assertTrue($t->has('foo', 'bar'));
 
@@ -165,6 +167,24 @@ class TranslationTranslatorTest extends TestCase
         $t->getLoader()->shouldReceive('load')->once()->with('en', '*', '*')->andReturn([]);
         $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo :message', '*')->andReturn([]);
         $this->assertEquals('foo baz', $t->getFromJson('foo :message', ['message' => 'baz']));
+    }
+
+    public function testGetFiresNotFoundEvent()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en', $dispatcher = new Dispatcher);
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn([]);
+
+        $dispatcher->listen(TranslationNotFound::class, function (TranslationNotFound $event) {
+            $_SERVER['event.key'] = $event->key;
+            $_SERVER['event.locale'] = $event->locale;
+            $_SERVER['event.replacements'] = $event->replacements;
+        });
+
+        $t->get('foo', [], 'en');
+
+        $this->assertEquals('foo', $_SERVER['event.key']);
+        $this->assertEquals('en', $_SERVER['event.locale']);
+        $this->assertEquals([], $_SERVER['event.replacements']);
     }
 
     protected function getLoader()
