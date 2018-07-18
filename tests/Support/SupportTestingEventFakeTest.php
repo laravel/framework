@@ -74,6 +74,27 @@ class SupportTestingEventFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The unexpected [Illuminate\Tests\Support\EventStub] event was dispatched.'));
         }
     }
+
+    public function testAssertDispatchedWithIgnore()
+    {
+        $dispatcher = m::mock(Dispatcher::class);
+        $dispatcher->shouldReceive('dispatch')->twice();
+
+        $fake = new EventFake($dispatcher, [
+            'Foo',
+            function ($event, $payload) {
+                return $event === 'Bar' && $payload['id'] === 1;
+            }
+        ]);
+
+        $fake->dispatch('Foo');
+        $fake->dispatch('Bar', ['id' => 1]);
+        $fake->dispatch('Baz');
+
+        $fake->assertNotDispatched('Foo');
+        $fake->assertNotDispatched('Bar');
+        $fake->assertDispatched('Baz');
+    }
 }
 
 class EventStub
