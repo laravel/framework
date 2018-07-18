@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Translation;
 
-use Illuminate\Events\Dispatcher;
-use Illuminate\Translation\Events\TranslationNotFound;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Translation\Events\TranslationNotFound;
 
 class TranslationTranslatorTest extends TestCase
 {

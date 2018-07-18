@@ -5,21 +5,21 @@ namespace Illuminate\Translation\Events;
 class TranslationNotFound
 {
     /**
-     * The key of the missing translation
+     * The key of the missing translation.
      *
      * @var string
      */
     public $key;
 
     /**
-     * The locale in which the translation was searched
+     * The locale in which the translation was searched.
      *
      * @var string
      */
     public $locale;
 
     /**
-     * The array of replacements passed to the translator
+     * The array of replacements passed to the translator.
      *
      * @var array
      */

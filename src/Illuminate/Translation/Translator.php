@@ -3,15 +3,15 @@
 namespace Illuminate\Translation;
 
 use Countable;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\NamespacedItemResolver;
-use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Translation\Events\TranslationNotFound;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
@@ -25,7 +25,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $loader;
 
     /**
-     * The event dispatcher
+     * The event dispatcher.
      *
      * @var \Illuminate\Events\Dispatcher
      */
