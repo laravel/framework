@@ -7,8 +7,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Support\NamespacedItemResolver;
+use Illuminate\Translation\Events\TranslationNotFound;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
@@ -21,6 +23,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @var \Illuminate\Contracts\Translation\Loader
      */
     protected $loader;
+
+    /**
+     * The event dispatcher.
+     *
+     * @var \Illuminate\Events\Dispatcher
+     */
+    protected $dispatcher;
 
     /**
      * The default locale being used by the translator.
@@ -55,12 +64,14 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      *
      * @param  \Illuminate\Contracts\Translation\Loader  $loader
      * @param  string  $locale
+     * @param  \Illuminate\Contracts\Events\Dispatcher $dispatcher
      * @return void
      */
-    public function __construct(Loader $loader, $locale)
+    public function __construct(Loader $loader, $locale, Dispatcher $dispatcher = null)
     {
         $this->loader = $loader;
         $this->locale = $locale;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -133,6 +144,11 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // from the application's language files. Otherwise we can return the line.
         if (isset($line)) {
             return $line;
+        }
+
+        // Help the developer by dispatching an event with the missing translation
+        if ($this->dispatcher) {
+            $this->dispatcher->dispatch(new TranslationNotFound($key, $locale, $replace));
         }
 
         return $key;
