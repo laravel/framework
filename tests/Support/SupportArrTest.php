@@ -604,53 +604,82 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['10' => 1, 20 => 2], $array);
     }
 
-    public function testForget()
+    /**
+     * @dataProvider providerTestForget
+     */
+    public function testForget(array $array, $keys, array $expectedArray)
     {
-        $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::forget($array, null);
-        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+        Arr::forget($array, $keys);
+        $this->assertEquals($expectedArray, $array);
+    }
 
-        $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::forget($array, []);
-        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+    public function providerTestForget()
+    {
+        return [
+            [
+                ['products' => ['desk' => ['price' => 100]]],
+                null,
+                ['products' => ['desk' => ['price' => 100]]]
+            ],
+            [
+                ['products' => ['desk' => ['price' => 100]]],
+                [],
+                ['products' => ['desk' => ['price' => 100]]]
 
-        $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::forget($array, 'products.desk');
-        $this->assertEquals(['products' => []], $array);
+            ],
+            [
+                ['products' => ['desk' => ['price' => 100]]],
+                'products.desk',
+                ['products' => []]
 
-        $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::forget($array, 'products.desk.price');
-        $this->assertEquals(['products' => ['desk' => []]], $array);
+            ],
+            [
+                ['products' => ['desk' => ['price' => 100]]],
+                'products.desk.price',
+                ['products' => ['desk' => []]]
 
-        $array = ['products' => ['desk' => ['price' => 100]]];
-        Arr::forget($array, 'products.final.price');
-        $this->assertEquals(['products' => ['desk' => ['price' => 100]]], $array);
+            ],
+            [
+                ['products' => ['desk' => ['price' => 100]]],
+                'products.final.price',
+                ['products' => ['desk' => ['price' => 100]]]
 
-        $array = ['shop' => ['cart' => [150 => 0]]];
-        Arr::forget($array, 'shop.final.cart');
-        $this->assertEquals(['shop' => ['cart' => [150 => 0]]], $array);
+            ],
+            [
+                ['shop' => ['cart' => [150 => 0]]],
+                'shop.final.cart',
+                ['shop' => ['cart' => [150 => 0]]]
 
-        $array = ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]];
-        Arr::forget($array, 'products.desk.price.taxes');
-        $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50]]]], $array);
+            ],
+            [
+                ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]],
+                'products.desk.price.taxes',
+                ['products' => ['desk' => ['price' => ['original' => 50]]]]
 
-        $array = ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]];
-        Arr::forget($array, 'products.desk.final.taxes');
-        $this->assertEquals(['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]], $array);
+            ],
+            [
+                ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]],
+                'products.desk.final.taxes',
+                ['products' => ['desk' => ['price' => ['original' => 50, 'taxes' => 60]]]]
 
-        $array = ['products' => ['desk' => ['price' => 50], null => 'something']];
-        Arr::forget($array, ['products.amount.all', 'products.desk.price']);
-        $this->assertEquals(['products' => ['desk' => [], null => 'something']], $array);
+            ],
+            [
+                ['products' => ['desk' => ['price' => 50], null => 'something']],
+                ['products.amount.all', 'products.desk.price'],
+                ['products' => ['desk' => [], null => 'something']]
 
-        // Only works on first level keys
-        $array = ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'];
-        Arr::forget($array, 'joe@example.com');
-        $this->assertEquals(['jane@example.com' => 'Jane'], $array);
-
-        // Does not work for nested keys
-        $array = ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]];
-        Arr::forget($array, ['emails.joe@example.com', 'emails.jane@localhost']);
-        $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
+            ],
+            'Only works on first level keys' => [
+                ['joe@example.com' => 'Joe', 'jane@example.com' => 'Jane'],
+                'joe@example.com',
+                ['jane@example.com' => 'Jane']
+            ],
+            'Does not work for nested keys' => [
+                ['emails' => ['joe@example.com' => ['name' => 'Joe'], 'jane@localhost' => ['name' => 'Jane']]],
+                ['emails.joe@example.com', 'emails.jane@localhost'],
+                ['emails' => ['joe@example.com' => ['name' => 'Joe']]]
+            ]
+        ];
     }
 
     public function testWrap()
