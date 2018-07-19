@@ -167,6 +167,8 @@ class FoundationTestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
+        $response->assertJsonFragment(['barfoo']);
+
         $response->assertJsonFragment(['foo' => 'bar']);
 
         $response->assertJsonFragment(['foobar_foo' => 'foo']);
@@ -174,16 +176,6 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonFragment(['foobar' => ['foobar_foo' => 'foo', 'foobar_bar' => 'bar']]);
 
         $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
-
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub()));
-
-        $response->assertJsonFragment(['id' => 10]);
-
-        try {
-            $response->assertJsonFragment(['id' => 1]);
-            $this->fail('Asserting id => 1, existsing in JsonSerializableSingleResourceWithIntegersStub should fail');
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
-        }
     }
 
     public function testAssertJsonStructure()
@@ -225,13 +217,6 @@ class FoundationTestResponseTest extends TestCase
         // Without structure
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceStub));
         $response->assertJsonCount(4);
-    }
-
-    public function testAssertJsonMissing()
-    {
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
-
-        $response->assertJsonMissing(['id' => 2]);
     }
 
     public function testAssertJsonMissingValidationErrors()
