@@ -697,11 +697,12 @@ class Builder
      * @param  array  $columns
      * @param  string  $pageName
      * @param  int|null  $page
+     * @param  int $onEachSide
      * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      *
      * @throws \InvalidArgumentException
      */
-    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
+    public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null, $onEachSide = 3)
     {
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
@@ -714,6 +715,7 @@ class Builder
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
+            'onEachSide' => $onEachSide
         ]);
     }
 
