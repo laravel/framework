@@ -549,13 +549,7 @@ class TestResponse
      */
     protected function jsonSearchStrings($key, $value)
     {
-        $needle = substr(json_encode([$key => $value]), 1, -1);
-
-        return [
-            $needle.']',
-            $needle.'}',
-            $needle.',',
-        ];
+        return substr(json_encode([$key => $value]), 1, -1);
     }
 
     /**
