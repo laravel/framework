@@ -661,6 +661,161 @@ class SupportArrTest extends TestCase
         $this->assertEquals(['emails' => ['joe@example.com' => ['name' => 'Joe']]], $array);
     }
 
+    /**
+     * @dataProvider providerTestForgetWithWildcards
+     */
+    public function testForgetWithWildcards(array $array, $keys, array $expectedArray)
+    {
+        Arr::forget($array, $keys);
+        $this->assertEquals($expectedArray, $array);
+    }
+
+    public function providerTestForgetWithWildcards()
+    {
+        return [
+            'With Wildcard' => [
+                [
+                    'email' => [
+                        'id' => 1,
+                        'email' => 'joe@example.com',
+                    ],
+                    'address' => [
+                        'id' => 2,
+                        'address' => 'North St',
+                    ],
+                ],
+                '*.id',
+                [
+                    'email' => [
+                        'email' => 'joe@example.com',
+                    ],
+                    'address' => [
+                        'address' => 'North St',
+                    ],
+                ],
+            ],
+            'With several Wildcards' => [
+                [
+                    'emails' => [
+                        [
+                            'id' => 1,
+                            'email' => 'joe@example.com',
+                        ],
+                        [
+                            'id' => 2,
+                            'email' => 'jane@localhost',
+                        ],
+                    ],
+                    'addresses' => [
+                        [
+                            'id' => 1,
+                            'address' => 'North St',
+                        ],
+                        [
+                            'id' => 2,
+                            'address' => 'South St',
+                        ],
+                    ],
+                ],
+                '*.*.id',
+                [
+                    'emails' => [
+                        [
+                            'email' => 'joe@example.com',
+                        ],
+                        [
+                            'email' => 'jane@localhost',
+                        ],
+                    ],
+                    'addresses' => [
+                        [
+                            'address' => 'North St',
+                        ],
+                        [
+                            'address' => 'South St',
+                        ],
+                    ],
+                ],
+            ],
+            'With several keys, one of which has a wildcard' => [
+                [
+                    'emails' => [
+                        [
+                            'id' => 1,
+                            'email' => 'joe@example.com',
+                        ],
+                        [
+                            'id' => 2,
+                            'email' => 'jane@localhost',
+                        ],
+                    ],
+                    'addresses' => [
+                        [
+                            'id' => 1,
+                            'address' => 'North St',
+                        ],
+                        [
+                            'id' => 2,
+                            'address' => 'South St',
+                        ],
+                    ],
+                ],
+                ['*.*.id', 'addresses'],
+                [
+                    'emails' => [
+                        [
+                            'email' => 'joe@example.com',
+                        ],
+                        [
+                            'email' => 'jane@localhost',
+                        ],
+                    ],
+                ],
+            ],
+            'With several keys with Wildcards' => [
+                [
+                    'emails' => [
+                        [
+                            'id' => 1,
+                            'email' => 'joe@example.com',
+                        ],
+                        [
+                            'id' => 2,
+                            'email' => 'jane@localhost',
+                        ],
+                    ],
+                    'addresses' => [
+                        [
+                            'id' => 1,
+                            'address' => 'North St',
+                        ],
+                        [
+                            'id' => 2,
+                            'address' => 'South St',
+                        ],
+                    ],
+                ],
+                ['*.*.id', 'addresses.*.address'],
+                [
+                    'emails' => [
+                        [
+                            'email' => 'joe@example.com',
+                        ],
+                        [
+                            'email' => 'jane@localhost',
+                        ],
+                    ],
+                    'addresses' => [
+                        [
+                        ],
+                        [
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
     public function testWrap()
     {
         $string = 'a';

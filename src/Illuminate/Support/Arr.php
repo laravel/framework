@@ -256,7 +256,17 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part])) {
+                if ($part === '*') {
+                    foreach ($array as &$item) {
+                        if (! is_array($item)) {
+                            // to unset an array item's key that item must itself be an array
+                            continue;
+                        }
+
+                        // we need to join the parts togetehr again since it's still a single key that needs forgetting
+                        static::forget($item, implode('.', $parts));
+                    }
+                } elseif (isset($array[$part]) && is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
