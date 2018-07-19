@@ -3,6 +3,8 @@
 namespace Illuminate\Foundation;
 
 use Exception;
+use ReflectionClass;
+use Composer\Autoload\ClassLoader;
 use Illuminate\Filesystem\Filesystem;
 
 class PackageManifest
@@ -48,14 +50,15 @@ class PackageManifest
      * @param  \Illuminate\Filesystem\Filesystem  $files
      * @param  string  $basePath
      * @param  string  $manifestPath
+     * @param  string  $vendorPath
      * @return void
      */
-    public function __construct(Filesystem $files, $basePath, $manifestPath)
+    public function __construct(Filesystem $files, $basePath, $manifestPath, $vendorPath = '')
     {
         $this->files = $files;
         $this->basePath = $basePath;
         $this->manifestPath = $manifestPath;
-        $this->vendorPath = $basePath.'/vendor';
+        $this->vendorPath = $vendorPath ?: $this->locateVendorPath();
     }
 
     /**
@@ -143,12 +146,12 @@ class PackageManifest
      */
     protected function packagesToIgnore()
     {
-        if (! file_exists($this->basePath.'/composer.json')) {
+        if (! file_exists(dirname($this->vendorPath).'/composer.json')) {
             return [];
         }
 
         return json_decode(file_get_contents(
-            $this->basePath.'/composer.json'
+            dirname($this->vendorPath).'/composer.json'
         ), true)['extra']['laravel']['dont-discover'] ?? [];
     }
 
@@ -168,5 +171,21 @@ class PackageManifest
         $this->files->put(
             $this->manifestPath, '<?php return '.var_export($manifest, true).';'
         );
+    }
+
+    /**
+     * Locate vendor directory path.
+     *
+     * Use reflection on \Composer\Autoload\ClassLoader
+     * and get its file path: /path/to/vendor/composer/ClassLoader.php
+     * Use dirname() to go 2 levels up and return: /path/to/vendor
+     *
+     * @return string
+     */
+    protected function locateVendorPath()
+    {
+        $path = (new ReflectionClass(ClassLoader::class))->getFileName();
+
+        return dirname($path, 2);
     }
 }
