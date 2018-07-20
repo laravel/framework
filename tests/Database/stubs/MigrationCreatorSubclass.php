@@ -6,7 +6,6 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 /**
  * Class MigrationCreatorSubclass
- * @package Foo\Bar
  */
 class MigrationCreatorSubclass extends MigrationCreator
 {
