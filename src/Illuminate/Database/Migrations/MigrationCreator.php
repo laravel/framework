@@ -24,6 +24,13 @@ class MigrationCreator
     protected $postCreate = [];
 
     /**
+     * The table.
+     *
+     * @var string
+     */
+    protected $table;
+
+    /**
      * Create a new migration creator instance.
      *
      * @param  \Illuminate\Filesystem\Filesystem  $files
@@ -47,6 +54,8 @@ class MigrationCreator
     public function create($name, $path, $table = null, $create = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
+
+        $this->table = $table;
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
@@ -150,13 +159,12 @@ class MigrationCreator
     /**
      * Fire the registered post create hooks.
      *
-     * @param  string  $table
      * @return void
      */
-    protected function firePostCreateHooks($table)
+    protected function firePostCreateHooks()
     {
         foreach ($this->postCreate as $callback) {
-            call_user_func($callback, $table);
+            call_user_func($callback, $this->table);
         }
     }
 
