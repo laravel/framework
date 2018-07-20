@@ -27,9 +27,11 @@ class LoadEnvironmentVariables
         try {
             (new Dotenv($app->environmentPath(), $app->environmentFile()))->load();
         } catch (InvalidPathException $e) {
-            //
+            echo 'The configured environment file path is invalid: '.$e->getMessage();
+            die(1);
         } catch (InvalidFileException $e) {
-            die('The environment file is invalid: '.$e->getMessage());
+            echo 'The environment file is invalid: '.$e->getMessage();
+            die(1);
         }
     }
 
