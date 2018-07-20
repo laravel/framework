@@ -35,11 +35,11 @@ class MailFake implements Mailer
         if (is_numeric($callback)) {
             return $this->assertSentTimes($mailable, $callback);
         }
-        
+
         $message = "The expected [{$mailable}] mailable was not sent.";
-        
+
         if (count($this->queuedMailables) > 0) {
-            $message.= " Did you mean to use assertQueued() instead?";
+            $message .= ' Did you mean to use assertQueued() instead?';
         }
 
         PHPUnit::assertTrue(
