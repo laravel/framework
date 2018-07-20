@@ -54,9 +54,16 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        $config = $this->app['config']->get($key, []);
+        $config = array_dot($this->app['config']->get($key, []));
 
-        $this->app['config']->set($key, array_merge(require $path, $config));
+        $merged = require $path;
+        if (count($config)) {
+            foreach ($config as $k => $v) {
+                data_set($merged, $k, $v);
+            }
+        }
+
+        $this->app['config']->set($key, $merged);
     }
 
     /**
