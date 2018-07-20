@@ -55,6 +55,8 @@ class MigrationCreator
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
+        // We are assigning the variable to the instance for backwards compatibility with prior versions
+        // so that it can be used in the firePostCreateHooks
         $this->table = $table;
 
         // First we will get the stub file for the migration, which serves as a type
@@ -70,7 +72,7 @@ class MigrationCreator
         // Next, we will fire any hooks that are supposed to fire after a migration is
         // created. Once that is done we'll be ready to return the full path to the
         // migration file so it can be used however it's needed by the developer.
-        $this->firePostCreateHooks($table);
+        $this->firePostCreateHooks();
 
         return $path;
     }
