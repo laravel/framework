@@ -299,11 +299,11 @@ if (! function_exists('cookie')) {
     /**
      * Create a new cookie instance.
      *
-     * @param  string  $name
-     * @param  string  $value
+     * @param  string|null  $name
+     * @param  string|null  $value
      * @param  int  $minutes
-     * @param  string  $path
-     * @param  string  $domain
+     * @param  string|null  $path
+     * @param  string|null  $domain
      * @param  bool  $secure
      * @param  bool  $httpOnly
      * @param  bool  $raw
