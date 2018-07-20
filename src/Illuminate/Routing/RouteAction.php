@@ -80,6 +80,8 @@ class RouteAction
      *
      * @param  string $action
      * @return string
+     *
+     * @throws \UnexpectedValueException
      */
     protected static function makeInvokable($action)
     {
