@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Cache;
 
 use Memcached;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 
 trait ManagesFrequencies
 {

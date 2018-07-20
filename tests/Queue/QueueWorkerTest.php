@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Queue;
 
 use Mockery;
 use RuntimeException;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;

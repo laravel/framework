@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Http;
 
 use Throwable;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Middleware\ThrottleRequestsWithRedis;

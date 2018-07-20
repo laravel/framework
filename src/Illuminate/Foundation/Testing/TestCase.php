@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\Application as Artisan;

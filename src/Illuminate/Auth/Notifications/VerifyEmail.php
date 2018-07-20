@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth\Notifications;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Notifications\Notification;
