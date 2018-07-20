@@ -28,6 +28,6 @@ class Log extends Facade
      */
     protected static function getFacadeAccessor()
     {
-        return LoggerInterface::class;
+        return 'log';
     }
 }
