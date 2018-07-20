@@ -6,7 +6,7 @@ use DateTime;
 use DateInterval;
 use Mockery as m;
 use DateTimeImmutable;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase

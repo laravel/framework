@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Cache\FileStore;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;

@@ -4,7 +4,7 @@ namespace Illuminate\Session;
 
 use Illuminate\Support\Arr;
 use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\InteractsWithTime;

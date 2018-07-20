@@ -6,7 +6,7 @@ use DateTime;
 use Mockery as m;
 use DateTimeImmutable;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;

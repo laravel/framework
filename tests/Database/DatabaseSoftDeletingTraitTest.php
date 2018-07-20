@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +25,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         ]);
         $model->delete();
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
+        $this->assertInstanceOf(Carbon::class, $model->deleted_at);
     }
 
     public function testRestore()
@@ -90,7 +91,7 @@ class DatabaseSoftDeletingTraitStub
 
     public function freshTimestamp()
     {
-        return \Illuminate\Support\Carbon::now();
+        return Carbon::now();
     }
 
     public function fromDateTime()

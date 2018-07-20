@@ -18,6 +18,7 @@
         "illuminate/contracts": "5.7.*",
         "illuminate/filesystem": "5.7.*",
         "illuminate/support": "5.7.*",
+        "nesbot/carbon": "^1.32",
         "symfony/finder": "^4.1",
         "symfony/http-foundation": "^4.1"
     },

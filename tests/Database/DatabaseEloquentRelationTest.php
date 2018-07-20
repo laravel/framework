@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Carbon\Carbon;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
@@ -47,7 +48,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $now = \Illuminate\Support\Carbon::now();
+        $now = Carbon::now();
         $related->shouldReceive('freshTimestampString')->andReturn($now);
         $builder->shouldReceive('update')->once()->with(['updated_at' => $now]);
 
@@ -120,7 +121,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder->shouldReceive('where');
             $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
             $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
-            $now = \Illuminate\Support\Carbon::now();
+            $now = Carbon::now();
             $anotherRelated->shouldReceive('freshTimestampString')->andReturn($now);
             $anotherBuilder->shouldReceive('update')->once()->with(['updated_at' => $now]);
 

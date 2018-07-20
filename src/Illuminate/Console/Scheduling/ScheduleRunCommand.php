@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Console\Command;
 
 class ScheduleRunCommand extends Command
@@ -31,7 +31,7 @@ class ScheduleRunCommand extends Command
     /**
      * The 24 hour timestamp this scheduler command started running.
      *
-     * @var \Illuminate\Support\Carbon;
+     * @var \Carbon\Carbon;
      */
     protected $startedAt;
 

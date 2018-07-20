@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentBelongsToManyTest;
 
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
