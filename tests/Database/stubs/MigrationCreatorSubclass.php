@@ -5,7 +5,7 @@ namespace Foo\Bar;
 use Illuminate\Database\Migrations\MigrationCreator;
 
 /**
- * Class MigrationCreatorSubclass
+ * Class MigrationCreatorSubclass.
  */
 class MigrationCreatorSubclass extends MigrationCreator
 {
