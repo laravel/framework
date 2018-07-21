@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Foo\Bar\MigrationCreatorSubclass;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
@@ -29,6 +30,38 @@ class DatabaseMigrationCreatorTest extends TestCase
 
         $creator = $this->getCreator();
         unset($_SERVER['__migration.creator']);
+        $creator->afterCreate(function ($table) {
+            $_SERVER['__migration.creator'] = $table;
+        });
+
+        $creator->expects($this->any())->method('getDatePrefix')->will($this->returnValue('foo'));
+        $creator->getFilesystem()->shouldReceive('get')->once()->with($creator->stubPath().'/update.stub')->andReturn('DummyClass DummyTable');
+        $creator->getFilesystem()->shouldReceive('put')->once()->with('foo/foo_create_bar.php', 'CreateBar baz');
+
+        $creator->create('create_bar', 'foo', $table);
+
+        $this->assertEquals($_SERVER['__migration.creator'], $table);
+
+        unset($_SERVER['__migration.creator']);
+    }
+
+    /**
+     * The original MigrationCreator::firePostCreateHooks() of 5.6 was parameter-less.
+     * Since that method is protected, developers can extend the class, like in MigrationCreatorSubclass.
+     * With recent changes, we saw an added parameter which breaks the MigrationCreatorSubclass in the
+     * original state of Larvel 5.6. The testBasicCreateMethodCallsPostCreateHooks above verifies the
+     * new functionality still works, while this test ensures the new changes are still compatible with
+     * the original 5.6 implementation.
+     */
+    public function testPostCreateHookMaintainsSameMethodSignature()
+    {
+        $table = 'baz';
+
+        $creator = $this->getMockBuilder(MigrationCreatorSubclass::class)
+            ->setMethods(['getDatePrefix'])
+            ->setConstructorArgs([m::mock('Illuminate\Filesystem\Filesystem')])
+            ->getMock();
+
         $creator->afterCreate(function ($table) {
             $_SERVER['__migration.creator'] = $table;
         });
