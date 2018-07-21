@@ -45,7 +45,7 @@ class HttpJsonResponseTest extends TestCase
     {
         $response = new \Illuminate\Http\JsonResponse(['foo' => 'bar']);
         $newResponse = $response->appendData(['another_foo' => 'new_bar']);
-        $this->assertInstanceOf('stdClass', $newResponse);
+        $this->assertInstanceOf(\Illuminate\Http\JsonResponse::class, $newResponse);
         $this->assertEquals('bar', $data->foo);
         $this->assertEquals('new_bar', $data->another_foo);
     }
