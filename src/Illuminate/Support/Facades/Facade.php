@@ -25,14 +25,18 @@ abstract class Facade
     /**
      * Convert the facade into a Mockery spy.
      *
-     * @return void
+     * @return MockInterface
      */
     public static function spy()
     {
         if (! static::isMock()) {
             $class = static::getMockableClass();
 
-            static::swap($class ? Mockery::spy($class) : Mockery::spy());
+            $spy = $class ? Mockery::spy($class) : Mockery::spy();
+
+            static::swap($spy);
+
+            return $spy;
         }
     }
 
