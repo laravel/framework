@@ -55,6 +55,19 @@ class JsonResponse extends BaseJsonResponse
     }
 
     /**
+     * Append data to json.
+     *
+     * @param  array  $data
+     * @return $this
+     *
+     * @throws \InvalidArgumentException
+     */
+    public function appendData($data = [])
+    {
+        return $this->setData(array_merge($this->original, $data));
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function setData($data = [])
