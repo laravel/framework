@@ -165,9 +165,9 @@ class Mailable implements MailableContract, Renderable
             return $this->later($this->delay, $queue);
         }
 
-        $connection = property_exists($this, 'connection') ? $this->connection : null;
+        $connection = $this->connection ?? null;
 
-        $queueName = property_exists($this, 'queue') ? $this->queue : null;
+        $queueName = $this->queue ?? null;
 
         return $queue->connection($connection)->pushOn(
             $queueName ?: null, new SendQueuedMailable($this)
@@ -183,9 +183,9 @@ class Mailable implements MailableContract, Renderable
      */
     public function later($delay, Queue $queue)
     {
-        $connection = property_exists($this, 'connection') ? $this->connection : null;
+        $connection = $this->connection ?? null;
 
-        $queueName = property_exists($this, 'queue') ? $this->queue : null;
+        $queueName = $this->queue ?? null;
 
         return $queue->connection($connection)->laterOn(
             $queueName ?: null, $delay, new SendQueuedMailable($this)
