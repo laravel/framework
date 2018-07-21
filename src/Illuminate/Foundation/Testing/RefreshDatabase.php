@@ -100,8 +100,7 @@ trait RefreshDatabase
      */
     protected function connectionsToTransact()
     {
-        return property_exists($this, 'connectionsToTransact')
-                            ? $this->connectionsToTransact : [null];
+        return $this->connectionsToTransact ?? [null];
     }
 
     /**
@@ -111,7 +110,6 @@ trait RefreshDatabase
      */
     protected function shouldDropViews()
     {
-        return property_exists($this, 'dropViews')
-                            ? $this->dropViews : false;
+        return $this->dropViews ?? false;
     }
 }
