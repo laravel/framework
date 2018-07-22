@@ -59,7 +59,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
-    protected function verifyUserCanAccessChannel($request, $channel, $options = [])
+    protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
             if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
@@ -70,8 +70,8 @@ abstract class Broadcaster implements BroadcasterContract
 
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
-            if ($result = $handler($request->user($options['guard'] ?? null), ...$parameters)) {
-                return $this->validAuthenticationResponse($request, $result, $options);
+            if ($result = $handler($this->retrieveUser($request, $channel), ...$parameters)) {
+                return $this->validAuthenticationResponse($request, $result);
             }
         }
 
@@ -264,5 +264,42 @@ abstract class Broadcaster implements BroadcasterContract
                 ->make($callback)
                 ->join(...$args);
         };
+    }
+
+    /**
+     * Retrieve options for a certain channel
+     *
+     * @param string $channel
+     * @return array
+     */
+    protected function retrieveOptionsForChannel($channel)
+    {
+        $channelName = Str::startsWith($channel, 'private-')
+            ? Str::replaceFirst('private-', '', $channel)
+            : Str::replaceFirst('presence-', '', $channel);
+
+        foreach ($this->channelsOptions as $pattern => $opts) {
+            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channelName)) {
+                continue;
+            }
+
+            return $opts;
+        }
+
+        return [];
+    }
+
+    /**
+     * Retrieve current user
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param string $channel
+     * @return mixed
+     */
+    protected function retrieveUser($request, $channel)
+    {
+        $options = $this->retrieveOptionsForChannel($channel);
+
+        return $request->user($options['guard'] ?? null);
     }
 }

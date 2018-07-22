@@ -59,7 +59,7 @@ class RedisBroadcaster extends Broadcaster
         }
 
         if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user($options['guard'] ?? null)) {
+            ! $this->retrieveUser($request, $request->channel_name)) {
             throw new AccessDeniedHttpException;
         }
 
@@ -82,7 +82,7 @@ class RedisBroadcaster extends Broadcaster
         }
 
         return json_encode(['channel_data' => [
-            'user_id' => $request->user($options['guard'] ?? null)->getAuthIdentifier(),
+            'user_id' => $this->retrieveUser($request, $request->channel_name)->getAuthIdentifier(),
             'user_info' => $result,
         ]]);
     }

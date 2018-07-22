@@ -15,7 +15,7 @@ class NullBroadcaster extends Broadcaster
     /**
      * {@inheritdoc}
      */
-    public function validAuthenticationResponse($request, $result, $options = [])
+    public function validAuthenticationResponse($request, $result)
     {
         //
     }

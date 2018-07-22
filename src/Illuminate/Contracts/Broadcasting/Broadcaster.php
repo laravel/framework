@@ -19,7 +19,7 @@ interface Broadcaster
      * @param  mixed  $result
      * @return mixed
      */
-    public function validAuthenticationResponse($request, $result, $options);
+    public function validAuthenticationResponse($request, $result);
 
     /**
      * Broadcast the given event.
