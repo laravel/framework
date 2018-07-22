@@ -1613,6 +1613,29 @@ class DatabaseEloquentModelTest extends TestCase
         $model->getAttributes();
     }
 
+    public function testModelAttributeCastingWithSpecialFloatValues()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $model->floatAttribute = 'Infinity';
+        $this->assertEquals(INF, $model->floatAttribute);
+
+        $model->floatAttribute = INF;
+        $this->assertEquals(INF, $model->floatAttribute);
+
+        $model->floatAttribute = '-Infinity';
+        $this->assertEquals(-INF, $model->floatAttribute);
+
+        $model->floatAttribute = -INF;
+        $this->assertEquals(-INF, $model->floatAttribute);
+
+        $model->floatAttribute = 'NaN';
+        $this->assertNan($model->floatAttribute);
+
+        $model->floatAttribute = NAN;
+        $this->assertNan($model->floatAttribute);
+    }
+
     public function testUpdatingNonExistentModelFails()
     {
         $model = new EloquentModelStub;
