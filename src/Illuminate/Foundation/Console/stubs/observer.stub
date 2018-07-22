@@ -7,7 +7,7 @@ use NamespacedDummyModel;
 class DummyClass
 {
     /**
-     * Handle to the DocDummyModel "created" event.
+     * Handle the DocDummyModel "created" event.
      *
      * @param  \NamespacedDummyModel  $dummyModel
      * @return void
