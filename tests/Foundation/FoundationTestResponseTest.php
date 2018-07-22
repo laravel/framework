@@ -181,7 +181,7 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertJsonFragment(['id' => 1]);
-            $this->fail('Asserting id => 1, existsing in JsonSerializableSingleResourceWithIntegersStub should fail');
+            $this->fail('Asserting id => 1, existing in JsonSerializableSingleResourceWithIntegersStub should fail');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
         }
     }

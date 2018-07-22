@@ -552,7 +552,7 @@ class Connection implements ConnectionInterface
 
         // Now we'll execute this callback and capture the result. Once it has been
         // executed we will restore the value of query logging and give back the
-        // value of hte callback so the original callers can have the results.
+        // value of the callback so the original callers can have the results.
         $result = $callback();
 
         $this->loggingQueries = $loggingQueries;
