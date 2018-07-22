@@ -17,7 +17,7 @@ class SupportTestingEventFakeTest extends TestCase
         $this->fake = new EventFake(m::mock(Dispatcher::class));
     }
 
-    public function testAssertDispacthed()
+    public function testAssertDispatched()
     {
         try {
             $this->fake->assertDispatched(EventStub::class);
