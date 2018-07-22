@@ -8,11 +8,12 @@ use DummyRootNamespaceHttp\Controllers\Controller;
 class DummyClass extends Controller
 {
     /**
-     * Run action.
+     * Handle the incoming request.
      *
+     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response
      */
-    public function __invoke()
+    public function __invoke(Request $request)
     {
         //
     }
