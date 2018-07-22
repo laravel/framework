@@ -67,7 +67,7 @@ class PusherBroadcaster extends Broadcaster
      * @param  mixed  $result
      * @return mixed
      */
-    public function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result, $options = [])
     {
         if (Str::startsWith($request->channel_name, 'private')) {
             return $this->decodePusherResponse(
@@ -79,7 +79,7 @@ class PusherBroadcaster extends Broadcaster
             $request,
             $this->pusher->presence_auth(
                 $request->channel_name, $request->socket_id,
-                $request->user()->getAuthIdentifier(), $result
+                $request->user($options['guard'] ?? null)->getAuthIdentifier(), $result
             )
         );
     }
