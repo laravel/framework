@@ -45,17 +45,26 @@ class RedisBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
+        $channelName = Str::startsWith($request->channel_name, 'private-')
+            ? Str::replaceFirst('private-', '', $request->channel_name)
+            : Str::replaceFirst('presence-', '', $request->channel_name);
+
+        $options = [];
+        foreach ($this->channelsOptions as $pattern => $opts) {
+            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channelName)) {
+                continue;
+            }
+
+            $options = $opts;
+        }
+
         if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user()) {
+            ! $request->user($options['guard'] ?? null)) {
             throw new AccessDeniedHttpException;
         }
 
-        $channelName = Str::startsWith($request->channel_name, 'private-')
-                            ? Str::replaceFirst('private-', '', $request->channel_name)
-                            : Str::replaceFirst('presence-', '', $request->channel_name);
-
         return parent::verifyUserCanAccessChannel(
-            $request, $channelName
+            $request, $channelName, $options
         );
     }
 
@@ -66,14 +75,14 @@ class RedisBroadcaster extends Broadcaster
      * @param  mixed  $result
      * @return mixed
      */
-    public function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result, $options = [])
     {
         if (is_bool($result)) {
             return json_encode($result);
         }
 
         return json_encode(['channel_data' => [
-            'user_id' => $request->user()->getAuthIdentifier(),
+            'user_id' => $request->user($options['guard'] ?? null)->getAuthIdentifier(),
             'user_info' => $result,
         ]]);
     }

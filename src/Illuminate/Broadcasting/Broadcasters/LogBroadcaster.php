@@ -35,7 +35,7 @@ class LogBroadcaster extends Broadcaster
     /**
      * {@inheritdoc}
      */
-    public function validAuthenticationResponse($request, $result)
+    public function validAuthenticationResponse($request, $result, $options = [])
     {
         //
     }

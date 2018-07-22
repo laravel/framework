@@ -59,19 +59,8 @@ abstract class Broadcaster implements BroadcasterContract
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
-    protected function verifyUserCanAccessChannel($request, $channel)
+    protected function verifyUserCanAccessChannel($request, $channel, $options = [])
     {
-        $options = [];
-
-        foreach ($this->channelsOptions as $pattern => $opts) {
-            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
-                continue;
-            }
-
-            $options = $opts;
-        }
-
-
         foreach ($this->channels as $pattern => $callback) {
             if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
                 continue;
@@ -82,7 +71,7 @@ abstract class Broadcaster implements BroadcasterContract
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
             if ($result = $handler($request->user($options['guard'] ?? null), ...$parameters)) {
-                return $this->validAuthenticationResponse($request, $result);
+                return $this->validAuthenticationResponse($request, $result, $options);
             }
         }
 
