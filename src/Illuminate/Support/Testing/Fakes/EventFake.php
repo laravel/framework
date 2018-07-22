@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -229,11 +230,9 @@ class EventFake implements Dispatcher
 
         return collect($this->eventsToFake)
             ->filter(function ($event) use ($eventName, $payload) {
-                if (is_callable($event)) {
-                    return $event($eventName, $payload);
-                }
-
-                return $event === $eventName;
+                return $event instanceof Closure
+                            ? $event($eventName, $payload)
+                            : $event === $eventName;
             })
             ->isEmpty();
     }
