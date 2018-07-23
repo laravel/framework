@@ -74,8 +74,10 @@ class SessionManager extends Manager
 
         $lifetime = $this->app['config']['session.lifetime'];
 
+        $logging = $this->app['config']['session.logging'] ?: [];
+
         return $this->buildSession(new DatabaseSessionHandler(
-            $this->getDatabaseConnection(), $table, $lifetime, $this->app
+            $this->getDatabaseConnection(), $table, $lifetime, $this->app, $logging
         ));
     }
 
