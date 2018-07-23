@@ -50,9 +50,17 @@ trait RefreshDatabase
     protected function refreshTestDatabase()
     {
         if (! RefreshDatabaseState::$migrated) {
-            $this->artisan('migrate:fresh', $this->shouldDropViews() ? [
-                '--drop-views' => true,
-            ] : []);
+            $options = [];
+
+            if ($this->shouldDropViews()) {
+                $options['--drop-views'] = true;
+            }
+
+            if ($this->shouldSeedWithRefresh()) {
+                $options['--seed'] = true;
+            }
+
+            $this->artisan('migrate:fresh', $options);
 
             $this->app[Kernel::class]->setArtisan(null);
 
@@ -113,5 +121,16 @@ trait RefreshDatabase
     {
         return property_exists($this, 'dropViews')
                             ? $this->dropViews : false;
+    }
+
+    /**
+     * Determine if the database should be seeded when refreshing the database.
+     *
+     * @return bool
+     */
+    protected function shouldSeedWithRefresh()
+    {
+        return property_exists($this, 'seedWithRefresh')
+                            ? $this->seedWithRefresh : false;
     }
 }
