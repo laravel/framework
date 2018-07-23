@@ -326,11 +326,9 @@ class Gate implements GateContract
         // After calling the authorization callback, we will call the "after" callbacks
         // that are registered with the Gate, which allows a developer to do logging
         // if that is required for this application. Then we'll return the result.
-        $this->callAfterCallbacks(
+        return $this->callAfterCallbacks(
             $user, $ability, $arguments, $result
         );
-
-        return $result;
     }
 
     /**
@@ -482,15 +480,17 @@ class Gate implements GateContract
      */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
-        $arguments = array_merge([$user, $ability, $result], [$arguments]);
-
         foreach ($this->afterCallbacks as $after) {
             if (is_null($user) && ! $this->callbackAllowsGuests($after)) {
                 continue;
             }
 
-            $after(...$arguments);
+            $afterResult = $after($user, $ability, $result, $arguments);
+
+            $result = $result ?? $afterResult;
         }
+
+        return $result;
     }
 
     /**
@@ -514,7 +514,7 @@ class Gate implements GateContract
         }
 
         return function () {
-            return false;
+            return null;
         };
     }
 
@@ -597,7 +597,7 @@ class Gate implements GateContract
 
             return is_callable([$policy, $ability])
                         ? $policy->{$ability}($user, ...$arguments)
-                        : false;
+                        : null;
         };
     }
 
