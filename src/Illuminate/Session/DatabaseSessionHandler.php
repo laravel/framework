@@ -44,6 +44,13 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     protected $container;
 
     /**
+     * Which request information should be logged.
+     *
+     * @var array
+     */
+    protected $logging;
+
+    /**
      * The existence state of the session.
      *
      * @var bool
@@ -59,10 +66,11 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      * @param  \Illuminate\Contracts\Container\Container|null  $container
      * @return void
      */
-    public function __construct(ConnectionInterface $connection, $table, $minutes, Container $container = null)
+    public function __construct(ConnectionInterface $connection, $table, $minutes, Container $container = null, array $logging = [])
     {
         $this->table = $table;
         $this->minutes = $minutes;
+        $this->logging = $logging;
         $this->container = $container;
         $this->connection = $connection;
     }
@@ -238,6 +246,10 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     protected function ipAddress()
     {
+        if (! Arr::get($this->logging, 'ip_address', true)) {
+            return null;
+        }
+
         return $this->container->make('request')->ip();
     }
 
@@ -248,6 +260,10 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
      */
     protected function userAgent()
     {
+        if (! Arr::get($this->logging, 'user_agent', true)) {
+            return null;
+        }
+
         return substr((string) $this->container->make('request')->header('User-Agent'), 0, 500);
     }
 
