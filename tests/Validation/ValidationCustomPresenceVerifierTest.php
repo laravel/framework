@@ -47,7 +47,7 @@ class ValidationCustomPresenceVerifierTest extends TestCase
         $verifier
             ->shouldReceive('setConnection')
             ->never();
-        
+
         return $verifier;
     }
 }
