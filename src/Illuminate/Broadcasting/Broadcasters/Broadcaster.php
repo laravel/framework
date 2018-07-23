@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Exception;
 use ReflectionClass;
 use ReflectionFunction;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -40,9 +41,10 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $channel
      * @param  callable|string  $callback
+     * @param  array   $options
      * @return $this
      */
-    public function channel($channel, $callback, array $options = [])
+    public function channel($channel, $callback, $options = [])
     {
         $this->channels[$channel] = $callback;
 
@@ -59,7 +61,7 @@ abstract class Broadcaster implements BroadcasterContract
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
-    protected function verifyUserCanAccessChannel($request, $channel)
+    protected function verifyUserCanAccessChannel($request, $channel, $options = [])
     {
         foreach ($this->channels as $pattern => $callback) {
             if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
@@ -70,7 +72,7 @@ abstract class Broadcaster implements BroadcasterContract
 
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
-            if ($result = $handler($this->retrieveUser($request, $channel), ...$parameters)) {
+            if ($result = $handler($this->retrieveUser($request, $options['guards'] ?? null), ...$parameters)) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
@@ -269,17 +271,13 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Retrieve options for a certain channel
      *
-     * @param string $channel
+     * @param  string $channel
      * @return array
      */
-    protected function retrieveOptionsForChannel($channel)
+    protected function retrieveChannelOptions($channel)
     {
-        $channelName = Str::startsWith($channel, 'private-')
-            ? Str::replaceFirst('private-', '', $channel)
-            : Str::replaceFirst('presence-', '', $channel);
-
         foreach ($this->channelsOptions as $pattern => $opts) {
-            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channelName)) {
+            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
                 continue;
             }
 
@@ -290,16 +288,27 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Retrieve current user
+     * Retrieve user by checking in provided guards
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param string $channel
+     * @param  array  $guards
+     *
      * @return mixed
      */
-    protected function retrieveUser($request, $channel)
+    protected function retrieveUser($request, $guards = null)
     {
-        $options = $this->retrieveOptionsForChannel($channel);
+        if (is_null($guards)) {
+            return $request->user();
+        }
 
-        return $request->user($options['guard'] ?? null);
+        $guards = Arr::wrap($guards);
+
+        foreach ($guards as $guard) {
+            if ($user = $request->user($guard)) {
+                return $user;
+            }
+        }
+
+        return null;
     }
 }
