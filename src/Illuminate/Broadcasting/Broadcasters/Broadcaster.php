@@ -58,6 +58,7 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
+     * @param  array   $options
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
@@ -271,7 +272,7 @@ abstract class Broadcaster implements BroadcasterContract
     /**
      * Retrieve options for a certain channel
      *
-     * @param  string $channel
+     * @param  string  $channel
      * @return array
      */
     protected function retrieveChannelOptions($channel)

@@ -109,7 +109,6 @@ class RedisBroadcaster extends Broadcaster
      * Return true if channel is protected by authentication
      *
      * @param  string  $channel
-     *
      * @return bool
      */
     public function isGuardedChannel($channel)
@@ -121,7 +120,6 @@ class RedisBroadcaster extends Broadcaster
      * Remove prefix from channel name
      *
      * @param  string  $channel
-     *
      * @return string
      */
     public function normalizeChannelName($channel)
