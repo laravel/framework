@@ -1047,7 +1047,9 @@ class Validator implements ValidatorContract
     protected function getPresenceVerifierFor($connection)
     {
         return tap($this->getPresenceVerifier(), function ($verifier) use ($connection) {
-            $verifier->setConnection($connection);
+            if (method_exists($verifier, 'setConnection')) {
+                $verifier->setConnection($connection);
+            }
         });
     }
 
