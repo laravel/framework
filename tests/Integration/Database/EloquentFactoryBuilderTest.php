@@ -53,7 +53,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->afterMakingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
             $server = factory(FactoryBuildableServer::class)
-                ->states('callable')
+                ->state('callable')
                 ->make(['user_id' => $user->id]);
 
             $user->servers->push($server);
@@ -91,7 +91,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->afterCreatingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
             $server = factory(FactoryBuildableServer::class)
-                ->states('callable')
+                ->state('callable')
                 ->create(['user_id' => $user->id]);
         });
 
@@ -186,11 +186,11 @@ class EloquentFactoryBuilderTest extends TestCase
     /**
      * @test
      */
-    public function creating_models_with_callable_states()
+    public function creating_models_with_callable_state()
     {
         $server = factory(FactoryBuildableServer::class)->create();
 
-        $callableServer = factory(FactoryBuildableServer::class)->states('callable')->create();
+        $callableServer = factory(FactoryBuildableServer::class)->state('callable')->create();
 
         $this->assertEquals('active', $server->status);
         $this->assertEquals(['Storage', 'Data'], $server->tags);
@@ -200,11 +200,11 @@ class EloquentFactoryBuilderTest extends TestCase
     /**
      * @test
      */
-    public function creating_models_with_inline_states()
+    public function creating_models_with_inline_state()
     {
         $server = factory(FactoryBuildableServer::class)->create();
 
-        $inlineServer = factory(FactoryBuildableServer::class)->states('inline')->create();
+        $inlineServer = factory(FactoryBuildableServer::class)->state('inline')->create();
 
         $this->assertEquals('active', $server->status);
         $this->assertEquals('inline', $inlineServer->status);
@@ -249,9 +249,9 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function creating_models_with_after_callback_states()
+    public function creating_models_with_after_callback_state()
     {
-        $user = factory(FactoryBuildableUser::class)->states('with_callable_server')->create();
+        $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->create();
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
@@ -276,9 +276,9 @@ class EloquentFactoryBuilderTest extends TestCase
     }
 
     /** @test **/
-    public function making_models_with_after_callback_states()
+    public function making_models_with_after_callback_state()
     {
-        $user = factory(FactoryBuildableUser::class)->states('with_callable_server')->make();
+        $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->make();
 
         $this->assertNotNull($user->profile);
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
