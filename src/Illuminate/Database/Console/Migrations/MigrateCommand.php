@@ -39,7 +39,8 @@ class MigrateCommand extends BaseCommand
     /**
      * Create a new migration command instance.
      *
-     * @param  \Illuminate\Database\Migrations\Migrator  $migrator
+     * @param \Illuminate\Database\Migrations\Migrator $migrator
+     *
      * @return void
      */
     public function __construct(Migrator $migrator)
@@ -56,7 +57,7 @@ class MigrateCommand extends BaseCommand
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -67,7 +68,7 @@ class MigrateCommand extends BaseCommand
         // so that migrations may be run for any path within the applications.
         $this->migrator->run($this->getMigrationPaths(), [
             'pretend' => $this->option('pretend'),
-            'step' => $this->option('step'),
+            'step'    => $this->option('step'),
         ]);
 
         // Once the migrator has run we will grab the note output and send it out to
@@ -94,7 +95,7 @@ class MigrateCommand extends BaseCommand
     {
         $this->migrator->setConnection($this->option('database'));
 
-        if (! $this->migrator->repositoryExists()) {
+        if (!$this->migrator->repositoryExists()) {
             $this->call(
                 'migrate:install', ['--database' => $this->option('database')]
             );

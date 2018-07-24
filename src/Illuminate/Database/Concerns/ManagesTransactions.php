@@ -11,11 +11,12 @@ trait ManagesTransactions
     /**
      * Execute a Closure within a transaction.
      *
-     * @param  \Closure  $callback
-     * @param  int  $attempts
-     * @return mixed
+     * @param \Closure $callback
+     * @param int      $attempts
      *
      * @throws \Exception|\Throwable
+     *
+     * @return mixed
      */
     public function transaction(Closure $callback, $attempts = 1)
     {
@@ -49,12 +50,13 @@ trait ManagesTransactions
     /**
      * Handle an exception encountered when running a transacted statement.
      *
-     * @param  \Exception  $e
-     * @param  int  $currentAttempt
-     * @param  int  $maxAttempts
-     * @return void
+     * @param \Exception $e
+     * @param int        $currentAttempt
+     * @param int        $maxAttempts
      *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function handleTransactionException($e, $currentAttempt, $maxAttempts)
     {
@@ -84,8 +86,9 @@ trait ManagesTransactions
     /**
      * Start a new database transaction.
      *
-     * @return void
      * @throws \Exception
+     *
+     * @return void
      */
     public function beginTransaction()
     {
@@ -129,10 +132,11 @@ trait ManagesTransactions
     /**
      * Handle an exception from a transaction beginning.
      *
-     * @param  \Throwable  $e
-     * @return void
+     * @param \Throwable $e
      *
      * @throws \Exception
+     *
+     * @return void
      */
     protected function handleBeginTransactionException($e)
     {
@@ -164,7 +168,8 @@ trait ManagesTransactions
     /**
      * Rollback the active database transaction.
      *
-     * @param  int|null  $toLevel
+     * @param int|null $toLevel
+     *
      * @return void
      */
     public function rollBack($toLevel = null)
@@ -193,7 +198,8 @@ trait ManagesTransactions
     /**
      * Perform a rollback within the database.
      *
-     * @param  int  $toLevel
+     * @param int $toLevel
+     *
      * @return void
      */
     protected function performRollBack($toLevel)

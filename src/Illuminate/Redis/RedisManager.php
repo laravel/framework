@@ -2,8 +2,8 @@
 
 namespace Illuminate\Redis;
 
-use InvalidArgumentException;
 use Illuminate\Contracts\Redis\Factory;
+use InvalidArgumentException;
 
 /**
  * @mixin \Illuminate\Redis\Connections\Connection
@@ -34,8 +34,9 @@ class RedisManager implements Factory
     /**
      * Create a new Redis manager instance.
      *
-     * @param  string  $driver
-     * @param  array  $config
+     * @param string $driver
+     * @param array  $config
+     *
      * @return void
      */
     public function __construct($driver, array $config)
@@ -47,7 +48,8 @@ class RedisManager implements Factory
     /**
      * Get a Redis connection by name.
      *
-     * @param  string|null  $name
+     * @param string|null $name
+     *
      * @return \Illuminate\Redis\Connections\Connection
      */
     public function connection($name = null)
@@ -64,10 +66,11 @@ class RedisManager implements Factory
     /**
      * Resolve the given connection by name.
      *
-     * @param  string|null  $name
-     * @return \Illuminate\Redis\Connections\Connection
+     * @param string|null $name
      *
      * @throws \InvalidArgumentException
+     *
+     * @return \Illuminate\Redis\Connections\Connection
      */
     public function resolve($name = null)
     {
@@ -89,7 +92,8 @@ class RedisManager implements Factory
     /**
      * Resolve the given cluster connection by name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Illuminate\Redis\Connections\Connection
      */
     protected function resolveCluster($name)
@@ -110,9 +114,9 @@ class RedisManager implements Factory
     {
         switch ($this->driver) {
             case 'predis':
-                return new Connectors\PredisConnector;
+                return new Connectors\PredisConnector();
             case 'phpredis':
-                return new Connectors\PhpRedisConnector;
+                return new Connectors\PhpRedisConnector();
         }
     }
 
@@ -129,8 +133,9 @@ class RedisManager implements Factory
     /**
      * Pass methods onto the default Redis connection.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)

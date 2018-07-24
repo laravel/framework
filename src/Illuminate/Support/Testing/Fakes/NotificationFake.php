@@ -2,11 +2,11 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use PHPUnit\Framework\Assert as PHPUnit;
-use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
+use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class NotificationFake implements NotificationFactory, NotificationDispatcher
 {
@@ -20,9 +20,10 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Assert if a notification was sent based on a truth-test callback.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
-     * @param  callable|null  $callback
+     * @param mixed         $notifiable
+     * @param string        $notification
+     * @param callable|null $callback
+     *
      * @return void
      */
     public function assertSentTo($notifiable, $notification, $callback = null)
@@ -48,9 +49,10 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Assert if a notification was sent a number of times.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
-     * @param  int  $times
+     * @param mixed  $notifiable
+     * @param string $notification
+     * @param int    $times
+     *
      * @return void
      */
     public function assertSentToTimes($notifiable, $notification, $times = 1)
@@ -64,9 +66,10 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Determine if a notification was sent based on a truth-test callback.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
-     * @param  callable|null  $callback
+     * @param mixed         $notifiable
+     * @param string        $notification
+     * @param callable|null $callback
+     *
      * @return void
      */
     public function assertNotSentTo($notifiable, $notification, $callback = null)
@@ -98,8 +101,9 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Assert the total amount of times a notification was sent.
      *
-     * @param  int  $expectedCount
-     * @param  string  $notification
+     * @param int    $expectedCount
+     * @param string $notification
+     *
      * @return void
      */
     public function assertTimesSent($expectedCount, $notification)
@@ -119,14 +123,15 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Get all of the notifications matching a truth-test callback.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
-     * @param  callable|null  $callback
+     * @param mixed         $notifiable
+     * @param string        $notification
+     * @param callable|null $callback
+     *
      * @return \Illuminate\Support\Collection
      */
     public function sent($notifiable, $notification, $callback = null)
     {
-        if (! $this->hasSent($notifiable, $notification)) {
+        if (!$this->hasSent($notifiable, $notification)) {
             return collect();
         }
 
@@ -144,20 +149,22 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Determine if there are more notifications left to inspect.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param mixed  $notifiable
+     * @param string $notification
+     *
      * @return bool
      */
     public function hasSent($notifiable, $notification)
     {
-        return ! empty($this->notificationsFor($notifiable, $notification));
+        return !empty($this->notificationsFor($notifiable, $notification));
     }
 
     /**
      * Get all of the notifications for a notifiable entity by type.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $notification
+     * @param mixed  $notifiable
+     * @param string $notification
+     *
      * @return array
      */
     protected function notificationsFor($notifiable, $notification)
@@ -172,8 +179,9 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed                                      $notification
+     *
      * @return void
      */
     public function send($notifiables, $notification)
@@ -184,25 +192,26 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed                                      $notification
+     *
      * @return void
      */
     public function sendNow($notifiables, $notification)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+        if (!$notifiables instanceof Collection && !is_array($notifiables)) {
             $notifiables = [$notifiables];
         }
 
         foreach ($notifiables as $notifiable) {
-            if (! $notification->id) {
+            if (!$notification->id) {
                 $notification->id = Str::uuid()->toString();
             }
 
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,
-                'channels' => $notification->via($notifiable),
-                'notifiable' => $notifiable,
+                'channels'     => $notification->via($notifiable),
+                'notifiable'   => $notifiable,
             ];
         }
     }
@@ -210,7 +219,8 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
     /**
      * Get a channel instance by name.
      *
-     * @param  string|null  $name
+     * @param string|null $name
+     *
      * @return mixed
      */
     public function channel($name = null)

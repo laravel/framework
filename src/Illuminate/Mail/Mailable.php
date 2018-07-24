@@ -2,20 +2,20 @@
 
 namespace Illuminate\Mail;
 
-use ReflectionClass;
-use ReflectionProperty;
 use BadMethodCallException;
-use Illuminate\Support\Str;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Contracts\Mail\Mailable as MailableContract;
+use Illuminate\Contracts\Mail\Mailer as MailerContract;
+use Illuminate\Contracts\Queue\Factory as Queue;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
-use Illuminate\Container\Container;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Localizable;
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Contracts\Queue\Factory as Queue;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Contracts\Mail\Mailer as MailerContract;
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
-use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use ReflectionClass;
+use ReflectionProperty;
 
 class Mailable implements MailableContract, Renderable
 {
@@ -129,7 +129,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Send the message using the given mailer.
      *
-     * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
+     * @param \Illuminate\Contracts\Mail\Mailer $mailer
+     *
      * @return void
      */
     public function send(MailerContract $mailer)
@@ -152,7 +153,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Queue the message for sending.
      *
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param \Illuminate\Contracts\Queue\Factory $queue
+     *
      * @return mixed
      */
     public function queue(Queue $queue)
@@ -173,8 +175,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Deliver the queued message after the given delay.
      *
-     * @param  \DateTimeInterface|\DateInterval|int  $delay
-     * @param  \Illuminate\Contracts\Queue\Factory  $queue
+     * @param \DateTimeInterface|\DateInterval|int $delay
+     * @param \Illuminate\Contracts\Queue\Factory  $queue
+     *
      * @return mixed
      */
     public function later($delay, Queue $queue)
@@ -271,8 +274,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Build the text view for a Markdown message.
      *
-     * @param  \Illuminate\Mail\Markdown  $markdown
-     * @param  array  $data
+     * @param \Illuminate\Mail\Markdown $markdown
+     * @param array                     $data
+     *
      * @return string
      */
     protected function buildMarkdownText($markdown, $data)
@@ -284,12 +288,13 @@ class Mailable implements MailableContract, Renderable
     /**
      * Add the sender to the message.
      *
-     * @param  \Illuminate\Mail\Message  $message
+     * @param \Illuminate\Mail\Message $message
+     *
      * @return $this
      */
     protected function buildFrom($message)
     {
-        if (! empty($this->from)) {
+        if (!empty($this->from)) {
             $message->from($this->from[0]['address'], $this->from[0]['name']);
         }
 
@@ -299,7 +304,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Add all of the recipients to the message.
      *
-     * @param  \Illuminate\Mail\Message  $message
+     * @param \Illuminate\Mail\Message $message
+     *
      * @return $this
      */
     protected function buildRecipients($message)
@@ -316,7 +322,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the subject for the message.
      *
-     * @param  \Illuminate\Mail\Message  $message
+     * @param \Illuminate\Mail\Message $message
+     *
      * @return $this
      */
     protected function buildSubject($message)
@@ -333,7 +340,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Add all of the attachments to the message.
      *
-     * @param  \Illuminate\Mail\Message  $message
+     * @param \Illuminate\Mail\Message $message
+     *
      * @return $this
      */
     protected function buildAttachments($message)
@@ -354,7 +362,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Run the callbacks for the message.
      *
-     * @param  \Illuminate\Mail\Message  $message
+     * @param \Illuminate\Mail\Message $message
+     *
      * @return $this
      */
     protected function runCallbacks($message)
@@ -369,7 +378,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the locale of the message.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return $this
      */
     public function locale($locale)
@@ -384,7 +394,8 @@ class Mailable implements MailableContract, Renderable
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
      *
-     * @param  int  $level
+     * @param int $level
+     *
      * @return $this
      */
     public function priority($level = 3)
@@ -399,8 +410,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the sender of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return $this
      */
     public function from($address, $name = null)
@@ -411,8 +423,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return bool
      */
     public function hasFrom($address, $name = null)
@@ -423,8 +436,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return $this
      */
     public function to($address, $name = null)
@@ -435,8 +449,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return bool
      */
     public function hasTo($address, $name = null)
@@ -447,8 +462,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return $this
      */
     public function cc($address, $name = null)
@@ -459,8 +475,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return bool
      */
     public function hasCc($address, $name = null)
@@ -471,8 +488,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the recipients of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return $this
      */
     public function bcc($address, $name = null)
@@ -483,8 +501,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return bool
      */
     public function hasBcc($address, $name = null)
@@ -495,8 +514,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the "reply to" address of the message.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -507,8 +527,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return bool
      */
     public function hasReplyTo($address, $name = null)
@@ -521,9 +542,10 @@ class Mailable implements MailableContract, Renderable
      *
      * All recipients are stored internally as [['name' => ?, 'address' => ?]]
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
-     * @param  string  $property
+     * @param object|array|string $address
+     * @param string|null         $name
+     * @param string              $property
+     *
      * @return $this
      */
     protected function setAddress($address, $name = null, $property = 'to')
@@ -532,7 +554,7 @@ class Mailable implements MailableContract, Renderable
             $recipient = $this->normalizeRecipient($recipient);
 
             $this->{$property}[] = [
-                'name' => $recipient->name ?? null,
+                'name'    => $recipient->name ?? null,
                 'address' => $recipient->email,
             ];
         }
@@ -543,13 +565,14 @@ class Mailable implements MailableContract, Renderable
     /**
      * Convert the given recipient arguments to an array.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
+     * @param object|array|string $address
+     * @param string|null         $name
+     *
      * @return array
      */
     protected function addressesToArray($address, $name)
     {
-        if (! is_array($address) && ! $address instanceof Collection) {
+        if (!is_array($address) && !$address instanceof Collection) {
             $address = is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
         }
 
@@ -559,7 +582,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Convert the given recipient into an object.
      *
-     * @param  mixed  $recipient
+     * @param mixed $recipient
+     *
      * @return object
      */
     protected function normalizeRecipient($recipient)
@@ -576,9 +600,10 @@ class Mailable implements MailableContract, Renderable
     /**
      * Determine if the given recipient is set on the mailable.
      *
-     * @param  object|array|string  $address
-     * @param  string|null  $name
-     * @param  string  $property
+     * @param object|array|string $address
+     * @param string|null         $name
+     * @param string              $property
+     *
      * @return bool
      */
     protected function hasRecipient($address, $name = null, $property = 'to')
@@ -588,12 +613,12 @@ class Mailable implements MailableContract, Renderable
         );
 
         $expected = [
-            'name' => $expected->name ?? null,
+            'name'    => $expected->name ?? null,
             'address' => $expected->email,
         ];
 
         return collect($this->{$property})->contains(function ($actual) use ($expected) {
-            if (! isset($expected['name'])) {
+            if (!isset($expected['name'])) {
                 return $actual['address'] == $expected['address'];
             }
 
@@ -604,7 +629,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the subject of the message.
      *
-     * @param  string  $subject
+     * @param string $subject
+     *
      * @return $this
      */
     public function subject($subject)
@@ -617,8 +643,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the Markdown template for the message.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return $this
      */
     public function markdown($view, array $data = [])
@@ -632,8 +659,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the view and view data for the message.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return $this
      */
     public function view($view, array $data = [])
@@ -647,7 +675,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the rendered HTML content for the message.
      *
-     * @param  string  $html
+     * @param string $html
+     *
      * @return $this
      */
     public function html($html)
@@ -660,8 +689,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the plain text view for the message.
      *
-     * @param  string  $textView
-     * @param  array  $data
+     * @param string $textView
+     * @param array  $data
+     *
      * @return $this
      */
     public function text($textView, array $data = [])
@@ -675,8 +705,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Set the view data for the message.
      *
-     * @param  string|array  $key
-     * @param  mixed   $value
+     * @param string|array $key
+     * @param mixed        $value
+     *
      * @return $this
      */
     public function with($key, $value = null)
@@ -693,8 +724,9 @@ class Mailable implements MailableContract, Renderable
     /**
      * Attach a file to the message.
      *
-     * @param  string  $file
-     * @param  array  $options
+     * @param string $file
+     * @param array  $options
+     *
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -707,9 +739,10 @@ class Mailable implements MailableContract, Renderable
     /**
      * Attach a file to the message from storage.
      *
-     * @param  string  $path
-     * @param  string  $name
-     * @param  array  $options
+     * @param string $path
+     * @param string $name
+     * @param array  $options
+     *
      * @return $this
      */
     public function attachFromStorage($path, $name = null, array $options = [])
@@ -720,10 +753,11 @@ class Mailable implements MailableContract, Renderable
     /**
      * Attach a file to the message from storage.
      *
-     * @param  string  $disk
-     * @param  string  $path
-     * @param  string  $name
-     * @param  array  $options
+     * @param string $disk
+     * @param string $path
+     * @param string $name
+     * @param array  $options
+     *
      * @return $this
      */
     public function attachFromStorageDisk($disk, $path, $name = null, array $options = [])
@@ -739,9 +773,10 @@ class Mailable implements MailableContract, Renderable
     /**
      * Attach in-memory data as an attachment.
      *
-     * @param  string  $data
-     * @param  string  $name
-     * @param  array  $options
+     * @param string $data
+     * @param string $name
+     * @param array  $options
+     *
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -754,7 +789,8 @@ class Mailable implements MailableContract, Renderable
     /**
      * Register a callback to be called with the Swift message instance.
      *
-     * @param  callable  $callback
+     * @param callable $callback
+     *
      * @return $this
      */
     public function withSwiftMessage($callback)
@@ -767,11 +803,12 @@ class Mailable implements MailableContract, Renderable
     /**
      * Dynamically bind parameters to the message.
      *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return $this
+     * @param string $method
+     * @param array  $parameters
      *
      * @throws \BadMethodCallException
+     *
+     * @return $this
      */
     public function __call($method, $parameters)
     {

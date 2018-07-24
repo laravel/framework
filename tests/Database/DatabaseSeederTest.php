@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Seeder;
 use Mockery as m;
 use Mockery\Mock;
-use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
 
 class TestSeeder extends Seeder
@@ -32,7 +32,7 @@ class DatabaseSeederTest extends TestCase
 
     public function testCallResolveTheClassAndCallsRun()
     {
-        $seeder = new TestSeeder;
+        $seeder = new TestSeeder();
         $seeder->setContainer($container = m::mock('Illuminate\Container\Container'));
         $output = m::mock('Symfony\Component\Console\Output\OutputInterface');
         $output->shouldReceive('writeln')->once()->andReturn('foo');
@@ -49,14 +49,14 @@ class DatabaseSeederTest extends TestCase
 
     public function testSetContainer()
     {
-        $seeder = new TestSeeder;
+        $seeder = new TestSeeder();
         $container = m::mock('Illuminate\Container\Container');
         $this->assertEquals($seeder->setContainer($container), $seeder);
     }
 
     public function testSetCommand()
     {
-        $seeder = new TestSeeder;
+        $seeder = new TestSeeder();
         $command = m::mock('Illuminate\Console\Command');
         $this->assertEquals($seeder->setCommand($command), $seeder);
     }
@@ -66,7 +66,7 @@ class DatabaseSeederTest extends TestCase
         $container = m::mock('Illuminate\Container\Container');
         $container->shouldReceive('call');
 
-        $seeder = new TestDepsSeeder;
+        $seeder = new TestDepsSeeder();
         $seeder->setContainer($container);
 
         $seeder->__invoke();

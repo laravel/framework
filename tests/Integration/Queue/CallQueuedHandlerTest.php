@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Support\Facades\Event;
 use Mockery;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\Events\JobFailed;
 
 /**
  * @group integration
@@ -33,7 +33,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerTestJob),
+            'command' => serialize(new CallQueuedHandlerTestJob()),
         ]);
 
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
@@ -54,7 +54,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('failed')->once();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+            'command' => serialize(new CallQueuedHandlerExceptionThrower()),
         ]);
 
         Event::assertDispatched(JobFailed::class);
@@ -75,7 +75,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('failed')->never();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+            'command' => serialize(new CallQueuedHandlerExceptionThrower()),
         ]);
 
         Event::assertNotDispatched(JobFailed::class);

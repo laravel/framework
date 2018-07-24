@@ -8,7 +8,7 @@ class HasherTest extends TestCase
 {
     public function testBasicBcryptHashing()
     {
-        $hasher = new \Illuminate\Hashing\BcryptHasher;
+        $hasher = new \Illuminate\Hashing\BcryptHasher();
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -18,11 +18,11 @@ class HasherTest extends TestCase
 
     public function testBasicArgonHashing()
     {
-        if (! defined('PASSWORD_ARGON2I')) {
+        if (!defined('PASSWORD_ARGON2I')) {
             $this->markTestSkipped('PHP not compiled with argon2 hashing support.');
         }
 
-        $hasher = new \Illuminate\Hashing\ArgonHasher;
+        $hasher = new \Illuminate\Hashing\ArgonHasher();
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));

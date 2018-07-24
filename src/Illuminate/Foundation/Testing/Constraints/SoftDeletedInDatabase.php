@@ -31,8 +31,9 @@ class SoftDeletedInDatabase extends Constraint
     /**
      * Create a new constraint instance.
      *
-     * @param  \Illuminate\Database\Connection  $database
-     * @param  array  $data
+     * @param \Illuminate\Database\Connection $database
+     * @param array                           $data
+     *
      * @return void
      */
     public function __construct(Connection $database, array $data)
@@ -45,7 +46,8 @@ class SoftDeletedInDatabase extends Constraint
     /**
      * Check if the data is found in the given table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return bool
      */
     public function matches($table): bool
@@ -57,7 +59,8 @@ class SoftDeletedInDatabase extends Constraint
     /**
      * Get the description of the failure.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return string
      */
     public function failureDescription($table): string
@@ -71,7 +74,8 @@ class SoftDeletedInDatabase extends Constraint
     /**
      * Get additional info about the records found in the database table.
      *
-     * @param  string  $table
+     * @param string $table
+     *
      * @return string
      */
     protected function getAdditionalInfo($table)

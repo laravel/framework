@@ -21,7 +21,8 @@ class Optional implements ArrayAccess
     /**
      * Create a new optional instance.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return void
      */
     public function __construct($value)
@@ -32,7 +33,8 @@ class Optional implements ArrayAccess
     /**
      * Dynamically access a property on the underlying object.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return mixed
      */
     public function __get($key)
@@ -46,6 +48,7 @@ class Optional implements ArrayAccess
      * Dynamically check a property exists on the underlying object.
      *
      * @param $name
+     *
      * @return bool
      */
     public function __isset($name)
@@ -64,7 +67,8 @@ class Optional implements ArrayAccess
     /**
      * Determine if an item exists at an offset.
      *
-     * @param  mixed  $key
+     * @param mixed $key
+     *
      * @return bool
      */
     public function offsetExists($key)
@@ -75,7 +79,8 @@ class Optional implements ArrayAccess
     /**
      * Get an item at a given offset.
      *
-     * @param  mixed  $key
+     * @param mixed $key
+     *
      * @return mixed
      */
     public function offsetGet($key)
@@ -86,8 +91,9 @@ class Optional implements ArrayAccess
     /**
      * Set the item at a given offset.
      *
-     * @param  mixed  $key
-     * @param  mixed  $value
+     * @param mixed $key
+     * @param mixed $value
+     *
      * @return void
      */
     public function offsetSet($key, $value)
@@ -100,7 +106,8 @@ class Optional implements ArrayAccess
     /**
      * Unset the item at a given offset.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     public function offsetUnset($key)
@@ -113,8 +120,9 @@ class Optional implements ArrayAccess
     /**
      * Dynamically pass a method to the underlying object.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)

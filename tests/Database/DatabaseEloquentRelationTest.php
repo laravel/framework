@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
@@ -18,8 +18,8 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testSetRelationFail()
     {
-        $parent = new EloquentRelationResetModelStub;
-        $relation = new EloquentRelationResetModelStub;
+        $parent = new EloquentRelationResetModelStub();
+        $relation = new EloquentRelationResetModelStub();
         $parent->setRelation('test', $relation);
         $parent->setRelation('foo', 'bar');
         $this->assertArrayNotHasKey('foo', $parent->toArray());
@@ -27,8 +27,8 @@ class DatabaseEloquentRelationTest extends TestCase
 
     public function testUnsetExistingRelation()
     {
-        $parent = new EloquentRelationResetModelStub;
-        $relation = new EloquentRelationResetModelStub;
+        $parent = new EloquentRelationResetModelStub();
+        $relation = new EloquentRelationResetModelStub();
         $parent->setRelation('foo', $relation);
         $parent->unsetRelation('foo');
         $this->assertFalse($parent->relationLoaded('foo'));
@@ -237,7 +237,7 @@ class DatabaseEloquentRelationTest extends TestCase
             return 'foo';
         });
 
-        $model = new EloquentRelationResetModelStub;
+        $model = new EloquentRelationResetModelStub();
         $relation = new EloquentRelationStub($model->newQuery(), $model);
 
         $result = $relation->foo();

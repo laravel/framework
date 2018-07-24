@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\View;
 
-use Mockery as m;
 use Illuminate\View\View;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase
@@ -140,7 +140,7 @@ class ViewTest extends TestCase
 
     public function testViewConstructedWithObjectData()
     {
-        $view = $this->getView(new DataObjectStub);
+        $view = $this->getView(new DataObjectStub());
         $this->assertInstanceOf('ArrayAccess', $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');

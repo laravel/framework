@@ -3,14 +3,14 @@
 namespace Illuminate\Foundation\Http;
 
 use Exception;
-use Throwable;
-use Illuminate\Routing\Router;
-use Illuminate\Routing\Pipeline;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Http\Kernel as KernelContract;
+use Illuminate\Routing\Pipeline;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Facade;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
+use Throwable;
 
 class Kernel implements KernelContract
 {
@@ -82,8 +82,9 @@ class Kernel implements KernelContract
     /**
      * Create a new HTTP kernel instance.
      *
-     * @param  \Illuminate\Contracts\Foundation\Application  $app
-     * @param  \Illuminate\Routing\Router  $router
+     * @param \Illuminate\Contracts\Foundation\Application $app
+     * @param \Illuminate\Routing\Router                   $router
+     *
      * @return void
      */
     public function __construct(Application $app, Router $router)
@@ -105,7 +106,8 @@ class Kernel implements KernelContract
     /**
      * Handle an incoming HTTP request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     public function handle($request)
@@ -134,7 +136,8 @@ class Kernel implements KernelContract
     /**
      * Send the given request through the middleware / router.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\Response
      */
     protected function sendRequestThroughRouter($request)
@@ -158,7 +161,7 @@ class Kernel implements KernelContract
      */
     public function bootstrap()
     {
-        if (! $this->app->hasBeenBootstrapped()) {
+        if (!$this->app->hasBeenBootstrapped()) {
             $this->app->bootstrapWith($this->bootstrappers());
         }
     }
@@ -180,8 +183,9 @@ class Kernel implements KernelContract
     /**
      * Call the terminate method on any terminable middleware.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
+     * @param \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Response $response
+     *
      * @return void
      */
     public function terminate($request, $response)
@@ -194,8 +198,9 @@ class Kernel implements KernelContract
     /**
      * Call the terminate method on any terminable middleware.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
+     * @param \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Response $response
+     *
      * @return void
      */
     protected function terminateMiddleware($request, $response)
@@ -206,7 +211,7 @@ class Kernel implements KernelContract
         );
 
         foreach ($middlewares as $middleware) {
-            if (! is_string($middleware)) {
+            if (!is_string($middleware)) {
                 continue;
             }
 
@@ -223,7 +228,8 @@ class Kernel implements KernelContract
     /**
      * Gather the route middleware for the given request.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return array
      */
     protected function gatherRouteMiddleware($request)
@@ -238,7 +244,8 @@ class Kernel implements KernelContract
     /**
      * Parse a middleware string to get the name and parameters.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return array
      */
     protected function parseMiddleware($middleware)
@@ -255,7 +262,8 @@ class Kernel implements KernelContract
     /**
      * Determine if the kernel has a given middleware.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return bool
      */
     public function hasMiddleware($middleware)
@@ -266,7 +274,8 @@ class Kernel implements KernelContract
     /**
      * Add a new middleware to beginning of the stack if it does not already exist.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return $this
      */
     public function prependMiddleware($middleware)
@@ -281,7 +290,8 @@ class Kernel implements KernelContract
     /**
      * Add a new middleware to end of the stack if it does not already exist.
      *
-     * @param  string  $middleware
+     * @param string $middleware
+     *
      * @return $this
      */
     public function pushMiddleware($middleware)
@@ -306,7 +316,8 @@ class Kernel implements KernelContract
     /**
      * Report the exception to the exception handler.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return void
      */
     protected function reportException(Exception $e)
@@ -317,8 +328,9 @@ class Kernel implements KernelContract
     /**
      * Render the exception to a response.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Exception  $e
+     * @param \Illuminate\Http\Request $request
+     * @param \Exception               $e
+     *
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderException($request, Exception $e)

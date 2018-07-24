@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Queue;
 
 use Exception;
+use Illuminate\Container\Container;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Container\Container;
 
 class QueueSyncQueueTest extends TestCase
 {
@@ -18,8 +18,8 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.test']);
 
-        $sync = new \Illuminate\Queue\SyncQueue;
-        $container = new \Illuminate\Container\Container;
+        $sync = new \Illuminate\Queue\SyncQueue();
+        $container = new \Illuminate\Container\Container();
         $sync->setContainer($container);
 
         $sync->push('Illuminate\Tests\Queue\SyncQueueTestHandler', ['foo' => 'bar']);
@@ -31,8 +31,8 @@ class QueueSyncQueueTest extends TestCase
     {
         unset($_SERVER['__sync.failed']);
 
-        $sync = new \Illuminate\Queue\SyncQueue;
-        $container = new \Illuminate\Container\Container;
+        $sync = new \Illuminate\Queue\SyncQueue();
+        $container = new \Illuminate\Container\Container();
         Container::setInstance($container);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher');
         $events->shouldReceive('dispatch')->times(3);
@@ -80,7 +80,7 @@ class FailingSyncQueueTestHandler
 {
     public function fire($job, $data)
     {
-        throw new Exception;
+        throw new Exception();
     }
 
     public function failed()

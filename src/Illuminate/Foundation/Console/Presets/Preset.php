@@ -13,9 +13,9 @@ class Preset
      */
     protected static function ensureComponentDirectoryExists()
     {
-        $filesystem = new Filesystem;
+        $filesystem = new Filesystem();
 
-        if (! $filesystem->isDirectory($directory = resource_path('assets/js/components'))) {
+        if (!$filesystem->isDirectory($directory = resource_path('assets/js/components'))) {
             $filesystem->makeDirectory($directory, 0755, true);
         }
     }
@@ -23,12 +23,13 @@ class Preset
     /**
      * Update the "package.json" file.
      *
-     * @param  bool  $dev
+     * @param bool $dev
+     *
      * @return void
      */
     protected static function updatePackages($dev = true)
     {
-        if (! file_exists(base_path('package.json'))) {
+        if (!file_exists(base_path('package.json'))) {
             return;
         }
 
@@ -55,7 +56,7 @@ class Preset
      */
     protected static function removeNodeModules()
     {
-        tap(new Filesystem, function ($files) {
+        tap(new Filesystem(), function ($files) {
             $files->deleteDirectory(base_path('node_modules'));
 
             $files->delete(base_path('yarn.lock'));

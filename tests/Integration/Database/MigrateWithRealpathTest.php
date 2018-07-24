@@ -11,7 +11,7 @@ class MigrateWithRealpathTest extends DatabaseTestCase
         parent::setUp();
 
         $options = [
-            '--path' => realpath(__DIR__.'/stubs/'),
+            '--path'     => realpath(__DIR__.'/stubs/'),
             '--realpath' => true,
         ];
 
@@ -30,9 +30,9 @@ class MigrateWithRealpathTest extends DatabaseTestCase
     public function test_migrations_has_the_migrated_table()
     {
         $this->assertDatabaseHas('migrations', [
-            'id' => 1,
+            'id'        => 1,
             'migration' => '2014_10_12_000000_create_members_table',
-            'batch' => 1,
+            'batch'     => 1,
         ]);
     }
 }

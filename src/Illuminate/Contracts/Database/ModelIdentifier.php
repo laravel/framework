@@ -37,10 +37,11 @@ class ModelIdentifier
     /**
      * Create a new model identifier.
      *
-     * @param  string  $class
-     * @param  mixed  $id
-     * @param  array  $relations
-     * @param  mixed  $connection
+     * @param string $class
+     * @param mixed  $id
+     * @param array  $relations
+     * @param mixed  $connection
+     *
      * @return void
      */
     public function __construct($class, $id, array $relations, $connection)

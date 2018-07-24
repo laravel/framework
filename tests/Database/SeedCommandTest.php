@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery;
-use Illuminate\Database\Seeder;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Database\Console\Seeds\SeedCommand;
 use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\Seeder;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class SeedCommandTest extends TestCase
 {
@@ -30,7 +30,7 @@ class SeedCommandTest extends TestCase
         $command->setLaravel($container);
 
         // call run to set up IO, then fire manually.
-        $command->run(new \Symfony\Component\Console\Input\ArrayInput(['--force' => true, '--database' => 'sqlite']), new \Symfony\Component\Console\Output\NullOutput);
+        $command->run(new \Symfony\Component\Console\Input\ArrayInput(['--force' => true, '--database' => 'sqlite']), new \Symfony\Component\Console\Output\NullOutput());
         $command->handle();
 
         $container->shouldHaveReceived('call')->with([$command, 'handle']);

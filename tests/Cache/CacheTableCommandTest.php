@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\Console\CacheTableCommand;
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
-use Illuminate\Cache\Console\CacheTableCommand;
 
 class CacheTableCommandTest extends TestCase
 {
@@ -22,7 +22,7 @@ class CacheTableCommandTest extends TestCase
         );
         $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator')->shouldIgnoreMissing();
 
-        $app = new Application;
+        $app = new Application();
         $app->useDatabasePath(__DIR__);
         $app['migration.creator'] = $creator;
         $command->setLaravel($app);
@@ -37,7 +37,7 @@ class CacheTableCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput());
     }
 }
 

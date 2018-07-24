@@ -2,16 +2,16 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Queue\Connectors\SqsConnector;
-use Illuminate\Queue\Connectors\NullConnector;
-use Illuminate\Queue\Connectors\SyncConnector;
-use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Illuminate\Queue\Connectors\DatabaseConnector;
-use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
+use Illuminate\Queue\Connectors\DatabaseConnector;
+use Illuminate\Queue\Connectors\NullConnector;
+use Illuminate\Queue\Connectors\RedisConnector;
+use Illuminate\Queue\Connectors\SqsConnector;
+use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Failed\DatabaseFailedJobProvider;
+use Illuminate\Queue\Failed\NullFailedJobProvider;
+use Illuminate\Support\ServiceProvider;
 
 class QueueServiceProvider extends ServiceProvider
 {
@@ -72,7 +72,8 @@ class QueueServiceProvider extends ServiceProvider
     /**
      * Register the connectors on the queue manager.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     public function registerConnectors($manager)
@@ -85,33 +86,36 @@ class QueueServiceProvider extends ServiceProvider
     /**
      * Register the Null queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     protected function registerNullConnector($manager)
     {
         $manager->addConnector('null', function () {
-            return new NullConnector;
+            return new NullConnector();
         });
     }
 
     /**
      * Register the Sync queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     protected function registerSyncConnector($manager)
     {
         $manager->addConnector('sync', function () {
-            return new SyncConnector;
+            return new SyncConnector();
         });
     }
 
     /**
      * Register the database queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     protected function registerDatabaseConnector($manager)
@@ -124,7 +128,8 @@ class QueueServiceProvider extends ServiceProvider
     /**
      * Register the Redis queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     protected function registerRedisConnector($manager)
@@ -137,26 +142,28 @@ class QueueServiceProvider extends ServiceProvider
     /**
      * Register the Beanstalkd queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     protected function registerBeanstalkdConnector($manager)
     {
         $manager->addConnector('beanstalkd', function () {
-            return new BeanstalkdConnector;
+            return new BeanstalkdConnector();
         });
     }
 
     /**
      * Register the Amazon SQS queue connector.
      *
-     * @param  \Illuminate\Queue\QueueManager  $manager
+     * @param \Illuminate\Queue\QueueManager $manager
+     *
      * @return void
      */
     protected function registerSqsConnector($manager)
     {
         $manager->addConnector('sqs', function () {
-            return new SqsConnector;
+            return new SqsConnector();
         });
     }
 
@@ -198,14 +205,15 @@ class QueueServiceProvider extends ServiceProvider
 
             return isset($config['table'])
                         ? $this->databaseFailedJobProvider($config)
-                        : new NullFailedJobProvider;
+                        : new NullFailedJobProvider();
         });
     }
 
     /**
      * Create a new database failed job provider.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Queue\Failed\DatabaseFailedJobProvider
      */
     protected function databaseFailedJobProvider($config)

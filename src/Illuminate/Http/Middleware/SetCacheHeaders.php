@@ -9,17 +9,19 @@ class SetCacheHeaders
     /**
      * Add cache related HTTP headers.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @param  string|array  $options
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
+     * @param string|array             $options
+     *
      * @throws \InvalidArgumentException
+     *
+     * @return \Symfony\Component\HttpFoundation\Response
      */
     public function handle($request, Closure $next, $options = [])
     {
         $response = $next($request);
 
-        if (! $request->isMethodCacheable() || ! $response->getContent()) {
+        if (!$request->isMethodCacheable() || !$response->getContent()) {
             return $response;
         }
 
@@ -40,7 +42,8 @@ class SetCacheHeaders
     /**
      * Parse the given header options.
      *
-     * @param  string  $options
+     * @param string $options
+     *
      * @return array
      */
     protected function parseOptions($options)

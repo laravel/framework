@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
-use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 
 class React extends Preset
 {
@@ -25,15 +25,16 @@ class React extends Preset
     /**
      * Update the given package array.
      *
-     * @param  array  $packages
+     * @param array $packages
+     *
      * @return array
      */
     protected static function updatePackageArray(array $packages)
     {
         return [
             'babel-preset-react' => '^6.23.0',
-            'react' => '^16.2.0',
-            'react-dom' => '^16.2.0',
+            'react'              => '^16.2.0',
+            'react-dom'          => '^16.2.0',
         ] + Arr::except($packages, ['vue']);
     }
 
@@ -54,7 +55,7 @@ class React extends Preset
      */
     protected static function updateComponent()
     {
-        (new Filesystem)->delete(
+        (new Filesystem())->delete(
             resource_path('assets/js/components/ExampleComponent.vue')
         );
 

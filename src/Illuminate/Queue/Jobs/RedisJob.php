@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue\Jobs;
 
-use Illuminate\Queue\RedisQueue;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Job as JobContract;
+use Illuminate\Queue\RedisQueue;
 
 class RedisJob extends Job implements JobContract
 {
@@ -39,12 +39,13 @@ class RedisJob extends Job implements JobContract
     /**
      * Create a new job instance.
      *
-     * @param  \Illuminate\Container\Container  $container
-     * @param  \Illuminate\Queue\RedisQueue  $redis
-     * @param  string  $job
-     * @param  string  $reserved
-     * @param  string  $connectionName
-     * @param  string  $queue
+     * @param \Illuminate\Container\Container $container
+     * @param \Illuminate\Queue\RedisQueue    $redis
+     * @param string                          $job
+     * @param string                          $reserved
+     * @param string                          $connectionName
+     * @param string                          $queue
+     *
      * @return void
      */
     public function __construct(Container $container, RedisQueue $redis, $job, $reserved, $connectionName, $queue)
@@ -87,7 +88,8 @@ class RedisJob extends Job implements JobContract
     /**
      * Release the job back into the queue.
      *
-     * @param  int   $delay
+     * @param int $delay
+     *
      * @return void
      */
     public function release($delay = 0)

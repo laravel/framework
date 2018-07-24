@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Notifications\Channels\BroadcastChannel;
+use Illuminate\Notifications\Notification;
+use Mockery;
+use PHPUnit\Framework\TestCase;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
@@ -17,7 +17,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new NotificationBroadcastChannelTestNotification;
+        $notification = new NotificationBroadcastChannelTestNotification();
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -29,7 +29,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedOnCustomChannels()
     {
-        $notification = new CustomChannelsTestNotification;
+        $notification = new CustomChannelsTestNotification();
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -44,7 +44,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomEventName()
     {
-        $notification = new CustomEventNameTestNotification;
+        $notification = new CustomEventNameTestNotification();
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -59,7 +59,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomDataType()
     {
-        $notification = new CustomEventNameTestNotification;
+        $notification = new CustomEventNameTestNotification();
         $notification->id = 1;
         $notifiable = Mockery::mock();
 
@@ -74,7 +74,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedNow()
     {
-        $notification = new TestNotificationBroadCastedNow;
+        $notification = new TestNotificationBroadCastedNow();
         $notification->id = 1;
         $notifiable = Mockery::mock();
 

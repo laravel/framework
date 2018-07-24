@@ -3,21 +3,21 @@
 namespace Illuminate\Console;
 
 use Closure;
-use Illuminate\Support\ProcessUtils;
-use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Contracts\Console\Application as ApplicationContract;
 use Illuminate\Contracts\Container\Container;
-use Symfony\Component\Console\Input\ArgvInput;
-use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Process\PhpExecutableFinder;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\ConsoleOutput;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\OutputInterface;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Console\Application as SymfonyApplication;
 use Symfony\Component\Console\Command\Command as SymfonyCommand;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
-use Illuminate\Contracts\Console\Application as ApplicationContract;
+use Symfony\Component\Console\Input\ArgvInput;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\BufferedOutput;
+use Symfony\Component\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\PhpExecutableFinder;
 
 class Application extends SymfonyApplication implements ApplicationContract
 {
@@ -52,9 +52,10 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Create a new Artisan console application.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $laravel
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
-     * @param  string  $version
+     * @param \Illuminate\Contracts\Container\Container $laravel
+     * @param \Illuminate\Contracts\Events\Dispatcher   $events
+     * @param string                                    $version
+     *
      * @return void
      */
     public function __construct(Container $laravel, Dispatcher $events, $version)
@@ -77,12 +78,12 @@ class Application extends SymfonyApplication implements ApplicationContract
     public function run(InputInterface $input = null, OutputInterface $output = null)
     {
         $commandName = $this->getCommandName(
-            $input = $input ?: new ArgvInput
+            $input = $input ?: new ArgvInput()
         );
 
         $this->events->fire(
             new Events\CommandStarting(
-                $commandName, $input, $output = $output ?: new ConsoleOutput
+                $commandName, $input, $output = $output ?: new ConsoleOutput()
             )
         );
 
@@ -102,7 +103,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public static function phpBinary()
     {
-        return ProcessUtils::escapeArgument((new PhpExecutableFinder)->find(false));
+        return ProcessUtils::escapeArgument((new PhpExecutableFinder())->find(false));
     }
 
     /**
@@ -118,7 +119,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Format the given command as a fully-qualified executable command.
      *
-     * @param  string  $string
+     * @param string $string
+     *
      * @return string
      */
     public static function formatCommandString($string)
@@ -129,7 +131,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Register a console "starting" bootstrapper.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public static function starting(Closure $callback)
@@ -162,12 +165,13 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Run an Artisan console command by name.
      *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @param  \Symfony\Component\Console\Output\OutputInterface|null  $outputBuffer
-     * @return int
+     * @param string                                                 $command
+     * @param array                                                  $parameters
+     * @param \Symfony\Component\Console\Output\OutputInterface|null $outputBuffer
      *
      * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
+     *
+     * @return int
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
@@ -175,13 +179,13 @@ class Application extends SymfonyApplication implements ApplicationContract
             $command = $this->laravel->make($command)->getName();
         }
 
-        if (! $this->has($command)) {
+        if (!$this->has($command)) {
             throw new CommandNotFoundException(sprintf('The command "%s" does not exist.', $command));
         }
 
         array_unshift($parameters, $command);
 
-        $this->lastOutput = $outputBuffer ?: new BufferedOutput;
+        $this->lastOutput = $outputBuffer ?: new BufferedOutput();
 
         $this->setCatchExceptions(false);
 
@@ -207,7 +211,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add a command to the console.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param \Symfony\Component\Console\Command\Command $command
+     *
      * @return \Symfony\Component\Console\Command\Command
      */
     public function add(SymfonyCommand $command)
@@ -222,7 +227,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add the command to the parent instance.
      *
-     * @param  \Symfony\Component\Console\Command\Command  $command
+     * @param \Symfony\Component\Console\Command\Command $command
+     *
      * @return \Symfony\Component\Console\Command\Command
      */
     protected function addToParent(SymfonyCommand $command)
@@ -233,7 +239,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Add a command, resolving through the application.
      *
-     * @param  string  $command
+     * @param string $command
+     *
      * @return \Symfony\Component\Console\Command\Command
      */
     public function resolve($command)
@@ -244,7 +251,8 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Resolve an array of commands through the application.
      *
-     * @param  array|mixed  $commands
+     * @param array|mixed $commands
+     *
      * @return $this
      */
     public function resolveCommands($commands)
