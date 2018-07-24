@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Support\Collection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class DatabaseMigrationRepositoryTest extends TestCase
 {

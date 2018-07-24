@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class DatabaseEloquentMorphToTest extends TestCase
 {
@@ -154,7 +154,7 @@ class DatabaseEloquentMorphToTest extends TestCase
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
-        $parent = $parent ?: new EloquentMorphToModelStub;
+        $parent = $parent ?: new EloquentMorphToModelStub();
 
         return m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
     }

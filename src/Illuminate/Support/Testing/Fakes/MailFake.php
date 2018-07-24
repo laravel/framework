@@ -2,10 +2,10 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
-use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Mail\Mailable;
-use PHPUnit\Framework\Assert as PHPUnit;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use PHPUnit\Framework\Assert as PHPUnit;
 
 class MailFake implements Mailer
 {
@@ -26,8 +26,9 @@ class MailFake implements Mailer
     /**
      * Assert if a mailable was sent based on a truth-test callback.
      *
-     * @param  string  $mailable
-     * @param  callable|int|null  $callback
+     * @param string            $mailable
+     * @param callable|int|null $callback
+     *
      * @return void
      */
     public function assertSent($mailable, $callback = null)
@@ -51,8 +52,9 @@ class MailFake implements Mailer
     /**
      * Assert if a mailable was sent a number of times.
      *
-     * @param  string  $mailable
-     * @param  int  $times
+     * @param string $mailable
+     * @param int    $times
+     *
      * @return void
      */
     protected function assertSentTimes($mailable, $times = 1)
@@ -66,8 +68,9 @@ class MailFake implements Mailer
     /**
      * Determine if a mailable was not sent based on a truth-test callback.
      *
-     * @param  string  $mailable
-     * @param  callable|null  $callback
+     * @param string        $mailable
+     * @param callable|null $callback
+     *
      * @return void
      */
     public function assertNotSent($mailable, $callback = null)
@@ -91,8 +94,9 @@ class MailFake implements Mailer
     /**
      * Assert if a mailable was queued based on a truth-test callback.
      *
-     * @param  string  $mailable
-     * @param  callable|int|null  $callback
+     * @param string            $mailable
+     * @param callable|int|null $callback
+     *
      * @return void
      */
     public function assertQueued($mailable, $callback = null)
@@ -110,8 +114,9 @@ class MailFake implements Mailer
     /**
      * Assert if a mailable was queued a number of times.
      *
-     * @param  string  $mailable
-     * @param  int  $times
+     * @param string $mailable
+     * @param int    $times
+     *
      * @return void
      */
     protected function assertQueuedTimes($mailable, $times = 1)
@@ -125,8 +130,9 @@ class MailFake implements Mailer
     /**
      * Determine if a mailable was not queued based on a truth-test callback.
      *
-     * @param  string  $mailable
-     * @param  callable|null  $callback
+     * @param string        $mailable
+     * @param callable|null $callback
+     *
      * @return void
      */
     public function assertNotQueued($mailable, $callback = null)
@@ -150,13 +156,14 @@ class MailFake implements Mailer
     /**
      * Get all of the mailables matching a truth-test callback.
      *
-     * @param  string  $mailable
-     * @param  callable|null  $callback
+     * @param string        $mailable
+     * @param callable|null $callback
+     *
      * @return \Illuminate\Support\Collection
      */
     public function sent($mailable, $callback = null)
     {
-        if (! $this->hasSent($mailable)) {
+        if (!$this->hasSent($mailable)) {
             return collect();
         }
 
@@ -172,7 +179,8 @@ class MailFake implements Mailer
     /**
      * Determine if the given mailable has been sent.
      *
-     * @param  string  $mailable
+     * @param string $mailable
+     *
      * @return bool
      */
     public function hasSent($mailable)
@@ -183,13 +191,14 @@ class MailFake implements Mailer
     /**
      * Get all of the queued mailables matching a truth-test callback.
      *
-     * @param  string  $mailable
-     * @param  callable|null  $callback
+     * @param string        $mailable
+     * @param callable|null $callback
+     *
      * @return \Illuminate\Support\Collection
      */
     public function queued($mailable, $callback = null)
     {
-        if (! $this->hasQueued($mailable)) {
+        if (!$this->hasQueued($mailable)) {
             return collect();
         }
 
@@ -205,7 +214,8 @@ class MailFake implements Mailer
     /**
      * Determine if the given mailable has been queued.
      *
-     * @param  string  $mailable
+     * @param string $mailable
+     *
      * @return bool
      */
     public function hasQueued($mailable)
@@ -216,7 +226,8 @@ class MailFake implements Mailer
     /**
      * Get all of the mailed mailables for a given type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return \Illuminate\Support\Collection
      */
     protected function mailablesOf($type)
@@ -229,7 +240,8 @@ class MailFake implements Mailer
     /**
      * Get all of the mailed mailables for a given type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return \Illuminate\Support\Collection
      */
     protected function queuedMailablesOf($type)
@@ -242,7 +254,8 @@ class MailFake implements Mailer
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
+     * @param mixed $users
+     *
      * @return \Illuminate\Mail\PendingMail
      */
     public function to($users)
@@ -253,7 +266,8 @@ class MailFake implements Mailer
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
+     * @param mixed $users
+     *
      * @return \Illuminate\Mail\PendingMail
      */
     public function bcc($users)
@@ -264,8 +278,9 @@ class MailFake implements Mailer
     /**
      * Send a new message when only a raw text part.
      *
-     * @param  string  $text
-     * @param  \Closure|string  $callback
+     * @param string          $text
+     * @param \Closure|string $callback
+     *
      * @return int
      */
     public function raw($text, $callback)
@@ -276,14 +291,15 @@ class MailFake implements Mailer
     /**
      * Send a new message using a view.
      *
-     * @param  string|array  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param string|array    $view
+     * @param array           $data
+     * @param \Closure|string $callback
+     *
      * @return void
      */
     public function send($view, array $data = [], $callback = null)
     {
-        if (! $view instanceof Mailable) {
+        if (!$view instanceof Mailable) {
             return;
         }
 
@@ -297,13 +313,14 @@ class MailFake implements Mailer
     /**
      * Queue a new e-mail message for sending.
      *
-     * @param  string|array  $view
-     * @param  string|null  $queue
+     * @param string|array $view
+     * @param string|null  $queue
+     *
      * @return mixed
      */
     public function queue($view, $queue = null)
     {
-        if (! $view instanceof Mailable) {
+        if (!$view instanceof Mailable) {
             return;
         }
 

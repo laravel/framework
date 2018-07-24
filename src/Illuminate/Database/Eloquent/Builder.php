@@ -2,15 +2,15 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Closure;
 use BadMethodCallException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Pagination\Paginator;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -88,7 +88,8 @@ class Builder
     /**
      * Create a new Eloquent query builder instance.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param \Illuminate\Database\Query\Builder $query
+     *
      * @return void
      */
     public function __construct(QueryBuilder $query)
@@ -99,7 +100,8 @@ class Builder
     /**
      * Create and return an un-saved model instance.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function make(array $attributes = [])
@@ -110,8 +112,9 @@ class Builder
     /**
      * Register a new global scope.
      *
-     * @param  string  $identifier
-     * @param  \Illuminate\Database\Eloquent\Scope|\Closure  $scope
+     * @param string                                       $identifier
+     * @param \Illuminate\Database\Eloquent\Scope|\Closure $scope
+     *
      * @return $this
      */
     public function withGlobalScope($identifier, $scope)
@@ -128,12 +131,13 @@ class Builder
     /**
      * Remove a registered global scope.
      *
-     * @param  \Illuminate\Database\Eloquent\Scope|string  $scope
+     * @param \Illuminate\Database\Eloquent\Scope|string $scope
+     *
      * @return $this
      */
     public function withoutGlobalScope($scope)
     {
-        if (! is_string($scope)) {
+        if (!is_string($scope)) {
             $scope = get_class($scope);
         }
 
@@ -147,7 +151,8 @@ class Builder
     /**
      * Remove all or passed registered global scopes.
      *
-     * @param  array|null  $scopes
+     * @param array|null $scopes
+     *
      * @return $this
      */
     public function withoutGlobalScopes(array $scopes = null)
@@ -176,7 +181,8 @@ class Builder
     /**
      * Add a where clause on the primary key to the query.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return $this
      */
     public function whereKey($id)
@@ -193,7 +199,8 @@ class Builder
     /**
      * Add a where clause on the primary key to the query.
      *
-     * @param  mixed  $id
+     * @param mixed $id
+     *
      * @return $this
      */
     public function whereKeyNot($id)
@@ -210,10 +217,11 @@ class Builder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure  $column
-     * @param  mixed   $operator
-     * @param  mixed   $value
-     * @param  string  $boolean
+     * @param string|array|\Closure $column
+     * @param mixed                 $operator
+     * @param mixed                 $value
+     * @param string                $boolean
+     *
      * @return $this
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
@@ -232,9 +240,10 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|array|string  $column
-     * @param  mixed  $operator
-     * @param  mixed  $value
+     * @param \Closure|array|string $column
+     * @param mixed                 $operator
+     * @param mixed                 $value
+     *
      * @return \Illuminate\Database\Eloquent\Builder|static
      */
     public function orWhere($column, $operator = null, $value = null)
@@ -249,7 +258,8 @@ class Builder
     /**
      * Create a collection of models from plain arrays.
      *
-     * @param  array  $items
+     * @param array $items
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function hydrate(array $items)
@@ -264,8 +274,9 @@ class Builder
     /**
      * Create a collection of models from a raw query.
      *
-     * @param  string  $query
-     * @param  array  $bindings
+     * @param string $query
+     * @param array  $bindings
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function fromQuery($query, $bindings = [])
@@ -278,8 +289,9 @@ class Builder
     /**
      * Find a model by its primary key.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static[]|static|null
      */
     public function find($id, $columns = ['*'])
@@ -294,8 +306,9 @@ class Builder
     /**
      * Find multiple models by their primary keys.
      *
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $ids
-     * @param  array  $columns
+     * @param \Illuminate\Contracts\Support\Arrayable|array $ids
+     * @param array                                         $columns
+     *
      * @return \Illuminate\Database\Eloquent\Collection
      */
     public function findMany($ids, $columns = ['*'])
@@ -310,11 +323,12 @@ class Builder
     /**
      * Find a model by its primary key or throw an exception.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @param mixed $id
+     * @param array $columns
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     *
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -324,11 +338,11 @@ class Builder
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }
-        } elseif (! is_null($result)) {
+        } elseif (!is_null($result)) {
             return $result;
         }
 
-        throw (new ModelNotFoundException)->setModel(
+        throw (new ModelNotFoundException())->setModel(
             get_class($this->model), $id
         );
     }
@@ -336,13 +350,14 @@ class Builder
     /**
      * Find a model by its primary key or return fresh model instance.
      *
-     * @param  mixed  $id
-     * @param  array  $columns
+     * @param mixed $id
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function findOrNew($id, $columns = ['*'])
     {
-        if (! is_null($model = $this->find($id, $columns))) {
+        if (!is_null($model = $this->find($id, $columns))) {
             return $model;
         }
 
@@ -352,13 +367,14 @@ class Builder
     /**
      * Get the first record matching the attributes or instantiate it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param array $attributes
+     * @param array $values
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function firstOrNew(array $attributes, array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (!is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -368,13 +384,14 @@ class Builder
     /**
      * Get the first record matching the attributes or create it.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param array $attributes
+     * @param array $values
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function firstOrCreate(array $attributes, array $values = [])
     {
-        if (! is_null($instance = $this->where($attributes)->first())) {
+        if (!is_null($instance = $this->where($attributes)->first())) {
             return $instance;
         }
 
@@ -386,8 +403,9 @@ class Builder
     /**
      * Create or update a record matching the attributes, and fill it with values.
      *
-     * @param  array  $attributes
-     * @param  array  $values
+     * @param array $attributes
+     * @param array $values
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function updateOrCreate(array $attributes, array $values = [])
@@ -400,25 +418,27 @@ class Builder
     /**
      * Execute the query and get the first result or throw an exception.
      *
-     * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|static
+     * @param array $columns
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     *
+     * @return \Illuminate\Database\Eloquent\Model|static
      */
     public function firstOrFail($columns = ['*'])
     {
-        if (! is_null($model = $this->first($columns))) {
+        if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
-        throw (new ModelNotFoundException)->setModel(get_class($this->model));
+        throw (new ModelNotFoundException())->setModel(get_class($this->model));
     }
 
     /**
      * Execute the query and get the first result or call a callback.
      *
-     * @param  \Closure|array  $columns
-     * @param  \Closure|null  $callback
+     * @param \Closure|array $columns
+     * @param \Closure|null  $callback
+     *
      * @return \Illuminate\Database\Eloquent\Model|static|mixed
      */
     public function firstOr($columns = ['*'], Closure $callback = null)
@@ -429,7 +449,7 @@ class Builder
             $columns = ['*'];
         }
 
-        if (! is_null($model = $this->first($columns))) {
+        if (!is_null($model = $this->first($columns))) {
             return $model;
         }
 
@@ -439,7 +459,8 @@ class Builder
     /**
      * Get a single column's value from the first result of a query.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return mixed
      */
     public function value($column)
@@ -452,7 +473,8 @@ class Builder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Collection|static[]
      */
     public function get($columns = ['*'])
@@ -472,7 +494,8 @@ class Builder
     /**
      * Get the hydrated models without eager loading.
      *
-     * @param  array  $columns
+     * @param array $columns
+     *
      * @return \Illuminate\Database\Eloquent\Model[]
      */
     public function getModels($columns = ['*'])
@@ -485,7 +508,8 @@ class Builder
     /**
      * Eager load the relationships for the models.
      *
-     * @param  array  $models
+     * @param array $models
+     *
      * @return array
      */
     public function eagerLoadRelations(array $models)
@@ -505,9 +529,10 @@ class Builder
     /**
      * Eagerly load the relationship on a set of models.
      *
-     * @param  array  $models
-     * @param  string  $name
-     * @param  \Closure  $constraints
+     * @param array    $models
+     * @param string   $name
+     * @param \Closure $constraints
+     *
      * @return array
      */
     protected function eagerLoadRelation(array $models, $name, Closure $constraints)
@@ -533,7 +558,8 @@ class Builder
     /**
      * Get the relation instance for the given relation name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Illuminate\Database\Eloquent\Relations\Relation
      */
     public function getRelation($name)
@@ -564,7 +590,8 @@ class Builder
     /**
      * Get the deeply nested relations for a given top-level relation.
      *
-     * @param  string  $relation
+     * @param string $relation
+     *
      * @return array
      */
     protected function relationsNestedUnder($relation)
@@ -586,8 +613,9 @@ class Builder
     /**
      * Determine if the relationship is nested.
      *
-     * @param  string  $relation
-     * @param  string  $name
+     * @param string $relation
+     * @param string $name
+     *
      * @return bool
      */
     protected function isNestedUnder($relation, $name)
@@ -610,10 +638,11 @@ class Builder
     /**
      * Chunk the results of a query by comparing numeric IDs.
      *
-     * @param  int  $count
-     * @param  callable  $callback
-     * @param  string  $column
-     * @param  string|null  $alias
+     * @param int         $count
+     * @param callable    $callback
+     * @param string      $column
+     * @param string|null $alias
+     *
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = null, $alias = null)
@@ -668,8 +697,9 @@ class Builder
     /**
      * Get an array with the values of a given column.
      *
-     * @param  string  $column
-     * @param  string|null  $key
+     * @param string      $column
+     * @param string|null $key
+     *
      * @return \Illuminate\Support\Collection
      */
     public function pluck($column, $key = null)
@@ -679,9 +709,9 @@ class Builder
         // If the model has a mutator for the requested column, we will spin through
         // the results and mutate the values so that the mutated version of these
         // columns are returned as you would expect from these Eloquent models.
-        if (! $this->model->hasGetMutator($column) &&
-            ! $this->model->hasCast($column) &&
-            ! in_array($column, $this->model->getDates())) {
+        if (!$this->model->hasGetMutator($column) &&
+            !$this->model->hasCast($column) &&
+            !in_array($column, $this->model->getDates())) {
             return $results;
         }
 
@@ -693,13 +723,14 @@ class Builder
     /**
      * Paginate the given query.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
-     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
      *
      * @throws \InvalidArgumentException
+     *
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
      */
     public function paginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
     {
@@ -712,7 +743,7 @@ class Builder
                                     : $this->model->newCollection();
 
         return $this->paginator($results, $total, $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
+            'path'     => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
     }
@@ -720,10 +751,11 @@ class Builder
     /**
      * Paginate the given query into a simple paginator.
      *
-     * @param  int  $perPage
-     * @param  array  $columns
-     * @param  string  $pageName
-     * @param  int|null  $page
+     * @param int      $perPage
+     * @param array    $columns
+     * @param string   $pageName
+     * @param int|null $page
+     *
      * @return \Illuminate\Contracts\Pagination\Paginator
      */
     public function simplePaginate($perPage = null, $columns = ['*'], $pageName = 'page', $page = null)
@@ -738,7 +770,7 @@ class Builder
         $this->skip(($page - 1) * $perPage)->take($perPage + 1);
 
         return $this->simplePaginator($this->get($columns), $perPage, $page, [
-            'path' => Paginator::resolveCurrentPath(),
+            'path'     => Paginator::resolveCurrentPath(),
             'pageName' => $pageName,
         ]);
     }
@@ -746,7 +778,8 @@ class Builder
     /**
      * Save a new model and return the instance.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function create(array $attributes = [])
@@ -759,7 +792,8 @@ class Builder
     /**
      * Save a new model and return the instance. Allow mass-assignment.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model|$this
      */
     public function forceCreate(array $attributes)
@@ -772,7 +806,8 @@ class Builder
     /**
      * Update a record in the database.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return int
      */
     public function update(array $values)
@@ -783,9 +818,10 @@ class Builder
     /**
      * Increment a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
+     * @param string    $column
+     * @param float|int $amount
+     * @param array     $extra
+     *
      * @return int
      */
     public function increment($column, $amount = 1, array $extra = [])
@@ -798,9 +834,10 @@ class Builder
     /**
      * Decrement a column's value by a given amount.
      *
-     * @param  string  $column
-     * @param  float|int  $amount
-     * @param  array  $extra
+     * @param string    $column
+     * @param float|int $amount
+     * @param array     $extra
+     *
      * @return int
      */
     public function decrement($column, $amount = 1, array $extra = [])
@@ -813,12 +850,13 @@ class Builder
     /**
      * Add the "updated at" column to an array of values.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return array
      */
     protected function addUpdatedAtColumn(array $values)
     {
-        if (! $this->model->usesTimestamps()) {
+        if (!$this->model->usesTimestamps()) {
             return $values;
         }
 
@@ -857,7 +895,8 @@ class Builder
     /**
      * Register a replacement for the default delete function.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public function onDelete(Closure $callback)
@@ -868,7 +907,8 @@ class Builder
     /**
      * Call the given local model scopes.
      *
-     * @param  array  $scopes
+     * @param array $scopes
+     *
      * @return mixed
      */
     public function scopes(array $scopes)
@@ -902,14 +942,14 @@ class Builder
      */
     public function applyScopes()
     {
-        if (! $this->scopes) {
+        if (!$this->scopes) {
             return $this;
         }
 
         $builder = clone $this;
 
         foreach ($this->scopes as $identifier => $scope) {
-            if (! isset($builder->scopes[$identifier])) {
+            if (!isset($builder->scopes[$identifier])) {
                 continue;
             }
 
@@ -936,8 +976,9 @@ class Builder
     /**
      * Apply the given scope on the current builder instance.
      *
-     * @param  callable  $scope
-     * @param  array  $parameters
+     * @param callable $scope
+     * @param array    $parameters
+     *
      * @return mixed
      */
     protected function callScope(callable $scope, $parameters = [])
@@ -964,8 +1005,9 @@ class Builder
     /**
      * Nest where conditions by slicing them at the given where count.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  int  $originalWhereCount
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param int                                $originalWhereCount
+     *
      * @return void
      */
     protected function addNewWheresWithinGroup(QueryBuilder $query, $originalWhereCount)
@@ -989,8 +1031,9 @@ class Builder
     /**
      * Slice where conditions at the given offset and add them to the query as a nested condition.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $whereSlice
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array                              $whereSlice
+     *
      * @return void
      */
     protected function groupWhereSliceForScope(QueryBuilder $query, $whereSlice)
@@ -1012,8 +1055,9 @@ class Builder
     /**
      * Create a where array with nested where conditions.
      *
-     * @param  array  $whereSlice
-     * @param  string  $boolean
+     * @param array  $whereSlice
+     * @param string $boolean
+     *
      * @return array
      */
     protected function createNestedWhere($whereSlice, $boolean = 'and')
@@ -1028,7 +1072,8 @@ class Builder
     /**
      * Set the relationships that should be eager loaded.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return $this
      */
     public function with($relations)
@@ -1043,7 +1088,8 @@ class Builder
     /**
      * Prevent the specified relations from being eager loaded.
      *
-     * @param  mixed  $relations
+     * @param mixed $relations
+     *
      * @return $this
      */
     public function without($relations)
@@ -1058,7 +1104,8 @@ class Builder
     /**
      * Create a new instance of the model being queried.
      *
-     * @param  array  $attributes
+     * @param array $attributes
+     *
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function newModelInstance($attributes = [])
@@ -1071,7 +1118,8 @@ class Builder
     /**
      * Parse a list of relations into individuals.
      *
-     * @param  array  $relations
+     * @param array $relations
+     *
      * @return array
      */
     protected function parseWithRelations(array $relations)
@@ -1106,7 +1154,8 @@ class Builder
     /**
      * Create a constraint to select the given columns for the relation.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return array
      */
     protected function createSelectWithConstraint($name)
@@ -1119,8 +1168,9 @@ class Builder
     /**
      * Parse the nested relationships in a relation.
      *
-     * @param  string  $name
-     * @param  array  $results
+     * @param string $name
+     * @param array  $results
+     *
      * @return array
      */
     protected function addNestedWiths($name, $results)
@@ -1133,7 +1183,7 @@ class Builder
         foreach (explode('.', $name) as $segment) {
             $progress[] = $segment;
 
-            if (! isset($results[$last = implode('.', $progress)])) {
+            if (!isset($results[$last = implode('.', $progress)])) {
                 $results[$last] = function () {
                     //
                 };
@@ -1156,7 +1206,8 @@ class Builder
     /**
      * Set the underlying query builder instance.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param \Illuminate\Database\Query\Builder $query
+     *
      * @return $this
      */
     public function setQuery($query)
@@ -1189,7 +1240,8 @@ class Builder
     /**
      * Set the relationships being eagerly loaded.
      *
-     * @param  array  $eagerLoad
+     * @param array $eagerLoad
+     *
      * @return $this
      */
     public function setEagerLoads(array $eagerLoad)
@@ -1212,7 +1264,8 @@ class Builder
     /**
      * Set a model instance for the model being queried.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @param \Illuminate\Database\Eloquent\Model $model
+     *
      * @return $this
      */
     public function setModel(Model $model)
@@ -1227,7 +1280,8 @@ class Builder
     /**
      * Qualify the given column name by the model's table.
      *
-     * @param  string  $column
+     * @param string $column
+     *
      * @return string
      */
     public function qualifyColumn($column)
@@ -1238,7 +1292,8 @@ class Builder
     /**
      * Get the given macro by name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Closure
      */
     public function getMacro($name)
@@ -1249,8 +1304,9 @@ class Builder
     /**
      * Dynamically handle calls into the query instance.
      *
-     * @param  string  $method
-     * @param  array  $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)
@@ -1291,11 +1347,12 @@ class Builder
     /**
      * Dynamically handle calls into the query instance.
      *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
+     * @param string $method
+     * @param array  $parameters
      *
      * @throws \BadMethodCallException
+     *
+     * @return mixed
      */
     public static function __callStatic($method, $parameters)
     {
@@ -1305,7 +1362,7 @@ class Builder
             return;
         }
 
-        if (! isset(static::$macros[$method])) {
+        if (!isset(static::$macros[$method])) {
             throw new BadMethodCallException(sprintf(
                 'Method %s::%s does not exist.', static::class, $method
             ));

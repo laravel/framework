@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Foundation\Testing\Constraints;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Tests\Foundation\FoundationTestResponseTest;
+use PHPUnit\Framework\TestCase;
 
 class SeeInOrderTest extends TestCase
 {

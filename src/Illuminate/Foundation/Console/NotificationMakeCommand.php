@@ -35,7 +35,7 @@ class NotificationMakeCommand extends GeneratorCommand
      */
     public function handle()
     {
-        if (parent::handle() === false && ! $this->option('force')) {
+        if (parent::handle() === false && !$this->option('force')) {
             return;
         }
 
@@ -53,7 +53,7 @@ class NotificationMakeCommand extends GeneratorCommand
     {
         $path = resource_path('views/'.str_replace('.', '/', $this->option('markdown'))).'.blade.php';
 
-        if (! $this->files->isDirectory(dirname($path))) {
+        if (!$this->files->isDirectory(dirname($path))) {
             $this->files->makeDirectory(dirname($path), 0755, true);
         }
 
@@ -63,7 +63,8 @@ class NotificationMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function buildClass($name)
@@ -92,7 +93,8 @@ class NotificationMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)

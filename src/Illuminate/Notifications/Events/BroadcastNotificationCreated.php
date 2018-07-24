@@ -2,10 +2,10 @@
 
 namespace Illuminate\Notifications\Events;
 
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Queue\SerializesModels;
 
 class BroadcastNotificationCreated implements ShouldBroadcast
 {
@@ -35,9 +35,10 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     /**
      * Create a new event instance.
      *
-     * @param  mixed  $notifiable
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  array  $data
+     * @param mixed                                  $notifiable
+     * @param \Illuminate\Notifications\Notification $notification
+     * @param array                                  $data
+     *
      * @return void
      */
     public function __construct($notifiable, $notification, $data)
@@ -56,7 +57,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     {
         $channels = $this->notification->broadcastOn();
 
-        if (! empty($channels)) {
+        if (!empty($channels)) {
             return $channels;
         }
 
@@ -87,7 +88,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
     public function broadcastWith()
     {
         return array_merge($this->data, [
-            'id' => $this->notification->id,
+            'id'   => $this->notification->id,
             'type' => $this->broadcastType(),
         ]);
     }

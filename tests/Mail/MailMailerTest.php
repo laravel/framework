@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
 use Illuminate\Mail\Mailer;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\HtmlString;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class MailMailerTest extends TestCase
 {
@@ -144,7 +144,7 @@ class MailMailerTest extends TestCase
         $view = m::mock('stdClass');
         $mailer->getViewFactory()->shouldReceive('make')->once()->andReturn($view);
         $view->shouldReceive('render')->once()->andReturn('rendered.view');
-        $swift = new FailingSwiftMailerStub;
+        $swift = new FailingSwiftMailerStub();
         $mailer->setSwiftMailer($swift);
 
         $mailer->send('foo', ['data'], function ($m) {
@@ -190,7 +190,7 @@ class MailMailerTest extends TestCase
     public function setSwiftMailer($mailer)
     {
         $swift = m::mock('Swift_Mailer');
-        $swift->shouldReceive('createMessage')->andReturn(new \Swift_Message);
+        $swift->shouldReceive('createMessage')->andReturn(new \Swift_Message());
         $swift->shouldReceive('getTransport')->andReturn($transport = m::mock('Swift_Transport'));
         $transport->shouldReceive('stop');
         $mailer->setSwiftMailer($swift);
@@ -221,6 +221,6 @@ class FailingSwiftMailerStub
 
     public function createMessage()
     {
-        return new \Swift_Message;
+        return new \Swift_Message();
     }
 }

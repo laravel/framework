@@ -77,8 +77,9 @@ class MailMessage extends SimpleMessage
     /**
      * Set the view for the mail message.
      *
-     * @param  array|string  $view
-     * @param  array  $data
+     * @param array|string $view
+     * @param array        $data
+     *
      * @return $this
      */
     public function view($view, array $data = [])
@@ -94,8 +95,9 @@ class MailMessage extends SimpleMessage
     /**
      * Set the Markdown template for the notification.
      *
-     * @param  string  $view
-     * @param  array  $data
+     * @param string $view
+     * @param array  $data
+     *
      * @return $this
      */
     public function markdown($view, array $data = [])
@@ -111,7 +113,8 @@ class MailMessage extends SimpleMessage
     /**
      * Set the default markdown template.
      *
-     * @param  string  $template
+     * @param string $template
+     *
      * @return $this
      */
     public function template($template)
@@ -124,8 +127,9 @@ class MailMessage extends SimpleMessage
     /**
      * Set the from address for the mail message.
      *
-     * @param  string  $address
-     * @param  string|null  $name
+     * @param string      $address
+     * @param string|null $name
+     *
      * @return $this
      */
     public function from($address, $name = null)
@@ -138,8 +142,9 @@ class MailMessage extends SimpleMessage
     /**
      * Set the "reply to" address of the message.
      *
-     * @param  array|string  $address
-     * @param  string|null  $name
+     * @param array|string $address
+     * @param string|null  $name
+     *
      * @return $this
      */
     public function replyTo($address, $name = null)
@@ -152,8 +157,9 @@ class MailMessage extends SimpleMessage
     /**
      * Set the cc address for the mail message.
      *
-     * @param  string  $address
-     * @param  string|null  $name
+     * @param string      $address
+     * @param string|null $name
+     *
      * @return $this
      */
     public function cc($address, $name = null)
@@ -166,8 +172,9 @@ class MailMessage extends SimpleMessage
     /**
      * Set the bcc address for the mail message.
      *
-     * @param  string  $address
-     * @param  string|null  $name
+     * @param string      $address
+     * @param string|null $name
+     *
      * @return $this
      */
     public function bcc($address, $name = null)
@@ -180,8 +187,9 @@ class MailMessage extends SimpleMessage
     /**
      * Attach a file to the message.
      *
-     * @param  string  $file
-     * @param  array  $options
+     * @param string $file
+     * @param array  $options
+     *
      * @return $this
      */
     public function attach($file, array $options = [])
@@ -194,9 +202,10 @@ class MailMessage extends SimpleMessage
     /**
      * Attach in-memory data as an attachment.
      *
-     * @param  string  $data
-     * @param  string  $name
-     * @param  array  $options
+     * @param string $data
+     * @param string $name
+     * @param array  $options
+     *
      * @return $this
      */
     public function attachData($data, $name, array $options = [])
@@ -211,7 +220,8 @@ class MailMessage extends SimpleMessage
      *
      * The value is an integer where 1 is the highest priority and 5 is the lowest.
      *
-     * @param  int  $level
+     * @param int $level
+     *
      * @return $this
      */
     public function priority($level)

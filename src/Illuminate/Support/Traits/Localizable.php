@@ -7,14 +7,15 @@ trait Localizable
     /**
      * Run the callback with the given locale.
      *
-     * @param  string  $locale
-     * @param  \Illuminate\Contracts\Translation\Translator  $translator
-     * @param  \Closure  $callback
+     * @param string                                       $locale
+     * @param \Illuminate\Contracts\Translation\Translator $translator
+     * @param \Closure                                     $callback
+     *
      * @return bool
      */
     public function withLocale($locale, $translator, $callback)
     {
-        if (! $locale || ! $translator) {
+        if (!$locale || !$translator) {
             return $callback();
         }
 

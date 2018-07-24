@@ -2,10 +2,10 @@
 
 namespace Illuminate\Http;
 
-use Illuminate\Support\Arr;
 use Illuminate\Container\Container;
-use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Traits\Macroable;
 use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class UploadedFile extends SymfonyUploadedFile
@@ -19,14 +19,15 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public static function fake()
     {
-        return new Testing\FileFactory;
+        return new Testing\FileFactory();
     }
 
     /**
      * Store the uploaded file on a filesystem disk.
      *
-     * @param  string  $path
-     * @param  array|string  $options
+     * @param string       $path
+     * @param array|string $options
+     *
      * @return string|false
      */
     public function store($path, $options = [])
@@ -37,8 +38,9 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Store the uploaded file on a filesystem disk with public visibility.
      *
-     * @param  string  $path
-     * @param  array|string  $options
+     * @param string       $path
+     * @param array|string $options
+     *
      * @return string|false
      */
     public function storePublicly($path, $options = [])
@@ -53,9 +55,10 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Store the uploaded file on a filesystem disk with public visibility.
      *
-     * @param  string  $path
-     * @param  string  $name
-     * @param  array|string  $options
+     * @param string       $path
+     * @param string       $name
+     * @param array|string $options
+     *
      * @return string|false
      */
     public function storePubliclyAs($path, $name, $options = [])
@@ -70,9 +73,10 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Store the uploaded file on a filesystem disk.
      *
-     * @param  string  $path
-     * @param  string  $name
-     * @param  array|string  $options
+     * @param string       $path
+     * @param string       $name
+     * @param array|string $options
+     *
      * @return string|false
      */
     public function storeAs($path, $name, $options = [])
@@ -89,8 +93,9 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Create a new file instance from a base instance.
      *
-     * @param  \Symfony\Component\HttpFoundation\File\UploadedFile  $file
-     * @param  bool $test
+     * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
+     * @param bool                                                $test
+     *
      * @return static
      */
     public static function createFromBase(SymfonyUploadedFile $file, $test = false)
@@ -108,7 +113,8 @@ class UploadedFile extends SymfonyUploadedFile
     /**
      * Parse and format the given options.
      *
-     * @param  array|string  $options
+     * @param array|string $options
+     *
      * @return array
      */
     protected function parseOptions($options)

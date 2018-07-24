@@ -16,9 +16,10 @@ class RedisLock extends Lock implements LockContract
     /**
      * Create a new lock instance.
      *
-     * @param  \Illuminate\Redis\Connections\Connection  $redis
-     * @param  string  $name
-     * @param  int  $seconds
+     * @param \Illuminate\Redis\Connections\Connection $redis
+     * @param string                                   $name
+     * @param int                                      $seconds
+     *
      * @return void
      */
     public function __construct($redis, $name, $seconds)

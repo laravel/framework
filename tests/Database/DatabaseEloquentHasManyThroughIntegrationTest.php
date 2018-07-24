@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 {
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -199,7 +199,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         });
     }
 
-
     public function testCursorReturnsCorrectModels()
     {
         $this->seedData();
@@ -208,7 +207,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         $posts = $country->posts()->cursor();
 
-        foreach ($posts as $post){
+        foreach ($posts as $post) {
             $this->assertEquals([
                 'id',
                 'user_id',
@@ -218,11 +217,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'created_at',
                 'updated_at',
                 'country_id', ], array_keys($post->getAttributes()));
-
         }
-
-
-
     }
 
     public function testEachReturnsCorrectModels()

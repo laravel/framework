@@ -16,9 +16,10 @@ class ArrayLoader implements Loader
     /**
      * Load the messages for the given locale.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  string  $namespace
+     * @param string $locale
+     * @param string $group
+     * @param string $namespace
+     *
      * @return array
      */
     public function load($locale, $group, $namespace = null)
@@ -35,8 +36,9 @@ class ArrayLoader implements Loader
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string  $hint
+     * @param string $namespace
+     * @param string $hint
+     *
      * @return void
      */
     public function addNamespace($namespace, $hint)
@@ -47,7 +49,8 @@ class ArrayLoader implements Loader
     /**
      * Add a new JSON path to the loader.
      *
-     * @param  string  $path
+     * @param string $path
+     *
      * @return void
      */
     public function addJsonPath($path)
@@ -58,10 +61,11 @@ class ArrayLoader implements Loader
     /**
      * Add messages to the loader.
      *
-     * @param  string  $locale
-     * @param  string  $group
-     * @param  array  $messages
-     * @param  string|null  $namespace
+     * @param string      $locale
+     * @param string      $group
+     * @param array       $messages
+     * @param string|null $namespace
+     *
      * @return $this
      */
     public function addMessages($locale, $group, array $messages, $namespace = null)

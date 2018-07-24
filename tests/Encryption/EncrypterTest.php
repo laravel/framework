@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Encryption;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Encryption\Encrypter;
+use PHPUnit\Framework\TestCase;
 
 class EncrypterTest extends TestCase
 {

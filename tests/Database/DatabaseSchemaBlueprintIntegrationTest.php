@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Facade;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 {
@@ -19,16 +19,16 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
      */
     public function setUp()
     {
-        $this->db = $db = new DB;
+        $this->db = $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $db->setAsGlobal();
 
-        $container = new Container;
+        $container = new Container();
         $container->instance('db', $db->getDatabaseManager());
         Facade::setFacadeApplication($container);
     }
@@ -51,7 +51,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->integer('age')->change();
         });
 
-        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar());
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
@@ -84,7 +84,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->renameIndex('index1', 'index2');
         });
 
-        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new \Illuminate\Database\Schema\Grammars\SQLiteGrammar());
 
         $expected = [
             'DROP INDEX index1',

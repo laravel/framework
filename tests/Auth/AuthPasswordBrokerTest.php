@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Auth;
 
-use Mockery as m;
-use Illuminate\Support\Arr;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Support\Arr;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class AuthPasswordBrokerTest extends TestCase
 {

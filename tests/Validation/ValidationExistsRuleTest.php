@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Validation\Validator;
-use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Validation\Rules\Exists;
+use Illuminate\Validation\Validator;
+use PHPUnit\Framework\TestCase;
 
 class ValidationExistsRuleTest extends TestCase
 {
@@ -18,10 +18,10 @@ class ValidationExistsRuleTest extends TestCase
      */
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
@@ -165,7 +165,7 @@ class ValidationExistsRuleTest extends TestCase
     public function getIlluminateArrayTranslator()
     {
         return new \Illuminate\Translation\Translator(
-            new \Illuminate\Translation\ArrayLoader, 'en'
+            new \Illuminate\Translation\ArrayLoader(), 'en'
         );
     }
 }

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Http\Middleware;
 
+use Illuminate\Encryption\Encrypter;
 use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
-use Illuminate\Encryption\Encrypter;
 
 class VerifyCsrfTokenExceptTest extends TestCase
 {

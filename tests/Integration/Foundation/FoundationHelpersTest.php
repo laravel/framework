@@ -13,11 +13,11 @@ class FoundationHelpersTest extends TestCase
     public function test_rescue()
     {
         $this->assertEquals(rescue(function () {
-            throw new Exception;
+            throw new Exception();
         }, 'rescued!'), 'rescued!');
 
         $this->assertEquals(rescue(function () {
-            throw new Exception;
+            throw new Exception();
         }, function () {
             return 'rescued!';
         }), 'rescued!');
@@ -26,7 +26,7 @@ class FoundationHelpersTest extends TestCase
             return 'no need to rescue';
         }, 'rescued!'), 'no need to rescue');
 
-        $testClass = new class {
+        $testClass = new class() {
             public function test(int $a)
             {
                 return $a;

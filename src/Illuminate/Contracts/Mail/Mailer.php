@@ -9,7 +9,8 @@ interface Mailer
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
+     * @param mixed $users
+     *
      * @return \Illuminate\Mail\PendingMail
      */
     public function to($users);
@@ -17,7 +18,8 @@ interface Mailer
     /**
      * Begin the process of mailing a mailable class instance.
      *
-     * @param  mixed  $users
+     * @param mixed $users
+     *
      * @return \Illuminate\Mail\PendingMail
      */
     public function bcc($users);
@@ -25,8 +27,9 @@ interface Mailer
     /**
      * Send a new message when only a raw text part.
      *
-     * @param  string  $text
-     * @param  mixed  $callback
+     * @param string $text
+     * @param mixed  $callback
+     *
      * @return void
      */
     public function raw($text, $callback);
@@ -34,9 +37,10 @@ interface Mailer
     /**
      * Send a new message using a view.
      *
-     * @param  string|array|MailableContract  $view
-     * @param  array  $data
-     * @param  \Closure|string  $callback
+     * @param string|array|MailableContract $view
+     * @param array                         $data
+     * @param \Closure|string               $callback
+     *
      * @return void
      */
     public function send($view, array $data = [], $callback = null);

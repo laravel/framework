@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\View;
 
+use Illuminate\View\Compilers\BladeCompiler;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\View\Compilers\BladeCompiler;
 
 class ViewBladeCompilerTest extends TestCase
 {

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Queue;
 
-use stdClass;
 use Mockery as m;
-use ReflectionClass;
 use PHPUnit\Framework\TestCase;
+use ReflectionClass;
+use stdClass;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
@@ -54,7 +54,7 @@ class QueueDatabaseQueueUnitTest extends TestCase
     {
         $this->expectException('InvalidArgumentException');
 
-        $job = new stdClass;
+        $job = new stdClass();
         $job->invalid = "\xc3\x28";
 
         $queue = $this->getMockForAbstractClass('Illuminate\Queue\Queue');
@@ -90,19 +90,19 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $database->shouldReceive('table')->with('table')->andReturn($query = m::mock('stdClass'));
         $query->shouldReceive('insert')->once()->andReturnUsing(function ($records) {
             $this->assertEquals([[
-                'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
-                'attempts' => 0,
-                'reserved_at' => null,
+                'queue'        => 'queue',
+                'payload'      => json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => 'available',
-                'created_at' => 'created',
+                'created_at'   => 'created',
             ], [
-                'queue' => 'queue',
-                'payload' => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
-                'attempts' => 0,
-                'reserved_at' => null,
+                'queue'        => 'queue',
+                'payload'      => json_encode(['displayName' => 'bar', 'job' => 'bar', 'maxTries' => null, 'timeout' => null, 'data' => ['data']]),
+                'attempts'     => 0,
+                'reserved_at'  => null,
                 'available_at' => 'available',
-                'created_at' => 'created',
+                'created_at'   => 'created',
             ]], $records);
         });
 

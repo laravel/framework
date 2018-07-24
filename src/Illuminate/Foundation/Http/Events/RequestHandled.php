@@ -21,8 +21,9 @@ class RequestHandled
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Illuminate\Http\Response  $response
+     * @param \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Response $response
+     *
      * @return void
      */
     public function __construct($request, $response)

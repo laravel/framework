@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest;
 
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -84,7 +84,7 @@ class Comment extends Model
 
     public function parent()
     {
-        return $this->belongsTo(Comment::class);
+        return $this->belongsTo(self::class);
     }
 
     public function revisions()

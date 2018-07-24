@@ -14,7 +14,8 @@ trait CompilesJson
     /**
      * Compile the JSON statement into valid PHP.
      *
-     * @param  string  $expression
+     * @param string $expression
+     *
      * @return string
      */
     protected function compileJson($expression)

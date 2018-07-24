@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Foundation\Application;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Foundation\Application;
 
 class FoundationHelpersTest extends TestCase
 {
@@ -15,7 +15,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testCache()
     {
-        $app = new Application;
+        $app = new Application();
         $app['cache'] = $cache = m::mock('stdClass');
 
         // 1. cache()

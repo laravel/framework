@@ -10,18 +10,19 @@ class ValidatePostSize
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return mixed
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
      *
      * @throws \Illuminate\Http\Exceptions\PostTooLargeException
+     *
+     * @return mixed
      */
     public function handle($request, Closure $next)
     {
         $max = $this->getPostMaxSize();
 
         if ($max > 0 && $request->server('CONTENT_LENGTH') > $max) {
-            throw new PostTooLargeException;
+            throw new PostTooLargeException();
         }
 
         return $next($request);

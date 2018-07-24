@@ -79,7 +79,7 @@ class CacheRedisStoreTest extends TestCase
         $redis->putMany([
             'foo'   => 'bar',
             'baz'   => 'qux',
-            'bar' => 'norf',
+            'bar'   => 'norf',
         ], 60);
     }
 

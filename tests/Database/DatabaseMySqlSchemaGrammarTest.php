@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Schema\Blueprint;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Schema\Blueprint;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
@@ -967,6 +967,6 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new \Illuminate\Database\Schema\Grammars\MySqlGrammar;
+        return new \Illuminate\Database\Schema\Grammars\MySqlGrammar();
     }
 }
