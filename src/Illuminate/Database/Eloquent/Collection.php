@@ -238,8 +238,7 @@ class Collection extends BaseCollection implements QueueableCollection
             return ! $item instanceof Model;
         }) ? $result->toBase() : $result;
     }
-    
-    
+
     /**
      * Run an associative map over each of the items.
      *
