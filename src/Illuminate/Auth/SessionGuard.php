@@ -192,22 +192,6 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     }
 
     /**
-     * Get the ID for the currently authenticated user.
-     *
-     * @return int|null
-     */
-    public function id()
-    {
-        if ($this->loggedOut) {
-            return;
-        }
-
-        return $this->user()
-                    ? $this->user()->getAuthIdentifier()
-                    : $this->session->get($this->getName());
-    }
-
-    /**
      * Log a user into the application without sessions or cookies.
      *
      * @param  array  $credentials
