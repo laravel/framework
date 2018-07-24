@@ -246,7 +246,7 @@ class Command extends SymfonyCommand
      * Get the value of a command argument.
      *
      * @param  string|null  $key
-     * @return string|array
+     * @return string|array|null
      */
     public function argument($key = null)
     {
@@ -282,7 +282,7 @@ class Command extends SymfonyCommand
      * Get the value of a command option.
      *
      * @param  string|null  $key
-     * @return string|array
+     * @return string|array|null
      */
     public function option($key = null)
     {
