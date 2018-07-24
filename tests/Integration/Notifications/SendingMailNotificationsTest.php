@@ -121,7 +121,7 @@ class SendingMailNotificationsTest extends TestCase
             Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
-                $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com']);
+                $message->shouldReceive('to')->once()->with(['taylor@laravel.com' => 'Taylor Otwell', 'foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
 
                 $message->shouldReceive('cc')->once()->with('cc@deepblue.com', 'cc');
 
@@ -201,6 +201,7 @@ class NotifiableUserWithNamedAddress extends NotifiableUser
         return [
             $this->email => $this->name,
             'foo_'.$this->email,
+            'bar_'.$this->email,
         ];
     }
 }
