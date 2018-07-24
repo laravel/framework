@@ -245,7 +245,7 @@ class Collection extends BaseCollection implements QueueableCollection
      * The callback should return an associative array with a single key/value pair.
      *
      * @param  callable  $callback
-     * @return static
+     * @return \Illuminate\Support\Collection|static
      */
     public function mapWithKeys(callable $callback)
     {
