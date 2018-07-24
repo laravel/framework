@@ -17,7 +17,8 @@ trait CompilesHelpers
     /**
      * Compile the "dd" statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param string $arguments
+     *
      * @return string
      */
     protected function compileDd($arguments)
@@ -28,7 +29,8 @@ trait CompilesHelpers
     /**
      * Compile the "dump" statements into valid PHP.
      *
-     * @param  string  $arguments
+     * @param string $arguments
+     *
      * @return string
      */
     protected function compileDump($arguments)
@@ -39,7 +41,8 @@ trait CompilesHelpers
     /**
      * Compile the method statements into valid PHP.
      *
-     * @param  string  $method
+     * @param string $method
+     *
      * @return string
      */
     protected function compileMethod($method)

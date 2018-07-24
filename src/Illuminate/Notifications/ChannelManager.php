@@ -2,15 +2,15 @@
 
 namespace Illuminate\Notifications;
 
-use InvalidArgumentException;
-use Illuminate\Support\Manager;
-use Nexmo\Client as NexmoClient;
 use GuzzleHttp\Client as HttpClient;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Bus\Dispatcher as Bus;
-use Nexmo\Client\Credentials\Basic as NexmoCredentials;
-use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Notifications\Dispatcher as DispatcherContract;
+use Illuminate\Contracts\Notifications\Factory as FactoryContract;
+use Illuminate\Support\Manager;
+use InvalidArgumentException;
+use Nexmo\Client as NexmoClient;
+use Nexmo\Client\Credentials\Basic as NexmoCredentials;
 
 class ChannelManager extends Manager implements DispatcherContract, FactoryContract
 {
@@ -24,8 +24,9 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed                                      $notification
+     *
      * @return void
      */
     public function send($notifiables, $notification)
@@ -38,9 +39,10 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
-     * @param  array|null  $channels
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed                                      $notification
+     * @param array|null                                 $channels
+     *
      * @return void
      */
     public function sendNow($notifiables, $notification, array $channels = null)
@@ -53,7 +55,8 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Get a channel instance.
      *
-     * @param  string|null  $name
+     * @param string|null $name
+     *
      * @return mixed
      */
     public function channel($name = null)
@@ -114,16 +117,17 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
      */
     protected function createSlackDriver()
     {
-        return new Channels\SlackWebhookChannel(new HttpClient);
+        return new Channels\SlackWebhookChannel(new HttpClient());
     }
 
     /**
      * Create a new driver instance.
      *
-     * @param  string  $driver
-     * @return mixed
+     * @param string $driver
      *
      * @throws \InvalidArgumentException
+     *
+     * @return mixed
      */
     protected function createDriver($driver)
     {
@@ -161,7 +165,8 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     /**
      * Set the default channel driver name.
      *
-     * @param  string  $channel
+     * @param string $channel
+     *
      * @return void
      */
     public function deliverVia($channel)

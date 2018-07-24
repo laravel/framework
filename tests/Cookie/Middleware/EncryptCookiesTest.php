@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Cookie\Middleware;
 
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
+use Illuminate\Cookie\CookieJar;
+use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
+use Illuminate\Cookie\Middleware\EncryptCookies;
+use Illuminate\Encryption\Encrypter;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Illuminate\Routing\Controller;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cookie\CookieJar;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Routing\Controller;
-use Illuminate\Container\Container;
-use Illuminate\Encryption\Encrypter;
 use Symfony\Component\HttpFoundation\Cookie;
-use Illuminate\Cookie\Middleware\EncryptCookies;
-use Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse;
-use Illuminate\Contracts\Encryption\Encrypter as EncrypterContract;
 
 class EncryptCookiesTest extends TestCase
 {
@@ -30,19 +30,19 @@ class EncryptCookiesTest extends TestCase
     {
         parent::setUp();
 
-        $container = new Container;
+        $container = new Container();
         $container->singleton(EncrypterContract::class, function () {
             return new Encrypter(str_repeat('a', 16));
         });
 
-        $this->router = new Router(new Dispatcher, $container);
+        $this->router = new Router(new Dispatcher(), $container);
     }
 
     public function testSetCookieEncryption()
     {
         $this->router->get($this->setCookiePath, [
             'middleware' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware',
-            'uses' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@setCookies',
+            'uses'       => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@setCookies',
         ]);
 
         $response = $this->router->dispatch(Request::create($this->setCookiePath, 'GET'));
@@ -59,7 +59,7 @@ class EncryptCookiesTest extends TestCase
     {
         $this->router->get($this->queueCookiePath, [
             'middleware' => ['Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestMiddleware', 'Illuminate\Tests\Cookie\Middleware\AddQueuedCookiesToResponseTestMiddleware'],
-            'uses' => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@queueCookies',
+            'uses'       => 'Illuminate\Tests\Cookie\Middleware\EncryptCookiesTestController@queueCookies',
         ]);
 
         $response = $this->router->dispatch(Request::create($this->queueCookiePath, 'GET'));
@@ -77,7 +77,7 @@ class EncryptCookiesTestController extends Controller
 {
     public function setCookies()
     {
-        $response = new Response;
+        $response = new Response();
         $response->headers->setCookie(new Cookie('encrypted_cookie', 'value'));
         $response->headers->setCookie(new Cookie('unencrypted_cookie', 'value'));
 
@@ -86,7 +86,7 @@ class EncryptCookiesTestController extends Controller
 
     public function queueCookies()
     {
-        return new Response;
+        return new Response();
     }
 }
 
@@ -101,7 +101,7 @@ class AddQueuedCookiesToResponseTestMiddleware extends AddQueuedCookiesToRespons
 {
     public function __construct()
     {
-        $cookie = new CookieJar;
+        $cookie = new CookieJar();
         $cookie->queue(new Cookie('encrypted_cookie', 'value'));
         $cookie->queue(new Cookie('unencrypted_cookie', 'value'));
 

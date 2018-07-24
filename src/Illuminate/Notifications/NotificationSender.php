@@ -2,11 +2,11 @@
 
 namespace Illuminate\Notifications;
 
-use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Database\Eloquent\Collection as ModelCollection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 
 class NotificationSender
 {
@@ -34,9 +34,10 @@ class NotificationSender
     /**
      * Create a new notification sender instance.
      *
-     * @param  \Illuminate\Notifications\ChannelManager  $manager
-     * @param  \Illuminate\Contracts\Bus\Dispatcher  $bus
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param \Illuminate\Notifications\ChannelManager $manager
+     * @param \Illuminate\Contracts\Bus\Dispatcher     $bus
+     * @param \Illuminate\Contracts\Events\Dispatcher  $events
+     *
      * @return void
      */
     public function __construct($manager, $bus, $events)
@@ -49,8 +50,9 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable entities.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed                                      $notification
+     *
      * @return void
      */
     public function send($notifiables, $notification)
@@ -67,9 +69,10 @@ class NotificationSender
     /**
      * Send the given notification immediately.
      *
-     * @param  \Illuminate\Support\Collection|array|mixed  $notifiables
-     * @param  mixed  $notification
-     * @param  array  $channels
+     * @param \Illuminate\Support\Collection|array|mixed $notifiables
+     * @param mixed                                      $notification
+     * @param array                                      $channels
+     *
      * @return void
      */
     public function sendNow($notifiables, $notification, array $channels = null)
@@ -94,19 +97,20 @@ class NotificationSender
     /**
      * Send the given notification to the given notifiable via a channel.
      *
-     * @param  mixed  $notifiable
-     * @param  string  $id
-     * @param  mixed  $notification
-     * @param  string  $channel
+     * @param mixed  $notifiable
+     * @param string $id
+     * @param mixed  $notification
+     * @param string $channel
+     *
      * @return void
      */
     protected function sendToNotifiable($notifiable, $id, $notification, $channel)
     {
-        if (! $notification->id) {
+        if (!$notification->id) {
             $notification->id = $id;
         }
 
-        if (! $this->shouldSendNotification($notifiable, $notification, $channel)) {
+        if (!$this->shouldSendNotification($notifiable, $notification, $channel)) {
             return;
         }
 
@@ -120,9 +124,10 @@ class NotificationSender
     /**
      * Determines if the notification can be sent.
      *
-     * @param  mixed  $notifiable
-     * @param  mixed  $notification
-     * @param  string  $channel
+     * @param mixed  $notifiable
+     * @param mixed  $notification
+     * @param string $channel
+     *
      * @return bool
      */
     protected function shouldSendNotification($notifiable, $notification, $channel)
@@ -135,8 +140,9 @@ class NotificationSender
     /**
      * Queue the given notification instances.
      *
-     * @param  mixed  $notifiables
-     * @param  array[\Illuminate\Notifications\Channels\Notification]  $notification
+     * @param mixed                                                  $notifiables
+     * @param array[\Illuminate\Notifications\Channels\Notification] $notification
+     *
      * @return void
      */
     protected function queueNotification($notifiables, $notification)
@@ -166,12 +172,13 @@ class NotificationSender
     /**
      * Format the notifiables into a Collection / array if necessary.
      *
-     * @param  mixed  $notifiables
+     * @param mixed $notifiables
+     *
      * @return \Illuminate\Database\Eloquent\Collection|array
      */
     protected function formatNotifiables($notifiables)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+        if (!$notifiables instanceof Collection && !is_array($notifiables)) {
             return $notifiables instanceof Model
                             ? new ModelCollection([$notifiables]) : [$notifiables];
         }

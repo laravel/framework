@@ -7,7 +7,8 @@ trait CompilesEchos
     /**
      * Compile Blade echos into valid PHP.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEchos($value)
@@ -36,7 +37,8 @@ trait CompilesEchos
     /**
      * Compile the "raw" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRawEchos($value)
@@ -55,7 +57,8 @@ trait CompilesEchos
     /**
      * Compile the "regular" echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileRegularEchos($value)
@@ -76,7 +79,8 @@ trait CompilesEchos
     /**
      * Compile the escaped echo statements.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function compileEscapedEchos($value)
@@ -95,7 +99,8 @@ trait CompilesEchos
     /**
      * Compile the default values for the echo statement.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     public function compileEchoDefaults($value)

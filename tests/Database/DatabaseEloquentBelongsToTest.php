@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentBelongsToTest extends TestCase
 {
@@ -78,7 +78,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 'foreign.value.two']);
-        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStub, new AnotherEloquentBelongsToModelStub];
+        $models = [new EloquentBelongsToModelStub(), new EloquentBelongsToModelStub(), new AnotherEloquentBelongsToModelStub()];
         $relation->addEagerConstraints($models);
     }
 
@@ -86,7 +86,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', ['foreign.value', 0]);
-        $models = [new EloquentBelongsToModelStub, new EloquentBelongsToModelStubWithZeroId];
+        $models = [new EloquentBelongsToModelStub(), new EloquentBelongsToModelStubWithZeroId()];
         $relation->addEagerConstraints($models);
     }
 
@@ -107,9 +107,9 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $result1->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $result2 = m::mock('stdClass');
         $result2->shouldReceive('getAttribute')->with('id')->andReturn(2);
-        $model1 = new EloquentBelongsToModelStub;
+        $model1 = new EloquentBelongsToModelStub();
         $model1->foreign_key = 1;
-        $model2 = new EloquentBelongsToModelStub;
+        $model2 = new EloquentBelongsToModelStub();
         $model2->foreign_key = 2;
         $models = $relation->match([$model1, $model2], new Collection([$result1, $result2]), 'foo');
 
@@ -153,7 +153,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
-        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $models = [new MissingEloquentBelongsToModelStub(), new MissingEloquentBelongsToModelStub()];
         $relation->addEagerConstraints($models);
     }
 
@@ -161,7 +161,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation(null, false, 'string');
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
-        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $models = [new MissingEloquentBelongsToModelStub(), new MissingEloquentBelongsToModelStub()];
         $relation->addEagerConstraints($models);
     }
 
@@ -169,7 +169,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
     {
         $relation = $this->getRelation(null, false);
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('relation.id', m::mustBe([null]));
-        $models = [new MissingEloquentBelongsToModelStub, new MissingEloquentBelongsToModelStub];
+        $models = [new MissingEloquentBelongsToModelStub(), new MissingEloquentBelongsToModelStub()];
         $relation->addEagerConstraints($models);
     }
 
@@ -184,7 +184,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
-        $parent = $parent ?: new EloquentBelongsToModelStub;
+        $parent = $parent ?: new EloquentBelongsToModelStub();
 
         return new BelongsTo($this->builder, $parent, 'foreign_key', 'id', 'relation');
     }

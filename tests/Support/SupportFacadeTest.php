@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayAccess;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportFacadeTest extends TestCase
 {
@@ -22,7 +22,7 @@ class SupportFacadeTest extends TestCase
 
     public function testFacadeCallsUnderlyingApplication()
     {
-        $app = new ApplicationStub;
+        $app = new ApplicationStub();
         $app->setAttributes(['foo' => $mock = m::mock('stdClass')]);
         $mock->shouldReceive('bar')->once()->andReturn('baz');
         FacadeStub::setFacadeApplication($app);
@@ -31,8 +31,8 @@ class SupportFacadeTest extends TestCase
 
     public function testShouldReceiveReturnsAMockeryMock()
     {
-        $app = new ApplicationStub;
-        $app->setAttributes(['foo' => new stdClass]);
+        $app = new ApplicationStub();
+        $app->setAttributes(['foo' => new stdClass()]);
         FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());
@@ -41,8 +41,8 @@ class SupportFacadeTest extends TestCase
 
     public function testSpyReturnsAMockerySpy()
     {
-        $app = new ApplicationStub;
-        $app->setAttributes(['foo' => new stdClass]);
+        $app = new ApplicationStub();
+        $app->setAttributes(['foo' => new stdClass()]);
         FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf(m\MockInterface::class, $spy = FacadeStub::spy());
@@ -53,8 +53,8 @@ class SupportFacadeTest extends TestCase
 
     public function testShouldReceiveCanBeCalledTwice()
     {
-        $app = new ApplicationStub;
-        $app->setAttributes(['foo' => new stdClass]);
+        $app = new ApplicationStub();
+        $app->setAttributes(['foo' => new stdClass()]);
         FacadeStub::setFacadeApplication($app);
 
         $this->assertInstanceOf('Mockery\MockInterface', $mock = FacadeStub::shouldReceive('foo')->once()->with('bar')->andReturn('baz')->getMock());

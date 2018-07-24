@@ -3,10 +3,10 @@
 namespace Illuminate\Tests\Events;
 
 use Exception;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
+use Illuminate\Events\Dispatcher;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {
@@ -18,7 +18,7 @@ class EventsDispatcherTest extends TestCase
     public function testBasicEventExecution()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo', function ($foo) {
             $_SERVER['__event.test'] = $foo;
         });
@@ -29,7 +29,7 @@ class EventsDispatcherTest extends TestCase
     public function testHaltingEventExecution()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo', function ($foo) {
             $this->assertTrue(true);
 
@@ -62,7 +62,7 @@ class EventsDispatcherTest extends TestCase
     public function testQueuedEventsAreFired()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->push('update', ['name' => 'taylor']);
         $d->listen('update', function ($name) {
             $_SERVER['__event.test'] = $name;
@@ -76,7 +76,7 @@ class EventsDispatcherTest extends TestCase
     public function testQueuedEventsCanBeForgotten()
     {
         $_SERVER['__event.test'] = 'unset';
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->push('update', ['name' => 'taylor']);
         $d->listen('update', function ($name) {
             $_SERVER['__event.test'] = $name;
@@ -90,7 +90,7 @@ class EventsDispatcherTest extends TestCase
     public function testWildcardListeners()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo.bar', function () {
             $_SERVER['__event.test'] = 'regular';
         });
@@ -108,7 +108,7 @@ class EventsDispatcherTest extends TestCase
     public function testWildcardListenersCacheFlushing()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo.*', function () {
             $_SERVER['__event.test'] = 'cached_wildcard';
         });
@@ -125,7 +125,7 @@ class EventsDispatcherTest extends TestCase
     public function testListenersCanBeRemoved()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo', function () {
             $_SERVER['__event.test'] = 'foo';
         });
@@ -138,7 +138,7 @@ class EventsDispatcherTest extends TestCase
     public function testWildcardListenersCanBeRemoved()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo.*', function () {
             $_SERVER['__event.test'] = 'foo';
         });
@@ -150,7 +150,7 @@ class EventsDispatcherTest extends TestCase
 
     public function testListenersCanBeFound()
     {
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $this->assertFalse($d->hasListeners('foo'));
 
         $d->listen('foo', function () {
@@ -160,7 +160,7 @@ class EventsDispatcherTest extends TestCase
 
     public function testWildcardListenersCanBeFound()
     {
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $this->assertFalse($d->hasListeners('foo.*'));
 
         $d->listen('foo.*', function () {
@@ -170,14 +170,14 @@ class EventsDispatcherTest extends TestCase
 
     public function testEventPassedFirstToWildcards()
     {
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo.*', function ($event, $data) {
             $this->assertEquals('foo.bar', $event);
             $this->assertEquals(['first', 'second'], $data);
         });
         $d->fire('foo.bar', ['first', 'second']);
 
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('foo.bar', function ($first, $second) {
             $this->assertEquals('first', $first);
             $this->assertEquals('second', $second);
@@ -187,7 +187,7 @@ class EventsDispatcherTest extends TestCase
 
     public function testQueuedEventHandlersAreQueued()
     {
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $queue = m::mock('Illuminate\Contracts\Queue\Queue');
 
         $queue->shouldReceive('connection')->once()->with(null)->andReturnSelf();
@@ -205,11 +205,11 @@ class EventsDispatcherTest extends TestCase
     public function testClassesWork()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('Illuminate\Tests\Events\ExampleEvent', function () {
             $_SERVER['__event.test'] = 'baz';
         });
-        $d->fire(new ExampleEvent);
+        $d->fire(new ExampleEvent());
 
         $this->assertSame('baz', $_SERVER['__event.test']);
     }
@@ -217,11 +217,11 @@ class EventsDispatcherTest extends TestCase
     public function testInterfacesWork()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('Illuminate\Tests\Events\SomeEventInterface', function () {
             $_SERVER['__event.test'] = 'bar';
         });
-        $d->fire(new AnotherEvent);
+        $d->fire(new AnotherEvent());
 
         $this->assertSame('bar', $_SERVER['__event.test']);
     }
@@ -229,14 +229,14 @@ class EventsDispatcherTest extends TestCase
     public function testBothClassesAndInterfacesWork()
     {
         unset($_SERVER['__event.test']);
-        $d = new Dispatcher;
+        $d = new Dispatcher();
         $d->listen('Illuminate\Tests\Events\AnotherEvent', function () {
             $_SERVER['__event.test1'] = 'fooo';
         });
         $d->listen('Illuminate\Tests\Events\SomeEventInterface', function () {
             $_SERVER['__event.test2'] = 'baar';
         });
-        $d->fire(new AnotherEvent);
+        $d->fire(new AnotherEvent());
 
         $this->assertSame('fooo', $_SERVER['__event.test1']);
         $this->assertSame('baar', $_SERVER['__event.test2']);
@@ -248,7 +248,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $event = new BroadcastEvent;
+        $event = new BroadcastEvent();
 
         $this->assertTrue($d->shouldBroadcast([$event]));
     }
@@ -259,7 +259,7 @@ class EventsDispatcherTest extends TestCase
 
         $d->makePartial()->shouldAllowMockingProtectedMethods();
 
-        $event = new BroadcastFalseCondition;
+        $event = new BroadcastFalseCondition();
 
         $this->assertFalse($d->shouldBroadcast([$event]));
     }

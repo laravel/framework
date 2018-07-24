@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Auth\AuthManager;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Contracts\Auth\UserProvider;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Auth\UserProvider;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithAuthentication;
 
 class FoundationAuthenticationTest extends TestCase
 {
@@ -24,7 +24,7 @@ class FoundationAuthenticationTest extends TestCase
      * @return array
      */
     protected $credentials = [
-        'email' => 'someone@laravel.com',
+        'email'    => 'someone@laravel.com',
         'password' => 'secret_password',
     ];
 
@@ -122,7 +122,7 @@ class FoundationAuthenticationTest extends TestCase
     public function testAssertCredentialsMissing()
     {
         $credentials = [
-            'email' => 'invalid',
+            'email'    => 'invalid',
             'password' => 'credentials',
         ];
 

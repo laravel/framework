@@ -21,8 +21,9 @@ class PendingChain
     /**
      * Create a new PendingChain instance.
      *
-     * @param  string  $class
-     * @param  array  $chain
+     * @param string $class
+     * @param array  $chain
+     *
      * @return void
      */
     public function __construct($class, $chain)

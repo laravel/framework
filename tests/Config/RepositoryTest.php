@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Config;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Config\Repository;
+use PHPUnit\Framework\TestCase;
 
 class RepositoryTest extends TestCase
 {
@@ -20,10 +20,10 @@ class RepositoryTest extends TestCase
     protected function setUp()
     {
         $this->repository = new Repository($this->config = [
-            'foo' => 'bar',
-            'bar' => 'baz',
-            'baz' => 'bat',
-            'null' => null,
+            'foo'       => 'bar',
+            'bar'       => 'baz',
+            'baz'       => 'bat',
+            'null'      => null,
             'associate' => [
                 'x' => 'xxx',
                 'y' => 'yyy',
@@ -63,8 +63,8 @@ class RepositoryTest extends TestCase
     public function testGetWithArrayOfKeys()
     {
         $this->assertSame([
-            'foo' => 'bar',
-            'bar' => 'baz',
+            'foo'  => 'bar',
+            'bar'  => 'baz',
             'none' => null,
         ], $this->repository->get([
             'foo',
@@ -88,8 +88,8 @@ class RepositoryTest extends TestCase
     public function testGetMany()
     {
         $this->assertSame([
-            'foo' => 'bar',
-            'bar' => 'baz',
+            'foo'  => 'bar',
+            'bar'  => 'baz',
             'none' => null,
         ], $this->repository->getMany([
             'foo',

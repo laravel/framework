@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use PHPUnit\Framework\TestCase;
 
 class SupportViewErrorBagTest extends TestCase
 {
@@ -43,7 +43,7 @@ class SupportViewErrorBagTest extends TestCase
         $viewErrorBag->put('default', $messageBag1);
         $viewErrorBag->put('default2', $messageBag2);
         $this->assertEquals([
-            'default' => $messageBag1,
+            'default'  => $messageBag1,
             'default2' => $messageBag2,
         ], $viewErrorBag->getBags());
     }

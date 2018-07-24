@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 {
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -125,7 +125,7 @@ class DatabaseEloquentPolymorphicIntegrationTest extends TestCase
 
         $likes = TestLike::with('likeable.owner')->get()->loadMorph('likeable', [
             TestComment::class => ['commentable'],
-            TestPost::class => 'comments',
+            TestPost::class    => 'comments',
         ]);
 
         $this->assertTrue($likes[0]->relationLoaded('likeable'));

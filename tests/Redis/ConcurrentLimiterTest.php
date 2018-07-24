@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Redis;
 
-use PHPUnit\Framework\TestCase;
-use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Limiters\ConcurrencyLimiter;
+use PHPUnit\Framework\TestCase;
 
 /**
  * @group redislimiters

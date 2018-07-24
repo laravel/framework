@@ -42,10 +42,11 @@ class PendingResourceRegistration
     /**
      * Create a new pending resource registration instance.
      *
-     * @param  \Illuminate\Routing\ResourceRegistrar  $registrar
-     * @param  string  $name
-     * @param  string  $controller
-     * @param  array  $options
+     * @param \Illuminate\Routing\ResourceRegistrar $registrar
+     * @param string                                $name
+     * @param string                                $controller
+     * @param array                                 $options
+     *
      * @return void
      */
     public function __construct(ResourceRegistrar $registrar, $name, $controller, array $options)
@@ -59,7 +60,8 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should apply to.
      *
-     * @param  array|string|dynamic  $methods
+     * @param array|string|dynamic $methods
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function only($methods)
@@ -72,7 +74,8 @@ class PendingResourceRegistration
     /**
      * Set the methods the controller should exclude.
      *
-     * @param  array|string|dynamic  $methods
+     * @param array|string|dynamic $methods
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function except($methods)
@@ -85,7 +88,8 @@ class PendingResourceRegistration
     /**
      * Set the route names for controller actions.
      *
-     * @param  array|string  $names
+     * @param array|string $names
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function names($names)
@@ -98,8 +102,9 @@ class PendingResourceRegistration
     /**
      * Set the route name for a controller action.
      *
-     * @param  string  $method
-     * @param  string  $name
+     * @param string $method
+     * @param string $name
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function name($method, $name)
@@ -112,7 +117,8 @@ class PendingResourceRegistration
     /**
      * Override the route parameter names.
      *
-     * @param  array|string  $parameters
+     * @param array|string $parameters
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function parameters($parameters)
@@ -125,8 +131,9 @@ class PendingResourceRegistration
     /**
      * Override a route parameter's name.
      *
-     * @param  string  $previous
-     * @param  string  $new
+     * @param string $previous
+     * @param string $new
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function parameter($previous, $new)
@@ -139,7 +146,8 @@ class PendingResourceRegistration
     /**
      * Set a middleware to the resource.
      *
-     * @param  mixed  $middleware
+     * @param mixed $middleware
+     *
      * @return \Illuminate\Routing\PendingResourceRegistration
      */
     public function middleware($middleware)
@@ -170,7 +178,7 @@ class PendingResourceRegistration
      */
     public function __destruct()
     {
-        if (! $this->registered) {
+        if (!$this->registered) {
             $this->register();
         }
     }

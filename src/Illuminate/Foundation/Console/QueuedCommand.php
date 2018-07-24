@@ -3,9 +3,9 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Console\Kernel as KernelContract;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Contracts\Console\Kernel as KernelContract;
 
 class QueuedCommand implements ShouldQueue
 {
@@ -21,7 +21,8 @@ class QueuedCommand implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return void
      */
     public function __construct($data)
@@ -32,7 +33,8 @@ class QueuedCommand implements ShouldQueue
     /**
      * Handle the job.
      *
-     * @param  \Illuminate\Contracts\Console\Kernel  $kernel
+     * @param \Illuminate\Contracts\Console\Kernel $kernel
+     *
      * @return void
      */
     public function handle(KernelContract $kernel)

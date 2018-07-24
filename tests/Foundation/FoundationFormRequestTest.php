@@ -3,16 +3,16 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Translation\Translator;
+use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
+use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\UrlGenerator;
+use Illuminate\Validation\Factory as ValidationFactory;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Redirector;
-use Illuminate\Container\Container;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Foundation\Http\FormRequest;
-use Illuminate\Contracts\Translation\Translator;
-use Illuminate\Validation\Factory as ValidationFactory;
-use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
 
 class FoundationFormRequestTest extends TestCase
 {
@@ -63,8 +63,9 @@ class FoundationFormRequestTest extends TestCase
     /**
      * Catch the given exception thrown from the executor, and return it.
      *
-     * @param  string  $class
-     * @param  \Closure  $excecutor
+     * @param string   $class
+     * @param \Closure $excecutor
+     *
      * @return \Exception
      */
     protected function catchException($class, $excecutor)
@@ -85,13 +86,14 @@ class FoundationFormRequestTest extends TestCase
     /**
      * Create a new request of the given type.
      *
-     * @param  array  $payload
-     * @param  string  $class
+     * @param array  $payload
+     * @param string $class
+     *
      * @return \Illuminate\Foundation\Http\FormRequest
      */
     protected function createRequest($payload = [], $class = FoundationTestFormRequestStub::class)
     {
-        $container = tap(new Container, function ($container) {
+        $container = tap(new Container(), function ($container) {
             $container->instance(
                 ValidationFactoryContract::class,
                 $this->createValidationFactory($container)
@@ -107,7 +109,8 @@ class FoundationFormRequestTest extends TestCase
     /**
      * Create a new validation factory.
      *
-     * @param  \Illuminate\Container\Container  $container
+     * @param \Illuminate\Container\Container $container
+     *
      * @return \Illuminate\Validation\Factory
      */
     protected function createValidationFactory($container)
@@ -121,7 +124,8 @@ class FoundationFormRequestTest extends TestCase
     /**
      * Create a mock redirector.
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Routing\Redirector
      */
     protected function createMockRedirector($request)

@@ -16,13 +16,13 @@ trait ValidatesWhenResolvedTrait
     {
         $this->prepareForValidation();
 
-        if (! $this->passesAuthorization()) {
+        if (!$this->passesAuthorization()) {
             $this->failedAuthorization();
         }
 
         $instance = $this->getValidatorInstance();
 
-        if (! $instance->passes()) {
+        if (!$instance->passes()) {
             $this->failedValidation($instance);
         }
     }
@@ -50,10 +50,11 @@ trait ValidatesWhenResolvedTrait
     /**
      * Handle a failed validation attempt.
      *
-     * @param  \Illuminate\Validation\Validator  $validator
-     * @return void
+     * @param \Illuminate\Validation\Validator $validator
      *
      * @throws \Illuminate\Validation\ValidationException
+     *
+     * @return void
      */
     protected function failedValidation(Validator $validator)
     {
@@ -77,12 +78,12 @@ trait ValidatesWhenResolvedTrait
     /**
      * Handle a failed authorization attempt.
      *
-     * @return void
-     *
      * @throws \Illuminate\Validation\UnauthorizedException
+     *
+     * @return void
      */
     protected function failedAuthorization()
     {
-        throw new UnauthorizedException;
+        throw new UnauthorizedException();
     }
 }

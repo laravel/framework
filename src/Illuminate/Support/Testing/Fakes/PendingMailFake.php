@@ -10,7 +10,8 @@ class PendingMailFake extends PendingMail
     /**
      * Create a new instance.
      *
-     * @param  \Illuminate\Support\Testing\Fakes\MailFake  $mailer
+     * @param \Illuminate\Support\Testing\Fakes\MailFake $mailer
+     *
      * @return void
      */
     public function __construct($mailer)
@@ -21,7 +22,8 @@ class PendingMailFake extends PendingMail
     /**
      * Send a new mailable message instance.
      *
-     * @param  \Illuminate\Mail\Mailable $mailable
+     * @param \Illuminate\Mail\Mailable $mailable
+     *
      * @return mixed
      */
     public function send(Mailable $mailable)
@@ -32,7 +34,8 @@ class PendingMailFake extends PendingMail
     /**
      * Send a mailable message immediately.
      *
-     * @param  \Illuminate\Mail\Mailable $mailable
+     * @param \Illuminate\Mail\Mailable $mailable
+     *
      * @return mixed
      */
     public function sendNow(Mailable $mailable)
@@ -43,7 +46,8 @@ class PendingMailFake extends PendingMail
     /**
      * Push the given mailable onto the queue.
      *
-     * @param  \Illuminate\Mail\Mailable $mailable
+     * @param \Illuminate\Mail\Mailable $mailable
+     *
      * @return mixed
      */
     public function queue(Mailable $mailable)

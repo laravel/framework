@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support\Facades;
 
-use Illuminate\Support\Testing\Fakes\BusFake;
 use Illuminate\Contracts\Bus\Dispatcher as BusDispatcherContract;
+use Illuminate\Support\Testing\Fakes\BusFake;
 
 /**
  * @method static mixed dispatch($command)
@@ -24,7 +24,7 @@ class Bus extends Facade
      */
     public static function fake()
     {
-        static::swap(new BusFake);
+        static::swap(new BusFake());
     }
 
     /**

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Auth\Notifications;
 
-use Illuminate\Support\Facades\Lang;
-use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Lang;
 
 class ResetPassword extends Notification
 {
@@ -25,7 +25,8 @@ class ResetPassword extends Notification
     /**
      * Create a notification instance.
      *
-     * @param  string  $token
+     * @param string $token
+     *
      * @return void
      */
     public function __construct($token)
@@ -36,7 +37,8 @@ class ResetPassword extends Notification
     /**
      * Get the notification's channels.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
+     *
      * @return array|string
      */
     public function via($notifiable)
@@ -47,7 +49,8 @@ class ResetPassword extends Notification
     /**
      * Build the mail representation of the notification.
      *
-     * @param  mixed  $notifiable
+     * @param mixed $notifiable
+     *
      * @return \Illuminate\Notifications\Messages\MailMessage
      */
     public function toMail($notifiable)
@@ -56,7 +59,7 @@ class ResetPassword extends Notification
             return call_user_func(static::$toMailCallback, $notifiable, $this->token);
         }
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(Lang::getFromJson('Reset Password Notification'))
             ->line(Lang::getFromJson('You are receiving this email because we received a password reset request for your account.'))
             ->action(Lang::getFromJson('Reset Password'), url(config('app.url').route('password.reset', $this->token, false)))
@@ -66,7 +69,8 @@ class ResetPassword extends Notification
     /**
      * Set a callback that should be used when building the notification mail message.
      *
-     * @param  \Closure  $callback
+     * @param \Closure $callback
+     *
      * @return void
      */
     public static function toMailUsing($callback)
