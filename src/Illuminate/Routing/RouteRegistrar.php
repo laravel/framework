@@ -143,10 +143,6 @@ class RouteRegistrar
      */
     protected function registerRoute($method, $uri, $action = null)
     {
-        if (! is_array($action)) {
-            $action = array_merge($this->attributes, $action ? ['uses' => $action] : []);
-        }
-
         return $this->router->{$method}($uri, $this->compileAction($action));
     }
 
