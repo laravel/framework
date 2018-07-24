@@ -95,7 +95,7 @@ class UploadedFile extends SymfonyUploadedFile
      */
     public function getContents()
     {
-        if (file_exists($this->getPathname())) {
+        if ($this->isValid()) {
             return file_get_contents($this->getPathname());
         }
 

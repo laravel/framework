@@ -11,7 +11,10 @@ class HttpUploadedFileTest extends TestCase
     {
         $file = new UploadedFile(
             __DIR__.'/fixtures/test.txt',
-            'test.txt'
+            'test.txt',
+            null,
+            null,
+            true
         );
 
         $this->assertEquals('This is a story about something that happened long ago when your grandfather was a child.', trim($file->getContents()));
