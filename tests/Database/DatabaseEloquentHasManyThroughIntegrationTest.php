@@ -207,8 +207,8 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country = HasManyThroughTestCountry::find(2);
 
         $posts = $country->posts()->cursor();
+
         foreach ($posts as $post){
-            dump($post);
             $this->assertEquals([
                 'id',
                 'user_id',
@@ -220,7 +220,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'country_id', ], array_keys($post->getAttributes()));
 
         }
-        dd();
 
 
 
