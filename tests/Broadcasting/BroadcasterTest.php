@@ -94,6 +94,131 @@ class BroadcasterTest extends TestCase
         };
         $broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
     }
+
+    public function testCanRegisterChannelsWithoutOptions()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('somechannel', function () {});
+    }
+
+    public function testCanRegisterChannelsWithOptions()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $options = [ 'a' => [ 'b', 'c' ] ];
+        $broadcaster->channel('somechannel', function () {}, $options);
+
+        $this->assertEquals(
+            $options,
+            $broadcaster->retrieveChannelOptions('somechannel')
+        );
+    }
+
+    public function testRetrieveUserWithoutGuard()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('somechannel', function () {});
+
+        $request = m::mock(\Illuminate\Http\Request::class);
+        $request->shouldReceive('user')
+                ->once()
+                ->withNoArgs()
+                ->andReturn(new DummyUser);
+
+        $this->assertInstanceOf(
+            DummyUser::class,
+            $broadcaster->retrieveUser($request, 'somechannel')
+        );
+    }
+
+    public function testRetrieveUserWithOneGuardUsingAStringForSpecifyingGuard()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('somechannel', function () {}, ['guards' => 'myguard']);
+
+        $request = m::mock(\Illuminate\Http\Request::class);
+        $request->shouldReceive('user')
+                ->once()
+                ->with('myguard')
+                ->andReturn(new DummyUser);
+
+        $this->assertInstanceOf(
+            DummyUser::class,
+            $broadcaster->retrieveUser($request, 'somechannel')
+        );
+    }
+
+    public function testRetrieveUserWithMultipleGuardsAndRespectGuardsOrder()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('somechannel', function () {}, ['guards' => ['myguard1', 'myguard2']]);
+        $broadcaster->channel('someotherchannel', function () {}, ['guards' => ['myguard2', 'myguard1']]);
+
+
+        $request = m::mock(\Illuminate\Http\Request::class);
+        $request->shouldReceive('user')
+                ->once()
+                ->with('myguard1')
+                ->andReturn(null);
+        $request->shouldReceive('user')
+                ->twice()
+                ->with('myguard2')
+                ->andReturn(new DummyUser)
+                ->ordered('user');
+
+        $this->assertInstanceOf(
+            DummyUser::class,
+            $broadcaster->retrieveUser($request, 'somechannel')
+        );
+
+        $this->assertInstanceOf(
+            DummyUser::class,
+            $broadcaster->retrieveUser($request, 'someotherchannel')
+        );
+    }
+
+    public function testRetrieveUserDontUseDefaultGuardWhenOneGuardSpecified()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('somechannel', function () {}, ['guards' => 'myguard']);
+
+        $request = m::mock(\Illuminate\Http\Request::class);
+        $request->shouldReceive('user')
+                ->once()
+                ->with('myguard')
+                ->andReturn(null);
+        $request->shouldNotReceive('user')
+                ->withNoArgs();
+
+        $broadcaster->retrieveUser($request, 'somechannel');
+    }
+
+    public function testRetrieveUserDontUseDefaultGuardWhenMultipleGuardsSpecified()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $broadcaster->channel('somechannel', function () {}, ['guards' => ['myguard1', 'myguard2']]);
+
+
+        $request = m::mock(\Illuminate\Http\Request::class);
+        $request->shouldReceive('user')
+                ->once()
+                ->with('myguard1')
+                ->andReturn(null);
+        $request->shouldReceive('user')
+                ->once()
+                ->with('myguard2')
+                ->andReturn(null);
+        $request->shouldNotReceive('user')
+                ->withNoArgs();
+
+        $broadcaster->retrieveUser($request, 'somechannel');
+    }
 }
 
 class FakeBroadcaster extends Broadcaster
@@ -113,6 +238,16 @@ class FakeBroadcaster extends Broadcaster
     public function extractAuthParameters($pattern, $channel, $callback)
     {
         return parent::extractAuthParameters($pattern, $channel, $callback);
+    }
+
+    public function retrieveChannelOptions($channel)
+    {
+        return parent::retrieveChannelOptions($channel);
+    }
+
+    public function retrieveUser($request, $channel)
+    {
+        return parent::retrieveUser($request, $channel);
     }
 }
 
@@ -162,4 +297,9 @@ class DummyBroadcastingChannel
     {
         //
     }
+}
+
+class DummyUser
+{
+
 }
