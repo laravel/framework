@@ -139,7 +139,7 @@ class Handler {
 	/**
 	 * Handle an exception for the application.
 	 *
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @return \Symfony\Component\HttpFoundation\Response
 	 */
 	public function handleException($exception)
@@ -163,7 +163,7 @@ class Handler {
 	/**
 	 * Handle an uncaught exception.
 	 *
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @return void
 	 */
 	public function handleUncaughtException($exception)
@@ -207,7 +207,7 @@ class Handler {
 	/**
 	 * Handle a console exception.
 	 *
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @return void
 	 */
 	public function handleConsole($exception)
@@ -218,7 +218,7 @@ class Handler {
 	/**
 	 * Handle the given exception.
 	 *
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @param  bool  $fromConsole
 	 * @return void
 	 */
@@ -253,10 +253,6 @@ class Handler {
 			{
 				$response = $handler($exception, $code, $fromConsole);
 			}
-			catch (\Exception $e)
-			{
-				$response = $this->formatException($e);
-			}
 			catch (\Throwable $e)
 			{
 				$response = $this->formatException($e);
@@ -275,17 +271,12 @@ class Handler {
 	/**
 	 * Display the given exception to the user.
 	 *
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @return void
 	 */
 	protected function displayException($exception)
 	{
 		$displayer = $this->debug ? $this->debugDisplayer : $this->plainDisplayer;
-
-		if (! $exception instanceof \Exception) {
-			$exception = new FatalThrowableError($exception);
-		}
-
 		return $displayer->display($exception);
 	}
 
@@ -293,7 +284,7 @@ class Handler {
 	 * Determine if the given handler handles this exception.
 	 *
 	 * @param  \Closure    $handler
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @return bool
 	 */
 	protected function handlesException(Closure $handler, $exception)
@@ -307,7 +298,7 @@ class Handler {
 	 * Determine if the given handler type hints the exception.
 	 *
 	 * @param  \ReflectionFunction  $reflection
-	 * @param  \Exception  $exception
+	 * @param  \Throwable  $exception
 	 * @return bool
 	 */
 	protected function hints(ReflectionFunction $reflection, $exception)
@@ -322,10 +313,10 @@ class Handler {
 	/**
 	 * Format an exception thrown by a handler.
 	 *
-	 * @param  \Exception  $e
+	 * @param  \Throwable  $e
 	 * @return string
 	 */
-	protected function formatException(\Exception $e)
+	protected function formatException(\Throwable $e)
 	{
 		if ($this->debug)
 		{
