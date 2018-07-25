@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class AuthDatabaseUserProviderTest extends PHPUnit_Framework_TestCase {
+class AuthDatabaseUserProviderTest extends TestCase {
 
 	public function tearDown()
 	{

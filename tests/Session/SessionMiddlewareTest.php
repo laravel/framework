@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class SessionMiddlewareTest extends PHPUnit_Framework_TestCase {
+class SessionMiddlewareTest extends TestCase {
 
 	public function tearDown()
 	{

@@ -1,6 +1,6 @@
 <?php
 
-class DatabasePostgresProcessorTest extends PHPUnit_Framework_TestCase {
+class DatabasePostgresProcessorTest extends TestCase {
 
 	public function testProcessColumnListing()
 	{

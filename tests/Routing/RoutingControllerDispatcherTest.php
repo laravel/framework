@@ -7,7 +7,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Container\Container;
 use Illuminate\Routing\ControllerDispatcher;
 
-class RoutingControllerDispatcherTest extends PHPUnit_Framework_TestCase {
+class RoutingControllerDispatcherTest extends TestCase {
 
 	public function setUp()
 	{

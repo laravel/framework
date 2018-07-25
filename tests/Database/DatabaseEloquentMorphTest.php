@@ -4,7 +4,7 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class DatabaseEloquentMorphTest extends PHPUnit_Framework_TestCase {
+class DatabaseEloquentMorphTest extends TestCase {
 
 	public function tearDown()
 	{

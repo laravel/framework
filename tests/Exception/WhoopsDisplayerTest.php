@@ -4,7 +4,7 @@ use Illuminate\Exception\WhoopsDisplayer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Mockery as m;
 
-class WhoopsDisplayerTest extends PHPUnit_Framework_TestCase {
+class WhoopsDisplayerTest extends TestCase {
 
 	public function tearDown()
 	{

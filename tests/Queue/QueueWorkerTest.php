@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Queue\Worker;
 
-class QueueWorkerTest extends PHPUnit_Framework_TestCase {
+class QueueWorkerTest extends TestCase {
 
 	public function tearDown()
 	{

@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class RemoteSecLibGatewayTest extends PHPUnit_Framework_TestCase {
+class RemoteSecLibGatewayTest extends TestCase {
 
 	public function tearDown()
 	{

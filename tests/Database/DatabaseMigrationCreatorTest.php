@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Database\Migrations\MigrationCreator;
 
-class DatabaseMigrationCreatorTest extends PHPUnit_Framework_TestCase {
+class DatabaseMigrationCreatorTest extends TestCase {
 
 	public function tearDown()
 	{

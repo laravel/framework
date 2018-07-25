@@ -4,7 +4,7 @@ use Mockery as m;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
-class HttpRequestTest extends PHPUnit_Framework_TestCase {
+class HttpRequestTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -388,7 +388,7 @@ class HttpRequestTest extends PHPUnit_Framework_TestCase {
 
 	public function testSessionMethod()
 	{
-		$this->setExpectedException('RuntimeException');
+		$this->expectException('RuntimeException');
 		$request = Request::create('/', 'GET');
 		$request->session();
 	}

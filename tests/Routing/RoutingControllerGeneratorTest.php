@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Routing\Generators\ControllerGenerator;
 
-class RoutingControllerGeneratorTest extends PHPUnit_Framework_TestCase {
+class RoutingControllerGeneratorTest extends TestCase {
 
 	public function tearDown()
 	{

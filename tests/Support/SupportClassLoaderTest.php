@@ -2,7 +2,7 @@
 
 use Illuminate\Support\ClassLoader;
 
-class SupportClassLoaderTest extends PHPUnit_Framework_TestCase {
+class SupportClassLoaderTest extends TestCase {
 
 	public function testNormalizingClass()
 	{

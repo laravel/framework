@@ -1,6 +1,6 @@
 <?php
 
-class RoutingControllerInspectorTest extends PHPUnit_Framework_TestCase {
+class RoutingControllerInspectorTest extends TestCase {
 
 	public function testMethodsAreCorrectlyDetermined()
 	{

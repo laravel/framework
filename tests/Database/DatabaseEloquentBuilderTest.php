@@ -4,7 +4,7 @@ use Mockery as m;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 
-class DatabaseEloquentBuilderTest extends PHPUnit_Framework_TestCase {
+class DatabaseEloquentBuilderTest extends TestCase {
 
 	public function tearDown()
 	{

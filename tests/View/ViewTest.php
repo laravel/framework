@@ -4,7 +4,7 @@ use Mockery as m;
 use Illuminate\View\View;
 use Illuminate\Support\Contracts\ArrayableInterface;
 
-class ViewTest extends PHPUnit_Framework_TestCase {
+class ViewTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -147,7 +147,7 @@ class ViewTest extends PHPUnit_Framework_TestCase {
 
 	public function testViewBadMethod()
 	{
-		$this->setExpectedException('BadMethodCallException');
+		$this->expectException('BadMethodCallException');
 		$view = $this->getView();
 		$view->badMethodCall();
 	}

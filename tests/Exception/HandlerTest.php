@@ -3,7 +3,7 @@
 use Illuminate\Exception\Handler;
 use Mockery as m;
 
-class HandlerTest extends PHPUnit_Framework_TestCase
+class HandlerTest extends TestCase
 {
 	protected function setUp()
 	{

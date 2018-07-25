@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Cache\DatabaseStore;
 
-class CacheDatabaseStoreTest extends PHPUnit_Framework_TestCase {
+class CacheDatabaseStoreTest extends TestCase {
 
 	public function tearDown()
 	{

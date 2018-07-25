@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class ConfigFileLoaderTest extends PHPUnit_Framework_TestCase {
+class ConfigFileLoaderTest extends TestCase {
 
 	public function tearDown()
 	{

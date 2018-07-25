@@ -12,6 +12,9 @@
          syntaxCheck="true"
          verbose="true"
 >
+    <listeners>
+        <listener class="\Mockery\Adapter\Phpunit\TestListener"></listener>
+    </listeners>
     <testsuites>
         <testsuite name="Laravel Test Suite">
             <directory suffix="Test.php">./tests</directory>

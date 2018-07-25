@@ -4,7 +4,7 @@ use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 
-class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase {
+class HttpRedirectResponseTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -128,7 +128,7 @@ class HttpRedirectResponseTest extends PHPUnit_Framework_TestCase {
 
 	public function testMagicCallException()
 	{
-		$this->setExpectedException('BadMethodCallException');
+		$this->expectException('BadMethodCallException');
 		$response = new RedirectResponse('foo.bar');
 		$response->doesNotExist('bar');
 	}

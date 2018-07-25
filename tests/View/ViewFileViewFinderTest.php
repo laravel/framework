@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class ViewFinderTest extends PHPUnit_Framework_TestCase {
+class ViewFinderTest extends TestCase {
 
 	public function tearDown()
 	{

@@ -2,7 +2,7 @@
 
 use Illuminate\Cache\FileStore;
 
-class CacheFileStoreTest extends PHPUnit_Framework_TestCase {
+class CacheFileStoreTest extends TestCase {
 
 	public function testNullIsReturnedIfFileDoesntExist()
 	{
