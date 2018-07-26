@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class FoundationViewPublishCommandTest extends PHPUnit_Framework_TestCase {
+class FoundationViewPublishCommandTest extends TestCase {
 
 	public function tearDown()
 	{

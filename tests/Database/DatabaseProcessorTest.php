@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class DatabaseProcessorTest extends PHPUnit_Framework_TestCase {
+class DatabaseProcessorTest extends TestCase {
 
 	public function tearDown()
 	{

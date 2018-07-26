@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\View\Engines\PhpEngine;
 
-class ViewPhpEngineTest extends PHPUnit_Framework_TestCase {
+class ViewPhpEngineTest extends TestCase {
 
 	public function tearDown()
 	{

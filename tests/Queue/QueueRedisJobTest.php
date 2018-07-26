@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class QueueRedisJobTest extends PHPUnit_Framework_TestCase {
+class QueueRedisJobTest extends TestCase {
 
 	public function tearDown()
 	{

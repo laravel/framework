@@ -1,6 +1,6 @@
 <?php
 
-class DatabaseSQLiteProcessorTest extends PHPUnit_Framework_TestCase {
+class DatabaseSQLiteProcessorTest extends TestCase {
 
 	public function testProcessColumnListing()
 	{

@@ -2,7 +2,7 @@
 
 use Illuminate\Support\SerializableClosure as S;
 
-class SupportSerializableClosureTest extends PHPUnit_Framework_TestCase {
+class SupportSerializableClosureTest extends TestCase {
 
 	public function testClosureCanBeSerializedAndRebuilt()
 	{

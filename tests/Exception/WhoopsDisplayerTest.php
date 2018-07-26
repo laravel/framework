@@ -4,7 +4,7 @@ use Illuminate\Exception\WhoopsDisplayer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Mockery as m;
 
-class WhoopsDisplayerTest extends PHPUnit_Framework_TestCase {
+class WhoopsDisplayerTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -14,9 +14,8 @@ class WhoopsDisplayerTest extends PHPUnit_Framework_TestCase {
 
 	public function testStatusAndHeadersAreSetInResponse()
 	{
-		$mockWhoops = m::mock('Whoops\Run[handleException]');
-		$mockWhoops->shouldReceive('handleException')->andReturn('response content');
-		$displayer = new WhoopsDisplayer($mockWhoops, false);
+	    $run = new \Whoops\Run();
+		$displayer = new WhoopsDisplayer($run, false);
 		$headers = array('X-My-Test-Header' => 'HeaderValue');
 		$exception = new HttpException(401, 'Unauthorized', null, $headers);
 		$response = $displayer->display($exception);

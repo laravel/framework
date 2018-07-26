@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\View\Factory;
 
-class ViewFactoryTest extends PHPUnit_Framework_TestCase {
+class ViewFactoryTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -349,7 +349,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 
 	public function testExceptionIsThrownForUnknownExtension()
 	{
-		$this->setExpectedException('InvalidArgumentException');
+		$this->expectException('InvalidArgumentException');
 		$factory = $this->getFactory();
 		$factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('view.foo');
 		$factory->make('view');
@@ -367,7 +367,7 @@ class ViewFactoryTest extends PHPUnit_Framework_TestCase {
 		$factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
 		$factory->getDispatcher()->shouldReceive('fire')->times(4);
 
-		$this->setExpectedException('Exception', 'section exception message');
+		$this->expectException('Exception', 'section exception message');
 		$factory->make('view')->render();
 	}
 

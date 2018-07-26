@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Foundation\Application;
 
-class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
+class FoundationApplicationTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -126,7 +126,7 @@ class FoundationApplicationTest extends PHPUnit_Framework_TestCase {
 
 	public function testHandleRespectsCatchArgument()
 	{
-		$this->setExpectedException('Exception');
+		$this->expectException('Exception');
 		$app = new Application;
 		$app['router'] = $router = m::mock('StdClass');
 		$router->shouldReceive('dispatch')->andThrow('Exception');

@@ -1,0 +1,32 @@
+version: '2'
+services:
+
+  # The Application
+  app:
+    build:
+      context: ./
+      dockerfile: docker/app.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+
+#  # The Test Database
+#  test_db:
+#    build:
+#      context: ./
+#      dockerfile: docker/db.dockerfile
+#    volumes:
+#      - ~/.docker/dashboard_test_db:/var/lib/mysql
+#    environment:
+#      - "MYSQL_DATABASE=test"
+#      - "MYSQL_USER=tester"
+#      - "MYSQL_PASSWORD=secret"
+#      - "MYSQL_ROOT_PASSWORD=secret"
+#    ports:
+#        - 33061:3306
+
+#  # The Keystore
+#  keystore:
+#    image: redis:3.2
+#    ports:
+#        - 63791:6379

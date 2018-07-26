@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\Support\Collection;
 
-class SupportCollectionTest extends PHPUnit_Framework_TestCase {
+class SupportCollectionTest extends TestCase {
 
 	public function testFirstReturnsFirstItemInCollection()
 	{

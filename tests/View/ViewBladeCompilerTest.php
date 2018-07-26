@@ -3,7 +3,7 @@
 use Mockery as m;
 use Illuminate\View\Compilers\BladeCompiler;
 
-class ViewBladeCompilerTest extends PHPUnit_Framework_TestCase {
+class ViewBladeCompilerTest extends TestCase {
 
 	public function tearDown()
 	{
@@ -473,7 +473,7 @@ empty
 
 
 	/**
-	 * @dataProvider testGetTagsProvider()
+	 * @dataProvider dataGetTagsProvider()
 	 */
 	public function testSetAndRetrieveContentTags($openingTag, $closingTag)
 	{
@@ -484,7 +484,7 @@ empty
 
 
 	/**
-	 * @dataProvider testGetTagsProvider()
+	 * @dataProvider dataGetTagsProvider()
 	 */
 	public function testSetAndRetrieveEscapedContentTags($openingTag, $closingTag)
 	{
@@ -494,7 +494,7 @@ empty
 	}
 
 
-	public function testGetTagsProvider()
+	public function dataGetTagsProvider()
 	{
 		return [
 			['{{', '}}'],

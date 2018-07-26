@@ -4,7 +4,7 @@ use Mockery as m;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\FileLoader;
 
-class TranslationFileLoaderTest extends PHPUnit_Framework_TestCase {
+class TranslationFileLoaderTest extends TestCase {
 
 	public function tearDown()
 	{

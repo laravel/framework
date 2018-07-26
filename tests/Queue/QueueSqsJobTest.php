@@ -6,7 +6,7 @@ use Guzzle\Common\Collection;
 use Aws\Common\Signature\SignatureV4;
 use Aws\Common\Credentials\Credentials;
 
-class QueueSqsJobTest extends PHPUnit_Framework_TestCase {
+class QueueSqsJobTest extends TestCase {
 
 	public function setUp() {
 

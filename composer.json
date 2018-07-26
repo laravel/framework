@@ -10,11 +10,10 @@
         }
     ],
     "require": {
-        "php": ">=5.4.0",
+        "php": ">=7.0.0",
         "classpreloader/classpreloader": "~1.0.2",
         "d11wtq/boris": "~1.0",
-        "ircmaxell/password-compat": "~1.0",
-        "filp/whoops": "1.1.*",
+        "filp/whoops": "^2.1",
         "jeremeamia/superclosure": "~1.0.1",
         "monolog/monolog": "~1.6",
         "nesbot/carbon": "~1.0",
@@ -70,15 +69,16 @@
         "aws/aws-sdk-php": "~2.6",
         "iron-io/iron_mq": "~1.5",
         "pda/pheanstalk": "~2.1",
-        "mockery/mockery": "~0.9",
-        "phpunit/phpunit": "~4.0"
+        "mockery/mockery": "~1.1",
+        "phpunit/phpunit": "~6.0"
     },
     "autoload": {
         "classmap": [
             "src/Illuminate/Queue/IlluminateQueueClosure.php"
         ],
         "files": [
-            "src/Illuminate/Support/helpers.php"
+            "src/Illuminate/Support/helpers.php",
+            "tests/TestCase.php"
         ],
         "psr-0": {
             "Illuminate": "src/"

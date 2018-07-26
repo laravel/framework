@@ -2,7 +2,7 @@
 
 use Mockery as m;
 
-class MailMessageTest extends PHPUnit_Framework_TestCase {
+class MailMessageTest extends TestCase {
 
 	public function tearDown()
 	{

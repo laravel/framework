@@ -4,7 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 
-class RoutingRouteTest extends PHPUnit_Framework_TestCase {
+class RoutingRouteTest extends TestCase {
 
 	public function testBasicDispatchingOfRoutes()
 	{
