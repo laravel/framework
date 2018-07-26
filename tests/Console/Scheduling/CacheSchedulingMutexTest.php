@@ -48,7 +48,7 @@ class CacheSchedulingMutexTest extends TestCase
         $this->time = Carbon::now();
     }
 
-    public function testMutexReceviesCorrectCreate()
+    public function testMutexReceivesCorrectCreate()
     {
         $this->cacheRepository->shouldReceive('add')->once()->with($this->event->mutexName().$this->time->format('Hi'), true, 60)->andReturn(true);
 

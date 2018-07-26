@@ -43,13 +43,15 @@ class ControllerMakeCommand extends GeneratorCommand
             $stub = '/stubs/controller.nested.stub';
         } elseif ($this->option('model')) {
             $stub = '/stubs/controller.model.stub';
+        } elseif ($this->option('invokable')) {
+            $stub = '/stubs/controller.invokable.stub';
         } elseif ($this->option('resource')) {
             $stub = '/stubs/controller.stub';
         }
 
         if ($this->option('api') && is_null($stub)) {
             $stub = '/stubs/controller.api.stub';
-        } elseif ($this->option('api') && ! is_null($stub)) {
+        } elseif ($this->option('api') && ! is_null($stub) && ! $this->option('invokable')) {
             $stub = str_replace('.stub', '.api.stub', $stub);
         }
 
@@ -172,13 +174,11 @@ class ControllerMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model'],
-
-            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class'],
-
-            ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class'],
-
-            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller'],
+            ['model', 'm', InputOption::VALUE_OPTIONAL, 'Generate a resource controller for the given model.'],
+            ['resource', 'r', InputOption::VALUE_NONE, 'Generate a resource controller class.'],
+            ['invokable', 'i', InputOption::VALUE_NONE, 'Generate a single method, invokable controller class.'],
+            ['parent', 'p', InputOption::VALUE_OPTIONAL, 'Generate a nested resource controller class.'],
+            ['api', null, InputOption::VALUE_NONE, 'Exclude the create and edit methods from the controller.'],
         ];
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Support\Testing\Fakes;
 
+use Closure;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\Assert as PHPUnit;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -207,7 +208,7 @@ class EventFake implements Dispatcher
     {
         $name = is_object($event) ? get_class($event) : (string) $event;
 
-        if ($this->shouldFakeEvent($name)) {
+        if ($this->shouldFakeEvent($name, $payload)) {
             $this->events[$name][] = func_get_args();
         } else {
             $this->dispatcher->dispatch($event, $payload, $halt);
@@ -218,11 +219,22 @@ class EventFake implements Dispatcher
      * Determine if an event should be faked or actually dispatched.
      *
      * @param  string  $eventName
+     * @param  mixed  $payload
      * @return bool
      */
-    protected function shouldFakeEvent($eventName)
+    protected function shouldFakeEvent($eventName, $payload)
     {
-        return empty($this->eventsToFake) || in_array($eventName, $this->eventsToFake);
+        if (empty($this->eventsToFake)) {
+            return true;
+        }
+
+        return collect($this->eventsToFake)
+            ->filter(function ($event) use ($eventName, $payload) {
+                return $event instanceof Closure
+                            ? $event($eventName, $payload)
+                            : $event === $eventName;
+            })
+            ->isEmpty();
     }
 
     /**

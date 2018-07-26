@@ -1,5 +1,18 @@
 # Release Notes for 5.6.x
 
+## v5.6.27 (2018-06-20)
+
+### Added
+- Add missing phpredis connection parameters to PhpRedisConnector ([#24678](https://github.com/laravel/framework/pull/24678))
+- Apply realpath option to refresh and fresh commands ([#24683](https://github.com/laravel/framework/pull/24683))
+- Added `loggedOut()` method in AuthenticatesUsers ([#24717](https://github.com/laravel/framework/pull/24717))
+
+### Changed
+- Use value() helper in whenLoaded() ([#24644](https://github.com/laravel/framework/pull/24644))
+- Allow accessing the value of the current migrator connection ([#24665](https://github.com/laravel/framework/pull/24665))
+- Check if configuration cache is valid after saving ([#24722](https://github.com/laravel/framework/pull/24722))
+- Except URIs from CheckForMaintenanceMode middleware ([#24740](https://github.com/laravel/framework/pull/24740))
+
 ## v5.6.26 (2018-06-20)
 
 ### Added

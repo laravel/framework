@@ -466,12 +466,12 @@ class TestResponse
         ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
-            $expected = substr(json_encode([$key => $value]), 1, -1);
+            $expected = $this->jsonSearchStrings($key, $value);
 
             PHPUnit::assertTrue(
                 Str::contains($actual, $expected),
                 'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
-                "[{$expected}]".PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
                 'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
@@ -498,12 +498,12 @@ class TestResponse
         ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
-            $unexpected = substr(json_encode([$key => $value]), 1, -1);
+            $unexpected = $this->jsonSearchStrings($key, $value);
 
             PHPUnit::assertFalse(
                 Str::contains($actual, $unexpected),
                 'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-                "[{$unexpected}]".PHP_EOL.PHP_EOL.
+                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
                 'within'.PHP_EOL.PHP_EOL.
                 "[{$actual}]."
             );
@@ -525,7 +525,7 @@ class TestResponse
         ));
 
         foreach (Arr::sortRecursive($data) as $key => $value) {
-            $unexpected = substr(json_encode([$key => $value]), 1, -1);
+            $unexpected = $this->jsonSearchStrings($key, $value);
 
             if (! Str::contains($actual, $unexpected)) {
                 return $this;
@@ -538,6 +538,24 @@ class TestResponse
             'within'.PHP_EOL.PHP_EOL.
             "[{$actual}]."
         );
+    }
+
+    /**
+     * Get the strings we need to search for when examining the JSON.
+     *
+     * @param  string  $key
+     * @param  string  $value
+     * @return array
+     */
+    protected function jsonSearchStrings($key, $value)
+    {
+        $needle = substr(json_encode([$key => $value]), 1, -1);
+
+        return [
+            $needle.']',
+            $needle.'}',
+            $needle.',',
+        ];
     }
 
     /**

@@ -495,7 +495,7 @@ trait HasRelationships
     }
 
     /**
-     * Instantiate a new HasManyThrough relationship.
+     * Instantiate a new MorphToMany relationship.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Model  $parent
