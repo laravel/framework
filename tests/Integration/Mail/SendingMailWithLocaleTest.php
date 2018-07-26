@@ -4,7 +4,7 @@ namespace Illuminate\Tests\Integration\Mail;
 
 use Mockery;
 use Illuminate\Mail\Mailable;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;

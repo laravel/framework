@@ -179,7 +179,7 @@ class NotificationSlackChannelTestNotification extends Notification
                     ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
-                        $timestamp = Mockery::mock(\Illuminate\Support\Carbon::class);
+                        $timestamp = Mockery::mock(\Carbon\Carbon::class);
                         $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
@@ -206,7 +206,7 @@ class NotificationSlackChannelTestNotificationWithImageIcon extends Notification
                     ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
-                        $timestamp = Mockery::mock(\Illuminate\Support\Carbon::class);
+                        $timestamp = Mockery::mock(\Carbon\Carbon::class);
                         $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
