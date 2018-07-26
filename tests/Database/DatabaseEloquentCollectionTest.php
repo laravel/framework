@@ -226,6 +226,33 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(BaseCollection::class, get_class($c));
     }
 
+    public function testMapWithKeys()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $c = new Collection([$one, $two]);
+
+        $cAfterMap = $c->mapWithKeys(function ($item, $position) {
+            return [$position => $item];
+        });
+
+        $this->assertEquals($c->all(), $cAfterMap->all());
+        $this->assertInstanceOf(Collection::class, $cAfterMap);
+    }
+
+    public function testMappingWithKeysToNonModelsReturnsABaseCollection()
+    {
+        $one = m::mock('Illuminate\Database\Eloquent\Model');
+        $two = m::mock('Illuminate\Database\Eloquent\Model');
+
+        $c = (new Collection([$one, $two]))->map(function ($item, $position) {
+            return [$position => 'not-a-model'];
+        });
+
+        $this->assertEquals(BaseCollection::class, get_class($c));
+    }
+
     public function testCollectionDiffsWithGivenCollection()
     {
         $one = m::mock('Illuminate\Database\Eloquent\Model');
