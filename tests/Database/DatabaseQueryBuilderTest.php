@@ -697,6 +697,35 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
     }
 
+    public function testUnionsWithInvokableClass()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1);
+        $builder->union(DatabaseQueryBuilderTestInvokableClassStub::select('*')->from('users')->where('id', '=', 2));
+        $this->assertEquals('select * from "users" where "id" = ? union select * from "users" where "id" = ?', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1);
+        $builder->union(DatabaseQueryBuilderTestInvokableClassStub::select('*')->from('users')->where('id', '=', 2));
+        $this->assertEquals('(select * from `users` where `id` = ?) union (select * from `users` where `id` = ?)', $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+
+        $builder = $this->getMysqlBuilder();
+        $expectedSql = '(select `a` from `t1` where `a` = ? and `b` = ?) union (select `a` from `t2` where `a` = ? and `b` = ?) order by `a` asc limit 10';
+        $union = DatabaseQueryBuilderTestInvokableClassStub::select('a')->from('t2')->where('a', 11)->where('b', 2);
+        $builder->select('a')->from('t1')->where('a', 10)->where('b', 1)->union($union)->orderBy('a')->limit(10);
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 10, 1 => 1, 2 => 11, 3 => 2], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $expectedSql = 'select * from (select "name" from "users" where "id" = ?) union select * from (select "name" from "users" where "id" = ?)';
+        $builder->select('name')->from('users')->where('id', '=', 1);
+        $builder->union(DatabaseQueryBuilderTestInvokableClassStub::select('name')->from('users')->where('id', '=', 2));
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals([0 => 1, 1 => 2], $builder->getBindings());
+    }
+
     public function testUnionAlls()
     {
         $builder = $this->getBuilder();
@@ -789,6 +818,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->whereNotIn('id', function ($q) {
             $q->select('id')->from('users')->where('age', '>', 25)->take(3);
         });
+        $this->assertEquals('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
+        $this->assertEquals([25], $builder->getBindings());
+    }
+
+    public function testSubSelectWhereInsWithInvokableClass()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereIn('id', DatabaseQueryBuilderTestInvokableClassStub::select('id')->from('users')->where('age', '>', 25)->take(3));
+        $this->assertEquals('select * from "users" where "id" in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
+        $this->assertEquals([25], $builder->getBindings());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->whereNotIn('id', DatabaseQueryBuilderTestInvokableClassStub::select('id')->from('users')->where('age', '>', 25)->take(3));
         $this->assertEquals('select * from "users" where "id" not in (select "id" from "users" where "age" > ? limit 3)', $builder->toSql());
         $this->assertEquals([25], $builder->getBindings());
     }
@@ -1045,6 +1089,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
     }
 
+    public function testNestedWheresWithInvokableClass()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->where('email', '=', 'foo')
+            ->orWhere(DatabaseQueryBuilderTestInvokableClassStub::where('name', '=', 'bar')->where('age', '=', 25));
+        $this->assertEquals('select * from "users" where "email" = ? or ("name" = ? and "age" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar', 2 => 25], $builder->getBindings());
+    }
+
+    public function testNestedWheresWithInvokableClassDoesNotInvokeGlobalFunctions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('is_array', '=', 'foo');
+        $this->assertEquals('select * from "users" where "is_array" = ?', $builder->toSql());
+        $this->assertEquals([0 => 'foo'], $builder->getBindings());
+    }
+
     public function testNestedWhereBindings()
     {
         $builder = $this->getBuilder();
@@ -1063,6 +1125,26 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertEquals('select * from "users" where "email" = ? or "id" = (select max(id) from "users" where "email" = ?)', $builder->toSql());
         $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
+    public function testFullSubSelectsWithInvokableClass()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', '=', 'foo')
+            ->orWhere('id', '=', DatabaseQueryBuilderTestInvokableClassStub::select(new Raw('max(id)'))->from('users')->where('email', '=', 'bar'));
+
+        $this->assertEquals('select * from "users" where "email" = ? or "id" = (select max(id) from "users" where "email" = ?)', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'bar'], $builder->getBindings());
+    }
+
+    public function testFullSubSelectsWithInvokableClassDoesNotInvokeGlobalFunctions()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('email', '=', 'foo')
+            ->orWhere('id', '=', 'in_array');
+
+        $this->assertEquals('select * from "users" where "email" = ? or "id" = ?', $builder->toSql());
+        $this->assertEquals([0 => 'foo', 1 => 'in_array'], $builder->getBindings());
     }
 
     public function testWhereExists()
@@ -1089,6 +1171,29 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('orders')->where('id', '=', 1)->orWhereNotExists(function ($q) {
             $q->select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"'));
         });
+        $this->assertEquals('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+    }
+
+    public function testWhereExistsWithInvokableClass()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')
+            ->whereExists(DatabaseQueryBuilderTestInvokableClassStub::select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"')));
+        $this->assertEquals('select * from "orders" where exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')
+            ->whereNotExists(DatabaseQueryBuilderTestInvokableClassStub::select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"')));
+        $this->assertEquals('select * from "orders" where not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where('id', '=', 1)
+            ->orWhereExists(DatabaseQueryBuilderTestInvokableClassStub::select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"')));
+        $this->assertEquals('select * from "orders" where "id" = ? or exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->where('id', '=', 1)
+            ->orWhereNotExists(DatabaseQueryBuilderTestInvokableClassStub::select('*')->from('products')->where('products.id', '=', new Raw('"orders"."id"')));
         $this->assertEquals('select * from "orders" where "id" = ? or not exists (select * from "products" where "products"."id" = "orders"."id")', $builder->toSql());
     }
 
@@ -1135,6 +1240,24 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('users')->join('contacts', function ($j) {
             $j->where('users.id', '=', 'foo')->orWhere('users.name', '=', 'bar');
         });
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
+
+        // Run the assertions again
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
+        $this->assertEquals(['foo', 'bar'], $builder->getBindings());
+    }
+
+    public function testComplexJoinWithInvokableClass()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->join('contacts', DatabaseQueryBuilderTestInvokableClassStub::on('users.id', '=', 'contacts.id')->orOn('users.name', '=', 'contacts.name'));
+        $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = "contacts"."id" or "users"."name" = "contacts"."name"', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')
+            ->join('contacts', DatabaseQueryBuilderTestInvokableClassStub::where('users.id', '=', 'foo')->orWhere('users.name', '=', 'bar'));
         $this->assertEquals('select * from "users" inner join "contacts" on "users"."id" = ? or "users"."name" = ?', $builder->toSql());
         $this->assertEquals(['foo', 'bar'], $builder->getBindings());
 
@@ -2336,6 +2459,18 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals($expectedBindings, $builder->getBindings());
     }
 
+    public function testSubSelectWithInvokableClass()
+    {
+        $expectedSql = 'select "foo", "bar", (select "baz" from "two" where "subkey" = ?) as "sub" from "one" where "key" = ?';
+        $expectedBindings = ['subval', 'val'];
+
+        $builder = $this->getPostgresBuilder();
+        $builder->from('one')->select(['foo', 'bar'])->where('key', '=', 'val');
+        $builder->selectSub(DatabaseQueryBuilderTestInvokableClassStub::from('two')->select('baz')->where('subkey', '=', 'subval'), 'sub');
+        $this->assertEquals($expectedSql, $builder->toSql());
+        $this->assertEquals($expectedBindings, $builder->getBindings());
+    }
+
     public function testSqlServerWhereDate()
     {
         $builder = $this->getSqlServerBuilder();
@@ -2850,5 +2985,32 @@ class DatabaseQueryBuilderTest extends TestCase
             new \Illuminate\Database\Query\Grammars\Grammar,
             m::mock('Illuminate\Database\Query\Processors\Processor'),
         ])->makePartial();
+    }
+}
+
+class DatabaseQueryBuilderTestInvokableClassStub
+{
+    protected $invokes = [];
+
+    public function __invoke($query)
+    {
+        foreach ($this->invokes as $action) {
+            $query->{$action[0]}(...$action[1]);
+        }
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        $instance = new static;
+        $instance->{$method}(...$parameters);
+
+        return $instance;
+    }
+
+    public function __call($name, $arguments)
+    {
+        $this->invokes[] = [$name, $arguments ?? []];
+
+        return $this;
     }
 }
