@@ -301,7 +301,7 @@ class Builder
         // If the given query is a callable, we will execute it while passing in a new
         // query instance to the callable. This will give the developer a chance to
         // format and work with the query before we cast it to a raw SQL string.
-        if (!is_string($query) && is_callable($query)) {
+        if (! is_string($query) && is_callable($query)) {
             $callback = $query;
 
             $callback($query = $this->forSubQuery());
@@ -385,7 +385,7 @@ class Builder
         // If the first "column" of the join is really a callable instance the developer
         // is trying to build a join with a complex "on" clause containing more than
         // one condition, so we'll add the join and call the callable with the query.
-        if (!is_string($first) && is_callable($first)) {
+        if (! is_string($first) && is_callable($first)) {
             call_user_func($first, $join);
 
             $this->joins[] = $join;
@@ -597,7 +597,7 @@ class Builder
         // If the columns is actually a callable instance, we will assume the developer
         // wants to begin a nested where statement which is wrapped in parenthesis.
         // We'll add that callable to the query then return back out immediately.
-        if (!is_string($column) && is_callable($column)) {
+        if (! is_string($column) && is_callable($column)) {
             return $this->whereNested($column, $boolean);
         }
 
@@ -611,7 +611,7 @@ class Builder
         // If the value is a callable, it means the developer is performing an entire
         // sub-select within the query and we will need to compile the sub-select
         // within the where clause to get the appropriate query record results.
-        if (!is_string($value) && is_callable($value)) {
+        if (! is_string($value) && is_callable($value)) {
             return $this->whereSub($column, $operator, $value, $boolean);
         }
 
@@ -839,7 +839,7 @@ class Builder
         // If the value of the where in clause is actually a callable, we will assume that
         // the developer is using a full sub-select for this "in" statement, and will
         // execute the callable, then we can re-construct the entire sub-selects.
-        if (!is_string($values) && is_callable($values)) {
+        if (! is_string($values) && is_callable($values)) {
             return $this->whereInSub($column, $values, $boolean, $not);
         }
 
