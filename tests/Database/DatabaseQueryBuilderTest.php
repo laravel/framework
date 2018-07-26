@@ -26,7 +26,8 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertFalse($builder->checkValidCallable('is_array'));
         $this->assertFalse($builder->checkValidCallable([$this, 'tearDown']));
-        $this->assertTrue($builder->checkValidCallable(function () {}));
+        $this->assertTrue($builder->checkValidCallable(function () {
+        }));
         $this->assertTrue($builder->checkValidCallable(DatabaseQueryBuilderTestInvokableClassStub::select('*')));
     }
 
