@@ -3,12 +3,13 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcaster extends Broadcaster
 {
+    use UsePusherChannelsNames;
+
     /**
      * The Redis instance.
      *
@@ -99,32 +100,5 @@ class RedisBroadcaster extends Broadcaster
         foreach ($this->formatChannels($channels) as $channel) {
             $connection->publish($channel, $payload);
         }
-    }
-
-    /**
-     * Return true if channel is protected by authentication
-     *
-     * @param  string  $channel
-     * @return bool
-     */
-    public function isGuardedChannel($channel)
-    {
-        return Str::startsWith($channel, ['private-', 'presence-']);
-    }
-
-    /**
-     * Remove prefix from channel name
-     *
-     * @param  string  $channel
-     * @return string
-     */
-    public function normalizeChannelName($channel)
-    {
-        if ($this->isGuardedChannel($channel)) {
-            return Str::startsWith($channel, 'private-')
-                ? Str::replaceFirst('private-', '', $channel)
-                : Str::replaceFirst('presence-', '', $channel);
-        }
-        return $channel;
     }
 }
