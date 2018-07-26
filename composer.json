@@ -13,7 +13,6 @@
         "php": ">=7.0.0",
         "classpreloader/classpreloader": "~1.0.2",
         "d11wtq/boris": "~1.0",
-        "ircmaxell/password-compat": "~1.0",
         "filp/whoops": "^2.1",
         "jeremeamia/superclosure": "~1.0.1",
         "monolog/monolog": "~1.6",
