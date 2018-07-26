@@ -79,9 +79,9 @@ class HttpRequestTest extends TestCase
     {
         return [
             ['', 1, 'default'],
-            ['foo/bar//baz', '1', 'foo'],
-            ['foo/bar//baz', '2', 'bar'],
-            ['foo/bar//baz', '3', 'baz'],
+            ['foo/bar//baz', 1, 'foo'],
+            ['foo/bar//baz', 2, 'bar'],
+            ['foo/bar//baz', 3, 'baz'],
         ];
     }
 
