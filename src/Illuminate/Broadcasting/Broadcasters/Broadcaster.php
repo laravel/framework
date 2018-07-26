@@ -58,11 +58,10 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
-     * @param  array   $options
      * @return mixed
      * @throws \Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException
      */
-    protected function verifyUserCanAccessChannel($request, $channel, $options = [])
+    protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
             if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
@@ -73,7 +72,7 @@ abstract class Broadcaster implements BroadcasterContract
 
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
-            if ($result = $handler($this->retrieveUser($request, $options['guards'] ?? null), ...$parameters)) {
+            if ($result = $handler($this->retrieveUser($request, $channel), ...$parameters)) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
@@ -292,12 +291,14 @@ abstract class Broadcaster implements BroadcasterContract
      * Retrieve user by checking in provided guards
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param  array  $guards
-     *
      * @return mixed
      */
-    protected function retrieveUser($request, $guards = null)
+    protected function retrieveUser($request, $channel)
     {
+        $options = $this->retrieveChannelOptions($channel);
+
+        $guards = $options['guards'] ?? null;
+
         if (is_null($guards)) {
             return $request->user();
         }
