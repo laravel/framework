@@ -108,10 +108,58 @@ class BroadcasterTest extends TestCase
 
         $options = [ 'a' => [ 'b', 'c' ] ];
         $broadcaster->channel('somechannel', function () {}, $options);
+    }
+
+    public function testCanRetrieveChannelsOptions()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $options = [ 'a' => [ 'b', 'c' ] ];
+        $broadcaster->channel('somechannel', function () {}, $options);
 
         $this->assertEquals(
             $options,
             $broadcaster->retrieveChannelOptions('somechannel')
+        );
+    }
+
+    public function testCanRetrieveChannelsOptionsUsingAChannelNameContainingArgs()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $options = [ 'a' => [ 'b', 'c' ] ];
+        $broadcaster->channel('somechannel.{id}.test.{text}', function () {}, $options);
+
+        $this->assertEquals(
+            $options,
+            $broadcaster->retrieveChannelOptions('somechannel.23.test.mytext')
+        );
+    }
+
+    public function testCanRetrieveChannelsOptionsWhenMultipleChannelsAreRegistered()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $options = [ 'a' => [ 'b', 'c' ] ];
+        $broadcaster->channel('somechannel', function () {});
+        $broadcaster->channel('someotherchannel', function () {}, $options);
+
+        $this->assertEquals(
+            $options,
+            $broadcaster->retrieveChannelOptions('someotherchannel')
+        );
+    }
+
+    public function testDontRetrieveChannelsOptionsWhenChannelDoesntExists()
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $options = [ 'a' => [ 'b', 'c' ] ];
+        $broadcaster->channel('somechannel', function () {}, $options);
+
+        $this->assertEquals(
+            [],
+            $broadcaster->retrieveChannelOptions('someotherchannel')
         );
     }
 
