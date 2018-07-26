@@ -219,6 +219,32 @@ class BroadcasterTest extends TestCase
 
         $broadcaster->retrieveUser($request, 'somechannel');
     }
+
+    /**
+     * @dataProvider channelNameMatchPatternProvider
+     */
+    public function testChannelNameMatchPattern($channel, $pattern, $shouldMatch)
+    {
+        $broadcaster = new FakeBroadcaster;
+
+        $this->assertEquals($shouldMatch, $broadcaster->channelNameMatchPattern($channel, $pattern));
+    }
+
+    public function channelNameMatchPatternProvider() {
+        return [
+            ['something', 'something', true],
+            ['something.23', 'something.{id}', true],
+            ['something.23.test', 'something.{id}.test', true],
+            ['something.23.test.42', 'something.{id}.test.{id2}', true],
+            ['something-23:test-42', 'something-{id}:test-{id2}', true],
+            ['something..test.42', 'something.{id}.test.{id2}', true],
+            ['23:string:test', '{id}:string:{text}', true],
+            ['something.23', 'something', false],
+            ['something.23.test.42', 'something.test.{id}', false],
+            ['something-23-test-42', 'something-{id}-test', false],
+            ['23:test', '{id}:test:abcd', false],
+        ];
+    }
 }
 
 class FakeBroadcaster extends Broadcaster
@@ -248,6 +274,11 @@ class FakeBroadcaster extends Broadcaster
     public function retrieveUser($request, $channel)
     {
         return parent::retrieveUser($request, $channel);
+    }
+
+    public function channelNameMatchPattern($channel, $pattern)
+    {
+        return parent::channelNameMatchPattern($channel, $pattern);
     }
 }
 

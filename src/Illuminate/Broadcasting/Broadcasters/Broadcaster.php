@@ -64,7 +64,7 @@ abstract class Broadcaster implements BroadcasterContract
     protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
-            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
+            if (! $this->channelNameMatchPattern($channel, $pattern)) {
                 continue;
             }
 
@@ -277,7 +277,7 @@ abstract class Broadcaster implements BroadcasterContract
     protected function retrieveChannelOptions($channel)
     {
         foreach ($this->channelsOptions as $pattern => $opts) {
-            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
+            if (! $this->channelNameMatchPattern($channel, $pattern)) {
                 continue;
             }
 
@@ -313,5 +313,17 @@ abstract class Broadcaster implements BroadcasterContract
         }
 
         return null;
+    }
+
+    /**
+     * Check if channel name from request match a pattern from registered channels
+     *
+     * @param  string  $channel
+     * @param  string  $pattern
+     * @return bool
+     */
+    protected function channelNameMatchPattern($channel, $pattern)
+    {
+        return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
     }
 }
