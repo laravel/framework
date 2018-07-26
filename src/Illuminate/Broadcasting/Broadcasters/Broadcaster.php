@@ -41,7 +41,7 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $channel
      * @param  callable|string  $callback
-     * @param  array   $options
+     * @param  array  $options
      * @return $this
      */
     public function channel($channel, $callback, $options = [])
@@ -288,9 +288,10 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Retrieve user by checking in provided guards
+     * Retrieve request user using optional guards
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param  string  $channel
      * @return mixed
      */
     protected function retrieveUser($request, $channel)
