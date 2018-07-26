@@ -1245,7 +1245,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Push all of the given items onto the collection.
      *
      * @param  \Traversable|array  $source
-     * @return $this
+     * @return static
      */
     public function concat($source)
     {
