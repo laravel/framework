@@ -4,6 +4,7 @@ namespace Illuminate\Support;
 
 use Closure;
 use InvalidArgumentException;
+use Illuminate\Contracts\Container\Container;
 
 abstract class Manager
 {
@@ -31,10 +32,10 @@ abstract class Manager
     /**
      * Create a new manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param  \Illuminate\Contracts\Container\Container  $app
      * @return void
      */
-    public function __construct($app)
+    public function __construct(Container $app)
     {
         $this->app = $app;
     }
