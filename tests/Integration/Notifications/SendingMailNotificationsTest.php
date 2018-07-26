@@ -143,7 +143,7 @@ class SendingMailNotificationsTest extends TestCase
 
         $user->notify($notification);
     }
-    
+
     public function test_mail_is_sent_with_subject()
     {
         $notification = new TestMailNotificationWithSubject;
