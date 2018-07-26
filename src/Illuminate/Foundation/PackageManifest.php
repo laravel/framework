@@ -97,6 +97,8 @@ class PackageManifest
             $this->build();
         }
 
+        $this->files->get($this->manifestPath, true);
+
         return $this->manifest = file_exists($this->manifestPath) ?
             $this->files->getRequire($this->manifestPath) : [];
     }
@@ -166,7 +168,8 @@ class PackageManifest
         }
 
         $this->files->put(
-            $this->manifestPath, '<?php return '.var_export($manifest, true).';'
+            $this->manifestPath, '<?php return '.var_export($manifest, true).';',
+            true
         );
     }
 }
