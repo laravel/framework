@@ -17,6 +17,19 @@ class DatabaseQueryBuilderTest extends TestCase
         m::close();
     }
 
+    public function testValidCallables()
+    {
+        $builder = $this->getBuilder();
+        $builder->macro('checkValidCallable', function ($callable) {
+            return $this->isValidCallable($callable);
+        });
+
+        $this->assertFalse($builder->checkValidCallable('is_array'));
+        $this->assertFalse($builder->checkValidCallable([$this, 'tearDown']));
+        $this->assertTrue($builder->checkValidCallable(function () {}));
+        $this->assertTrue($builder->checkValidCallable(DatabaseQueryBuilderTestInvokableClassStub::select('*')));
+    }
+
     public function testBasicSelect()
     {
         $builder = $this->getBuilder();

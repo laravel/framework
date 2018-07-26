@@ -218,7 +218,7 @@ class Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        if (! is_string($column) && is_callable($column)) {
+        if ($this->isValidCallable($column)) {
             $column($query = $this->model->newModelQuery());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
