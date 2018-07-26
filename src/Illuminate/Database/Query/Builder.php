@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Query;
 
-use Closure;
 use RuntimeException;
 use BadMethodCallException;
 use Illuminate\Support\Arr;
@@ -226,7 +225,7 @@ class Builder
     /**
      * Add a subselect expression to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Illuminate\Database\Query\Builder|callable|string $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
@@ -262,7 +261,7 @@ class Builder
     /**
      * Makes "from" fetch from a subquery.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Illuminate\Database\Query\Builder|callable|string $query
      * @param  string  $as
      * @return \Illuminate\Database\Query\Builder|static
      *
@@ -294,15 +293,15 @@ class Builder
     /**
      * Creates a subquery and parse it.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Illuminate\Database\Query\Builder|callable|string $query
      * @return array
      */
     protected function createSub($query)
     {
-        // If the given query is a Closure, we will execute it while passing in a new
-        // query instance to the Closure. This will give the developer a chance to
+        // If the given query is a callable, we will execute it while passing in a new
+        // query instance to the callable. This will give the developer a chance to
         // format and work with the query before we cast it to a raw SQL string.
-        if ($query instanceof Closure) {
+        if (! is_string($query) && is_callable($query)) {
             $callback = $query;
 
             $callback($query = $this->forSubQuery());
@@ -372,7 +371,7 @@ class Builder
      * Add a join clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  string|callable  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
@@ -383,10 +382,10 @@ class Builder
     {
         $join = new JoinClause($this, $type, $table);
 
-        // If the first "column" of the join is really a Closure instance the developer
+        // If the first "column" of the join is really a callable instance the developer
         // is trying to build a join with a complex "on" clause containing more than
-        // one condition, so we'll add the join and call a Closure with the query.
-        if ($first instanceof Closure) {
+        // one condition, so we'll add the join and call the callable with the query.
+        if (! is_string($first) && is_callable($first)) {
             call_user_func($first, $join);
 
             $this->joins[] = $join;
@@ -426,7 +425,7 @@ class Builder
     /**
      * Add a subquery join clause to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Illuminate\Database\Query\Builder|callable|string $query
      * @param  string  $as
      * @param  string  $first
      * @param  string|null  $operator
@@ -479,7 +478,7 @@ class Builder
     /**
      * Add a subquery left join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Illuminate\Database\Query\Builder|callable|string $query
      * @param  string  $as
      * @param  string  $first
      * @param  string|null  $operator
@@ -522,7 +521,7 @@ class Builder
     /**
      * Add a subquery right join to the query.
      *
-     * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
+     * @param  \Illuminate\Database\Query\Builder|callable|string $query
      * @param  string  $as
      * @param  string  $first
      * @param  string|null  $operator
@@ -573,7 +572,7 @@ class Builder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure  $column
+     * @param  string|array|callable  $column
      * @param  mixed   $operator
      * @param  mixed   $value
      * @param  string  $boolean
@@ -595,10 +594,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        // If the columns is actually a Closure instance, we will assume the developer
+        // If the columns is actually a callable instance, we will assume the developer
         // wants to begin a nested where statement which is wrapped in parenthesis.
-        // We'll add that Closure to the query then return back out immediately.
-        if ($column instanceof Closure) {
+        // We'll add that callable to the query then return back out immediately.
+        if (! is_string($column) && is_callable($column)) {
             return $this->whereNested($column, $boolean);
         }
 
@@ -609,10 +608,10 @@ class Builder
             list($value, $operator) = [$operator, '='];
         }
 
-        // If the value is a Closure, it means the developer is performing an entire
+        // If the value is a callable, it means the developer is performing an entire
         // sub-select within the query and we will need to compile the sub-select
         // within the where clause to get the appropriate query record results.
-        if ($value instanceof Closure) {
+        if (! is_string($value) && is_callable($value)) {
             return $this->whereSub($column, $operator, $value, $boolean);
         }
 
@@ -718,7 +717,7 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  string|array|\Closure  $column
+     * @param  string|array|callable  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Query\Builder|static
@@ -837,10 +836,10 @@ class Builder
             );
         }
 
-        // If the value of the where in clause is actually a Closure, we will assume that
+        // If the value of the where in clause is actually a callable, we will assume that
         // the developer is using a full sub-select for this "in" statement, and will
-        // execute those Closures, then we can re-construct the entire sub-selects.
-        if ($values instanceof Closure) {
+        // execute the callable, then we can re-construct the entire sub-selects.
+        if (! is_string($values) && is_callable($values)) {
             return $this->whereInSub($column, $values, $boolean, $not);
         }
 
@@ -905,13 +904,13 @@ class Builder
     /**
      * Add a where in with a sub-select to the query.
      *
-     * @param  string   $column
-     * @param  \Closure $callback
-     * @param  string   $boolean
-     * @param  bool     $not
+     * @param  string    $column
+     * @param  callable  $callback
+     * @param  string    $boolean
+     * @param  bool      $not
      * @return $this
      */
-    protected function whereInSub($column, Closure $callback, $boolean, $not)
+    protected function whereInSub($column, callable $callback, $boolean, $not)
     {
         $type = $not ? 'NotInSub' : 'InSub';
 
@@ -1254,11 +1253,11 @@ class Builder
     /**
      * Add a nested where statement to the query.
      *
-     * @param  \Closure $callback
+     * @param  callable $callback
      * @param  string   $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNested(Closure $callback, $boolean = 'and')
+    public function whereNested(callable $callback, $boolean = 'and')
     {
         call_user_func($callback, $query = $this->forNestedWhere());
 
@@ -1300,11 +1299,11 @@ class Builder
      *
      * @param  string   $column
      * @param  string   $operator
-     * @param  \Closure $callback
+     * @param  callable $callback
      * @param  string   $boolean
      * @return $this
      */
-    protected function whereSub($column, $operator, Closure $callback, $boolean)
+    protected function whereSub($column, $operator, callable $callback, $boolean)
     {
         $type = 'Sub';
 
@@ -1325,12 +1324,12 @@ class Builder
     /**
      * Add an exists clause to the query.
      *
-     * @param  \Closure $callback
+     * @param  callable $callback
      * @param  string   $boolean
      * @param  bool     $not
      * @return $this
      */
-    public function whereExists(Closure $callback, $boolean = 'and', $not = false)
+    public function whereExists(callable $callback, $boolean = 'and', $not = false)
     {
         $query = $this->forSubQuery();
 
@@ -1345,11 +1344,11 @@ class Builder
     /**
      * Add an or exists clause to the query.
      *
-     * @param  \Closure $callback
+     * @param  callable $callback
      * @param  bool     $not
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereExists(Closure $callback, $not = false)
+    public function orWhereExists(callable $callback, $not = false)
     {
         return $this->whereExists($callback, 'or', $not);
     }
@@ -1357,11 +1356,11 @@ class Builder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure $callback
+     * @param  callable $callback
      * @param  string   $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function whereNotExists(Closure $callback, $boolean = 'and')
+    public function whereNotExists(callable $callback, $boolean = 'and')
     {
         return $this->whereExists($callback, $boolean, true);
     }
@@ -1369,10 +1368,10 @@ class Builder
     /**
      * Add a where not exists clause to the query.
      *
-     * @param  \Closure  $callback
+     * @param  callable  $callback
      * @return \Illuminate\Database\Query\Builder|static
      */
-    public function orWhereNotExists(Closure $callback)
+    public function orWhereNotExists(callable $callback)
     {
         return $this->orWhereExists($callback, true);
     }
@@ -1839,13 +1838,13 @@ class Builder
     /**
      * Add a union statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
+     * @param  \Illuminate\Database\Query\Builder|callable  $query
      * @param  bool  $all
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function union($query, $all = false)
     {
-        if ($query instanceof Closure) {
+        if (is_callable($query)) {
             call_user_func($query, $query = $this->newQuery());
         }
 
@@ -1859,7 +1858,7 @@ class Builder
     /**
      * Add a union all statement to the query.
      *
-     * @param  \Illuminate\Database\Query\Builder|\Closure  $query
+     * @param  \Illuminate\Database\Query\Builder|callable  $query
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function unionAll($query)

@@ -456,6 +456,17 @@ class DatabaseEloquentBuilderTest extends TestCase
         unset($_SERVER['__eloquent.constrain']);
     }
 
+    public function testEagerLoadRelationAccepsInvokableClass()
+    {
+        $builder = m::mock('Illuminate\Database\Eloquent\Builder[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
+        $invokable = EloquentBuilderTestInvokableClassStub::where('foo', 'bar');
+        $builder->setEagerLoads(['foo' => $invokable]);
+        $builder->shouldAllowMockingProtectedMethods()->shouldReceive('eagerLoadRelation')->with(['models'], 'foo', $invokable)->andReturn(['foo']);
+
+        $results = $builder->eagerLoadRelations(['models']);
+        $this->assertEquals(['foo'], $results);
+    }
+
     public function testGetRelationProperlySetsNestedRelationships()
     {
         $builder = $this->getBuilder();
@@ -586,6 +597,31 @@ class DatabaseEloquentBuilderTest extends TestCase
             $query->foo();
         });
         $this->assertEquals($builder, $result);
+    }
+
+    public function testNestedWhereWithInvokableClass()
+    {
+        $nestedQuery = m::mock('Illuminate\Database\Eloquent\Builder');
+        $nestedRawQuery = $this->getMockQueryBuilder();
+        $nestedQuery->shouldReceive('getQuery')->once()->andReturn($nestedRawQuery);
+        $model = $this->getMockModel()->makePartial();
+        $model->shouldReceive('newModelQuery')->once()->andReturn($nestedQuery);
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('from');
+        $builder->setModel($model);
+        $builder->getQuery()->shouldReceive('addNestedWhereQuery')->once()->with($nestedRawQuery, 'and');
+        $nestedQuery->shouldReceive('foo')->once();
+
+        $result = $builder->where(EloquentBuilderTestInvokableClassStub::foo());
+        $this->assertEquals($builder, $result);
+    }
+
+    public function testNestedWhereWithInvokableClassDoesNotInvokeGlobalFunction()
+    {
+        $builder = $this->getBuilder();
+        $builder->getQuery()->shouldReceive('where')->once()->with('in_array', '=', 'bar');
+        $result = $builder->where('in_array', '=', 'bar');
+        $this->assertEquals($result, $builder);
     }
 
     public function testRealNestedWhereWithScopes()
@@ -1066,6 +1102,33 @@ class DatabaseEloquentBuilderTest extends TestCase
         $query->shouldReceive('from')->with('foo_table');
 
         return $query;
+    }
+}
+
+class EloquentBuilderTestInvokableClassStub
+{
+    protected $invokes = [];
+
+    public function __invoke($query)
+    {
+        foreach ($this->invokes as $action) {
+            $query->{$action[0]}(...$action[1]);
+        }
+    }
+
+    public static function __callStatic($method, $parameters)
+    {
+        $instance = new static;
+        $instance->{$method}(...$parameters);
+
+        return $instance;
+    }
+
+    public function __call($name, $arguments)
+    {
+        $this->invokes[] = [$name, $arguments ?? []];
+
+        return $this;
     }
 }
 
