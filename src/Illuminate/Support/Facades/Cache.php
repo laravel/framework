@@ -3,7 +3,7 @@
 namespace Illuminate\Support\Facades;
 
 /**
- * @method static \Illuminate\Contracts\Cache\Repository  store(string|null $name = null)
+ * @method static \Illuminate\Contracts\Cache\Repository store(string|null $name = null)
  * @method static bool has(string $key)
  * @method static mixed get(string $key, mixed $default = null)
  * @method static mixed pull(string $key, mixed $default = null)
@@ -20,6 +20,7 @@ namespace Illuminate\Support\Facades;
  *
  * @see \Illuminate\Cache\CacheManager
  * @see \Illuminate\Cache\Repository
+ * @see \Illuminate\Contracts\Cache\Store
  */
 class Cache extends Facade
 {
