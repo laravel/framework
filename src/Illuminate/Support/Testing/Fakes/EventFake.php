@@ -234,7 +234,7 @@ class EventFake implements Dispatcher
                             ? $event($eventName, $payload)
                             : $event === $eventName;
             })
-            ->isEmpty();
+            ->isNotEmpty();
     }
 
     /**

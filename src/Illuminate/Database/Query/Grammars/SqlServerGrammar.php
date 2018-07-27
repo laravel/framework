@@ -185,7 +185,7 @@ class SqlServerGrammar extends Grammar
     {
         $constraint = $this->compileRowConstraint($query);
 
-        return "select * from ({$sql}) as temp_table where row_num {$constraint}";
+        return "select * from ({$sql}) as temp_table where row_num {$constraint} order by row_num";
     }
 
     /**
