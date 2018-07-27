@@ -78,7 +78,7 @@ class SupportTestingEventFakeTest extends TestCase
     public function testAssertDispatchedWithIgnore()
     {
         $dispatcher = m::mock(Dispatcher::class);
-        $dispatcher->shouldReceive('dispatch')->twice();
+        $dispatcher->shouldReceive('dispatch')->once();
 
         $fake = new EventFake($dispatcher, [
             'Foo',
@@ -91,9 +91,9 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->dispatch('Bar', ['id' => 1]);
         $fake->dispatch('Baz');
 
-        $fake->assertNotDispatched('Foo');
-        $fake->assertNotDispatched('Bar');
-        $fake->assertDispatched('Baz');
+        $fake->assertDispatched('Foo');
+        $fake->assertDispatched('Bar');
+        $fake->assertNotDispatched('Baz');
     }
 }
 
