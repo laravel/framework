@@ -25,7 +25,7 @@ class Arr
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array   $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $value
      * @return array
      */
@@ -125,7 +125,7 @@ class Arr
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|int|string  $keys
      * @return array
      */
     public static function except($array, $keys)
@@ -227,7 +227,7 @@ class Arr
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|int|string  $keys
      * @return void
      */
     public static function forget(&$array, $keys)
@@ -271,7 +271,7 @@ class Arr
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -308,7 +308,7 @@ class Arr
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  int|string|array  $keys
      * @return bool
      */
     public static function has($array, $keys)
@@ -365,7 +365,7 @@ class Arr
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|int|string  $keys
      * @return array
      */
     public static function only($array, $keys)
@@ -430,7 +430,7 @@ class Arr
      *
      * @param  array  $array
      * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  int|string|null  $key
      * @return array
      */
     public static function prepend($array, $value, $key = null)
@@ -448,7 +448,7 @@ class Arr
      * Get a value from the array, and remove it.
      *
      * @param  array   $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -507,7 +507,7 @@ class Arr
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array   $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $value
      * @return array
      */
