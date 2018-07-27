@@ -36,7 +36,7 @@ if (! function_exists('array_add')) {
      * Add an element to an array using "dot" notation if it doesn't exist.
      *
      * @param  array   $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $value
      * @return array
      */
@@ -91,7 +91,7 @@ if (! function_exists('array_except')) {
      * Get all of the given array except for a specified array of keys.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|int|string  $keys
      * @return array
      */
     function array_except($array, $keys)
@@ -134,7 +134,7 @@ if (! function_exists('array_forget')) {
      * Remove one or many array items from a given array using "dot" notation.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|int|string  $keys
      * @return void
      */
     function array_forget(&$array, $keys)
@@ -148,7 +148,7 @@ if (! function_exists('array_get')) {
      * Get an item from an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -163,7 +163,7 @@ if (! function_exists('array_has')) {
      * Check if an item or items exist in an array using "dot" notation.
      *
      * @param  \ArrayAccess|array  $array
-     * @param  string|array  $keys
+     * @param  string|int|array  $keys
      * @return bool
      */
     function array_has($array, $keys)
@@ -192,7 +192,7 @@ if (! function_exists('array_only')) {
      * Get a subset of the items from the given array.
      *
      * @param  array  $array
-     * @param  array|string  $keys
+     * @param  array|int|string  $keys
      * @return array
      */
     function array_only($array, $keys)
@@ -222,7 +222,7 @@ if (! function_exists('array_prepend')) {
      *
      * @param  array  $array
      * @param  mixed  $value
-     * @param  mixed  $key
+     * @param  int|string|null  $key
      * @return array
      */
     function array_prepend($array, $value, $key = null)
@@ -236,7 +236,7 @@ if (! function_exists('array_pull')) {
      * Get a value from the array, and remove it.
      *
      * @param  array   $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $default
      * @return mixed
      */
@@ -267,7 +267,7 @@ if (! function_exists('array_set')) {
      * If no key is given to the method, the entire array will be replaced.
      *
      * @param  array   $array
-     * @param  string  $key
+     * @param  int|string  $key
      * @param  mixed   $value
      * @return array
      */
