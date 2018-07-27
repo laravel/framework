@@ -16,6 +16,21 @@ class DatabaseEloquentHasManyTest extends TestCase
         m::close();
     }
 
+    public function testSaveManyMethod()
+    {
+        $relation = $this->getRelation();
+
+        $mockModel = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save'])->getMock();
+        $mockModel->expects($this->once())->method('save');
+
+        $mockModel2 = $this->getMockBuilder('Illuminate\Database\Eloquent\Model')->setMethods(['save'])->getMock();
+        $mockModel2->expects($this->once())->method('save');
+
+        $result = $relation->saveMany([$mockModel, $mockModel2]);
+
+        $this->assertEquals([$mockModel, $mockModel2], $result);
+    }
+
     public function testMakeMethodDoesNotSaveNewModel()
     {
         $relation = $this->getRelation();

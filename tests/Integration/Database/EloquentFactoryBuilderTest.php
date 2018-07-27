@@ -213,21 +213,6 @@ class EloquentFactoryBuilderTest extends TestCase
     /**
      * @test
      */
-    public function creating_models_with_relationships()
-    {
-        factory(FactoryBuildableUser::class, 2)
-            ->create()
-            ->each(function ($user) {
-                $user->servers()->saveMany(factory(FactoryBuildableServer::class, 2)->make());
-            })
-            ->each(function ($user) {
-                $this->assertCount(2, $user->servers);
-            });
-    }
-
-    /**
-     * @test
-     */
     public function creating_models_on_custom_connection()
     {
         $user = factory(FactoryBuildableUser::class)
