@@ -18,6 +18,6 @@ class HttpUploadedFileTest extends TestCase
             true
         );
 
-        $this->assertEquals('This is a story about something that happened long ago when your grandfather was a child.', trim($file->getContents()));
+        $this->assertEquals('This is a story about something that happened long ago when your grandfather was a child.', trim($file->get()));
     }
 }
