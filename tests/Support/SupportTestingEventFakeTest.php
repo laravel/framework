@@ -91,9 +91,9 @@ class SupportTestingEventFakeTest extends TestCase
         $fake->dispatch('Bar', ['id' => 1]);
         $fake->dispatch('Baz');
 
-        $fake->assertNotDispatched('Foo');
-        $fake->assertNotDispatched('Bar');
-        $fake->assertDispatched('Baz');
+        $fake->assertDispatched('Foo');
+        $fake->assertDispatched('Bar');
+        $fake->assertNotDispatched('Baz');
     }
 }
 
