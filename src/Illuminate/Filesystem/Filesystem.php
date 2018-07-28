@@ -563,7 +563,7 @@ class Filesystem
     {
         $allDirectories = $this->directories($directory);
 
-        if (!empty($allDirectories)) {
+        if (! empty($allDirectories)) {
             foreach ($allDirectories as $directoryName) {
                 $this->deleteDirectory($directoryName);
             }
