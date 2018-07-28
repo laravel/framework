@@ -161,7 +161,7 @@ class MailgunTransport extends Transport
      */
     public function setDomain($domain)
     {
-        $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
+        $this->url = $domain.'/messages.mime';
 
         return $this->domain = $domain;
     }
