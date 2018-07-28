@@ -55,7 +55,7 @@ class MailFake implements Mailer
      * @param  int  $times
      * @return void
      */
-    protected function assertSentTimes($mailable, $times = 1)
+    public function assertSentTimes($mailable, $times = 1)
     {
         PHPUnit::assertTrue(
             ($count = $this->sent($mailable)->count()) === $times,
@@ -114,7 +114,7 @@ class MailFake implements Mailer
      * @param  int  $times
      * @return void
      */
-    protected function assertQueuedTimes($mailable, $times = 1)
+    public function assertQueuedTimes($mailable, $times = 1)
     {
         PHPUnit::assertTrue(
             ($count = $this->queued($mailable)->count()) === $times,
