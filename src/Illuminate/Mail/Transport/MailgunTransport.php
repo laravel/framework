@@ -2,6 +2,7 @@
 
 namespace Illuminate\Mail\Transport;
 
+use Illuminate\Support\Str;
 use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
 
@@ -161,7 +162,11 @@ class MailgunTransport extends Transport
      */
     public function setDomain($domain)
     {
-        $this->url = $domain.'/messages.mime';
+        $url = ! Str::startsWith($domain, ['http://', 'https://'])
+                        ? 'https://api.mailgun.net/v3/'.$domain
+                        : $domain;
+
+        $this->url = $url.'/messages.mime';
 
         return $this->domain = $domain;
     }
