@@ -66,9 +66,9 @@ class FileSessionHandler implements SessionHandlerInterface
      */
     public function read($sessionId)
     {
-        if ($this->files->exists($path = $this->path.'/'.$sessionId)) {
-            if (filemtime($path) >= Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
-                return $this->files->get($path, true);
+        if ($this->files->isFile($path = $this->path.'/'.$sessionId)) {
+            if ($this->files->lastModified($path) >= Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+                return $this->files->sharedGet($path);
             }
         }
 
