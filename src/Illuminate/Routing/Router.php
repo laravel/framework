@@ -425,7 +425,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
      */
-    protected function addRoute($methods, $uri, $action)
+    public function addRoute($methods, $uri, $action)
     {
         return $this->routes->add($this->createRoute($methods, $uri, $action));
     }
