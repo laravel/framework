@@ -371,12 +371,12 @@ class HttpRequestTest extends TestCase
         $this->assertNull($request['non-existant']);
 
         $this->assertTrue(isset($request['name']));
-        $this->assertEquals(null, $request['name']);
+        $this->assertNull($request['name']);
 
         $this->assertNotEquals('Taylor', $request['name']);
 
         $this->assertTrue(isset($request['foo.bar']));
-        $this->assertEquals(null, $request['foo.bar']);
+        $this->assertNull($request['foo.bar']);
         $this->assertTrue(isset($request['foo.baz']));
         $this->assertEquals('', $request['foo.baz']);
 
