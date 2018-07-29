@@ -3,6 +3,7 @@
 namespace Illuminate\Support;
 
 use DateInterval;
+use Carbon\Carbon;
 use DateTimeInterface;
 
 trait InteractsWithTime

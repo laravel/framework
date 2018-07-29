@@ -3,7 +3,7 @@
 namespace Illuminate\Tests\Integration\Routing;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;

@@ -4,7 +4,7 @@ namespace Illuminate\Queue;
 
 use Exception;
 use Throwable;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;

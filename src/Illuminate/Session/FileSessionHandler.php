@@ -3,7 +3,7 @@
 namespace Illuminate\Session;
 
 use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
+use Carbon\Carbon;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 
