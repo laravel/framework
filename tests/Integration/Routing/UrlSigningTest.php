@@ -21,7 +21,7 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignature() ? 'valid' : 'invalid';
         })->name('foo');
 
-        $this->assertTrue(is_string($url = URL::signedRoute('foo', ['id' => 1])));
+        $this->assertInternalType('string', $url = URL::signedRoute('foo', ['id' => 1]));
         $this->assertEquals('valid', $this->get($url)->original);
     }
 
@@ -32,7 +32,7 @@ class UrlSigningTest extends TestCase
         })->name('foo');
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertTrue(is_string($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1])));
+        $this->assertInternalType('string', $url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
         $this->assertEquals('valid', $this->get($url)->original);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
@@ -55,7 +55,7 @@ class UrlSigningTest extends TestCase
         })->name('foo')->middleware(ValidateSignature::class);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertTrue(is_string($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1])));
+        $this->assertInternalType('string', $url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
         $this->assertEquals('valid', $this->get($url)->original);
     }
 
@@ -66,7 +66,7 @@ class UrlSigningTest extends TestCase
         })->name('foo')->middleware(ValidateSignature::class);
 
         Carbon::setTestNow(Carbon::create(2018, 1, 1));
-        $this->assertTrue(is_string($url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1])));
+        $this->assertInternalType('string', $url = URL::temporarySignedRoute('foo', now()->addMinutes(5), ['id' => 1]));
         Carbon::setTestNow(Carbon::create(2018, 1, 1)->addMinutes(10));
 
         $response = $this->get($url);
@@ -82,7 +82,7 @@ class UrlSigningTest extends TestCase
             return $request->hasValidSignature() ? $routable : 'invalid';
         })->name('foo');
 
-        $this->assertTrue(is_string($url = URL::signedRoute('foo', $model)));
+        $this->assertInternalType('string', $url = URL::signedRoute('foo', $model));
         $this->assertEquals('routable', $this->get($url)->original);
     }
 }

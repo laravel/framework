@@ -107,7 +107,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->delete('file.txt'));
-        $this->assertFalse(file_exists($this->tempDir.'/file.txt'));
+        $this->assertFileNotExists($this->tempDir.'/file.txt');
     }
 
     public function testDeleteReturnsFalseWhenFileNotFound()
