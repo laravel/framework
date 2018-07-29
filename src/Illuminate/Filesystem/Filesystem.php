@@ -556,7 +556,7 @@ class Filesystem
     /**
      * Remove all of the directories within a given directory.
      *
-     * @param string $directory
+     * @param  string  $directory
      * @return bool
      */
     public function deleteDirectories($directory)
