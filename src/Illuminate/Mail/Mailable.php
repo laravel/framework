@@ -212,7 +212,7 @@ class Mailable implements MailableContract, Renderable
         if (isset($this->html)) {
             return array_filter([
                 'html' => new HtmlString($this->html),
-                'text' => isset($this->textView) ? $this->textView : null,
+                'text' => $this->textView ?? null,
             ]);
         }
 
