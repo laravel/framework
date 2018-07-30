@@ -194,6 +194,7 @@ class AuthAccessGateTest extends TestCase
         $gate->define('foo', function ($user) {
             return true;
         });
+
         $gate->define('bar', function ($user) {
             return false;
         });
@@ -201,14 +202,63 @@ class AuthAccessGateTest extends TestCase
         $gate->after(function ($user, $ability, $result) {
             if ($ability == 'foo') {
                 $this->assertTrue($result, 'After callback on `foo` should receive true as result');
+            } elseif ($ability == 'bar') {
+                $this->assertFalse($result, 'After callback on `bar` should receive false as result');
             } else {
-                $this->assertFalse($result, 'After callback on `bar` or `missing` should receive false as result');
+                $this->assertNull($result, 'After callback on `missing` should receive null as result');
             }
         });
 
         $this->assertTrue($gate->check('foo'));
         $this->assertFalse($gate->check('bar'));
         $this->assertFalse($gate->check('missing'));
+    }
+
+    public function test_after_callbacks_can_allow_if_null()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->after(function ($user, $ability, $result) {
+            return true;
+        });
+
+        $this->assertTrue($gate->allows('null'));
+    }
+
+    public function test_after_callbacks_do_not_override_previous_result()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('deny', function ($user) {
+            return false;
+        });
+
+        $gate->define('allow', function ($user) {
+            return true;
+        });
+
+        $gate->after(function ($user, $ability, $result) {
+            return ! $result;
+        });
+
+        $this->assertTrue($gate->allows('allow'));
+        $this->assertTrue($gate->denies('deny'));
+    }
+
+    public function test_after_callbacks_do_not_override_each_other()
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->after(function ($user, $ability, $result) {
+            return $ability == 'allow' ? true : false;
+        });
+
+        $gate->after(function ($user, $ability, $result) {
+            return ! $result;
+        });
+
+        $this->assertTrue($gate->allows('allow'));
+        $this->assertTrue($gate->denies('deny'));
     }
 
     public function test_current_user_that_is_on_gate_always_injected_into_closure_callbacks()
