@@ -2,7 +2,6 @@
 
 namespace Illuminate\Mail\Transport;
 
-use Illuminate\Support\Str;
 use Swift_Mime_SimpleMessage;
 use GuzzleHttp\ClientInterface;
 
