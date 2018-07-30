@@ -681,19 +681,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON back into an array or object.
-     *
-     * @param  string  $value
-     * @param  bool  $asObject
-     * @return mixed
-     */
-    public function fromJson($value, $asObject = false)
-    {
-        return json_decode($value, ! $asObject);
-    }
-
-    /**
-     * Cast the given float value.
+     * Decode the given float.
      *
      * @param  mixed  $value
      * @return mixed
@@ -710,6 +698,18 @@ trait HasAttributes
             default:
                 return (float) $value;
         }
+    }
+
+    /**
+     * Decode the given JSON back into an array or object.
+     *
+     * @param  string  $value
+     * @param  bool  $asObject
+     * @return mixed
+     */
+    public function fromJson($value, $asObject = false)
+    {
+        return json_decode($value, ! $asObject);
     }
 
     /**
