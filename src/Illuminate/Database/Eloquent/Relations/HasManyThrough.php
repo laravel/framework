@@ -426,6 +426,16 @@ class HasManyThrough extends Relation
     }
 
     /**
+     * Get a generator for the given query.
+     *
+     * @return \Generator
+     */
+    public function cursor()
+    {
+        return $this->prepareQueryBuilder()->cursor();
+    }
+
+    /**
      * Execute a callback over each item while chunking.
      *
      * @param  callable  $callback

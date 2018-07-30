@@ -554,6 +554,27 @@ class Filesystem
     }
 
     /**
+     * Remove all of the directories within a given directory.
+     *
+     * @param  string  $directory
+     * @return bool
+     */
+    public function deleteDirectories($directory)
+    {
+        $allDirectories = $this->directories($directory);
+
+        if (! empty($allDirectories)) {
+            foreach ($allDirectories as $directoryName) {
+                $this->deleteDirectory($directoryName);
+            }
+
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
      * Empty the specified directory of all files and folders.
      *
      * @param  string  $directory

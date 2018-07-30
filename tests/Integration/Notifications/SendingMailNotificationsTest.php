@@ -174,6 +174,36 @@ class SendingMailNotificationsTest extends TestCase
         $user->notify($notification);
     }
 
+    public function test_mail_is_sent_to_multiple_adresses()
+    {
+        $notification = new TestMailNotificationWithSubject;
+
+        $user = NotifiableUserWithMultipleAddreses::forceCreate([
+            'email' => 'taylor@laravel.com',
+        ]);
+
+        $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
+        $this->markdown->shouldReceive('renderText')->once()->andReturn('textContent');
+
+        $this->mailer->shouldReceive('send')->once()->with(
+            ['html' => 'htmlContent', 'text' => 'textContent'],
+            $notification->toMail($user)->toArray(),
+            Mockery::on(function ($closure) {
+                $message = Mockery::mock(\Illuminate\Mail\Message::class);
+
+                $message->shouldReceive('to')->once()->with(['foo_taylor@laravel.com', 'bar_taylor@laravel.com']);
+
+                $message->shouldReceive('subject')->once()->with('mail custom subject');
+
+                $closure($message);
+
+                return true;
+            })
+        );
+
+        $user->notify($notification);
+    }
+
     public function test_mail_is_sent_using_mailable()
     {
         $notification = new TestMailNotificationWithMailable;
@@ -201,6 +231,17 @@ class NotifiableUserWithNamedAddress extends NotifiableUser
         return [
             $this->email => $this->name,
             'foo_'.$this->email,
+        ];
+    }
+}
+
+class NotifiableUserWithMultipleAddreses extends NotifiableUser
+{
+    public function routeNotificationForMail($notification)
+    {
+        return [
+            'foo_'.$this->email,
+            'bar_'.$this->email,
         ];
     }
 }
