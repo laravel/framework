@@ -199,6 +199,27 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         });
     }
 
+    public function testCursorReturnsCorrectModels()
+    {
+        $this->seedData();
+        $this->seedDataExtended();
+        $country = HasManyThroughTestCountry::find(2);
+
+        $posts = $country->posts()->cursor();
+
+        foreach ($posts as $post) {
+            $this->assertEquals([
+                'id',
+                'user_id',
+                'title',
+                'body',
+                'email',
+                'created_at',
+                'updated_at',
+                'country_id', ], array_keys($post->getAttributes()));
+        }
+    }
+
     public function testEachReturnsCorrectModels()
     {
         $this->seedData();
