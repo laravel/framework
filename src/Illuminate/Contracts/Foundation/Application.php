@@ -59,11 +59,10 @@ interface Application extends Container
      * Register a service provider with the application.
      *
      * @param  \Illuminate\Support\ServiceProvider|string  $provider
-     * @param  array  $options
      * @param  bool   $force
      * @return \Illuminate\Support\ServiceProvider
      */
-    public function register($provider, $options = [], $force = false);
+    public function register($provider, $force = false);
 
     /**
      * Register a deferred provider and service.
