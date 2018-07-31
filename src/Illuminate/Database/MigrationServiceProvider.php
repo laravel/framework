@@ -57,7 +57,7 @@ class MigrationServiceProvider extends ServiceProvider
         $this->app->singleton('migrator', function ($app) {
             $repository = $app['migration.repository'];
 
-            return new Migrator($repository, $app['db'], $app['files']);
+            return new Migrator($app, $repository, $app['db'], $app['files']);
         });
     }
 

@@ -7,6 +7,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Contracts\Container\Container;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
 class Migrator
@@ -54,17 +55,27 @@ class Migrator
     protected $output;
 
     /**
+     * The IoC container instance.
+     *
+     * @var \Illuminate\Container\Container
+     */
+    protected $container;
+
+    /**
      * Create a new migrator instance.
      *
-     * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface  $repository
-     * @param  \Illuminate\Database\ConnectionResolverInterface  $resolver
-     * @param  \Illuminate\Filesystem\Filesystem  $files
-     * @return void
+     * @param  \Illuminate\Contracts\Container\Container $container
+     * @param  \Illuminate\Database\Migrations\MigrationRepositoryInterface $repository
+     * @param  \Illuminate\Database\ConnectionResolverInterface $resolver
+     * @param  \Illuminate\Filesystem\Filesystem $files
      */
-    public function __construct(MigrationRepositoryInterface $repository,
-                                Resolver $resolver,
-                                Filesystem $files)
-    {
+    public function __construct(
+        Container $container,
+        MigrationRepositoryInterface $repository,
+        Resolver $resolver,
+        Filesystem $files
+    ) {
+        $this->container = $container;
         $this->files = $files;
         $this->resolver = $resolver;
         $this->repository = $repository;
@@ -357,7 +368,7 @@ class Migrator
 
         $callback = function () use ($migration, $method) {
             if (method_exists($migration, $method)) {
-                $migration->{$method}();
+                $this->container->call([$migration, $method]);
             }
         };
 

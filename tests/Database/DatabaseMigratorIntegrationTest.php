@@ -6,13 +6,23 @@ use Mockery;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Schema\Builder;
+use Illuminate\Database\DatabaseManager;
 use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 
 class DatabaseMigratorIntegrationTest extends TestCase
 {
+    /**
+     * @var \Illuminate\Database\Capsule\Manager
+     */
     protected $db;
+
+    /**
+     * @var \Illuminate\Database\Migrations\Migrator
+     */
+    protected $migrator;
 
     /**
      * Bootstrap Eloquent.
@@ -31,10 +41,14 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $db->setAsGlobal();
 
         $container = new \Illuminate\Container\Container;
-        $container->instance('db', $db->getDatabaseManager());
+        $databaseManager = $db->getDatabaseManager();
+        $container->instance('db', $databaseManager);
+        $container->instance(DatabaseManager::class, $databaseManager);
+        $container->instance(Builder::class, $databaseManager->getSchemaBuilder());
         \Illuminate\Support\Facades\Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
+            $container,
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
             new Filesystem
@@ -142,5 +156,14 @@ class DatabaseMigratorIntegrationTest extends TestCase
         $this->assertFalse($this->db->schema()->hasTable('users'));
         $this->assertFalse($this->db->schema()->hasTable('password_resets'));
         $this->assertFalse($this->db->schema()->hasTable('flights'));
+    }
+
+    public function testServicesCanBeInjectedInTheMigrationMethods()
+    {
+        $this->migrator->run([__DIR__.'/migrations/three']);
+        $this->assertTrue($this->db->schema()->hasTable('test'));
+        $this->assertSame(1, $this->db->getConnection()->table('test')->where('name', '=', 'PirateKing')->count());
+        $this->migrator->rollback([__DIR__.'/migrations/three']);
+        $this->assertFalse($this->db->schema()->hasTable('test'));
     }
 }
