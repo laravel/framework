@@ -64,6 +64,21 @@ class MySqlGrammar extends Grammar
     }
 
     /**
+     * Compile a "JSON length" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  string  $value
+     * @return string
+     */
+    protected function compileJsonLength($column, $operator, $value)
+    {
+        list($field, $path) = $this->wrapJsonFieldAndPath($column);
+
+        return 'json_length('.$field.$path.') '.$operator.' '.$value;
+    }
+
+    /**
      * Compile a single union statement.
      *
      * @param  array  $union
