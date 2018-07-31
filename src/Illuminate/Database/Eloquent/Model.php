@@ -722,10 +722,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
-
-            $this->fireModelEvent('updated', false);
-
             $this->syncChanges();
+            $this->fireModelEvent('updated', false);
         }
 
         return true;
