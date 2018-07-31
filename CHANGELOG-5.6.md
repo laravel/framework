@@ -1,6 +1,38 @@
 # Release Notes for 5.6.x
 
-## v5.6.27 (2018-06-20)
+## v5.6.29 (2018-07-26)
+
+### Added
+- Added restored() and forceDeleted() to observer stub ([#40ba2ee](https://github.com/laravel/framework/commit/49ac5be5ae9b69f160058a3f10022c9511222db5))
+- Added UploadedFile::getContents() ([#24924](https://github.com/laravel/framework/pull/24924))
+- Added an alias for a single FactoryBuilder state definition ([#24937](https://github.com/laravel/framework/pull/24937))
+
+### Changed
+- Allow closure to determine if event should be faked ([#24887](https://github.com/laravel/framework/pull/24887))
+- Update error message for MailFake::assertSent() ([#24911](https://github.com/laravel/framework/pull/24911))
+- Return instance of spy when swapping facade for a Mockery spy ([#24918](https://github.com/laravel/framework/pull/24918))
+- Renamed Mailer::setGlobalTo() to setGlobalToAndRemoveCcAndBcc() to be more clear about what it does ([#24917](https://github.com/laravel/framework/pull/24917))
+- Update the font path used in frontend stub ([#24926](https://github.com/laravel/framework/pull/24926))
+
+### Fixed
+- Fixed an issue when passing an array to Request::is() ([#24885](https://github.com/laravel/framework/pull/24885))
+- Fixed message string in NotificationFake::assertSentToTimes() ([#24929](https://github.com/laravel/framework/pull/24929))
+
+## v5.6.28 (2018-07-17)
+
+### Added
+- Added support for variadic params in Cache\Repository::tags() ([#24810](https://github.com/laravel/framework/pull/24810))
+- Handle unquoted JSON selector for MYSQL ([#24817](https://github.com/laravel/framework/pull/24817))
+- Added ability to generate single action controller ([#24843](https://github.com/laravel/framework/pull/24843))
+- Applied improvements to the generated migration name ([#24845](https://github.com/laravel/framework/pull/24845))
+- Added JPEG support to FileFactory::image() ([#24853](https://github.com/laravel/framework/pull/24853))
+
+### Changed
+- Stop reporting PDOException manually from inside ConnectionFactory ([#24864](https://github.com/laravel/framework/pull/24864))
+- remove unnecessary foreach from is() method ([#24872](https://github.com/laravel/framework/pull/24872))
+
+
+## v5.6.27 (2018-07-10)
 
 ### Added
 - Add missing phpredis connection parameters to PhpRedisConnector ([#24678](https://github.com/laravel/framework/pull/24678))
