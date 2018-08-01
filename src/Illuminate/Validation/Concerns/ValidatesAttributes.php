@@ -37,6 +37,26 @@ trait ValidatesAttributes
     }
 
     /**
+     * Validate that an attribute is an active Host
+     *
+     * @param  string  $attribute
+     * @param  mixed   $value
+     * @return bool
+     */
+    public function validateActiveHost($attribute, $value)
+    {
+        if (! is_string($value)) {
+            return false;
+        }
+
+        try {
+            return count(dns_get_record($value, DNS_A | DNS_AAAA)) > 0;
+        } catch (Exception $e) {
+            return false;
+        }
+    }
+
+    /**
      * Validate that an attribute is an active URL.
      *
      * @param  string  $attribute
@@ -49,12 +69,8 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ($url = parse_url($value, PHP_URL_HOST)) {
-            try {
-                return count(dns_get_record($url, DNS_A | DNS_AAAA)) > 0;
-            } catch (Exception $e) {
-                return false;
-            }
+        if ($host = parse_url($value, PHP_URL_HOST)) {
+            return $this->validateActiveHost($attribute, $host);
         }
 
         return false;
