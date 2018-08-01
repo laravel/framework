@@ -2,6 +2,9 @@
 
 namespace Illuminate\Notifications\Messages;
 
+use Traversable;
+use Illuminate\Contracts\Support\Arrayable;
+
 class MailMessage extends SimpleMessage
 {
     /**
@@ -144,7 +147,11 @@ class MailMessage extends SimpleMessage
      */
     public function replyTo($address, $name = null)
     {
-        $this->replyTo[] = [$address, $name];
+        if (is_array($address) || $address instanceof Arrayable || $address instanceof Traversable) {
+            $this->replyTo += $this->prepareAddress($address);
+        } else {
+            $this->replyTo[] = [$address, $name];
+        }
 
         return $this;
     }
@@ -152,13 +159,17 @@ class MailMessage extends SimpleMessage
     /**
      * Set the cc address for the mail message.
      *
-     * @param  string  $address
+     * @param  array|string  $address
      * @param  string|null  $name
      * @return $this
      */
     public function cc($address, $name = null)
     {
-        $this->cc[] = [$address, $name];
+        if (is_array($address) || $address instanceof Arrayable || $address instanceof Traversable) {
+            $this->cc += $this->prepareAddress($address);
+        } else {
+            $this->cc[] = [$address, $name];
+        }
 
         return $this;
     }
@@ -166,13 +177,17 @@ class MailMessage extends SimpleMessage
     /**
      * Set the bcc address for the mail message.
      *
-     * @param  string  $address
+     * @param  array|string  $address
      * @param  string|null  $name
      * @return $this
      */
     public function bcc($address, $name = null)
     {
-        $this->bcc[] = [$address, $name];
+        if (is_array($address) || $address instanceof Arrayable || $address instanceof Traversable) {
+            $this->bcc += $this->prepareAddress($address);
+        } else {
+            $this->bcc[] = [$address, $name];
+        }
 
         return $this;
     }
@@ -229,5 +244,21 @@ class MailMessage extends SimpleMessage
     public function data()
     {
         return array_merge($this->toArray(), $this->viewData);
+    }
+
+    /**
+     * Prepare address input for support multiple recipients.
+     *
+     * @param array $value
+     * @return array
+     */
+    protected function prepareAddress($value)
+    {
+        $recipients = [];
+        foreach ($value as $name => $address) {
+            $recipients[] = [$address, is_numeric($name) ? null : $name];
+        }
+
+        return $recipients;
     }
 }
