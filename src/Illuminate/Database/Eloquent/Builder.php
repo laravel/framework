@@ -312,7 +312,7 @@ class Builder
      *
      * @param  mixed  $id
      * @param  array  $columns
-     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
+     * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
      * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
