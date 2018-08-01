@@ -37,7 +37,7 @@ trait ValidatesAttributes
     }
 
     /**
-     * Validate that an attribute is an active Host
+     * Validate that an attribute is an active Host.
      *
      * @param  string  $attribute
      * @param  mixed   $value
