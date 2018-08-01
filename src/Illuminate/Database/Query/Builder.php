@@ -2084,7 +2084,7 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
-     * @param  string  $alias
+     * @param  string|null  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id', $alias = null)
