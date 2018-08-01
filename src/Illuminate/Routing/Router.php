@@ -694,7 +694,7 @@ class Router implements RegistrarContract, BindingRegistrar
                     $name = $main_name;
                 }
             }
-            
+
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten();
 
