@@ -676,6 +676,24 @@ class Router implements RegistrarContract, BindingRegistrar
     public function gatherRouteMiddleware(Route $route)
     {
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
+            // try to see if the name contains any middleware parameters
+            if(strpos($name, ':') !== FALSE){
+                list($main_name, $args) = explode(':', $name);
+                // check to see if the `$main_name` is part of the middleware groups only
+                if(array_key_exists($main_name, $this->middlewareGroups)){
+                    $group =  $this->middlewareGroups[$main_name];
+                    /* 
+                        loop to:
+                        distribute the middleware parameters/arguments to 
+                        all individual middlewares that make up the group
+                    */
+                    foreach($group as $key => $middleware){
+                        $group[$key] = "{$middleware}:{$args}";
+                    }
+                    $this->middlewareGroups[$main_name] = $group;
+                    $name = $main_name;
+                }
+            }
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten();
 
