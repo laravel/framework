@@ -167,6 +167,8 @@ class FoundationTestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
 
+        $response->assertJsonFragment(['foobar']);
+
         $response->assertJsonFragment(['foo' => 'bar']);
 
         $response->assertJsonFragment(['foobar_foo' => 'foo']);
