@@ -2357,6 +2357,7 @@ class Builder
     public function aggregate($function, $columns = ['*'])
     {
         $results = $this->cloneWithout(['columns'])
+                        ->cloneWithout(['groups'])
                         ->cloneWithoutBindings(['select'])
                         ->setAggregate($function, $columns)
                         ->get($columns);
