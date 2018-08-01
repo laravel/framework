@@ -612,7 +612,7 @@ class Builder
      *
      * @param  int  $count
      * @param  callable  $callback
-     * @param  string  $column
+     * @param  string|null  $column
      * @param  string|null  $alias
      * @return bool
      */
