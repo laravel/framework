@@ -677,7 +677,7 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
             // try to see if the name contains any middleware parameters
-            if(strpos($name, ':') !== FALSE){
+            if(is_string($name) && strpos($name, ':') !== FALSE){
                 list($main_name, $args) = explode(':', $name);
                 // check to see if the `$main_name` is part of the middleware groups only
                 if(array_key_exists($main_name, $this->middlewareGroups)){
