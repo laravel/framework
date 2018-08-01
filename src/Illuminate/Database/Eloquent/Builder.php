@@ -210,7 +210,7 @@ class Builder
     /**
      * Add a basic where clause to the query.
      *
-     * @param  string|array|\Closure  $column
+     * @param  callable|string|array  $column
      * @param  mixed   $operator
      * @param  mixed   $value
      * @param  string  $boolean
@@ -218,7 +218,7 @@ class Builder
      */
     public function where($column, $operator = null, $value = null, $boolean = 'and')
     {
-        if ($column instanceof Closure) {
+        if ($this->isValidCallable($column)) {
             $column($query = $this->model->newModelQuery());
 
             $this->query->addNestedWhereQuery($query->getQuery(), $boolean);
@@ -232,7 +232,7 @@ class Builder
     /**
      * Add an "or where" clause to the query.
      *
-     * @param  \Closure|array|string  $column
+     * @param  callable|array|string  $column
      * @param  mixed  $operator
      * @param  mixed  $value
      * @return \Illuminate\Database\Eloquent\Builder|static
@@ -541,10 +541,10 @@ class Builder
      *
      * @param  array  $models
      * @param  string  $name
-     * @param  \Closure  $constraints
+     * @param  callable  $constraints
      * @return array
      */
-    protected function eagerLoadRelation(array $models, $name, Closure $constraints)
+    protected function eagerLoadRelation(array $models, $name, callable $constraints)
     {
         // First we will "back up" the existing where conditions on the query so we can
         // add our eager constraints. Then we will merge the wheres that were on the

@@ -158,4 +158,15 @@ trait BuildsQueries
             'items', 'perPage', 'currentPage', 'options'
         ));
     }
+
+    /**
+     * Determine if the object is a acceptable callable for query builder.
+     *
+     * @param mixed $callable
+     * @return bool
+     */
+    protected function isValidCallable($callable)
+    {
+        return $callable && ! is_string($callable) && ! is_array($callable) && is_callable($callable);
+    }
 }
