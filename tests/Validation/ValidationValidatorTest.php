@@ -2105,6 +2105,22 @@ class ValidationValidatorTest extends TestCase
         $this->assertTrue($v->passes());
     }
 
+    public function testValidateActiveHost()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['x' => 'aslsdlks'], ['x' => 'active_host']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => ['fdsfs', 'fdsfds']], ['x' => 'active_host']);
+        $this->assertFalse($v->passes());
+
+        $v = new Validator($trans, ['x' => 'google.com'], ['x' => 'active_host']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['x' => 'www.google.com'], ['x' => 'active_host']);
+        $this->assertTrue($v->passes());
+    }
+
     public function testValidateImage()
     {
         $trans = $this->getIlluminateArrayTranslator();
