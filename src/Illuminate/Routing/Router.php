@@ -677,20 +677,24 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $middleware = collect($route->gatherMiddleware())->map(function ($name) {
             // try to see if the name contains any middleware parameters
-            if(is_string($name) && strpos($name, ':') !== FALSE){
+            if (is_string($name) && strpos($name, ':') !== FALSE) {
                 list($main_name, $args) = explode(':', $name);
                 // check to see if the `$main_name` is part of the middleware groups only
-                if(array_key_exists($main_name, $this->middlewareGroups)){
+                if (array_key_exists($main_name, $this->middlewareGroups)) {
                     $group =  $this->middlewareGroups[$main_name];
-
-                    foreach($group as $key => $middleware){
-                        $group[$key] = "{$middleware}:{$args}";
+                    // distribute the middleware parameters to all
+                    // individual middlewares that make up the group
+                    foreach ($group as $key => $middleware) {
+                        if (!isset($this->middlewareGroups[$middleware])) {
+                            $group[$key] = "{$middleware}:{$args}";
+                        }
                     }
-
+                    // overwrite major group middleware array with modified one
                     $this->middlewareGroups[$main_name] = $group;
                     $name = $main_name;
                 }
             }
+            
             return (array) MiddlewareNameResolver::resolve($name, $this->middleware, $this->middlewareGroups);
         })->flatten();
 
