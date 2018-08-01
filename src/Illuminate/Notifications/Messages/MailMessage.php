@@ -147,8 +147,8 @@ class MailMessage extends SimpleMessage
      */
     public function replyTo($address, $name = null)
     {
-        if (is_array($address) || $address instanceof Arrayable || $address instanceof Traversable) {
-            $this->replyTo += $this->prepareAddress($address);
+        if ($this->arrayOfAddresses($address)) {
+            $this->replyTo += $this->parseAddresses($address);
         } else {
             $this->replyTo[] = [$address, $name];
         }
@@ -165,8 +165,8 @@ class MailMessage extends SimpleMessage
      */
     public function cc($address, $name = null)
     {
-        if (is_array($address) || $address instanceof Arrayable || $address instanceof Traversable) {
-            $this->cc += $this->prepareAddress($address);
+        if ($this->arrayOfAddresses($address)) {
+            $this->cc += $this->parseAddresses($address);
         } else {
             $this->cc[] = [$address, $name];
         }
@@ -183,8 +183,8 @@ class MailMessage extends SimpleMessage
      */
     public function bcc($address, $name = null)
     {
-        if (is_array($address) || $address instanceof Arrayable || $address instanceof Traversable) {
-            $this->bcc += $this->prepareAddress($address);
+        if ($this->arrayOfAddresses($address)) {
+            $this->bcc += $this->parseAddresses($address);
         } else {
             $this->bcc[] = [$address, $name];
         }
@@ -247,18 +247,28 @@ class MailMessage extends SimpleMessage
     }
 
     /**
-     * Prepare address input for support multiple recipients.
+     * Parse the multi-address array into the necessary format.
      *
-     * @param array $value
+     * @param  array  $value
      * @return array
      */
-    protected function prepareAddress($value)
+    protected function parseAddresses($value)
     {
-        $recipients = [];
-        foreach ($value as $name => $address) {
-            $recipients[] = [$address, is_numeric($name) ? null : $name];
-        }
+        return collect($value)->map(function ($address, $name) {
+            return [$address, is_numeric($name) ? null : $name];
+        })->values()->all();
+    }
 
-        return $recipients;
+    /**
+     * Determine if the given "address" is actually an array of addresses.
+     *
+     * @param  mixed  $address
+     * @return bool
+     */
+    protected function arrayOfAddresses($address)
+    {
+        return is_array($address) ||
+               $address instanceof Arrayable ||
+               $address instanceof Traversable;
     }
 }
