@@ -28,7 +28,7 @@ class ValidationAddFailureTest extends TestCase
      * @param string $class name of the class
      * @param string $method name of the method
      * @throws ReflectionException if $class or $method don't exist
-     * @throws PHPUnit_Framework_ExpectationFailedException if the method isn't public
+     * @throws PHPUnit_Framework_ExpectationFailedException if the method is not public
      */
     public function assertPublicMethod($class, $method)
     {
