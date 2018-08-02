@@ -584,7 +584,7 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return void
      */
-    public function addFailure($attribute, $rule, $parameters)
+    public function addFailure($attribute, $rule, $parameters = [])
     {
         if (! $this->messages) {
             $this->passes();
