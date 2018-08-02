@@ -29,7 +29,14 @@ class MailgunTransport extends Transport
     protected $domain;
 
     /**
-     * The Mailgun API end-point.
+     * The Mailgun region.
+     *
+     * @var string
+     */
+    protected $region;
+
+    /**
+     * THe Mailgun API end-point.
      *
      * @var string
      */
@@ -144,6 +151,27 @@ class MailgunTransport extends Transport
     }
 
     /**
+     * Get the region being used.
+     *
+     * @return string
+     */
+    public function getRegion()
+    {
+        return $this->region;
+    }
+
+    /**
+     * Set the region being used.
+     *
+     * @param  string  $region
+     * @return string
+     */
+    public function setRegion($region)
+    {
+        return $this->region = $region;
+    }
+
+    /**
      * Get the domain being used by the transport.
      *
      * @return string
@@ -161,7 +189,8 @@ class MailgunTransport extends Transport
      */
     public function setDomain($domain)
     {
-        $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
+        $region = empty($this->getRegion()) ? '' : str_finish($this->getRegion(), '.');
+        $this->url = 'https://api.'.$region.'mailgun.net/v3/'.$domain.'/messages.mime';
 
         return $this->domain = $domain;
     }
