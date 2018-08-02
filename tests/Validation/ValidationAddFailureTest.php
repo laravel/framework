@@ -11,7 +11,6 @@ use ReflectionMethod;
 
 class ValidationAddFailureTest extends TestCase
 {
-
     /**
      * Making Validator using ValidationValidatorTest
      * 
@@ -25,7 +24,6 @@ class ValidationAddFailureTest extends TestCase
 
         return $v;
     }
-
 
     /**
      * Assert that a method has public access.
@@ -41,7 +39,6 @@ class ValidationAddFailureTest extends TestCase
         self::assertTrue($reflector->isPublic(), 'method is not public');
     }
 
-
     public function testAddFailureExistsAndVisibile()
     {
         $validator   = $this->makeValidator();
@@ -51,13 +48,11 @@ class ValidationAddFailureTest extends TestCase
         $this->assertPublicMethod($validator, $method_name);
     }
 
-
     public function testAddFailureIsFunctional()
     {
         $attribute = 'Eugene';
         $validator = $this->makeValidator();
         $validator->addFailure($attribute, 'not_in');
-        echo $validator->messages();
         $messages = json_decode($validator->messages());
         $this->assertSame($messages->{"foo.bar.baz"}[0], "validation.required", 'initial data in messages is lost');
         $this->assertSame($messages->{$attribute}[0], "validation.not_in", 'new data in messages was not added');
