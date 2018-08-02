@@ -22,7 +22,6 @@ class ValidationRequiredIfTest extends TestCase
 
         $this->assertEquals('', (string) $rule);
 
-
         $rule = new RequiredIf(true);
 
         $this->assertEquals('required', (string) $rule);

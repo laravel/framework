@@ -14,14 +14,14 @@ class RequiredIf
     /**
      * The condition that validates the attribute.
      *
-     * @var boolean|\Closure
+     * @var bool|\Closure
      */
     public $condition;
 
     /**
      * Create a new Closure based required validation rule.
      *
-     * @param  boolean|\Closure  $condition
+     * @param  bool|\Closure  $condition
      * @return void
      */
     public function __construct($condition)
