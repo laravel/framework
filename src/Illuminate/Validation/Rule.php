@@ -73,4 +73,15 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Create a new Closure based required validation rule.
+     *
+     * @param  \Closure  $callback
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($callback)
+    {
+        return new Rules\RequiredIf($callback);
+    }
 }
