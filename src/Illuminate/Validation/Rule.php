@@ -75,7 +75,7 @@ class Rule
     }
 
     /**
-     * Create a new Closure based required validation rule.
+     * Get a required_if constraint builder instance.
      *
      * @param  \Closure  $callback
      * @return \Illuminate\Validation\Rules\RequiredIf

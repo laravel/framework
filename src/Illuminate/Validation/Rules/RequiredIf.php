@@ -19,7 +19,7 @@ class RequiredIf
     public $condition;
 
     /**
-     * Create a new Closure based required validation rule.
+     * Create a new required validation rule based on a condition.
      *
      * @param  bool|\Closure  $condition
      * @return void
