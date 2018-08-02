@@ -589,7 +589,7 @@ class Validator implements ValidatorContract
         if (! $this->messages) {
             $this->passes();
         }
-        
+
         $this->messages->add($attribute, $this->makeReplacements(
             $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));
