@@ -73,4 +73,15 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a required_if constraint builder instance.
+     *
+     * @param  \Closure  $callback
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($callback)
+    {
+        return new Rules\RequiredIf($callback);
+    }
 }
