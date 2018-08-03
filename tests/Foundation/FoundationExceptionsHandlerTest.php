@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
-use Illuminate\Foundation\Exceptions\Renderer;
 use Mockery as m;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
@@ -11,6 +10,7 @@ use Illuminate\Container\Container;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Foundation\Exceptions\Renderer;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
@@ -147,7 +147,7 @@ class CustomException extends Exception implements Responsable
 class CustomHandlerToRenderer extends Handler
 {
     protected $renderers = [
-        Exception::class => CustomRenderer::class
+        Exception::class => CustomRenderer::class,
     ];
 }
 

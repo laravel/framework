@@ -180,7 +180,7 @@ class Handler implements ExceptionHandlerContract
         $e = $this->prepareException($e);
 
         $renderer = collect($this->renderers)
-            ->first(function($renderer, $toBeRender) use ($e) {
+            ->first(function ($renderer, $toBeRender) use ($e) {
                 return $e instanceof $toBeRender;
             });
 
