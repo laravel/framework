@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Exception;
+use Illuminate\Foundation\Exceptions\Renderer;
 use Mockery as m;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
@@ -80,6 +81,15 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My custom exception response"}', $response);
     }
 
+    public function testHandleTheException()
+    {
+        $customHandler = new CustomHandlerToRenderer($this->container);
+
+        $response = $customHandler->render($this->request, new Exception('Exception message'))->getContent();
+
+        $this->assertSame('{"error":true,"custom":true}', $response);
+    }
+
     public function testReturnsJsonWithoutStackTraceWhenAjaxRequestAndDebugFalseAndExceptionMessageIsMasked()
     {
         $this->config->shouldReceive('get')->with('app.debug', null)->once()->andReturn(false);
@@ -131,5 +141,25 @@ class CustomException extends Exception implements Responsable
     public function toResponse($request)
     {
         return response()->json(['response' => 'My custom exception response']);
+    }
+}
+
+class CustomHandlerToRenderer extends Handler
+{
+    protected $renderers = [
+        Exception::class => CustomRenderer::class
+    ];
+}
+
+class CustomRenderer extends Renderer
+{
+    /**
+     * Render the exception response.
+     *
+     * @return mixed
+     */
+    public function render()
+    {
+        return response()->json(['error' => true, 'custom' => true]);
     }
 }

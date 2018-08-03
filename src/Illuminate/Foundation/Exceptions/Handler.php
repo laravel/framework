@@ -74,6 +74,11 @@ class Handler implements ExceptionHandlerContract
     ];
 
     /**
+     * Renders to render the exception.
+     */
+    protected $renderers = [];
+
+    /**
      * Create a new exception handler instance.
      *
      * @param  \Illuminate\Contracts\Container\Container  $container
@@ -173,6 +178,15 @@ class Handler implements ExceptionHandlerContract
         }
 
         $e = $this->prepareException($e);
+
+        $renderer = collect($this->renderers)
+            ->first(function($renderer, $toBeRender) use ($e) {
+                return $e instanceof $toBeRender;
+            });
+
+        if ($renderer) {
+            return (new $renderer($request, $e))->render();
+        }
 
         if ($e instanceof HttpResponseException) {
             return $e->getResponse();
