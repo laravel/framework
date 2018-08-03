@@ -2,10 +2,10 @@
 
 namespace Illuminate\Broadcasting;
 
-use Closure;
 use Pusher\Pusher;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
+use Illuminate\Support\Manager;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
@@ -16,40 +16,8 @@ use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
 /**
  * @mixin \Illuminate\Contracts\Broadcasting\Broadcaster
  */
-class BroadcastManager implements FactoryContract
+class BroadcastManager extends Manager implements FactoryContract
 {
-    /**
-     * The application instance.
-     *
-     * @var \Illuminate\Foundation\Application
-     */
-    protected $app;
-
-    /**
-     * The array of resolved broadcast drivers.
-     *
-     * @var array
-     */
-    protected $drivers = [];
-
-    /**
-     * The registered custom driver creators.
-     *
-     * @var array
-     */
-    protected $customCreators = [];
-
-    /**
-     * Create a new manager instance.
-     *
-     * @param  \Illuminate\Foundation\Application  $app
-     * @return void
-     */
-    public function __construct($app)
-    {
-        $this->app = $app;
-    }
-
     /**
      * Register the routes for handling broadcast authentication and sockets.
      *
@@ -291,31 +259,5 @@ class BroadcastManager implements FactoryContract
     public function setDefaultDriver($name)
     {
         $this->app['config']['broadcasting.default'] = $name;
-    }
-
-    /**
-     * Register a custom driver creator Closure.
-     *
-     * @param  string    $driver
-     * @param  \Closure  $callback
-     * @return $this
-     */
-    public function extend($driver, Closure $callback)
-    {
-        $this->customCreators[$driver] = $callback;
-
-        return $this;
-    }
-
-    /**
-     * Dynamically call the default driver instance.
-     *
-     * @param  string  $method
-     * @param  array   $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->driver()->$method(...$parameters);
     }
 }
