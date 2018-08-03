@@ -81,7 +81,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->assertSame('{"response":"My custom exception response"}', $response);
     }
 
-    public function testHandleTheException()
+    public function testRenderTheExceptionWithRenderer()
     {
         $customHandler = new CustomHandlerToRenderer($this->container);
 
