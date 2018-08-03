@@ -2,8 +2,6 @@
 
 namespace Illuminate\Validation\Rules;
 
-use Closure;
-
 class RequiredIf
 {
     /**
