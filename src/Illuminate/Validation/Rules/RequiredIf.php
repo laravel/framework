@@ -7,21 +7,16 @@ use Closure;
 class RequiredIf
 {
     /**
-     * The name of the rule.
-     */
-    protected $rule = 'required';
-
-    /**
      * The condition that validates the attribute.
      *
-     * @var bool|\Closure
+     * @var callable|bool
      */
     public $condition;
 
     /**
      * Create a new required validation rule based on a condition.
      *
-     * @param  bool|\Closure  $condition
+     * @param  callable|bool  $condition
      * @return void
      */
     public function __construct($condition)
@@ -36,10 +31,10 @@ class RequiredIf
      */
     public function __toString()
     {
-        if ($this->condition instanceof Closure) {
-            return $this->condition->__invoke() ? $this->rule : '';
+        if (is_callable($this->condition)) {
+            return call_user_func($this->condition) ? 'required' : '';
         }
 
-        return $this->condition ? $this->rule : '';
+        return $this->condition ? 'required' : '';
     }
 }
