@@ -40,7 +40,8 @@ class SupportPluralizerTest extends TestCase
         $this->assertEquals('VertexFields', Str::plural('VertexField'));
     }
 
-    public function testPluralWithNegativeCount() {
+    public function testPluralWithNegativeCount()
+    {
         $this->assertEquals('test', Str::plural('test', 1));
         $this->assertEquals('tests', Str::plural('test', 2));
         $this->assertEquals('test', Str::plural('test', -1));
