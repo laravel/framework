@@ -21,6 +21,9 @@ export default class Example extends Component {
     }
 }
 
-if (document.getElementById('example')) {
-    ReactDOM.render(<Example />, document.getElementById('example'));
+const reactElements = document.querySelectorAll('.example');
+if (reactElements.length > 0) {
+    reactElements.forEach(element => {
+        ReactDOM.render(<Example />, element);
+    });
 }
