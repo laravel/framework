@@ -78,7 +78,7 @@ trait InteractsWithContentTypes
             }
 
             foreach ($types as $type) {
-                if ($this->matchesType($accept, $type) || $accept === strtok($type, '/').'/*') {
+                if (self::matchesType($accept, $type) || $accept === strtok($type, '/').'/*') {
                     return true;
                 }
             }
@@ -111,7 +111,7 @@ trait InteractsWithContentTypes
                     $type = $mimeType;
                 }
 
-                if ($this->matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
+                if (self::matchesType($type, $accept) || $accept === strtok($type, '/').'/*') {
                     return $contentType;
                 }
             }
