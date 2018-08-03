@@ -202,11 +202,7 @@ class Event
      */
     protected function runCommandInForeground(Container $container)
     {
-        $this->callBeforeCallbacks($container);
-
-        (new Process(
-            $this->buildCommand(), base_path(), null, null, null
-        ))->run();
+        $this->runCommandInBackground($container);
 
         $this->callAfterCallbacks($container);
     }
