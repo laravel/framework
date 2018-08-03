@@ -2,7 +2,6 @@
 
 namespace Illuminate\Broadcasting;
 
-use Closure;
 use Pusher\Pusher;
 use Psr\Log\LoggerInterface;
 use InvalidArgumentException;
