@@ -12,8 +12,8 @@ use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
 use Illuminate\Support\Traits\Macroable;
-use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Jsonable;
+use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
