@@ -568,7 +568,7 @@ class TestResponse
     public function assertJsonStructure(array $structure = null, $responseData = null)
     {
         if (is_null($structure)) {
-            return $this->assertJson($this->json());
+            return $this->assertExactJson($this->json());
         }
 
         if (is_null($responseData)) {

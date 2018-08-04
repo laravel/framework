@@ -154,7 +154,7 @@ class FoundationTestResponseTest extends TestCase
 
         $resource = new JsonSerializableMixedResourcesStub;
 
-        $response->assertJson($resource->jsonSerialize());
+        $response->assertExactJson($resource->jsonSerialize());
     }
 
     public function testAssertJsonFragment()
