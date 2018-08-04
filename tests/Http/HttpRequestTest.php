@@ -583,6 +583,12 @@ class HttpRequestTest extends TestCase
         $this->assertEquals(['foo' => 'fooValue', 'qux' => false, 'quux' => true, 'fb' => 0, 'ax' => ''], $request->allFilled());
     }
 
+    public function testAllFilledInputIgnoreKeysNotFilled()
+    {
+        $request = Request::create('/', 'POST', ['foo' => 'fooValue', 'baz' => 'bazValue']);
+        $this->assertEquals(['foo' => 'fooValue'], $request->allFilled(['foo', 'bar']));
+    }
+
     public function testInputWithEmptyFilename()
     {
         $invalidFiles = [
