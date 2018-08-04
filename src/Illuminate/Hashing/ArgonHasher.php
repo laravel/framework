@@ -29,6 +29,20 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     protected $threads = 2;
 
     /**
+     * The default Argon hashing type.
+     *
+     * @var string
+     */
+    protected $type = 'argon2i';
+
+    /**
+     * The Argon supported hashing types.
+     *
+     * @var array
+     */
+    protected $supportedTypes = ['argon2i', 'argon2id'];
+
+    /**
      * Create a new hasher instance.
      *
      * @param  array  $options
@@ -39,6 +53,9 @@ class ArgonHasher extends AbstractHasher implements HasherContract
         $this->time = $options['time'] ?? $this->time;
         $this->memory = $options['memory'] ?? $this->memory;
         $this->threads = $options['threads'] ?? $this->threads;
+        $this->type = $options['type'] ?? $this->type;
+
+        $this->ensureValidHashingType($this->type);
     }
 
     /**
@@ -52,7 +69,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function make($value, array $options = [])
     {
-        $hash = password_hash($value, PASSWORD_ARGON2I, [
+        $hash = password_hash($value, $this->getHashingAlgorithmConstant($options), [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
             'threads' => $this->threads($options),
@@ -75,7 +92,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
+        if (! in_array($this->info($hashedValue)['algoName'], $this->supportedTypes)) {
             throw new RuntimeException('This password does not use the Argon algorithm.');
         }
 
@@ -91,7 +108,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function needsRehash($hashedValue, array $options = [])
     {
-        return password_needs_rehash($hashedValue, PASSWORD_ARGON2I, [
+        return password_needs_rehash($hashedValue, $this->getHashingAlgorithmConstant($options), [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
             'threads' => $this->threads($options),
@@ -138,6 +155,21 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     }
 
     /**
+     * Set the default password hashing type.
+     *
+     * @param  string  $hashingType
+     * @return $this
+     */
+    public function setHashingType(string $hashingType)
+    {
+        $this->ensureValidHashingType($hashingType);
+
+        $this->type = $hashingType;
+
+        return $this;
+    }
+
+    /**
      * Extract the memory cost value from the options array.
      *
      * @param  array  $options
@@ -168,5 +200,36 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     protected function threads(array $options)
     {
         return $options['threads'] ?? $this->threads;
+    }
+
+    /**
+     * Throws RuntimeException if the hashing type is not valid and supported.
+     *
+     * @param string $hashingType
+     */
+    protected function ensureValidHashingType(string $hashingType)
+    {
+        if (! in_array($hashingType, $this->supportedTypes)) {
+            throw new RuntimeException(sprintf('Argon "%s" hashing type is not supported.', $hashingType));
+        }
+    }
+
+    /**
+     * Get the hashing algorithm constant value from the options array.
+     *
+     * @param  array  $options
+     * @return int
+     */
+    protected function getHashingAlgorithmConstant(array $options)
+    {
+        $hashingType = $options['type'] ?? $this->type;
+
+        $this->ensureValidHashingType($hashingType);
+
+        if ($hashingType === 'argon2i') {
+            return PASSWORD_ARGON2I;
+        } else {
+            return PASSWORD_ARGON2ID;
+        }
     }
 }
