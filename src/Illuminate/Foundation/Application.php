@@ -9,9 +9,11 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
+use Illuminate\Support\Debug\Dumper;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Log\LogServiceProvider;
 use Illuminate\Support\ServiceProvider;
+use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Events\EventServiceProvider;
 use Illuminate\Routing\RoutingServiceProvider;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
@@ -146,6 +148,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->registerBaseServiceProviders();
 
         $this->registerCoreContainerAliases();
+
+        $this->registerVarDumper();
     }
 
     /**
@@ -188,6 +192,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->register(new LogServiceProvider($this));
 
         $this->register(new RoutingServiceProvider($this));
+    }
+
+    /**
+     * Register Laravel's dumper.
+     *
+     * @return void
+     */
+    protected function registerVarDumper()
+    {
+        VarDumper::setHandler([new Dumper, 'dump']);
     }
 
     /**
