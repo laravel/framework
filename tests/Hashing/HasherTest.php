@@ -14,12 +14,13 @@ class HasherTest extends TestCase
         $this->assertTrue($hasher->check('password', $value));
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['rounds' => 1]));
+        $this->assertSame('bcrypt', password_get_info($value)['algoName']);
     }
 
-    public function testBasicArgonHashing()
+    public function testBasicArgon2iHashing()
     {
         if (! defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('PHP not compiled with argon2 hashing support.');
+            $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 
         $hasher = new \Illuminate\Hashing\ArgonHasher;
@@ -28,6 +29,22 @@ class HasherTest extends TestCase
         $this->assertTrue($hasher->check('password', $value));
         $this->assertFalse($hasher->needsRehash($value));
         $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
+        $this->assertSame('argon2i', password_get_info($value)['algoName']);
+    }
+
+    public function testBasicArgon2idHashing()
+    {
+        if (! defined('PASSWORD_ARGON2ID')) {
+            $this->markTestSkipped('PHP not compiled with Argon2id hashing support.');
+        }
+
+        $hasher = new \Illuminate\Hashing\ArgonHasher(['type' => 'argon2id']);
+        $value = $hasher->make('password');
+        $this->assertNotSame('password', $value);
+        $this->assertTrue($hasher->check('password', $value));
+        $this->assertFalse($hasher->needsRehash($value));
+        $this->assertTrue($hasher->needsRehash($value, ['threads' => 1]));
+        $this->assertSame('argon2id', password_get_info($value)['algoName']);
     }
 
     /**
@@ -36,7 +53,7 @@ class HasherTest extends TestCase
     public function testBasicBcryptVerification()
     {
         if (! defined('PASSWORD_ARGON2I')) {
-            $this->markTestSkipped('PHP not compiled with argon2 hashing support.');
+            $this->markTestSkipped('PHP not compiled with argon2i hashing support.');
         }
 
         $argonHasher = new \Illuminate\Hashing\ArgonHasher;
@@ -52,5 +69,24 @@ class HasherTest extends TestCase
         $bcryptHasher = new \Illuminate\Hashing\BcryptHasher;
         $bcryptHashed = $bcryptHasher->make('password');
         (new \Illuminate\Hashing\ArgonHasher)->check('password', $bcryptHashed);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Argon "argon55-x" hashing type is not supported.
+     */
+    public function testExceptionIsThrownForAnUnsupportedArgonTypeOnConstruction()
+    {
+        new \Illuminate\Hashing\ArgonHasher(['type' => 'argon55-x']);
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Argon "argon55-x" hashing type is not supported.
+     */
+    public function testExceptionIsThrownForAnUnsupportedArgonTypeOnPasswordMakeMethod()
+    {
+        $hasher = new \Illuminate\Hashing\ArgonHasher;
+        $hasher->make('password', ['type' => 'argon55-x']);
     }
 }
