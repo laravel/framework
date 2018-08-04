@@ -63,6 +63,17 @@ class Rule
     }
 
     /**
+     * Get a required_if constraint builder instance.
+     *
+     * @param  callable  $callback
+     * @return \Illuminate\Validation\Rules\RequiredIf
+     */
+    public static function requiredIf($callback)
+    {
+        return new Rules\RequiredIf($callback);
+    }
+
+    /**
      * Get a unique constraint builder instance.
      *
      * @param  string  $table

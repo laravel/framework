@@ -154,7 +154,7 @@ class FoundationTestResponseTest extends TestCase
 
         $resource = new JsonSerializableMixedResourcesStub;
 
-        $response->assertJson($resource->jsonSerialize());
+        $response->assertExactJson($resource->jsonSerialize());
     }
 
     public function testAssertJsonFragment()
@@ -166,8 +166,6 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonFragment(['foo' => 'foo 0', 'bar' => 'bar 0', 'foobar' => 'foobar 0']);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableMixedResourcesStub));
-
-        $response->assertJsonFragment(['foobar']);
 
         $response->assertJsonFragment(['foo' => 'bar']);
 
