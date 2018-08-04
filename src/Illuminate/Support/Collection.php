@@ -11,8 +11,8 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
+use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -320,7 +320,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         (new static(func_get_args()))
             ->push($this)
             ->each(function ($item) {
-                (new Dumper)->dump($item);
+                VarDumper::dump($item);
             });
 
         return $this;
