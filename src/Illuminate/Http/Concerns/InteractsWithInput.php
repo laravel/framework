@@ -197,6 +197,23 @@ trait InteractsWithInput
     }
 
     /**
+     * Get all the entries and files for the request,
+     * which are with values filled, the values need to be boolean,
+     * numeric, strings or non-empty.
+     *
+     * @param array|mixed $keys
+     * @return array
+     */
+    public function allFilled($keys = null)
+    {
+        return collect($this->all($keys))
+            ->filter(function ($value) {
+                return is_bool($value) || is_numeric($value) || is_string($value) || ! empty($value);
+            })
+            ->toArray();
+    }
+
+    /**
      * Retrieve an input item from the request.
      *
      * @param  string|null  $key
