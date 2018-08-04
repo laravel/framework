@@ -28,6 +28,16 @@ class HashManager extends Manager implements Hasher
     }
 
     /**
+     * Create an instance of the Argon2id hash Driver.
+     *
+     * @return \Illuminate\Hashing\Argon2idHasher
+     */
+    public function createArgon2idDriver()
+    {
+        return new Argon2idHasher($this->app['config']['hashing.argon'] ?? []);
+    }
+
+    /**
      * Get information about the given hashed value.
      *
      * @param  string  $hashedValue
