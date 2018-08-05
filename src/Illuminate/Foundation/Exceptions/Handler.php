@@ -217,7 +217,7 @@ class Handler implements ExceptionHandlerContract
     {
         return $request->expectsJson()
                     ? response()->json(['message' => $exception->getMessage()], 401)
-                    : redirect()->guest(route('login'));
+                    : redirect()->guest($this->loginRoute());
     }
 
     /**
@@ -477,5 +477,15 @@ class Handler implements ExceptionHandlerContract
     protected function isHttpException(Exception $e)
     {
         return $e instanceof HttpException;
+    }
+
+    /**
+     * Returns the route that a user should be redirected to if they aren't authenticated.
+     *
+     * @return string
+     */
+    protected function loginRoute()
+    {
+        return route('login');
     }
 }
