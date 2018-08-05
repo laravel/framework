@@ -375,6 +375,16 @@ class LogManager implements LoggerInterface
     }
 
     /**
+     * Get fallback log channel name.
+     *
+     * @return string
+     */
+    protected function getFallbackChannelName()
+    {
+        return $this->app->bound('env') ? $this->app->environment() : 'production';
+    }
+
+    /**
      * Get the log connection configuration.
      *
      * @param  string  $name

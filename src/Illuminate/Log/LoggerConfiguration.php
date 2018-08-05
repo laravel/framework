@@ -51,9 +51,16 @@ trait LoggerConfiguration
     protected function parseChannel(array $config)
     {
         if (! isset($config['name'])) {
-            return $this->app->bound('env') ? $this->app->environment() : 'production';
+            return $this->getFallbackChannelName();
         }
 
         return $config['name'];
     }
+
+    /**
+     * Get fallback log channel name.
+     *
+     * @return string
+     */
+    abstract protected function getFallbackChannelName();
 }
