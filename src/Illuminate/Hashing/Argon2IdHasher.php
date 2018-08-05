@@ -7,16 +7,6 @@ use RuntimeException;
 class Argon2IdHasher extends ArgonHasher
 {
     /**
-     * Get the algorithm that should be used for hashing.
-     *
-     * @return int
-     */
-    protected function algorithm()
-    {
-        return PASSWORD_ARGON2ID;
-    }
-
-    /**
      * Check the given plain value against a hash.
      *
      * @param  string  $value
@@ -35,5 +25,15 @@ class Argon2IdHasher extends ArgonHasher
         }
 
         return password_verify($value, $hashedValue);
+    }
+
+    /**
+     * Get the algorithm that should be used for hashing.
+     *
+     * @return int
+     */
+    protected function algorithm()
+    {
+        return PASSWORD_ARGON2ID;
     }
 }
