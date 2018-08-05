@@ -68,7 +68,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     /**
      * Get the algorithm that should be used for hashing.
      *
-     * @return string
+     * @return int
      */
     protected function algorithm()
     {
@@ -86,7 +86,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     public function check($value, $hashedValue, array $options = [])
     {
         if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
-            throw new RuntimeException('This password does not use the Argon algorithm.');
+            throw new RuntimeException('This password does not use the Argon2i algorithm.');
         }
 
         return parent::check($value, $hashedValue, $options);
