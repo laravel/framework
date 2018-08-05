@@ -70,6 +70,13 @@ interface Job
     public function failed($e);
 
     /**
+     * Get the delay for retrying a job.
+     *
+     * @return int
+     */
+    public function retryDelay();
+
+    /**
      * Get the number of times to attempt a job.
      *
      * @return int|null

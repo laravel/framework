@@ -93,10 +93,13 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
-        $worker = $this->getWorker('default', ['queue' => [$job]]);
-        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 10]));
+        $initialDelay = 10;
+        $retryDelay = $job->retryDelay();
 
-        $this->assertEquals(10, $job->releaseAfter);
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => $initialDelay]));
+
+        $this->assertEquals($initialDelay + $retryDelay, $job->releaseAfter);
         $this->assertFalse($job->deleted);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
@@ -387,6 +390,11 @@ class WorkerFakeJob
         $this->markAsFailed();
 
         $this->failedWith = $e;
+    }
+
+    public function retryDelay()
+    {
+        return 5;
     }
 
     public function hasFailed()
