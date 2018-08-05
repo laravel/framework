@@ -45,7 +45,7 @@ class FilesystemAdapterTest extends TestCase
     {
         $this->filesystem->write('file.txt', 'Hello World');
         $files = new FilesystemAdapter($this->filesystem);
-        $response = $files->download('file.txt', 'hello.txt');
+        $response = $files->download('file.txt', '中文.txt');
         $this->assertInstanceOf(StreamedResponse::class, $response);
         // $this->assertEquals('attachment; filename="hello.txt"', $response->headers->get('content-disposition'));
     }
