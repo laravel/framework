@@ -301,9 +301,10 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $name
      * @param  array  $parameters
      * @param  \DateTimeInterface|int  $expiration
+     * @param  bool  $absolute
      * @return string
      */
-    public function signedRoute($name, $parameters = [], $expiration = null)
+    public function signedRoute($name, $parameters = [], $expiration = null, $absolute = true)
     {
         $parameters = $this->formatParameters($parameters);
 
@@ -317,7 +318,7 @@ class UrlGenerator implements UrlGeneratorContract
 
         return $this->route($name, $parameters + [
             'signature' => hash_hmac('sha256', $this->route($name, $parameters), $key),
-        ]);
+        ], $absolute);
     }
 
     /**
@@ -326,11 +327,12 @@ class UrlGenerator implements UrlGeneratorContract
      * @param  string  $name
      * @param  \DateTimeInterface|int  $expiration
      * @param  array  $parameters
+     * @param  bool  $absolute
      * @return string
      */
-    public function temporarySignedRoute($name, $expiration, $parameters = [])
+    public function temporarySignedRoute($name, $expiration, $parameters = [], $absolute = true)
     {
-        return $this->signedRoute($name, $parameters, $expiration);
+        return $this->signedRoute($name, $parameters, $expiration, $absolute);
     }
 
     /**
