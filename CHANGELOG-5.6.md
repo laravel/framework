@@ -4,7 +4,7 @@
 
 ### Added
 - Added restored() and forceDeleted() to observer stub ([#40ba2ee](https://github.com/laravel/framework/commit/49ac5be5ae9b69f160058a3f10022c9511222db5))
-- Added UploadedFile::getContents() ([#24924](https://github.com/laravel/framework/pull/24924))
+- Added UploadedFile::get() ([#24924](https://github.com/laravel/framework/pull/24924))
 - Added an alias for a single FactoryBuilder state definition ([#24937](https://github.com/laravel/framework/pull/24937))
 
 ### Changed
