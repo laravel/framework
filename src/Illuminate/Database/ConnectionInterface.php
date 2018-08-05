@@ -27,20 +27,18 @@ interface ConnectionInterface
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @param  bool  $useReadPdo
      * @return mixed
      */
-    public function selectOne($query, $bindings = [], $useReadPdo = true);
+    public function selectOne($query, $bindings = []);
 
     /**
      * Run a select statement against the database.
      *
      * @param  string  $query
      * @param  array   $bindings
-     * @param  bool  $useReadPdo
      * @return array
      */
-    public function select($query, $bindings = [], $useReadPdo = true);
+    public function select($query, $bindings = []);
 
     /**
      * Run an insert statement against the database.
