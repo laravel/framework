@@ -6,6 +6,9 @@ use Closure;
 use InvalidArgumentException;
 use Illuminate\Contracts\Auth\Factory as FactoryContract;
 
+/**
+ * @mixin \Illuminate\Contracts\Auth\Guard|\Illuminate\Contracts\Auth\StatefulGuard
+ */
 class AuthManager implements FactoryContract
 {
     use CreatesUserProviders;
