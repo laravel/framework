@@ -484,7 +484,7 @@ class Handler implements ExceptionHandlerContract
      *
      * @return string
      */
-    protected function loginRoute(): string
+    protected function loginRoute()
     {
         return route('login');
     }
