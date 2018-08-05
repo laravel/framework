@@ -2247,7 +2247,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidatePhpMimetypes()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__DIR__.'/ValidationRuleTest.php', '', null, null, null, true];
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('rtf'));

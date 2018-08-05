@@ -52,7 +52,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function make($value, array $options = [])
     {
-        $hash = password_hash($value, PASSWORD_ARGON2I, [
+        $hash = password_hash($value, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
             'threads' => $this->threads($options),
@@ -63,6 +63,16 @@ class ArgonHasher extends AbstractHasher implements HasherContract
         }
 
         return $hash;
+    }
+
+    /**
+     * Get the algorithm that should be used for hashing.
+     *
+     * @return string
+     */
+    protected function algorithm()
+    {
+        return PASSWORD_ARGON2I;
     }
 
     /**
@@ -91,7 +101,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function needsRehash($hashedValue, array $options = [])
     {
-        return password_needs_rehash($hashedValue, PASSWORD_ARGON2I, [
+        return password_needs_rehash($hashedValue, $this->algorithm(), [
             'memory_cost' => $this->memory($options),
             'time_cost' => $this->time($options),
             'threads' => $this->threads($options),
