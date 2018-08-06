@@ -86,7 +86,7 @@ class Builder
     protected $removedScopes = [];
 
     /**
-     * Indicates if scopes would be isolated
+     * Indicates if local scopes will be isolated
      *
      * @var bool
      */
@@ -1257,7 +1257,7 @@ class Builder
     }
 
     /**
-     * Get the value indicating whether scopes are isolated
+     * Get the value indicating whether local scopes are isolated
      *
      * @return bool
      */
@@ -1267,7 +1267,7 @@ class Builder
     }
 
     /**
-     * Set whether scopes will be isolated
+     * Set whether local scopes will be isolated
      *
      * @param  bool  $isolateScopes
      * @return $this
