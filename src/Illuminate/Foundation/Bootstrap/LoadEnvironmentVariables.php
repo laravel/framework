@@ -29,7 +29,8 @@ class LoadEnvironmentVariables
         } catch (InvalidPathException $e) {
             //
         } catch (InvalidFileException $e) {
-            die('The environment file is invalid: '.$e->getMessage());
+            echo 'The environment file is invalid: '.$e->getMessage();
+            die(1);
         }
     }
 
