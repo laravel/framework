@@ -86,6 +86,13 @@ class Builder
     protected $removedScopes = [];
 
     /**
+     * Indicates if local scopes will be isolated
+     *
+     * @var bool
+     */
+    protected $isolateScopes = true;
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -938,9 +945,9 @@ class Builder
      *
      * @param  callable  $scope
      * @param  array  $parameters
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function callScope(callable $scope, $parameters = [])
+    protected function callScope(callable $scope, $parameters = []) : Builder
     {
         array_unshift($parameters, $this);
 
@@ -950,15 +957,18 @@ class Builder
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+            ? 0 : count($query->wheres);
 
-        $result = $scope(...array_values($parameters)) ?? $this;
+        $builder = $scope(...array_values($parameters)) ?? $this;
 
-        if (count((array) $query->wheres) > $originalWhereCount) {
-            $this->addNewWheresWithinGroup($query, $originalWhereCount);
+        // We can only disable isolating for Local Scopes
+        if($scope instanceof Closure  ||  $builder->isIsolateScopes()){
+            if (count((array) $query->wheres) > $originalWhereCount) {
+                $this->addNewWheresWithinGroup($query, $originalWhereCount);
+            }
         }
 
-        return $result;
+        return $builder;
     }
 
     /**
@@ -1244,6 +1254,29 @@ class Builder
     public function getMacro($name)
     {
         return Arr::get($this->localMacros, $name);
+    }
+
+    /**
+     * Get the value indicating whether local scopes are isolated
+     *
+     * @return bool
+     */
+    public function isIsolateScopes(): bool
+    {
+        return $this->isolateScopes;
+    }
+
+    /**
+     * Set whether local scopes will be isolated
+     *
+     * @param  bool  $isolateScopes
+     * @return $this
+     */
+    public function setIsolateScopes(bool $isolateScopes): Builder
+    {
+        $this->isolateScopes = $isolateScopes;
+
+        return $this;
     }
 
     /**
