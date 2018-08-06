@@ -60,7 +60,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function testFindOrFailMethodThrowsModelNotFoundException()
     {
@@ -72,7 +72,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function testFindOrFailMethodWithManyThrowsModelNotFoundException()
     {
@@ -84,7 +84,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function testFirstOrFailMethodThrowsModelNotFoundException()
     {
@@ -490,7 +490,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\RelationNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\RelationNotFoundException
      */
     public function testGetRelationThrowsException()
     {

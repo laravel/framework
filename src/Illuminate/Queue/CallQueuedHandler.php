@@ -6,7 +6,7 @@ use Exception;
 use ReflectionClass;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException;
 
 class CallQueuedHandler
 {

@@ -119,7 +119,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
      */
     public function testFirstOrFailThrowsAnException()
@@ -131,7 +131,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasManyThroughTestPost].
      */
     public function testFindOrFailThrowsAnException()

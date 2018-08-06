@@ -913,7 +913,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  \Closure|null  $callback
      * @return void
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function model($key, $class, Closure $callback = null)
     {

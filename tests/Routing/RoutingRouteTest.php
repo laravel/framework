@@ -777,7 +777,7 @@ class RoutingRouteTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      * @expectedExceptionMessage No query results for model [Illuminate\Tests\Routing\RouteModelBindingNullStub].
      */
     public function testModelBindingWithNullReturn()
@@ -1406,7 +1406,7 @@ class RoutingRouteTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function testImplicitBindingsWithOptionalParameterWithNonExistingKeyInUri()
     {
@@ -1793,7 +1793,7 @@ class RoutingTestNonExistingUserModel extends RoutingTestUserModel
 
     public function firstOrFail()
     {
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException;
+        throw new \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException;
     }
 }
 

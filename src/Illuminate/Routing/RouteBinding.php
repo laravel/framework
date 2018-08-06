@@ -4,7 +4,7 @@ namespace Illuminate\Routing;
 
 use Closure;
 use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException;
 
 class RouteBinding
 {

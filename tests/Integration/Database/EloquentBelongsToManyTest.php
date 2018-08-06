@@ -251,7 +251,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     /**
      * @test
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function firstOrFail_method()
     {
@@ -278,7 +278,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
     /**
      * @test
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function findOrFail_method()
     {
