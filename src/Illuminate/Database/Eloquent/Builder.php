@@ -945,9 +945,9 @@ class Builder
      *
      * @param  callable  $scope
      * @param  array  $parameters
-     * @return mixed
+     * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function callScope(callable $scope, $parameters = [])
+    protected function callScope(callable $scope, $parameters = []) : Builder
     {
         array_unshift($parameters, $this);
 
@@ -957,17 +957,18 @@ class Builder
         // scope so that we can properly group the added scope constraints in the
         // query as their own isolated nested where statement and avoid issues.
         $originalWhereCount = is_null($query->wheres)
-                    ? 0 : count($query->wheres);
+            ? 0 : count($query->wheres);
 
-        $result = $scope(...array_values($parameters)) ?? $this;
+        $builder = $scope(...array_values($parameters)) ?? $this;
 
-        if($this->isIsolateScopes()){
+        // We can oly disable isolating for Local Scopes
+        if($scope instanceof Closure  ||  $builder->isIsolateScopes()){
             if (count((array) $query->wheres) > $originalWhereCount) {
                 $this->addNewWheresWithinGroup($query, $originalWhereCount);
             }
         }
 
-        return $result;
+        return $builder;
     }
 
     /**
