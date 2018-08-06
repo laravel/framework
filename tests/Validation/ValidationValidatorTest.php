@@ -8,10 +8,12 @@ use DateTimeImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Rules\Conditional;
 use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Validation\ImplicitRule;
 
@@ -4018,6 +4020,55 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
 
         $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
+    }
+
+    public function testItMergesConditionalRulesIntoTheMainRulesArray()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans,
+            [
+                'address' => 'Fakestreet',
+                'users' => [
+                    ['name' => 'John'],
+                    ['name' => 'Jane'],
+                ],
+                'email' => 'john@example.com',
+            ],
+            [
+                'address' => (new Conditional(true))->passes('required'),
+                'users.*.name' => [
+                    'required',
+                    (new Conditional(true))->passes('max:10'),
+                ],
+                'email' => [
+                    (new Conditional(true))->passes([
+                        'required',
+                        (new In(['john@example.com'])),
+                        (new Conditional(false))->fails('max:40'),
+                    ]),
+                ],
+            ]);
+
+        $this->assertTrue($v->passes());
+        $this->assertEquals([
+            'address' => [
+                'required',
+            ],
+            'users.0.name' => [
+                'required',
+                'max:10',
+            ],
+            'users.1.name' => [
+                'required',
+                'max:10',
+            ],
+            'email' => [
+                'required',
+                'in:"john@example.com"',
+                'max:40',
+            ],
+        ], $v->getRules());
     }
 
     protected function getTranslator()

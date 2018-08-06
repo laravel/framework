@@ -7,6 +7,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Conditional;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 
 class ValidationRuleParser
@@ -85,6 +86,8 @@ class ValidationRuleParser
     {
         if (is_string($rule)) {
             return explode('|', $rule);
+        } elseif ($this->hasConditionalRule($rule)) {
+            return $this->mergeConditionalRules($rule);
         } elseif (is_object($rule)) {
             return [$this->prepareRule($rule)];
         }
@@ -106,6 +109,7 @@ class ValidationRuleParser
 
         if (! is_object($rule) ||
             $rule instanceof RuleContract ||
+            $rule instanceof Conditional ||
             ($rule instanceof Exists && $rule->queryCallbacks()) ||
             ($rule instanceof Unique && $rule->queryCallbacks())) {
             return $rule;
@@ -273,5 +277,54 @@ class ValidationRuleParser
             default:
                 return $rule;
         }
+    }
+
+    /**
+     * Checks if there are any conditional rules.
+     *
+     * @param  mixed $rules
+     *
+     * @return bool
+     */
+    protected function hasConditionalRule($rules)
+    {
+        if (is_object($rules)) {
+            return $rules instanceof Conditional;
+        }
+
+        return count(
+                Arr::where($rules, function ($rule) {
+                    return $rule instanceof Conditional;
+                })
+            ) > 0;
+    }
+
+    /**
+     * Merge any conditional rules into the set rules.
+     *
+     * @param  $rules
+     *
+     * @return array
+     */
+    protected function mergeConditionalRules($rules)
+    {
+        if (is_object($rules)) {
+            $rules = [$rules];
+        }
+
+        foreach ($rules as $key => $rule) {
+            if (! $rule instanceof Conditional) {
+                continue;
+            }
+
+            $rules = array_merge(
+                $rules,
+                $this->explodeExplicitRule($rule->getRules())
+            );
+
+            unset($rules[$key]);
+        }
+
+        return array_map([$this, 'prepareRule'], array_values($rules));
     }
 }
