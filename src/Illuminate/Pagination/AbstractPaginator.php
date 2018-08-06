@@ -42,13 +42,6 @@ abstract class AbstractPaginator implements Htmlable
     protected $path = '/';
 
     /**
-     * The number of links to display on each side of current page link.
-     *
-     * @var int
-     */
-    protected $onEachSide = 3;
-
-    /**
      * The query parameters to add to all URLs.
      *
      * @var array
@@ -68,6 +61,13 @@ abstract class AbstractPaginator implements Htmlable
      * @var string
      */
     protected $pageName = 'page';
+
+    /**
+     * The number of links to display on each side of current page link.
+     *
+     * @var int
+     */
+    public $onEachSide = 3;
 
     /**
      * The current path resolver callback.
@@ -350,40 +350,6 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Set the number of links to display on each side of current page link.
-     *
-     * @param int $amount
-     * @return this
-     */
-    public function linksOnEachSide($amount)
-    {
-        return $this->setOnEachSide($amount);
-    }
-
-    /**
-     * Get the number of links to display on each side of current page link.
-     *
-     * @return int
-     */
-    public function getOnEachSide()
-    {
-        return $this->onEachSide;
-    }
-
-    /**
-     * Set the number of links to display on each side of current page link.
-     *
-     * @param int $amount
-     * @return $this
-     */
-    public function setOnEachSide($amount)
-    {
-        $this->onEachSide = $amount;
-
-        return $this;
-    }
-
-    /**
      * Set the base path to assign to all URLs.
      *
      * @param  string  $path
@@ -403,6 +369,19 @@ abstract class AbstractPaginator implements Htmlable
     public function setPath($path)
     {
         $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the number of links to display on each side of current page link.
+     *
+     * @param  int  $count
+     * @return this
+     */
+    public function onEachSide($count)
+    {
+        $this->onEachSide = $count;
 
         return $this;
     }

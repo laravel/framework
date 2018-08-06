@@ -42,7 +42,7 @@ class UrlWindow
      */
     public function get()
     {
-        $onEachSide = $this->paginator->getOnEachSide();
+        $onEachSide = $this->paginator->onEachSide;
 
         if ($this->paginator->lastPage() < ($onEachSide * 2) + 6) {
             return $this->getSmallSlider();

@@ -58,7 +58,7 @@ class UrlWindowTest extends TestCase
         }
 
         $p = new LengthAwarePaginator($array, count($array), 1, 8);
-        $p->linksOnEachSide(1);
+        $p->onEachSide(1);
         $window = new UrlWindow($p);
 
         $slider = [];
