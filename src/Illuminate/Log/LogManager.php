@@ -18,7 +18,7 @@ use Monolog\Handler\SlackWebhookHandler;
 
 class LogManager implements LoggerInterface
 {
-    use LoggerConfiguration;
+    use ParsesLogConfiguration;
 
     /**
      * The application instance.
