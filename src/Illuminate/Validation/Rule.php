@@ -84,4 +84,15 @@ class Rule
     {
         return new Rules\Unique($table, $column);
     }
+
+    /**
+     * Get a conditional builder instance.
+     *
+     * @param  \Closure|bool $value
+     * @return \Illuminate\Validation\Rules\Conditional
+     */
+    public static function conditional($value)
+    {
+        return new Rules\Conditional($value);
+    }
 }
