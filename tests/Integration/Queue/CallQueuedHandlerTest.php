@@ -105,6 +105,6 @@ class CallQueuedHandlerExceptionThrower
 
     public function __wakeup()
     {
-        throw new \Illuminate\Database\Eloquent\ModelNotFoundException('Foo');
+        throw new \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException('Foo');
     }
 }

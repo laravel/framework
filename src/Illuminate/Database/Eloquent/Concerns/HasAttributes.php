@@ -10,7 +10,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
-use Illuminate\Database\Eloquent\JsonEncodingException;
+use Illuminate\Database\Eloquent\Exceptions\JsonEncodingException;
 
 trait HasAttributes
 {

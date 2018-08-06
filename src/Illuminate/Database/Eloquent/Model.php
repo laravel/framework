@@ -15,6 +15,8 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
+use Illuminate\Database\Eloquent\Exceptions\JsonEncodingException;
+use Illuminate\Database\Eloquent\Exceptions\MassAssignmentException;
 
 abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializable, QueueableEntity, UrlRoutable
 {
@@ -307,7 +309,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  array  $attributes
      * @return $this
      *
-     * @throws \Illuminate\Database\Eloquent\MassAssignmentException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\MassAssignmentException
      */
     public function fill(array $attributes)
     {
@@ -1075,7 +1077,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * @param  int  $options
      * @return string
      *
-     * @throws \Illuminate\Database\Eloquent\JsonEncodingException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\JsonEncodingException
      */
     public function toJson($options = 0)
     {

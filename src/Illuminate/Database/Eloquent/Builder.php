@@ -11,6 +11,8 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
+use Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Exceptions\RelationNotFoundException;
 
 /**
  * @mixin \Illuminate\Database\Query\Builder
@@ -348,7 +350,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection|static|static[]
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -437,7 +439,7 @@ class Builder
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function firstOrFail($columns = ['*'])
     {

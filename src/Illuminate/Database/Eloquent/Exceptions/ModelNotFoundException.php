@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Database\Eloquent;
+namespace Illuminate\Database\Eloquent\Exceptions;
 
 use RuntimeException;
 use Illuminate\Support\Arr;

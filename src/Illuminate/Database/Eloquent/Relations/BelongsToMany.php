@@ -7,7 +7,7 @@ use InvalidArgumentException;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException;
 
 class BelongsToMany extends Relation
 {
@@ -500,7 +500,7 @@ class BelongsToMany extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|\Illuminate\Database\Eloquent\Collection
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function findOrFail($id, $columns = ['*'])
     {
@@ -536,7 +536,7 @@ class BelongsToMany extends Relation
      * @param  array  $columns
      * @return \Illuminate\Database\Eloquent\Model|static
      *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @throws \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      */
     public function firstOrFail($columns = ['*'])
     {

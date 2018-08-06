@@ -438,7 +438,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1
      */
     public function testFindOrFailWithSingleIdThrowsModelNotFoundException()
@@ -447,7 +447,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
+     * @expectedException \Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException
      * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\EloquentTestUser] 1, 2
      */
     public function testFindOrFailWithMultipleIdsThrowsModelNotFoundException()

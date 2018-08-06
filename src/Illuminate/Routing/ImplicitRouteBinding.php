@@ -4,7 +4,7 @@ namespace Illuminate\Routing;
 
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Routing\UrlRoutable;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Exceptions\ModelNotFoundException;
 
 class ImplicitRouteBinding
 {
