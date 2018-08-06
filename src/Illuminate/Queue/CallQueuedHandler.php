@@ -165,6 +165,7 @@ class CallQueuedHandler
             );
         } catch (ModelNotFoundException $e) {
             $this->handleModelNotFound($job, $e);
+
             return 0;
         }
 
