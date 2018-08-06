@@ -100,7 +100,7 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
      */
     protected function elements()
     {
-        $window = UrlWindow::make($this, $this->onEachSide);
+        $window = UrlWindow::make($this);
 
         return array_filter([
             $window['first'],
