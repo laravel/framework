@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Validation;
 
-use Illuminate\Validation\Rules\Conditional;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\Rules\Conditional;
 
 class ValidationConditionalRuleTest extends TestCase
 {

@@ -3,17 +3,17 @@
 namespace Illuminate\Tests\Validation;
 
 use DateTime;
-use Illuminate\Validation\Rules\Conditional;
-use Illuminate\Validation\Rules\In;
 use Mockery as m;
 use DateTimeImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Validation\Rules\In;
 use Illuminate\Validation\Validator;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Contracts\Validation\Rule;
+use Illuminate\Validation\Rules\Conditional;
 use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Validation\ImplicitRule;
 
@@ -4046,8 +4046,8 @@ class ValidationValidatorTest extends TestCase
                         'required',
                         (new In(['john@example.com'])),
                         (new Conditional(false))->fails('max:40'),
-                    ])
-                ]
+                    ]),
+                ],
             ]);
 
         $this->assertTrue($v->passes());

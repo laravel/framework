@@ -5,9 +5,9 @@ namespace Illuminate\Validation;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Validation\Rules\Conditional;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Validation\Rules\Conditional;
 use Illuminate\Contracts\Validation\Rule as RuleContract;
 
 class ValidationRuleParser
@@ -313,7 +313,7 @@ class ValidationRuleParser
         }
 
         foreach ($rules as $key => $rule) {
-            if (!$rule instanceof Conditional) {
+            if (! $rule instanceof Conditional) {
                 continue;
             }
 
