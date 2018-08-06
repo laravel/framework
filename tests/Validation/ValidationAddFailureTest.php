@@ -12,13 +12,13 @@ class ValidationAddFailureTest extends TestCase
      *
      * @return Validator
      */
-    public function makeValidator(): Validator
+    public function makeValidator()
     {
         $mainTest = new ValidationValidatorTest();
         $trans = $mainTest->getIlluminateArrayTranslator();
-        $v = new Validator($trans, ['foo' => ['bar' => ['baz' => '']]], ['foo.bar.baz' => 'sometimes|required']);
+        $validator = new Validator($trans, ['foo' => ['bar' => ['baz' => '']]], ['foo.bar.baz' => 'sometimes|required']);
 
-        return $v;
+        return $validator;
     }
 
     public function testAddFailureExists()
