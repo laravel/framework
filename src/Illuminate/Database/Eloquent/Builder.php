@@ -961,7 +961,7 @@ class Builder
 
         $builder = $scope(...array_values($parameters)) ?? $this;
 
-        // We can oly disable isolating for Local Scopes
+        // We can only disable isolating for Local Scopes
         if($scope instanceof Closure  ||  $builder->isIsolateScopes()){
             if (count((array) $query->wheres) > $originalWhereCount) {
                 $this->addNewWheresWithinGroup($query, $originalWhereCount);
