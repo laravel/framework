@@ -350,7 +350,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Set the number of links to display on each side of current page link
+     * Set the number of links to display on each side of current page link.
      *
      * @param int $amount
      * @return this
@@ -361,7 +361,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Get the number of links to display on each side of current page link
+     * Get the number of links to display on each side of current page link.
      *
      * @return int
      */
@@ -371,7 +371,7 @@ abstract class AbstractPaginator implements Htmlable
     }
 
     /**
-     * Set the number of links to display on each side of current page link
+     * Set the number of links to display on each side of current page link.
      *
      * @param int $amount
      * @return $this
