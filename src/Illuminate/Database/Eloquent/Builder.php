@@ -86,6 +86,13 @@ class Builder
     protected $removedScopes = [];
 
     /**
+     * Indicates if scopes would be isolated
+     *
+     * @var bool
+     */
+    protected $isolateScopes = true;
+
+    /**
      * Create a new Eloquent query builder instance.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -954,8 +961,10 @@ class Builder
 
         $result = $scope(...array_values($parameters)) ?? $this;
 
-        if (count((array) $query->wheres) > $originalWhereCount) {
-            $this->addNewWheresWithinGroup($query, $originalWhereCount);
+        if($this->isIsolateScopes()){
+            if (count((array) $query->wheres) > $originalWhereCount) {
+                $this->addNewWheresWithinGroup($query, $originalWhereCount);
+            }
         }
 
         return $result;
@@ -1244,6 +1253,29 @@ class Builder
     public function getMacro($name)
     {
         return Arr::get($this->localMacros, $name);
+    }
+
+    /**
+     * Get the value indicating whether scopes are isolated
+     *
+     * @return bool
+     */
+    public function isIsolateScopes(): bool
+    {
+        return $this->isolateScopes;
+    }
+
+    /**
+     * Set whether scopes will be isolated
+     *
+     * @param  bool  $isolateScopes
+     * @return $this
+     */
+    public function setIsolateScopes(bool $isolateScopes): Builder
+    {
+        $this->isolateScopes = $isolateScopes;
+
+        return $this;
     }
 
     /**
