@@ -194,6 +194,7 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
+     * @param  mixed  $job
      */
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $job = null)
     {
