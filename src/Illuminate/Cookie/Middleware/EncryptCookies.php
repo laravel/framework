@@ -26,6 +26,13 @@ class EncryptCookies
     protected $except = [];
 
     /**
+     * Indicates if the cookies should be serialized.
+     *
+     * @var bool
+     */
+    protected $serialize = false;
+
+    /**
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
@@ -93,7 +100,7 @@ class EncryptCookies
     {
         return is_array($cookie)
                         ? $this->decryptArray($cookie)
-                        : $this->encrypter->decrypt($cookie, false);
+                        : $this->encrypter->decrypt($cookie, $this->serialize);
     }
 
     /**
@@ -108,7 +115,7 @@ class EncryptCookies
 
         foreach ($cookie as $key => $value) {
             if (is_string($value)) {
-                $decrypted[$key] = $this->encrypter->decrypt($value, false);
+                $decrypted[$key] = $this->encrypter->decrypt($value, $this->serialize);
             }
         }
 
@@ -129,7 +136,7 @@ class EncryptCookies
             }
 
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue(), false)
+                $cookie, $this->encrypter->encrypt($cookie->getValue(), $this->serialize)
             ));
         }
 
