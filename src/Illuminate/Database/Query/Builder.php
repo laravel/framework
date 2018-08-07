@@ -1415,7 +1415,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
 
-        $this->addBinding($values);
+        $this->addBinding($this->cleanBindings($values));
 
         return $this;
     }
