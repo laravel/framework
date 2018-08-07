@@ -88,12 +88,31 @@ class CallQueuedHandlerTest extends TestCase
         $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
 
         $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('attempts')->andReturn(1);
 
         $retryDelay = $instance->retryDelay($job, [
             'command' => serialize(new CallQueuedHandlerTestJob),
         ]);
 
         $this->assertEquals(CallQueuedHandlerTestJob::$retryDelay, $retryDelay);
+    }
+
+    public function test_retry_delay_can_interact_with_queue()
+    {
+        CallQueuedHandlerTestJob::$handled = false;
+
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+
+        $attempts = 2;
+        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('attempts')->andReturn($attempts);
+
+        $retryDelay = $instance->retryDelay($job, [
+            'command' => serialize(new CallQueuedHandlerTestJob),
+        ]);
+
+        $expectedDelay = $attempts * CallQueuedHandlerTestJob::$retryDelay;
+        $this->assertEquals($expectedDelay, $retryDelay);
     }
 
     public function test_job_with_no_retry_delay_returns_default()
@@ -145,7 +164,7 @@ class CallQueuedHandlerTestJob
 
     public function retryDelay()
     {
-        return static::$retryDelay;
+        return $this->attempts() * static::$retryDelay;
     }
 }
 
