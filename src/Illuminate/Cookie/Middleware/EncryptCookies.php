@@ -26,15 +26,6 @@ class EncryptCookies
     protected $except = [];
 
     /**
-     * The cookies that should not be serialized.
-     *
-     * @var array
-     */
-    protected $serialization = [
-        'XSRF-TOKEN' => false,
-    ];
-
-    /**
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
@@ -43,8 +34,6 @@ class EncryptCookies
     public function __construct(EncrypterContract $encrypter)
     {
         $this->encrypter = $encrypter;
-
-        $this->serialization[config('session.cookie')] = false;
     }
 
     /**
@@ -102,11 +91,9 @@ class EncryptCookies
      */
     protected function decryptCookie($name, $cookie)
     {
-        $serialize = array_get($this->serialization, $name, true);
-
         return is_array($cookie)
                         ? $this->decryptArray($cookie)
-                        : $this->encrypter->decrypt($cookie, $serialize);
+                        : $this->encrypter->decrypt($cookie, false);
     }
 
     /**
@@ -120,10 +107,8 @@ class EncryptCookies
         $decrypted = [];
 
         foreach ($cookie as $key => $value) {
-            $serialize = array_get($this->serialization, $key, true);
-
             if (is_string($value)) {
-                $decrypted[$key] = $this->encrypter->decrypt($value, $serialize);
+                $decrypted[$key] = $this->encrypter->decrypt($value, false);
             }
         }
 
@@ -143,10 +128,8 @@ class EncryptCookies
                 continue;
             }
 
-            $serialize = array_get($this->serialization, $cookie->getName(), true);
-
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue(), $serialize)
+                $cookie, $this->encrypter->encrypt($cookie->getValue(), false)
             ));
         }
 
