@@ -71,7 +71,6 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessed::class))->twice();
     }
 
-
     public function test_job_can_be_fired_based_on_priority()
     {
         $worker = $this->getWorker('default', [
