@@ -4007,6 +4007,21 @@ class ValidationValidatorTest extends TestCase
 
     public function testValidateReturnsValidatedDataNestedRules()
     {
+        $post = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
+
+        $rules = ['nested.foo' => 'required', 'array.*' => 'integer'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
+        $v->sometimes('type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
+    }
+
+    public function testValidateReturnsValidatedDataNestedChildRules()
+    {
         $post = ['nested' => ['foo' => 'bar', 'with' => 'extras', 'type' => 'admin']];
 
         $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.foo' => 'required']);

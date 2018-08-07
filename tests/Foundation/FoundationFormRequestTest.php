@@ -36,9 +36,20 @@ class FoundationFormRequestTest extends TestCase
 
     public function test_validated_method_returns_the_validated_data_nested_rules()
     {
-        $payload = ['nested' => ['foo' => 'bar', 'with' => 'extras']];
+        $payload = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
 
         $request = $this->createRequest($payload, FoundationTestFormRequestNestedStub::class);
+
+        $request->validateResolved();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $request->validated());
+    }
+
+    public function test_validated_method_returns_the_validated_data_nested_child_rules()
+    {
+        $payload = ['nested' => ['foo' => 'bar', 'with' => 'extras']];
+
+        $request = $this->createRequest($payload, FoundationTestFormRequestNestedChildStub::class);
 
         $request->validateResolved();
 
@@ -197,6 +208,19 @@ class FoundationTestFormRequestStub extends FormRequest
 }
 
 class FoundationTestFormRequestNestedStub extends FormRequest
+{
+    public function rules()
+    {
+        return ['nested.foo' => 'required', 'array.*' => 'integer'];
+    }
+
+    public function authorize()
+    {
+        return true;
+    }
+}
+
+class FoundationTestFormRequestNestedChildStub extends FormRequest
 {
     public function rules()
     {
