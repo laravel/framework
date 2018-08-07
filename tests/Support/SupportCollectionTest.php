@@ -949,6 +949,16 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([1 => 'dayle', 0 => 'taylor'], $data->all());
     }
 
+    public function testSortKeys()
+    {
+        $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
+        $data = $data->sortKeys(function($a, $b) {
+            return strcasecmp($a, $b);
+        });
+
+        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->all());
+    }
+
     public function testSortByKeys()
     {
         $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
