@@ -69,7 +69,7 @@ abstract class Facade
     }
 
     /**
-     * Create a fresh mock instance for the given class.
+     * Create a mock instance for the given class.
      *
      * @return \Mockery\MockInterface
      */
