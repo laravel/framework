@@ -952,7 +952,7 @@ class SupportCollectionTest extends TestCase
     public function testSortKeys()
     {
         $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
-        $data = $data->sortKeys(function($a, $b) {
+        $data = $data->sortKeys(function ($a, $b) {
             return strcasecmp($a, $b);
         });
 
