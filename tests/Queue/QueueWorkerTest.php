@@ -451,4 +451,3 @@ class WorkerFakeJob
 class LoopBreakerException extends RuntimeException
 {
 }
-
