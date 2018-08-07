@@ -43,6 +43,8 @@ class EncryptCookies
     public function __construct(EncrypterContract $encrypter)
     {
         $this->encrypter = $encrypter;
+
+        $this->serialization[config('session.cookie')] = false;
     }
 
     /**
