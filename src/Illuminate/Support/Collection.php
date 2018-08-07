@@ -1505,7 +1505,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  bool  $descending
      * @return static
      */
-    public function sortKeys($options = SORT_REGULAR, $descending = false)
+    public function sortByKeys($options = SORT_REGULAR, $descending = false)
     {
         $items = $this->items;
 
@@ -1520,7 +1520,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  int $options
      * @return static
      */
-    public function sortKeysDesc($options = SORT_REGULAR)
+    public function sortByKeysDesc($options = SORT_REGULAR)
     {
         return $this->sortKeys($options, true);
     }
