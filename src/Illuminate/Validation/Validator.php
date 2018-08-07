@@ -308,12 +308,17 @@ class Validator implements ValidatorContract
 
         $results = [];
 
-        $rules = collect($this->getRules())->keys()->map(function ($rule) {
-            return Str::contains($rule, '*') ? explode('.', $rule)[0] : $rule;
-        })->unique();
+        $keys = array_keys($this->getRules());
+        $input = $this->getData();
 
-        foreach ($rules as $rule) {
-            Arr::set($results, $rule, data_get($this->getData(), $rule));
+        $placeholder = new \stdClass();
+
+        foreach ($keys as $key) {
+            $value = data_get($input, $key, $placeholder);
+
+            if ($value !== $placeholder) {
+                Arr::set($results, $key, $value);
+            }
         }
 
         return $results;
