@@ -26,6 +26,15 @@ class EncryptCookies
     protected $except = [];
 
     /**
+     * The cookies that should not be serialized.
+     *
+     * @var array
+     */
+    protected $serialization = [
+        'XSRF-TOKEN' => false,
+    ];
+
+    /**
      * Create a new CookieGuard instance.
      *
      * @param  \Illuminate\Contracts\Encryption\Encrypter  $encrypter
@@ -73,7 +82,7 @@ class EncryptCookies
             }
 
             try {
-                $request->cookies->set($key, $this->decryptCookie($cookie));
+                $request->cookies->set($key, $this->decryptCookie($key, $cookie));
             } catch (DecryptException $e) {
                 $request->cookies->set($key, null);
             }
@@ -85,14 +94,15 @@ class EncryptCookies
     /**
      * Decrypt the given cookie and return the value.
      *
+     * @param  string  $name
      * @param  string|array  $cookie
      * @return string|array
      */
-    protected function decryptCookie($cookie)
+    protected function decryptCookie($name, $cookie)
     {
         return is_array($cookie)
                         ? $this->decryptArray($cookie)
-                        : $this->encrypter->decrypt($cookie);
+                        : $this->encrypter->decrypt($cookie, $this->serialization[$name] ?? true);
     }
 
     /**
@@ -107,7 +117,7 @@ class EncryptCookies
 
         foreach ($cookie as $key => $value) {
             if (is_string($value)) {
-                $decrypted[$key] = $this->encrypter->decrypt($value);
+                $decrypted[$key] = $this->encrypter->decrypt($value, $this->serialization[$key] ?? true);
             }
         }
 
@@ -127,8 +137,10 @@ class EncryptCookies
                 continue;
             }
 
+            $serialize = $this->serialization[$cookie->getName()] ?? true;
+
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue())
+                $cookie, $this->encrypter->encrypt($cookie->getValue(), $serialize)
             ));
         }
 

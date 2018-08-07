@@ -138,7 +138,7 @@ class VerifyCsrfToken
         $token = $request->input('_token') ?: $request->header('X-CSRF-TOKEN');
 
         if (! $token && $header = $request->header('X-XSRF-TOKEN')) {
-            $token = $this->encrypter->decrypt($header);
+            $token = $this->encrypter->decrypt($header, false);
         }
 
         return $token;
