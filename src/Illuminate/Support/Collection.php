@@ -1499,13 +1499,30 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Sort through each item by keys with a callback.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function sortKeys(callable $callback = null)
+    {
+        $items = $this->items;
+
+        $callback
+            ? uksort($items, $callback)
+            : ksort($items);
+
+        return new static($items);
+    }
+
+    /**
      * Sort the collection keys.
      *
      * @param  int  $options
      * @param  bool  $descending
      * @return static
      */
-    public function sortKeys($options = SORT_REGULAR, $descending = false)
+    public function sortByKeys($options = SORT_REGULAR, $descending = false)
     {
         $items = $this->items;
 
@@ -1520,9 +1537,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  int $options
      * @return static
      */
-    public function sortKeysDesc($options = SORT_REGULAR)
+    public function sortByKeysDesc($options = SORT_REGULAR)
     {
-        return $this->sortKeys($options, true);
+        return $this->sortByKeys($options, true);
     }
 
     /**

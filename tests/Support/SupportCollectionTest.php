@@ -952,15 +952,28 @@ class SupportCollectionTest extends TestCase
     public function testSortKeys()
     {
         $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
+        $data = $data->sortKeys(function ($a, $b) {
+            return strcasecmp($a, $b);
+        });
 
+        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->all());
+
+        $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
         $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->sortKeys()->all());
     }
 
-    public function testSortKeysDesc()
+    public function testSortByKeys()
+    {
+        $data = new Collection(['b' => 'dayle', 'a' => 'taylor']);
+
+        $this->assertEquals(['a' => 'taylor', 'b' => 'dayle'], $data->sortByKeys()->all());
+    }
+
+    public function testSortByKeysDesc()
     {
         $data = new Collection(['a' => 'taylor', 'b' => 'dayle']);
 
-        $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $data->sortKeys()->all());
+        $this->assertEquals(['b' => 'dayle', 'a' => 'taylor'], $data->sortByKeys()->all());
     }
 
     public function testReverse()
