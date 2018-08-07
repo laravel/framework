@@ -53,7 +53,6 @@ class WorkerOptions
      */
     public $stopOnEmptyQueue;
 
-
     /**
      * Create a new worker options instance.
      *
