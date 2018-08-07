@@ -1539,7 +1539,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function sortByKeysDesc($options = SORT_REGULAR)
     {
-        return $this->sortKeys($options, true);
+        return $this->sortByKeys($options, true);
     }
 
     /**
