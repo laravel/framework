@@ -303,7 +303,7 @@ class Gate implements GateContract
      * @param  array|mixed  $arguments
      * @return mixed
      */
-    protected function raw($ability, $arguments = [])
+    public function raw($ability, $arguments = [])
     {
         $arguments = Arr::wrap($arguments);
 
