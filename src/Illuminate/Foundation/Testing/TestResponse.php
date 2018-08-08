@@ -206,11 +206,12 @@ class TestResponse
      *
      * @param  string  $cookieName
      * @param  mixed  $value
+     * @param  bool  $unserialize
      * @return $this
      */
-    public function assertPlainCookie($cookieName, $value = null)
+    public function assertPlainCookie($cookieName, $value = null, $unserialize = false)
     {
-        $this->assertCookie($cookieName, $value, false);
+        $this->assertCookie($cookieName, $value, false, $unserialize);
 
         return $this;
     }
@@ -221,9 +222,10 @@ class TestResponse
      * @param  string  $cookieName
      * @param  mixed  $value
      * @param  bool  $encrypted
+     * @param  bool  $unserialize
      * @return $this
      */
-    public function assertCookie($cookieName, $value = null, $encrypted = true)
+    public function assertCookie($cookieName, $value = null, $encrypted = true, $unserialize = false)
     {
         PHPUnit::assertNotNull(
             $cookie = $this->getCookie($cookieName),
@@ -237,7 +239,7 @@ class TestResponse
         $cookieValue = $cookie->getValue();
 
         $actual = $encrypted
-            ? app('encrypter')->decrypt($cookieValue) : $cookieValue;
+            ? app('encrypter')->decrypt($cookieValue, $unserialize) : $cookieValue;
 
         PHPUnit::assertEquals(
             $value, $actual,
