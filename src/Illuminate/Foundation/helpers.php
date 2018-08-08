@@ -782,7 +782,7 @@ if (! function_exists('response')) {
      * @param  \Illuminate\View\View|string|array|null  $content
      * @param  int     $status
      * @param  array   $headers
-     * @return \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Routing\ResponseFactory
+     * @return \Illuminate\Http\Response|\Illuminate\Contracts\Routing\ResponseFactory
      */
     function response($content = '', $status = 200, array $headers = [])
     {
