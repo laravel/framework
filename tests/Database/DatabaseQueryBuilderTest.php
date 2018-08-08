@@ -2636,6 +2636,11 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->where('company_id', 1)->orWhereRowValues(['last_update', 'order_number'], '<', [1, 2]);
         $this->assertEquals('select * from "orders" where "company_id" = ? or (last_update, order_number) < (?, ?)', $builder->toSql());
+
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('orders')->whereRowValues(['last_update', 'order_number'], '<', [1, new Raw('2')]);
+        $this->assertEquals('select * from "orders" where (last_update, order_number) < (?, 2)', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
     }
 
     public function testWhereRowValuesArityMismatch()
