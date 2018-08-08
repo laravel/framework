@@ -702,14 +702,14 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given JSON into array
+     * Decode the given JSON into array.
      * @param string $value
      * @return array
      */
     protected function fromJsonToArray($value)
     {
         $json = $this->fromJson($value);
-        return !is_array($json) ? [] : $json;
+        return ! is_array($json) ? [] : $json;
     }
 
     /**
