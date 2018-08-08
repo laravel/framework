@@ -51,11 +51,4 @@ interface Validator extends MessageProvider
      * @return array
      */
     public function validate();
-
-    /**
-     * Get the validation rules. Array keys must be attribute.
-     *
-     * @return array
-     */
-    public function getRules();
 }

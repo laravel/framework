@@ -23,9 +23,7 @@ trait ValidatesRequests
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
-        $validator->validate();
-
-        return $this->extractInputFromRules($request, $validator->getRules());
+        return $validator->validate();
     }
 
     /**
@@ -41,9 +39,8 @@ trait ValidatesRequests
                              array $messages = [], array $customAttributes = [])
     {
         $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
-        $validator->validate();
 
-        return $this->extractInputFromRules($request, $validator->getRules());
+        return $validator->validate();
     }
 
     /**
