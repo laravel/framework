@@ -709,6 +709,7 @@ trait HasAttributes
     protected function fromJsonToArray($value)
     {
         $json = $this->fromJson($value);
+
         return ! is_array($json) ? [] : $json;
     }
 
