@@ -161,23 +161,48 @@ class DatabaseConnectorTest extends TestCase
         $this->assertSame($result, $connection);
     }
 
+    public function testSqlServerConnectCallsCreateConnectionWithPreferredODBC()
+    {
+        if (! in_array('odbc', PDO::getAvailableDrivers())) {
+            $this->markTestSkipped('PHP was compiled without PDO ODBC support.');
+        }
+
+        $config = ['odbc' => true, 'odbc_datasource_name' => 'server=localhost;database=test;'];
+        $dsn = $this->getDsn($config);
+        $connector = $this->getMockBuilder('Illuminate\Database\Connectors\SqlServerConnector')->setMethods(['createConnection', 'getOptions'])->getMock();
+        $connection = m::mock('stdClass');
+        $connector->expects($this->once())->method('getOptions')->with($this->equalTo($config))->will($this->returnValue(['options']));
+        $connector->expects($this->once())->method('createConnection')->with($this->equalTo($dsn), $this->equalTo($config), $this->equalTo(['options']))->will($this->returnValue($connection));
+        $result = $connector->connect($config);
+
+        $this->assertSame($result, $connection);
+    }
+
     protected function getDsn(array $config)
     {
         extract($config, EXTR_SKIP);
 
-        if (in_array('dblib', PDO::getAvailableDrivers())) {
-            $port = isset($config['port']) ? ':'.$port : '';
-            $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
-            $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
+        $availableDrivers = PDO::getAvailableDrivers();
 
-            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
-        } else {
+        if (in_array('odbc', $availableDrivers) &&
+            ($config['odbc'] ?? null) === true) {
+            return isset($config['odbc_datasource_name'])
+                ? 'odbc:'.$config['odbc_datasource_name'] : '';
+        }
+
+        if (in_array('sqlsrv', $availableDrivers)) {
             $port = isset($config['port']) ? ','.$port : '';
             $appname = isset($config['appname']) ? ';APP='.$config['appname'] : '';
             $readonly = isset($config['readonly']) ? ';ApplicationIntent=ReadOnly' : '';
             $pooling = (isset($config['pooling']) && $config['pooling'] == false) ? ';ConnectionPooling=0' : '';
 
             return "sqlsrv:Server={$host}{$port};Database={$database}{$readonly}{$pooling}{$appname}";
+        } else {
+            $port = isset($config['port']) ? ':'.$port : '';
+            $appname = isset($config['appname']) ? ';appname='.$config['appname'] : '';
+            $charset = isset($config['charset']) ? ';charset='.$config['charset'] : '';
+
+            return "dblib:host={$host}{$port};dbname={$database}{$charset}{$appname}";
         }
     }
 }
