@@ -42,9 +42,7 @@ class Response extends BaseResponse
             $content = $content->render();
         }
 
-        parent::setContent($content);
-
-        return $this;
+        return parent::setContent($content);
     }
 
     /**
