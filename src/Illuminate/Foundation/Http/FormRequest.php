@@ -89,9 +89,15 @@ class FormRequest extends Request implements ValidatesWhenResolved
      */
     protected function createDefaultValidator(ValidationFactory $factory)
     {
+        $messages = [];
+
+        if (method_exists($this, 'messages')) {
+            $messages = $this->container->call([$this, 'messages']);
+        }
+
         return $factory->make(
             $this->validationData(), $this->container->call([$this, 'rules']),
-            $this->messages(), $this->attributes()
+            $messages, $this->attributes()
         );
     }
 
@@ -178,16 +184,6 @@ class FormRequest extends Request implements ValidatesWhenResolved
         return $this->only(collect($rules)->keys()->map(function ($rule) {
             return Str::contains($rule, '*') ? explode('.', $rule)[0] : $rule;
         })->unique()->toArray());
-    }
-
-    /**
-     * Get custom messages for validator errors.
-     *
-     * @return array
-     */
-    public function messages()
-    {
-        return [];
     }
 
     /**

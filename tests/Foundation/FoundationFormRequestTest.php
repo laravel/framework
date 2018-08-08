@@ -5,11 +5,13 @@ namespace Illuminate\Tests\Foundation;
 use Exception;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Auth\AuthManager;
 use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\ValidationException;
 use Illuminate\Contracts\Translation\Translator;
 use Illuminate\Validation\Factory as ValidationFactory;
 use Illuminate\Contracts\Validation\Factory as ValidationFactoryContract;
@@ -69,6 +71,38 @@ class FoundationFormRequestTest extends TestCase
     public function test_prepare_for_validation_runs_before_validation()
     {
         $this->createRequest([], FoundationTestFormRequestHooks::class)->validateResolved();
+    }
+
+    public function test_method_injection_in_form_request_methods()
+    {
+        $container = tap(new Container, function (Container $container) {
+            $container->instance(
+                ValidationFactoryContract::class,
+                $this->createValidationFactory($container)
+            );
+            $translator = m::mock(Translator::class);
+            $translator->shouldReceive('trans')->with('messages.foobar')->andReturn('The name is required.');
+            $container->instance(
+                Translator::class,
+                $translator
+            );
+            $authManager = m::mock(AuthManager::class);
+            $authManager->shouldReceive('check')->andReturn(true);
+            $container->instance(
+                AuthManager::class,
+                $authManager
+            );
+        });
+
+        $request = FoundationTestFormRequestWithInjectedServicesStub::create('/', 'GET', ['name' => '']);
+        $request->setRedirector($this->createMockRedirector($request))->setContainer($container);
+
+        try {
+            $request->validateResolved();
+            $this->fail('A Illuminate\Validation\ValidationException was supposed to be thrown.');
+        } catch (ValidationException $exception) {
+            $this->assertTrue(in_array('The name is required.', $exception->errors()['name']));
+        }
     }
 
     /**
@@ -220,5 +254,24 @@ class FoundationTestFormRequestHooks extends FormRequest
     public function prepareForValidation()
     {
         $this->replace(['name' => 'Taylor']);
+    }
+}
+class FoundationTestFormRequestWithInjectedServicesStub extends FormRequest
+{
+    public function rules(Translator $translator)
+    {
+        return ['name' => 'required'];
+    }
+
+    public function authorize(AuthManager $authManager)
+    {
+        return $authManager->check();
+    }
+
+    public function messages(Translator $translator)
+    {
+        return [
+            'name.required' => $translator->trans('messages.foobar'),
+        ];
     }
 }
