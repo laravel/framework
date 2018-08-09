@@ -173,7 +173,6 @@ class EncryptCookies
     /**
      * Determine if the cookie contents should be serialized.
      *
-     * @param  string  $name
      * @return bool
      */
     public static function serialized()
