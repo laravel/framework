@@ -339,6 +339,17 @@ class TestResponse
     }
 
     /**
+     * Escape a given string and assert that is contained within the response text.
+     *
+     * @param  string  $value
+     * @return $this
+     */
+    public function assertSeeEscaped($value)
+    {
+        return $this->assertSee(e($value));
+    }
+
+    /**
      * Assert that the given strings are contained in order within the response.
      *
      * @param  array  $values
