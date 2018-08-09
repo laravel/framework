@@ -206,12 +206,11 @@ class TestResponse
      *
      * @param  string  $cookieName
      * @param  mixed  $value
-     * @param  bool  $unserialize
      * @return $this
      */
-    public function assertPlainCookie($cookieName, $value = null, $unserialize = false)
+    public function assertPlainCookie($cookieName, $value = null)
     {
-        $this->assertCookie($cookieName, $value, false, $unserialize);
+        $this->assertCookie($cookieName, $value, false);
 
         return $this;
     }
