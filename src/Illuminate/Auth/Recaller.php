@@ -81,6 +81,10 @@ class Recaller
      */
     protected function hasAllSegments()
     {
+        if (@unserialize($this->recaller)) {
+            return false;
+        }
+
         $segments = explode('|', $this->recaller);
 
         return count($segments) == 3 && trim($segments[0]) !== '' && trim($segments[1]) !== '';
