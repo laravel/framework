@@ -100,7 +100,7 @@ class EncryptCookies
     {
         return is_array($cookie)
                         ? $this->decryptArray($cookie)
-                        : $this->encrypter->decrypt($cookie, static::serialized($name));
+                        : $this->encrypter->decrypt($cookie, static::serialized());
     }
 
     /**
@@ -115,7 +115,7 @@ class EncryptCookies
 
         foreach ($cookie as $key => $value) {
             if (is_string($value)) {
-                $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized($key));
+                $decrypted[$key] = $this->encrypter->decrypt($value, static::serialized());
             }
         }
 
@@ -136,7 +136,7 @@ class EncryptCookies
             }
 
             $response->headers->setCookie($this->duplicate(
-                $cookie, $this->encrypter->encrypt($cookie->getValue(), static::serialized($cookie->getName()))
+                $cookie, $this->encrypter->encrypt($cookie->getValue(), static::serialized())
             ));
         }
 
@@ -176,7 +176,7 @@ class EncryptCookies
      * @param  string  $name
      * @return bool
      */
-    public static function serialized($name)
+    public static function serialized()
     {
         return static::$serialize;
     }
