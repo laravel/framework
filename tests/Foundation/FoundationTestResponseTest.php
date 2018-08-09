@@ -81,6 +81,19 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeText('foobar');
     }
 
+    public function testAssertSeeEscaped()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(\Mockery::mock(View::class, [
+                'render' => 'Ahmed Kh&#039;aled',
+            ]));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        $response->assertSeeEscaped('Ahmed Kh\'aled');
+    }
+
     public function testAssertSeeTextInOrder()
     {
         $baseResponse = tap(new Response, function ($response) {
