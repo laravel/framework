@@ -1484,11 +1484,37 @@ class RoutingRouteTest extends TestCase
         $router->get('contact_us', function () {
             throw new \Exception('Route should not be reachable.');
         });
-        $router->redirect('contact_us', 'contact', 302);
+        $router->redirect('contact_us', 'contact');
 
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(302, $response->getStatusCode());
+    }
+
+    public function testRouteRedirectWithCustomStatus()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new \Exception('Route should not be reachable.');
+        });
+        $router->redirect('contact_us', 'contact', 301);
+
+        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(301, $response->getStatusCode());
+    }
+
+    public function testRoutePermanentRedirect()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new \Exception('Route should not be reachable.');
+        });
+        $router->permanentRedirect('contact_us', 'contact');
+
+        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(301, $response->getStatusCode());
     }
 
     protected function getRouter()
