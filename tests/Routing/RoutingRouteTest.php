@@ -1504,6 +1504,19 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(301, $response->getStatusCode());
     }
 
+    public function testRoutePermanentRedirect()
+    {
+        $router = $this->getRouter();
+        $router->get('contact_us', function () {
+            throw new \Exception('Route should not be reachable.');
+        });
+        $router->permanentRedirect('contact_us', 'contact');
+
+        $response = $router->dispatch(Request::create('contact_us', 'GET'));
+        $this->assertTrue($response->isRedirect('contact'));
+        $this->assertEquals(301, $response->getStatusCode());
+    }
+
     protected function getRouter()
     {
         $container = new Container;

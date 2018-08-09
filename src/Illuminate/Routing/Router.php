@@ -244,6 +244,18 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Create a permanent redirect from one URI to another.
+     *
+     * @param  string  $uri
+     * @param  string  $destination
+     * @return \Illuminate\Routing\Route
+     */
+    public function permanentRedirect($uri, $destination)
+    {
+        return $this->redirect($uri, $destination, 301);
+    }
+
+    /**
      * Register a new route that returns a view.
      *
      * @param  string  $uri
