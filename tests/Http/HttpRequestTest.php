@@ -92,9 +92,6 @@ class HttpRequestTest extends TestCase
     {
         $request = Request::create($path, 'GET');
         $this->assertEquals($expected, $request->segments());
-
-        $request = Request::create('foo/bar', 'GET');
-        $this->assertEquals(['foo', 'bar'], $request->segments());
     }
 
     public function segmentsProvider()
