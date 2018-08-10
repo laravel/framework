@@ -310,7 +310,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         (new static(func_get_args()))
             ->push($this)
             ->each(function ($item) {
-                (new Dumper)->dump($item);
+                dump($item);
             });
 
         return $this;
