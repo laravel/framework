@@ -490,9 +490,11 @@ class Grammar extends BaseGrammar
      */
     protected function whereRowValues(Builder $query, $where)
     {
+        $columns = $this->columnize($where['columns']);
+
         $values = $this->parameterize($where['values']);
 
-        return '('.implode(', ', $where['columns']).') '.$where['operator'].' ('.$values.')';
+        return '('.$columns.') '.$where['operator'].' ('.$values.')';
     }
 
     /**
