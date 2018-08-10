@@ -1,5 +1,29 @@
 # Release Notes for 5.6.x
 
+## v5.6.32 (2018-08-09)
+
+### Added
+- Added serialization parameters to helper functions decrypt and encrypt ([#25166](https://github.com/laravel/framework/pull/25166))
+
+## v5.6.31 (2018-08-09)
+
+### Changed
+- Make Auth/Recaller handle serialized and unserialized cookies ([#25167](https://github.com/laravel/framework/pull/25167))
+
+## v5.6.30 (2018-08-08)
+
+### Added
+- Support passing CC/CBC in array form in mail notification ([#25029](https://github.com/laravel/framework/pull/25029))
+- Added Rule::requiredIf ([#25066](https://github.com/laravel/framework/pull/25066))
+- Support raw expressions in whereRowValues() ([#25117](https://github.com/laravel/framework/pull/25117))
+
+### Changed
+- Stopped serializing csrf cookie / header ([#25121](https://github.com/laravel/framework/pull/25121))
+
+### Fixed
+- Avoid an "Undefined offset: 0" if no job was pulled from redis queue ([#25020](https://github.com/laravel/framework/pull/25020))
+- Updating the Pluralizer class to respect the grammar rule ([#25063](https://github.com/laravel/framework/pull/25063))
+
 ## v5.6.29 (2018-07-26)
 
 ### Added
