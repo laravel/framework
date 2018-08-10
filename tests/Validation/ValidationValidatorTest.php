@@ -4005,6 +4005,17 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
     }
 
+    public function testValidationWithSlashes()
+    {
+        $trans = $this->getIlluminateArrayTranslator();
+
+        $v = new Validator($trans, ['foo/' => 'bar'], ['foo/' => 'required']);
+        $this->assertTrue($v->passes());
+
+        $v = new Validator($trans, ['foo' => ['bar/' => 'baz']], ['foo.*' => 'sometimes']);
+        $this->assertTrue($v->passes());
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');
