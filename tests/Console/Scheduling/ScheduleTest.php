@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Console\Scheduling;
 
-use Illuminate\Support\Facades\Queue;
 use Mockery as m;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Container\Container;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Queue;
+use Illuminate\Console\Scheduling\Schedule;
 
 class ScheduleTest extends TestCase
 {
