@@ -44,18 +44,6 @@ trait ValidatesRequests
     }
 
     /**
-     * Get the request input based on the given validation rules.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
-     * @return array
-     */
-    protected function extractInputFromRules(Request $request, array $rules)
-    {
-        return $request->only(array_keys($rules));
-    }
-
-    /**
      * Validate the given request with the given rules.
      *
      * @param  string  $errorBag
