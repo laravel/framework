@@ -97,9 +97,9 @@ class Schedule
             $job = is_string($job) ? resolve($job) : $job;
 
             if ($job instanceof ShouldQueue) {
-                $job->queue === null || $queue !== null ?
-                    dispatch($job)->onConnection($connection)->onQueue($queue) :
-                    dispatch($job)->onConnection($connection);
+                $queue = $queue || $job->queue;
+
+                dispatch($job)->onConnection($connection)->onQueue($queue);
             } else {
                 dispatch_now($job);
             }
