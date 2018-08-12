@@ -16,7 +16,7 @@ class Notification
     public $id;
 
     /**
-     * Locale used when sending the notification.
+     * The locale to be used when sending the notification.
      *
      * @var string|null
      */

@@ -1,4 +1,4 @@
-<?php
+Local used<?php
 
 namespace Illuminate\Notifications;
 
@@ -22,7 +22,7 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     protected $defaultChannel = 'mail';
 
     /**
-     * Locale used when sending notifications.
+     * The locale used when sending notifications.
      *
      * @var string|null
      */

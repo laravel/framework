@@ -35,7 +35,7 @@ class NotificationSender
     protected $events;
 
     /**
-     * Locale used when sending notifications.
+     * The locale to be used when sending notifications.
      *
      * @var string|null
      */
