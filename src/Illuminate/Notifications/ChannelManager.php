@@ -1,4 +1,4 @@
-Local used<?php
+<?php
 
 namespace Illuminate\Notifications;
 
