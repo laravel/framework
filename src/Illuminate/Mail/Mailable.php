@@ -4,13 +4,13 @@ namespace Illuminate\Mail;
 
 use ReflectionClass;
 use ReflectionProperty;
-use BadMethodCallException;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Support\Traits\Localizable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Contracts\Queue\Factory as Queue;
 use Illuminate\Contracts\Mail\Mailer as MailerContract;
 use Illuminate\Contracts\Mail\Mailable as MailableContract;
@@ -18,7 +18,7 @@ use Illuminate\Contracts\Filesystem\Factory as FilesystemFactory;
 
 class Mailable implements MailableContract, Renderable
 {
-    use Localizable;
+    use ForwardsCalls, Localizable;
 
     /**
      * The locale of the message.
@@ -808,8 +808,6 @@ class Mailable implements MailableContract, Renderable
             return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
-        ));
+        $this->throwBadMethodCallException($method);
     }
 }
