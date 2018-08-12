@@ -362,11 +362,32 @@ class Worker
             // so it is not lost entirely. This'll let the job be retried at a later time by
             // another listener (or this same one). We will re-throw this exception after.
             if (! $job->isDeleted() && ! $job->isReleased() && ! $job->hasFailed()) {
-                $job->release($options->delay + $job->retryDelay());
+                $job->release($options->delay + $this->getJobRetryDelay($job));
             }
         }
 
         throw $e;
+    }
+
+    /**
+     * Gets the job's retry delay with exception handling.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @return int
+     */
+    protected function getJobRetryDelay($job)
+    {
+        try {
+            return $job->retryDelay();
+        } catch (Exception $e) {
+            $this->exceptions->report($e);
+
+            return 0;
+        } catch (Throwable $e) {
+            $this->exceptions->report($e = new FatalThrowableError($e));
+
+            return 0;
+        }
     }
 
     /**

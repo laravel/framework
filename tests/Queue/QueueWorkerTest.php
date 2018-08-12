@@ -106,6 +106,27 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
 
+    public function test_job_retry_delay_exception_releases_immediately()
+    {
+        $e = new RuntimeException;
+        $retryException = new \Exception('retry Exception');
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+        $job->setRetryException($retryException);
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertEquals(0, $job->releaseAfter);
+        $this->assertFalse($job->deleted);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($retryException);
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
+    }
+
     public function test_job_is_not_released_if_it_has_exceeded_max_attempts()
     {
         $e = new RuntimeException;
@@ -325,6 +346,7 @@ class WorkerFakeJob
     public $failedWith;
     public $failed = false;
     public $connectionName;
+    public $retryException;
 
     public function __construct($callback = null)
     {
@@ -394,6 +416,10 @@ class WorkerFakeJob
 
     public function retryDelay()
     {
+        if (isset($this->retryException)) {
+            throw $this->retryException;
+        }
+
         return 5;
     }
 
@@ -410,5 +436,10 @@ class WorkerFakeJob
     public function setConnectionName($name)
     {
         $this->connectionName = $name;
+    }
+
+    public function setRetryException($e)
+    {
+        $this->retryException = $e;
     }
 }
