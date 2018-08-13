@@ -185,7 +185,10 @@ class Application extends SymfonyApplication implements ApplicationContract
 
         $this->setCatchExceptions(false);
 
-        $result = $this->run(new ArrayInput($parameters), $this->lastOutput);
+        $input = new ArrayInput($parameters);
+        $input->setInteractive(false);
+
+        $result = $this->run($input, $this->lastOutput);
 
         $this->setCatchExceptions(true);
 
