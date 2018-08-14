@@ -26,7 +26,7 @@ class MakeViewCommand extends Command
     private $path = null;
 
     /**
-     * Create a new view blade file
+     * Create a new view blade file.
      * @return void
      */
     public function __construct()
@@ -36,7 +36,7 @@ class MakeViewCommand extends Command
     }
 
     /**
-     * Execute the console command
+     * Execute the console command.
      */
     public function handle()
     {
@@ -49,7 +49,7 @@ class MakeViewCommand extends Command
     }
 
     /**
-     * Make the path for view file
+     * Make the path for view file.
      * @param string $view
      * @return string
      */
@@ -60,16 +60,16 @@ class MakeViewCommand extends Command
         $path = '';
         $count = count($paths) - 1;
         for ($i = 0; $i < $count; $i++) {
-            $path .= $paths[$i] . '/';
-            if (!is_dir($this->path . '/views/' . $path)) {
-                mkdir($this->path . '/views/' . $path);
+            $path .= $paths[$i].'/';
+            if (!is_dir($this->path.'/views/'.$path)) {
+                mkdir($this->path.'/views/'.$path);
             }
         }
-        return $this->path . '/views/' . $path . $view;
+        return $this->path . '/views/'.$path.$view;
     }
 
     /**
-     * Provides a content for view file
+     * Provides a content for view file.
      * @param string $layout
      * @param string $section
      * @return string
@@ -87,13 +87,13 @@ class MakeViewCommand extends Command
     }
 
     /**
-     * Put content on view file on choiced path
+     * Put content on view file on choiced path.
      * @param string $path
      * @param string $content
      */
     private function createView($path, $content)
     {
-        file_put_contents($path . '.blade.php', $content);
+        file_put_contents($path.'.blade.php',$content);
         $this->info('View created successfully.');
     }
 }
