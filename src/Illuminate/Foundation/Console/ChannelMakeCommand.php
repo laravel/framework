@@ -3,6 +3,7 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
+use Symfony\Component\Console\Input\InputOption;
 
 class ChannelMakeCommand extends GeneratorCommand
 {
@@ -37,7 +38,7 @@ class ChannelMakeCommand extends GeneratorCommand
     {
         return str_replace(
             'DummyUser',
-            class_basename(config('auth.providers.users.model')),
+            class_basename($this->getUserModel()),
             parent::buildClass($name)
         );
     }
@@ -61,5 +62,17 @@ class ChannelMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         return $rootNamespace.'\Broadcasting';
+    }
+
+    /**
+     * Get the console command arguments.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [
+            ['auth', 'a', InputOption::VALUE_OPTIONAL, 'The auth provider that the channel applies to.'],
+        ];
     }
 }
