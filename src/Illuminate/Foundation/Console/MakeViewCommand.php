@@ -6,7 +6,6 @@ use Illuminate\Console\Command;
 
 class MakeViewCommand extends Command
 {
-
     /**
      * The console command signature.
      *
