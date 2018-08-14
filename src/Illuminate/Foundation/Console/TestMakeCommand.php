@@ -12,7 +12,7 @@ class TestMakeCommand extends GeneratorCommand
      *
      * @var string
      */
-    protected $signature = 'make:test {name : The name of the class} {--unit : Create a unit test}';
+    protected $signature = 'make:test {name : The name of the class} {--unit : Create a unit test} {--regression : Create a regression test}';
 
     /**
      * The console command description.
@@ -36,10 +36,14 @@ class TestMakeCommand extends GeneratorCommand
     protected function getStub()
     {
         if ($this->option('unit')) {
-            return __DIR__.'/stubs/unit-test.stub';
+            return __DIR__ . '/stubs/unit-test.stub';
         }
 
-        return __DIR__.'/stubs/test.stub';
+        if ($this->option('regression')) {
+            return __DIR__ . '/stubs/regression-test.stub';
+        }
+
+        return __DIR__ . '/stubs/test.stub';
     }
 
     /**
@@ -52,7 +56,7 @@ class TestMakeCommand extends GeneratorCommand
     {
         $name = Str::replaceFirst($this->rootNamespace(), '', $name);
 
-        return base_path('tests').str_replace('\\', '/', $name).'.php';
+        return base_path('tests') . str_replace('\\', '/', $name) . '.php';
     }
 
     /**
@@ -64,10 +68,14 @@ class TestMakeCommand extends GeneratorCommand
     protected function getDefaultNamespace($rootNamespace)
     {
         if ($this->option('unit')) {
-            return $rootNamespace.'\Unit';
-        } else {
-            return $rootNamespace.'\Feature';
+            return $rootNamespace . '\Unit';
         }
+
+        if ($this->option('regression')) {
+            return $rootNamespace . '\Regression';
+        }
+
+        return $rootNamespace . '\Feature';
     }
 
     /**
