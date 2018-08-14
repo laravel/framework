@@ -1177,3 +1177,23 @@ if (! function_exists('with')) {
         return is_null($callback) ? $value : $callback($value);
     }
 }
+
+if (! function_exists('if_isset')) {
+    /**
+     * Return the given value if isset, otherwise return the optional parameter.
+     *
+     * @param  mixed  $value
+     * @param  mixed  $defaultValue
+     * @return mixed
+     */
+    function if_isset($value, $key, $defaultValue = null)
+    {
+        if (is_object($value)) {
+            return isset($value->{$key}) ? $value->{$key} : $defaultValue;
+        } elseif (is_array($value)) {
+            return isset($value[$key]) ? $value[$key] : $defaultValue;
+        } else {
+            return $value;
+        }
+    }
+}

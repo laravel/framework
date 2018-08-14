@@ -900,6 +900,14 @@ class SupportHelpersTest extends TestCase
         }));
     }
 
+    public function testIfIsset()
+    {
+        $arr = ['keyword' => 10];
+        $this->assertEquals(10, if_isset($arr, 'keyword'));
+
+        $this->assertEquals(10, if_isset($arr, 'not_exists', 10));
+    }
+
     public function testEnv()
     {
         putenv('foo=bar');
