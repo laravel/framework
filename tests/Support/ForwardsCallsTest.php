@@ -60,7 +60,7 @@ class ForwardsCallsOne
 
     public function throwTestException($method)
     {
-        $this->throwBadMethodCallException($method);
+        static::throwBadMethodCallException($method);
     }
 }
 

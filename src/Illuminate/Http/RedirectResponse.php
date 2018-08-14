@@ -231,6 +231,6 @@ class RedirectResponse extends BaseRedirectResponse
             return $this->with(Str::snake(substr($method, 4)), $parameters[0]);
         }
 
-        $this->throwBadMethodCallException($method);
+        static::throwBadMethodCallException($method);
     }
 }

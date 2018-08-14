@@ -2813,6 +2813,6 @@ class Builder
             return $this->dynamicWhere($method, $parameters);
         }
 
-        $this->throwBadMethodCallException($method);
+        static::throwBadMethodCallException($method);
     }
 }

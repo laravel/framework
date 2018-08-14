@@ -1341,7 +1341,7 @@ class Builder
         }
 
         if (! isset(static::$macros[$method])) {
-            $this->throwBadMethodCallException($method);
+            static::throwBadMethodCallException($method);
         }
 
         if (static::$macros[$method] instanceof Closure) {

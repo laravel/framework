@@ -808,6 +808,6 @@ class Mailable implements MailableContract, Renderable
             return $this->with(Str::camel(substr($method, 4)), $parameters[0]);
         }
 
-        $this->throwBadMethodCallException($method);
+        static::throwBadMethodCallException($method);
     }
 }

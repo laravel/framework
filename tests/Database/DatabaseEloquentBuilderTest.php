@@ -408,6 +408,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()
+     */
+    public function testMissingStaticMacrosThrowsProperException()
+    {
+        Builder::missingMacro();
+    }
+
     public function testGetModelsProperlyHydratesModels()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
