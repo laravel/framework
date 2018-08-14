@@ -171,7 +171,7 @@ abstract class GeneratorCommand extends Command
     {
         $stub = str_replace(
             ['DummyNamespace', 'DummyRootNamespace', 'NamespacedDummyUserModel'],
-            [$this->getNamespace($name), $this->rootNamespace(), config('auth.providers.users.model')],
+            [$this->getNamespace($name), $this->rootNamespace(), $this->getUserModel()],
             $stub
         );
 
@@ -187,6 +187,18 @@ abstract class GeneratorCommand extends Command
     protected function getNamespace($name)
     {
         return trim(implode('\\', array_slice(explode('\\', $name), 0, -1)), '\\');
+    }
+
+    /**
+     * Get the class name of user model.
+     *
+     * @return \Illuminate\Config\Repository|mixed
+     */
+    protected function getUserModel()
+    {
+        $provider = $this->hasOption('auth') ? ($this->option('auth') ?? 'users') : 'users';
+
+        return config('auth.providers.'.$provider.'.model');
     }
 
     /**
