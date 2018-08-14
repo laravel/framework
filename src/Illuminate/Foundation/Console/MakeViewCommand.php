@@ -61,11 +61,11 @@ class MakeViewCommand extends Command
         $count = count($paths) - 1;
         for ($i = 0; $i < $count; $i++) {
             $path .= $paths[$i].'/';
-            if (!is_dir($this->path.'/views/'.$path)) {
+            if (! is_dir($this->path.'/views/'.$path)) {
                 mkdir($this->path.'/views/'.$path);
             }
         }
-        return $this->path . '/views/'.$path.$view;
+        return $this->path.'/views/'.$path.$view;
     }
 
     /**
@@ -93,7 +93,7 @@ class MakeViewCommand extends Command
      */
     private function createView($path, $content)
     {
-        file_put_contents($path.'.blade.php',$content);
+        file_put_contents($path.'.blade.php', $content);
         $this->info('View created successfully.');
     }
 }
