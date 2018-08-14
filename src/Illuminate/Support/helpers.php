@@ -1186,8 +1186,14 @@ if (! function_exists('if_isset')) {
      * @param  mixed  $defaultValue
      * @return mixed
      */
-    function if_isset($arr, $key, $defaultValue = null)
+    function if_isset($value, $key, $defaultValue = null)
     {
-        return isset($arr[$key]) ? $arr[$key] : $defaultValue;
+        if (is_object($value)) {
+            return isset($value->{$key}) ? $value->{$key} : $defaultValue;
+        } else if (is_array($value)) {
+            return isset($value[$key]) ? $value[$key] : $defaultValue;
+        } else {
+            return $value;
+        }
     }
 }
