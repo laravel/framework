@@ -459,11 +459,12 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $name
      * @param  string|null  $algorithm
+     * @param  int|array|null  $lengths
      * @return \Illuminate\Support\Fluent
      */
-    public function primary($columns, $name = null, $algorithm = null)
+    public function primary($columns, $name = null, $algorithm = null, $lengths = null)
     {
-        return $this->indexCommand('primary', $columns, $name, $algorithm);
+        return $this->indexCommand('primary', $columns, $name, $algorithm, $lengths);
     }
 
     /**
@@ -472,11 +473,12 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $name
      * @param  string|null  $algorithm
+     * @param  int|array|null  $lengths
      * @return \Illuminate\Support\Fluent
      */
-    public function unique($columns, $name = null, $algorithm = null)
+    public function unique($columns, $name = null, $algorithm = null, $lengths = null)
     {
-        return $this->indexCommand('unique', $columns, $name, $algorithm);
+        return $this->indexCommand('unique', $columns, $name, $algorithm, $lengths);
     }
 
     /**
@@ -485,11 +487,12 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $name
      * @param  string|null  $algorithm
+     * @param  int|array|null  $lengths
      * @return \Illuminate\Support\Fluent
      */
-    public function index($columns, $name = null, $algorithm = null)
+    public function index($columns, $name = null, $algorithm = null, $lengths = null)
     {
-        return $this->indexCommand('index', $columns, $name, $algorithm);
+        return $this->indexCommand('index', $columns, $name, $algorithm, $lengths);
     }
 
     /**
@@ -1195,11 +1198,14 @@ class Blueprint
      * @param  string|array  $columns
      * @param  string  $index
      * @param  string|null  $algorithm
+     * @param  int|array|null  $lengths
      * @return \Illuminate\Support\Fluent
      */
-    protected function indexCommand($type, $columns, $index, $algorithm = null)
+    protected function indexCommand($type, $columns, $index, $algorithm = null, $lengths = null)
     {
         $columns = (array) $columns;
+
+        $lengths = (array) $lengths;
 
         // If no name was specified for this index, we will create one using a basic
         // convention of the table name, followed by the columns, followed by an
@@ -1207,7 +1213,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type, compact('index', 'columns', 'algorithm')
+            $type, compact('index', 'columns', 'algorithm', 'lengths')
         );
     }
 

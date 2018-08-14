@@ -309,6 +309,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `users` add primary key `bar` using hash(`foo`)', $statements[0]);
     }
 
+    public function testAddingPrimaryKeyWithLengths()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->primary('foo', 'bar', null, 50);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add primary key `bar`(`foo`(50))', $statements[0]);
+    }
+
     public function testAddingUniqueKey()
     {
         $blueprint = new Blueprint('users');
@@ -317,6 +327,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add unique `bar`(`foo`)', $statements[0]);
+    }
+
+    public function testAddingUniqueKeyWithLengths()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->unique('foo', 'bar', null, 50);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add unique `bar`(`foo`(50))', $statements[0]);
     }
 
     public function testAddingIndex()
@@ -337,6 +357,16 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertCount(1, $statements);
         $this->assertEquals('alter table `users` add index `baz` using hash(`foo`, `bar`)', $statements[0]);
+    }
+
+    public function testAddingIndexWithLengths()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->index(['foo', 'bar'], 'baz', null, [50, 100]);
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(1, $statements);
+        $this->assertEquals('alter table `users` add index `baz`(`foo`(50), `bar`(100))', $statements[0]);
     }
 
     public function testAddingSpatialIndex()
