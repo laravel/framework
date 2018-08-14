@@ -55,12 +55,12 @@ class Vue extends Preset
     protected static function updateComponent()
     {
         (new Filesystem)->delete(
-            resource_path('assets/js/components/Example.js')
+            resource_path('js/components/Example.js')
         );
 
         copy(
             __DIR__.'/vue-stubs/ExampleComponent.vue',
-            resource_path('assets/js/components/ExampleComponent.vue')
+            resource_path('js/components/ExampleComponent.vue')
         );
     }
 
@@ -71,6 +71,6 @@ class Vue extends Preset
      */
     protected static function updateBootstrapping()
     {
-        copy(__DIR__.'/vue-stubs/app.js', resource_path('assets/js/app.js'));
+        copy(__DIR__.'/vue-stubs/app.js', resource_path('js/app.js'));
     }
 }

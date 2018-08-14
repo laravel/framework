@@ -55,12 +55,12 @@ class React extends Preset
     protected static function updateComponent()
     {
         (new Filesystem)->delete(
-            resource_path('assets/js/components/ExampleComponent.vue')
+            resource_path('js/components/ExampleComponent.vue')
         );
 
         copy(
             __DIR__.'/react-stubs/Example.js',
-            resource_path('assets/js/components/Example.js')
+            resource_path('js/components/Example.js')
         );
     }
 
@@ -71,6 +71,6 @@ class React extends Preset
      */
     protected static function updateBootstrapping()
     {
-        copy(__DIR__.'/react-stubs/app.js', resource_path('assets/js/app.js'));
+        copy(__DIR__.'/react-stubs/app.js', resource_path('js/app.js'));
     }
 }

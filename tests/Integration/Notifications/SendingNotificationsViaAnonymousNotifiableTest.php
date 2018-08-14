@@ -46,14 +46,16 @@ class SendingNotificationsViaAnonymousNotifiableTest extends TestCase
             ->route('testchannel', 'enzo')
             ->route('anothertestchannel', 'enzo@deepblue.com');
 
-        NotificationFacade::send(
+        NotificationFacade::locale('it')->send(
             $notifiable,
             new TestMailNotificationForAnonymousNotifiable()
         );
 
         NotificationFacade::assertSentTo(new AnonymousNotifiable(), TestMailNotificationForAnonymousNotifiable::class,
-            function ($notification, $channels, $notifiable) {
-                return $notifiable->routes['testchannel'] == 'enzo' && $notifiable->routes['anothertestchannel'] == 'enzo@deepblue.com';
+            function ($notification, $channels, $notifiable, $locale) {
+                return $notifiable->routes['testchannel'] === 'enzo' &&
+                    $notifiable->routes['anothertestchannel'] === 'enzo@deepblue.com' &&
+                    $locale === 'it';
             }
         );
     }
