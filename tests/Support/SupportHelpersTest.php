@@ -899,7 +899,7 @@ class SupportHelpersTest extends TestCase
             return $five + 5;
         }));
     }
-    
+
     public function testIfIsset()
     {
         $arr = ['keyword' => 10];
