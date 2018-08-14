@@ -215,12 +215,20 @@ class MySqlGrammar extends Grammar
      */
     protected function compileKey(Blueprint $blueprint, Fluent $command, $type)
     {
+        $columns = [];
+
+        foreach ($command->columns as $i => $column) {
+            $length = isset($command->lengths[$i]) ? '('.$command->lengths[$i].')' : '';
+
+            $columns[] = $this->wrap($column).$length;
+        }
+
         return sprintf('alter table %s add %s %s%s(%s)',
             $this->wrapTable($blueprint),
             $type,
             $this->wrap($command->index),
             $command->algorithm ? ' using '.$command->algorithm : '',
-            $this->columnize($command->columns)
+            implode(', ', $columns)
         );
     }
 
