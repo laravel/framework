@@ -31,6 +31,15 @@ class ForwardsCallsTest extends TestCase
     }
 
     /**
+     * @expectedException  \BadMethodCallException
+     * @expectedExceptionMessage  Call to undefined method Illuminate\Tests\Support\ForwardsCallsOne::this1_shouldWork_too()
+     */
+    public function testMissingAlphanumericForwardedCallThrowsCorrectError()
+    {
+        (new ForwardsCallsOne)->this1_shouldWork_too('foo', 'bar');
+    }
+
+    /**
      * @expectedException  \Error
      * @expectedExceptionMessage  Call to undefined method Illuminate\Tests\Support\ForwardsCallsBase::missingMethod()
      */
