@@ -1180,7 +1180,7 @@ if (! function_exists('with')) {
 
 if (! function_exists('if_isset')) {
     /**
-     * Return the given value if isset, otherwise return optional second parameter.
+     * Return the given value if isset, otherwise return the optional parameter.
      *
      * @param  mixed  $value
      * @param  mixed  $defaultValue
