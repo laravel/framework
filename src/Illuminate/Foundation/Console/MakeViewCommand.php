@@ -65,6 +65,7 @@ class MakeViewCommand extends Command
                 mkdir($this->path.'/views/'.$path);
             }
         }
+
         return $this->path.'/views/'.$path.$view;
     }
 
@@ -83,6 +84,7 @@ class MakeViewCommand extends Command
         if ($section) {
             $content .= "@section('{$section}') \n\n\n\n\n@endsection";
         }
+
         return $content;
     }
 
