@@ -33,19 +33,19 @@ trait ForwardsCalls
                 throw $e;
             }
 
-            $this->throwBadMethodCallException($method);
+            static::throwBadMethodCallException($method);
         }
     }
 
     /**
-     * Create a bad method call exception for the given method.
+     * Throw a bad method call exception for the given method.
      *
      * @param  string  $method
      * @return void
      *
      * @throws \BadMethodCallException
      */
-    protected function throwBadMethodCallException($method)
+    protected static function throwBadMethodCallException($method)
     {
         throw new BadMethodCallException(sprintf(
             'Call to undefined method %s::%s()', static::class, $method
