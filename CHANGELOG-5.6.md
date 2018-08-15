@@ -1,6 +1,6 @@
 # Release Notes for 5.6.x
 
-## v5.6.32 (2018-08-09)
+## v5.6.32 & v5.6.33 (2018-08-09)
 
 ### Added
 - Added serialization parameters to helper functions decrypt and encrypt ([#25166](https://github.com/laravel/framework/pull/25166))
