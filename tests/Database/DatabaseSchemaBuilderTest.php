@@ -21,7 +21,7 @@ class DatabaseSchemaBuilderTest extends TestCase
         $builder = new Builder($connection);
         $grammar->shouldReceive('compileTableExists')->once()->andReturn('sql');
         $connection->shouldReceive('getTablePrefix')->once()->andReturn('prefix_');
-        $connection->shouldReceive('select')->once()->with('sql', ['prefix_table'])->andReturn(['prefix_table']);
+        $connection->shouldReceive('selectFromWriteConnection')->once()->with('sql', ['prefix_table'])->andReturn(['prefix_table']);
 
         $this->assertTrue($builder->hasTable('table'));
     }
