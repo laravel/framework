@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 use Closure;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
@@ -420,18 +419,19 @@ class TestResponse
     }
 
     /**
-     * Get the assertion message for assertJson.
+     * Get the assertion failure message for assertJson.
      *
      * @param  array  $data
+     * @param  bool   $expectingPresent
      * @return string
      */
-    protected function assertJsonMessage(array $data)
+    protected function assertJsonMessage(array $data, $expectingPresent = true)
     {
         $expected = json_encode($data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
         $actual = json_encode($this->decodeResponseJson(), JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
 
-        return 'Unable to find JSON: '.PHP_EOL.PHP_EOL.
+        return ($expectingPresent ? 'Unable to find JSON: ' : 'Found unexpected JSON: ').PHP_EOL.PHP_EOL.
             "[{$expected}]".PHP_EOL.PHP_EOL.
             'within response JSON:'.PHP_EOL.PHP_EOL.
             "[{$actual}].".PHP_EOL.PHP_EOL;
@@ -462,20 +462,21 @@ class TestResponse
      */
     public function assertJsonFragment(array $data)
     {
-        $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
-        ));
+        $responseIterator = $this->recursiveIterator($this->decodeResponseJson());
+        $fragmentIterator = $this->recursiveIterator($data);
 
-        foreach (Arr::sortRecursive($data) as $key => $value) {
-            $expected = $this->jsonSearchStrings($key, $value);
+        foreach ($fragmentIterator as $key => $value) {
+            $matches = 0;
 
-            PHPUnit::assertTrue(
-                Str::contains($actual, $expected),
-                'Unable to find JSON fragment: '.PHP_EOL.PHP_EOL.
-                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
-                'within'.PHP_EOL.PHP_EOL.
-                "[{$actual}]."
-            );
+            foreach ($responseIterator as $responseKey => $responseValue) {
+                if ($key == $responseKey && $value == $responseValue) {
+                    $matches++;
+                }
+            }
+
+            if ($matches == 0) {
+                PHPUnit::fail($this->assertJsonMessage([$key => $value]));
+            }
         }
 
         return $this;
@@ -494,20 +495,15 @@ class TestResponse
             return $this->assertJsonMissingExact($data);
         }
 
-        $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
-        ));
+        $responseIterator = $this->recursiveIterator($this->decodeResponseJson());
+        $fragmentIterator = $this->recursiveIterator($data);
 
-        foreach (Arr::sortRecursive($data) as $key => $value) {
-            $unexpected = $this->jsonSearchStrings($key, $value);
-
-            PHPUnit::assertFalse(
-                Str::contains($actual, $unexpected),
-                'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-                '['.json_encode([$key => $value]).']'.PHP_EOL.PHP_EOL.
-                'within'.PHP_EOL.PHP_EOL.
-                "[{$actual}]."
-            );
+        foreach ($fragmentIterator as $key => $value) {
+            foreach ($responseIterator as $responseKey => $responseValue) {
+                if ($key == $responseKey && $value == $responseValue) {
+                    PHPUnit::fail($this->assertJsonMessage([$key => $value], false));
+                }
+            }
         }
 
         return $this;
@@ -521,42 +517,36 @@ class TestResponse
      */
     public function assertJsonMissingExact(array $data)
     {
-        $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
-        ));
+        $responseIterator = $this->recursiveIterator($this->decodeResponseJson());
+        $fragmentIterator = $this->recursiveIterator($data);
 
-        foreach (Arr::sortRecursive($data) as $key => $value) {
-            $unexpected = $this->jsonSearchStrings($key, $value);
+        foreach ($fragmentIterator as $key => $value) {
+            $matches = 0;
 
-            if (! Str::contains($actual, $unexpected)) {
+            foreach ($responseIterator as $responseKey => $responseValue) {
+                if ($key == $responseKey && $value == $responseValue) {
+                    $matches++;
+                }
+            }
+
+            // if this pair is missing then the assertion passes, otherwise keep searching
+            if ($matches == 0) {
                 return $this;
             }
         }
 
-        PHPUnit::fail(
-            'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-            '['.json_encode($data).']'.PHP_EOL.PHP_EOL.
-            'within'.PHP_EOL.PHP_EOL.
-            "[{$actual}]."
-        );
+        // all pairs were found, so the assertion fails
+        PHPUnit::fail($this->assertJsonMessage($data, false));
     }
 
     /**
-     * Get the strings we need to search for when examining the JSON.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return array
+     * Walks through leaf nodes of a multi-dimensional array.
+     * @param array $data
+     * @return \RecursiveIteratorIterator
      */
-    protected function jsonSearchStrings($key, $value)
+    private function recursiveIterator(array $data)
     {
-        $needle = substr(json_encode([$key => $value]), 1, -1);
-
-        return [
-            $needle.']',
-            $needle.'}',
-            $needle.',',
-        ];
+        return new \RecursiveIteratorIterator(new \RecursiveArrayIterator($data));
     }
 
     /**

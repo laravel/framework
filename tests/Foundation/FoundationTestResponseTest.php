@@ -182,7 +182,7 @@ class FoundationTestResponseTest extends TestCase
         try {
             $response->assertJsonFragment(['id' => 1]);
             $this->fail('Asserting id => 1, existing in JsonSerializableSingleResourceWithIntegersStub should fail');
-        } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
         }
     }
 
@@ -232,6 +232,34 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissing(['id' => 2]);
+
+        try {
+            $response->assertJsonMissing(['id' => 20]);
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+    }
+
+    public function testAssertJsonMissingExact()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonMissingExact(['id' => 2]);
+
+        try {
+            $response->assertJsonMissingExact(['id' => 20]);
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        try {
+            $response->assertJsonMissingExact(['id' => 20, 'foo' => 'bar']);
+            $this->fail('No exception was thrown');
+        } catch (Exception $e) {
+        }
+
+        // This is missing because bar has changed to baz
+        $response->assertJsonMissingExact(['id' => 20, 'foo' => 'baz']);
     }
 
     public function testAssertJsonMissingValidationErrors()
