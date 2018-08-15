@@ -4,7 +4,6 @@ namespace Illuminate\Foundation\Testing;
 
 use Closure;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
@@ -541,7 +540,7 @@ class TestResponse
     }
 
     /**
-     * Walks through leaf nodes of a multi-dimensional array
+     * Walks through leaf nodes of a multi-dimensional array.
      * @param array $data
      * @return \RecursiveIteratorIterator
      */
