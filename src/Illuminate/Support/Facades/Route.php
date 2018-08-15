@@ -12,6 +12,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route any(string $uri, \Closure|array|string|null $action = null)
  * @method static \Illuminate\Routing\Route match(array|string $methods, string $uri, \Closure|array|string|null $action = null)
  * @method static \Illuminate\Routing\RouteRegistrar prefix(string  $prefix)
+ * @method static \Illuminate\Routing\RouteRegistrar where(array  $where)
  * @method static \Illuminate\Routing\PendingResourceRegistration resource(string $name, string $controller, array $options = [])
  * @method static \Illuminate\Routing\PendingResourceRegistration apiResource(string $name, string $controller, array $options = [])
  * @method static void apiResources(array $resources)
