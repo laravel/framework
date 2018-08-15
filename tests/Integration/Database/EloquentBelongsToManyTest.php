@@ -622,6 +622,27 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
             $this->assertEquals('exclude', $tag->pivot->flag);
         }
     }
+
+    public function test_custom_related_key()
+    {
+        $post = Post::create(['title' => str_random()]);
+
+        $tag = $post->tagsWithCustomRelatedKey()->create(['name' => str_random()]);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+
+        $post->tagsWithCustomRelatedKey()->detach($tag);
+
+        $post->tagsWithCustomRelatedKey()->attach($tag);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+
+        $post->tagsWithCustomRelatedKey()->detach(new Collection([$tag]));
+
+        $post->tagsWithCustomRelatedKey()->attach(new Collection([$tag]));
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+
+        $post->tagsWithCustomRelatedKey()->updateExistingPivot($tag, ['flag' => 'exclude']);
+        $this->assertEquals('exclude', $post->tagsWithCustomRelatedKey()->first()->pivot->flag);
+    }
 }
 
 class Post extends Model
@@ -663,6 +684,12 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(CustomPivot::class)
             ->as('tag');
+    }
+
+    public function tagsWithCustomRelatedKey()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id', 'id', 'name')
+            ->withPivot('flag');
     }
 }
 
