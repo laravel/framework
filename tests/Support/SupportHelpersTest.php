@@ -950,6 +950,18 @@ class SupportHelpersTest extends TestCase
         putenv('foo=(null)');
         $this->assertEquals('', env('foo'));
     }
+
+    public function testAnyEmpty()
+    {
+        $this->assertTrue(any_empty('foo', null, 'bar'));
+        $this->assertTrue(any_empty('foo', '', 'bar'));
+        $this->assertTrue(any_empty('foo', 0, 'bar'));
+        $this->assertTrue(any_empty('foo', false, 'bar'));
+        $this->assertFalse(any_empty('foo', 'null', 'bar'));
+        $this->assertFalse(any_empty('foo', ' ', 'bar'));
+        $this->assertFalse(any_empty('foo', 1, 'bar'));
+        $this->assertFalse(any_empty('foo', true, 'bar'));
+    }
 }
 
 trait SupportTestTraitOne
