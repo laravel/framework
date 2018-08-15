@@ -171,6 +171,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertEquals('api/users', $this->getRoute()->uri());
     }
 
+    public function testCanRegisterGroupWithPrefixAndWhere()
+    {
+        $this->router->prefix('foo/{bar}')->where(['bar' => '[0-9]+'])->group(function ($router) {
+            $router->get('here', function () {
+                return 'good';
+            });
+        });
+
+        $this->seeResponse('good', Request::create('foo/12345/here', 'GET'));
+    }
+
     public function testCanRegisterGroupWithNamePrefix()
     {
         $this->router->name('api.')->group(function ($router) {
