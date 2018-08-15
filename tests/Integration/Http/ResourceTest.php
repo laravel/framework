@@ -6,6 +6,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
 use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
@@ -703,5 +704,25 @@ class ResourceTest extends TestCase
                 'Fourth',
             ],
         ], $results);
+    }
+
+    public function test_the_resource_can_be_an_array()
+    {
+        Route::get('/', function () {
+            return new JsonResource([
+                'user@example.com' => 'John',
+                'admin@example.com' => 'Hank',
+            ]);
+        });
+
+        $this->withoutExceptionHandling()
+            ->get('/', ['Accept' => 'application/json'])
+            ->assertStatus(200)
+            ->assertJson([
+                'data' => [
+                    'user@example.com' => 'John',
+                    'admin@example.com' => 'Hank',
+                ],
+            ]);
     }
 }

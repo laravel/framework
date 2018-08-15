@@ -69,7 +69,7 @@ class Builder
     {
         $table = $this->connection->getTablePrefix().$table;
 
-        return count($this->connection->select(
+        return count($this->connection->selectFromWriteConnection(
             $this->grammar->compileTableExists(), [$table]
         )) > 0;
     }
@@ -130,7 +130,7 @@ class Builder
      */
     public function getColumnListing($table)
     {
-        $results = $this->connection->select($this->grammar->compileColumnListing(
+        $results = $this->connection->selectFromWriteConnection($this->grammar->compileColumnListing(
             $this->connection->getTablePrefix().$table
         ));
 
