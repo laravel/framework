@@ -53,7 +53,7 @@ class RouteRegistrar
      * @var array
      */
     protected $allowedAttributes = [
-        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix',
+        'as', 'domain', 'middleware', 'name', 'namespace', 'prefix', 'where'
     ];
 
     /**
