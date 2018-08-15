@@ -518,24 +518,26 @@ class TestResponse
      */
     public function assertJsonMissingExact(array $data)
     {
-        $actual = json_encode(Arr::sortRecursive(
-            (array) $this->decodeResponseJson()
-        ));
+        $responseIterator = $this->recursiveIterator($this->decodeResponseJson());
+        $fragmentIterator = $this->recursiveIterator($data);
 
-        foreach (Arr::sortRecursive($data) as $key => $value) {
-            $unexpected = $this->jsonSearchStrings($key, $value);
+        foreach ($fragmentIterator as $key => $value) {
+            $matches = 0;
 
-            if (! Str::contains($actual, $unexpected)) {
+            foreach ($responseIterator as $responseKey => $responseValue) {
+                if ($key == $responseKey && $value == $responseValue) {
+                    $matches++;
+                }
+            }
+
+            // if this pair is missing then the assertion passes, otherwise keep searching
+            if ($matches == 0) {
                 return $this;
             }
         }
 
-        PHPUnit::fail(
-            'Found unexpected JSON fragment: '.PHP_EOL.PHP_EOL.
-            '['.json_encode($data).']'.PHP_EOL.PHP_EOL.
-            'within'.PHP_EOL.PHP_EOL.
-            "[{$actual}]."
-        );
+        // all pairs were found, so the assertion fails
+        PHPUnit::fail($this->assertJsonMessage($data, false));
     }
 
     /**
@@ -546,24 +548,6 @@ class TestResponse
     private function recursiveIterator(array $data)
     {
         return new \RecursiveIteratorIterator(new \RecursiveArrayIterator($data));
-    }
-
-    /**
-     * Get the strings we need to search for when examining the JSON.
-     *
-     * @param  string  $key
-     * @param  string  $value
-     * @return array
-     */
-    protected function jsonSearchStrings($key, $value)
-    {
-        $needle = substr(json_encode([$key => $value]), 1, -1);
-
-        return [
-            $needle.']',
-            $needle.'}',
-            $needle.',',
-        ];
     }
 
     /**
