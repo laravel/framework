@@ -8,6 +8,24 @@ use Illuminate\Support\Debug\Dumper;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
 
+if (! function_exists('any_empty')) {
+    /**
+     * Check if any of the given variables is empty.
+     *
+     * @return string
+     */
+    function any_empty()
+    {
+        foreach (func_get_args() as $arg) {
+            if (empty($arg)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}
+
 if (! function_exists('append_config')) {
     /**
      * Assign high numeric IDs to a config item to force appending.
