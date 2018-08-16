@@ -378,16 +378,16 @@ class Worker
     protected function getJobRetryDelay($job)
     {
         try {
-            return $job->retryDelay();
+            if (($retryDelay = $job->retryDelay()) > 0) {
+                return $retryDelay;
+            }
         } catch (Exception $e) {
             $this->exceptions->report($e);
-
-            return 0;
         } catch (Throwable $e) {
             $this->exceptions->report($e = new FatalThrowableError($e));
-
-            return 0;
         }
+
+        return 0;
     }
 
     /**
