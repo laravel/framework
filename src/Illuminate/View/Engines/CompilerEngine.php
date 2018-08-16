@@ -4,6 +4,7 @@ namespace Illuminate\View\Engines;
 
 use Exception;
 use ErrorException;
+use Illuminate\Support\Str;
 use Illuminate\View\Compilers\CompilerInterface;
 
 class CompilerEngine extends PhpEngine
