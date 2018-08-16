@@ -97,11 +97,7 @@ class View implements ArrayAccess, ViewContract
             $this->factory->flushStateIfDoneRendering();
 
             return ! is_null($response) ? $response : $contents;
-        } catch (Exception $e) {
-            $this->factory->flushState();
-
-            throw $e;
-        } catch (Throwable $e) {
+        } catch (Exception | Throwable $e) {
             $this->factory->flushState();
 
             throw $e;
