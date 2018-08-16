@@ -130,8 +130,8 @@ class Command extends SymfonyCommand
         // After parsing the signature we will spin through the arguments and options
         // and set them on this command. These will already be changed into proper
         // instances of these "InputArgument" and "InputOption" Symfony classes.
-        $this->getDefinition()->addArguments($argument);
-        $this->getDefinition()->addOptions($option);
+        $this->getDefinition()->addArguments($arguments);
+        $this->getDefinition()->addOptions($options);
     }
 
     /**
