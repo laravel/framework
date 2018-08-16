@@ -240,7 +240,6 @@ class FoundationTestResponseTest extends TestCase
         }
     }
 
-
     public function testAssertJsonMissingExact()
     {
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
