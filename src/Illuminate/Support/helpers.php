@@ -17,7 +17,7 @@ if (! function_exists('any_empty')) {
     function any_empty()
     {
         foreach (func_get_args() as $arg) {
-            if (empty($arg) === true) {
+            if (empty($arg)) {
                 return true;
             }
         }
