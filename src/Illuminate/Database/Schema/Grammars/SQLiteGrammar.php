@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Schema\Grammars;
 
 use RuntimeException;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Fluent;
 use Doctrine\DBAL\Schema\Index;
 use Illuminate\Database\Connection;
@@ -332,7 +333,7 @@ class SQLiteGrammar extends Grammar
 
         $indexes = $schemaManager->listTableIndexes($this->getTablePrefix().$blueprint->getTable());
 
-        $index = array_get($indexes, $command->from);
+        $index = Arr::get($indexes, $command->from);
 
         if (! $index) {
             throw new RuntimeException("Index [{$command->from}] does not exist.");
