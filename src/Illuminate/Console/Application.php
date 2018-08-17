@@ -287,7 +287,7 @@ class Application extends SymfonyApplication implements ApplicationContract
     /**
      * Get the Laravel application instance.
      *
-     * @return \Illuminate\Contracts\Foundation\Application
+     * @return \Illuminate\Contracts\Container\Container
      */
     public function getLaravel()
     {
