@@ -15,96 +15,122 @@ class FoundationTestResponseTest extends TestCase
 {
     public function testAssertViewIs()
     {
-        $baseResponse = tap(new Response, function ($response) {
-            $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'hello world',
-                'getData' => ['foo' => 'bar'],
-                'getName' => 'dir.my-view',
-            ]));
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'getData' => ['foo' => 'bar'],
+            'getName' => 'dir.my-view',
+        ]);
 
         $response->assertViewIs('dir.my-view');
     }
 
     public function testAssertViewHas()
     {
-        $baseResponse = tap(new Response, function ($response) {
-            $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'hello world',
-                'getData' => ['foo' => 'bar'],
-            ]));
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'getData' => ['foo' => 'bar'],
+        ]);
 
         $response->assertViewHas('foo');
     }
 
     public function testAssertSeeInOrder()
     {
-        $baseResponse = tap(new Response, function ($response) {
-            $response->setContent(\Mockery::mock(View::class, [
-                'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
-            ]));
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
 
         $response->assertSeeInOrder(['foo', 'bar', 'baz']);
+
         $response->assertSeeInOrder(['foo', 'bar', 'baz', 'foo']);
+    }
+
+    public function testAssertSeeInOrderCanFail()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
 
         try {
             $response->assertSeeInOrder(['baz', 'bar', 'foo']);
-            TestCase::fail('Assertion was expected to fail.');
-        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        } catch (Exception $e) {
+            $this->assertTrue(true);
+
+            return;
         }
+
+        TestCase::fail('Assertion was expected to fail.');
+    }
+
+    public function testAssertSeeInOrderCanFail2()
+    {
+        $response = $this->makeMockResponse([
+            'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
+        ]);
 
         try {
             $response->assertSeeInOrder(['foo', 'qux', 'bar', 'baz']);
-            TestCase::fail('Assertion was expected to fail.');
-        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        } catch (Exception $e) {
+            $this->assertTrue(true);
+
+            return;
         }
+
+        TestCase::fail('Assertion was expected to fail.');
     }
 
     public function testAssertSeeText()
     {
-        $baseResponse = tap(new Response, function ($response) {
-            $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'foo<strong>bar</strong>',
-            ]));
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong>',
+        ]);
 
         $response->assertSeeText('foobar');
     }
 
     public function testAssertSeeTextInOrder()
     {
-        $baseResponse = tap(new Response, function ($response) {
-            $response->setContent(\Mockery::mock(View::class, [
-                'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
-            ]));
-        });
-
-        $response = TestResponse::fromBaseResponse($baseResponse);
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+        ]);
 
         $response->assertSeeTextInOrder(['foobar', 'baz']);
+
         $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
+    }
+
+    public function testAssertSeeTextInOrderCanFail()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+        ]);
 
         try {
             $response->assertSeeTextInOrder(['baz', 'foobar']);
-            TestCase::fail('Assertion was expected to fail.');
-        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        } catch (Exception $e) {
+            $this->assertTrue(true);
+
+            return;
         }
+
+        TestCase::fail('Assertion was expected to fail.');
+    }
+
+    public function testAssertSeeTextInOrderCanFail2()
+    {
+        $response = $this->makeMockResponse([
+            'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
+        ]);
 
         try {
             $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
-            TestCase::fail('Assertion was expected to fail.');
-        } catch (\PHPUnit\Framework\AssertionFailedError $e) {
+        } catch (Exception $e) {
+            $this->assertTrue(true);
+
+            return;
         }
+
+        TestCase::fail('Assertion was expected to fail.');
     }
 
     public function testAssertHeader()
@@ -117,11 +143,14 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertHeader('Location', '/bar');
-            $this->fail('No exception was thrown');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
             $this->assertEquals('/bar', $e->getComparisonFailure()->getExpected());
             $this->assertEquals('/foo', $e->getComparisonFailure()->getActual());
+
+            return;
         }
+
+        $this->fail('No exception was thrown');
     }
 
     /**
@@ -181,9 +210,11 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertJsonFragment(['id' => 1]);
-            $this->fail('Asserting id => 1, existing in JsonSerializableSingleResourceWithIntegersStub should fail');
         } catch (\PHPUnit\Framework\ExpectationFailedException $e) {
+            return;
         }
+
+        $this->fail('Asserting id => 1, existing in JsonSerializableSingleResourceWithIntegersStub should fail');
     }
 
     public function testAssertJsonStructure()
@@ -235,9 +266,11 @@ class FoundationTestResponseTest extends TestCase
 
         try {
             $response->assertJsonMissing(['id' => 20]);
-            $this->fail('No exception was thrown');
         } catch (Exception $e) {
+            return;
         }
+
+        $this->fail('No exception was thrown');
     }
 
     public function testAssertJsonMissingExact()
@@ -246,20 +279,38 @@ class FoundationTestResponseTest extends TestCase
 
         $response->assertJsonMissingExact(['id' => 2]);
 
+        // This is missing because bar has changed to baz
+        $response->assertJsonMissingExact(['id' => 20, 'foo' => 'baz']);
+    }
+
+    public function test_assert_json_missing_exact_can_fail()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonMissingExact(['id' => 2]);
+
         try {
             $response->assertJsonMissingExact(['id' => 20]);
-            $this->fail('No exception was thrown');
         } catch (Exception $e) {
+            return;
         }
+
+        $this->fail('No exception was thrown');
+    }
+
+    public function test_assert_json_missing_exact_can_fail_2()
+    {
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
+
+        $response->assertJsonMissingExact(['id' => 2]);
 
         try {
             $response->assertJsonMissingExact(['id' => 20, 'foo' => 'bar']);
-            $this->fail('No exception was thrown');
         } catch (Exception $e) {
+            return;
         }
 
-        // This is missing because bar has changed to baz
-        $response->assertJsonMissingExact(['id' => 20, 'foo' => 'baz']);
+        $this->fail('No exception was thrown');
     }
 
     public function testAssertJsonMissingValidationErrors()
@@ -274,18 +325,6 @@ class FoundationTestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
 
-        try {
-            $response->assertJsonMissingValidationErrors('foo');
-            $this->fail('No exception was thrown');
-        } catch (Exception $e) {
-        }
-
-        try {
-            $response->assertJsonMissingValidationErrors('bar');
-            $this->fail('No exception was thrown');
-        } catch (Exception $e) {
-        }
-
         $response->assertJsonMissingValidationErrors('baz');
 
         $baseResponse = tap(new Response, function ($response) {
@@ -294,6 +333,52 @@ class FoundationTestResponseTest extends TestCase
 
         $response = TestResponse::fromBaseResponse($baseResponse);
         $response->assertJsonMissingValidationErrors('foo');
+    }
+
+    public function testAssertJsonMissingValidationErrorsCanFail()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['errors' => [
+                    'foo' => [],
+                    'bar' => ['one', 'two'],
+                ]]
+            ));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertJsonMissingValidationErrors('foo');
+        } catch (Exception $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->fail('No exception was thrown');
+    }
+
+    public function testAssertJsonMissingValidationErrorsCanFail2()
+    {
+        $baseResponse = tap(new Response, function ($response) {
+            $response->setContent(json_encode(['errors' => [
+                    'foo' => [],
+                    'bar' => ['one', 'two'],
+                ]]
+            ));
+        });
+
+        $response = TestResponse::fromBaseResponse($baseResponse);
+
+        try {
+            $response->assertJsonMissingValidationErrors('bar');
+        } catch (Exception $e) {
+            $this->assertTrue(true);
+
+            return;
+        }
+
+        $this->fail('No exception was thrown');
     }
 
     public function testMacroable()
@@ -332,6 +417,15 @@ class FoundationTestResponseTest extends TestCase
             json_decode($response->getContent(), true),
             $response->json()
         );
+    }
+
+    private function makeMockResponse($content)
+    {
+        $baseResponse = tap(new Response, function ($response) use ($content) {
+            $response->setContent(\Mockery::mock(View::class, $content));
+        });
+
+        return TestResponse::fromBaseResponse($baseResponse);
     }
 }
 
