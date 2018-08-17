@@ -1617,6 +1617,9 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
 
+        $model->floatAttribute = 0;
+        $this->assertEquals(0, $model->floatAttribute);
+
         $model->floatAttribute = 'Infinity';
         $this->assertEquals(INF, $model->floatAttribute);
 

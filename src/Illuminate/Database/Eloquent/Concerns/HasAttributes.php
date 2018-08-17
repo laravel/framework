@@ -688,7 +688,7 @@ trait HasAttributes
      */
     public function fromFloat($value)
     {
-        switch ($value) {
+        switch ((string) $value) {
             case 'Infinity':
                 return INF;
             case '-Infinity':
