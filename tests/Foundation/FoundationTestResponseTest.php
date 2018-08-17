@@ -2,13 +2,12 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Exception;
 use JsonSerializable;
 use Illuminate\Http\Response;
-use PHPUnit\Framework\AssertionFailedError;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
+use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
