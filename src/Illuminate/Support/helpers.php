@@ -1139,6 +1139,18 @@ if (! function_exists('transform')) {
     }
 }
 
+if (! function_exists('uuid')) {
+    /**
+     * Get a UUID.
+     *
+     * @return mixed|null
+     */
+	function uuid()
+	{
+		return Str::uuid();
+	}
+}
+
 if (! function_exists('value')) {
     /**
      * Return the default value of the given value.
