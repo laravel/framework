@@ -64,7 +64,9 @@ class ClearCommand extends Command
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        $this->cache()->flush();
+        if (! $this->cache()->flush()) {
+            return $this->error('Failed to clear cache. Make sure you have appropriate rights.');
+        }
 
         $this->flushFacades();
 
