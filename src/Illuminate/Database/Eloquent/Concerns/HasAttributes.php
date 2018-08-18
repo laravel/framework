@@ -478,7 +478,7 @@ trait HasAttributes
             case 'real':
             case 'float':
             case 'double':
-                return $this->fromFloat($value);
+                return (float) $value;
             case 'string':
                 return (string) $value;
             case 'bool':
@@ -684,17 +684,6 @@ trait HasAttributes
         return json_encode($value);
     }
 
-    /**
-     * Decode the given float.
-     *
-     * @param  mixed  $value
-     * @return mixed
-     */
-    public function fromFloat($value)
-    {
-        return (float) $value;
-    }
-    
     /**
      * Decode the given float using postgreSql constants
      *
