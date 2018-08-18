@@ -1617,17 +1617,20 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
 
+        $model->floatAttribute = 0;
+        $this->assertSame(0.0, $model->floatAttribute);
+
         $model->floatAttribute = 'Infinity';
-        $this->assertEquals(INF, $model->floatAttribute);
+        $this->assertSame(INF, $model->floatAttribute);
 
         $model->floatAttribute = INF;
-        $this->assertEquals(INF, $model->floatAttribute);
+        $this->assertSame(INF, $model->floatAttribute);
 
         $model->floatAttribute = '-Infinity';
-        $this->assertEquals(-INF, $model->floatAttribute);
+        $this->assertSame(-INF, $model->floatAttribute);
 
         $model->floatAttribute = -INF;
-        $this->assertEquals(-INF, $model->floatAttribute);
+        $this->assertSame(-INF, $model->floatAttribute);
 
         $model->floatAttribute = 'NaN';
         $this->assertNan($model->floatAttribute);
