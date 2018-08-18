@@ -1,0 +1,5 @@
+@extends('ParentView')
+
+@section('ContentSection')
+
+@endsection
