@@ -40,7 +40,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        return __DIR__ . '/stubs/view.stub';
+        return __DIR__.'/stubs/view.stub';
     }
 
     /**
@@ -51,7 +51,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getPath($name)
     {
-        return $this->getViewPath() . '/' . $this->getFileName();
+        return $this->getViewPath().'/'.$this->getFileName();
     }
 
     /**
@@ -75,7 +75,7 @@ class ViewMakeCommand extends GeneratorCommand
      */
     protected function getFileName()
     {
-        return $this->getNameInput() . '.blade.php';
+        return $this->getNameInput().'.blade.php';
     }
 
     /**
