@@ -69,7 +69,7 @@ class ClearCommand extends Command
         $this->flushFacades();
 
         if (! $successful) {
-            return $this->error('Failed to clear cache. Make sure you have appropriate rights.');
+            return $this->error('Failed to clear cache. Make sure you have the appropriate permissions.');
         }
 
         $this->laravel['events']->fire(
