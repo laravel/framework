@@ -64,11 +64,13 @@ class ClearCommand extends Command
             'cache:clearing', [$this->argument('store'), $this->tags()]
         );
 
-        if (! $this->cache()->flush()) {
-            return $this->error('Failed to clear cache. Make sure you have appropriate rights.');
-        }
+        $successful = $this->cache()->flush();
 
         $this->flushFacades();
+
+        if (! $successful) {
+            return $this->error('Failed to clear cache. Make sure you have appropriate rights.');
+        }
 
         $this->laravel['events']->fire(
             'cache:cleared', [$this->argument('store'), $this->tags()]
