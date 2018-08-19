@@ -110,7 +110,9 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toArray($request)
     {
-        return $this->resource->toArray();
+        return is_array($this->resource)
+            ? $this->resource
+            : $this->resource->toArray();
     }
 
     /**

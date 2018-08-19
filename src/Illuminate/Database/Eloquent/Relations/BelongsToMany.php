@@ -796,7 +796,7 @@ class BelongsToMany extends Relation
     {
         $model->save(['touch' => false]);
 
-        $this->attach($model->getKey(), $pivotAttributes, $touch);
+        $this->attach($model, $pivotAttributes, $touch);
 
         return $model;
     }
@@ -836,7 +836,7 @@ class BelongsToMany extends Relation
         // accomplish this which will insert the record and any more attributes.
         $instance->save(['touch' => false]);
 
-        $this->attach($instance->getKey(), $joining, $touch);
+        $this->attach($instance, $joining, $touch);
 
         return $instance;
     }
