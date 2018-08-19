@@ -1633,7 +1633,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertSame(-INF, $model->postgreSqlfloatAttribute);
 
         $model->postgreSqlfloatAttribute = 'NaN';
-        $this->assertNan($model->floatAttribute);
+        $this->assertNan($model->postgreSqlfloatAttribute);
 
         $model->postgreSqlfloatAttribute = NAN;
         $this->assertNan($model->postgreSqlfloatAttribute);
