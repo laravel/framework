@@ -713,7 +713,7 @@ trait ValidatesAttributes
             $id = $this->getValue($matches[1]);
         }
 
-        if (strtolower($id) == 'null') {
+        if (strtolower($id) === 'null') {
             $id = null;
         }
 
@@ -955,7 +955,7 @@ trait ValidatesAttributes
                 }
             }
 
-            return count(array_diff($value, $parameters)) == 0;
+            return count(array_diff($value, $parameters)) === 0;
         }
 
         return ! is_array($value) && in_array((string) $value, $parameters);
@@ -1655,7 +1655,7 @@ trait ValidatesAttributes
      */
     protected function requireSameType($first, $second)
     {
-        if (gettype($first) != gettype($second)) {
+        if (gettype($first) !== gettype($second)) {
             throw new InvalidArgumentException('The values under comparison must be of the same type');
         }
     }

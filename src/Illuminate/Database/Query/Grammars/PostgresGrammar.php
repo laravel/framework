@@ -204,7 +204,7 @@ class PostgresGrammar extends Grammar
         // strip the leading boolean we will do so when using as the only where.
         $joinWheres = $this->compileUpdateJoinWheres($query);
 
-        if (trim($baseWheres) == '') {
+        if (trim($baseWheres) === '') {
             return 'where '.$this->removeLeadingBoolean($joinWheres);
         }
 

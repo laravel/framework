@@ -410,7 +410,7 @@ class FilesystemTest extends TestCase
             }
         }
 
-        while (pcntl_waitpid(0, $status) != -1) {
+        while (pcntl_waitpid(0, $status) !== -1) {
             $status = pcntl_wexitstatus($status);
             $result *= $status;
         }

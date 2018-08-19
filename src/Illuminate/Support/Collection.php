@@ -558,7 +558,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
                 return is_string($value) || (is_object($value) && method_exists($value, '__toString'));
             });
 
-            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) == 1) {
+            if (count($strings) < 2 && count(array_filter([$retrieved, $value], 'is_object')) === 1) {
                 return in_array($operator, ['!=', '<>', '!==']);
             }
 
