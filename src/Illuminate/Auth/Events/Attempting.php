@@ -19,15 +19,24 @@ class Attempting
     public $remember;
 
     /**
+     * The guard this attempt is made to.
+     *
+     * @var string
+     */
+    public $guard;
+
+    /**
      * Create a new event instance.
      *
      * @param  array  $credentials
      * @param  bool  $remember
+     * @param  string  $guard
      * @return void
      */
-    public function __construct($credentials, $remember)
+    public function __construct($credentials, $remember, $guard)
     {
         $this->remember = $remember;
         $this->credentials = $credentials;
+        $this->guard = $guard;
     }
 }

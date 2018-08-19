@@ -493,7 +493,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
         }
 
         if (isset($this->events)) {
-            $this->events->dispatch(new Events\Logout($user));
+            $this->events->dispatch(new Events\Logout($user, $this->name));
         }
 
         // Once we have fired the logout event we will clear the users out of memory
@@ -576,7 +576,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     {
         if (isset($this->events)) {
             $this->events->dispatch(new Events\Attempting(
-                $credentials, $remember
+                $credentials, $remember, $this->name
             ));
         }
     }
@@ -591,7 +591,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function fireLoginEvent($user, $remember = false)
     {
         if (isset($this->events)) {
-            $this->events->dispatch(new Events\Login($user, $remember));
+            $this->events->dispatch(new Events\Login(
+                $user, $remember, $this->name
+            ));
         }
     }
 
@@ -604,7 +606,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function fireAuthenticatedEvent($user)
     {
         if (isset($this->events)) {
-            $this->events->dispatch(new Events\Authenticated($user));
+            $this->events->dispatch(new Events\Authenticated(
+                $user, $this->name
+            ));
         }
     }
 
@@ -618,7 +622,9 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
     protected function fireFailedEvent($user, array $credentials)
     {
         if (isset($this->events)) {
-            $this->events->dispatch(new Events\Failed($user, $credentials));
+            $this->events->dispatch(new Events\Failed(
+                $user, $credentials, $this->name
+            ));
         }
     }
 

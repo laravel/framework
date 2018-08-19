@@ -23,15 +23,24 @@ class Login
     public $remember;
 
     /**
+     * The guard the user authenticated to.
+     *
+     * @var string
+     */
+    public $guard;
+
+    /**
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  bool  $remember
+     * @param  string  $guard
      * @return void
      */
-    public function __construct($user, $remember)
+    public function __construct($user, $remember, $guard)
     {
         $this->user = $user;
         $this->remember = $remember;
+        $this->guard = $guard;
     }
 }
