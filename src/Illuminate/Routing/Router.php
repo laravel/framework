@@ -108,7 +108,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * @var array
      */
     protected $groupStack = [];
-    
+
     /**
      * The attributes that are aliased.
      *
@@ -361,7 +361,7 @@ class Router implements RegistrarContract, BindingRegistrar
         foreach ($attributes as $attributeKey => $attributeValue) {
             $attributes[$this->getAttributeAlias($attributeKey, $attributeKey)] = $attributeValue;
         }
-        
+
         $this->updateGroupStack($attributes);
 
         // Once we have updated the group stack, we'll load the provided routes and
@@ -1083,9 +1083,9 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         return $this->currentRouteNamed(...$patterns);
     }
-    
+
     /**
-     * Get alias of an attribute if there is one, otherwise return the default
+     * Get alias of an attribute if there is one, otherwise return the default.
      *
      * @param  string  $key
      * @param  string  $default
