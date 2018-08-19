@@ -21,7 +21,7 @@ class Attempting
     /**
      * The guard this attempt is made to.
      *
-     * @var string
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
      */
     public $guard;
 
@@ -30,7 +30,7 @@ class Attempting
      *
      * @param  array  $credentials
      * @param  bool  $remember
-     * @param  string  $guard
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @return void
      */
     public function __construct($credentials, $remember, $guard)

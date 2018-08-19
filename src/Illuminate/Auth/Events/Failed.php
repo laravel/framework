@@ -21,7 +21,7 @@ class Failed
     /**
      * The guard the user failed to authenticated to.
      *
-     * @var string
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
      */
     public $guard;
 
@@ -30,7 +30,7 @@ class Failed
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $credentials
-     * @param  string  $guard
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @return void
      */
     public function __construct($user, $credentials, $guard)

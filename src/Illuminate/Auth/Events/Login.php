@@ -25,7 +25,7 @@ class Login
     /**
      * The guard the user authenticated to.
      *
-     * @var string
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
      */
     public $guard;
 
@@ -34,7 +34,7 @@ class Login
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  bool  $remember
-     * @param  string  $guard
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @return void
      */
     public function __construct($user, $remember, $guard)

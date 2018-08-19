@@ -18,7 +18,7 @@ class Authenticated
     /**
      * The guard the user is authenticating to.
      *
-     * @var string
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
      */
     public $guard;
 
@@ -26,7 +26,7 @@ class Authenticated
      * Create a new event instance.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $guard
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @return void
      */
     public function __construct($user, $guard)
