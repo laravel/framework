@@ -174,6 +174,24 @@ abstract class Job
     }
 
     /**
+     * Get the delay for retrying a job.
+     *
+     * @return int
+     */
+    public function retryDelay()
+    {
+        $payload = $this->payload();
+
+        list($class, $method) = JobName::parse($payload['job']);
+
+        if (method_exists($this->instance = $this->resolve($class), 'retryDelay')) {
+            return $this->instance->retryDelay($this, $payload['data']);
+        }
+
+        return 0;
+    }
+
+    /**
      * Resolve the given class.
      *
      * @param  string  $class

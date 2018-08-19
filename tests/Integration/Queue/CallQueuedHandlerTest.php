@@ -80,6 +80,74 @@ class CallQueuedHandlerTest extends TestCase
 
         Event::assertNotDispatched(JobFailed::class);
     }
+
+    public function test_job_with_retry_delay_returns_delay()
+    {
+        CallQueuedHandlerTestJob::$handled = false;
+
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+
+        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('attempts')->andReturn(1);
+
+        $retryDelay = $instance->retryDelay($job, [
+            'command' => serialize(new CallQueuedHandlerTestJob),
+        ]);
+
+        $this->assertEquals(CallQueuedHandlerTestJob::$retryDelay, $retryDelay);
+    }
+
+    public function test_retry_delay_can_interact_with_queue()
+    {
+        CallQueuedHandlerTestJob::$handled = false;
+
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+
+        $attempts = 2;
+        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('attempts')->andReturn($attempts);
+
+        $retryDelay = $instance->retryDelay($job, [
+            'command' => serialize(new CallQueuedHandlerTestJob),
+        ]);
+
+        $expectedDelay = $attempts * CallQueuedHandlerTestJob::$retryDelay;
+        $this->assertEquals($expectedDelay, $retryDelay);
+    }
+
+    public function test_job_with_no_retry_delay_returns_default()
+    {
+        CallQueuedHandlerTestJob::$handled = false;
+
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+
+        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+
+        $retryDelay = $instance->retryDelay($job, [
+            'command' => serialize(new CallQueuedHandlerNoRetryJob),
+        ]);
+
+        $this->assertEquals(0, $retryDelay);
+    }
+
+    public function test_job_when_model_not_found_exception_is_thrown_retry_delay_returns_default()
+    {
+        $instance = new \Illuminate\Queue\CallQueuedHandler(new \Illuminate\Bus\Dispatcher(app()));
+
+        $job = Mockery::mock('Illuminate\Contracts\Queue\Job');
+        $job->shouldReceive('getConnectionName')->andReturn('connection');
+        $job->shouldReceive('resolveName')->andReturn(__CLASS__);
+        $job->shouldReceive('markAsFailed')->once();
+        $job->shouldReceive('isDeleted')->andReturn(false);
+        $job->shouldReceive('delete')->once();
+        $job->shouldReceive('failed')->once();
+
+        $retryDelay = $instance->retryDelay($job, [
+            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+        ]);
+
+        $this->assertEquals(0, $retryDelay);
+    }
 }
 
 class CallQueuedHandlerTestJob
@@ -87,10 +155,26 @@ class CallQueuedHandlerTestJob
     use \Illuminate\Queue\InteractsWithQueue;
 
     public static $handled = false;
+    public static $retryDelay = 10;
 
     public function handle()
     {
         static::$handled = true;
+    }
+
+    public function retryDelay()
+    {
+        return $this->attempts() * static::$retryDelay;
+    }
+}
+
+class CallQueuedHandlerNoRetryJob
+{
+    use \Illuminate\Queue\InteractsWithQueue;
+
+    public function handle()
+    {
+        //
     }
 }
 

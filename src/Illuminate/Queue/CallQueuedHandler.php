@@ -149,4 +149,30 @@ class CallQueuedHandler
             $command->failed($e);
         }
     }
+
+    /**
+     * Call the retryDelay method on the job instance.
+     *
+     * @param  \Illuminate\Contracts\Queue\Job  $job
+     * @param  array  $data
+     * @return int
+     */
+    public function retryDelay(Job $job, array $data)
+    {
+        try {
+            $command = $this->setJobInstanceIfNecessary(
+                $job, unserialize($data['command'])
+            );
+        } catch (ModelNotFoundException $e) {
+            $this->handleModelNotFound($job, $e);
+
+            return 0;
+        }
+
+        if (method_exists($command, 'retryDelay')) {
+            return $command->retryDelay();
+        }
+
+        return 0;
+    }
 }

@@ -93,12 +93,35 @@ class QueueWorkerTest extends TestCase
             throw $e;
         });
 
+        $retryDelay = $job->retryDelay();
+
         $worker = $this->getWorker('default', ['queue' => [$job]]);
         $worker->runNextJob('default', 'queue', $this->workerOptions(['delay' => 10]));
 
-        $this->assertEquals(10, $job->releaseAfter);
+        $this->assertEquals($retryDelay, $job->releaseAfter);
         $this->assertFalse($job->deleted);
         $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
+        $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
+    }
+
+    public function test_job_retry_delay_exception_releases_immediately()
+    {
+        $e = new RuntimeException;
+        $retryException = new \Exception('retry Exception');
+
+        $job = new WorkerFakeJob(function () use ($e) {
+            throw $e;
+        });
+        $job->setRetryException($retryException);
+
+        $worker = $this->getWorker('default', ['queue' => [$job]]);
+        $worker->runNextJob('default', 'queue', new WorkerOptions);
+
+        $this->assertEquals(0, $job->releaseAfter);
+        $this->assertFalse($job->deleted);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($e);
+        $this->exceptionHandler->shouldHaveReceived('report')->with($retryException);
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobExceptionOccurred::class))->once();
         $this->events->shouldNotHaveReceived('dispatch', [Mockery::type(JobProcessed::class)]);
     }
@@ -322,6 +345,7 @@ class WorkerFakeJob
     public $failedWith;
     public $failed = false;
     public $connectionName;
+    public $retryException;
 
     public function __construct($callback = null)
     {
@@ -389,6 +413,15 @@ class WorkerFakeJob
         $this->failedWith = $e;
     }
 
+    public function retryDelay()
+    {
+        if (isset($this->retryException)) {
+            throw $this->retryException;
+        }
+
+        return 5;
+    }
+
     public function hasFailed()
     {
         return $this->failed;
@@ -402,5 +435,10 @@ class WorkerFakeJob
     public function setConnectionName($name)
     {
         $this->connectionName = $name;
+    }
+
+    public function setRetryException($e)
+    {
+        $this->retryException = $e;
     }
 }
