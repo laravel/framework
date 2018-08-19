@@ -478,7 +478,7 @@ trait HasAttributes
             case 'real':
             case 'float':
             case 'double':
-                return $this->fromFloat($value);
+                return (float) $value;
             case 'string':
                 return (string) $value;
             case 'bool':
@@ -498,6 +498,10 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
+            case 'postgresql_real':
+            case 'postgresql_float':
+            case 'postgresql_double':
+                return $this->postgreSqlfromFloat($value);
             default:
                 return $value;
         }
@@ -681,12 +685,12 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given float.
+     * Decode the given float value using postgreSql constants.
      *
      * @param  mixed  $value
      * @return mixed
      */
-    public function fromFloat($value)
+    public function postgreSqlfromFloat($value)
     {
         switch ((string) $value) {
             case 'Infinity':

@@ -1617,26 +1617,26 @@ class DatabaseEloquentModelTest extends TestCase
     {
         $model = new EloquentModelCastingStub;
 
-        $model->floatAttribute = 0;
-        $this->assertSame(0.0, $model->floatAttribute);
+        $model->postgreSqlfloatAttribute = 0;
+        $this->assertSame(0.0, $model->postgreSqlfloatAttribute);
 
-        $model->floatAttribute = 'Infinity';
-        $this->assertSame(INF, $model->floatAttribute);
+        $model->postgreSqlfloatAttribute = 'Infinity';
+        $this->assertSame(INF, $model->postgreSqlfloatAttribute);
 
-        $model->floatAttribute = INF;
-        $this->assertSame(INF, $model->floatAttribute);
+        $model->postgreSqlfloatAttribute = INF;
+        $this->assertSame(INF, $model->postgreSqlfloatAttribute);
 
-        $model->floatAttribute = '-Infinity';
-        $this->assertSame(-INF, $model->floatAttribute);
+        $model->postgreSqlfloatAttribute = '-Infinity';
+        $this->assertSame(-INF, $model->postgreSqlfloatAttribute);
 
-        $model->floatAttribute = -INF;
-        $this->assertSame(-INF, $model->floatAttribute);
+        $model->postgreSqlfloatAttribute = -INF;
+        $this->assertSame(-INF, $model->postgreSqlfloatAttribute);
 
-        $model->floatAttribute = 'NaN';
-        $this->assertNan($model->floatAttribute);
+        $model->postgreSqlfloatAttribute = 'NaN';
+        $this->assertNan($model->postgreSqlfloatAttribute);
 
-        $model->floatAttribute = NAN;
-        $this->assertNan($model->floatAttribute);
+        $model->postgreSqlfloatAttribute = NAN;
+        $this->assertNan($model->postgreSqlfloatAttribute);
     }
 
     public function testUpdatingNonExistentModelFails()
@@ -2121,6 +2121,7 @@ class EloquentModelCastingStub extends Model
         'dateAttribute' => 'date',
         'datetimeAttribute' => 'datetime',
         'timestampAttribute' => 'timestamp',
+        'postgreSqlfloatAttribute' => 'postgresql_float',
     ];
 
     public function jsonAttributeValue()
