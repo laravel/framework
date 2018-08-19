@@ -685,7 +685,7 @@ trait HasAttributes
     }
 
     /**
-     * Decode the given float using postgreSql constants
+     * Decode the given float using postgreSql constants.
      *
      * @param  mixed  $value
      * @return mixed
