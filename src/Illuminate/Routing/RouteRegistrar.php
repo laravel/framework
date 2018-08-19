@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Closure;
 use BadMethodCallException;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 /**
@@ -92,7 +91,7 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
-        $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
+        $this->attributes[$this->router->getAttributeAlias($key, $key)] = $value;
 
         return $this;
     }
