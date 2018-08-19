@@ -498,9 +498,9 @@ trait HasAttributes
                 return $this->asDateTime($value);
             case 'timestamp':
                 return $this->asTimestamp($value);
-            case 'PostgreSQL_real':
-            case 'PostgreSQL_float':
-            case 'PostgreSQL_double':
+            case 'postgresql_real':
+            case 'postgresql_float':
+            case 'postgresql_double':
                 return $this->postgreSqlfromFloat($value);
             default:
                 return $value;
