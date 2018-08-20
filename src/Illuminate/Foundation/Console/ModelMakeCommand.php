@@ -84,6 +84,10 @@ class ModelMakeCommand extends GeneratorCommand
     {
         $table = Str::plural(Str::snake(class_basename($this->argument('name'))));
 
+        if ($this->option('pivot')) {
+            $table = Str::singular($table);
+        }
+
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
             '--create' => $table,
