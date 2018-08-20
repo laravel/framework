@@ -57,15 +57,6 @@ class RouteRegistrar
     ];
 
     /**
-     * The attributes that are aliased.
-     *
-     * @var array
-     */
-    protected $aliases = [
-        'name' => 'as',
-    ];
-
-    /**
      * Create a new route registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
