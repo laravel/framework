@@ -187,11 +187,7 @@ trait ManagesTransactions
         // level that was passed into this method so it will be right from here out.
         try {
             $this->performRollBack($toLevel);
-        }
-
-        // If we catch an exception caused by lost connection, we'll set the current
-        // transaction level to zero. We will throw the exception back out.
-        catch (Exception $e) {
+        } catch (Exception $e) {
             $this->handleRollBackException($e);
         }
 
@@ -220,7 +216,7 @@ trait ManagesTransactions
     /**
      * Handle an exception from a rollback.
      *
-     * @param \Exception $e
+     * @param \Exception  $e
      *
      * @throws \Exception
      */
