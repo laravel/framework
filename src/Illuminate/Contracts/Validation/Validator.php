@@ -44,4 +44,11 @@ interface Validator extends MessageProvider
      * @return \Illuminate\Support\MessageBag
      */
     public function errors();
+
+    /**
+     * Run the validator's rules against its data.
+     *
+     * @return array
+     */
+    public function validate();
 }

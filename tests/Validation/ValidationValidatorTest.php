@@ -4020,6 +4020,32 @@ class ValidationValidatorTest extends TestCase
         $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
     }
 
+    public function testValidateReturnsValidatedDataNestedChildRules()
+    {
+        $post = ['nested' => ['foo' => 'bar', 'with' => 'extras', 'type' => 'admin']];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.foo' => 'required']);
+        $v->sometimes('nested.type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar']], $data);
+    }
+
+    public function testValidateReturnsValidatedDataNestedArrayRules()
+    {
+        $post = ['nested' => [['bar' => 'baz', 'with' => 'extras', 'type' => 'admin'], ['bar' => 'baz2', 'with' => 'extras', 'type' => 'admin']]];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.*.bar' => 'required']);
+        $v->sometimes('nested.*.type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
+    }
+
     protected function getTranslator()
     {
         return m::mock('Illuminate\Contracts\Translation\Translator');
