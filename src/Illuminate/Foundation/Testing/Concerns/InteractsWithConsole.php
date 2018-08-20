@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
-use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\PendingCommand;
 
 trait InteractsWithConsole
