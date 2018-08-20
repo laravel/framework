@@ -308,15 +308,12 @@ class Validator implements ValidatorContract
 
         $results = [];
 
-        $keys = array_keys($this->getRules());
-        $input = $this->getData();
+        $missingValue = Str::random(10);
 
-        $placeholder = new \stdClass();
+        foreach (array_keys($this->getRules()) as $key) {
+            $value = data_get($this->getData(), $key, $missingValue);
 
-        foreach ($keys as $key) {
-            $value = data_get($input, $key, $placeholder);
-
-            if ($value !== $placeholder) {
+            if ($value !== $missingValue) {
                 Arr::set($results, $key, $value);
             }
         }

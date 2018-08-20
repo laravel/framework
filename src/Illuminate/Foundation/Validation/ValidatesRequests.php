@@ -38,9 +38,9 @@ trait ValidatesRequests
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
     {
-        $validator = $this->getValidationFactory()->make($request->all(), $rules, $messages, $customAttributes);
-
-        return $validator->validate();
+        return $this->getValidationFactory()->make(
+            $request->all(), $rules, $messages, $customAttributes
+        )->validate();
     }
 
     /**
