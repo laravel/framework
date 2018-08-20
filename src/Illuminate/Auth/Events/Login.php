@@ -9,6 +9,13 @@ class Login
     use SerializesModels;
 
     /**
+     * The authentication guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    public $guard;
+
+    /**
      * The authenticated user.
      *
      * @var \Illuminate\Contracts\Auth\Authenticatable
@@ -23,24 +30,17 @@ class Login
     public $remember;
 
     /**
-     * The guard the user authenticated to.
-     *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
-     */
-    public $guard;
-
-    /**
      * Create a new event instance.
      *
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @param  bool  $remember
-     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @return void
      */
-    public function __construct($user, $remember, $guard)
+    public function __construct($guard, $user, $remember)
     {
         $this->user = $user;
-        $this->remember = $remember;
         $this->guard = $guard;
+        $this->remember = $remember;
     }
 }

@@ -5,6 +5,13 @@ namespace Illuminate\Auth\Events;
 class Attempting
 {
     /**
+     * The authentication guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    public $guard;
+
+    /**
      * The credentials for the user.
      *
      * @var array
@@ -19,24 +26,17 @@ class Attempting
     public $remember;
 
     /**
-     * The guard this attempt is made to.
-     *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
-     */
-    public $guard;
-
-    /**
      * Create a new event instance.
      *
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @param  array  $credentials
      * @param  bool  $remember
-     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @return void
      */
-    public function __construct($credentials, $remember, $guard)
+    public function __construct($guard, $credentials, $remember)
     {
+        $this->guard = $guard;
         $this->remember = $remember;
         $this->credentials = $credentials;
-        $this->guard = $guard;
     }
 }
