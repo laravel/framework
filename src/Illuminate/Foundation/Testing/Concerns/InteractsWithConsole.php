@@ -9,14 +9,14 @@ trait InteractsWithConsole
 {
     /**
      * The list of expected questions with their answers.
-     * 
+     *
      * @var array
      */
     public $expectedQuestions = [];
 
     /**
      * The list of expected outputs.
-     * 
+     *
      * @var array
      */
     public $expectedOutput = [];

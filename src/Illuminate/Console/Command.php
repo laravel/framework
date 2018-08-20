@@ -163,7 +163,7 @@ class Command extends SymfonyCommand
     public function run(InputInterface $input, OutputInterface $output)
     {
         return parent::run(
-            $this->input = $input, 
+            $this->input = $input,
             $this->output = $this->laravel->make(OutputStyle::class, ['input' => $input, 'output' => $output])
         );
     }
