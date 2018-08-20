@@ -82,6 +82,7 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
+        // Replaces the aliased attributes to their respective counterparts.
         $this->attributes[$this->router->getAttributeAlias($key, $key)] = $value;
 
         return $this;

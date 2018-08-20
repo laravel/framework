@@ -358,6 +358,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function group(array $attributes, $routes)
     {
+        // Replaces the aliased attributes to their respective counterparts.
         foreach ($attributes as $attributeKey => $attributeValue) {
             $attributes[$this->getAttributeAlias($attributeKey, $attributeKey)] = $attributeValue;
         }
