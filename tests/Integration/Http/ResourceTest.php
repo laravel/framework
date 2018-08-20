@@ -708,21 +708,60 @@ class ResourceTest extends TestCase
 
     public function test_the_resource_can_be_an_array()
     {
-        Route::get('/', function () {
-            return new JsonResource([
+        $this->assertJsonResourceResponse([
+            'user@example.com' => 'John',
+            'admin@example.com' => 'Hank',
+        ], [
+            'data' => [
                 'user@example.com' => 'John',
                 'admin@example.com' => 'Hank',
-            ]);
+            ],
+        ]);
+    }
+
+    public function test_it_strips_numeric_keys()
+    {
+        $this->assertJsonResourceResponse([
+            0 => 'John',
+            1 => 'Hank',
+        ], ['data' => ['John', 'Hank']]);
+
+        $this->assertJsonResourceResponse([
+            0 => 'John',
+            1 => 'Hank',
+            3 => 'Bill',
+        ], ['data' => ['John', 'Hank', 'Bill']]);
+
+        $this->assertJsonResourceResponse([
+            5 => 'John',
+            6 => 'Hank',
+        ], ['data' => ['John', 'Hank']]);
+    }
+
+    public function test_it_strips_all_keys_if_any_of_them_are_numeric()
+    {
+        $this->assertJsonResourceResponse([
+            '5' => 'John',
+            '6' => 'Hank',
+            'a' => 'Bill',
+        ], ['data' => ['John', 'Hank', 'Bill']]);
+
+        $this->assertJsonResourceResponse([
+            5 => 'John',
+            6 => 'Hank',
+            'a' => 'Bill',
+        ], ['data' => ['John', 'Hank', 'Bill']]);
+    }
+
+    private function assertJsonResourceResponse($data, $expectedJson)
+    {
+        Route::get('/', function () use ($data) {
+            return new JsonResource($data);
         });
 
         $this->withoutExceptionHandling()
             ->get('/', ['Accept' => 'application/json'])
             ->assertStatus(200)
-            ->assertJson([
-                'data' => [
-                    'user@example.com' => 'John',
-                    'admin@example.com' => 'Hank',
-                ],
-            ]);
+            ->assertExactJson($expectedJson);
     }
 }
