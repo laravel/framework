@@ -79,7 +79,7 @@ class ScheduleRunCommand extends Command
         }
 
         if (! $this->eventsRan) {
-            $this->info('No scheduled commands are ready to run.');
+            $this->info($this->runAt().' No scheduled commands are ready to run.');
         }
     }
 
@@ -94,7 +94,7 @@ class ScheduleRunCommand extends Command
         if ($this->schedule->serverShouldRun($event, $this->startedAt)) {
             $this->runEvent($event);
         } else {
-            $this->line('<info>Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
+            $this->line('<info>'.$this->runAt().' Skipping command (has already run on another server):</info> '.$event->getSummaryForDisplay());
         }
     }
 
@@ -106,10 +106,20 @@ class ScheduleRunCommand extends Command
      */
     protected function runEvent($event)
     {
-        $this->line('<info>Running scheduled command:</info> '.$event->getSummaryForDisplay());
+        $this->line('<info>'.$this->runAt().' Running scheduled command:</info> '.$event->getSummaryForDisplay());
 
         $event->run($this->laravel);
 
         $this->eventsRan = true;
+    }
+
+    /**
+     * Return string format for current date time.
+     *
+     * @return string
+     */
+    private function runAt(): string
+    {
+        return '['.Carbon::now()->format('Y-m-d H:i:s').']';
     }
 }
