@@ -1,6 +1,6 @@
 # Release Notes for 5.6.x
 
-## v5.6.34 (not-released)
+## v5.6.34 (2018-08-21)
 
 ### Changed
 - Wrap columns in whereRowValues ([#25179](https://github.com/laravel/framework/pull/25179))
@@ -8,7 +8,7 @@
 - When specifying events to be faked, other events should be normally dispatched ([#25185](https://github.com/laravel/framework/pull/25185))
 
 ### Fixed
-- Fix URL validation pattern ph PHP7.3 ([#25194](https://github.com/laravel/framework/pull/25194))
+- Fix URL validation pattern on PHP 7.3 ([#25194](https://github.com/laravel/framework/pull/25194))
 
 ## v5.6.32 & v5.6.33 (2018-08-09)
 
