@@ -230,6 +230,7 @@ trait QueriesRelationships
      * Add subselect queries to sum the relations.
      *
      * @param  mixed  $relations
+     * @param  string  $column
      * @return $this
      */
     public function withSum($relations, $column)
