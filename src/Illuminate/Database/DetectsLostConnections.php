@@ -29,6 +29,7 @@ trait DetectsLostConnections
             'Error writing data to the connection',
             'Resource deadlock avoided',
             'Transaction() on null',
+            'Name or service not known',
         ]);
     }
 }
