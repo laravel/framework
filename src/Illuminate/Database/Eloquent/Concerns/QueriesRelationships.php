@@ -232,7 +232,7 @@ trait QueriesRelationships
      * @param  mixed  $relations
      * @return $this
      */
-    public function withSum($relations,$column)
+    public function withSum($relations, $column)
     {
         if (empty($relations)) {
             return $this;
@@ -262,7 +262,7 @@ trait QueriesRelationships
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
             $query = $relation->getRelationExistenceSumQuery(
-                $relation->getRelated()->newQuery(), $this,$column
+                $relation->getRelated()->newQuery(), $this, $column
             );
 
             $query->callScope($constraints);
