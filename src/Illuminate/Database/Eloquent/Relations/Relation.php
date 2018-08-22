@@ -202,7 +202,7 @@ abstract class Relation
      * @param string $column for sum
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationExistenceSumQuery(Builder $query, Builder $parentQuery,$column)
+    public function getRelationExistenceSumQuery(Builder $query, Builder $parentQuery, $column)
     {
         return $this->getRelationExistenceQuery(
             $query, $parentQuery, new Expression("sum(`{$column}`)")
