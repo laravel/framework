@@ -495,7 +495,7 @@ class Dispatcher implements DispatcherContract
      */
     protected function createListenerAndJob($class, $method, $arguments)
     {
-        $listener = (new ReflectionClass($class))->newInstanceWithoutConstructor();
+        $listener = $this->container->make($class);
 
         return [$listener, $this->propagateListenerOptions(
             $listener, new CallQueuedListener($class, $method, $arguments)
