@@ -199,7 +199,7 @@ abstract class Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param string $column for sum
+     * @param  string  $column
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getRelationExistenceSumQuery(Builder $query, Builder $parentQuery, $column)
@@ -215,7 +215,7 @@ abstract class Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
-     * @param  array|mixed $columns
+     * @param  array|mixed  $columns
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function getRelationExistenceQuery(Builder $query, Builder $parentQuery, $columns = ['*'])
