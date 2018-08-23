@@ -2,8 +2,8 @@
 
 namespace Illuminate\Support;
 
-use Carbon\Factory;
 use DateInterval;
+use Carbon\Factory;
 use DateTimeInterface;
 
 trait InteractsWithTime

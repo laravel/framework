@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Support;
 
 use DateTime;
-use DateTimeInterface;
 use Carbon\Carbon;
+use DateTimeInterface;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon as BaseCarbon;
 

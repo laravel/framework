@@ -2,9 +2,9 @@
 
 namespace Illuminate\Cache;
 
-use Carbon\Factory;
 use Closure;
 use ArrayAccess;
+use Carbon\Factory;
 use DateTimeInterface;
 use BadMethodCallException;
 use Illuminate\Cache\Events\CacheHit;

@@ -5,8 +5,8 @@ namespace Illuminate\Tests\Cache;
 use DateTime;
 use DateInterval;
 use Mockery as m;
-use DateTimeImmutable;
 use Carbon\Carbon;
+use DateTimeImmutable;
 use PHPUnit\Framework\TestCase;
 
 class CacheRepositoryTest extends TestCase

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Queue;
 
-use Carbon\Factory;
 use Exception;
 use Throwable;
+use Carbon\Factory;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\DetectsLostConnections;
 use Illuminate\Contracts\Debug\ExceptionHandler;

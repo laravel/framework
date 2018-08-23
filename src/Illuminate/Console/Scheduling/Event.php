@@ -2,11 +2,11 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Carbon\Factory;
 use Closure;
+use Carbon\Carbon;
+use Carbon\Factory;
 use Cron\CronExpression;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Http\Exceptions;
 
+use Exception;
 use Carbon\Carbon;
 use Carbon\Factory;
-use Exception;
 use Symfony\Component\HttpKernel\Exception\ServiceUnavailableHttpException;
 
 class MaintenanceModeException extends ServiceUnavailableHttpException

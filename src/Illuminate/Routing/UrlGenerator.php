@@ -2,8 +2,8 @@
 
 namespace Illuminate\Routing;
 
-use Carbon\Factory;
 use Closure;
+use Carbon\Factory;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;

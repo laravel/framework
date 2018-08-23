@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session\Middleware;
 
-use Carbon\Factory;
 use Closure;
+use Carbon\Factory;
 use Illuminate\Http\Request;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;

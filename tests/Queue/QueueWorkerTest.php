@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery;
-use RuntimeException;
 use Carbon\Carbon;
+use RuntimeException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Queue\WorkerOptions;

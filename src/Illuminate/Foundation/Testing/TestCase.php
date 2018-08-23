@@ -2,9 +2,9 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Mockery;
 use Carbon\Carbon;
 use Carbon\CarbonImmutable;
-use Mockery;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Console\Application as Artisan;

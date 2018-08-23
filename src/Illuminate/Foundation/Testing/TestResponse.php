@@ -2,10 +2,10 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Carbon\Carbon;
-use Carbon\CarbonImmutable;
-use Carbon\Factory;
 use Closure;
+use Carbon\Carbon;
+use Carbon\Factory;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\View\View;

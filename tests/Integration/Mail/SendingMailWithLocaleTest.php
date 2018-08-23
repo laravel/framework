@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Integration\Mail;
 
 use Mockery;
-use Illuminate\Mail\Mailable;
 use Carbon\Carbon;
+use Illuminate\Mail\Mailable;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\View;

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Illuminate\Http\Request;
 use Carbon\Carbon;
+use Illuminate\Http\Request;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Route;
