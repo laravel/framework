@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Support\Carbon;
+use Carbon\Factory;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
@@ -242,7 +242,7 @@ class DatabaseQueue extends Queue implements QueueContract
      */
     protected function isReservedButExpired($query)
     {
-        $expiration = Carbon::now()->subSeconds($this->retryAfter)->getTimestamp();
+        $expiration = app(Factory::class)->now()->subSeconds($this->retryAfter)->getTimestamp();
 
         $query->orWhere(function ($query) use ($expiration) {
             $query->where('reserved_at', '<=', $expiration);

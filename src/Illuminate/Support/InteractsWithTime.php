@@ -3,11 +3,13 @@
 namespace Illuminate\Support;
 
 use DateInterval;
+use Carbon\Factory;
 use DateTimeInterface;
 
 trait InteractsWithTime
 {
     /**
+     * Get the number of seconds until the given DateTime.
      * Get the number of seconds until the given DateTime.
      *
      * @param  \DateTimeInterface|\DateInterval|int  $delay
@@ -34,7 +36,7 @@ trait InteractsWithTime
 
         return $delay instanceof DateTimeInterface
                             ? $delay->getTimestamp()
-                            : Carbon::now()->addSeconds($delay)->getTimestamp();
+                            : app(Factory::class)->now()->addSeconds($delay)->getTimestamp();
     }
 
     /**
@@ -46,7 +48,7 @@ trait InteractsWithTime
     protected function parseDateInterval($delay)
     {
         if ($delay instanceof DateInterval) {
-            $delay = Carbon::now()->add($delay);
+            $delay = app(Factory::class)->now()->add($delay);
         }
 
         return $delay;
@@ -59,6 +61,6 @@ trait InteractsWithTime
      */
     protected function currentTime()
     {
-        return Carbon::now()->getTimestamp();
+        return app(Factory::class)->now()->getTimestamp();
     }
 }

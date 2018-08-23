@@ -2,7 +2,7 @@
 
 namespace Illuminate\Auth\Notifications;
 
-use Illuminate\Support\Carbon;
+use Carbon\Factory;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Notifications\Notification;
@@ -59,7 +59,7 @@ class VerifyEmail extends Notification
     protected function verificationUrl($notifiable)
     {
         return URL::temporarySignedRoute(
-            'verification.verify', Carbon::now()->addMinutes(60), ['id' => $notifiable->getKey()]
+            'verification.verify', app(Factory::class)->now()->addMinutes(60), ['id' => $notifiable->getKey()]
         );
     }
 

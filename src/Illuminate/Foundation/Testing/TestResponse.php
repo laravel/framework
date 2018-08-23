@@ -3,9 +3,11 @@
 namespace Illuminate\Foundation\Testing;
 
 use Closure;
+use Carbon\Carbon;
+use Carbon\Factory;
+use Carbon\CarbonImmutable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\View\View;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
@@ -256,15 +258,18 @@ class TestResponse
      */
     public function assertCookieExpired($cookieName)
     {
+        $dateFactory = app(Factory::class);
+
         PHPUnit::assertNotNull(
             $cookie = $this->getCookie($cookieName),
             "Cookie [{$cookieName}] not present on response."
         );
 
-        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+        /** @var Carbon|CarbonImmutable $expiresAt */
+        $expiresAt = $dateFactory->createFromTimestamp($cookie->getExpiresTime());
 
         PHPUnit::assertTrue(
-            $expiresAt->lessThan(Carbon::now()),
+            $expiresAt->lessThan($dateFactory->now()),
             "Cookie [{$cookieName}] is not expired, it expires at [{$expiresAt}]."
         );
 
@@ -279,15 +284,18 @@ class TestResponse
      */
     public function assertCookieNotExpired($cookieName)
     {
+        $dateFactory = app(Factory::class);
+
         PHPUnit::assertNotNull(
             $cookie = $this->getCookie($cookieName),
             "Cookie [{$cookieName}] not present on response."
         );
 
-        $expiresAt = Carbon::createFromTimestamp($cookie->getExpiresTime());
+        /** @var Carbon|CarbonImmutable $expiresAt */
+        $expiresAt = $dateFactory->createFromTimestamp($cookie->getExpiresTime());
 
         PHPUnit::assertTrue(
-            $expiresAt->greaterThan(Carbon::now()),
+            $expiresAt->greaterThan($dateFactory->now()),
             "Cookie [{$cookieName}] is expired, it expired at [{$expiresAt}]."
         );
 

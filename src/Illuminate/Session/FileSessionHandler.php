@@ -2,8 +2,8 @@
 
 namespace Illuminate\Session;
 
+use Carbon\Factory;
 use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 
@@ -67,7 +67,7 @@ class FileSessionHandler implements SessionHandlerInterface
     public function read($sessionId)
     {
         if ($this->files->isFile($path = $this->path.'/'.$sessionId)) {
-            if ($this->files->lastModified($path) >= Carbon::now()->subMinutes($this->minutes)->getTimestamp()) {
+            if ($this->files->lastModified($path) >= app(Factory::class)->now()->subMinutes($this->minutes)->getTimestamp()) {
                 return $this->files->sharedGet($path);
             }
         }

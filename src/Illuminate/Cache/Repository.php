@@ -4,9 +4,9 @@ namespace Illuminate\Cache;
 
 use Closure;
 use ArrayAccess;
+use Carbon\Factory;
 use DateTimeInterface;
 use BadMethodCallException;
-use Illuminate\Support\Carbon;
 use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\Events\KeyWritten;
@@ -554,7 +554,8 @@ class Repository implements CacheContract, ArrayAccess
         $duration = $this->parseDateInterval($duration);
 
         if ($duration instanceof DateTimeInterface) {
-            $duration = Carbon::now()->diffInSeconds(Carbon::createFromTimestamp($duration->getTimestamp()), false) / 60;
+            $dateFactory = app(Factory::class);
+            $duration = $dateFactory->now()->diffInSeconds($dateFactory->createFromTimestamp($duration->getTimestamp()), false) / 60;
         }
 
         return (int) ($duration * 60) > 0 ? $duration : null;

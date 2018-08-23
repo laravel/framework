@@ -7,11 +7,11 @@ use Countable;
 use Exception;
 use Throwable;
 use DateTimeZone;
+use Carbon\Factory;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
@@ -240,7 +240,7 @@ trait ValidatesAttributes
     {
         try {
             if ($this->isTestingRelativeDateTime($value)) {
-                return new Carbon($value);
+                return app(Factory::class)->parse($value);
             }
 
             return new DateTime($value);
@@ -257,8 +257,10 @@ trait ValidatesAttributes
      */
     protected function isTestingRelativeDateTime($value)
     {
-        return Carbon::hasTestNow() && is_string($value) && (
-            $value === 'now' || Carbon::hasRelativeKeywords($value)
+        $dateFactory = app(Factory::class);
+
+        return $dateFactory->hasTestNow() && is_string($value) && (
+            $value === 'now' || $dateFactory->hasRelativeKeywords($value)
         );
     }
 

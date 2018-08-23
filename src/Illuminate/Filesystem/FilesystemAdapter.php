@@ -2,11 +2,11 @@
 
 namespace Illuminate\Filesystem;
 
+use Carbon\Factory;
 use RuntimeException;
 use Illuminate\Http\File;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Collection;
 use League\Flysystem\AdapterInterface;
@@ -548,7 +548,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
     public function getRackspaceTemporaryUrl($adapter, $path, $expiration, $options)
     {
         return $adapter->getContainer()->getObject($path)->getTemporaryUrl(
-            Carbon::now()->diffInSeconds($expiration),
+            app(Factory::class)->now()->diffInSeconds($expiration),
             $options['method'] ?? 'GET',
             $options['forcePublicUrl'] ?? true
         );

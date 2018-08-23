@@ -3,15 +3,15 @@
 namespace Illuminate\Tests\Support;
 
 use DateTime;
+use Carbon\Carbon;
 use DateTimeInterface;
-use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Carbon\Carbon as BaseCarbon;
 
 class SupportCarbonTest extends TestCase
 {
     /**
-     * @var \Illuminate\Support\Carbon
+     * @var \Carbon\Carbon
      */
     protected $now;
 
