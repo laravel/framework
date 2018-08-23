@@ -84,7 +84,7 @@ trait InteractsWithDatabase
      */
     public function seed($class = 'DatabaseSeeder')
     {
-        $this->artisan('db:seed', ['--class' => $class]);
+        $this->artisan('db:seed', ['--class' => $class, '--no-interaction' => true]);
 
         return $this;
     }
