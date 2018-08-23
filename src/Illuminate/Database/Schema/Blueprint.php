@@ -219,8 +219,7 @@ class Blueprint
                 $value = $column->{$attributeName};
 
                 $this->addCommand(
-                    $commandName,
-                    compact('value', 'column')
+                    $commandName, compact('value', 'column')
                 );
             }
         }
@@ -1228,8 +1227,7 @@ class Blueprint
         $index = $index ?: $this->createIndexName($type, $columns);
 
         return $this->addCommand(
-            $type,
-            compact('index', 'columns', 'algorithm')
+            $type, compact('index', 'columns', 'algorithm')
         );
     }
 
