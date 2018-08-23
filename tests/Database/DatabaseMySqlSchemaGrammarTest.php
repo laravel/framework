@@ -269,6 +269,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
         $this->assertEquals('alter table `photos` drop `imageable_type`, drop `imageable_id`', $statements[1]);
     }
 
+    public function testDropMorphsUnique()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->dropMorphsUnique('profile');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `users` drop index `users_profile_type_profile_id_unique`', $statements[0]);
+        $this->assertEquals('alter table `users` drop `profile_type`, drop `profile_id`', $statements[1]);
+    }
+
     public function testRenameTable()
     {
         $blueprint = new Blueprint('users');
@@ -932,6 +943,17 @@ class DatabaseMySqlSchemaGrammarTest extends TestCase
 
         $this->assertEquals(1, count($statements));
         $this->assertEquals("alter table `users` add `foo` varchar(255) not null comment 'Escape \\' when using words like it\\'s'", $statements[0]);
+    }
+
+    public function testAddingMorphsUnique()
+    {
+        $blueprint = new Blueprint('users');
+        $blueprint->morphsUnique('profile');
+        $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
+
+        $this->assertCount(2, $statements);
+        $this->assertEquals('alter table `users` add `profile_type` varchar(255) not null, add `profile_id` bigint unsigned not null', $statements[0]);
+        $this->assertEquals('alter table `users` add unique `users_profile_type_profile_id_unique`(`profile_type`, `profile_id`)', $statements[1]);
     }
 
     public function testDropAllTables()
