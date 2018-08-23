@@ -2,7 +2,7 @@
 
 namespace Illuminate\Queue\Failed;
 
-use Illuminate\Support\Carbon;
+use Carbon\Factory;
 use Illuminate\Database\ConnectionResolverInterface;
 
 class DatabaseFailedJobProvider implements FailedJobProviderInterface
@@ -54,7 +54,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      */
     public function log($connection, $queue, $payload, $exception)
     {
-        $failed_at = Carbon::now();
+        $failed_at = app(Factory::class)->now();
 
         $exception = (string) $exception;
 

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Auth\Passwords;
 
+use Carbon\Factory;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
@@ -107,7 +107,11 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function getPayload($email, $token)
     {
-        return ['email' => $email, 'token' => $this->hasher->make($token), 'created_at' => new Carbon];
+        return [
+            'email' => $email,
+            'token' => $this->hasher->make($token),
+            'created_at' => app(Factory::class)->now(),
+        ];
     }
 
     /**
@@ -136,7 +140,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     protected function tokenExpired($createdAt)
     {
-        return Carbon::parse($createdAt)->addSeconds($this->expires)->isPast();
+        return app(Factory::class)->parse($createdAt)->addSeconds($this->expires)->isPast();
     }
 
     /**
@@ -157,7 +161,7 @@ class DatabaseTokenRepository implements TokenRepositoryInterface
      */
     public function deleteExpired()
     {
-        $expiredAt = Carbon::now()->subSeconds($this->expires);
+        $expiredAt = app(Factory::class)->now()->subSeconds($this->expires);
 
         $this->getTable()->where('created_at', '<', $expiredAt)->delete();
     }

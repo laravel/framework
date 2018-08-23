@@ -1,7 +1,7 @@
 <?php
 
+use Carbon\Factory;
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
@@ -619,11 +619,11 @@ if (! function_exists('now')) {
      * Create a new Carbon instance for the current time.
      *
      * @param  \DateTimeZone|string|null $tz
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\CarbonInterface
      */
     function now($tz = null)
     {
-        return Carbon::now($tz);
+        return app(Factory::class)->now($tz);
     }
 }
 
@@ -882,11 +882,11 @@ if (! function_exists('today')) {
      * Create a new Carbon instance for the current date.
      *
      * @param  \DateTimeZone|string|null $tz
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     function today($tz = null)
     {
-        return Carbon::today($tz);
+        return app(Factory::class)->today($tz);
     }
 }
 

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Support\Carbon;
+use Carbon\Factory;
 
 trait ManagesFrequencies
 {
@@ -53,9 +53,11 @@ trait ManagesFrequencies
     private function inTimeInterval($startTime, $endTime)
     {
         return function () use ($startTime, $endTime) {
-            return Carbon::now($this->timezone)->between(
-                Carbon::parse($startTime, $this->timezone),
-                Carbon::parse($endTime, $this->timezone),
+            $dateFactory = app(Factory::class);
+
+            return $dateFactory->now($this->timezone)->between(
+                $dateFactory->parse($startTime, $this->timezone),
+                $dateFactory->parse($endTime, $this->timezone),
                 true
             );
         };

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use Illuminate\Support\Carbon;
+use Carbon\Factory;
 
 trait HasTimestamps
 {
@@ -77,11 +77,11 @@ trait HasTimestamps
     /**
      * Get a fresh timestamp for the model.
      *
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     public function freshTimestamp()
     {
-        return new Carbon;
+        return app(Factory::class)->now();
     }
 
     /**

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Session;
 
+use Carbon\Factory;
 use Illuminate\Support\Arr;
 use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\InteractsWithTime;
@@ -114,7 +114,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     protected function expired($session)
     {
         return isset($session->last_activity) &&
-            $session->last_activity < Carbon::now()->subMinutes($this->minutes)->getTimestamp();
+            $session->last_activity < app(Factory::class)->now()->subMinutes($this->minutes)->getTimestamp();
     }
 
     /**

@@ -2,10 +2,12 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Carbon\Carbon;
+use Carbon\CarbonImmutable;
+use Carbon\Factory;
 use Closure;
 use Cron\CronExpression;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
@@ -295,7 +297,8 @@ class Event
      */
     protected function expressionPasses()
     {
-        $date = Carbon::now();
+        /** @var Carbon|CarbonImmutable $date */
+        $date = app(Factory::class)->now();
 
         if ($this->timezone) {
             $date->setTimezone($this->timezone);
@@ -687,11 +690,11 @@ class Event
      * @param  \DateTime|string  $currentTime
      * @param  int  $nth
      * @param  bool  $allowCurrentDate
-     * @return \Illuminate\Support\Carbon
+     * @return \Carbon\Carbon
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
-        return Carbon::instance(CronExpression::factory(
+        return app(Factory::class)->instance(CronExpression::factory(
             $this->getExpression()
         )->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
     }

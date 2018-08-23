@@ -2,12 +2,12 @@
 
 namespace Illuminate\Routing;
 
+use Carbon\Factory;
 use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -352,7 +352,7 @@ class UrlGenerator implements UrlGeneratorContract
         $signature = hash_hmac('sha256', $original, call_user_func($this->keyResolver));
 
         return  hash_equals($signature, $request->query('signature', '')) &&
-               ! ($expires && Carbon::now()->getTimestamp() > $expires);
+               ! ($expires && app(Factory::class)->now()->getTimestamp() > $expires);
     }
 
     /**

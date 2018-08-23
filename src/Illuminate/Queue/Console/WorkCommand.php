@@ -2,8 +2,8 @@
 
 namespace Illuminate\Queue\Console;
 
+use Carbon\Factory;
 use Illuminate\Queue\Worker;
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Contracts\Queue\Job;
 use Illuminate\Queue\WorkerOptions;
@@ -169,7 +169,7 @@ class WorkCommand extends Command
     {
         $this->output->writeln(sprintf(
             "<{$type}>[%s][%s] %s</{$type}> %s",
-            Carbon::now()->format('Y-m-d H:i:s'),
+            app(Factory::class)->now()->format('Y-m-d H:i:s'),
             $job->getJobId(),
             str_pad("{$status}:", 11), $job->resolveName()
         ));
