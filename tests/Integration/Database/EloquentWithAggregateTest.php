@@ -1,18 +1,42 @@
 <?php
 
-namespace Illuminate\Tests\Database;
+namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Tests\TestCase;
+use Illuminate\Support\Facades\Schema;
 
-class DatabaseEloquentWithAggregateTest extends TestCase
+
+class EloquentWithAggregateTest extends DatabaseTestCase
 {
     public function setUp()
     {
         parent::setUp();
-        $this->artisan('migrate');
-        $this->artisan('db:seed');
+
+        Schema::create('orders', function ($table) {
+            $table->increments('id');
+            $table->string('reference');
+            $table->timestamps();
+        });
+
+        Schema::create('product_orders', function ($table) {
+            $table->increments('id');
+            $table->string('name');
+            $table->integer('order_id')->unsigned();
+            $table->integer('qty');
+            $table->integer('price');
+        });
+
+        DB::table('orders')->insert([
+            'reference' => '12345678',
+        ]);
+
+        // products in orders
+        DB::table('product_orders')->insert([
+            ['name' =>'imac','qty'=>'1','price'=>'1500','order_id'=>1],
+            ['name' =>'galaxy s9','qty'=>'2','price'=>'1000','order_id'=>1],
+            ['name' =>'apple watch','qty'=>'3','price'=>'1200','order_id'=>1],
+        ]);
     }
 
     public function testWithCount()
@@ -60,14 +84,6 @@ class DatabaseEloquentWithAggregateTest extends TestCase
         $this->assertEquals($expected->products_count, $actual->products_count);
         $this->assertEquals($expected->order_products_count, $actual->order_products_count);
     }
-
-    public function tearDown()
-    {
-        $this->artisan('migrate:reset');
-        parent::tearDown();
-
-    }
-
 }
 
 class Orders extends Model
