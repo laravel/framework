@@ -103,5 +103,4 @@ class ProductOrders extends Model
     protected $fillable = [
         'name', 'qty', 'price',
     ];
-
 }
