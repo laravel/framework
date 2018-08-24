@@ -534,7 +534,7 @@ class ResourceTest extends TestCase
         $this->assertTrue($createdPost->is($response->getOriginalContent()));
     }
 
-    public function test_original_on_response_is_collection_of_model_when_collection_resource()
+    public function test_original_on_response_is_paginated_collection_of_model_when_collection_resource()
     {
         $createdPosts = collect([
             new Post(['id' => 5, 'title' => 'Test Title']),
@@ -542,6 +542,23 @@ class ResourceTest extends TestCase
         ]);
         Route::get('/', function () use ($createdPosts) {
             return new EmptyPostCollectionResource(new LengthAwarePaginator($createdPosts, 10, 15, 1));
+        });
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+        $createdPosts->each(function ($post) use ($response) {
+            $this->assertTrue($response->getOriginalContent()->contains($post));
+        });
+    }
+
+    public function test_original_on_response_is_collection_of_model_when_collection_resource()
+    {
+        $createdPosts = collect([
+            new Post(['id' => 5, 'title' => 'Test Title']),
+            new Post(['id' => 6, 'title' => 'Test Title 2']),
+        ]);
+        Route::get('/', function () use ($createdPosts) {
+            return new EmptyPostCollectionResource($createdPosts);
         });
         $response = $this->withoutExceptionHandling()->get(
             '/', ['Accept' => 'application/json']

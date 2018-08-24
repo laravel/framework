@@ -44,6 +44,10 @@ class ResourceResponse implements Responsable
         ), function ($response) use ($request) {
             $response->original = $this->resource->resource;
 
+            if ($response->original instanceof Collection) {
+                $response->original = $response->original->pluck('resource');
+            }
+
             $this->resource->withResponse($request, $response);
         });
     }
