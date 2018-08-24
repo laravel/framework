@@ -3,11 +3,11 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
+use DateTime;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
@@ -1071,8 +1071,8 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof Carbon) {
-            $value = $value->toDateString();
+        if ($value instanceof DateTime) {
+            $value = $value->format('Y-m-d');
         }
 
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
@@ -1110,8 +1110,8 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof Carbon) {
-            $value = $value->toTimeString();
+        if ($value instanceof DateTime) {
+            $value = $value->format('H:i:s');
         }
 
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
@@ -1149,7 +1149,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof Carbon) {
+        if ($value instanceof DateTime) {
             $value = $value->format('d');
         }
 
@@ -1188,7 +1188,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof Carbon) {
+        if ($value instanceof DateTime) {
             $value = $value->format('m');
         }
 
@@ -1227,7 +1227,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof Carbon) {
+        if ($value instanceof DateTime) {
             $value = $value->format('Y');
         }
 
