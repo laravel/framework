@@ -7,9 +7,6 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
 use Illuminate\Contracts\Translation\Translator;
 
-/**
- * @group f
- */
 class ValidatesAttributesTest extends TestCase
 {
     /**
