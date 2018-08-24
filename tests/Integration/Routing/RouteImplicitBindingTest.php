@@ -57,7 +57,7 @@ class RouteImplicitBindingTest extends TestCase
             ->assertJsonFragment([
                 'id' => $this->user->id,
                 'email' => 'awesome@laravel.com',
-                'password' => 'vault'
+                'password' => 'vault',
             ]);
     }
 
@@ -88,7 +88,7 @@ class RouteImplicitBindingTest extends TestCase
             ->assertJsonFragment([
                 'id' => $this->user->id,
                 'email' => 'awesome@laravel.com',
-                'password' => 'vault'
+                'password' => 'vault',
             ]);
     }
 
