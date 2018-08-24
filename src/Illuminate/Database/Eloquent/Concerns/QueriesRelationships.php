@@ -177,7 +177,7 @@ trait QueriesRelationships
      */
     public function withCount($relations)
     {
-        return $this->witheAggregate($relations,'count','*');
+        return $this->withAggregate($relations, 'count', '*');
     }
     /**
      * Add subselect queries to sum the relations.
@@ -188,7 +188,7 @@ trait QueriesRelationships
      */
     public function withSum($relations, $column)
     {
-        return $this->witheAggregate($relations,'sum',$column);
+        return $this->withAggregate($relations, 'sum', $column);
     }
     /**
      * Add subselect queries to avg the relations.
@@ -197,9 +197,9 @@ trait QueriesRelationships
      * @param string $column
      * @return $this
      */
-    public function withAvg($relations,$column)
+    public function withAvg($relations, $column)
     {
-        return $this->witheAggregate($relations,'avg',$column);
+        return $this->withAggregate($relations, 'avg', $column);
     }
 
     /**
@@ -209,9 +209,9 @@ trait QueriesRelationships
      * @param string $column
      * @return $this
      */
-    public function withMax($relations,$column)
+    public function withMax($relations, $column)
     {
-        return $this->witheAggregate($relations,'max',$column);
+        return $this->withAggregate($relations, 'max', $column);
     }
     /**
      * Add subselect queries to min the relations.
@@ -220,9 +220,9 @@ trait QueriesRelationships
      * @param string $column
      * @return $this
      */
-    public function withMin($relations,$column)
+    public function withMin($relations, $column)
     {
-        return $this->witheAggregate($relations,'min',$column);
+        return $this->withAggregate($relations, 'min', $column);
     }
     /**
      * Add subselect queries to aggregate the relations.
@@ -232,7 +232,7 @@ trait QueriesRelationships
      * @param  string  $column
      * @return $this
      */
-    public function witheAggregate($relations, $aggregate, $column)
+    public function withAggregate($relations, $aggregate, $column)
     {
         if (empty($relations)) {
             return $this;

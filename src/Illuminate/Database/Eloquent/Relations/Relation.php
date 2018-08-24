@@ -209,6 +209,7 @@ abstract class Relation
             $query, $parentQuery, new Expression($aggregate."({$column})")
         )->setBindings([], 'select');
     }
+
     /**
      * Add the constraints for an internal relationship existence query.
      *

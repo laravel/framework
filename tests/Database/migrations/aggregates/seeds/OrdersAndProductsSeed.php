@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Database\Seeder;
-use \Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\DB;
+
 class OrdersAndProductsSeed extends Seeder
 {
     /**
@@ -18,9 +19,9 @@ class OrdersAndProductsSeed extends Seeder
 
         // products in orders
         DB::table('product_orders')->insert([
-            ['name' =>'imac','qty'=>'1','price'=>'1500','order_id'=>1],
-            ['name' =>'galaxy s9','qty'=>'2','price'=>'1000','order_id'=>1],
-            ['name' =>'apple watch','qty'=>'3','price'=>'1200','order_id'=>1],
+            ['name' =>'imac', 'qty'=>'1','price'=>'1500', 'order_id'=>1],
+            ['name' => 'galaxy s9', 'qty'=>'2', 'price'=>'1000', 'order_id'=>1],
+            ['name' => 'apple watch',' qty'=>'3', 'price'=>'1200', 'order_id'=>1],
         ]);
 
     }
