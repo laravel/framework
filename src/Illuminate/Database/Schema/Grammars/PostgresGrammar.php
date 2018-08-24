@@ -729,7 +729,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeGeometry(Fluent $column)
     {
-        throw new RuntimeException('The database driver in use does not support the Geometry spatial column type.');
+        return $this->formatPostGisType('geometry');
     }
 
     /**
