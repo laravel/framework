@@ -7,6 +7,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
@@ -1070,6 +1071,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof Carbon) {
+            $value = $value->toDateString();
+        }
+
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
 
@@ -1104,6 +1109,10 @@ class Builder
         list($value, $operator) = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof Carbon) {
+            $value = $value->toTimeString();
+        }
 
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
@@ -1140,6 +1149,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof Carbon) {
+            $value = $value->format('d');
+        }
+
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
 
@@ -1175,6 +1188,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof Carbon) {
+            $value = $value->format('m');
+        }
+
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
 
@@ -1209,6 +1226,10 @@ class Builder
         list($value, $operator) = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
+
+        if ($value instanceof Carbon) {
+            $value = $value->format('Y');
+        }
 
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
     }
