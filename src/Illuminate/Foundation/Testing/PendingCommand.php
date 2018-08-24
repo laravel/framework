@@ -94,14 +94,14 @@ class PendingCommand
     }
 
     /**
-     * Assert that the response has the given status code.
+     * Assert that the command has the given exit code.
      *
-     * @param  int  $status
+     * @param  int  $exitCode
      * @return $this
      */
-    public function expectsExitCode($status)
+    public function assertExitCode($exitCode)
     {
-        $this->expectedExitCode = $status;
+        $this->expectedExitCode = $exitCode;
 
         return $this;
     }
