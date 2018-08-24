@@ -3,11 +3,12 @@
 namespace Illuminate\Foundation\Testing;
 
 use Mockery;
+use Illuminate\Support\Str;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
-use PHPUnit\Framework\TestCase as PHPUnit;
 use Mockery\Exception\BadMethodCallException;
 use Symfony\Component\Console\Input\ArrayInput;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Mockery\Exception\NoMatchingExpectationException;
 
@@ -25,28 +26,28 @@ class PendingCommand
      *
      * @var \Illuminate\Foundation\Application
      */
-    private $app;
+    protected $app;
 
     /**
      * The command to run.
      *
      * @var string
      */
-    private $command;
+    protected $command;
 
     /**
      * The parameters to pass to the command.
      *
      * @var array
      */
-    private $parameters;
+    protected $parameters;
 
     /**
      * The expected exit code.
      *
      * @var int
      */
-    private $expectedExitCode;
+    protected $expectedExitCode;
 
     /**
      * Create a new pending console command run.
@@ -57,10 +58,10 @@ class PendingCommand
      * @param  array  $parameters
      * @return void
      */
-    public function __construct(PHPUnit $test, $app, $command, $parameters)
+    public function __construct(PHPUnitTestCase $test, $app, $command, $parameters)
     {
-        $this->test = $test;
         $this->app = $app;
+        $this->test = $test;
         $this->command = $command;
         $this->parameters = $parameters;
     }
@@ -80,7 +81,7 @@ class PendingCommand
     }
 
     /**
-     * Specify an output that should be printed when the command runs.
+     * Specify output that should be printed when the command runs.
      *
      * @param  string  $output
      * @return $this
@@ -98,7 +99,7 @@ class PendingCommand
      * @param  int  $status
      * @return $this
      */
-    public function assertStatus($status)
+    public function expectsExitCode($status)
     {
         $this->expectedExitCode = $status;
 
@@ -110,7 +111,7 @@ class PendingCommand
      *
      * @return void
      */
-    private function mockTheConsoleOutput()
+    protected function mockConsoleOutput()
     {
         $mock = Mockery::mock(OutputStyle::class.'[askQuestion]', [
             (new ArrayInput($this->parameters)), $this->createABufferedOutputMock(),
@@ -166,17 +167,17 @@ class PendingCommand
      */
     public function __destruct()
     {
-        $this->mockTheConsoleOutput();
+        $this->mockConsoleOutput();
 
         try {
             $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters);
         } catch (NoMatchingExpectationException $e) {
             if ($e->getMethodName() == 'askQuestion') {
-                $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked!');
+                $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
             }
         } catch (BadMethodCallException $e) {
-            if (str_contains($e->getMessage(), 'askQuestion')) {
-                $this->test->fail('An an expected question was asked while running the command.');
+            if (Str::contains($e->getMessage(), 'askQuestion')) {
+                $this->test->fail('An expected question was asked while running the command.');
             }
         }
 

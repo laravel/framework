@@ -162,9 +162,12 @@ class Command extends SymfonyCommand
      */
     public function run(InputInterface $input, OutputInterface $output)
     {
+        $this->output = $this->laravel->make(
+            OutputStyle::class, ['input' => $input, 'output' => $output]
+        );
+
         return parent::run(
-            $this->input = $input,
-            $this->output = $this->laravel->make(OutputStyle::class, ['input' => $input, 'output' => $output])
+            $this->input = $input, $this->output
         );
     }
 

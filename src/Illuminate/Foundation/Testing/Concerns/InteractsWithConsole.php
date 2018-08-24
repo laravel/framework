@@ -7,18 +7,18 @@ use Illuminate\Foundation\Testing\PendingCommand;
 trait InteractsWithConsole
 {
     /**
-     * The list of expected questions with their answers.
-     *
-     * @var array
-     */
-    public $expectedQuestions = [];
-
-    /**
-     * The list of expected outputs.
+     * All of the expected output lines.
      *
      * @var array
      */
     public $expectedOutput = [];
+
+    /**
+     * All of the expected questions.
+     *
+     * @var array
+     */
+    public $expectedQuestions = [];
 
     /**
      * Call artisan command and return code.
@@ -31,11 +31,11 @@ trait InteractsWithConsole
     {
         $this->beforeApplicationDestroyed(function () {
             if (count($this->expectedQuestions)) {
-                $this->fail('Question "'.array_first($this->expectedQuestions)[0].'" was never asked!');
+                $this->fail('Question "'.array_first($this->expectedQuestions)[0].'" was not asked.');
             }
 
             if (count($this->expectedOutput)) {
-                $this->fail('Output "'.array_first($this->expectedOutput).'" was never printed!');
+                $this->fail('Output "'.array_first($this->expectedOutput).'" was not printed.');
             }
         });
 
