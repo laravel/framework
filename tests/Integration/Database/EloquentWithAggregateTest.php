@@ -68,7 +68,7 @@ class EloquentWithAggregateTest extends DatabaseTestCase
 
     public function testWithMaxWithAliasWithWhere()
     {
-        $actual = Orders::withMax(['products as higher_price'=>function($query) {
+        $actual = Orders::withMax(['products as higher_price'=>function ($query) {
             $query->where('qty', '>', 1);
         }], 'price')->first();
         $expected = DB::select(DB::raw('select (select max(price) from "product_orders" where "orders"."id" = "product_orders"."order_id" and "qty" > 1) as "higher_price" from "orders"'))[0];
