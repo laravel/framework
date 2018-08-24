@@ -768,43 +768,6 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['baz', 'qux', 'quuux'], $builder->getBindings());
     }
 
-    public function testWithSum()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-
-        $builder = $model->withSum('foo','foo_id');
-
-        $this->assertEquals('select `eloquent_builder_test_model_parent_stubs`.*, (select sum(`foo_id`) from `eloquent_builder_test_model_close_related_stubs` where `eloquent_builder_test_model_parent_stubs`.`foo_id` = `eloquent_builder_test_model_close_related_stubs`.`id`) as `foo_sum` from `eloquent_builder_test_model_parent_stubs`', $builder->toSql());
-    }
-
-    public function testWithSumAndSelect()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-
-        $builder = $model->select('id')->withSum('foo','foo_id');
-
-        $this->assertEquals('select `id`, (select sum(`foo_id`) from `eloquent_builder_test_model_close_related_stubs` where `eloquent_builder_test_model_parent_stubs`.`foo_id` = `eloquent_builder_test_model_close_related_stubs`.`id`) as `foo_sum` from `eloquent_builder_test_model_parent_stubs`', $builder->toSql());
-    }
-
-    public function testWithSumAndMergedWheres()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-
-        $builder = $model->select('id')->withSum(['activeFoo' => function ($q) {
-            $q->where('bam', '>', 'qux');
-        }],'foo_id');
-
-        $this->assertEquals('select `id`, (select sum(`foo_id`) from `eloquent_builder_test_model_close_related_stubs` where `eloquent_builder_test_model_parent_stubs`.`foo_id` = `eloquent_builder_test_model_close_related_stubs`.`id` and `bam` > ? and `active` = ?) as `active_foo_sum` from `eloquent_builder_test_model_parent_stubs`', $builder->toSql());
-        $this->assertEquals(['qux', true], $builder->getBindings());
-    }
-    public function testWithSumAndRename()
-    {
-        $model = new EloquentBuilderTestModelParentStub;
-
-        $builder = $model->withSum('foo as foo_bar','foo_id');
-
-        $this->assertEquals('select `eloquent_builder_test_model_parent_stubs`.*, (select sum(`foo_id`) from `eloquent_builder_test_model_close_related_stubs` where `eloquent_builder_test_model_parent_stubs`.`foo_id` = `eloquent_builder_test_model_close_related_stubs`.`id`) as `foo_bar` from `eloquent_builder_test_model_parent_stubs`', $builder->toSql());
-    }
     public function testHasNestedWithConstraints()
     {
         $model = new EloquentBuilderTestModelParentStub;
