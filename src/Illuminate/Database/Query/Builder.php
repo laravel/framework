@@ -3,8 +3,8 @@
 namespace Illuminate\Database\Query;
 
 use Closure;
-use DateTime;
 use RuntimeException;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -1071,7 +1071,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y-m-d');
         }
 
@@ -1110,7 +1110,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeInterface) {
             $value = $value->format('H:i:s');
         }
 
@@ -1149,7 +1149,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeInterface) {
             $value = $value->format('d');
         }
 
@@ -1188,7 +1188,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeInterface) {
             $value = $value->format('m');
         }
 
@@ -1227,7 +1227,7 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
-        if ($value instanceof DateTime) {
+        if ($value instanceof DateTimeInterface) {
             $value = $value->format('Y');
         }
 
