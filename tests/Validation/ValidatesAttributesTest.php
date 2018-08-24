@@ -17,7 +17,7 @@ class ValidatesAttributesTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        
+
         $this->translator = Mockery::spy(Translator::class);
     }
 
