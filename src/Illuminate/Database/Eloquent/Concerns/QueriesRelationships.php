@@ -177,6 +177,8 @@ trait QueriesRelationships
      */
     public function withCount($relations)
     {
+        $relations = is_array($relations) ? $relations : func_get_args();
+
         return $this->withAggregate($relations, 'count', '*');
     }
 
