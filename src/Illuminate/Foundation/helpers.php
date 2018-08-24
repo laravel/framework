@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Str;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 use Illuminate\Container\Container;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Contracts\Bus\Dispatcher;
 use Illuminate\Contracts\Auth\Access\Gate;
 use Illuminate\Contracts\Support\Responsable;
@@ -623,7 +623,7 @@ if (! function_exists('now')) {
      */
     function now($tz = null)
     {
-        return Carbon::now($tz);
+        return Date::now($tz);
     }
 }
 
@@ -886,7 +886,7 @@ if (! function_exists('today')) {
      */
     function today($tz = null)
     {
-        return Carbon::today($tz);
+        return Date::today($tz);
     }
 }
 

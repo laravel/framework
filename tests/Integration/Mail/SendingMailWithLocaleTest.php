@@ -77,7 +77,7 @@ class SendingMailWithLocaleTest extends TestCase
 
         Mail::to('test@mail.com')->locale('es')->send(new TimestampTestMail);
 
-        $this->assertContains('nombre dentro de 1 día',
+        $this->assertRegExp('/nombre (en|dentro de) (un|1) día/',
             app('swift.transport')->messages()[0]->getBody()
         );
 

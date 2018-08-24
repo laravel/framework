@@ -2,8 +2,8 @@
 
 namespace Illuminate\Console\Scheduling;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Date;
 
 class ScheduleRunCommand extends Command
 {
@@ -52,7 +52,7 @@ class ScheduleRunCommand extends Command
     {
         $this->schedule = $schedule;
 
-        $this->startedAt = Carbon::now();
+        $this->startedAt = Date::now();
 
         parent::__construct();
     }

@@ -5,6 +5,7 @@ namespace Illuminate\Session\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Session\SessionManager;
 use Illuminate\Contracts\Session\Session;
 use Illuminate\Session\CookieSessionHandler;
@@ -194,13 +195,13 @@ class StartSession
     /**
      * Get the cookie lifetime in seconds.
      *
-     * @return \DateTimeInterface
+     * @return \DateTimeInterface|int
      */
     protected function getCookieExpirationDate()
     {
         $config = $this->manager->getSessionConfig();
 
-        return $config['expire_on_close'] ? 0 : Carbon::now()->addMinutes($config['lifetime']);
+        return $config['expire_on_close'] ? 0 : Date::instance(Carbon::now()->addRealMinutes($config['lifetime']));
     }
 
     /**

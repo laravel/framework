@@ -147,7 +147,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             app('swift.transport')->messages()[0]->getBody()
         );
 
-        $this->assertContains('dans 1 jour',
+        $this->assertRegExp('/dans (1|un) jour/',
             app('swift.transport')->messages()[0]->getBody()
         );
 

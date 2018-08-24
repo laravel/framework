@@ -7,6 +7,7 @@ use Cron\CronExpression;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
 use GuzzleHttp\Client as HttpClient;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Contracts\Mail\Mailer;
 use Symfony\Component\Process\Process;
 use Illuminate\Support\Traits\Macroable;
@@ -691,7 +692,7 @@ class Event
      */
     public function nextRunDate($currentTime = 'now', $nth = 0, $allowCurrentDate = false)
     {
-        return Carbon::instance(CronExpression::factory(
+        return Date::instance(CronExpression::factory(
             $this->getExpression()
         )->getNextRunDate($currentTime, $nth, $allowCurrentDate, $this->timezone));
     }

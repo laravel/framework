@@ -18,7 +18,7 @@
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.1",
         "illuminate/contracts": "5.8.*",
-        "nesbot/carbon": "^1.24.1"
+        "nesbot/carbon": "^1.26.3 || ^2.0"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
