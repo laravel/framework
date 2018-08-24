@@ -95,7 +95,7 @@ class Orders extends Model
     {
         return $this->hasMany(ProductOrders::class, 'order_id');
     }
-    
+
 }
 
 class ProductOrders extends Model

@@ -182,6 +182,20 @@ abstract class Relation
     }
 
     /**
+     * Add the constraints for a relationship count query.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function getRelationExistenceCountQuery(Builder $query, Builder $parentQuery)
+    {
+        return $this->getRelationExistenceQuery(
+            $query, $parentQuery, new Expression('count(*)')
+        )->setBindings([], 'select');
+    }
+
+    /**
      * Add the constraints for a relationship sum query.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
