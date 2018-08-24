@@ -41,7 +41,7 @@ class ValidatesAttributesTest extends TestCase
             'attr_2' => true,
             'attr_3' => 'true',
             'attr_4' => 'yes',
-            'attr_5' => 'on'
+            'attr_5' => 'on',
         ], [
             'attr_1' => 'required|accepted',
             'attr_2' => 'required|accepted',
@@ -96,9 +96,9 @@ class ValidatesAttributesTest extends TestCase
         $value = '2018-12-31 23:59:59';
 
         $validator = new Validator($this->translator, [
-            'start' => $value
+            'start' => $value,
         ], [
-            'start' => 'date|date_format:Y-m-d H:i:s'
+            'start' => 'date|date_format:Y-m-d H:i:s',
         ]);
 
         self::assertTrue($validator->passes());
