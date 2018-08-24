@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Routing;
 
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Foundation\Support\Providers\RouteServiceProvider;
@@ -34,7 +35,13 @@ class RouteImplicitBindingTest extends TestCase
     {
         parent::setUp();
 
-        $this->loadLaravelMigrations();
+        Schema::create('users', function ($table) {
+            $table->increments('id');
+            $table->string('email');
+            $table->string('name')->nullable();
+            $table->string('password');
+            $table->timestamps();
+        });
 
         $this->user = User::create([
             'name' => 'Laravel',
