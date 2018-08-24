@@ -583,6 +583,24 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
 
         $this->assertNotEquals('2017-10-10 10:10:10', Tag::find(300)->updated_at);
     }
+
+    public function test_custom_related_key()
+    {
+        $post = Post::create(['title' => str_random()]);
+
+        $tag = $post->tagsWithCustomRelatedKey()->create(['name' => str_random()]);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+
+        $post->tagsWithCustomRelatedKey()->detach($tag);
+
+        $post->tagsWithCustomRelatedKey()->attach($tag);
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+
+        $post->tagsWithCustomRelatedKey()->detach(new Collection([$tag]));
+
+        $post->tagsWithCustomRelatedKey()->attach(new Collection([$tag]));
+        $this->assertEquals($tag->name, $post->tagsWithCustomRelatedKey()->first()->pivot->tag_id);
+    }
 }
 
 class Post extends Model
@@ -618,6 +636,12 @@ class Post extends Model
         return $this->belongsToMany(TagWithCustomPivot::class, 'posts_tags', 'post_id', 'tag_id')
             ->using(CustomPivot::class)
             ->as('tag');
+    }
+
+    public function tagsWithCustomRelatedKey()
+    {
+        return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id', 'id', 'name')
+            ->withPivot('flag');
     }
 }
 
