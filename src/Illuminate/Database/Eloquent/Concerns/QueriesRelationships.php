@@ -179,6 +179,7 @@ trait QueriesRelationships
     {
         return $this->withAggregate($relations, 'count', '*');
     }
+
     /**
      * Add subselect queries to sum the relations.
      *
@@ -190,6 +191,7 @@ trait QueriesRelationships
     {
         return $this->withAggregate($relations, 'sum', $column);
     }
+
     /**
      * Add subselect queries to avg the relations.
      *
@@ -213,6 +215,7 @@ trait QueriesRelationships
     {
         return $this->withAggregate($relations, 'max', $column);
     }
+
     /**
      * Add subselect queries to min the relations.
      *
@@ -224,6 +227,7 @@ trait QueriesRelationships
     {
         return $this->withAggregate($relations, 'min', $column);
     }
+
     /**
      * Add subselect queries to aggregate the relations.
      *
@@ -276,9 +280,9 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = $alias ?? Str::snake($name.'_'.strtolower($aggregate));
+            $column_alias = $alias ?? Str::snake($name.'_'.strtolower($aggregate));
 
-            $this->selectSub($query, $column);
+            $this->selectSub($query, $column_alias);
         }
 
         return $this;
