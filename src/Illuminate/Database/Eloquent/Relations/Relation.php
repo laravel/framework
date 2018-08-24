@@ -199,13 +199,14 @@ abstract class Relation
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @param  \Illuminate\Database\Eloquent\Builder  $parentQuery
+     * @param string  $aggregate
      * @param  string  $column
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    public function getRelationExistenceSumQuery(Builder $query, Builder $parentQuery, $column)
+    public function getRelationExistenceAggregatesQuery(Builder $query, Builder $parentQuery, $aggregate, $column)
     {
         return $this->getRelationExistenceQuery(
-            $query, $parentQuery, new Expression("sum(`{$column}`)")
+            $query, $parentQuery, new Expression($aggregate."({$column})")
         )->setBindings([], 'select');
     }
     /**
