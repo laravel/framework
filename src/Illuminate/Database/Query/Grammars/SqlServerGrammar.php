@@ -473,17 +473,6 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
-     * Wrap the given JSON path.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function wrapJsonPath($value)
-    {
-        return '\'$."'.str_replace('->', '"."', $value).'"\'';
-    }
-
-    /**
      * Wrap a table in keyword identifiers.
      *
      * @param  \Illuminate\Database\Query\Expression|string  $table
