@@ -434,19 +434,6 @@ class Blueprint
     }
 
     /**
-     * Indicate that the polymorphic columns should be dropped.
-     *
-     * @param  string  $name
-     * @param  string|null  $uniqueName
-     * @return void
-     */
-    public function dropMorphsUnique($name, $uniqueName = null)
-    {
-        $this->dropUnique($uniqueName ?: $this->createIndexName('unique', ["{$name}_type", "{$name}_id"]));
-        $this->dropColumn("{$name}_type", "{$name}_id");
-    }
-
-    /**
      * Rename the table to a given name.
      *
      * @param  string  $to
@@ -1163,20 +1150,6 @@ class Blueprint
         $this->unsignedBigInteger("{$name}_id");
 
         $this->index(["{$name}_type", "{$name}_id"], $indexName);
-    }
-
-    /**
-     * Add the proper columns for a polymorphic table with a unique index.
-     *
-     * @param  string  $name
-     * @param  string|null  $uniqueName
-     * @return void
-     */
-    public function morphsUnique($name, $uniqueName = null)
-    {
-        $this->string("{$name}_type");
-        $this->unsignedBigInteger("{$name}_id");
-        $this->unique(["{$name}_type", "{$name}_id"], $uniqueName);
     }
 
     /**
