@@ -25,7 +25,7 @@ trait InteractsWithConsole
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @return int
+     * @return \Illuminate\Foundation\Testing\PendingCommand
      */
     public function artisan($command, $parameters = [])
     {
