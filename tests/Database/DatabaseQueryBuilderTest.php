@@ -2094,6 +2094,21 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from [users] where json_value([items], \'$."price"."in_usd"\') = ? and json_value([items], \'$."age"\') = ?', $builder->toSql());
     }
 
+    public function testSqliteWrappingJson()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('items->price')->from('users')->where('users.items->price', '=', 1)->orderBy('items->price');
+        $this->assertEquals('select json_extract("items", \'$."price"\') from "users" where json_extract("users"."items", \'$."price"\') = ? order by json_extract("items", \'$."price"\') asc', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1);
+        $this->assertEquals('select * from "users" where json_extract("items", \'$."price"."in_usd"\') = ?', $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('items->price->in_usd', '=', 1)->where('items->age', '=', 2);
+        $this->assertEquals('select * from "users" where json_extract("items", \'$."price"."in_usd"\') = ? and json_extract("items", \'$."age"\') = ?', $builder->toSql());
+    }
+
     public function testSQLiteOrderBy()
     {
         $builder = $this->getSQLiteBuilder();
