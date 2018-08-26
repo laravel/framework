@@ -109,7 +109,7 @@ class Command extends SymfonyCommand
         // the command we'll set the arguments and the options on this command.
         $this->setDescription($this->description);
 
-        $this->setHidden($this->hidden);
+        $this->setHidden($this->isHidden());
 
         if (! isset($this->signature)) {
             $this->specifyParameters();
