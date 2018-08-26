@@ -137,7 +137,6 @@ class Mailer implements MailerContract, MailQueueContract
         return (new PendingMail($this))->to($users);
     }
 
-
     /**
      * Begin the process of mailing a mailable class instance.
      *
