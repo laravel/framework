@@ -3,37 +3,66 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery;
+use Mockery\MockInterface;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
+use Illuminate\Notifications\Channels\SlackWebhookChannel;
 
 class NotificationSlackChannelTest extends TestCase
 {
+    /**
+     * @var SlackWebhookChannel
+     */
+    private $slackChannel;
+
+    /**
+     * @var MockInterface|\GuzzleHttp\Client
+     */
+    private $guzzleHttp;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->guzzleHttp = Mockery::mock('GuzzleHttp\Client');
+
+        $this->slackChannel = new SlackWebhookChannel($this->guzzleHttp);
+    }
+
     public function tearDown()
     {
         Mockery::close();
     }
 
     /**
-     * @param  \Illuminate\Notifications\Notification  $notification
-     * @param  array  $payload
+     * @dataProvider payloadDataProvider
+     * @param Notification $notification
+     * @param array $payload
      */
-    protected function validatePayload($notification, $payload)
+    public function testCorrectPayloadIsSentToSlack(Notification $notification, array $payload)
     {
-        $notifiable = new NotificationSlackChannelTestNotifiable;
+        $this->guzzleHttp->shouldReceive('post')->andReturnUsing(function ($argUrl, $argPayload) use ($payload) {
+            $this->assertEquals($argUrl, 'url');
+            $this->assertEquals($argPayload, $payload);
+        });
 
-        $channel = new \Illuminate\Notifications\Channels\SlackWebhookChannel(
-            $http = Mockery::mock('GuzzleHttp\Client')
-        );
-
-        $http->shouldReceive('post')->with('url', $payload);
-
-        $channel->send($notifiable, $notification);
+        $this->slackChannel->send(new NotificationSlackChannelTestNotifiable, $notification);
     }
 
-    public function testCorrectPayloadIsSentToSlack()
+    public function payloadDataProvider()
     {
-        $this->validatePayload(
+        return [
+            'payloadWithIcon' => $this->getPayloadWithIcon(),
+            'payloadWithImageIcon' => $this->getPayloadWithImageIcon(),
+            'payloadWithoutOptionalFields' => $this->getPayloadWithoutOptionalFields(),
+            'payloadWithAttachmentFieldBuilder' => $this->getPayloadWithAttachmentFieldBuilder(),
+        ];
+    }
+
+    private function getPayloadWithIcon()
+    {
+        return [
             new NotificationSlackChannelTestNotification,
             [
                 'json' => [
@@ -64,13 +93,13 @@ class NotificationSlackChannelTest extends TestCase
                         ],
                     ],
                 ],
-            ]
-        );
+            ],
+        ];
     }
 
-    public function testCorrectPayloadIsSentToSlackWithImageIcon()
+    private function getPayloadWithImageIcon()
     {
-        $this->validatePayload(
+        return [
             new NotificationSlackChannelTestNotificationWithImageIcon,
             [
                 'json' => [
@@ -98,13 +127,13 @@ class NotificationSlackChannelTest extends TestCase
                         ],
                     ],
                 ],
-            ]
-        );
+            ],
+        ];
     }
 
-    public function testCorrectPayloadWithoutOptionalFieldsIsSentToSlack()
+    private function getPayloadWithoutOptionalFields()
     {
-        $this->validatePayload(
+        return [
             new NotificationSlackChannelWithoutOptionalFieldsTestNotification,
             [
                 'json' => [
@@ -124,13 +153,13 @@ class NotificationSlackChannelTest extends TestCase
                         ],
                     ],
                 ],
-            ]
-        );
+            ],
+        ];
     }
 
-    public function testCorrectPayloadWithAttachmentFieldBuilderIsSentToSlack()
+    public function getPayloadWithAttachmentFieldBuilder()
     {
-        $this->validatePayload(
+        return [
             new NotificationSlackChannelWithAttachmentFieldBuilderTestNotification,
             [
                 'json' => [
@@ -155,8 +184,8 @@ class NotificationSlackChannelTest extends TestCase
                         ],
                     ],
                 ],
-            ]
-        );
+            ],
+        ];
     }
 }
 

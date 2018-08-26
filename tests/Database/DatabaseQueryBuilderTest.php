@@ -404,6 +404,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereTimeSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', '22:00');
+        $this->assertEquals('select * from [users] where cast([created_at] as time) = ?', $builder->toSql());
+        $this->assertEquals([0 => '22:00'], $builder->getBindings());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('users')->whereTime('created_at', new Raw('NOW()'));
+        $this->assertEquals('select * from [users] where cast([created_at] as time) = NOW()', $builder->toSql());
+        $this->assertEquals([], $builder->getBindings());
+    }
+
     public function testWhereDatePostgres()
     {
         $builder = $this->getPostgresBuilder();
