@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Validation;
 use Illuminate\Validation\Rule;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\In;
+use Illuminate\Tests\Validation\fixtures\Values;
 
 class ValidationInRuleTest extends TestCase
 {
@@ -27,6 +28,10 @@ class ValidationInRuleTest extends TestCase
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
 
         $rule = Rule::in(collect([1, 2, 3, 4]));
+
+        $this->assertEquals('in:"1","2","3","4"', (string) $rule);
+
+        $rule = Rule::in(new Values);
 
         $this->assertEquals('in:"1","2","3","4"', (string) $rule);
 
