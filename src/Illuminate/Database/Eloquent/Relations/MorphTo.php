@@ -244,6 +244,22 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * Remove all or passed registered global scopes.
+     *
+     * @param  array|null  $scopes
+     * @return $this
+     */
+    public function withoutGlobalScopes(array $scopes = null)
+    {
+        $this->macroBuffer[] = [
+            'method' => __FUNCTION__,
+            'parameters' => [$scopes],
+        ];
+
+        return $this;
+    }
+
+    /**
      * Replay stored macro calls on the actual related instance.
      *
      * @param  \Illuminate\Database\Eloquent\Builder  $query
