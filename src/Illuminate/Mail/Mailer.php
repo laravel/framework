@@ -137,6 +137,18 @@ class Mailer implements MailerContract, MailQueueContract
         return (new PendingMail($this))->to($users);
     }
 
+
+    /**
+     * Begin the process of mailing a mailable class instance.
+     *
+     * @param  mixed  $users
+     * @return \Illuminate\Mail\PendingMail
+     */
+    public function cc($users)
+    {
+        return (new PendingMail($this))->cc($users);
+    }
+
     /**
      * Begin the process of mailing a mailable class instance.
      *
