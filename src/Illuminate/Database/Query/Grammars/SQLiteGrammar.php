@@ -273,4 +273,23 @@ class SQLiteGrammar extends Grammar
             'delete from '.$this->wrapTable($query->from) => [],
         ];
     }
+
+    /**
+     * Wrap the given JSON selector.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonSelector($value)
+    {
+        $parts = explode('->', $value, 2);
+
+        $field = $this->wrap($parts[0]);
+
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+
+        $selector = 'json_extract('.$field.$path.')';
+
+        return $selector;
+    }
 }
