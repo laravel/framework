@@ -3,9 +3,11 @@
 namespace Illuminate\Database\Eloquent\Concerns;
 
 use Closure;
+use RuntimeException;
 use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
+use Illuminate\Database\Eloquent\Relations\MorphTo;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 
@@ -28,6 +30,10 @@ trait QueriesRelationships
         }
 
         $relation = $this->getRelationWithoutConstraints($relation);
+
+        if ($relation instanceof MorphTo) {
+            throw new RuntimeException('has() and whereHas() do not support MorphTo relationships.');
+        }
 
         // If we only need to check for the existence of the relation, then we can optimize
         // the subquery to only run a "where exists" clause instead of this full "count"
