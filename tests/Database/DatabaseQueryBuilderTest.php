@@ -2837,13 +2837,27 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1], $builder->getBindings());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     */
     public function testWhereJsonLengthSqlite()
     {
         $builder = $this->getSQLiteBuilder();
-        $builder->select('*')->from('users')->whereJsonLength('options', 0)->toSql();
+        $builder->select('*')->from('users')->whereJsonLength('options', 0);
+        $this->assertEquals('select * from "users" where json_array_length("options") = ?', $builder->toSql());
+        $this->assertEquals([0], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->whereJsonLength('users.options->languages', '>', 0);
+        $this->assertEquals('select * from "users" where json_array_length("users"."options", \'$."languages"\') > ?', $builder->toSql());
+        $this->assertEquals([0], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', new Raw('0'));
+        $this->assertEquals('select * from "users" where "id" = ? or json_array_length("options", \'$."languages"\') = 0', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereJsonLength('options->languages', '>', new Raw('0'));
+        $this->assertEquals('select * from "users" where "id" = ? or json_array_length("options", \'$."languages"\') > 0', $builder->toSql());
+        $this->assertEquals([1], $builder->getBindings());
     }
 
     public function testWhereJsonLengthSqlServer()
