@@ -21,7 +21,7 @@ class Recaller
      */
     public function __construct($recaller)
     {
-        $this->recaller = $recaller;
+        $this->recaller = @unserialize($recaller, ['allowed_classes' => false]) ?: $recaller;
     }
 
     /**

@@ -1389,7 +1389,7 @@ class Builder
     {
         $type = $not ? 'NotExists' : 'Exists';
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+        $this->wheres[] = compact('type', 'query', 'boolean');
 
         $this->addBinding($query->getBindings(), 'where');
 
@@ -1415,7 +1415,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
 
-        $this->addBinding($values);
+        $this->addBinding($this->cleanBindings($values));
 
         return $this;
     }
@@ -2127,7 +2127,7 @@ class Builder
      * @param  int  $count
      * @param  callable  $callback
      * @param  string  $column
-     * @param  string  $alias
+     * @param  string|null  $alias
      * @return bool
      */
     public function chunkById($count, callable $callback, $column = 'id', $alias = null)

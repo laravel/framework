@@ -28,6 +28,11 @@ class EloquentWithCountTest extends DatabaseTestCase
             $table->increments('id');
             $table->integer('two_id');
         });
+
+        Schema::create('four', function ($table) {
+            $table->increments('id');
+            $table->integer('one_id');
+        });
     }
 
     /**
@@ -49,6 +54,18 @@ class EloquentWithCountTest extends DatabaseTestCase
             ['id' => 1, 'twos_count' => 1],
         ], $results->get()->toArray());
     }
+
+    public function test_global_scopes()
+    {
+        $one = Model1::create();
+        $one->fours()->create();
+
+        $result = Model1::withCount('fours')->first();
+        $this->assertEquals(0, $result->fours_count);
+
+        $result = Model1::withCount('allFours')->first();
+        $this->assertEquals(1, $result->all_fours_count);
+    }
 }
 
 class Model1 extends Model
@@ -60,6 +77,16 @@ class Model1 extends Model
     public function twos()
     {
         return $this->hasMany(Model2::class, 'one_id');
+    }
+
+    public function fours()
+    {
+        return $this->hasMany(Model4::class, 'one_id');
+    }
+
+    public function allFours()
+    {
+        return $this->fours()->withoutGlobalScopes();
     }
 }
 
@@ -88,6 +115,22 @@ class Model3 extends Model
 
         static::addGlobalScope('app', function ($builder) {
             $builder->where('idz', '>', 0);
+        });
+    }
+}
+
+class Model4 extends Model
+{
+    public $table = 'four';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('app', function ($builder) {
+            $builder->where('id', '>', 1);
         });
     }
 }

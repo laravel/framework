@@ -1,10 +1,44 @@
 # Release Notes for 5.6.x
 
+## v5.6.34 (2018-08-21)
+
+### Changed
+- Wrap columns in whereRowValues ([#25179](https://github.com/laravel/framework/pull/25179))
+- Make copyrights line localizable in mail messages ([#25183](https://github.com/laravel/framework/pull/25183))
+- When specifying events to be faked, other events should be normally dispatched ([#25185](https://github.com/laravel/framework/pull/25185))
+
+### Fixed
+- Fix URL validation pattern on PHP 7.3 ([#25194](https://github.com/laravel/framework/pull/25194))
+
+## v5.6.32 & v5.6.33 (2018-08-09)
+
+### Added
+- Added serialization parameters to helper functions decrypt and encrypt ([#25166](https://github.com/laravel/framework/pull/25166))
+
+## v5.6.31 (2018-08-09)
+
+### Changed
+- Make Auth/Recaller handle serialized and unserialized cookies ([#25167](https://github.com/laravel/framework/pull/25167))
+
+## v5.6.30 (2018-08-08)
+
+### Added
+- Support passing CC/CBC in array form in mail notification ([#25029](https://github.com/laravel/framework/pull/25029))
+- Added Rule::requiredIf ([#25066](https://github.com/laravel/framework/pull/25066))
+- Support raw expressions in whereRowValues() ([#25117](https://github.com/laravel/framework/pull/25117))
+
+### Changed
+- Stopped serializing csrf cookie / header ([#25121](https://github.com/laravel/framework/pull/25121))
+
+### Fixed
+- Avoid an "Undefined offset: 0" if no job was pulled from redis queue ([#25020](https://github.com/laravel/framework/pull/25020))
+- Updating the Pluralizer class to respect the grammar rule ([#25063](https://github.com/laravel/framework/pull/25063))
+
 ## v5.6.29 (2018-07-26)
 
 ### Added
 - Added restored() and forceDeleted() to observer stub ([#40ba2ee](https://github.com/laravel/framework/commit/49ac5be5ae9b69f160058a3f10022c9511222db5))
-- Added UploadedFile::getContents() ([#24924](https://github.com/laravel/framework/pull/24924))
+- Added UploadedFile::get() ([#24924](https://github.com/laravel/framework/pull/24924))
 - Added an alias for a single FactoryBuilder state definition ([#24937](https://github.com/laravel/framework/pull/24937))
 
 ### Changed
