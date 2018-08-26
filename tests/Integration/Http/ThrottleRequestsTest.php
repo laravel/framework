@@ -7,6 +7,7 @@ use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Routing\Middleware\ThrottleRequests;
+use Illuminate\Tests\Integration\Http\Fixtures\User;
 use Illuminate\Http\Exceptions\ThrottleRequestsException;
 
 /**
@@ -55,5 +56,33 @@ class ThrottleRequestsTest extends TestCase
             $this->assertEquals(2, $e->getHeaders()['Retry-After']);
             $this->assertEquals(Carbon::now()->addSeconds(2)->getTimestamp(), $e->getHeaders()['X-RateLimit-Reset']);
         }
+    }
+
+    /**
+     * @see test_locks_handles_user_limit_attribute_and_function
+     * @return array
+     */
+    public function provider_test_locks_handles_user_limit_attribute_and_function()
+    {
+        return [
+            ['quota', 10],
+            ['quotaLimitFunction', 20],
+        ];
+    }
+
+    /**
+     * @dataProvider provider_test_locks_handles_user_limit_attribute_and_function
+     * @param string $maxAttempts
+     * @param int $limit
+     */
+    public function test_locks_handles_user_limit_attribute_and_function($maxAttempts, $limit)
+    {
+        Route::get('/', function () {
+            return 'yes';
+        })->middleware(ThrottleRequests::class.':'.$maxAttempts.',1');
+
+        $response = $this->withoutExceptionHandling()->be(new User)->get('/');
+        $this->assertEquals('yes', $response->getContent());
+        $this->assertEquals($limit, $response->headers->get('X-RateLimit-Limit'));
     }
 }
