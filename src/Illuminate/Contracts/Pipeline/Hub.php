@@ -8,8 +8,8 @@ interface Hub
      * Send an object through one of the available pipelines.
      *
      * @param  mixed  $object
-     * @param  string|null  $pipeline
+     * @param  string  $pipeline
      * @return mixed
      */
-    public function pipe($object, $pipeline = null);
+    public function pipe($object, string $pipeline = 'default');
 }
