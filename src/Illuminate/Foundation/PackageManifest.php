@@ -117,6 +117,7 @@ class PackageManifest
         }
 
         $ignoreAll = in_array('*', $ignore = $this->packagesToIgnore());
+        $defaultPriority = 100;
 
         $this->write(collect($packages)->mapWithKeys(function ($package) {
             return [$this->format($package['name']) => $package['extra']['laravel'] ?? []];
@@ -124,7 +125,9 @@ class PackageManifest
             $ignore = array_merge($ignore, $configuration['dont-discover'] ?? []);
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
-        })->filter()->all());
+        })->filter()->sortByDesc(function ($configuration) use ($defaultPriority) {
+            return $configuration['priority'] ?? $defaultPriority;
+        })->all());
     }
 
     /**
