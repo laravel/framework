@@ -23,6 +23,8 @@ abstract class Seeder
      */
     protected $command;
 
+    protected $silent = false;
+
     /**
      * Seed the given connection from the given path.
      *
@@ -32,13 +34,11 @@ abstract class Seeder
      */
     public function call($class, $silent = false)
     {
+        $this->silent = $silent;
+
         $classes = Arr::wrap($class);
 
         foreach ($classes as $class) {
-            if ($silent === false && isset($this->command)) {
-                $this->command->getOutput()->writeln("<info>Seeding:</info> $class");
-            }
-
             $this->resolve($class)->__invoke();
         }
 
@@ -116,6 +116,10 @@ abstract class Seeder
     {
         if (! method_exists($this, 'run')) {
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
+        }
+
+        if ($this->silent === false && isset($this->command)) {
+            $this->command->getOutput()->writeln('<info>Seeding:</info> '.get_class($this));
         }
 
         return isset($this->container)
