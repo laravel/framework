@@ -119,7 +119,7 @@ abstract class Seeder
         }
 
         if ($this->silent === false && isset($this->command)) {
-            $this->command->getOutput()->writeln("<info>Seeding:</info> ".get_class($this));
+            $this->command->getOutput()->writeln('<info>Seeding:</info> '.get_class($this));
         }
 
         return isset($this->container)
