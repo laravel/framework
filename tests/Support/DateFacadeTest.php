@@ -14,8 +14,8 @@ class DateFacadeTest extends TestCase
     protected function tearDown()
     {
         parent::tearDown();
-        Date::use(Carbon::class);
-        Date::intercept(function ($date) {
+        Date::swap(Carbon::class);
+        Date::swap(function ($date) {
             return $date;
         });
     }
@@ -31,12 +31,12 @@ class DateFacadeTest extends TestCase
         );
     }
 
-    public function testIntercept()
+    public function testSwapClosure()
     {
         $start = Carbon::now()->getTimestamp();
         $this->assertSame(Carbon::class, get_class(Date::now()));
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
-        Date::intercept(function (Carbon $date) {
+        Date::swap(function (Carbon $date) {
             return new DateTime($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
         });
         $start = Carbon::now()->getTimestamp();
@@ -44,33 +44,15 @@ class DateFacadeTest extends TestCase
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
     }
 
-    public function testUse()
+    public function testSwapClassName()
     {
         $start = Carbon::now()->getTimestamp();
         $this->assertSame(Carbon::class, get_class(Date::now()));
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
-        Date::use(DateTime::class);
+        Date::swap(DateTime::class);
         $start = Carbon::now()->getTimestamp();
         $this->assertSame(DateTime::class, get_class(Date::now()));
         $this->assertBetweenStartAndNow($start, Date::now()->getTimestamp());
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Date class must implement a public static instance(DateTimeInterface $date) method or implements DateTimeInterface.
-     */
-    public function testUseWrongClass()
-    {
-        Date::use(Date::class);
-    }
-
-    /**
-     * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Date class must implement a public static instance(DateTimeInterface $date) method or implements DateTimeInterface.
-     */
-    public function testUseWrongString()
-    {
-        Date::use('not-a-class');
     }
 
     public function testCarbonImmutable()
@@ -79,15 +61,15 @@ class DateFacadeTest extends TestCase
             $this->markTestSkipped('Test for Carbon 2 only');
         }
 
-        Date::use(CarbonImmutable::class);
+        Date::swap(CarbonImmutable::class);
         $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
-        Date::use(Carbon::class);
+        Date::swap(Carbon::class);
         $this->assertSame(Carbon::class, get_class(Date::now()));
-        Date::intercept(function (Carbon $date) {
+        Date::swap(function (Carbon $date) {
             return $date->toImmutable();
         });
         $this->assertSame(CarbonImmutable::class, get_class(Date::now()));
-        Date::intercept(function ($date) {
+        Date::swap(function ($date) {
             return $date;
         });
         $this->assertSame(Carbon::class, get_class(Date::now()));
@@ -99,9 +81,9 @@ class DateFacadeTest extends TestCase
         Date::swap(null);
         $this->assertSame('en', Date::now()->locale);
         include_once __DIR__.'/fixtures/CustomDateClass.php';
-        Date::use(\CustomDateClass::class);
+        Date::swap(\CustomDateClass::class);
         $this->assertInstanceOf(\CustomDateClass::class, Date::now());
         $this->assertInstanceOf(Carbon::class, Date::now()->getOriginal());
-        Date::use(Carbon::class);
+        Date::swap(Carbon::class);
     }
 }

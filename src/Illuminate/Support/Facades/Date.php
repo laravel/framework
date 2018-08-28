@@ -2,9 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
-use DateTimeInterface;
 use ReflectionException;
-use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 
 /**
@@ -86,20 +84,6 @@ use Illuminate\Support\Carbon;
 class Date extends Facade
 {
     /**
-     * Date instance class name.
-     *
-     * @var string
-     */
-    protected static $className = Carbon::class;
-
-    /**
-     * Date interceptor.
-     *
-     * @var callable
-     */
-    protected static $interceptor;
-
-    /**
      * Get the registered name of the component.
      *
      * @return string
@@ -109,32 +93,6 @@ class Date extends Facade
     protected static function getFacadeAccessor()
     {
         return 'date';
-    }
-
-    /**
-     * Change the class to use for date instances.
-     *
-     * @param string $className
-     */
-    public static function use(string $className)
-    {
-        if (! (class_exists($className) && (in_array(DateTimeInterface::class, class_implements($className)) || method_exists($className, 'instance')))) {
-            throw new InvalidArgumentException(
-                'Date class must implement a public static instance(DateTimeInterface $date) method or implements DateTimeInterface.'
-            );
-        }
-
-        static::$className = $className;
-    }
-
-    /**
-     * Set an interceptor for each date (Carbon instance).
-     *
-     * @param callable $interceptor
-     */
-    public static function intercept(callable $interceptor)
-    {
-        static::$interceptor = $interceptor;
     }
 
     /**
@@ -149,30 +107,35 @@ class Date extends Facade
      */
     public static function __callStatic($method, $args)
     {
+        $root = null;
+
         try {
-            if (static::getFacadeRoot()) {
-                return parent::__callStatic($method, $args);
-            }
+            $root = static::getFacadeRoot();
         } catch (ReflectionException $exception) {
             // continue
         }
 
-        if (method_exists(static::$className, $method)) {
-            $date = static::$className::$method(...$args);
-        } else {
+        if (! $root) {
+            Date::swap($root = Carbon::class);
+        }
+
+        if (is_callable($root)) {
+            return $root(Carbon::$method(...$args));
+        }
+
+        if (is_string($root)) {
+            if (method_exists($root, $method)) {
+                return $root::$method(...$args);
+            }
             /** @var Carbon $date */
             $date = Carbon::$method(...$args);
-            if (method_exists(static::$className, 'instance')) {
-                $date = static::$className::instance($date);
-            } else {
-                $date = new static::$className($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
+            if (method_exists($root, 'instance')) {
+                return $root::instance($date);
             }
+
+            return new $root($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
         }
 
-        if (static::$interceptor) {
-            return call_user_func(static::$interceptor, $date);
-        }
-
-        return $date;
+        return parent::__callStatic($method, $args);
     }
 }
