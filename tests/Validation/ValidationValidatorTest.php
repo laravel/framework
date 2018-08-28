@@ -2247,7 +2247,7 @@ class ValidationValidatorTest extends TestCase
     public function testValidatePhpMimetypes()
     {
         $trans = $this->getIlluminateArrayTranslator();
-        $uploadedFile = [__FILE__, '', null, null, null, true];
+        $uploadedFile = [__DIR__.'/ValidationRuleTest.php', '', null, null, null, true];
 
         $file = $this->getMockBuilder('Symfony\Component\HttpFoundation\File\UploadedFile')->setMethods(['guessExtension', 'getClientOriginalExtension'])->setConstructorArgs($uploadedFile)->getMock();
         $file->expects($this->any())->method('guessExtension')->will($this->returnValue('rtf'));
@@ -4003,6 +4003,47 @@ class ValidationValidatorTest extends TestCase
         $data = $v->validate();
 
         $this->assertEquals(['first' => 'john', 'preferred' => 'john'], $data);
+    }
+
+    public function testValidateReturnsValidatedDataNestedRules()
+    {
+        $post = ['nested' => ['foo' => 'bar', 'baz' => ''], 'array' => [1, 2]];
+
+        $rules = ['nested.foo' => 'required', 'array.*' => 'integer'];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, $rules);
+        $v->sometimes('type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar'], 'array' => [1, 2]], $data);
+    }
+
+    public function testValidateReturnsValidatedDataNestedChildRules()
+    {
+        $post = ['nested' => ['foo' => 'bar', 'with' => 'extras', 'type' => 'admin']];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.foo' => 'required']);
+        $v->sometimes('nested.type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => ['foo' => 'bar']], $data);
+    }
+
+    public function testValidateReturnsValidatedDataNestedArrayRules()
+    {
+        $post = ['nested' => [['bar' => 'baz', 'with' => 'extras', 'type' => 'admin'], ['bar' => 'baz2', 'with' => 'extras', 'type' => 'admin']]];
+
+        $v = new Validator($this->getIlluminateArrayTranslator(), $post, ['nested.*.bar' => 'required']);
+        $v->sometimes('nested.*.type', 'required', function () {
+            return false;
+        });
+        $data = $v->validate();
+
+        $this->assertEquals(['nested' => [['bar' => 'baz'], ['bar' => 'baz2']]], $data);
     }
 
     protected function getTranslator()

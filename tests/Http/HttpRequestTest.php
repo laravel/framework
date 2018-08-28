@@ -79,9 +79,9 @@ class HttpRequestTest extends TestCase
     {
         return [
             ['', 1, 'default'],
-            ['foo/bar//baz', '1', 'foo'],
-            ['foo/bar//baz', '2', 'bar'],
-            ['foo/bar//baz', '3', 'baz'],
+            ['foo/bar//baz', 1, 'foo'],
+            ['foo/bar//baz', 2, 'bar'],
+            ['foo/bar//baz', 3, 'baz'],
         ];
     }
 
@@ -141,6 +141,9 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('http://foo.com/foo/bar/?name=taylor', 'GET');
         $this->assertEquals('http://foo.com/foo/bar?name=graham', $request->fullUrlWithQuery(['name' => 'graham']));
+
+        $request = Request::create('https://foo.com', 'GET');
+        $this->assertEquals('https://foo.com/?key=value%20with%20spaces', $request->fullUrlWithQuery(['key' => 'value with spaces']));
     }
 
     public function testIsMethod()
@@ -185,6 +188,23 @@ class HttpRequestTest extends TestCase
         $this->assertTrue($request->routeIs('foo.bar'));
         $this->assertTrue($request->routeIs('foo*', '*bar'));
         $this->assertFalse($request->routeIs('foo.foo'));
+    }
+
+    public function testRouteMethod()
+    {
+        $request = Request::create('/foo/bar', 'GET');
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/{required}/{optional?}', []);
+            $route->bind($request);
+
+            return $route;
+        });
+
+        $this->assertEquals('bar', $request->route('required'));
+        $this->assertEquals('bar', $request->route('required', 'default'));
+        $this->assertNull($request->route('optional'));
+        $this->assertEquals('default', $request->route('optional', 'default'));
     }
 
     public function testAjaxMethod()
@@ -332,6 +352,36 @@ class HttpRequestTest extends TestCase
 
         $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
         $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
+    }
+
+    public function testArrayAccess()
+    {
+        $request = Request::create('/', 'GET', ['name' => null, 'foo' => ['bar' => null, 'baz' => '']]);
+
+        $request->setRouteResolver(function () use ($request) {
+            $route = new Route('GET', '/foo/bar/{id}/{name}', []);
+            $route->bind($request);
+            $route->setParameter('id', 'foo');
+            $route->setParameter('name', 'Taylor');
+
+            return $route;
+        });
+
+        $this->assertFalse(isset($request['non-existant']));
+        $this->assertNull($request['non-existant']);
+
+        $this->assertTrue(isset($request['name']));
+        $this->assertNull($request['name']);
+
+        $this->assertNotEquals('Taylor', $request['name']);
+
+        $this->assertTrue(isset($request['foo.bar']));
+        $this->assertNull($request['foo.bar']);
+        $this->assertTrue(isset($request['foo.baz']));
+        $this->assertEquals('', $request['foo.baz']);
+
+        $this->assertTrue(isset($request['id']));
+        $this->assertEquals('foo', $request['id']);
     }
 
     public function testAllMethod()

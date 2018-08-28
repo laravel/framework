@@ -306,11 +306,19 @@ class Validator implements ValidatorContract
             throw new ValidationException($this);
         }
 
-        $data = collect($this->getData());
+        $results = [];
 
-        return $data->only(collect($this->getRules())->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
-        })->unique())->toArray();
+        $missingValue = Str::random(10);
+
+        foreach (array_keys($this->getRules()) as $key) {
+            $value = data_get($this->getData(), $key, $missingValue);
+
+            if ($value !== $missingValue) {
+                Arr::set($results, $key, $value);
+            }
+        }
+
+        return $results;
     }
 
     /**
@@ -578,8 +586,12 @@ class Validator implements ValidatorContract
      * @param  array   $parameters
      * @return void
      */
-    protected function addFailure($attribute, $rule, $parameters)
+    public function addFailure($attribute, $rule, $parameters = [])
     {
+        if (! $this->messages) {
+            $this->passes();
+        }
+
         $this->messages->add($attribute, $this->makeReplacements(
             $this->getMessage($attribute, $rule), $attribute, $rule, $parameters
         ));

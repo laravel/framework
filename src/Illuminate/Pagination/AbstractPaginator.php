@@ -3,15 +3,19 @@
 namespace Illuminate\Pagination;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @mixin \Illuminate\Support\Collection
  */
 abstract class AbstractPaginator implements Htmlable
 {
+    use ForwardsCalls;
+
     /**
      * All of the items being paginated.
      *
@@ -60,6 +64,13 @@ abstract class AbstractPaginator implements Htmlable
      * @var string
      */
     protected $pageName = 'page';
+
+    /**
+     * The number of links to display on each side of current page link.
+     *
+     * @var int
+     */
+    public $onEachSide = 3;
 
     /**
      * The current path resolver callback.
@@ -156,7 +167,7 @@ abstract class AbstractPaginator implements Htmlable
 
         return $this->path
                         .(Str::contains($this->path, '?') ? '&' : '?')
-                        .http_build_query($parameters, '', '&')
+                        .Arr::query($parameters)
                         .$this->buildFragment();
     }
 
@@ -361,6 +372,19 @@ abstract class AbstractPaginator implements Htmlable
     public function setPath($path)
     {
         $this->path = $path;
+
+        return $this;
+    }
+
+    /**
+     * Set the number of links to display on each side of current page link.
+     *
+     * @param  int  $count
+     * @return this
+     */
+    public function onEachSide($count)
+    {
+        $this->onEachSide = $count;
 
         return $this;
     }
@@ -599,7 +623,7 @@ abstract class AbstractPaginator implements Htmlable
      */
     public function __call($method, $parameters)
     {
-        return $this->getCollection()->$method(...$parameters);
+        return $this->forwardCallTo($this->getCollection(), $method, $parameters);
     }
 
     /**

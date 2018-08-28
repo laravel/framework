@@ -236,8 +236,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
-        $events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
-        $events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
         $model->id = 1;
         $model->foo = 'bar';
@@ -257,7 +257,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model->expects($this->once())->method('newModelQuery')->will($this->returnValue($query));
         $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('until');
-        $events->shouldReceive('fire');
+        $events->shouldReceive('dispatch');
 
         $model->id = 1;
         $model->syncOriginal();
@@ -334,8 +334,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.updating: '.get_class($model), $model)->andReturn(true);
-        $events->shouldReceive('fire')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
-        $events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.updated: '.get_class($model), $model)->andReturn(true);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model)->andReturn(true);
 
         $model->id = 1;
         $model->syncOriginal();
@@ -466,8 +466,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
-        $events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
-        $events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model);
 
         $model->name = 'taylor';
         $model->exists = false;
@@ -486,8 +486,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
         $events->shouldReceive('until')->once()->with('eloquent.saving: '.get_class($model), $model)->andReturn(true);
         $events->shouldReceive('until')->once()->with('eloquent.creating: '.get_class($model), $model)->andReturn(true);
-        $events->shouldReceive('fire')->once()->with('eloquent.created: '.get_class($model), $model);
-        $events->shouldReceive('fire')->once()->with('eloquent.saved: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.created: '.get_class($model), $model);
+        $events->shouldReceive('dispatch')->once()->with('eloquent.saved: '.get_class($model), $model);
 
         $model->name = 'taylor';
         $model->exists = false;
@@ -1367,6 +1367,12 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
     }
 
+    public function testModelsTraitIsInitialized()
+    {
+        $model = new EloquentModelStubWithTrait;
+        $this->assertTrue($model->fooBarIsInitialized);
+    }
+
     public function testAppendingOfAttributes()
     {
         $model = new EloquentModelAppendsStub;
@@ -1605,6 +1611,32 @@ class DatabaseEloquentModelTest extends TestCase
         $model->jsonAttribute = ['foo' => "b\xF8r"];
 
         $model->getAttributes();
+    }
+
+    public function testModelAttributeCastingWithSpecialFloatValues()
+    {
+        $model = new EloquentModelCastingStub;
+
+        $model->floatAttribute = 0;
+        $this->assertSame(0.0, $model->floatAttribute);
+
+        $model->floatAttribute = 'Infinity';
+        $this->assertSame(INF, $model->floatAttribute);
+
+        $model->floatAttribute = INF;
+        $this->assertSame(INF, $model->floatAttribute);
+
+        $model->floatAttribute = '-Infinity';
+        $this->assertSame(-INF, $model->floatAttribute);
+
+        $model->floatAttribute = -INF;
+        $this->assertSame(-INF, $model->floatAttribute);
+
+        $model->floatAttribute = 'NaN';
+        $this->assertNan($model->floatAttribute);
+
+        $model->floatAttribute = NAN;
+        $this->assertNan($model->floatAttribute);
     }
 
     public function testUpdatingNonExistentModelFails()
@@ -1877,6 +1909,21 @@ class EloquentModelStub extends Model
     {
         $this->scopesCalled['framework'] = [$framework, $version];
     }
+}
+
+trait FooBarTrait
+{
+    public $fooBarIsInitialized = false;
+
+    public function initializeFooBarTrait()
+    {
+        $this->fooBarIsInitialized = true;
+    }
+}
+
+class EloquentModelStubWithTrait extends EloquentModelStub
+{
+    use FooBarTrait;
 }
 
 class EloquentModelCamelStub extends EloquentModelStub

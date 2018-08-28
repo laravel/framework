@@ -18,6 +18,8 @@ use Monolog\Handler\SlackWebhookHandler;
 
 class LogManager implements LoggerInterface
 {
+    use ParsesLogConfiguration;
+
     /**
      * The application instance.
      *
@@ -38,22 +40,6 @@ class LogManager implements LoggerInterface
      * @var array
      */
     protected $customCreators = [];
-
-    /**
-     * The Log levels.
-     *
-     * @var array
-     */
-    protected $levels = [
-        'debug' => Monolog::DEBUG,
-        'info' => Monolog::INFO,
-        'notice' => Monolog::NOTICE,
-        'warning' => Monolog::WARNING,
-        'error' => Monolog::ERROR,
-        'critical' => Monolog::CRITICAL,
-        'alert' => Monolog::ALERT,
-        'emergency' => Monolog::EMERGENCY,
-    ];
 
     /**
      * Create a new Log manager instance.
@@ -389,37 +375,13 @@ class LogManager implements LoggerInterface
     }
 
     /**
-     * Extract the log channel from the given configuration.
+     * Get fallback log channel name.
      *
-     * @param  array  $config
      * @return string
      */
-    protected function parseChannel(array $config)
+    protected function getFallbackChannelName()
     {
-        if (! isset($config['name'])) {
-            return $this->app->bound('env') ? $this->app->environment() : 'production';
-        }
-
-        return $config['name'];
-    }
-
-    /**
-     * Parse the string level into a Monolog constant.
-     *
-     * @param  array  $config
-     * @return int
-     *
-     * @throws \InvalidArgumentException
-     */
-    protected function level(array $config)
-    {
-        $level = $config['level'] ?? 'debug';
-
-        if (isset($this->levels[$level])) {
-            return $this->levels[$level];
-        }
-
-        throw new InvalidArgumentException('Invalid log level.');
+        return $this->app->bound('env') ? $this->app->environment() : 'production';
     }
 
     /**
@@ -478,7 +440,7 @@ class LogManager implements LoggerInterface
      */
     public function emergency($message, array $context = [])
     {
-        return $this->driver()->emergency($message, $context);
+        $this->driver()->emergency($message, $context);
     }
 
     /**
@@ -494,7 +456,7 @@ class LogManager implements LoggerInterface
      */
     public function alert($message, array $context = [])
     {
-        return $this->driver()->alert($message, $context);
+        $this->driver()->alert($message, $context);
     }
 
     /**
@@ -509,7 +471,7 @@ class LogManager implements LoggerInterface
      */
     public function critical($message, array $context = [])
     {
-        return $this->driver()->critical($message, $context);
+        $this->driver()->critical($message, $context);
     }
 
     /**
@@ -523,7 +485,7 @@ class LogManager implements LoggerInterface
      */
     public function error($message, array $context = [])
     {
-        return $this->driver()->error($message, $context);
+        $this->driver()->error($message, $context);
     }
 
     /**
@@ -539,7 +501,7 @@ class LogManager implements LoggerInterface
      */
     public function warning($message, array $context = [])
     {
-        return $this->driver()->warning($message, $context);
+        $this->driver()->warning($message, $context);
     }
 
     /**
@@ -552,7 +514,7 @@ class LogManager implements LoggerInterface
      */
     public function notice($message, array $context = [])
     {
-        return $this->driver()->notice($message, $context);
+        $this->driver()->notice($message, $context);
     }
 
     /**
@@ -567,7 +529,7 @@ class LogManager implements LoggerInterface
      */
     public function info($message, array $context = [])
     {
-        return $this->driver()->info($message, $context);
+        $this->driver()->info($message, $context);
     }
 
     /**
@@ -580,7 +542,7 @@ class LogManager implements LoggerInterface
      */
     public function debug($message, array $context = [])
     {
-        return $this->driver()->debug($message, $context);
+        $this->driver()->debug($message, $context);
     }
 
     /**
@@ -594,7 +556,7 @@ class LogManager implements LoggerInterface
      */
     public function log($level, $message, array $context = [])
     {
-        return $this->driver()->log($level, $message, $context);
+        $this->driver()->log($level, $message, $context);
     }
 
     /**

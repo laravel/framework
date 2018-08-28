@@ -4,7 +4,6 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use RuntimeException;
-use BadMethodCallException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -13,6 +12,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -20,7 +20,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class Builder
 {
-    use BuildsQueries, Macroable {
+    use BuildsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -2813,8 +2813,6 @@ class Builder
             return $this->dynamicWhere($method, $parameters);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
-        ));
+        static::throwBadMethodCallException($method);
     }
 }

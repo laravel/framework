@@ -4,7 +4,6 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Optional;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Debug\Dumper;
 use Illuminate\Contracts\Support\Htmlable;
 use Illuminate\Support\HigherOrderTapProxy;
 
@@ -541,23 +540,6 @@ if (! function_exists('data_set')) {
         }
 
         return $target;
-    }
-}
-
-if (! function_exists('dd')) {
-    /**
-     * Dump the passed variables and end the script.
-     *
-     * @param  mixed  $args
-     * @return void
-     */
-    function dd(...$args)
-    {
-        foreach ($args as $x) {
-            (new Dumper)->dump($x);
-        }
-
-        die(1);
     }
 }
 

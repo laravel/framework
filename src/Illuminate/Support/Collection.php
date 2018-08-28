@@ -11,9 +11,9 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Debug\Dumper;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Jsonable;
+use Symfony\Component\VarDumper\VarDumper;
 use Illuminate\Contracts\Support\Arrayable;
 
 /**
@@ -145,8 +145,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function avg($callback = null)
     {
-        if ($count = $this->count()) {
-            return $this->sum($callback) / $count;
+        $callback = $this->valueRetriever($callback);
+
+        $items = $this->map(function ($value) use ($callback) {
+            return $callback($value);
+        })->filter(function ($value) {
+            return ! is_null($value);
+        });
+
+        if ($count = $items->count()) {
+            return $items->sum() / $count;
         }
     }
 
@@ -169,14 +177,16 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function median($key = null)
     {
-        $count = $this->count();
+        $values = (isset($key) ? $this->pluck($key) : $this)
+            ->filter(function ($item) {
+                return ! is_null($item);
+            })->sort()->values();
+
+        $count = $values->count();
 
         if ($count == 0) {
             return;
         }
-
-        $values = (isset($key) ? $this->pluck($key) : $this)
-                    ->sort()->values();
 
         $middle = (int) ($count / 2);
 
@@ -310,7 +320,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         (new static(func_get_args()))
             ->push($this)
             ->each(function ($item) {
-                (new Dumper)->dump($item);
+                VarDumper::dump($item);
             });
 
         return $this;
@@ -514,7 +524,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return static
      */
-    public function where($key, $operator, $value = null)
+    public function where($key, $operator = null, $value = null)
     {
         return $this->filter($this->operatorForWhere(...func_get_args()));
     }
@@ -527,8 +537,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return \Closure
      */
-    protected function operatorForWhere($key, $operator, $value = null)
+    protected function operatorForWhere($key, $operator = null, $value = null)
     {
+        if (func_num_args() === 1) {
+            $value = true;
+
+            $operator = '=';
+        }
+
         if (func_num_args() === 2) {
             $value = $operator;
 
@@ -1102,11 +1118,11 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $callback = $this->valueRetriever($callback);
 
-        return $this->filter(function ($value) {
+        return $this->map(function ($value) use ($callback) {
+            return $callback($value);
+        })->filter(function ($value) {
             return ! is_null($value);
-        })->reduce(function ($result, $item) use ($callback) {
-            $value = $callback($item);
-
+        })->reduce(function ($result, $value) {
             return is_null($result) || $value < $result ? $value : $result;
         });
     }
@@ -1409,9 +1425,29 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             return new static;
         }
 
-        $groupSize = ceil($this->count() / $numberOfGroups);
+        $groups = new static;
 
-        return $this->chunk($groupSize);
+        $groupSize = floor($this->count() / $numberOfGroups);
+
+        $remain = $this->count() % $numberOfGroups;
+
+        $start = 0;
+
+        for ($i = 0; $i < $numberOfGroups; $i++) {
+            $size = $groupSize;
+
+            if ($i < $remain) {
+                $size++;
+            }
+
+            if ($size) {
+                $groups->push(new static(array_slice($this->items, $start, $size)));
+
+                $start += $size;
+            }
+        }
+
+        return $groups;
     }
 
     /**

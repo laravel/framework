@@ -23,9 +23,7 @@ trait ValidatesRequests
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 
-        $validator->validate();
-
-        return $this->extractInputFromRules($request, $validator->getRules());
+        return $validator->validate();
     }
 
     /**
@@ -40,25 +38,9 @@ trait ValidatesRequests
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
     {
-        $this->getValidationFactory()
-             ->make($request->all(), $rules, $messages, $customAttributes)
-             ->validate();
-
-        return $this->extractInputFromRules($request, $rules);
-    }
-
-    /**
-     * Get the request input based on the given validation rules.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
-     * @return array
-     */
-    protected function extractInputFromRules(Request $request, array $rules)
-    {
-        return $request->only(collect($rules)->keys()->map(function ($rule) {
-            return explode('.', $rule)[0];
-        })->unique()->toArray());
+        return $this->getValidationFactory()->make(
+            $request->all(), $rules, $messages, $customAttributes
+        )->validate();
     }
 
     /**

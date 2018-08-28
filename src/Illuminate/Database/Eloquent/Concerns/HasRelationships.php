@@ -425,7 +425,7 @@ trait HasRelationships
         // models using underscores in alphabetical order. The two model names
         // are transformed to snake case from their default CamelCase also.
         if (is_null($table)) {
-            $table = $this->joiningTable($related);
+            $table = $this->joiningTable($related, $instance);
         }
 
         return $this->newBelongsToMany(
@@ -563,24 +563,36 @@ trait HasRelationships
      * Get the joining table name for a many-to-many relation.
      *
      * @param  string  $related
+     * @param  \Illuminate\Database\Eloquent\Model|null  $instance
      * @return string
      */
-    public function joiningTable($related)
+    public function joiningTable($related, $instance = null)
     {
         // The joining table name, by convention, is simply the snake cased models
         // sorted alphabetically and concatenated with an underscore, so we can
         // just sort the models and join them together to get the table name.
-        $models = [
-            Str::snake(class_basename($related)),
-            Str::snake(class_basename($this)),
+        $segments = [
+            $instance ? $instance->joiningTableSegment()
+                      : Str::snake(class_basename($related)),
+            $this->joiningTableSegment(),
         ];
 
         // Now that we have the model names in an array we can just sort them and
         // use the implode function to join them together with an underscores,
         // which is typically used by convention within the database system.
-        sort($models);
+        sort($segments);
 
-        return strtolower(implode('_', $models));
+        return strtolower(implode('_', $segments));
+    }
+
+    /**
+     * Get this model's half of the intermediate table name for belongsToMany relationships.
+     *
+     * @return string
+     */
+    public function joiningTableSegment()
+    {
+        return Str::snake(class_basename($this));
     }
 
     /**

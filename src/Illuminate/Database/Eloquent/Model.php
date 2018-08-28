@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
@@ -24,7 +25,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         Concerns\HasRelationships,
         Concerns\HasTimestamps,
         Concerns\HidesAttributes,
-        Concerns\GuardsAttributes;
+        Concerns\GuardsAttributes,
+        ForwardsCalls;
 
     /**
      * The connection name for the model.
@@ -118,6 +120,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $booted = [];
 
     /**
+     * The array of trait initializers that will be called on each new instance.
+     *
+     * @var array
+     */
+    protected static $traitInitializers = [];
+
+    /**
      * The array of global scopes on the model.
      *
      * @var array
@@ -154,6 +163,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __construct(array $attributes = [])
     {
         $this->bootIfNotBooted();
+
+        $this->initializeTraits();
 
         $this->syncOriginal();
 
@@ -199,6 +210,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
         $booted = [];
 
+        static::$traitInitializers[$class] = [];
+
         foreach (class_uses_recursive($class) as $trait) {
             $method = 'boot'.class_basename($trait);
 
@@ -207,6 +220,26 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
 
                 $booted[] = $method;
             }
+
+            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
+                static::$traitInitializers[$class][] = $method;
+
+                static::$traitInitializers[$class] = array_unique(
+                    static::$traitInitializers[$class]
+                );
+            }
+        }
+    }
+
+    /**
+     * Initialize any initializable traits on the model.
+     *
+     * @return void
+     */
+    protected function initializeTraits()
+    {
+        foreach (static::$traitInitializers[static::class] as $method) {
+            $this->{$method}();
         }
     }
 
@@ -692,9 +725,9 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         if (count($dirty) > 0) {
             $this->setKeysForSaveQuery($query)->update($dirty);
 
-            $this->fireModelEvent('updated', false);
-
             $this->syncChanges();
+
+            $this->fireModelEvent('updated', false);
         }
 
         return true;
@@ -1567,7 +1600,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             return $this->$method(...$parameters);
         }
 
-        return $this->newQuery()->$method(...$parameters);
+        return $this->forwardCallTo($this->newQuery(), $method, $parameters);
     }
 
     /**

@@ -236,11 +236,23 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  int  $status
      * @return \Illuminate\Routing\Route
      */
-    public function redirect($uri, $destination, $status = 301)
+    public function redirect($uri, $destination, $status = 302)
     {
         return $this->any($uri, '\Illuminate\Routing\RedirectController')
                 ->defaults('destination', $destination)
                 ->defaults('status', $status);
+    }
+
+    /**
+     * Create a permanent redirect from one URI to another.
+     *
+     * @param  string  $uri
+     * @param  string  $destination
+     * @return \Illuminate\Routing\Route
+     */
+    public function permanentRedirect($uri, $destination)
+    {
+        return $this->redirect($uri, $destination, 301);
     }
 
     /**
@@ -1124,9 +1136,10 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Register the typical authentication routes for an application.
      *
+     * @param  array  $options
      * @return void
      */
-    public function auth()
+    public function auth(array $options = [])
     {
         // Authentication Routes...
         $this->get('login', 'Auth\LoginController@showLoginForm')->name('login');
@@ -1141,7 +1154,24 @@ class Router implements RegistrarContract, BindingRegistrar
         $this->get('password/reset', 'Auth\ForgotPasswordController@showLinkRequestForm')->name('password.request');
         $this->post('password/email', 'Auth\ForgotPasswordController@sendResetLinkEmail')->name('password.email');
         $this->get('password/reset/{token}', 'Auth\ResetPasswordController@showResetForm')->name('password.reset');
-        $this->post('password/reset', 'Auth\ResetPasswordController@reset');
+        $this->post('password/reset', 'Auth\ResetPasswordController@reset')->name('password.update');
+
+        // Email Verification Routes...
+        if ($options['verify'] ?? false) {
+            $this->emailVerification();
+        }
+    }
+
+    /**
+     * Register the typical email verification routes for an application.
+     *
+     * @return void
+     */
+    public function emailVerification()
+    {
+        $this->get('email/verify', 'Auth\VerificationController@show')->name('verification.notice');
+        $this->get('email/verify/{id}', 'Auth\VerificationController@verify')->name('verification.verify');
+        $this->get('email/resend', 'Auth\VerificationController@resend')->name('verification.resend');
     }
 
     /**

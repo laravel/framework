@@ -48,6 +48,23 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     }
 
     /**
+     * Check the given plain value against a hash.
+     *
+     * @param  string  $value
+     * @param  string  $hashedValue
+     * @param  array  $options
+     * @return bool
+     */
+    public function check($value, $hashedValue, array $options = [])
+    {
+        if ($this->info($hashedValue)['algoName'] !== 'bcrypt') {
+            throw new RuntimeException('This password does not use the Bcrypt algorithm.');
+        }
+
+        return parent::check($value, $hashedValue, $options);
+    }
+
+    /**
      * Check if the given hash has been hashed using the given options.
      *
      * @param  string  $hashedValue

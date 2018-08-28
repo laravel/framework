@@ -12,7 +12,6 @@ use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Contracts\Auth\Factory as Auth;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 
@@ -33,13 +32,6 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);
-
-        $this->container->singleton(Auth::class, function () {
-            $auth = m::mock(Auth::class);
-            $auth->shouldReceive('authenticate')->once()->andReturn(null);
-
-            return $auth;
-        });
 
         $this->container->singleton(GateContract::class, function () {
             return new Gate($this->container, function () {
@@ -208,7 +200,7 @@ class AuthorizeMiddlewareTest extends TestCase
             $nextParam = $param;
         };
 
-        (new Authorize($this->container->make(Auth::class), $this->gate()))
+        (new Authorize($this->gate()))
             ->handle($request, $next, 'success', $instance);
     }
 

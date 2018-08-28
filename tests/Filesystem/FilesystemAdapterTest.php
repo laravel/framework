@@ -7,6 +7,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Illuminate\Filesystem\FilesystemAdapter;
 use Symfony\Component\HttpFoundation\StreamedResponse;
+use Illuminate\Contracts\Filesystem\FileExistsException;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
 
 class FilesystemAdapterTest extends TestCase
@@ -106,7 +107,7 @@ class FilesystemAdapterTest extends TestCase
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $this->assertTrue($filesystemAdapter->delete('file.txt'));
-        $this->assertFalse(file_exists($this->tempDir.'/file.txt'));
+        $this->assertFileNotExists($this->tempDir.'/file.txt');
     }
 
     public function testDeleteReturnsFalseWhenFileNotFound()
@@ -144,5 +145,49 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertFileExists($this->tempDir.'/foo/foo2.txt');
         $this->assertEquals($data, file_get_contents($this->tempDir.'/foo/foo2.txt'));
+    }
+
+    public function testStream()
+    {
+        $this->filesystem->write('file.txt', $original_content = 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $readStream = $filesystemAdapter->readStream('file.txt');
+        $filesystemAdapter->writeStream('copy.txt', $readStream);
+        $this->assertEquals($original_content, $filesystemAdapter->get('copy.txt'));
+    }
+
+    public function testStreamBetweenFilesystems()
+    {
+        $secondFilesystem = new Filesystem(new Local($this->tempDir.'/second'));
+        $this->filesystem->write('file.txt', $original_content = 'Hello World');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $secondFilesystemAdapter = new FilesystemAdapter($secondFilesystem);
+        $readStream = $filesystemAdapter->readStream('file.txt');
+        $secondFilesystemAdapter->writeStream('copy.txt', $readStream);
+        $this->assertEquals($original_content, $secondFilesystemAdapter->get('copy.txt'));
+    }
+
+    public function testStreamToExistingFileThrows()
+    {
+        $this->expectException(FileExistsException::class);
+        $this->filesystem->write('file.txt', 'Hello World');
+        $this->filesystem->write('existing.txt', 'Dear Kate');
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $readStream = $filesystemAdapter->readStream('file.txt');
+        $filesystemAdapter->writeStream('existing.txt', $readStream);
+    }
+
+    public function testReadStreamNonExistentFileThrows()
+    {
+        $this->expectException(FileNotFoundException::class);
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->readStream('nonexistent.txt');
+    }
+
+    public function testStreamInvalidResourceThrows()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $filesystemAdapter = new FilesystemAdapter($this->filesystem);
+        $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }
 }

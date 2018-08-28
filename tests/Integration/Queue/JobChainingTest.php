@@ -174,8 +174,8 @@ class JobChainingTest extends TestCase
         $this->assertEquals('another_queue', JobChainingTestSecondJob::$usedQueue);
         $this->assertEquals('sync2', JobChainingTestSecondJob::$usedConnection);
 
-        $this->assertEquals(null, JobChainingTestThirdJob::$usedQueue);
-        $this->assertEquals(null, JobChainingTestThirdJob::$usedConnection);
+        $this->assertNull(JobChainingTestThirdJob::$usedQueue);
+        $this->assertNull(JobChainingTestThirdJob::$usedConnection);
     }
 }
 

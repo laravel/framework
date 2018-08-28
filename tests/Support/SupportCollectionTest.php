@@ -483,6 +483,12 @@ class SupportCollectionTest extends TestCase
             [['v' => 'hello']],
             $c->where('v', new \Illuminate\Support\HtmlString('hello'))->values()->all()
         );
+
+        $c = new Collection([['v' => 1], ['v' => 2], ['v' => null]]);
+        $this->assertEquals(
+            [['v' => 1], ['v' => 2]],
+            $c->where('v')->values()->all()
+        );
     }
 
     public function testWhereStrict()
@@ -1586,6 +1592,25 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(['d'], $data->nth(4, 3)->all());
     }
 
+    public function testMapWithKeysOverwritingKeys()
+    {
+        $data = new Collection([
+            ['id' => 1, 'name' => 'A'],
+            ['id' => 2, 'name' => 'B'],
+            ['id' => 1, 'name' => 'C'],
+        ]);
+        $data = $data->mapWithKeys(function ($item) {
+            return [$item['id'] => $item['name']];
+        });
+        $this->assertSame(
+            [
+                1 => 'C',
+                2 => 'B',
+            ],
+            $data->all()
+        );
+    }
+
     public function testTransform()
     {
         $data = new Collection(['first' => 'taylor', 'last' => 'otwell']);
@@ -2058,6 +2083,10 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(10, $c->min('foo'));
         $this->assertEquals(10, $c->min->foo);
 
+        $c = new Collection([['foo' => 10], ['foo' => 20], ['foo' => null]]);
+        $this->assertEquals(10, $c->min('foo'));
+        $this->assertEquals(10, $c->min->foo);
+
         $c = new Collection([1, 2, 3, 4, 5]);
         $this->assertEquals(1, $c->min());
 
@@ -2088,6 +2117,13 @@ class SupportCollectionTest extends TestCase
     public function testGettingAvgItemsFromCollection()
     {
         $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $this->assertEquals(15, $c->avg(function ($item) {
+            return $item->foo;
+        }));
+        $this->assertEquals(15, $c->avg('foo'));
+        $this->assertEquals(15, $c->avg->foo);
+
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20], (object) ['foo' => null]]);
         $this->assertEquals(15, $c->avg(function ($item) {
             return $item->foo;
         }));
@@ -2247,6 +2283,17 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals(2, $collection->median('foo'));
     }
 
+    public function testMedianOnCollectionWithNull()
+    {
+        $collection = new Collection([
+            (object) ['foo' => 1],
+            (object) ['foo' => 2],
+            (object) ['foo' => 4],
+            (object) ['foo' => null],
+        ]);
+        $this->assertEquals(2, $collection->median('foo'));
+    }
+
     public function testEvenMedianCollection()
     {
         $collection = new Collection([
@@ -2359,6 +2406,15 @@ class SupportCollectionTest extends TestCase
                 return $chunk->values()->toArray();
             })->toArray()
         );
+
+        $collection = new Collection([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+
+        $this->assertEquals(
+            [[1, 2, 3, 4, 5], [6, 7, 8, 9, 10]],
+            $collection->split(2)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+        );
     }
 
     public function testSplitCollectionWithAnUndivisableCount()
@@ -2383,6 +2439,42 @@ class SupportCollectionTest extends TestCase
                 return $chunk->values()->toArray();
             })->toArray()
         );
+    }
+
+    public function testSplitCollectionIntoThreeWithCountOfFour()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c'], ['d']],
+            $collection->split(3)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+            );
+    }
+
+    public function testSplitCollectionIntoThreeWithCountOfFive()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd', 'e']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c', 'd'], ['e']],
+            $collection->split(3)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+            );
+    }
+
+    public function testSplitCollectionIntoSixWithCountOfTen()
+    {
+        $collection = new Collection(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
+
+        $this->assertEquals(
+            [['a', 'b'], ['c', 'd'], ['e', 'f'], ['g', 'h'], ['i'], ['j']],
+            $collection->split(6)->map(function (Collection $chunk) {
+                return $chunk->values()->toArray();
+            })->toArray()
+            );
     }
 
     public function testSplitEmptyCollection()

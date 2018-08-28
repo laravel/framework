@@ -124,8 +124,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         $question = $this->getBaseUrl().$this->getPathInfo() == '/' ? '/?' : '?';
 
         return count($this->query()) > 0
-            ? $this->url().$question.http_build_query(array_merge($this->query(), $query))
-            : $this->fullUrl().$question.http_build_query($query);
+            ? $this->url().$question.Arr::query(array_merge($this->query(), $query))
+            : $this->fullUrl().$question.Arr::query($query);
     }
 
     /**
@@ -506,10 +506,10 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      * Get the route handling the request.
      *
      * @param  string|null  $param
-     *
+     * @param  mixed   $default
      * @return \Illuminate\Routing\Route|object|string
      */
-    public function route($param = null)
+    public function route($param = null, $default = null)
     {
         $route = call_user_func($this->getRouteResolver());
 
@@ -517,7 +517,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
             return $route;
         }
 
-        return $route->parameter($param);
+        return $route->parameter($param, $default);
     }
 
     /**
@@ -620,9 +620,9 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function offsetExists($offset)
     {
-        return array_key_exists(
-            $offset,
-            $this->all() + $this->route()->parameters()
+        return Arr::has(
+            $this->all() + $this->route()->parameters(),
+            $offset
         );
     }
 
@@ -679,10 +679,8 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
      */
     public function __get($key)
     {
-        if (array_key_exists($key, $this->all())) {
-            return data_get($this->all(), $key);
-        }
-
-        return $this->route($key);
+        return Arr::get($this->all(), $key, function () use ($key) {
+            return $this->route($key);
+        });
     }
 }
