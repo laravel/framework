@@ -1061,7 +1061,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1083,7 +1083,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDate($column, $operator, $value = null)
@@ -1100,7 +1100,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string   $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1122,7 +1122,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereTime($column, $operator, $value = null)
@@ -1139,7 +1139,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1161,7 +1161,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDay($column, $operator, $value = null)
@@ -1178,7 +1178,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1200,7 +1200,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  \DateTimeInterface|string|int  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereMonth($column, $operator, $value = null)
