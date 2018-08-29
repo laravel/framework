@@ -4,7 +4,6 @@ namespace Illuminate\Support;
 
 use stdClass;
 use Countable;
-use Exception;
 use ArrayAccess;
 use Traversable;
 use ArrayIterator;
@@ -1912,19 +1911,23 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Dynamically access collection proxies.
+     * Dynamically access collection proxies and pluck values.
      *
      * @param  string  $key
      * @return mixed
-     *
-     * @throws \Exception
      */
     public function __get($key)
     {
-        if (! in_array($key, static::$proxies)) {
-            throw new Exception("Property [{$key}] does not exist on this collection instance.");
+        if (in_array($key, static::$proxies)) {
+            return new HigherOrderCollectionProxy($this, $key);
         }
 
-        return new HigherOrderCollectionProxy($this, $key);
+        $result = $this->pluck($key);
+
+        if ($result->first() instanceof self) {
+            $result = $result->flatten();
+        }
+
+        return $result;
     }
 }
