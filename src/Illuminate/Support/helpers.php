@@ -721,7 +721,7 @@ if (! function_exists('optional')) {
      */
     function optional($value = null, callable $callback = null)
     {
-        if(! is_null($value) && ! is_null($callback)) {
+        if (! is_null($value) && ! is_null($callback)) {
             return $callback($value);
         }
 
