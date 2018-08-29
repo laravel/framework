@@ -643,6 +643,20 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $post->tagsWithCustomRelatedKey()->updateExistingPivot($tag, ['flag' => 'exclude']);
         $this->assertEquals('exclude', $post->tagsWithCustomRelatedKey()->first()->pivot->flag);
     }
+
+    public function test_global_scope_columns()
+    {
+        $tag = Tag::create(['name' => str_random()]);
+        $post = Post::create(['title' => str_random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag->id, 'flag' => 'empty'],
+        ]);
+
+        $tags = $post->tagsWithGlobalScope;
+
+        $this->assertEquals(['id' => 1], $tags[0]->getAttributes());
+    }
 }
 
 class Post extends Model
@@ -691,6 +705,11 @@ class Post extends Model
         return $this->belongsToMany(Tag::class, 'posts_tags', 'post_id', 'tag_id', 'id', 'name')
             ->withPivot('flag');
     }
+
+    public function tagsWithGlobalScope()
+    {
+        return $this->belongsToMany(TagWithGlobalScope::class, 'posts_tags', 'post_id', 'tag_id');
+    }
 }
 
 class Tag extends Model
@@ -734,4 +753,20 @@ class CustomPivot extends Pivot
 {
     protected $table = 'posts_tags';
     protected $dateFormat = 'U';
+}
+
+class TagWithGlobalScope extends Model
+{
+    public $table = 'tags';
+    public $timestamps = true;
+    protected $guarded = ['id'];
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope(function ($query) {
+            $query->select('tags.id');
+        });
+    }
 }

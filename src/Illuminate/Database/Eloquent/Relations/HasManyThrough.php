@@ -461,8 +461,10 @@ class HasManyThrough extends Relation
      */
     protected function prepareQueryBuilder($columns = ['*'])
     {
-        return $this->query->applyScopes()->addSelect(
-            $this->shouldSelect($this->query->getQuery()->columns ? [] : $columns)
+        $builder = $this->query->applyScopes();
+
+        return $builder->addSelect(
+            $this->shouldSelect($builder->getQuery()->columns ? [] : $columns)
         );
     }
 
