@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
-use Exception;
 use ArrayAccess;
 use Mockery as m;
 use ReflectionClass;
@@ -2742,12 +2741,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(['foo' => 3, 'bar' => ['nested' => 'two']], $collection->toArray());
     }
 
-    public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty()
+    public function testDynamicPluck()
     {
-        $collection = new Collection();
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
-        $collection->foo;
+        $data = new Collection([['name' => 'foo'], ['name' => 'bar']]);
+        $this->assertEquals(['foo', 'bar'], $data->name->all());
+
+        $data = new Collection([['name' => new Collection(['foo'])], ['name' => new Collection(['bar'])]]);
+        $this->assertEquals(['foo', 'bar'], $data->name->all());
     }
 
     public function testGetWithNullReturnsNull()
