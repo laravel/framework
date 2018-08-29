@@ -790,7 +790,7 @@ class SupportHelpersTest extends TestCase
             throw new RuntimeException(
                 'The optional callback should not be called for null'
             );
-        }));
+        })->missing);
 
         $this->assertEquals(10, optional(5, function ($number) {
             return $number * 2;

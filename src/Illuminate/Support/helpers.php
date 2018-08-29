@@ -721,11 +721,11 @@ if (! function_exists('optional')) {
      */
     function optional($value = null, callable $callback = null)
     {
-        if (is_null($callback)) {
-            return new Optional($value);
-        } elseif (! is_null($value)) {
+        if(! is_null($value) && ! is_null($callback)) {
             return $callback($value);
         }
+
+        return new Optional($value);
     }
 }
 
