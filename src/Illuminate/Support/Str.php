@@ -88,7 +88,6 @@ class Str
      * @param  bool  $insensitive
      * @param  bool  $innerOnly
      * @param  bool  $inverse
-     *
      * @return string
      */
     public static function between($string, $start, $end, $insensitive = false, $innerOnly = true, $inverse = false)
