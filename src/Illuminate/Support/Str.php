@@ -82,7 +82,7 @@ class Str
     /**
      * Get the portion of a string between two given strings.
      *
-     * @param  string  $subject
+     * @param  string  $haystack
      * @param  string  $start
      * @param  string  $end
      * @param  bool  $insensitive
@@ -90,7 +90,7 @@ class Str
      * @param  bool  $inverse
      * @return string
      */
-    public static function between($string, $start, $end, $insensitive = false, $innerOnly = true, $inverse = false)
+    public static function between($haystack, $start, $end, $insensitive = false, $innerOnly = true, $inverse = false)
     {
         if ($insensitive) {
             $string = strtolower($string);
