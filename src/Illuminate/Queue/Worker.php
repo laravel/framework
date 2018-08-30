@@ -198,10 +198,8 @@ class Worker
     protected function stopIfNecessary(WorkerOptions $options, $lastRestart)
     {
         if ($this->shouldQuit) {
-            $this->kill();
-        }
-
-        if ($this->memoryExceeded($options->memory)) {
+            $this->stop();
+        } elseif ($this->memoryExceeded($options->memory)) {
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
