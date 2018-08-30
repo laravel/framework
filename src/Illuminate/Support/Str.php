@@ -80,6 +80,39 @@ class Str
     }
 
     /**
+     * Get the portion of a string between two given strings.
+     *
+     * @param  string  $subject
+     * @param  string  $start
+     * @param  string  $end
+     * @param  bool  $insensitive
+     * @param  bool  $innerOnly
+     * @param  bool  $inverse
+     *
+     * @return string
+     */
+    public static function between($string, $start, $end, $insensitive = false, $innerOnly = true, $inverse = false)
+    {
+        if ($insensitive) {
+            $string = strtolower($string);
+            $start = strtolower($start);
+            $end = strtolower($end);
+        }
+        if (($startPosition = strpos($string, $start)) === false || ($endPosition = strpos($string, $end)) === false) {
+            return false;
+        }
+        if ($innerOnly) {
+            $startPosition += strlen($start);
+            $endPosition -= strlen($end);
+        }
+        $between = substr($string, $startPosition, ($endPosition + strlen($end)) - $startPosition);
+        if ($inverse) {
+            return str_replace($between, '', $string);
+        }
+        return $between;
+    }
+
+    /**
      * Convert a value to camel case.
      *
      * @param  string  $value
