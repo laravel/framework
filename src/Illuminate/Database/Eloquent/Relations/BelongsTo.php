@@ -289,17 +289,6 @@ class BelongsTo extends Relation
     }
 
     /**
-     * Determine if the related model has an auto-incrementing ID.
-     *
-     * @return bool
-     */
-    protected function relationHasIncrementingId()
-    {
-        return $this->related->getIncrementing() &&
-                                $this->related->getKeyType() === 'int';
-    }
-
-    /**
      * Make a new related instance for the given model.
      *
      * @param  \Illuminate\Database\Eloquent\Model  $parent
