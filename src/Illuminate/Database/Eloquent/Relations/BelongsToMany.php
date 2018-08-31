@@ -568,9 +568,9 @@ class BelongsToMany extends Relation
         // First we'll add the proper select columns onto the query so it is run with
         // the proper columns. Then, we will get the results and hydrate out pivot
         // models with the result of those columns as a separate model relation.
-        $columns = $this->query->getQuery()->columns ? [] : $columns;
-
         $builder = $this->query->applyScopes();
+
+        $columns = $builder->getQuery()->columns ? [] : $columns;
 
         $models = $builder->addSelect(
             $this->shouldSelect($columns)
