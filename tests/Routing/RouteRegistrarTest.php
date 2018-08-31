@@ -230,6 +230,71 @@ class RouteRegistrarTest extends TestCase
         $this->seeMiddleware('resource-middleware');
     }
 
+    public function testCanRegisterResourcesWithExceptOption()
+    {
+        $this->router->resources([
+            'resource-one'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubOne::class,
+            'resource-two'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => \Illuminate\Tests\Routing\RouteRegistrarControllerStubThree::class,
+        ], ['except' => ['create', 'show']]);
+
+        $this->assertCount(15, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+        }
+    }
+
+    public function testCanRegisterResourcesWithOnlyOption()
+    {
+        $this->router->resources([
+            'resource-one'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubOne::class,
+            'resource-two'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => \Illuminate\Tests\Routing\RouteRegistrarControllerStubThree::class,
+        ], ['only' => ['create', 'show']]);
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+        }
+    }
+
+    public function testCanRegisterResourcesWithoutOption()
+    {
+        $this->router->resources([
+            'resource-one'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubOne::class,
+            'resource-two'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => \Illuminate\Tests\Routing\RouteRegistrarControllerStubThree::class,
+        ]);
+
+        $this->assertCount(21, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+        }
+    }
+
     public function testCanAccessRegisteredResourceRoutesAsRouteCollection()
     {
         $resource = $this->router->middleware('resource-middleware')
@@ -268,6 +333,72 @@ class RouteRegistrarTest extends TestCase
 
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
+    public function testCanRegisterApiResourcesWithExceptOption()
+    {
+        $this->router->apiResources([
+            'resource-one'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubOne::class,
+            'resource-two'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => \Illuminate\Tests\Routing\RouteRegistrarControllerStubThree::class,
+        ], ['except' => ['create', 'show']]);
+
+        $this->assertCount(12, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+        }
+    }
+
+    public function testCanRegisterApiResourcesWithOnlyOption()
+    {
+        $this->router->apiResources([
+            'resource-one'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubOne::class,
+            'resource-two'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => \Illuminate\Tests\Routing\RouteRegistrarControllerStubThree::class,
+        ], ['only' => ['index', 'show']]);
+
+        $this->assertCount(6, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+        }
+    }
+
+    public function testCanRegisterApiResourcesWithoutOption()
+    {
+        $this->router->apiResources([
+            'resource-one'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubOne::class,
+            'resource-two'      => \Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo::class,
+            'resource-three'    => \Illuminate\Tests\Routing\RouteRegistrarControllerStubThree::class,
+        ]);
+
+        $this->assertCount(15, $this->router->getRoutes());
+
+        foreach (['one', 'two', 'three'] as $resource) {
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.index'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.show'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.store'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.update'));
+            $this->assertTrue($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.destroy'));
+
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.create'));
+            $this->assertFalse($this->router->getRoutes()->hasNamedRoute('resource-'.$resource.'.edit'));
+        }
     }
 
     public function testUserCanRegisterApiResource()
