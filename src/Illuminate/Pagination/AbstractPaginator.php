@@ -380,7 +380,7 @@ abstract class AbstractPaginator implements Htmlable
      * Set the number of links to display on each side of current page link.
      *
      * @param  int  $count
-     * @return this
+     * @return $this
      */
     public function onEachSide($count)
     {
