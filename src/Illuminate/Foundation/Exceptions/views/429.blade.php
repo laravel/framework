@@ -1,4 +1,4 @@
-@extends('errors::layout')
+@extends('errors::illustrated-layout')
 
 @section('code', '429')
 @section('title', 'Too Many Requests')
