@@ -2,8 +2,6 @@
 
 namespace Illuminate\Contracts\Mail;
 
-use Illuminate\Contracts\Mail\Mailable as MailableContract;
-
 interface Mailer
 {
     /**
