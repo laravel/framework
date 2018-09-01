@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Collect;
 
 use stdClass;
 use Exception;
@@ -9,14 +9,11 @@ use Mockery as m;
 use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
+use Illuminate\Collect\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-/**
- * @deprecated Test that there isn't any breaking change during the Illuminate/Collect refactoring.
- */
-class SupportCollectionTest extends TestCase
+class CollectCollectionTest extends TestCase
 {
     public function testFirstReturnsFirstItemInCollection()
     {
