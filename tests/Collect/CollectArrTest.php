@@ -1,16 +1,15 @@
 <?php
 
-namespace Illuminate\Tests\Support;
+namespace Illuminate\Tests\Collect;
 
 use stdClass;
 use ArrayObject;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Carbon;
+use Illuminate\Collect\Arr;
+use Illuminate\Support\Carbon; // TODO  Refactoring
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
+use Illuminate\Collect\Collection;
 
-/** @deprecated Test that there isn't any breaking change during the Illuminate/Collect refactoring. */
-class SupportArrTest extends TestCase
+class CollectArrTest extends TestCase
 {
     public function testAccessible()
     {

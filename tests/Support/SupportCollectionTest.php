@@ -13,9 +13,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
-/**
- * @deprecated Test that there isn't any breaking change during the Illuminate/Collect refactoring.
- */
+/** @deprecated Test that there isn't any breaking change during the Illuminate/Collect refactoring. */
 class SupportCollectionTest extends TestCase
 {
     public function testFirstReturnsFirstItemInCollection()
