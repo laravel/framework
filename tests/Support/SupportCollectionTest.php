@@ -2384,6 +2384,36 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([3, 4, 5, 6], $collection->slice(-6, -2)->values()->toArray());
     }
 
+    public function testApertureDefaultLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6]);
+        $this->assertEquals([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6]], $collection->aperture()->toArray());
+    }
+
+    public function testApertureOneLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([[1], [2], [3]], $collection->aperture(1)->toArray());
+    }
+
+    public function testApertureTooLongLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([], $collection->aperture(5)->toArray());
+    }
+
+    public function testApertureNegativeLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([], $collection->aperture(-1)->toArray());
+    }
+
+    public function testApertureZeroLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([], $collection->aperture(0)->toArray());
+    }
+
     public function testCollectionFromTraversable()
     {
         $collection = new Collection(new \ArrayObject([1, 2, 3]));

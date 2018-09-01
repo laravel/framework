@@ -128,6 +128,31 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Returns a new collection containing sub-collections with n consecutive elements.
+     * If the length is zero, negative or greater than the size of the collection,
+     * an empty collection will be returned.
+     *
+     * @param int $length
+     * @return static
+     */
+    public function aperture($length = 2)
+    {
+        if ($length < 1) {
+            return new self;
+        }
+
+        $idx = 0;
+        $limit = $this->count() - ($length - 1);
+        $collection = new self;
+        while ($idx < $limit) {
+            $collection->push($this->slice($idx, $length)->values());
+            $idx++;
+        }
+
+        return $collection;
+    }
+
+    /**
      * Get all of the items in the collection.
      *
      * @return array
