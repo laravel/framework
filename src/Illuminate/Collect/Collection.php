@@ -455,7 +455,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get all items except for those with the specified keys.
      *
-     * @param  \Illuminate\Support\Collection|mixed  $keys
+     * @param  \Illuminate\Collect\Collection|mixed  $keys
      * @return static
      */
     public function except($keys)
@@ -1807,9 +1807,9 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Get a base Support collection instance from this collection.
+     * Get a base Collect collection instance from this collection.
      *
-     * @return \Illuminate\Support\Collection
+     * @return \Illuminate\Collect\Collection
      */
     public function toBase()
     {
