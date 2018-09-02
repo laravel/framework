@@ -102,8 +102,4 @@ class DatabaseSoftDeletingTraitStub
     {
         return defined('static::UPDATED_AT') ? static::UPDATED_AT : 'updated_at';
     }
-
-    public function syncOriginal()
-    {
-    }
 }
