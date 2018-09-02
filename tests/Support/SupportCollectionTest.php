@@ -2404,8 +2404,9 @@ class SupportCollectionTest extends TestCase
 
     public function testNgramNegativeLength()
     {
+        $this->expectException(\InvalidArgumentException::class);
         $collection = new Collection([1, 2, 3]);
-        $this->assertEquals([], $collection->ngram(-1)->toArray());
+        $collection->ngram(-1);
     }
 
     public function testNgramZeroLength()
