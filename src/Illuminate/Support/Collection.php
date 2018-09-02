@@ -138,12 +138,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function aperture($length = 2)
     {
         if ($length < 1) {
-            return new self;
+            return new static;
         }
 
         $idx = 0;
         $limit = $this->count() - ($length - 1);
-        $collection = new self;
+        $collection = new static;
         while ($idx < $limit) {
             $collection->push($this->slice($idx, $length)->values());
             $idx++;
