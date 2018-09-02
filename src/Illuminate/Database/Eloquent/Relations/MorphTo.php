@@ -231,6 +231,8 @@ class MorphTo extends BelongsTo
      */
     public function withoutGlobalScopes(array $scopes = null)
     {
+        $this->getQuery()->withoutGlobalScopes($scopes);
+
         $this->macroBuffer[] = [
             'method' => __FUNCTION__,
             'parameters' => [$scopes],
