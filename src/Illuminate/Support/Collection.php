@@ -128,24 +128,34 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
-     * Returns a new collection containing sub-collections with n consecutive elements.
-     * If the length is zero, negative or greater than the size of the collection,
-     * an empty collection will be returned.
+     * Returns a new collection containing sub-collections with overlapping n-grams.
+     * If n is zero or greater than the size of the collection, an empty collection will be returned.
      *
-     * @param int $length
+     * <code>
+     * $collection = collect([1, 2, 3, 4, 5])
+     * $collection->ngram()->toArray(); // [[1, 2], [2, 3], [3, 4], [4, 5]]
+     * $collection->ngram(3)->toArray(); // [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+     * </code>
+     *
+     * @param int $n
      * @return static
+     * @throws \InvalidArgumentException When $n is negative
      */
-    public function aperture($length = 2)
+    public function ngram($n = 2)
     {
-        if ($length < 1) {
+        if ($n < 0) {
+            throw new \InvalidArgumentException("n can't be negative");
+        }
+
+        if ($n == 0) {
             return new static;
         }
 
         $idx = 0;
-        $limit = $this->count() - ($length - 1);
+        $limit = $this->count() - ($n - 1);
         $collection = new static;
         while ($idx < $limit) {
-            $collection->push($this->slice($idx, $length)->values());
+            $collection->push($this->slice($idx, $n)->values());
             $idx++;
         }
 
