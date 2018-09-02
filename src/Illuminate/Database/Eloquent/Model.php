@@ -681,7 +681,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // If the model has an incrementing key, we can use the "insertGetId" method on
         // the query builder, which will give us back the final inserted ID for this
         // table from the database. Not all tables have to be incrementing though.
-        $attributes = $this->attributes;
+        $attributes = $this->getAttributes();
 
         if ($this->getIncrementing()) {
             $this->insertAndSetId($query, $attributes);
@@ -1345,7 +1345,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function getForeignKey()
     {
-        return Str::snake(class_basename($this)).'_'.$this->primaryKey;
+        return Str::snake(class_basename($this)).'_'.$this->getKeyName();
     }
 
     /**
