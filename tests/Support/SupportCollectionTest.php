@@ -2384,6 +2384,37 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([3, 4, 5, 6], $collection->slice(-6, -2)->values()->toArray());
     }
 
+    public function testNgramDefaultLength()
+    {
+        $collection = new Collection([1, 2, 3, 4, 5, 6]);
+        $this->assertEquals([[1, 2], [2, 3], [3, 4], [4, 5], [5, 6]], $collection->ngram()->toArray());
+    }
+
+    public function testNgramOneLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([[1], [2], [3]], $collection->ngram(1)->toArray());
+    }
+
+    public function testNgramTooLongLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([], $collection->ngram(5)->toArray());
+    }
+
+    public function testNgramNegativeLength()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $collection = new Collection([1, 2, 3]);
+        $collection->ngram(-1);
+    }
+
+    public function testNgramZeroLength()
+    {
+        $collection = new Collection([1, 2, 3]);
+        $this->assertEquals([], $collection->ngram(0)->toArray());
+    }
+
     public function testCollectionFromTraversable()
     {
         $collection = new Collection(new \ArrayObject([1, 2, 3]));
