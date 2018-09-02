@@ -419,7 +419,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Apply the callback if the value is truthy.
      *
-     * @param  bool  $value
+     * @param  mixed  $value
      * @param  callable  $callback
      * @param  callable  $default
      * @return mixed
