@@ -19,7 +19,6 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo = m::mock('Illuminate\Foundation\ProviderRepository[createProvider,loadManifest,shouldRecompile]', [$app, m::mock('Illuminate\Filesystem\Filesystem'), [__DIR__.'/services.php']]);
         $repo->shouldReceive('loadManifest')->once()->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
         $repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
-        $provider = m::mock('Illuminate\Support\ServiceProvider');
 
         $app->shouldReceive('register')->once()->with('foo');
         $app->shouldReceive('runningInConsole')->andReturn(false);
