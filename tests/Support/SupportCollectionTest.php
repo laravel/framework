@@ -145,7 +145,7 @@ class SupportCollectionTest extends TestCase
 
     public function testCollectionShuffleWithSeed()
     {
-        $collection = new Collection((range(0, 100, 10)));
+        $collection = new Collection(range(0, 100, 10));
 
         $firstRandom = $collection->shuffle(1234);
         $secondRandom = $collection->shuffle(1234);
