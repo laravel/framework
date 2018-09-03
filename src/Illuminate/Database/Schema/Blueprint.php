@@ -1072,7 +1072,7 @@ class Blueprint
      * Create a new point column on the table.
      *
      * @param  string  $column
-     * @param  null|int  $srid
+     * @param  int|null  $srid
      * @return \Illuminate\Database\Schema\ColumnDefinition
      */
     public function point($column, $srid = null)
