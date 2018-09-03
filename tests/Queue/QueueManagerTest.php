@@ -20,7 +20,7 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.sync' => ['driver' => 'sync'],
             ],
-            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            'encrypter' => m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
 
         $manager = new QueueManager($app);
@@ -43,7 +43,7 @@ class QueueManagerTest extends TestCase
                 'queue.default' => 'sync',
                 'queue.connections.foo' => ['driver' => 'bar'],
             ],
-            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            'encrypter' => m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
 
         $manager = new QueueManager($app);
@@ -65,7 +65,7 @@ class QueueManagerTest extends TestCase
             'config' => [
                 'queue.default' => 'null',
             ],
-            'encrypter' => $encrypter = m::mock('Illuminate\Contracts\Encryption\Encrypter'),
+            'encrypter' => m::mock('Illuminate\Contracts\Encryption\Encrypter'),
         ];
 
         $manager = new QueueManager($app);
