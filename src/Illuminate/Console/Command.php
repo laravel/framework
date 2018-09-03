@@ -315,7 +315,7 @@ class Command extends SymfonyCommand
      *
      * @param  string  $question
      * @param  string|null  $default
-     * @return string
+     * @return mixed
      */
     public function ask($question, $default = null)
     {
@@ -328,7 +328,7 @@ class Command extends SymfonyCommand
      * @param  string  $question
      * @param  array   $choices
      * @param  string|null  $default
-     * @return string
+     * @return mixed
      */
     public function anticipate($question, array $choices, $default = null)
     {
@@ -341,7 +341,7 @@ class Command extends SymfonyCommand
      * @param  string  $question
      * @param  array   $choices
      * @param  string|null  $default
-     * @return string
+     * @return mixed
      */
     public function askWithCompletion($question, array $choices, $default = null)
     {
@@ -357,7 +357,7 @@ class Command extends SymfonyCommand
      *
      * @param  string  $question
      * @param  bool    $fallback
-     * @return string
+     * @return mixed
      */
     public function secret($question, $fallback = true)
     {
