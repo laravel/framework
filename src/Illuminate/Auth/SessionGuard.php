@@ -539,7 +539,7 @@ class SessionGuard implements StatefulGuard, SupportsBasicAuth
      *
      * @param  string  $password
      * @param  string  $attribute
-     * @return null|bool
+     * @return bool|null
      */
     public function logoutOtherDevices($password, $attribute = 'password')
     {
