@@ -1,0 +1,37 @@
+{
+    "name": "illuminate/collect",
+    "description": "The Illuminate Collect package.",
+    "license": "MIT",
+    "homepage": "https://laravel.com",
+    "support": {
+        "issues": "https://github.com/laravel/framework/issues",
+        "source": "https://github.com/laravel/framework"
+    },
+    "authors": [
+        {
+            "name": "Taylor Otwell",
+            "email": "taylor@laravel.com"
+        }
+    ],
+    "require": {
+        "php": "^7.1.3",
+        "illuminate/contracts": "5.8.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "Illuminate\\Collect\\": ""
+        }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "5.8-dev"
+        }
+    },
+    "suggest": {
+        "symfony/var-dumper": "Required to use the dump and dd methods (^4.1)."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "minimum-stability": "dev"
+}

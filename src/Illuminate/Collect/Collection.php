@@ -11,10 +11,10 @@ use ArrayIterator;
 use CachingIterator;
 use JsonSerializable;
 use IteratorAggregate;
-use Illuminate\Support\Traits\Macroable; // Todo refactor
-use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Support\Traits\Macroable; // TODO How can we handle this one? This is the only requirement to Support.
+use Illuminate\Contracts\Support\Jsonable; // TODO What to do with them ? Fetch all the contracts just for them?
 use Symfony\Component\VarDumper\VarDumper;
-use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Arrayable; // TODO What to do with them ? Fetch all the contracts just for them?
 
 /**
  * @property-read HigherOrderCollectionProxy $average

@@ -5,7 +5,7 @@ namespace Illuminate\Tests\Collect;
 use stdClass;
 use ArrayObject;
 use Illuminate\Collect\Arr;
-use Illuminate\Support\Carbon; // TODO  Refactoring
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Collect\Collection;
 
