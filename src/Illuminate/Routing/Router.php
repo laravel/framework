@@ -284,7 +284,7 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
-     * Register an entrypoint for single page applications
+     * Register an entrypoint for single page applications.
      *
      * @param  \Closure|array|string|null  $action
      * @return \Illuminate\Routing\Route
