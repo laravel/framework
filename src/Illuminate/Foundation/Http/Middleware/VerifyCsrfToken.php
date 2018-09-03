@@ -105,7 +105,7 @@ class VerifyCsrfToken
                 $except = trim($except, '/');
             }
 
-            if ($request->fullUrlIs($except) || $request->is($except)) {
+            if ($request->fullUrlIs($except) || $request->is($except) || $request->routeIs($except)) {
                 return true;
             }
         }
