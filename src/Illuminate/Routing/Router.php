@@ -284,6 +284,17 @@ class Router implements RegistrarContract, BindingRegistrar
     }
 
     /**
+     * Register an entrypoint for single page applications.
+     *
+     * @param  \Closure|array|string|null  $action
+     * @return \Illuminate\Routing\Route
+     */
+    public function entrypoint($action = null)
+    {
+        return $this->addRoute(['GET', 'HEAD'], '{capture?}', $action)->where('capture', '[\/\w\.-]*');
+    }
+
+    /**
      * Register an array of resource controllers.
      *
      * @param  array  $resources
