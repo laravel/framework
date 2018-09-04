@@ -36,6 +36,6 @@ class AuthenticateWithBasicAuth
      */
     public function handle($request, Closure $next, $guard = null, $field = null)
     {
-        return $this->auth->guard($guard)->basic($field) ?: $next($request);
+        return $this->auth->guard($guard)->basic($field ?: 'email') ?: $next($request);
     }
 }
