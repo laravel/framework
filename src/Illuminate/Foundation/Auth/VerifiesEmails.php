@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Auth;
 
+use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
 
 trait VerifiesEmails
@@ -30,7 +31,9 @@ trait VerifiesEmails
     public function verify(Request $request)
     {
         if ($request->route('id') == $request->user()->getKey()) {
-            $request->user()->markEmailAsVerified();
+            if ($request->user()->markEmailAsVerified()) {
+                event(new Verified($request->user()));
+            }
         }
 
         return redirect($this->redirectPath());
