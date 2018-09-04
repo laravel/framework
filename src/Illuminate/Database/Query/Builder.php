@@ -4,7 +4,7 @@ namespace Illuminate\Database\Query;
 
 use Closure;
 use RuntimeException;
-use BadMethodCallException;
+use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
@@ -13,6 +13,7 @@ use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Database\Query\Processors\Processor;
@@ -20,7 +21,7 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class Builder
 {
-    use BuildsQueries, Macroable {
+    use BuildsQueries, ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -1060,7 +1061,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1070,6 +1071,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('Y-m-d');
+        }
+
         return $this->addDateBasedWhere('Date', $column, $operator, $value, $boolean);
     }
 
@@ -1078,7 +1083,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDate($column, $operator, $value = null)
@@ -1095,7 +1100,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  mixed   $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string   $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1105,6 +1110,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('H:i:s');
+        }
+
         return $this->addDateBasedWhere('Time', $column, $operator, $value, $boolean);
     }
 
@@ -1113,7 +1122,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string   $operator
-     * @param  mixed   $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereTime($column, $operator, $value = null)
@@ -1130,7 +1139,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1140,6 +1149,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('d');
+        }
+
         return $this->addDateBasedWhere('Day', $column, $operator, $value, $boolean);
     }
 
@@ -1148,7 +1161,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereDay($column, $operator, $value = null)
@@ -1165,7 +1178,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1175,6 +1188,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('m');
+        }
+
         return $this->addDateBasedWhere('Month', $column, $operator, $value, $boolean);
     }
 
@@ -1183,7 +1200,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereMonth($column, $operator, $value = null)
@@ -1200,7 +1217,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string|int  $value
      * @param  string  $boolean
      * @return \Illuminate\Database\Query\Builder|static
      */
@@ -1210,6 +1227,10 @@ class Builder
             $value, $operator, func_num_args() === 2
         );
 
+        if ($value instanceof DateTimeInterface) {
+            $value = $value->format('Y');
+        }
+
         return $this->addDateBasedWhere('Year', $column, $operator, $value, $boolean);
     }
 
@@ -1218,7 +1239,7 @@ class Builder
      *
      * @param  string  $column
      * @param  string  $operator
-     * @param  mixed  $value
+     * @param  \DateTimeInterface|string|int  $value
      * @return \Illuminate\Database\Query\Builder|static
      */
     public function orWhereYear($column, $operator, $value = null)
@@ -1389,7 +1410,7 @@ class Builder
     {
         $type = $not ? 'NotExists' : 'Exists';
 
-        $this->wheres[] = compact('type', 'operator', 'query', 'boolean');
+        $this->wheres[] = compact('type', 'query', 'boolean');
 
         $this->addBinding($query->getBindings(), 'where');
 
@@ -1415,7 +1436,7 @@ class Builder
 
         $this->wheres[] = compact('type', 'columns', 'operator', 'values', 'boolean');
 
-        $this->addBinding($values);
+        $this->addBinding($this->cleanBindings($values));
 
         return $this;
     }
@@ -2813,8 +2834,6 @@ class Builder
             return $this->dynamicWhere($method, $parameters);
         }
 
-        throw new BadMethodCallException(sprintf(
-            'Method %s::%s does not exist.', static::class, $method
-        ));
+        static::throwBadMethodCallException($method);
     }
 }

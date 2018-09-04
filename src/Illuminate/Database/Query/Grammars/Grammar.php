@@ -490,9 +490,11 @@ class Grammar extends BaseGrammar
      */
     protected function whereRowValues(Builder $query, $where)
     {
+        $columns = $this->columnize($where['columns']);
+
         $values = $this->parameterize($where['values']);
 
-        return '('.implode(', ', $where['columns']).') '.$where['operator'].' ('.$values.')';
+        return '('.$columns.') '.$where['operator'].' ('.$values.')';
     }
 
     /**
@@ -928,6 +930,17 @@ class Grammar extends BaseGrammar
     protected function wrapJsonSelector($value)
     {
         throw new RuntimeException('This database engine does not support JSON operations.');
+    }
+
+    /**
+     * Wrap the given JSON path.
+     *
+     * @param  string  $value
+     * @return string
+     */
+    protected function wrapJsonPath($value)
+    {
+        return '\'$."'.str_replace('->', '"."', $value).'"\'';
     }
 
     /**

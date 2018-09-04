@@ -5,6 +5,13 @@ namespace Illuminate\Auth\Events;
 class Failed
 {
     /**
+     * The authentication guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    public $guard;
+
+    /**
      * The user the attempter was trying to authenticate as.
      *
      * @var \Illuminate\Contracts\Auth\Authenticatable|null
@@ -21,13 +28,15 @@ class Failed
     /**
      * Create a new event instance.
      *
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
      * @param  array  $credentials
      * @return void
      */
-    public function __construct($user, $credentials)
+    public function __construct($guard, $user, $credentials)
     {
         $this->user = $user;
+        $this->guard = $guard;
         $this->credentials = $credentials;
     }
 }

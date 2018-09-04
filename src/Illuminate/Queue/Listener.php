@@ -222,7 +222,7 @@ class Listener
      */
     public function memoryExceeded($memoryLimit)
     {
-        return (memory_get_usage() / 1024 / 1024) >= $memoryLimit;
+        return (memory_get_usage(true) / 1024 / 1024) >= $memoryLimit;
     }
 
     /**

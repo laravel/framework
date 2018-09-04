@@ -370,6 +370,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      *
      * @param  string  $path
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function url($path)
     {
@@ -489,6 +491,8 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      * @param  \DateTimeInterface  $expiration
      * @param  array  $options
      * @return string
+     *
+     * @throws \RuntimeException
      */
     public function temporaryUrl($path, $expiration, array $options = [])
     {

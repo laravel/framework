@@ -148,7 +148,7 @@ trait HasEvents
         // First, we will get the proper method to call on the event dispatcher, and then we
         // will attempt to fire a custom, object based event for the given event. If that
         // returns a result we can return that result, or we'll call the string events.
-        $method = $halt ? 'until' : 'fire';
+        $method = $halt ? 'until' : 'dispatch';
 
         $result = $this->filterModelEventResults(
             $this->fireCustomModelEvent($event, $method)

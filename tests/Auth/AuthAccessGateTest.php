@@ -26,6 +26,32 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_before_can_allow_guests()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->before(function (?StdClass $user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
+    public function test_after_can_allow_guests()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->after(function (?StdClass $user) {
+            return true;
+        });
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
     public function test_closures_can_allow_guest_users()
     {
         $gate = new Gate(new Container, function () {

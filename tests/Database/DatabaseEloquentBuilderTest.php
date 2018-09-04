@@ -408,6 +408,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals($builder->bam(), $builder->getQuery());
     }
 
+    /**
+     * @expectedException \BadMethodCallException
+     * @expectedExceptionMessage Call to undefined method Illuminate\Database\Eloquent\Builder::missingMacro()
+     */
+    public function testMissingStaticMacrosThrowsProperException()
+    {
+        Builder::missingMacro();
+    }
+
     public function testGetModelsProperlyHydratesModels()
     {
         $builder = m::mock('Illuminate\Database\Eloquent\Builder[get]', [$this->getMockQueryBuilder()]);
@@ -460,7 +469,7 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
+        $builder->getModel()->shouldReceive('newInstance->orders')->once()->andReturn($relation = m::mock('stdClass'));
         $relationQuery = m::mock('stdClass');
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);
         $relationQuery->shouldReceive('with')->once()->with(['lines' => null, 'lines.details' => null]);
@@ -473,8 +482,8 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->setModel($this->getMockModel());
-        $builder->getModel()->shouldReceive('orders')->once()->andReturn($relation = m::mock('stdClass'));
-        $builder->getModel()->shouldReceive('ordersGroups')->once()->andReturn($groupsRelation = m::mock('stdClass'));
+        $builder->getModel()->shouldReceive('newInstance->orders')->once()->andReturn($relation = m::mock('stdClass'));
+        $builder->getModel()->shouldReceive('newInstance->ordersGroups')->once()->andReturn($groupsRelation = m::mock('stdClass'));
 
         $relationQuery = m::mock('stdClass');
         $relation->shouldReceive('getQuery')->andReturn($relationQuery);

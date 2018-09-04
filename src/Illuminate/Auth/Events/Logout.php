@@ -9,6 +9,13 @@ class Logout
     use SerializesModels;
 
     /**
+     * The authenticationg guard implementation.
+     *
+     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     */
+    public $guard;
+
+    /**
      * The authenticated user.
      *
      * @var \Illuminate\Contracts\Auth\Authenticatable
@@ -18,11 +25,13 @@ class Logout
     /**
      * Create a new event instance.
      *
+     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
-    public function __construct($user)
+    public function __construct($guard, $user)
     {
         $this->user = $user;
+        $this->guard = $guard;
     }
 }

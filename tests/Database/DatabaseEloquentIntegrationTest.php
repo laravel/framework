@@ -716,6 +716,14 @@ class DatabaseEloquentIntegrationTest extends TestCase
         $this->assertEquals($questionMarksCount, $bindingsCount);
     }
 
+    /**
+     * @expectedException \RuntimeException
+     */
+    public function testHasOnMorphToRelationship()
+    {
+        EloquentTestPhoto::has('imageable')->get();
+    }
+
     public function testBelongsToManyRelationshipModelsAreProperlyHydratedOverChunkedRequest()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);

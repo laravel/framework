@@ -9,13 +9,14 @@ use Illuminate\Support\Traits\Macroable;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Expression;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Traits\ForwardsCalls;
 
 /**
  * @mixin \Illuminate\Database\Eloquent\Builder
  */
 abstract class Relation
 {
-    use Macroable {
+    use ForwardsCalls, Macroable {
         __call as macroCall;
     }
 
@@ -223,7 +224,7 @@ abstract class Relation
     {
         return collect($models)->map(function ($value) use ($key) {
             return $key ? $value->getAttribute($key) : $value->getKey();
-        })->values()->unique()->sort()->all();
+        })->values()->unique(null, true)->sort()->all();
     }
 
     /**
@@ -366,7 +367,7 @@ abstract class Relation
             return $this->macroCall($method, $parameters);
         }
 
-        $result = $this->query->{$method}(...$parameters);
+        $result = $this->forwardCallTo($this->query, $method, $parameters);
 
         if ($result === $this->query) {
             return $this;

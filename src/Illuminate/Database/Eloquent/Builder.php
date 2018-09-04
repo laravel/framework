@@ -8,6 +8,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Database\Concerns\BuildsQueries;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Query\Builder as QueryBuilder;
@@ -17,7 +18,7 @@ use Illuminate\Database\Query\Builder as QueryBuilder;
  */
 class Builder
 {
-    use BuildsQueries, Concerns\QueriesRelationships;
+    use BuildsQueries, Concerns\QueriesRelationships, ForwardsCalls;
 
     /**
      * The base query builder instance.
@@ -152,12 +153,12 @@ class Builder
      */
     public function withoutGlobalScopes(array $scopes = null)
     {
-        if (is_array($scopes)) {
-            foreach ($scopes as $scope) {
-                $this->withoutGlobalScope($scope);
-            }
-        } else {
-            $this->scopes = [];
+        if (! is_array($scopes)) {
+            $scopes = array_keys($this->scopes);
+        }
+
+        foreach ($scopes as $scope) {
+            $this->withoutGlobalScope($scope);
         }
 
         return $this;
@@ -577,7 +578,7 @@ class Builder
         // and error prone. We don't want constraints because we add eager ones.
         $relation = Relation::noConstraints(function () use ($name) {
             try {
-                return $this->getModel()->{$name}();
+                return $this->getModel()->newInstance()->$name();
             } catch (BadMethodCallException $e) {
                 throw RelationNotFoundException::make($this->getModel(), $name);
             }
@@ -1317,7 +1318,7 @@ class Builder
             return $this->toBase()->{$method}(...$parameters);
         }
 
-        $this->query->{$method}(...$parameters);
+        $this->forwardCallTo($this->query, $method, $parameters);
 
         return $this;
     }
@@ -1340,9 +1341,7 @@ class Builder
         }
 
         if (! isset(static::$macros[$method])) {
-            throw new BadMethodCallException(sprintf(
-                'Method %s::%s does not exist.', static::class, $method
-            ));
+            static::throwBadMethodCallException($method);
         }
 
         if (static::$macros[$method] instanceof Closure) {
