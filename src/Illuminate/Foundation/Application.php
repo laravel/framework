@@ -1048,6 +1048,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function setLocale($locale)
     {
+        if ($this->isLocale($locale)) {
+            return;
+        }
+
         $this['config']->set('app.locale', $locale);
 
         $this['translator']->setLocale($locale);
