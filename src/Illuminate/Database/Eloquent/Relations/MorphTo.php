@@ -230,12 +230,9 @@ class MorphTo extends BelongsTo
      */
     public function touch()
     {
-        // If there is no related model, we'll just return to prevent an invalid query.
-        if (is_null($this->ownerKey)) {
-            return;
+        if (! is_null($this->ownerKey)) {
+            parent::touch();
         }
-
-        parent::touch();
     }
 
     /**
