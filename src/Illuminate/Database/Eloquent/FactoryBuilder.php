@@ -2,7 +2,6 @@
 
 namespace Illuminate\Database\Eloquent;
 
-use Illuminate\Support\Arr;
 use Faker\Generator as Faker;
 use InvalidArgumentException;
 use Illuminate\Support\Traits\Macroable;
@@ -66,13 +65,6 @@ class FactoryBuilder
      * @var array
      */
     protected $activeStates = [];
-
-    /**
-     * Indicates if the state to apply is random.
-     *
-     * @var bool
-     */
-    protected $hasRandomState = false;
 
     /**
      * The Faker instance for the builder.
@@ -145,32 +137,6 @@ class FactoryBuilder
     public function states($states)
     {
         $this->activeStates = is_array($states) ? $states : func_get_args();
-
-        return $this;
-    }
-
-    /**
-     * Set the available states to be applied to the model and that the model has a random state.
-     *
-     * @param  array|mixed  $states
-     * @return $this
-     */
-    public function randomStates($states)
-    {
-        $this->states($states);
-        $this->randomState();
-
-        return $this;
-    }
-
-    /**
-     * State that the model has a random state.
-     *
-     * @return $this
-     */
-    public function randomState()
-    {
-        $this->hasRandomState = true;
 
         return $this;
     }
@@ -343,19 +309,6 @@ class FactoryBuilder
      */
     protected function applyStates(array $definition, array $attributes = [])
     {
-        if ($this->hasRandomState) {
-            $state = Arr::random($this->activeStates);
-
-            if (! isset($this->states[$this->class][$state]) && ! $this->stateHasAfterCallback($state)) {
-                throw new InvalidArgumentException("Unable to locate [{$state}] state for [{$this->class}].");
-            }
-
-            return array_merge(
-                $definition,
-                $this->stateAttributes($state, $attributes)
-            );
-        }
-
         foreach ($this->activeStates as $state) {
             if (! isset($this->states[$this->class][$state])) {
                 if ($this->stateHasAfterCallback($state)) {
