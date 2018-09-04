@@ -58,6 +58,35 @@ class SendingMailWithLocaleTest extends TestCase
         );
     }
 
+    public function test_mail_sent_with_new_locale_raises_event()
+    {
+        Event::fake();
+
+        Mail::to('test@mail.com')->locale($locale = 'ar')->send(new TestMail);
+
+        Event::assertDispatched(LocaleUpdated::class, function ($event) use ($locale) {
+            return $event->locale === $locale;
+        });
+    }
+
+    public function test_mail_sent_with_default_locale_does_not_raise_event()
+    {
+        Event::fake();
+
+        Mail::to('test@mail.com')->locale('en')->send(new TestMail);
+
+        Event::assertNotDispatched(LocaleUpdated::class);
+    }
+
+    public function test_mail_sent_without_locale_does_not_raise_event()
+    {
+        Event::fake();
+
+        Mail::to('test@mail.com')->send(new TestMail);
+
+        Event::assertNotDispatched(LocaleUpdated::class);
+    }
+
     public function test_mail_is_sent_with_selected_locale()
     {
         Mail::to('test@mail.com')->locale('ar')->send(new TestMail());

@@ -128,6 +128,50 @@ class SendingNotificationsWithLocaleTest extends TestCase
         );
     }
 
+    public function test_notification_sent_without_locale_does_not_raise_event()
+    {
+        Event::fake();
+
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $user->notify((new GreetingMailNotification));
+
+        Event::assertNotDispatched(LocaleUpdated::class);
+    }
+
+    public function test_notification_sent_with_default_locale_does_not_raise_event()
+    {
+        Event::fake();
+
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $user->notify((new GreetingMailNotification)->locale('en'));
+
+        Event::assertNotDispatched(LocaleUpdated::class);
+    }
+
+    public function test_notification_sent_with_new_locale_raises_event()
+    {
+        Event::fake();
+
+        $user = NotifiableLocalizedUser::forceCreate([
+            'email' => 'taylor@laravel.com',
+            'name' => 'Taylor Otwell',
+        ]);
+
+        $user->notify((new GreetingMailNotification)->locale($locale = 'fr'));
+
+        Event::assertDispatched(LocaleUpdated::class, function ($event) use ($locale) {
+            return $event->locale === $locale;
+        });
+    }
+
     public function test_mail_is_sent_with_locale_updated_listeners_called()
     {
         Carbon::setTestNow(Carbon::parse('2018-07-25'));
