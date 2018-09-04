@@ -224,6 +224,18 @@ class MorphTo extends BelongsTo
     }
 
     /**
+     * Touch all of the related models for the relationship.
+     *
+     * @return void
+     */
+    public function touch()
+    {
+        if (! is_null($this->ownerKey)) {
+            parent::touch();
+        }
+    }
+
+    /**
      * Remove all or passed registered global scopes.
      *
      * @param  array|null  $scopes
