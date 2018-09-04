@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Auth;
 
-use Illuminate\Auth\Events\Verified;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Verified;
 
 trait VerifiesEmails
 {
