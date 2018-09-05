@@ -39,7 +39,7 @@ class TrimStrings extends TransformsRequest
     protected function cleanValue($key, $value)
     {
         if (is_array($value)) {
-            if(! in_array($key, $this->except, true)){
+            if (! in_array($key, $this->except, true)) {
                 return $this->cleanArray($value);
             } else {
                 return $value;
