@@ -37,6 +37,13 @@ class BladeCompiler extends Compiler implements CompilerInterface
     protected $customDirectives = [];
 
     /**
+     * All the custom "helper directive" callbacks.
+     *
+     * @var array
+     */
+    protected $customHelpers = [];
+
+    /**
      * All custom "condition" handlers.
      *
      * @var array
@@ -410,6 +417,47 @@ class BladeCompiler extends Compiler implements CompilerInterface
         $this->directive('end'.$name, function () {
             return '<?php endif; ?>';
         });
+    }
+
+    /**
+     * Create a helper directive for a regular function.
+     *
+     * @param string $directiveName
+     * @param string|callable $function
+     * @param bool $shouldEcho
+     * @return void
+     */
+    public function helper(string $directiveName, $function = null, bool $shouldEcho = true)
+    {
+        $echo = $shouldEcho ? 'echo ' : '';
+
+        if (!is_string($function) && is_callable($function)) {
+            $this->customHelpers[$directiveName] = $function;
+
+            $this->directive($directiveName, function($expression) use ($directiveName, $echo) {
+                return "<?php $echo\Illuminate\Support\Facades\Blade::getHelper('$directiveName', $expression); ?>";
+            });
+
+            return;
+        }
+
+        $functionName = $function ?? $directiveName;
+
+        $this->directive($directiveName, function($expression) use ($functionName, $echo) {
+            return "<?php $echo$functionName($expression); ?>";
+        });
+    }
+
+    /**
+     * Get and execute a callback helper directive.
+     *
+     * @param string $name
+     * @param mixed ...$arguments
+     * @return mixed
+     */
+    public function getHelper(string $name, ...$arguments)
+    {
+        return $this->customHelpers[$name](...$arguments);
     }
 
     /**

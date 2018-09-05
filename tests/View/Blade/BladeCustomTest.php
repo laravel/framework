@@ -185,4 +185,56 @@ class BladeCustomTest extends AbstractBladeTestCase
         $expected = '<?php echo $__env->make(\'app.includes.foreach\', [], \Illuminate\Support\Arr::except(get_defined_vars(), array(\'__data\', \'__path\')))->render(); ?>';
         $this->assertEquals($expected, $this->compiler->compileString($string));
     }
+
+    public function testCustomNamedHelpers()
+    {
+        $this->assertCount(0, $this->compiler->getCustomDirectives());
+        $this->compiler->helper('uppercase', 'strtoupper');
+        $this->assertCount(1, $this->compiler->getCustomDirectives());
+
+        $string = '@uppercase("Hello world.")';
+        $expected = '<?php echo strtoupper("Hello world."); ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomUnnamedHelpers()
+    {
+        $this->assertCount(0, $this->compiler->getCustomDirectives());
+        $this->compiler->helper('join');
+        $this->assertCount(1, $this->compiler->getCustomDirectives());
+
+        $string = '@join("|", ["Hello", "world"])';
+        $expected = '<?php echo join("|", ["Hello", "world"]); ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomHelpersWithoutEcho()
+    {
+        $this->assertCount(0, $this->compiler->getCustomDirectives());
+        $this->compiler->helper('join', null, false);
+        $this->assertCount(1, $this->compiler->getCustomDirectives());
+
+        $string = '@join("|", ["Hello", "world"])';
+        $expected = '<?php join("|", ["Hello", "world"]); ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+    }
+
+    public function testCustomHelperCallbacks()
+    {
+        $this->assertCount(0, $this->compiler->getCustomDirectives());
+        $this->compiler->helper('example', function($a, $b, $c = 'give', $d = 'you') {
+            return "$a $b $c $d up";
+        });
+        $this->assertCount(1, $this->compiler->getCustomDirectives());
+
+        $string = '@example("Never", "gonna")';
+        $expected = '<?php echo \Illuminate\Support\Facades\Blade::getHelper(\'example\', "Never", "gonna"); ?>';
+
+        $this->assertEquals($expected, $this->compiler->compileString($string));
+
+        echo $expected;
+    }
 }
