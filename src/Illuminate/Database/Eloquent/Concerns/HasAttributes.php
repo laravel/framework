@@ -788,9 +788,9 @@ trait HasAttributes
      */
     public function fromDateTime($value)
     {
-        return empty($value) ? $value : $this->asDateTime($value)->format(
-            $this->getDateFormat()
-        );
+        return empty($value)
+            ? $value
+            : $this->asDateTime($value)->setTimeZone(config('app.timezone'))->format($this->getDateFormat());
     }
 
     /**
