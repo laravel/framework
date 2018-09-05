@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Foundation\Testing\PendingCommand;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\PendingCommand;
 
 class ConsoleApplicationTest extends TestCase
 {
