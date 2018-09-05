@@ -17,11 +17,11 @@ trait MustVerifyEmail
     /**
      * Mark the given user's email as verified.
      *
-     * @return void
+     * @return bool
      */
     public function markEmailAsVerified()
     {
-        $this->forceFill(['email_verified_at' => $this->freshTimestamp()])->save();
+        return $this->forceFill(['email_verified_at' => $this->freshTimestamp()])->save();
     }
 
     /**
