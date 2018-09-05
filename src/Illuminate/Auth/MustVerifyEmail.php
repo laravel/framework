@@ -21,7 +21,9 @@ trait MustVerifyEmail
      */
     public function markEmailAsVerified()
     {
-        return $this->forceFill(['email_verified_at' => $this->freshTimestamp()])->save();
+        return $this->forceFill([
+            'email_verified_at' => $this->freshTimestamp()
+        ])->save();
     }
 
     /**

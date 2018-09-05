@@ -30,10 +30,9 @@ trait VerifiesEmails
      */
     public function verify(Request $request)
     {
-        if ($request->route('id') == $request->user()->getKey()) {
-            if ($request->user()->markEmailAsVerified()) {
-                event(new Verified($request->user()));
-            }
+        if ($request->route('id') == $request->user()->getKey() &&
+            $request->user()->markEmailAsVerified()) {
+            event(new Verified($request->user()));
         }
 
         return redirect($this->redirectPath());
