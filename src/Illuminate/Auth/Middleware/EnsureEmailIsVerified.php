@@ -13,13 +13,17 @@ class EnsureEmailIsVerified
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Closure  $next
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\Response|\Illuminate\Http\RedirectResponse
      */
     public function handle($request, Closure $next)
     {
         if (! $request->user() ||
             ($request->user() instanceof MustVerifyEmail &&
             ! $request->user()->hasVerifiedEmail())) {
+            if ($request->expectsJson()) {
+                abort(403, 'Your email address is not verified.');
+            }
+
             return Redirect::route('verification.notice');
         }
 
