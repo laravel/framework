@@ -12,7 +12,7 @@ class PostgresBuilder extends Builder
      */
     public function hasTable($table)
     {
-        list($schema, $table) = $this->parseSchemaAndTable($table);
+        [$schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
@@ -107,7 +107,7 @@ class PostgresBuilder extends Builder
      */
     public function getColumnListing($table)
     {
-        list($schema, $table) = $this->parseSchemaAndTable($table);
+        [$schema, $table] = $this->parseSchemaAndTable($table);
 
         $table = $this->connection->getTablePrefix().$table;
 
