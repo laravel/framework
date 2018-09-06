@@ -164,7 +164,7 @@ class CacheFileStoreTest extends TestCase
 
         $store = new FileStore($files, __DIR__.'--wrong');
         $result = $store->flush();
-        $this->assertFalse($result, 'Flush should not clean directory');
+        $this->assertTrue($result, 'Flush should ignore nonexisting directory and report success');
     }
 
     protected function mockFilesystem()
