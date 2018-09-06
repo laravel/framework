@@ -35,4 +35,28 @@ trait MustVerifyEmail
     {
         $this->notify(new Notifications\VerifyEmail);
     }
+
+    /**
+     * Scope the unverified emails.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeUnverifiedEmail($query)
+    {
+        return $query->whereNull('email_verified_at');
+    }
+
+    /**
+     * Scope the verified emails.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    public function scopeVerifiedEmail($query)
+    {
+        return $query->whereNotNull('email_verified_at');
+    }
 }
