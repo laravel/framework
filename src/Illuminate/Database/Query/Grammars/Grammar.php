@@ -519,6 +519,7 @@ class Grammar extends BaseGrammar
      * @param  string  $column
      * @param  string  $value
      * @return string
+     *
      * @throws \RuntimeException
      */
     protected function compileJsonContains($column, $value)
@@ -558,6 +559,7 @@ class Grammar extends BaseGrammar
      * @param  string  $operator
      * @param  string  $value
      * @return string
+     *
      * @throws \RuntimeException
      */
     protected function compileJsonLength($column, $operator, $value)
