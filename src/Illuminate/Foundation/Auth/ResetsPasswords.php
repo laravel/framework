@@ -27,7 +27,9 @@ trait ResetsPasswords
     {
         $email = '';
         if (is_null($token) == false) {
-            $email = DB::table('password_resets')
+            $provider = config('auth.defaults.passwords');
+            $table = config(sprintf('auth.passwords.%s.table', $provider));
+            $email = DB::table($table)
                 ->select('email')
                 ->where('token', $token)
                 ->first()->email;
