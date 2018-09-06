@@ -51,7 +51,7 @@ class WorkerOptions
      *
      * @var bool
      */
-    public $stopOnEmptyQueue;
+    public $stopWhenEmpty;
 
     /**
      * Create a new worker options instance.
@@ -62,10 +62,10 @@ class WorkerOptions
      * @param  int  $sleep
      * @param  int  $maxTries
      * @param  bool  $force
-     * @param  bool  $stopOnEmptyQueue
+     * @param  bool  $stopWhenEmpty
      * @return void
      */
-    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $stopOnEmptyQueue = false)
+    public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $stopWhenEmpty = false)
     {
         $this->delay = $delay;
         $this->sleep = $sleep;
@@ -73,6 +73,6 @@ class WorkerOptions
         $this->memory = $memory;
         $this->timeout = $timeout;
         $this->maxTries = $maxTries;
-        $this->stopOnEmptyQueue = $stopOnEmptyQueue;
+        $this->stopWhenEmpty = $stopWhenEmpty;
     }
 }

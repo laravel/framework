@@ -49,7 +49,7 @@ class QueueWorkerTest extends TestCase
     public function test_worker_can_work_until_queue_is_empty()
     {
         $workerOptions = new WorkerOptions;
-        $workerOptions->stopOnEmptyQueue = true;
+        $workerOptions->stopWhenEmpty = true;
 
         $worker = $this->getWorker('default', ['queue' => [
             $firstJob = new WorkerFakeJob,

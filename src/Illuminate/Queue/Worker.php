@@ -204,7 +204,7 @@ class Worker
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
             $this->stop();
-        } elseif ($options->stopOnEmptyQueue && is_null($job)) {
+        } elseif ($options->stopWhenEmpty && is_null($job)) {
             $this->stop();
         }
     }
