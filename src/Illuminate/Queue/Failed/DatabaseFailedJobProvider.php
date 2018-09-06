@@ -82,9 +82,7 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     {
         return $this->getTable()->get(['id'])->all();
     }
-
-
-
+    
     /**
      * Get a single failed job.
      *
