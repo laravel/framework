@@ -16,7 +16,8 @@ class AuthMakeCommand extends Command
      */
     protected $signature = 'make:auth
                     {--views : Only scaffold the authentication views}
-                    {--force : Overwrite existing views by default}';
+                    {--force : Overwrite existing views by default}
+                    {--verify : Add email verification support}';
 
     /**
      * The console command description.
@@ -56,12 +57,21 @@ class AuthMakeCommand extends Command
                 app_path('Http/Controllers/HomeController.php'),
                 $this->compileControllerStub()
             );
-
-            file_put_contents(
-                base_path('routes/web.php'),
-                file_get_contents(__DIR__.'/stubs/make/routes.stub'),
-                FILE_APPEND
-            );
+            
+            if ($this->option('verify')) {
+                file_put_contents(
+                    base_path('routes/web.php'),
+                    file_get_contents(__DIR__.'/stubs/make/routes_verify.stub'),
+                    FILE_APPEND
+                );
+                $this->addInterfaceToModel();
+            } else {
+                file_put_contents(
+                    base_path('routes/web.php'),
+                    file_get_contents(__DIR__.'/stubs/make/routes.stub'),
+                    FILE_APPEND
+                );
+            }
         }
 
         $this->info('Authentication scaffolding generated successfully.');
@@ -90,18 +100,18 @@ class AuthMakeCommand extends Command
      */
     protected function exportViews()
     {
-        foreach ($this->views as $key => $value) {
-            if (file_exists($view = resource_path('views/'.$value)) && ! $this->option('force')) {
-                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
-                    continue;
-                }
-            }
+        // foreach ($this->views as $key => $value) {
+        //     if (file_exists($view = resource_path('views/'.$value)) && ! $this->option('force')) {
+        //         if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
+        //             continue;
+        //         }
+        //     }
 
-            copy(
-                __DIR__.'/stubs/make/views/'.$key,
-                $view
-            );
-        }
+        //     copy(
+        //         __DIR__.'/stubs/make/views/'.$key,
+        //         $view
+        //     );
+        // }
     }
 
     /**
@@ -116,5 +126,19 @@ class AuthMakeCommand extends Command
             $this->getAppNamespace(),
             file_get_contents(__DIR__.'/stubs/make/controllers/HomeController.stub')
         );
+    }
+
+    /**
+     * Add MustVerifyEmail interface to user model
+     * 
+     * @return void
+     */
+    protected function addInterfaceToModel()
+    {
+        if (file_exists(app_path("User.php"))) {
+            $userFileContent = file_get_contents(app_path("User.php"));
+            $userFileContent = preg_replace('/(class User extends Authenticatable)\n/', "$1 implements MustVerifyEmail\n", $userFileContent);
+            file_put_contents(app_path("User.php"), $userFileContent);
+        }
     }
 }
