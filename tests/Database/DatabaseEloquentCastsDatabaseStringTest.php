@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
-class DatabaseEloquentCastsDatabaseString extends TestCase
+class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 {
     public function setUp()
     {
