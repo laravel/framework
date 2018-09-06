@@ -4,6 +4,7 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
@@ -24,8 +25,19 @@ trait ResetsPasswords
      */
     public function showResetForm(Request $request, $token = null)
     {
+        $email = '';
+        if (is_null($token) == false) {
+            $provider = config('auth.defaults.passwords');
+            $table = config(sprintf('auth.passwords.%s.table', $provider));
+            $record = DB::table($table)
+                ->select('email')
+                ->where('token', $token)
+                ->first();
+            $email = optional($record)->email;
+        }
+
         return view('auth.passwords.reset')->with(
-            ['token' => $token, 'email' => $request->email]
+            ['token' => $token, 'email' => $request->get('email', $email)]
         );
     }
 
