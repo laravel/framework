@@ -14,7 +14,7 @@ interface MustVerifyEmail
     /**
      * Mark the given user's email as verified.
      *
-     * @return void
+     * @return bool
      */
     public function markEmailAsVerified();
 

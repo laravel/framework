@@ -2,10 +2,18 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\PendingCommand;
 
 trait InteractsWithConsole
 {
+    /**
+     * Indicates if the console output should be mocked.
+     *
+     * @var bool
+     */
+    public $mockConsoleOutput = true;
+
     /**
      * All of the expected output lines.
      *
@@ -25,10 +33,14 @@ trait InteractsWithConsole
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @return \Illuminate\Foundation\Testing\PendingCommand
+     * @return \Illuminate\Foundation\Testing\PendingCommand|int
      */
     public function artisan($command, $parameters = [])
     {
+        if (! $this->mockConsoleOutput) {
+            return $this->app[Kernel::class]->call($command, $parameters);
+        }
+
         $this->beforeApplicationDestroyed(function () {
             if (count($this->expectedQuestions)) {
                 $this->fail('Question "'.array_first($this->expectedQuestions)[0].'" was not asked.');
@@ -40,5 +52,17 @@ trait InteractsWithConsole
         });
 
         return new PendingCommand($this, $this->app, $command, $parameters);
+    }
+
+    /**
+     * Disable mocking the console output.
+     *
+     * @return $this
+     */
+    protected function withoutMockingConsoleOutput()
+    {
+        $this->mockConsoleOutput = false;
+
+        return $this;
     }
 }
