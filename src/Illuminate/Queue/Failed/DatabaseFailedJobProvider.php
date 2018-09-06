@@ -74,6 +74,16 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
     }
 
     /**
+     * Get a list of all the failed jobs IDs.
+     *
+     * @return array
+     */
+    public function getAllFailedJobIds()
+    {
+        return $this->getTable()->get(['id'])->all();
+    }
+
+    /**
      * Get a single failed job.
      *
      * @param  mixed  $id

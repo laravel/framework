@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue\Console;
 
-use Illuminate\Support\Arr;
 use Illuminate\Console\Command;
 
 class RetryCommand extends Command
@@ -53,7 +52,7 @@ class RetryCommand extends Command
         $ids = (array) $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
-            $ids = Arr::pluck($this->laravel['queue.failer']->all(), 'id');
+            $ids = $this->laravel['queue.failer']->getAllFailedJobIds();
         }
 
         return $ids;
