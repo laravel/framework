@@ -41,6 +41,7 @@ class MailgunTransport extends Transport
      * @param  \GuzzleHttp\ClientInterface  $client
      * @param  string  $key
      * @param  string  $domain
+     * @param  string|null  $endpoint
      * @return void
      */
     public function __construct(ClientInterface $client, $key, $domain, $endpoint = null)
