@@ -18,29 +18,16 @@ class ConsoleApplicationTest extends TestCase
 
     public function test_artisan_call_using_command_name()
     {
-        $exitCode = $this->artisan('foo:bar', [
+        $this->artisan('foo:bar', [
             'id' => 1,
-        ]);
-
-        $this->assertSame(0, $exitCode);
+        ])->assertExitCode(0);
     }
 
     public function test_artisan_call_using_command_class()
     {
-        $exitCode = $this->artisan(FooCommandStub::class, [
+        $this->artisan(FooCommandStub::class, [
             'id' => 1,
-        ]);
-
-        $this->assertSame(0, $exitCode);
-    }
-
-    public function test_artisan_call_using_command_class_with_mocked_output()
-    {
-        $pendingCommand = $this->withMockedConsoleOutput()->artisan(FooCommandStub::class, ['id' => 1]);
-
-        $this->assertInstanceOf(PendingCommand::class, $pendingCommand);
-
-        $pendingCommand->assertExitCode(0);
+        ])->assertExitCode(0);
     }
 }
 
