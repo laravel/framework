@@ -35,7 +35,7 @@ trait MustVerifyEmail
     {
         $this->notify(new Notifications\VerifyEmail);
     }
-    
+
     /**
      * Scope the unverified emails.
      *
