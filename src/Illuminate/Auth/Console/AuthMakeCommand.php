@@ -130,7 +130,7 @@ class AuthMakeCommand extends Command
 
     /**
      * Add MustVerifyEmail interface to user model.
-     * 
+     *
      * @return void
      */
     protected function addInterfaceToModel()
