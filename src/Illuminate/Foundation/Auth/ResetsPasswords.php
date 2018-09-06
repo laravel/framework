@@ -29,10 +29,11 @@ trait ResetsPasswords
         if (is_null($token) == false) {
             $provider = config('auth.defaults.passwords');
             $table = config(sprintf('auth.passwords.%s.table', $provider));
-            $email = DB::table($table)
+            $record = DB::table($table)
                 ->select('email')
                 ->where('token', $token)
-                ->first()->email;
+                ->first();
+            $email = optional($record)->email;
         }
 
         return view('auth.passwords.reset')->with(
