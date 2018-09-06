@@ -7,7 +7,12 @@ use Illuminate\Foundation\Testing\PendingCommand;
 
 trait InteractsWithConsole
 {
-    protected $mockConsoleOutput = false;
+    /**
+     * Indicates if the console output should be mocked.
+     *
+     * @var bool
+     */
+    public $mockConsoleOutput = true;
 
     /**
      * All of the expected output lines.
@@ -28,7 +33,7 @@ trait InteractsWithConsole
      *
      * @param  string  $command
      * @param  array  $parameters
-     * @return \Illuminate\Foundation\Testing\PendingCommand
+     * @return \Illuminate\Foundation\Testing\PendingCommand|int
      */
     public function artisan($command, $parameters = [])
     {
@@ -49,9 +54,14 @@ trait InteractsWithConsole
         return new PendingCommand($this, $this->app, $command, $parameters);
     }
 
-    protected function withMockedConsoleOutput()
+    /**
+     * Disable mocking the console output.
+     *
+     * @return $this
+     */
+    protected function withoutMockingConsoleOutput()
     {
-        $this->mockConsoleOutput = true;
+        $this->mockConsoleOutput = false;
 
         return $this;
     }
