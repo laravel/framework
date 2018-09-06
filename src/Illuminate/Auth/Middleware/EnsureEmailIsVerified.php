@@ -3,6 +3,7 @@
 namespace Illuminate\Auth\Middleware;
 
 use Closure;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 
@@ -21,7 +22,7 @@ class EnsureEmailIsVerified
             ($request->user() instanceof MustVerifyEmail &&
             ! $request->user()->hasVerifiedEmail())) {
             return $request->expectsJson()
-                    ? abort(403, 'Your email address is not verified.')
+                    ? abort(Response::HTTP_FORBIDDEN, 'Your email address is not verified.')
                     : Redirect::route('verification.notice');
         }
 
