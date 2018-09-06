@@ -2,10 +2,13 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\PendingCommand;
 
 trait InteractsWithConsole
 {
+    protected $mockConsoleOutput = false;
+
     /**
      * All of the expected output lines.
      *
@@ -29,6 +32,10 @@ trait InteractsWithConsole
      */
     public function artisan($command, $parameters = [])
     {
+        if (! $this->mockConsoleOutput) {
+            return $this->app[Kernel::class]->call($command, $parameters);
+        }
+
         $this->beforeApplicationDestroyed(function () {
             if (count($this->expectedQuestions)) {
                 $this->fail('Question "'.array_first($this->expectedQuestions)[0].'" was not asked.');
@@ -40,5 +47,12 @@ trait InteractsWithConsole
         });
 
         return new PendingCommand($this, $this->app, $command, $parameters);
+    }
+
+    protected function withMockedConsoleOutput()
+    {
+        $this->mockConsoleOutput = true;
+
+        return $this;
     }
 }

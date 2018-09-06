@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Integration\Console;
 use Illuminate\Console\Command;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\PendingCommand;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -19,14 +20,27 @@ class ConsoleApplicationTest extends TestCase
     {
         $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
-        ])->assertExitCode(0);
+        ]);
+
+        $this->assertSame(0, $exitCode);
     }
 
     public function test_artisan_call_using_command_class()
     {
         $exitCode = $this->artisan(FooCommandStub::class, [
             'id' => 1,
-        ])->assertExitCode(0);
+        ]);
+
+        $this->assertSame(0, $exitCode);
+    }
+
+    public function test_artisan_call_using_command_class_with_mocked_output()
+    {
+        $pendingCommand = $this->withMockedConsoleOutput()->artisan(FooCommandStub::class, ['id' => 1]);
+
+        $this->assertInstanceOf(PendingCommand::class, $pendingCommand);
+
+        $pendingCommand->assertExitCode(0);
     }
 }
 
