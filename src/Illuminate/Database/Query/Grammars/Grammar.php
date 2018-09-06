@@ -538,6 +538,34 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "where JSON length" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereJsonLength(Builder $query, $where)
+    {
+        return $this->compileJsonLength(
+            $where['column'], $where['operator'], $this->parameter($where['value'])
+        );
+    }
+
+    /**
+     * Compile a "JSON length" statement into SQL.
+     *
+     * @param  string  $column
+     * @param  string  $operator
+     * @param  string  $value
+     * @return string
+     * @throws \RuntimeException
+     */
+    protected function compileJsonLength($column, $operator, $value)
+    {
+        throw new RuntimeException('This database engine does not support JSON length operations.');
+    }
+
+    /**
      * Compile the "group by" portions of the query.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
@@ -930,6 +958,23 @@ class Grammar extends BaseGrammar
     protected function wrapJsonSelector($value)
     {
         throw new RuntimeException('This database engine does not support JSON operations.');
+    }
+
+    /**
+     * Split the given JSON selector into the field and the optional path and wrap them separately.
+     *
+     * @param  string  $column
+     * @return array
+     */
+    protected function wrapJsonFieldAndPath($column)
+    {
+        $parts = explode('->', $column, 2);
+
+        $field = $this->wrap($parts[0]);
+
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+
+        return [$field, $path];
     }
 
     /**

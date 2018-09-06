@@ -1514,6 +1514,49 @@ class Builder
     }
 
     /**
+     * Add a "where JSON length" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @param  string  $boolean
+     * @return $this
+     */
+    public function whereJsonLength($column, $operator, $value = null, $boolean = 'and')
+    {
+        $type = 'JsonLength';
+
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        $this->wheres[] = compact('type', 'column', 'operator', 'value', 'boolean');
+
+        if (! $value instanceof Expression) {
+            $this->addBinding($value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add a "or where JSON length" clause to the query.
+     *
+     * @param  string  $column
+     * @param  mixed  $operator
+     * @param  mixed  $value
+     * @return $this
+     */
+    public function orWhereJsonLength($column, $operator, $value = null)
+    {
+        list($value, $operator) = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        return $this->whereJsonLength($column, $operator, $value, 'or');
+    }
+
+    /**
      * Handles dynamic "where" clauses to the query.
      *
      * @param  string  $method
