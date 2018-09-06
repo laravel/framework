@@ -142,7 +142,7 @@ class FileStore implements Store
     public function flush()
     {
         if (! $this->files->isDirectory($this->directory)) {
-            return false;
+            return true;
         }
 
         foreach ($this->files->directories($this->directory) as $directory) {
