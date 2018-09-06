@@ -52,7 +52,7 @@ class RetryCommand extends Command
         $ids = (array) $this->argument('id');
 
         if (count($ids) === 1 && $ids[0] === 'all') {
-            $ids = $this->laravel['queue.failer']->all();
+            $ids = $this->laravel['queue.failer']->getAllFailedJobIds();
         }
 
         return $ids;

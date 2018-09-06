@@ -70,8 +70,20 @@ class DatabaseFailedJobProvider implements FailedJobProviderInterface
      */
     public function all()
     {
+        return $this->getTable()->orderBy('id', 'desc')->get()->all();
+    }
+
+    /**
+     * Get a list of all the failed jobs IDs.
+     *
+     * @return array
+     */
+    public function getAllFailedJobIds()
+    {
         return $this->getTable()->get(['id'])->all();
     }
+
+
 
     /**
      * Get a single failed job.
