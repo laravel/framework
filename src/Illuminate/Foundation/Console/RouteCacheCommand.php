@@ -50,11 +50,11 @@ class RouteCacheCommand extends Command
      */
     public function handle()
     {
-        $this->call('route:clear');
-
         $routes = $this->getFreshApplicationRoutes();
 
         if (count($routes) === 0) {
+            $this->call('route:clear');
+
             return $this->error("Your application doesn't have any routes.");
         }
 
