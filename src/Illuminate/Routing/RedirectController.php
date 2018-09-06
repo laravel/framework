@@ -14,7 +14,7 @@ class RedirectController extends Controller
      */
     public function __invoke(...$args)
     {
-        list($destination, $status) = array_slice($args, -2);
+        [$destination, $status] = array_slice($args, -2);
 
         return new RedirectResponse($destination, $status);
     }

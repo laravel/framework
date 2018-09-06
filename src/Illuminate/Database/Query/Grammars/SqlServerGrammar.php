@@ -338,7 +338,7 @@ class SqlServerGrammar extends Grammar
      */
     public function compileUpdate(Builder $query, $values)
     {
-        list($table, $alias) = $this->parseUpdateTable($query->from);
+        [$table, $alias] = $this->parseUpdateTable($query->from);
 
         // Each one of the columns in the update statements needs to be wrapped in the
         // keyword identifiers, also a place-holder needs to be created for each of
