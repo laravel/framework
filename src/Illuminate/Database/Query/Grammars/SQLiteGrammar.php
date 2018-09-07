@@ -297,11 +297,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $parts = explode('->', $value, 2);
-
-        $field = $this->wrap($parts[0]);
-
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+        list($field, $path) = $this->wrapJsonFieldAndPath($value);
 
         $selector = 'json_extract('.$field.$path.')';
 
