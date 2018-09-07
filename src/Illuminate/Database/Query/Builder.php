@@ -2891,13 +2891,13 @@ class Builder
 
         $bindings = $this->getBindings();
 
-        if(count($bindings) == 0) {
+        if (count($bindings) == 0) {
             return $sql;
         }
 
         array_walk($bindings, function($value) use (&$sql) {
             $value = is_string($value)? var_export($value, true) : $value;
-            
+
             $sql = preg_replace("/\?/", $value, $sql, 1);
         });
 
