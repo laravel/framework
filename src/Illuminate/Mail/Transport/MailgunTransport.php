@@ -64,7 +64,8 @@ class MailgunTransport extends Transport
 
         $message->setBcc([]);
 
-        $this->client->post(
+        $this->client->request(
+            'POST',
             "https://{$this->endpoint}/v3/{$this->domain}/messages.mime",
             $this->payload($message, $to)
         );
