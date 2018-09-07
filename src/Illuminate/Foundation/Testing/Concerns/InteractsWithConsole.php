@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation\Testing\Concerns;
 
+use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
 use Illuminate\Foundation\Testing\PendingCommand;
 
@@ -62,6 +63,8 @@ trait InteractsWithConsole
     protected function withoutMockingConsoleOutput()
     {
         $this->mockConsoleOutput = false;
+
+        $this->app->offsetUnset(OutputStyle::class);
 
         return $this;
     }
