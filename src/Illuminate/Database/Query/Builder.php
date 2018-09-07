@@ -2885,7 +2885,7 @@ class Builder
      *
      * @return string
      */
-    public function toSqlBinded()
+    public function toSqlBound()
     {
         $sql = $this->toSql();
 
