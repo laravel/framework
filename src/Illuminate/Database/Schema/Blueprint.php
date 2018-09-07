@@ -1179,6 +1179,22 @@ class Blueprint
     }
 
     /**
+     * Add columns for a polymorphic table with unique index.
+     *
+     * @param  string  $name
+     * @param  string|null  $indexName
+     * @return void
+     */
+    public function uniqueMorphs($name, $indexName = null)
+    {
+        $this->string("{$name}_type");
+
+        $this->unsignedBigInteger("{$name}_id");
+
+        $this->unique(["{$name}_type", "{$name}_id"], $indexName);
+    }
+
+    /**
      * Adds the `remember_token` column to the table.
      *
      * @return \Illuminate\Database\Schema\ColumnDefinition
