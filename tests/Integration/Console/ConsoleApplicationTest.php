@@ -17,29 +17,17 @@ class ConsoleApplicationTest extends TestCase
 
     public function test_artisan_call_using_command_name()
     {
-        $exitCode = $this->artisan('foo:bar', [
+        $this->artisan('foo:bar', [
             'id' => 1,
-        ]);
-
-        $this->assertEquals($exitCode, 0);
+        ])->assertExitCode(0);
     }
 
     public function test_artisan_call_using_command_class()
     {
-        $exitCode = $this->artisan(FooCommandStub::class, [
+        $this->artisan(FooCommandStub::class, [
             'id' => 1,
-        ]);
-
-        $this->assertEquals($exitCode, 0);
+        ])->assertExitCode(0);
     }
-
-    /*
-     * @expectedException \Symfony\Component\Console\Exception\CommandNotFoundException
-     */
-    // public function test_artisan_call_invalid_command_name()
-    // {
-    //     $this->artisan('foo:bars');
-    // }
 }
 
 class FooCommandStub extends Command

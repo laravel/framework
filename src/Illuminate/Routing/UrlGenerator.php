@@ -419,7 +419,7 @@ class UrlGenerator implements UrlGeneratorContract
     protected function formatAction($action)
     {
         if (is_array($action)) {
-            $action = implode('@', $action);
+            $action = '\\'.implode('@', $action);
         }
 
         if ($this->rootNamespace && ! (strpos($action, '\\') === 0)) {

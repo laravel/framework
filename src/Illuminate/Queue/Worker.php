@@ -123,7 +123,7 @@ class Worker
             // Finally, we will check to see if we have exceeded our memory limits or if
             // the queue should restart based on other indications. If so, we'll stop
             // this worker and let whatever is "monitoring" it restart the process.
-            $this->stopIfNecessary($options, $lastRestart);
+            $this->stopIfNecessary($options, $lastRestart, $job);
         }
     }
 
@@ -194,16 +194,17 @@ class Worker
      *
      * @param  \Illuminate\Queue\WorkerOptions  $options
      * @param  int  $lastRestart
+     * @param  mixed  $job
      */
-    protected function stopIfNecessary(WorkerOptions $options, $lastRestart)
+    protected function stopIfNecessary(WorkerOptions $options, $lastRestart, $job = null)
     {
         if ($this->shouldQuit) {
-            $this->kill();
-        }
-
-        if ($this->memoryExceeded($options->memory)) {
+            $this->stop();
+        } elseif ($this->memoryExceeded($options->memory)) {
             $this->stop(12);
         } elseif ($this->queueShouldRestart($lastRestart)) {
+            $this->stop();
+        } elseif ($options->stopWhenEmpty && is_null($job)) {
             $this->stop();
         }
     }

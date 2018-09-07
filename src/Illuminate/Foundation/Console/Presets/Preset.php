@@ -37,7 +37,8 @@ class Preset
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
 
         $packages[$configurationKey] = static::updatePackageArray(
-            array_key_exists($configurationKey, $packages) ? $packages[$configurationKey] : []
+            array_key_exists($configurationKey, $packages) ? $packages[$configurationKey] : [],
+            $configurationKey
         );
 
         ksort($packages[$configurationKey]);

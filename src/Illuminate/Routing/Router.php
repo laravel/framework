@@ -287,12 +287,13 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register an array of resource controllers.
      *
      * @param  array  $resources
+     * @param  array  $options
      * @return void
      */
-    public function resources(array $resources)
+    public function resources(array $resources, array $options = [])
     {
         foreach ($resources as $name => $controller) {
-            $this->resource($name, $controller);
+            $this->resource($name, $controller, $options);
         }
     }
 
@@ -321,12 +322,13 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register an array of API resource controllers.
      *
      * @param  array  $resources
+     * @param  array  $options
      * @return void
      */
-    public function apiResources(array $resources)
+    public function apiResources(array $resources, array $options = [])
     {
         foreach ($resources as $name => $controller) {
-            $this->apiResource($name, $controller);
+            $this->apiResource($name, $controller, $options);
         }
     }
 

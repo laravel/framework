@@ -160,7 +160,7 @@ class Redirector
     /**
      * Create a new redirect response to a controller action.
      *
-     * @param  string  $action
+     * @param  string|array  $action
      * @param  mixed   $parameters
      * @param  int     $status
      * @param  array   $headers

@@ -1,5 +1,11 @@
-@extends('errors::layout')
+@extends('errors::illustrated-layout')
 
-@section('title', 'Error')
+@section('code', '500')
+@section('title', __('Error'))
 
-@section('message', 'Whoops, looks like something went wrong.')
+@section('image')
+<div style="background-image: url('/svg/500.svg');" class="absolute pin bg-cover bg-no-repeat md:bg-left lg:bg-center">
+</div>
+@endsection
+
+@section('message', __('Whoops, something went wrong on our servers.'))
