@@ -1540,7 +1540,7 @@ class ValidationValidatorTest extends TestCase
             'validation.gt.numeric' => ':value',
             'validation.gt.string' => ':value',
             'validation.gt.file' => ':value',
-            'validation.gt.array' => ':value'
+            'validation.gt.array' => ':value',
         ], 'en');
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'gt:4']);
@@ -1565,7 +1565,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(5, $v->messages()->first('photo'));
 
-        $v = new Validator($trans, ['items' => [1,2,3], 'more' => [0,1,2,3]], ['items' => 'gt:more']);
+        $v = new Validator($trans, ['items' => [1, 2, 3], 'more' => [0, 1, 2, 3]], ['items' => 'gt:more']);
         $this->assertFalse($v->passes());
         $this->assertEquals(4, $v->messages()->first('items'));
     }
@@ -1577,7 +1577,7 @@ class ValidationValidatorTest extends TestCase
             'validation.lt.numeric' => ':value',
             'validation.lt.string' => ':value',
             'validation.lt.file' => ':value',
-            'validation.lt.array' => ':value'
+            'validation.lt.array' => ':value',
         ], 'en');
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'lt:2']);
@@ -1602,7 +1602,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(2, $v->messages()->first('photo'));
 
-        $v = new Validator($trans, ['items' => [1,2,3], 'less' => [0,1]], ['items' => 'lt:less']);
+        $v = new Validator($trans, ['items' => [1, 2, 3], 'less' => [0, 1]], ['items' => 'lt:less']);
         $this->assertFalse($v->passes());
         $this->assertEquals(2, $v->messages()->first('items'));
     }
@@ -1614,7 +1614,7 @@ class ValidationValidatorTest extends TestCase
             'validation.gte.numeric' => ':value',
             'validation.gte.string' => ':value',
             'validation.gte.file' => ':value',
-            'validation.gte.array' => ':value'
+            'validation.gte.array' => ':value',
         ], 'en');
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'gte:4']);
@@ -1639,7 +1639,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(5, $v->messages()->first('photo'));
 
-        $v = new Validator($trans, ['items' => [1,2,3], 'more' => [0,1,2,3]], ['items' => 'gte:more']);
+        $v = new Validator($trans, ['items' => [1, 2, 3], 'more' => [0, 1, 2, 3]], ['items' => 'gte:more']);
         $this->assertFalse($v->passes());
         $this->assertEquals(4, $v->messages()->first('items'));
     }
@@ -1651,7 +1651,7 @@ class ValidationValidatorTest extends TestCase
             'validation.lte.numeric' => ':value',
             'validation.lte.string' => ':value',
             'validation.lte.file' => ':value',
-            'validation.lte.array' => ':value'
+            'validation.lte.array' => ':value',
         ], 'en');
 
         $v = new Validator($trans, ['items' => '3'], ['items' => 'lte:2']);
@@ -1676,7 +1676,7 @@ class ValidationValidatorTest extends TestCase
         $this->assertFalse($v->passes());
         $this->assertEquals(2, $v->messages()->first('photo'));
 
-        $v = new Validator($trans, ['items' => [1,2,3], 'less' => [0,1]], ['items' => 'lte:less']);
+        $v = new Validator($trans, ['items' => [1, 2, 3], 'less' => [0, 1]], ['items' => 'lte:less']);
         $this->assertFalse($v->passes());
         $this->assertEquals(2, $v->messages()->first('items'));
     }
