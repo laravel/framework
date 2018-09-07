@@ -239,11 +239,7 @@ if (! function_exists('cache')) {
         }
 
         if (is_string($arguments[0])) {
-            if (! array_key_exists(1, $arguments)) {
-                return app('cache')->get($arguments[0]);
-            } else {
-                return app('cache')->get($arguments[0], $arguments[1] ?? null);
-            }
+            return app('cache')->get(...$arguments);
         }
 
         if (! is_array($arguments[0])) {
