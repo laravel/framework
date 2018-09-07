@@ -529,8 +529,16 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $group = end($this->groupStack);
 
+        if (isset($group['namespace']) && class_exists($group['namespace'].'\\'.$class)) {
+            return $group['namespace'].'\\'.$class;
+        }
+
+        if (class_exists($class)) {
+            return $class;
+        }
+
         return isset($group['namespace']) && strpos($class, '\\') !== 0
-                ? $group['namespace'].'\\'.$class : $class;
+            ? $group['namespace'].'\\'.$class : $class;
     }
 
     /**

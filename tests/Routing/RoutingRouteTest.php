@@ -1454,6 +1454,17 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar2', 'GET'))->getContent());
     }
 
+    public function testDispatchingCallableActionClassesWithFullyQualifiedClassName()
+    {
+        $router = $this->getRouter();
+
+        $router->group(['namespace' => '\\App\\FakeNamespace'], function () use ($router) {
+            $router->get('foo/bar', ActionStub::class);
+        });
+
+        $this->assertEquals('hello', $router->dispatch(Request::create('foo/bar', 'GET'))->getContent());
+    }
+
     public function testResponseIsReturned()
     {
         $router = $this->getRouter();
