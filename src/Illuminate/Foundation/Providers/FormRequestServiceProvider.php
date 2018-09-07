@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Providers;
 use Illuminate\Routing\Redirector;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Contracts\Validation\ValidatesWhenResolved;
 
 class FormRequestServiceProvider extends ServiceProvider
@@ -26,11 +27,11 @@ class FormRequestServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $this->app->afterResolving(ValidatesWhenResolved::class, function ($resolved) {
+        $this->app->afterResolving(ValidatesWhenResolved::class, function (ValidatesWhenResolved $resolved) {
             $resolved->validateResolved();
         });
 
-        $this->app->resolving(FormRequest::class, function ($request, $app) {
+        $this->app->resolving(FormRequest::class, function ($request, Application $app) {
             $request = FormRequest::createFrom($app['request'], $request);
 
             $request->setContainer($app)->setRedirector($app->make(Redirector::class));
