@@ -529,10 +529,8 @@ class Router implements RegistrarContract, BindingRegistrar
     {
         $group = end($this->groupStack);
 
-        $classWithNamespace = $group['namespace'].'\\'.$class;
-
-        if (class_exists($classWithNamespace)) {
-            return $classWithNamespace;
+        if (isset($group['namespace']) && class_exists($group['namespace'].'\\'.$class)) {
+            return $group['namespace'].'\\'.$class;
         }
 
         if (class_exists($class)) {
@@ -540,7 +538,7 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         return isset($group['namespace']) && strpos($class, '\\') !== 0
-            ? $classWithNamespace : $class;
+            ? $group['namespace'].'\\'.$class : $class;
     }
 
     /**
