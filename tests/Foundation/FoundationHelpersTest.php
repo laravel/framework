@@ -26,10 +26,14 @@ class FoundationHelpersTest extends TestCase
         cache(['foo' => 'bar'], 1);
 
         // 3. cache('foo');
-        $cache->shouldReceive('get')->once()->andReturn('bar');
+        $cache->shouldReceive('get')->once()->with('foo')->andReturn('bar');
         $this->assertEquals('bar', cache('foo'));
 
-        // 4. cache('baz', 'default');
+        // 4. cache('foo', null);
+        $cache->shouldReceive('get')->once()->with('foo', null)->andReturn('bar');
+        $this->assertEquals('bar', cache('foo', null));
+
+        // 5. cache('baz', 'default');
         $cache->shouldReceive('get')->once()->with('baz', 'default')->andReturn('default');
         $this->assertEquals('default', cache('baz', 'default'));
     }
