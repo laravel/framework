@@ -21,7 +21,7 @@ class Inspiring
     public static function quote()
     {
         return Collection::make(
-            Lang::trans('insipre.words_of_wisdom')
+            Lang::trans('inspire.words_of_wisdom')
         )->random();
     }
 }
