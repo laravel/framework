@@ -63,7 +63,7 @@ trait InteractsWithConsole
     protected function withoutMockingConsoleOutput()
     {
         $this->mockConsoleOutput = false;
-        
+
         $this->app->offsetUnset(OutputStyle::class);
 
         return $this;
