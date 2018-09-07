@@ -130,9 +130,11 @@ class FormRequest extends Request implements ValidatesWhenResolved
 
         if ($this->redirect) {
             return $url->to($this->redirect);
-        } elseif ($this->redirectRoute) {
+        }
+        if ($this->redirectRoute) {
             return $url->route($this->redirectRoute);
-        } elseif ($this->redirectAction) {
+        }
+        if ($this->redirectAction) {
             return $url->action($this->redirectAction);
         }
 
