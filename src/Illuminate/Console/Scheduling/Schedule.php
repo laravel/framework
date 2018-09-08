@@ -133,7 +133,7 @@ class Schedule
     protected function compileParameters(array $parameters)
     {
         return collect($parameters)->map(function ($value, $key) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $value = collect($value)->map(function ($value) {
                     return ProcessUtils::escapeArgument($value);
                 })->implode(' ');

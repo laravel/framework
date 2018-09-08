@@ -132,7 +132,7 @@ trait InteractsWithPivotTable
     protected function formatRecordsList(array $records)
     {
         return collect($records)->mapWithKeys(function ($attributes, $id) {
-            if (! is_array($attributes)) {
+            if (! \is_array($attributes)) {
                 list($id, $attributes) = [$attributes, []];
             }
 
@@ -275,7 +275,7 @@ trait InteractsWithPivotTable
      */
     protected function extractAttachIdAndAttributes($key, $value, array $attributes)
     {
-        return is_array($value)
+        return \is_array($value)
                     ? [$key, array_merge($value, $attributes)]
                     : [$value, $attributes];
     }
@@ -459,7 +459,7 @@ trait InteractsWithPivotTable
     public function withPivot($columns)
     {
         $this->pivotColumns = array_merge(
-            $this->pivotColumns, is_array($columns) ? $columns : func_get_args()
+            $this->pivotColumns, \is_array($columns) ? $columns : func_get_args()
         );
 
         return $this;

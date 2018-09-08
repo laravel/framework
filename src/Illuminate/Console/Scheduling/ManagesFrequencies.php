@@ -375,7 +375,7 @@ trait ManagesFrequencies
      */
     public function days($days)
     {
-        $days = is_array($days) ? $days : func_get_args();
+        $days = \is_array($days) ? $days : func_get_args();
 
         return $this->spliceIntoPosition(5, implode(',', $days));
     }

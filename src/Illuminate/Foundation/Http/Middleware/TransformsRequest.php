@@ -81,7 +81,7 @@ class TransformsRequest
      */
     protected function cleanValue($key, $value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $this->cleanArray($value);
         }
 

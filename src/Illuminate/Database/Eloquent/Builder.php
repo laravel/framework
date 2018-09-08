@@ -153,7 +153,7 @@ class Builder
      */
     public function withoutGlobalScopes(array $scopes = null)
     {
-        if (! is_array($scopes)) {
+        if (! \is_array($scopes)) {
             $scopes = array_keys($this->scopes);
         }
 
@@ -182,7 +182,7 @@ class Builder
      */
     public function whereKey($id)
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             $this->query->whereIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -199,7 +199,7 @@ class Builder
      */
     public function whereKeyNot($id)
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             $this->query->whereNotIn($this->model->getQualifiedKeyName(), $id);
 
             return $this;
@@ -319,7 +319,7 @@ class Builder
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id) || $id instanceof Arrayable) {
+        if (\is_array($id) || $id instanceof Arrayable) {
             return $this->findMany($id, $columns);
         }
 
@@ -355,7 +355,7 @@ class Builder
     {
         $result = $this->find($id, $columns);
 
-        if (is_array($id)) {
+        if (\is_array($id)) {
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }

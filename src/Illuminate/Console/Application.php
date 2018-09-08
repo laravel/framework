@@ -249,7 +249,7 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function resolveCommands($commands)
     {
-        $commands = is_array($commands) ? $commands : func_get_args();
+        $commands = \is_array($commands) ? $commands : func_get_args();
 
         foreach ($commands as $command) {
             $this->resolve($command);

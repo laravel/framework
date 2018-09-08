@@ -105,7 +105,7 @@ class MorphPivot extends Pivot
      */
     public function newQueryForRestoration($ids)
     {
-        if (is_array($ids)) {
+        if (\is_array($ids)) {
             return $this->newQueryForCollectionRestoration($ids);
         }
 

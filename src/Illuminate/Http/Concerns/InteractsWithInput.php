@@ -78,7 +78,7 @@ trait InteractsWithInput
      */
     public function has($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : func_get_args();
 
         $input = $this->all();
 
@@ -99,7 +99,7 @@ trait InteractsWithInput
      */
     public function hasAny($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : func_get_args();
 
         $input = $this->all();
 
@@ -120,7 +120,7 @@ trait InteractsWithInput
      */
     public function filled($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
             if ($this->isEmptyString($value)) {
@@ -139,7 +139,7 @@ trait InteractsWithInput
      */
     public function anyFilled($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $key) {
             if ($this->filled($key)) {
@@ -160,7 +160,7 @@ trait InteractsWithInput
     {
         $value = $this->input($key);
 
-        return ! is_bool($value) && ! is_array($value) && trim((string) $value) === '';
+        return ! is_bool($value) && ! \is_array($value) && trim((string) $value) === '';
     }
 
     /**
@@ -189,7 +189,7 @@ trait InteractsWithInput
 
         $results = [];
 
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+        foreach (\is_array($keys) ? $keys : func_get_args() as $key) {
             Arr::set($results, $key, Arr::get($input, $key));
         }
 
@@ -224,7 +224,7 @@ trait InteractsWithInput
 
         $placeholder = new stdClass;
 
-        foreach (is_array($keys) ? $keys : func_get_args() as $key) {
+        foreach (\is_array($keys) ? $keys : func_get_args() as $key) {
             $value = data_get($input, $key, $placeholder);
 
             if ($value !== $placeholder) {
@@ -243,7 +243,7 @@ trait InteractsWithInput
      */
     public function except($keys)
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : func_get_args();
 
         $results = $this->all();
 
@@ -323,11 +323,11 @@ trait InteractsWithInput
     protected function convertUploadedFiles(array $files)
     {
         return array_map(function ($file) {
-            if (is_null($file) || (is_array($file) && empty(array_filter($file)))) {
+            if (is_null($file) || (\is_array($file) && empty(array_filter($file)))) {
                 return $file;
             }
 
-            return is_array($file)
+            return \is_array($file)
                         ? $this->convertUploadedFiles($file)
                         : UploadedFile::createFromBase($file);
         }, $files);
@@ -341,7 +341,7 @@ trait InteractsWithInput
      */
     public function hasFile($key)
     {
-        if (! is_array($files = $this->file($key))) {
+        if (! \is_array($files = $this->file($key))) {
             $files = [$files];
         }
 

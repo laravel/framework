@@ -59,7 +59,7 @@ class Response extends BaseResponse
                $content instanceof Jsonable ||
                $content instanceof ArrayObject ||
                $content instanceof JsonSerializable ||
-               is_array($content);
+               \is_array($content);
     }
 
     /**

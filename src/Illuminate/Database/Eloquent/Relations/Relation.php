@@ -318,7 +318,7 @@ abstract class Relation
     {
         $map = static::buildMorphMapFromModels($map);
 
-        if (is_array($map)) {
+        if (\is_array($map)) {
             static::$morphMap = $merge && static::$morphMap
                             ? $map + static::$morphMap : $map;
         }

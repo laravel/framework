@@ -203,7 +203,7 @@ class PhpRedisConnection extends Connection implements ConnectionContract
      */
     public function zadd($key, ...$dictionary)
     {
-        if (is_array(end($dictionary))) {
+        if (\is_array(end($dictionary))) {
             foreach (array_pop($dictionary) as $member => $score) {
                 $dictionary[] = $score;
                 $dictionary[] = $member;

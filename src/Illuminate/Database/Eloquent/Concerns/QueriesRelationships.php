@@ -191,7 +191,7 @@ trait QueriesRelationships
             $this->query->select([$this->query->from.'.*']);
         }
 
-        $relations = is_array($relations) ? $relations : func_get_args();
+        $relations = \is_array($relations) ? $relations : func_get_args();
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name

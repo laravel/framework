@@ -109,7 +109,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
             return $this->any();
         }
 
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $key) {
             if ($this->first($key) === '') {
@@ -128,7 +128,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
      */
     public function hasAny($keys = [])
     {
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : func_get_args();
 
         foreach ($keys as $key) {
             if ($this->has($key)) {
@@ -152,7 +152,7 @@ class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, Me
 
         $firstMessage = Arr::first($messages, null, '');
 
-        return is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
+        return \is_array($firstMessage) ? Arr::first($firstMessage) : $firstMessage;
     }
 
     /**

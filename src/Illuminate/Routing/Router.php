@@ -741,7 +741,7 @@ class Router implements RegistrarContract, BindingRegistrar
                     $response instanceof Jsonable ||
                     $response instanceof ArrayObject ||
                     $response instanceof JsonSerializable ||
-                    is_array($response))) {
+                    \is_array($response))) {
             $response = new JsonResponse($response);
         } elseif (! $response instanceof SymfonyResponse) {
             $response = new Response($response);
@@ -1052,7 +1052,7 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function has($name)
     {
-        $names = is_array($name) ? $name : func_get_args();
+        $names = \is_array($name) ? $name : func_get_args();
 
         foreach ($names as $value) {
             if (! $this->routes->hasNamedRoute($value)) {
@@ -1250,7 +1250,7 @@ class Router implements RegistrarContract, BindingRegistrar
         }
 
         if ($method == 'middleware') {
-            return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+            return (new RouteRegistrar($this))->attribute($method, \is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
         return (new RouteRegistrar($this))->attribute($method, $parameters[0]);

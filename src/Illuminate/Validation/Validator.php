@@ -217,7 +217,7 @@ class Validator implements ValidatorContract
         $newData = [];
 
         foreach ($data as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $value = $this->parseData($value);
             }
 

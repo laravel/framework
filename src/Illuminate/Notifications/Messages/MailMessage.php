@@ -267,7 +267,7 @@ class MailMessage extends SimpleMessage
      */
     protected function arrayOfAddresses($address)
     {
-        return is_array($address) ||
+        return \is_array($address) ||
                $address instanceof Arrayable ||
                $address instanceof Traversable;
     }

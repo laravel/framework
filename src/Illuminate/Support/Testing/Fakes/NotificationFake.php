@@ -34,7 +34,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function assertSentTo($notifiable, $notification, $callback = null)
     {
-        if (is_array($notifiable) || $notifiable instanceof Collection) {
+        if (\is_array($notifiable) || $notifiable instanceof Collection) {
             foreach ($notifiable as $singleNotifiable) {
                 $this->assertSentTo($singleNotifiable, $notification, $callback);
             }
@@ -78,7 +78,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function assertNotSentTo($notifiable, $notification, $callback = null)
     {
-        if (is_array($notifiable) || $notifiable instanceof Collection) {
+        if (\is_array($notifiable) || $notifiable instanceof Collection) {
             foreach ($notifiable as $singleNotifiable) {
                 $this->assertNotSentTo($singleNotifiable, $notification, $callback);
             }
@@ -197,7 +197,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function sendNow($notifiables, $notification)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+        if (! $notifiables instanceof Collection && ! \is_array($notifiables)) {
             $notifiables = [$notifiables];
         }
 
