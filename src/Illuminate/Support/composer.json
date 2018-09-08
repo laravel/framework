@@ -17,8 +17,8 @@
         "php": "^7.1.3",
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.1",
-        "illuminate/contracts": "5.7.*",
-        "nesbot/carbon": "^1.24.1"
+        "illuminate/contracts": "5.8.*",
+        "nesbot/carbon": "^1.26.3"
     },
     "conflict": {
         "tightenco/collect": "<5.5.33"
@@ -33,11 +33,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.7-dev"
+            "dev-master": "5.8-dev"
         }
     },
     "suggest": {
-        "illuminate/filesystem": "Required to use the composer class (5.7.*).",
+        "illuminate/filesystem": "Required to use the composer class (5.8.*).",
+        "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "ramsey/uuid": "Required to use Str::uuid() (^3.7).",
         "symfony/process": "Required to use the composer class (^4.1).",
         "symfony/var-dumper": "Required to use the dd function (^4.1)."

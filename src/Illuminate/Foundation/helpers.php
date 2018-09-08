@@ -91,7 +91,7 @@ if (! function_exists('action')) {
     /**
      * Generate the URL to a controller action.
      *
-     * @param  string  $name
+     * @param  string|array  $name
      * @param  mixed   $parameters
      * @param  bool    $absolute
      * @return string
@@ -239,7 +239,7 @@ if (! function_exists('cache')) {
         }
 
         if (is_string($arguments[0])) {
-            return app('cache')->get($arguments[0], $arguments[1] ?? null);
+            return app('cache')->get(...$arguments);
         }
 
         if (! is_array($arguments[0])) {

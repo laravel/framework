@@ -17,14 +17,14 @@ class ConsoleApplicationTest extends TestCase
 
     public function test_artisan_call_using_command_name()
     {
-        $exitCode = $this->artisan('foo:bar', [
+        $this->artisan('foo:bar', [
             'id' => 1,
         ])->assertExitCode(0);
     }
 
     public function test_artisan_call_using_command_class()
     {
-        $exitCode = $this->artisan(FooCommandStub::class, [
+        $this->artisan(FooCommandStub::class, [
             'id' => 1,
         ])->assertExitCode(0);
     }

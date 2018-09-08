@@ -319,7 +319,7 @@ class Command extends SymfonyCommand
      *
      * @param  string  $question
      * @param  string|null  $default
-     * @return string
+     * @return mixed
      */
     public function ask($question, $default = null)
     {
@@ -332,7 +332,7 @@ class Command extends SymfonyCommand
      * @param  string  $question
      * @param  array   $choices
      * @param  string|null  $default
-     * @return string
+     * @return mixed
      */
     public function anticipate($question, array $choices, $default = null)
     {
@@ -345,7 +345,7 @@ class Command extends SymfonyCommand
      * @param  string  $question
      * @param  array   $choices
      * @param  string|null  $default
-     * @return string
+     * @return mixed
      */
     public function askWithCompletion($question, array $choices, $default = null)
     {
@@ -361,7 +361,7 @@ class Command extends SymfonyCommand
      *
      * @param  string  $question
      * @param  bool    $fallback
-     * @return string
+     * @return mixed
      */
     public function secret($question, $fallback = true)
     {
@@ -421,7 +421,7 @@ class Command extends SymfonyCommand
      * Write a string as information output.
      *
      * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  int|string|null  $verbosity
      * @return void
      */
     public function info($string, $verbosity = null)
@@ -434,7 +434,7 @@ class Command extends SymfonyCommand
      *
      * @param  string  $string
      * @param  string  $style
-     * @param  null|int|string  $verbosity
+     * @param  int|string|null  $verbosity
      * @return void
      */
     public function line($string, $style = null, $verbosity = null)
@@ -448,7 +448,7 @@ class Command extends SymfonyCommand
      * Write a string as comment output.
      *
      * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  int|string|null  $verbosity
      * @return void
      */
     public function comment($string, $verbosity = null)
@@ -460,7 +460,7 @@ class Command extends SymfonyCommand
      * Write a string as question output.
      *
      * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  int|string|null  $verbosity
      * @return void
      */
     public function question($string, $verbosity = null)
@@ -472,7 +472,7 @@ class Command extends SymfonyCommand
      * Write a string as error output.
      *
      * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  int|string|null  $verbosity
      * @return void
      */
     public function error($string, $verbosity = null)
@@ -484,7 +484,7 @@ class Command extends SymfonyCommand
      * Write a string as warning output.
      *
      * @param  string  $string
-     * @param  null|int|string  $verbosity
+     * @param  int|string|null  $verbosity
      * @return void
      */
     public function warn($string, $verbosity = null)

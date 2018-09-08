@@ -46,6 +46,31 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessed::class))->once();
     }
 
+    public function test_worker_can_work_until_queue_is_empty()
+    {
+        $workerOptions = new WorkerOptions;
+        $workerOptions->stopWhenEmpty = true;
+
+        $worker = $this->getWorker('default', ['queue' => [
+            $firstJob = new WorkerFakeJob,
+            $secondJob = new WorkerFakeJob,
+        ]]);
+
+        $this->expectException(LoopBreakerException::class);
+
+        $worker->daemon('default', 'queue', $workerOptions);
+
+        $this->assertTrue($firstJob->fired);
+
+        $this->assertTrue($secondJob->fired);
+
+        $this->assertSame(0, $worker->stoppedWithStatus);
+
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessing::class))->twice();
+
+        $this->events->shouldHaveReceived('dispatch')->with(Mockery::type(JobProcessed::class))->twice();
+    }
+
     public function test_job_can_be_fired_based_on_priority()
     {
         $worker = $this->getWorker('default', [
@@ -262,6 +287,18 @@ class InsomniacWorker extends \Illuminate\Queue\Worker
     {
         $this->sleptFor = $seconds;
     }
+
+    public function stop($status = 0)
+    {
+        $this->stoppedWithStatus = $status;
+
+        throw new LoopBreakerException;
+    }
+
+    public function daemonShouldRun(WorkerOptions $options, $connectionName, $queue)
+    {
+        return true;
+    }
 }
 
 class WorkerFakeManager extends \Illuminate\Queue\QueueManager
@@ -403,4 +440,13 @@ class WorkerFakeJob
     {
         $this->connectionName = $name;
     }
+
+    public function timeout()
+    {
+        return time() + 60;
+    }
+}
+
+class LoopBreakerException extends RuntimeException
+{
 }

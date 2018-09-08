@@ -79,7 +79,7 @@
         "league/flysystem-cached-adapter": "^1.0",
         "mockery/mockery": "^1.0",
         "moontoast/math": "^1.1",
-        "orchestra/testbench-core": "3.7.*",
+        "orchestra/testbench-core": "3.8.*",
         "pda/pheanstalk": "^3.0",
         "phpunit/phpunit": "^7.0",
         "predis/predis": "^1.1.1",
@@ -106,7 +106,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.7-dev"
+            "dev-master": "5.8-dev"
         }
     },
     "suggest": {
@@ -121,6 +121,7 @@
         "league/flysystem-cached-adapter": "Required to use the Flysystem cache (^1.0).",
         "league/flysystem-rackspace": "Required to use the Flysystem Rackspace driver (^1.0).",
         "league/flysystem-sftp": "Required to use the Flysystem SFTP driver (^1.0).",
+        "moontoast/math": "Required to use ordered UUIDs (^1.1).",
         "nexmo/client": "Required to use the Nexmo transport (^1.0).",
         "pda/pheanstalk": "Required to use the beanstalk queue driver (^3.0).",
         "predis/predis": "Required to use the redis cache and queue drivers (^1.0).",

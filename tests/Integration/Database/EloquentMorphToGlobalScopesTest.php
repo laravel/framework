@@ -63,6 +63,14 @@ class EloquentMorphToGlobalScopesTest extends DatabaseTestCase
         $this->assertNotNull($comments[0]->commentable);
         $this->assertNotNull($comments[1]->commentable);
     }
+
+    public function test_lazy_loading()
+    {
+        $comment = Comment::latest('id')->first();
+        $post = $comment->commentable()->withoutGlobalScopes()->first();
+
+        $this->assertNotNull($post);
+    }
 }
 
 class Comment extends Model

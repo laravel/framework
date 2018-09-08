@@ -15,14 +15,14 @@
     ],
     "require": {
         "php": "^7.1.3",
-        "illuminate/broadcasting": "5.7.*",
-        "illuminate/bus": "5.7.*",
-        "illuminate/container": "5.7.*",
-        "illuminate/contracts": "5.7.*",
-        "illuminate/filesystem": "5.7.*",
-        "illuminate/mail": "5.7.*",
-        "illuminate/queue": "5.7.*",
-        "illuminate/support": "5.7.*"
+        "illuminate/broadcasting": "5.8.*",
+        "illuminate/bus": "5.8.*",
+        "illuminate/container": "5.8.*",
+        "illuminate/contracts": "5.8.*",
+        "illuminate/filesystem": "5.8.*",
+        "illuminate/mail": "5.8.*",
+        "illuminate/queue": "5.8.*",
+        "illuminate/support": "5.8.*"
     },
     "autoload": {
         "psr-4": {
@@ -31,12 +31,12 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "5.7-dev"
+            "dev-master": "5.8-dev"
         }
     },
     "suggest": {
         "guzzlehttp/guzzle": "Required to use the Slack transport (^6.0)",
-        "illuminate/database": "Required to use the database transport (5.7.*).",
+        "illuminate/database": "Required to use the database transport (5.8.*).",
         "nexmo/client": "Required to use the Nexmo transport (^1.0)."
     },
     "config": {
