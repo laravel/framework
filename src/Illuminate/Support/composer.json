@@ -18,7 +18,6 @@
         "ext-mbstring": "*",
         "doctrine/inflector": "^1.1",
         "illuminate/contracts": "5.8.*",
-        "illuminate/contracts": "5.7.*",
         "nesbot/carbon": "^1.26.3"
     },
     "conflict": {
