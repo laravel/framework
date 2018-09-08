@@ -2,9 +2,7 @@
 
 namespace Illuminate\Cache;
 
-use Illuminate\Contracts\Cache\Store;
-
-class ArrayStore extends TaggableStore implements Store
+class ArrayStore extends TaggableStore
 {
     use RetrievesMultipleKeys;
 
