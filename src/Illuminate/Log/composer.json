@@ -5,7 +5,8 @@
     "homepage": "https://laravel.com",
     "support": {
         "issues": "https://github.com/laravel/framework/issues",
-        "source": "https://github.com/laravel/framework"
+        "source": "https://github.com/laravel/framework",
+        "ideas": "https://github.com/laravel/ideas/issues"
     },
     "authors": [
         {
