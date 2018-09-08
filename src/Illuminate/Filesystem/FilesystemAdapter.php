@@ -291,7 +291,7 @@ class FilesystemAdapter implements FilesystemContract, CloudFilesystemContract
      */
     public function delete($paths)
     {
-        $paths = is_array($paths) ? $paths : func_get_args();
+        $paths = \is_array($paths) ? $paths : func_get_args();
 
         $success = true;
 

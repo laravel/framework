@@ -128,7 +128,7 @@ class PostgresBuilder extends Builder
     {
         $table = explode('.', $table);
 
-        if (is_array($schema = $this->connection->getConfig('schema'))) {
+        if (\is_array($schema = $this->connection->getConfig('schema'))) {
             if (in_array($table[0], $schema)) {
                 return [array_shift($table), implode('.', $table)];
             }

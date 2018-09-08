@@ -104,9 +104,9 @@ class LengthAwarePaginator extends AbstractPaginator implements Arrayable, Array
 
         return array_filter([
             $window['first'],
-            is_array($window['slider']) ? '...' : null,
+            \is_array($window['slider']) ? '...' : null,
             $window['slider'],
-            is_array($window['last']) ? '...' : null,
+            \is_array($window['last']) ? '...' : null,
             $window['last'],
         ]);
     }

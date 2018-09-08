@@ -19,7 +19,7 @@ trait ValidatesRequests
     {
         $request = $request ?: request();
 
-        if (is_array($validator)) {
+        if (\is_array($validator)) {
             $validator = $this->getValidationFactory()->make($request->all(), $validator);
         }
 

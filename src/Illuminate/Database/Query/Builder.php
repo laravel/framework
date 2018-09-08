@@ -219,7 +219,7 @@ class Builder
      */
     public function select($columns = ['*'])
     {
-        $this->columns = is_array($columns) ? $columns : func_get_args();
+        $this->columns = \is_array($columns) ? $columns : func_get_args();
 
         return $this;
     }
@@ -337,7 +337,7 @@ class Builder
      */
     public function addSelect($column)
     {
-        $column = is_array($column) ? $column : func_get_args();
+        $column = \is_array($column) ? $column : func_get_args();
 
         $this->columns = array_merge((array) $this->columns, $column);
 
@@ -585,7 +585,7 @@ class Builder
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
-        if (is_array($column)) {
+        if (\is_array($column)) {
             return $this->addArrayOfWheres($column, $boolean);
         }
 
@@ -659,7 +659,7 @@ class Builder
     {
         return $this->whereNested(function ($query) use ($column, $method, $boolean) {
             foreach ($column as $key => $value) {
-                if (is_numeric($key) && is_array($value)) {
+                if (is_numeric($key) && \is_array($value)) {
                     $query->{$method}(...array_values($value));
                 } else {
                     $query->$method($key, '=', $value, $boolean);
@@ -747,7 +747,7 @@ class Builder
         // If the column is an array, we will assume it is an array of key-value pairs
         // and can add them each as a where clause. We will maintain the boolean we
         // received when the method was called and pass it into the nested where.
-        if (is_array($first)) {
+        if (\is_array($first)) {
             return $this->addArrayOfWheres($first, $boolean, 'whereColumn');
         }
 
@@ -2232,7 +2232,7 @@ class Builder
 
         $key = $this->stripTableForPluck($key);
 
-        return is_array($queryResult[0])
+        return \is_array($queryResult[0])
                     ? $this->pluckFromArrayColumn($queryResult, $column, $key)
                     : $this->pluckFromObjectColumn($queryResult, $column, $key);
     }
@@ -2518,7 +2518,7 @@ class Builder
             return true;
         }
 
-        if (! is_array(reset($values))) {
+        if (! \is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -2751,7 +2751,7 @@ class Builder
             throw new InvalidArgumentException("Invalid binding type: {$type}.");
         }
 
-        if (is_array($value)) {
+        if (\is_array($value)) {
             $this->bindings[$type] = array_values(array_merge($this->bindings[$type], $value));
         } else {
             $this->bindings[$type][] = $value;

@@ -159,7 +159,7 @@ abstract class Grammar
      */
     public function quoteString($value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return implode(', ', array_map([$this, __FUNCTION__], $value));
         }
 

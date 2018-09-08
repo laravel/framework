@@ -67,7 +67,7 @@ class DatabaseStore implements Store
             return;
         }
 
-        $cache = is_array($cache) ? (object) $cache : $cache;
+        $cache = \is_array($cache) ? (object) $cache : $cache;
 
         // If this cache expiration date is past the current time, we will remove this
         // item from the cache. Then we will return a null value since the cache is
@@ -155,7 +155,7 @@ class DatabaseStore implements Store
                 return false;
             }
 
-            $cache = is_array($cache) ? (object) $cache : $cache;
+            $cache = \is_array($cache) ? (object) $cache : $cache;
 
             $current = unserialize($cache->value);
 

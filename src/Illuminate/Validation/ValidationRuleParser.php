@@ -151,7 +151,7 @@ class ValidationRuleParser
      */
     public function mergeRules($results, $attribute, $rules = [])
     {
-        if (is_array($attribute)) {
+        if (\is_array($attribute)) {
             foreach ((array) $attribute as $innerAttribute => $innerRules) {
                 $results = $this->mergeRulesForAttribute($results, $innerAttribute, $innerRules);
             }
@@ -195,7 +195,7 @@ class ValidationRuleParser
             return [$rules, []];
         }
 
-        if (is_array($rules)) {
+        if (\is_array($rules)) {
             $rules = static::parseArrayRule($rules);
         } else {
             $rules = static::parseStringRule($rules);

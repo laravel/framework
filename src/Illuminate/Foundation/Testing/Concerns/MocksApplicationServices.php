@@ -49,7 +49,7 @@ trait MocksApplicationServices
      */
     public function expectsEvents($events)
     {
-        $events = is_array($events) ? $events : func_get_args();
+        $events = \is_array($events) ? $events : func_get_args();
 
         $this->withoutEvents();
 
@@ -75,7 +75,7 @@ trait MocksApplicationServices
      */
     public function doesntExpectEvents($events)
     {
-        $events = is_array($events) ? $events : func_get_args();
+        $events = \is_array($events) ? $events : func_get_args();
 
         $this->withoutEvents();
 
@@ -128,7 +128,7 @@ trait MocksApplicationServices
      */
     protected function expectsJobs($jobs)
     {
-        $jobs = is_array($jobs) ? $jobs : func_get_args();
+        $jobs = \is_array($jobs) ? $jobs : func_get_args();
 
         $this->withoutJobs();
 
@@ -154,7 +154,7 @@ trait MocksApplicationServices
      */
     protected function doesntExpectJobs($jobs)
     {
-        $jobs = is_array($jobs) ? $jobs : func_get_args();
+        $jobs = \is_array($jobs) ? $jobs : func_get_args();
 
         $this->withoutJobs();
 

@@ -473,7 +473,7 @@ class Route
      */
     protected function parseWhere($name, $expression)
     {
-        return is_array($name) ? $name : [$name => $expression];
+        return \is_array($name) ? $name : [$name => $expression];
     }
 
     /**

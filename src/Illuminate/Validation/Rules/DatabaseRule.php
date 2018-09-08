@@ -56,7 +56,7 @@ trait DatabaseRule
      */
     public function where($column, $value = null)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $this->whereIn($column, $value);
         }
 
@@ -78,7 +78,7 @@ trait DatabaseRule
      */
     public function whereNot($column, $value)
     {
-        if (is_array($value)) {
+        if (\is_array($value)) {
             return $this->whereNotIn($column, $value);
         }
 

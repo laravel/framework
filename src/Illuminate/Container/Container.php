@@ -288,7 +288,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     protected function parseBindMethod($method)
     {
-        if (is_array($method)) {
+        if (\is_array($method)) {
             return $method[0].'@'.$method[1];
         }
 
@@ -430,7 +430,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function tag($abstracts, $tags)
     {
-        $tags = is_array($tags) ? $tags : array_slice(func_get_args(), 1);
+        $tags = \is_array($tags) ? $tags : array_slice(func_get_args(), 1);
 
         foreach ($tags as $tag) {
             if (! isset($this->tags[$tag])) {

@@ -158,7 +158,7 @@ class Message
      */
     protected function addAddresses($address, $name, $type)
     {
-        if (is_array($address)) {
+        if (\is_array($address)) {
             $this->swift->{"set{$type}"}($address, $name);
         } else {
             $this->swift->{"add{$type}"}($address, $name);

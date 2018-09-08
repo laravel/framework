@@ -91,7 +91,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             $request = $request ?: Container::getInstance()->make('request')
         );
 
-        if (is_array($data)) {
+        if (\is_array($data)) {
             $data = $data;
         } elseif ($data instanceof Arrayable || $data instanceof Collection) {
             $data = $data->toArray();
@@ -110,7 +110,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
      */
     public function toArray($request)
     {
-        return is_array($this->resource)
+        return \is_array($this->resource)
             ? $this->resource
             : $this->resource->toArray();
     }

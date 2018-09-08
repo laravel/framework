@@ -304,7 +304,7 @@ class SqlServerGrammar extends Grammar
     {
         $table = $this->wrapTable($query->from);
 
-        $where = is_array($query->wheres) ? $this->compileWheres($query) : '';
+        $where = \is_array($query->wheres) ? $this->compileWheres($query) : '';
 
         return isset($query->joins)
                     ? $this->compileDeleteWithJoins($query, $table, $where)

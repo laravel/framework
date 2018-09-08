@@ -310,7 +310,7 @@ class Factory implements FactoryContract
      */
     public function share($key, $value = null)
     {
-        $keys = is_array($key) ? $key : [$key => $value];
+        $keys = \is_array($key) ? $key : [$key => $value];
 
         foreach ($keys as $key => $value) {
             $this->shared[$key] = $value;

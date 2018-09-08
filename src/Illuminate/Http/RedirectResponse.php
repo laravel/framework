@@ -41,7 +41,7 @@ class RedirectResponse extends BaseRedirectResponse
      */
     public function with($key, $value = null)
     {
-        $key = is_array($key) ? $key : [$key => $value];
+        $key = \is_array($key) ? $key : [$key => $value];
 
         foreach ($key as $k => $v) {
             $this->session->flash($k, $v);
@@ -89,7 +89,7 @@ class RedirectResponse extends BaseRedirectResponse
     protected function removeFilesFromInput(array $input)
     {
         foreach ($input as $key => $value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $input[$key] = $this->removeFilesFromInput($value);
             }
 

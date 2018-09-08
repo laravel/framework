@@ -181,7 +181,7 @@ class SimpleMessage
             return $line;
         }
 
-        if (is_array($line)) {
+        if (\is_array($line)) {
             return implode(' ', array_map('trim', $line));
         }
 

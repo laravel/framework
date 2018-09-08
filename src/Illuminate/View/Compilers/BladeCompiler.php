@@ -168,7 +168,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
         // parse each one into the corresponding valid PHP. We will then have this
         // template as the correctly rendered PHP that can be rendered natively.
         foreach (token_get_all($value) as $token) {
-            $result .= is_array($token) ? $this->parseToken($token) : $token;
+            $result .= \is_array($token) ? $this->parseToken($token) : $token;
         }
 
         if (! empty($this->rawBlocks)) {

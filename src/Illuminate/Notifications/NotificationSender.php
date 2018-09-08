@@ -189,7 +189,7 @@ class NotificationSender
      */
     protected function formatNotifiables($notifiables)
     {
-        if (! $notifiables instanceof Collection && ! is_array($notifiables)) {
+        if (! $notifiables instanceof Collection && ! \is_array($notifiables)) {
             return $notifiables instanceof Model
                             ? new ModelCollection([$notifiables]) : [$notifiables];
         }

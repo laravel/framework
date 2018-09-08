@@ -43,7 +43,7 @@ class HigherOrderCollectionProxy
     public function __get($key)
     {
         return $this->collection->{$this->method}(function ($value) use ($key) {
-            return is_array($value) ? $value[$key] : $value->{$key};
+            return \is_array($value) ? $value[$key] : $value->{$key};
         });
     }
 

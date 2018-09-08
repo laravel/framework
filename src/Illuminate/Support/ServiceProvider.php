@@ -81,7 +81,7 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        if (is_array($this->app->config['view']['paths'])) {
+        if (\is_array($this->app->config['view']['paths'])) {
             foreach ($this->app->config['view']['paths'] as $viewPath) {
                 if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
                     $this->app['view']->addNamespace($namespace, $appPath);
@@ -261,7 +261,7 @@ abstract class ServiceProvider
      */
     public function commands($commands)
     {
-        $commands = is_array($commands) ? $commands : func_get_args();
+        $commands = \is_array($commands) ? $commands : func_get_args();
 
         Artisan::starting(function ($artisan) use ($commands) {
             $artisan->resolveCommands($commands);

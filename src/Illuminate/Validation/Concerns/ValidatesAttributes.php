@@ -315,7 +315,7 @@ trait ValidatesAttributes
      */
     public function validateArray($attribute, $value)
     {
-        return is_array($value);
+        return \is_array($value);
     }
 
     /**
@@ -611,7 +611,7 @@ trait ValidatesAttributes
         // that the columns being "verified" shares the given attribute's name.
         $column = $this->getQueryColumn($parameters, $attribute);
 
-        $expected = (is_array($value)) ? count($value) : 1;
+        $expected = (\is_array($value)) ? count($value) : 1;
 
         return $this->getExistCount(
             $connection, $table, $column, $value, $parameters
@@ -640,7 +640,7 @@ trait ValidatesAttributes
             $extra = array_merge($extra, $this->currentRule->queryCallbacks());
         }
 
-        return is_array($value)
+        return \is_array($value)
                 ? $verifier->getMultiCount($table, $column, $value, $extra)
                 : $verifier->getCount($table, $column, $value, null, null, $extra);
     }
@@ -948,9 +948,9 @@ trait ValidatesAttributes
      */
     public function validateIn($attribute, $value, $parameters)
     {
-        if (is_array($value) && $this->hasRule($attribute, 'Array')) {
+        if (\is_array($value) && $this->hasRule($attribute, 'Array')) {
             foreach ($value as $element) {
-                if (is_array($element)) {
+                if (\is_array($element)) {
                     return false;
                 }
             }
@@ -958,7 +958,7 @@ trait ValidatesAttributes
             return count(array_diff($value, $parameters)) == 0;
         }
 
-        return ! is_array($value) && in_array((string) $value, $parameters);
+        return ! \is_array($value) && in_array((string) $value, $parameters);
     }
 
     /**
@@ -1250,7 +1250,7 @@ trait ValidatesAttributes
             return false;
         } elseif (is_string($value) && trim($value) === '') {
             return false;
-        } elseif ((is_array($value) || $value instanceof Countable) && count($value) < 1) {
+        } elseif ((\is_array($value) || $value instanceof Countable) && count($value) < 1) {
             return false;
         } elseif ($value instanceof File) {
             return (string) $value->getPath() !== '';
@@ -1560,7 +1560,7 @@ trait ValidatesAttributes
         // entire length of the string will be considered the attribute size.
         if (is_numeric($value) && $hasNumeric) {
             return $value;
-        } elseif (is_array($value)) {
+        } elseif (\is_array($value)) {
             return count($value);
         } elseif ($value instanceof File) {
             return $value->getSize() / 1024;

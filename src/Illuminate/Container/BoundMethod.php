@@ -71,7 +71,7 @@ class BoundMethod
      */
     protected static function callBoundMethod($container, $callback, $default)
     {
-        if (! is_array($callback)) {
+        if (! \is_array($callback)) {
             return $default instanceof Closure ? $default() : $default;
         }
 
@@ -131,7 +131,7 @@ class BoundMethod
             $callback = explode('::', $callback);
         }
 
-        return is_array($callback)
+        return \is_array($callback)
                         ? new ReflectionMethod($callback[0], $callback[1])
                         : new ReflectionFunction($callback);
     }

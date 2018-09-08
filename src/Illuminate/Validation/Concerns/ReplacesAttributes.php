@@ -431,7 +431,7 @@ trait ReplacesAttributes
     {
         $parameters = $this->parseNamedParameters($parameters);
 
-        if (is_array($parameters)) {
+        if (\is_array($parameters)) {
             foreach ($parameters as $key => $value) {
                 $message = str_replace(':'.$key, $value, $message);
             }
