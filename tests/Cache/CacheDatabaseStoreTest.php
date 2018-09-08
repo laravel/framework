@@ -48,6 +48,17 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertEquals('bar', $store->get('foo'));
     }
 
+    public function testValueIsReturnedOnPostgres()
+    {
+        $store = $this->getPostgresStore();
+        $table = m::mock('stdClass');
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $table->shouldReceive('where')->once()->with('key', '=', 'prefixfoo')->andReturn($table);
+        $table->shouldReceive('first')->once()->andReturn((object) ['value' => base64_encode(serialize('bar')), 'expiration' => 999999999999999]);
+
+        $this->assertEquals('bar', $store->get('foo'));
+    }
+
     public function testValueIsInsertedWhenNoExceptionsAreThrown()
     {
         $store = $this->getMockBuilder('Illuminate\Cache\DatabaseStore')->setMethods(['getTime'])->setConstructorArgs($this->getMocks())->getMock();
@@ -72,6 +83,17 @@ class CacheDatabaseStoreTest extends TestCase
         $table->shouldReceive('update')->once()->with(['value' => serialize('bar'), 'expiration' => 61]);
 
         $store->put('foo', 'bar', 1);
+    }
+
+    public function testValueIsInsertedOnPostgres()
+    {
+        $store = $this->getMockBuilder('Illuminate\Cache\DatabaseStore')->setMethods(['getTime'])->setConstructorArgs($this->getPostgresMocks())->getMock();
+        $table = m::mock('stdClass');
+        $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
+        $store->expects($this->once())->method('getTime')->will($this->returnValue(1));
+        $table->shouldReceive('insert')->once()->with(['key' => 'prefixfoo', 'value' => base64_encode(serialize("\0")), 'expiration' => 61]);
+
+        $store->put('foo', "\0", 1);
     }
 
     public function testForeverCallsStoreItemWithReallyLongTime()
@@ -186,8 +208,18 @@ class CacheDatabaseStoreTest extends TestCase
         return new DatabaseStore(m::mock('Illuminate\Database\Connection'), 'table', 'prefix');
     }
 
+    protected function getPostgresStore()
+    {
+        return new DatabaseStore(m::mock('Illuminate\Database\PostgresConnection'), 'table', 'prefix');
+    }
+
     protected function getMocks()
     {
         return [m::mock('Illuminate\Database\Connection'), 'table', 'prefix'];
+    }
+
+    protected function getPostgresMocks()
+    {
+        return [m::mock('Illuminate\Database\PostgresConnection'), 'table', 'prefix'];
     }
 }
