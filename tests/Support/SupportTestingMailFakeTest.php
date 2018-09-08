@@ -123,7 +123,7 @@ class MailableStub extends Mailable
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.7';
+    protected $version = '5.8';
 
     /**
      * Build the message.
@@ -141,7 +141,7 @@ class QueueableMailableStub extends Mailable implements ShouldQueue
 {
     public $framework = 'Laravel';
 
-    protected $version = '5.7';
+    protected $version = '5.8';
 
     /**
      * Build the message.
