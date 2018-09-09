@@ -70,14 +70,7 @@ class Kernel implements KernelContract
      *
      * @var array
      */
-    protected $middlewarePriority = [
-        \Illuminate\Session\Middleware\StartSession::class,
-        \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-        \Illuminate\Auth\Middleware\Authenticate::class,
-        \Illuminate\Session\Middleware\AuthenticateSession::class,
-        \Illuminate\Routing\Middleware\SubstituteBindings::class,
-        \Illuminate\Auth\Middleware\Authorize::class,
-    ];
+    protected $middlewarePriority = [];
 
     /**
      * Create a new HTTP kernel instance.
