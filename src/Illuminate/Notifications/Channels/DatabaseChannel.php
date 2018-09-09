@@ -33,7 +33,7 @@ class DatabaseChannel
     protected function getData($notifiable, Notification $notification)
     {
         if (method_exists($notification, 'toDatabase')) {
-            return is_array($data = $notification->toDatabase($notifiable))
+            return \is_array($data = $notification->toDatabase($notifiable))
                                 ? $data : $data->data;
         }
 

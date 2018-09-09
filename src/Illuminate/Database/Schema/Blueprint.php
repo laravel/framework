@@ -292,7 +292,7 @@ class Blueprint
      */
     public function dropColumn($columns)
     {
-        $columns = is_array($columns) ? $columns : func_get_args();
+        $columns = \is_array($columns) ? $columns : func_get_args();
 
         return $this->addCommand('dropColumn', compact('columns'));
     }
@@ -1226,7 +1226,7 @@ class Blueprint
         // If the given "index" is actually an array of columns, the developer means
         // to drop an index merely by specifying the columns involved without the
         // conventional name, so we will build the index name from the columns.
-        if (is_array($index)) {
+        if (\is_array($index)) {
             $index = $this->createIndexName($type, $columns = $index);
         }
 

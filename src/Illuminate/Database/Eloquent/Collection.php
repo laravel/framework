@@ -29,7 +29,7 @@ class Collection extends BaseCollection implements QueueableCollection
             $key = $key->toArray();
         }
 
-        if (is_array($key)) {
+        if (\is_array($key)) {
             if ($this->isEmpty()) {
                 return new static;
             }

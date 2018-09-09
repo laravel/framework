@@ -97,7 +97,7 @@ class Store implements Session
         if ($data = $this->handler->read($this->getId())) {
             $data = @unserialize($this->prepareForUnserialize($data));
 
-            if ($data !== false && ! is_null($data) && is_array($data)) {
+            if ($data !== false && ! is_null($data) && \is_array($data)) {
                 return $data;
             }
         }
@@ -177,7 +177,7 @@ class Store implements Session
     {
         $placeholder = new stdClass();
 
-        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
+        return ! collect(\is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
             return $this->get($key, $placeholder) === $placeholder;
         });
     }
@@ -190,7 +190,7 @@ class Store implements Session
      */
     public function has($key)
     {
-        return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) {
+        return ! collect(\is_array($key) ? $key : func_get_args())->contains(function ($key) {
             return is_null($this->get($key));
         });
     }
@@ -264,7 +264,7 @@ class Store implements Session
      */
     public function put($key, $value = null)
     {
-        if (! is_array($key)) {
+        if (! \is_array($key)) {
             $key = [$key => $value];
         }
 
@@ -383,7 +383,7 @@ class Store implements Session
      */
     public function keep($keys = null)
     {
-        $this->mergeNewFlashes($keys = is_array($keys) ? $keys : func_get_args());
+        $this->mergeNewFlashes($keys = \is_array($keys) ? $keys : func_get_args());
 
         $this->removeFromOldFlashData($keys);
     }

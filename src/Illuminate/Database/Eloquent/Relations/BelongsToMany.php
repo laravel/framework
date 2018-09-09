@@ -366,7 +366,7 @@ class BelongsToMany extends Relation
      */
     public function withPivotValue($column, $value = null)
     {
-        if (is_array($column)) {
+        if (\is_array($column)) {
             foreach ($column as $name => $value) {
                 $this->withPivotValue($name, $value);
             }
@@ -474,7 +474,7 @@ class BelongsToMany extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        return is_array($id) ? $this->findMany($id, $columns) : $this->where(
+        return \is_array($id) ? $this->findMany($id, $columns) : $this->where(
             $this->getRelated()->getQualifiedKeyName(), '=', $id
         )->first($columns);
     }
@@ -506,7 +506,7 @@ class BelongsToMany extends Relation
     {
         $result = $this->find($id, $columns);
 
-        if (is_array($id)) {
+        if (\is_array($id)) {
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }

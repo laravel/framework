@@ -118,7 +118,7 @@ class EloquentUserProvider implements UserProvider
                 continue;
             }
 
-            if (is_array($value) || $value instanceof Arrayable) {
+            if (\is_array($value) || $value instanceof Arrayable) {
                 $query->whereIn($key, $value);
             } else {
                 $query->where($key, $value);

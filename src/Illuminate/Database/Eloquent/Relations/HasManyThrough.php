@@ -283,7 +283,7 @@ class HasManyThrough extends Relation
      */
     public function find($id, $columns = ['*'])
     {
-        if (is_array($id)) {
+        if (\is_array($id)) {
             return $this->findMany($id, $columns);
         }
 
@@ -323,7 +323,7 @@ class HasManyThrough extends Relation
     {
         $result = $this->find($id, $columns);
 
-        if (is_array($id)) {
+        if (\is_array($id)) {
             if (count($result) === count(array_unique($id))) {
                 return $result;
             }

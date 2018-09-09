@@ -136,7 +136,7 @@ class FactoryBuilder
      */
     public function states($states)
     {
-        $this->activeStates = is_array($states) ? $states : func_get_args();
+        $this->activeStates = \is_array($states) ? $states : func_get_args();
 
         return $this;
     }
@@ -357,7 +357,7 @@ class FactoryBuilder
     protected function expandAttributes(array $attributes)
     {
         foreach ($attributes as &$attribute) {
-            if (is_callable($attribute) && ! is_string($attribute) && ! is_array($attribute)) {
+            if (is_callable($attribute) && ! is_string($attribute) && ! \is_array($attribute)) {
                 $attribute = $attribute($attributes);
             }
 

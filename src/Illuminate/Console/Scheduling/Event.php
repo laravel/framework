@@ -528,7 +528,7 @@ class Event
      */
     public function environments($environments)
     {
-        $this->environments = is_array($environments) ? $environments : func_get_args();
+        $this->environments = \is_array($environments) ? $environments : func_get_args();
 
         return $this;
     }

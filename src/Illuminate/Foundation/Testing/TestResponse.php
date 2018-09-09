@@ -577,13 +577,13 @@ class TestResponse
         }
 
         foreach ($structure as $key => $value) {
-            if (is_array($value) && $key === '*') {
+            if (\is_array($value) && $key === '*') {
                 PHPUnit::assertInternalType('array', $responseData);
 
                 foreach ($responseData as $responseDataItem) {
                     $this->assertJsonStructure($structure['*'], $responseDataItem);
                 }
-            } elseif (is_array($value)) {
+            } elseif (\is_array($value)) {
                 PHPUnit::assertArrayHasKey($key, $responseData);
 
                 $this->assertJsonStructure($structure[$key], $responseData[$key]);
@@ -725,7 +725,7 @@ class TestResponse
      */
     public function assertViewHas($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->assertViewHasAll($key);
         }
 
@@ -812,7 +812,7 @@ class TestResponse
      */
     public function assertSessionHas($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             return $this->assertSessionHasAll($key);
         }
 
@@ -907,7 +907,7 @@ class TestResponse
      */
     public function assertSessionMissing($key)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             foreach ($key as $value) {
                 $this->assertSessionMissing($value);
             }

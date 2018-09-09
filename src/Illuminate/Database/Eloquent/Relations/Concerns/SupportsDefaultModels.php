@@ -54,7 +54,7 @@ trait SupportsDefaultModels
             return call_user_func($this->withDefault, $instance, $parent) ?: $instance;
         }
 
-        if (is_array($this->withDefault)) {
+        if (\is_array($this->withDefault)) {
             $instance->forceFill($this->withDefault);
         }
 

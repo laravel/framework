@@ -462,7 +462,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         if ($keys instanceof self) {
             $keys = $keys->all();
-        } elseif (! is_array($keys)) {
+        } elseif (! \is_array($keys)) {
             $keys = func_get_args();
         }
 
@@ -747,7 +747,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function groupBy($groupBy, $preserveKeys = false)
     {
-        if (is_array($groupBy)) {
+        if (\is_array($groupBy)) {
             $nextGroups = $groupBy;
 
             $groupBy = array_shift($nextGroups);
@@ -760,7 +760,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         foreach ($this->items as $key => $value) {
             $groupKeys = $groupBy($value, $key);
 
-            if (! is_array($groupKeys)) {
+            if (! \is_array($groupKeys)) {
                 $groupKeys = [$groupKeys];
             }
 
@@ -817,7 +817,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function has($key)
     {
-        $keys = is_array($key) ? $key : func_get_args();
+        $keys = \is_array($key) ? $key : func_get_args();
 
         foreach ($keys as $value) {
             if (! $this->offsetExists($value)) {
@@ -839,7 +839,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $first = $this->first();
 
-        if (is_array($first) || is_object($first)) {
+        if (\is_array($first) || is_object($first)) {
             return implode($glue, $this->pluck($value)->all());
         }
 
@@ -1167,7 +1167,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
             $keys = $keys->all();
         }
 
-        $keys = is_array($keys) ? $keys : func_get_args();
+        $keys = \is_array($keys) ? $keys : func_get_args();
 
         return new static(Arr::only($this->items, $keys));
     }
@@ -1883,7 +1883,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     protected function getArrayableItems($items)
     {
-        if (is_array($items)) {
+        if (\is_array($items)) {
             return $items;
         } elseif ($items instanceof self) {
             return $items->all();

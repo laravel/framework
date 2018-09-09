@@ -21,7 +21,7 @@ trait ConditionallyLoadsAttributes
         foreach ($data as $key => $value) {
             $index++;
 
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $data[$key] = $this->filter($value);
 
                 continue;

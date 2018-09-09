@@ -479,7 +479,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     public function environment()
     {
         if (func_num_args() > 0) {
-            $patterns = is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
+            $patterns = \is_array(func_get_arg(0)) ? func_get_arg(0) : func_get_args();
 
             return Str::is($patterns, $this['env']);
         }

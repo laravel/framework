@@ -172,7 +172,7 @@ class SQLiteGrammar extends Grammar
         // basic routine regardless of an amount of records given to us to insert.
         $table = $this->wrapTable($query->from);
 
-        if (! is_array(reset($values))) {
+        if (! \is_array(reset($values))) {
             $values = [$values];
         }
 
@@ -255,7 +255,7 @@ class SQLiteGrammar extends Grammar
             return "delete from {$this->wrapTable($query->from)} where {$this->wrap('rowid')} in ({$selectSql})";
         }
 
-        $wheres = is_array($query->wheres) ? $this->compileWheres($query) : '';
+        $wheres = \is_array($query->wheres) ? $this->compileWheres($query) : '';
 
         return trim("delete from {$this->wrapTable($query->from)} $wheres");
     }

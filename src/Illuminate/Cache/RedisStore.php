@@ -209,7 +209,7 @@ class RedisStore extends TaggableStore implements Store
     public function tags($names)
     {
         return new RedisTaggedCache(
-            $this, new TagSet($this, is_array($names) ? $names : func_get_args())
+            $this, new TagSet($this, \is_array($names) ? $names : func_get_args())
         );
     }
 

@@ -18,7 +18,7 @@ class Arr
      */
     public static function accessible($value)
     {
-        return is_array($value) || $value instanceof ArrayAccess;
+        return \is_array($value) || $value instanceof ArrayAccess;
     }
 
     /**
@@ -51,7 +51,7 @@ class Arr
         foreach ($array as $values) {
             if ($values instanceof Collection) {
                 $values = $values->all();
-            } elseif (! is_array($values)) {
+            } elseif (! \is_array($values)) {
                 continue;
             }
 
@@ -111,7 +111,7 @@ class Arr
         $results = [];
 
         foreach ($array as $key => $value) {
-            if (is_array($value) && ! empty($value)) {
+            if (\is_array($value) && ! empty($value)) {
                 $results = array_merge($results, static::dot($value, $prepend.$key.'.'));
             } else {
                 $results[$prepend.$key] = $value;
@@ -211,7 +211,7 @@ class Arr
         foreach ($array as $item) {
             $item = $item instanceof Collection ? $item->all() : $item;
 
-            if (! is_array($item)) {
+            if (! \is_array($item)) {
                 $result[] = $item;
             } elseif ($depth === 1) {
                 $result = array_merge($result, array_values($item));
@@ -256,7 +256,7 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part])) {
+                if (isset($array[$part]) && \is_array($array[$part])) {
                     $array = &$array[$part];
                 } else {
                     continue 2;
@@ -420,7 +420,7 @@ class Arr
     {
         $value = is_string($value) ? explode('.', $value) : $value;
 
-        $key = is_null($key) || is_array($key) ? $key : explode('.', $key);
+        $key = is_null($key) || \is_array($key) ? $key : explode('.', $key);
 
         return [$value, $key];
     }
@@ -525,7 +525,7 @@ class Arr
             // If the key doesn't exist at this depth, we will just create an empty array
             // to hold the next value, allowing us to create the arrays to hold final
             // values at the correct depth. Then we'll keep digging into the array.
-            if (! isset($array[$key]) || ! is_array($array[$key])) {
+            if (! isset($array[$key]) || ! \is_array($array[$key])) {
                 $array[$key] = [];
             }
 
@@ -580,7 +580,7 @@ class Arr
     public static function sortRecursive($array)
     {
         foreach ($array as &$value) {
-            if (is_array($value)) {
+            if (\is_array($value)) {
                 $value = static::sortRecursive($value);
             }
         }
@@ -629,6 +629,6 @@ class Arr
             return [];
         }
 
-        return ! is_array($value) ? [$value] : $value;
+        return ! \is_array($value) ? [$value] : $value;
     }
 }

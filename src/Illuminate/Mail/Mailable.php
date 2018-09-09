@@ -576,7 +576,7 @@ class Mailable implements MailableContract, Renderable
      */
     protected function addressesToArray($address, $name)
     {
-        if (! is_array($address) && ! $address instanceof Collection) {
+        if (! \is_array($address) && ! $address instanceof Collection) {
             $address = is_string($name) ? [['name' => $name, 'email' => $address]] : [$address];
         }
 
@@ -591,7 +591,7 @@ class Mailable implements MailableContract, Renderable
      */
     protected function normalizeRecipient($recipient)
     {
-        if (is_array($recipient)) {
+        if (\is_array($recipient)) {
             return (object) $recipient;
         } elseif (is_string($recipient)) {
             return (object) ['email' => $recipient];
@@ -708,7 +708,7 @@ class Mailable implements MailableContract, Renderable
      */
     public function with($key, $value = null)
     {
-        if (is_array($key)) {
+        if (\is_array($key)) {
             $this->viewData = array_merge($this->viewData, $key);
         } else {
             $this->viewData[$key] = $value;

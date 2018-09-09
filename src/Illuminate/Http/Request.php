@@ -370,7 +370,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
 
         $files = $from->files->all();
 
-        $files = is_array($files) ? array_filter($files) : $files;
+        $files = \is_array($files) ? array_filter($files) : $files;
 
         $request->initialize(
             $from->query->all(),
@@ -442,7 +442,7 @@ class Request extends SymfonyRequest implements Arrayable, ArrayAccess
         }
 
         foreach ($files as $key => $file) {
-            if (is_array($file)) {
+            if (\is_array($file)) {
                 $files[$key] = $this->filterFiles($files[$key]);
             }
 

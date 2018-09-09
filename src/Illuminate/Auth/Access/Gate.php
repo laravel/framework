@@ -87,7 +87,7 @@ class Gate implements GateContract
      */
     public function has($ability)
     {
-        $abilities = is_array($ability) ? $ability : func_get_args();
+        $abilities = \is_array($ability) ? $ability : func_get_args();
 
         foreach ($abilities as $ability) {
             if (! isset($this->abilities[$ability])) {

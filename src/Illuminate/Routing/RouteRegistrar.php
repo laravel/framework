@@ -144,7 +144,7 @@ class RouteRegistrar
      */
     protected function registerRoute($method, $uri, $action = null)
     {
-        if (! is_array($action)) {
+        if (! \is_array($action)) {
             $action = array_merge($this->attributes, $action ? ['uses' => $action] : []);
         }
 
@@ -187,7 +187,7 @@ class RouteRegistrar
 
         if (in_array($method, $this->allowedAttributes)) {
             if ($method == 'middleware') {
-                return $this->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
+                return $this->attribute($method, \is_array($parameters[0]) ? $parameters[0] : $parameters);
             }
 
             return $this->attribute($method, $parameters[0]);

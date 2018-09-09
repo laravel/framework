@@ -418,7 +418,7 @@ class UrlGenerator implements UrlGeneratorContract
      */
     protected function formatAction($action)
     {
-        if (is_array($action)) {
+        if (\is_array($action)) {
             $action = '\\'.implode('@', $action);
         }
 

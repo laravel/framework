@@ -455,7 +455,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public static function all($columns = ['*'])
     {
         return (new static)->newQuery()->get(
-            is_array($columns) ? $columns : func_get_args()
+            \is_array($columns) ? $columns : func_get_args()
         );
     }
 
@@ -835,7 +835,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // type value or get this total count of records deleted for logging, etc.
         $count = 0;
 
-        $ids = is_array($ids) ? $ids : func_get_args();
+        $ids = \is_array($ids) ? $ids : func_get_args();
 
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
@@ -1004,7 +1004,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newQueryForRestoration($ids)
     {
-        return is_array($ids)
+        return \is_array($ids)
                 ? $this->newQueryWithoutScopes()->whereIn($this->getQualifiedKeyName(), $ids)
                 : $this->newQueryWithoutScopes()->whereKey($ids);
     }
