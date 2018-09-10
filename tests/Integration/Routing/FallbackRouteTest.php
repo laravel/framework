@@ -95,4 +95,23 @@ class FallbackRouteTest extends TestCase
         $this->assertContains('one', $this->get('/one')->getContent());
         $this->assertEquals(200, $this->get('/one')->getStatusCode());
     }
+
+    public function test_methods()
+    {
+        Route::fallback(function () {
+            return 'GET';
+        });
+        Route::fallback(function () {
+            return 'POST';
+        }, 'POST');
+
+        $this->get('non-existing')
+            ->assertSee('GET')
+            ->assertOk();
+        $this->post('non-existing')
+            ->assertSee('POST')
+            ->assertOk();
+        $this->put('non-existing')
+            ->assertStatus(405);
+    }
 }
