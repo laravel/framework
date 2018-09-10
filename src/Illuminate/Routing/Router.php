@@ -217,14 +217,15 @@ class Router implements RegistrarContract, BindingRegistrar
      * Register a new Fallback route with the router.
      *
      * @param  \Closure|array|string|null  $action
+     * @param  array|string  $methods
      * @return \Illuminate\Routing\Route
      */
-    public function fallback($action)
+    public function fallback($action, $methods = 'GET')
     {
         $placeholder = 'fallbackPlaceholder';
 
         return $this->addRoute(
-            'GET', "{{$placeholder}}", $action
+            $methods, "{{$placeholder}}", $action
         )->where($placeholder, '.*')->fallback();
     }
 
