@@ -42,7 +42,7 @@ class BoundMethod
      *
      * @throws \InvalidArgumentException
      */
-    protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
+    public static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
         $segments = explode('@', $target);
 
@@ -169,7 +169,7 @@ class BoundMethod
      * @param  mixed  $callback
      * @return bool
      */
-    protected static function isCallableWithAtSign($callback)
+    public static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && strpos($callback, '@') !== false;
     }

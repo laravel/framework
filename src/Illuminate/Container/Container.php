@@ -222,6 +222,10 @@ class Container implements ArrayAccess, ContainerContract
             $concrete = $abstract;
         }
 
+        if (BoundMethod::isCallableWithAtSign($concrete)) {
+            $concrete = $this->getFactoryClosure($abstract, $concrete);
+        }
+
         // If the factory is not a Closure, it means it is just a class name which is
         // bound into this container to the abstract type and we will just wrap it
         // up inside its own Closure to give us more convenience when extending.
@@ -254,6 +258,19 @@ class Container implements ArrayAccess, ContainerContract
             }
 
             return $container->make($concrete, $parameters);
+        };
+    }
+
+    /**
+     * Get the Closure to be used when building a type from a factory.
+     * @param  string  $abstract
+     * @param  $concrete
+     * @return  Closure
+     */
+    private function getFactoryClosure(string $abstract, $concrete)
+    {
+        return function ($container, $parameters = []) use ($abstract, $concrete) {
+            return BoundMethod::callClass($container, $concrete, $parameters);
         };
     }
 
