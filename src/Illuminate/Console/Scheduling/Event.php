@@ -376,7 +376,7 @@ class Event
      */
     public function emailOutputTo($addresses, $onlyIfOutputExists = false)
     {
-        $this->ensureOutputIsBeingCaptured();
+        $this->ensureOutputIsBeingCapturedForEmail();
 
         $addresses = Arr::wrap($addresses);
 
@@ -399,11 +399,11 @@ class Event
     }
 
     /**
-     * Ensure that the command output is being captured.
+     * Ensure that output is being captured for email.
      *
      * @return void
      */
-    protected function ensureOutputIsBeingCaptured()
+    protected function ensureOutputIsBeingCapturedForEmail()
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
