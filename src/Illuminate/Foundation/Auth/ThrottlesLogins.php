@@ -8,6 +8,7 @@ use Illuminate\Cache\RateLimiter;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Support\Facades\Lang;
 use Illuminate\Validation\ValidationException;
+use Symfony\Component\HttpFoundation\Response;
 
 trait ThrottlesLogins
 {
@@ -52,7 +53,7 @@ trait ThrottlesLogins
 
         throw ValidationException::withMessages([
             $this->username() => [Lang::get('auth.throttle', ['seconds' => $seconds])],
-        ])->status(429);
+        ])->status(Response::HTTP_TOO_MANY_REQUESTS);
     }
 
     /**
