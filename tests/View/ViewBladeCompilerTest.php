@@ -96,16 +96,4 @@ class ViewBladeCompilerTest extends TestCase
     {
         return m::mock('Illuminate\Filesystem\Filesystem');
     }
-
-    public function testGetTagsProvider()
-    {
-        return [
-            ['{{', '}}'],
-            ['{{{', '}}}'],
-            ['[[', ']]'],
-            ['[[[', ']]]'],
-            ['((', '))'],
-            ['(((', ')))'],
-        ];
-    }
 }
