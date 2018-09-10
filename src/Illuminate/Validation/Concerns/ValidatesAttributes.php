@@ -1087,7 +1087,9 @@ trait ValidatesAttributes
             return false;
         }
 
-        return $value->getPath() !== '' && in_array($value->guessExtension(), $parameters);
+        return $value->getPath() !== '' && ($value instanceof UploadedFile)
+            ? in_array($value->guessClientExtension(), $parameters)
+            : in_array($value->guessExtension(), $parameters);
     }
 
     /**
@@ -1108,9 +1110,11 @@ trait ValidatesAttributes
             return false;
         }
 
+        $mimeType = $value instanceof UploadedFile ? $value->getClientMimeType() : $value->getMimeType();
+
         return $value->getPath() !== '' &&
-                (in_array($value->getMimeType(), $parameters) ||
-                 in_array(explode('/', $value->getMimeType())[0].'/*', $parameters));
+                (in_array($mimeType, $parameters) ||
+                 in_array(explode('/', $mimeType)[0].'/*', $parameters));
     }
 
     /**
