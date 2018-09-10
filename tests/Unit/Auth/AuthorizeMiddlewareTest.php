@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Auth;
+namespace Illuminate\Tests\Unit\Auth;
 
 use stdClass;
 use Mockery as m;

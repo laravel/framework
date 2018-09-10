@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Auth;
+namespace Illuminate\Tests\Unit\Auth;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -102,17 +102,17 @@ class AuthEloquentUserProviderTest extends TestCase
     public function testModelsCanBeCreated()
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $provider = new EloquentUserProvider($hasher, 'Illuminate\Tests\Auth\EloquentProviderUserStub');
+        $provider = new EloquentUserProvider($hasher, \Illuminate\Tests\Unit\Auth\EloquentProviderUserStub::class);
         $model = $provider->createModel();
 
-        $this->assertInstanceOf('Illuminate\Tests\Auth\EloquentProviderUserStub', $model);
+        $this->assertInstanceOf(\Illuminate\Tests\Unit\Auth\EloquentProviderUserStub::class, $model);
     }
 
     protected function getProviderMock()
     {
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
 
-        return $this->getMockBuilder('Illuminate\Auth\EloquentUserProvider')->setMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
+        return $this->getMockBuilder(\Illuminate\Auth\EloquentUserProvider::class)->setMethods(['createModel'])->setConstructorArgs([$hasher, 'foo'])->getMock();
     }
 }
 

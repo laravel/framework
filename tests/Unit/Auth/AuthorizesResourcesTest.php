@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Auth;
+namespace Illuminate\Tests\Unit\Auth;
 
 use Closure;
 use Illuminate\Http\Request;
@@ -65,8 +65,8 @@ class AuthorizesResourcesTest extends TestCase
     {
         $router = new Router(new \Illuminate\Events\Dispatcher);
 
-        $router->aliasMiddleware('can', '\Illuminate\Tests\Auth\AuthorizesResourcesMiddleware');
-        $router->get($method)->uses('\Illuminate\Tests\Auth\AuthorizesResourcesController@'.$method);
+        $router->aliasMiddleware('can', \Illuminate\Tests\Unit\Auth\AuthorizesResourcesMiddleware::class);
+        $router->get($method)->uses('\Illuminate\Tests\Unit\Auth\AuthorizesResourcesController@'.$method);
 
         $this->assertEquals(
             'caught '.$middleware,
