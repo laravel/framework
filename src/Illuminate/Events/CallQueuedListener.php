@@ -12,6 +12,13 @@ class CallQueuedListener implements ShouldQueue
     use InteractsWithQueue;
 
     /**
+     * The listener class instance
+     *
+     * @var \Illuminate\Contracts\Queue\ShouldQueue
+     */
+    public $handler;
+
+    /**
      * The listener class name.
      *
      * @var string
@@ -78,12 +85,12 @@ class CallQueuedListener implements ShouldQueue
     {
         $this->prepareData();
 
-        $handler = $this->setJobInstanceIfNecessary(
+        $this->handler = $this->setJobInstanceIfNecessary(
             $this->job, $container->make($this->class)
         );
 
         call_user_func_array(
-            [$handler, $this->method], $this->data
+            [$this->handler, $this->method], $this->data
         );
     }
 
@@ -143,7 +150,8 @@ class CallQueuedListener implements ShouldQueue
      */
     public function displayName()
     {
-        return $this->class;
+        return method_exists($this->handler, 'displayName')
+            ? $this->handler->displayName() : $this->class;
     }
 
     /**
