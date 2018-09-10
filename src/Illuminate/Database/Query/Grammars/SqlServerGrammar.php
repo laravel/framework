@@ -104,6 +104,20 @@ class SqlServerGrammar extends Grammar
     }
 
     /**
+     * Compile a "where time" clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereTime(Builder $query, $where)
+    {
+        $value = $this->parameter($where['value']);
+
+        return 'cast('.$this->wrap($where['column']).' as time) '.$where['operator'].' '.$value;
+    }
+
+    /**
      * Compile a "JSON contains" statement into SQL.
      *
      * @param  string  $column
@@ -456,17 +470,6 @@ class SqlServerGrammar extends Grammar
         $field = $this->wrapSegments(explode('.', array_shift($parts)));
 
         return 'json_value('.$field.', '.$this->wrapJsonPath($parts[0]).')';
-    }
-
-    /**
-     * Wrap the given JSON path.
-     *
-     * @param  string  $value
-     * @return string
-     */
-    protected function wrapJsonPath($value)
-    {
-        return '\'$."'.str_replace('->', '"."', $value).'"\'';
     }
 
     /**

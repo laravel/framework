@@ -361,9 +361,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function makeHidden($attributes)
     {
-        return $this->each(function ($model) use ($attributes) {
-            $model->addHidden($attributes);
-        });
+        return $this->each->addHidden($attributes);
     }
 
     /**
@@ -374,9 +372,7 @@ class Collection extends BaseCollection implements QueueableCollection
      */
     public function makeVisible($attributes)
     {
-        return $this->each(function ($model) use ($attributes) {
-            $model->makeVisible($attributes);
-        });
+        return $this->each->makeVisible($attributes);
     }
 
     /**

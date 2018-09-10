@@ -461,8 +461,10 @@ class HasManyThrough extends Relation
      */
     protected function prepareQueryBuilder($columns = ['*'])
     {
-        return $this->query->applyScopes()->addSelect(
-            $this->shouldSelect($this->query->getQuery()->columns ? [] : $columns)
+        $builder = $this->query->applyScopes();
+
+        return $builder->addSelect(
+            $this->shouldSelect($builder->getQuery()->columns ? [] : $columns)
         );
     }
 
@@ -508,7 +510,7 @@ class HasManyThrough extends Relation
         $query->getModel()->setTable($hash);
 
         return $query->select($columns)->whereColumn(
-            $parentQuery->getQuery()->from.'.'.$query->getModel()->getKeyName(), '=', $this->getQualifiedFirstKeyName()
+            $parentQuery->getQuery()->from.'.'.$this->localKey, '=', $this->getQualifiedFirstKeyName()
         );
     }
 
