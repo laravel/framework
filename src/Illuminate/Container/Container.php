@@ -270,7 +270,7 @@ class Container implements ArrayAccess, ContainerContract
     private function getFactoryClosure(string $abstract, $concrete)
     {
         return function ($container, $parameters = []) use ($abstract, $concrete) {
-            return BoundMethod::callClass($container, $concrete, $parameters);
+            return BoundMethod::call($container, $concrete, $parameters);
         };
     }
 

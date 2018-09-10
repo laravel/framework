@@ -42,7 +42,7 @@ class BoundMethod
      *
      * @throws \InvalidArgumentException
      */
-    public static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
+    protected static function callClass($container, $target, array $parameters = [], $defaultMethod = null)
     {
         $segments = explode('@', $target);
 
