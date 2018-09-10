@@ -411,11 +411,23 @@ class Event
     }
 
     /**
+     * @deprecated please use ensureOutputIsBeingCaptured
+     *
      * Ensure that output is being captured for email.
      *
      * @return void
      */
     protected function ensureOutputIsBeingCapturedForEmail()
+    {
+        $this->ensureOutputIsBeingCaptured();
+    }
+
+    /**
+     * Ensure that the command output is being captured.
+     *
+     * @return void
+     */
+    protected function ensureOutputIsBeingCaptured()
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
