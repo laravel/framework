@@ -15,7 +15,7 @@ class SesTransport extends Transport
     protected $ses;
 
     /**
-     * Transmission options.
+     * The Amazon SES transmission options.
      *
      * @var array
      */
@@ -43,8 +43,7 @@ class SesTransport extends Transport
 
         $result = $this->ses->sendRawEmail(
             array_merge(
-                $this->options,
-                [
+                $this->options, [
                     'Source' => key($message->getSender() ?: $message->getFrom()),
                     'RawMessage' => [
                         'Data' => $message->toString(),
