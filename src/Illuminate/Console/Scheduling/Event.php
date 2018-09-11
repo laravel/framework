@@ -411,11 +411,11 @@ class Event
     }
 
     /**
-     * @deprecated please use ensureOutputIsBeingCaptured
-     *
      * Ensure that output is being captured for email.
      *
      * @return void
+     *
+     * @deprecated See ensureOutputIsBeingCaptured.
      */
     protected function ensureOutputIsBeingCapturedForEmail()
     {
