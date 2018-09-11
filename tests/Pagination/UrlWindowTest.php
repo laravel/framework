@@ -42,12 +42,16 @@ class UrlWindowTest extends TestCase
          */
         $p = new LengthAwarePaginator($array, count($array), 1, 8);
         $window = new UrlWindow($p);
+	    $slider = [];
+	    for ($i = 5; $i <= 11; $i++) {
+		    $slider[$i] = '/?page='.$i;
+	    }
         $last = [];
-        for ($i = 5; $i <= 13; $i++) {
+        for ($i = 12; $i <= 13; $i++) {
             $last[$i] = '/?page='.$i;
         }
 
-        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => null, 'last' => $last], $window->get());
+        $this->assertEquals(['first' => [1 => '/?page=1', 2 => '/?page=2'], 'slider' => $slider, 'last' => $last], $window->get());
     }
 
     public function testCustomUrlRangeForAWindowOfLinks()
