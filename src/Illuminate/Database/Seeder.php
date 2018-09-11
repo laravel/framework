@@ -118,8 +118,10 @@ abstract class Seeder
             throw new InvalidArgumentException('Method [run] missing from '.get_class($this));
         }
 
-        return isset($this->container)
-                    ? $this->container->call([$this, 'run'])
-                    : $this->run();
+        if (isset($this->container)) {
+            $this->container->call([$this, 'run']);
+        } else {
+            $this->run();
+        }
     }
 }
