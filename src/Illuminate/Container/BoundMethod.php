@@ -169,8 +169,21 @@ class BoundMethod
      * @param  mixed  $callback
      * @return bool
      */
-    public static function isCallableWithAtSign($callback)
+    protected static function isCallableWithAtSign($callback)
     {
         return is_string($callback) && strpos($callback, '@') !== false;
+    }
+
+    /**
+     * Determine if the given variable is a php callable or
+     * if it is a string with the Class@method syntax
+     * but it should not be a closure.
+     *
+     * @param  $callable
+     * @return  bool
+     */
+    public static function isCallableButNotAClosure($callable)
+    {
+        return (is_callable($callable) || self::isCallableWithAtSign($callable)) && ! $callable instanceof Closure;
     }
 }

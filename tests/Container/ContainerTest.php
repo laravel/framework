@@ -1048,6 +1048,38 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->get('Taylor');
     }
+
+    public function testWeCanBindAFactoryMethodToBeCalledAndResolveAConcreteClass()
+    {
+        $container = new Container;
+        $container->bind('foo', [new FactoryClass, 'createAConcreteClass']);
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->make('foo'));
+    }
+
+    public function testWeCanBindAFactoryAtSignMethodToBeCalledAndResolveAConcreteClass()
+    {
+        $container = new Container;
+        $container->bind('foo', 'Illuminate\Tests\Container\FactoryClass@createAConcreteClass');
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->make('foo'));
+    }
+
+    public function testWeCanBindAStaticFactoryMethodToBeCalledAndResolveAConcreteClassUsingTheColonColonSyntax()
+    {
+        $container = new Container;
+        $container->bind('foo', 'Illuminate\Tests\Container\FactoryClass::createAConcreteClass');
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->make('foo'));
+    }
+
+    public function testWeCanBindAStaticFactoryMethodToBeCalledAndResolveAConcreteClassUsingTheArraySyntax()
+    {
+        $container = new Container;
+        $container->bind('foo', ['Illuminate\Tests\Container\FactoryClass', 'createAConcreteClass']);
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->make('foo'));
+    }
 }
 
 class ContainerConcreteStub
@@ -1210,5 +1242,18 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     public function __construct()
     {
         static::$instantiations++;
+    }
+}
+
+class FactoryClass
+{
+    public function createAConcreteClass()
+    {
+        return new ContainerConcreteStub();
+    }
+
+    public static function staticallyCreateAConcreteClass()
+    {
+        return new ContainerConcreteStub();
     }
 }
