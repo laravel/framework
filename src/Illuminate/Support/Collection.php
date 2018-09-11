@@ -147,9 +147,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     {
         $callback = $this->valueRetriever($callback);
 
-        $items = $this->map(function ($value) use ($callback) {
-            return $callback($value);
-        })->filter(function ($value) {
+        $items = $this->map($callback)->filter(function ($value) {
             return ! is_null($value);
         });
 
@@ -1684,7 +1682,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     /**
      * Get a value retrieving callback.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @return callable
      */
     protected function valueRetriever($value)
