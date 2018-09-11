@@ -77,9 +77,10 @@ class TransportManager extends Manager
             'version' => 'latest', 'service' => 'email',
         ]);
 
-        return new SesTransport(new SesClient(
-            $this->addSesCredentials($config)
-        ));
+        return new SesTransport(
+            new SesClient($this->addSesCredentials($config)),
+            $config['options'] ?? []
+        );
     }
 
     /**

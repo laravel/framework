@@ -22,7 +22,7 @@ class SparkPostTransport extends Transport
     protected $key;
 
     /**
-     * Transmission options.
+     * The SparkPost transmission options.
      *
      * @var array
      */

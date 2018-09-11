@@ -339,6 +339,18 @@ class Event
     }
 
     /**
+     * Ensure that the output is stored on disk in a log file.
+     *
+     * @return $this
+     */
+    public function storeOutput()
+    {
+        $this->ensureOutputIsBeingCaptured();
+
+        return $this;
+    }
+
+    /**
      * Send the output of the command to a given location.
      *
      * @param  string  $location
@@ -402,8 +414,20 @@ class Event
      * Ensure that output is being captured for email.
      *
      * @return void
+     *
+     * @deprecated See ensureOutputIsBeingCaptured.
      */
     protected function ensureOutputIsBeingCapturedForEmail()
+    {
+        $this->ensureOutputIsBeingCaptured();
+    }
+
+    /**
+     * Ensure that the command output is being captured.
+     *
+     * @return void
+     */
+    protected function ensureOutputIsBeingCaptured()
     {
         if (is_null($this->output) || $this->output == $this->getDefaultOutput()) {
             $this->sendOutputTo(storage_path('logs/schedule-'.sha1($this->mutexName()).'.log'));
