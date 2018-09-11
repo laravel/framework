@@ -128,10 +128,6 @@ class PendingCommand
      */
     public function run()
     {
-        if ($this->hasExecuted) {
-            return;
-        }
-
         $this->hasExecuted = true;
 
         $this->mockConsoleOutput();
@@ -215,6 +211,10 @@ class PendingCommand
      */
     public function __destruct()
     {
+        if ($this->hasExecuted) {
+            return;
+        }
+
         $this->run();
     }
 }
