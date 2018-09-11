@@ -222,7 +222,7 @@ class Container implements ArrayAccess, ContainerContract
             $concrete = $abstract;
         }
 
-        if (BoundMethod::isCallableButNotAClosure($concrete)){
+        if (BoundMethod::isCallableButNotAClosure($concrete)) {
             $concrete = $this->getFactoryClosure($abstract, $concrete);
         }
 
