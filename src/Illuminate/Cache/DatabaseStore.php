@@ -223,7 +223,7 @@ class DatabaseStore implements Store
      */
     public function flush()
     {
-        $this->table()->delete();
+        $this->table()->truncate();
 
         return true;
     }
