@@ -56,6 +56,22 @@ trait InteractsWithConsole
     }
 
     /**
+     * Call artisan command without mocking and return code.
+     *
+     * @param  string  $command
+     * @param  array  $parameters
+     * @return \Illuminate\Foundation\Testing\PendingCommand|int
+     */
+    public function artisanWithoutMock($command, $parameters = [])
+    {
+        $this->withoutMockingConsoleOutput();
+        $output = $this->artisan($command, $parameters);
+        $this->mockConsoleOutput = true;
+
+        return $output;
+    }
+
+    /**
      * Disable mocking the console output.
      *
      * @return $this

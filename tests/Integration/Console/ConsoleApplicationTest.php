@@ -28,6 +28,28 @@ class ConsoleApplicationTest extends TestCase
             'id' => 1,
         ])->assertExitCode(0);
     }
+
+    public function test_artisan_without_mock_call()
+    {
+        $outputWithoutMock = $this->artisanWithoutMock('foo:bar', [
+            'id' => 1,
+        ]);
+
+        $this->assertSame(0, $outputWithoutMock);
+    }
+
+    public function test_artisan_with_mock_call_after_without_mock_call()
+    {
+        $outputWithoutMock = $this->artisanWithoutMock('foo:bar', [
+            'id' => 1,
+        ]);
+        $outputWithMock = $this->artisan('foo:bar', [
+            'id' => 1,
+        ]);
+
+        $this->assertSame(0, $outputWithoutMock);
+        $outputWithMock->assertExitCode(0);
+    }
 }
 
 class FooCommandStub extends Command
