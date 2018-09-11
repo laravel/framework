@@ -105,6 +105,16 @@ class PendingCommand
     }
 
     /**
+     * Call the given command immediately.
+     *
+     * @return int
+     */
+    public function callNow()
+    {
+        return $this->app[Kernel::class]->call($this->command, $this->parameters);
+    }
+
+    /**
      * Mock the application's console output.
      *
      * @return void
@@ -168,7 +178,7 @@ class PendingCommand
         $this->mockConsoleOutput();
 
         try {
-            $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters);
+            $exitCode = $this->callNow();
         } catch (NoMatchingExpectationException $e) {
             if ($e->getMethodName() == 'askQuestion') {
                 $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
