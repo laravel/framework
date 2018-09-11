@@ -48,11 +48,11 @@ class PendingCommand
     protected $expectedExitCode;
 
     /**
-     * Determine if command was called.
+     * Determine if command has executed.
      *
      * @var bool
      */
-    private $isCalled = false;
+    protected $hasExecuted = false;
 
     /**
      * Create a new pending console command run.
@@ -112,15 +112,46 @@ class PendingCommand
     }
 
     /**
-     * Call the given command immediately.
+     * Execute the command.
      *
      * @return int
      */
-    public function callNow()
+    public function execute()
     {
-        $this->isCalled = true;
+        return $this->run();
+    }
 
-        return $this->app[Kernel::class]->call($this->command, $this->parameters);
+    /**
+     * Execute the command.
+     *
+     * @return int
+     */
+    public function run()
+    {
+        if ($this->hasExecuted) {
+            return;
+        }
+
+        $this->hasExecuted = true;
+
+        $this->mockConsoleOutput();
+
+        try {
+            $exitCode = $this->app[Kernel::class]->call($this->command, $this->parameters);
+        } catch (NoMatchingExpectationException $e) {
+            if ($e->getMethodName() == 'askQuestion') {
+                $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
+            }
+        }
+
+        if ($this->expectedExitCode != null) {
+            $this->test->assertTrue(
+                $exitCode == $this->expectedExitCode,
+                "Expected status code {$this->expectedExitCode} but received {$exitCode}."
+            );
+        }
+
+        return $exitCode;
     }
 
     /**
@@ -184,25 +215,6 @@ class PendingCommand
      */
     public function __destruct()
     {
-        if ($this->isCalled) {
-            return;
-        }
-
-        $this->mockConsoleOutput();
-
-        try {
-            $exitCode = $this->callNow();
-        } catch (NoMatchingExpectationException $e) {
-            if ($e->getMethodName() == 'askQuestion') {
-                $this->test->fail('Unexpected question "'.$e->getActualArguments()[0]->getQuestion().'" was asked.');
-            }
-        }
-
-        if ($this->expectedExitCode != null) {
-            $this->test->assertTrue(
-                $exitCode == $this->expectedExitCode,
-                "Expected status code {$this->expectedExitCode} but received {$exitCode}."
-            );
-        }
+        $this->run();
     }
 }

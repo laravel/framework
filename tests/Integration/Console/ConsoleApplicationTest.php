@@ -31,24 +31,25 @@ class ConsoleApplicationTest extends TestCase
 
     public function test_artisan_call_now()
     {
-        $outputWithoutMock = $this->artisan('foo:bar', [
+        $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
-        ])->callNow();
+        ])->run();
 
-        $this->assertSame(0, $outputWithoutMock);
+        $this->assertSame(0, $exitCode);
     }
 
     public function test_artisan_with_mock_call_after_call_now()
     {
-        $outputWithoutMock = $this->artisan('foo:bar', [
+        $exitCode = $this->artisan('foo:bar', [
             'id' => 1,
-        ])->callNow();
-        $outputWithMock = $this->artisan('foo:bar', [
+        ])->run();
+
+        $mock = $this->artisan('foo:bar', [
             'id' => 1,
         ]);
 
-        $this->assertSame(0, $outputWithoutMock);
-        $outputWithMock->assertExitCode(0);
+        $this->assertSame(0, $exitCode);
+        $mock->assertExitCode(0);
     }
 }
 
