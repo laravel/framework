@@ -1068,7 +1068,7 @@ class ContainerTest extends TestCase
     public function testWeCanBindAStaticFactoryMethodToBeCalledAndResolveAConcreteClassUsingTheColonColonSyntax()
     {
         $container = new Container;
-        $container->bind('foo', 'Illuminate\Tests\Container\FactoryClass::createAConcreteClass');
+        $container->bind('foo', 'Illuminate\Tests\Container\FactoryClass::staticallyCreateAConcreteClass');
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $container->make('foo'));
     }
@@ -1076,7 +1076,7 @@ class ContainerTest extends TestCase
     public function testWeCanBindAStaticFactoryMethodToBeCalledAndResolveAConcreteClassUsingTheArraySyntax()
     {
         $container = new Container;
-        $container->bind('foo', ['Illuminate\Tests\Container\FactoryClass', 'createAConcreteClass']);
+        $container->bind('foo', ['Illuminate\Tests\Container\FactoryClass', 'staticallyCreateAConcreteClass']);
 
         $this->assertInstanceOf(ContainerConcreteStub::class, $container->make('foo'));
     }
