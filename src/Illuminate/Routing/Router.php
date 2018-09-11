@@ -5,6 +5,7 @@ namespace Illuminate\Routing;
 use Closure;
 use ArrayObject;
 use JsonSerializable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -107,6 +108,15 @@ class Router implements RegistrarContract, BindingRegistrar
      * @var array
      */
     protected $groupStack = [];
+
+    /**
+     * The attributes that are aliased.
+     *
+     * @var array
+     */
+    protected $aliases = [
+        'name' => 'as',
+    ];
 
     /**
      * All of the verbs supported by the router.
@@ -362,6 +372,11 @@ class Router implements RegistrarContract, BindingRegistrar
      */
     public function group(array $attributes, $routes)
     {
+        // Replaces the aliased attributes to their respective counterparts.
+        foreach ($attributes as $attributeKey => $attributeValue) {
+            $attributes[$this->getAttributeAlias($attributeKey, $attributeKey)] = $attributeValue;
+        }
+
         $this->updateGroupStack($attributes);
 
         // Once we have updated the group stack, we'll load the provided routes and
@@ -1082,6 +1097,18 @@ class Router implements RegistrarContract, BindingRegistrar
     public function is(...$patterns)
     {
         return $this->currentRouteNamed(...$patterns);
+    }
+
+    /**
+     * Get alias of an attribute if there is one, otherwise return the default.
+     *
+     * @param  string  $key
+     * @param  string  $default
+     * @return string
+     */
+    public function getAttributeAlias($key, $default)
+    {
+        return Arr::get($this->aliases, $key, $default);
     }
 
     /**

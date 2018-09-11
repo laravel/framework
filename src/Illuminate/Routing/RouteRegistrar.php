@@ -4,7 +4,6 @@ namespace Illuminate\Routing;
 
 use Closure;
 use BadMethodCallException;
-use Illuminate\Support\Arr;
 use InvalidArgumentException;
 
 /**
@@ -58,15 +57,6 @@ class RouteRegistrar
     ];
 
     /**
-     * The attributes that are aliased.
-     *
-     * @var array
-     */
-    protected $aliases = [
-        'name' => 'as',
-    ];
-
-    /**
      * Create a new route registrar instance.
      *
      * @param  \Illuminate\Routing\Router  $router
@@ -92,7 +82,8 @@ class RouteRegistrar
             throw new InvalidArgumentException("Attribute [{$key}] does not exist.");
         }
 
-        $this->attributes[Arr::get($this->aliases, $key, $key)] = $value;
+        // Replaces the aliased attributes to their respective counterparts.
+        $this->attributes[$this->router->getAttributeAlias($key, $key)] = $value;
 
         return $this;
     }
