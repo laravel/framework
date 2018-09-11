@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Auth;
+namespace Illuminate\Tests\Unit\Auth;
 
 use stdClass;
 use PHPUnit\Framework\TestCase;
@@ -336,7 +336,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
+        $gate->define('foo', '\Illuminate\Tests\Unit\Auth\AccessGateTestClass@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -345,7 +345,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestInvokableClass');
+        $gate->define('foo', \Illuminate\Tests\Unit\Auth\AccessGateTestInvokableClass::class);
 
         $this->assertTrue($gate->check('foo'));
     }

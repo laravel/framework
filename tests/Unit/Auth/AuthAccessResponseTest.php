@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Auth;
+namespace Illuminate\Tests\Unit\Auth;
 
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Response;
