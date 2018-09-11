@@ -5,9 +5,9 @@ namespace Illuminate\Auth\Events;
 class Attempting
 {
     /**
-     * The authentication guard implementation.
+     * The authentication guard name.
      *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     * @var string
      */
     public $guard;
 
@@ -28,7 +28,7 @@ class Attempting
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
+     * @param  string  $guard
      * @param  array  $credentials
      * @param  bool  $remember
      * @return void
