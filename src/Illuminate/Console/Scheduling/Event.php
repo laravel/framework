@@ -388,7 +388,7 @@ class Event
      */
     public function emailOutputTo($addresses, $onlyIfOutputExists = false)
     {
-        $this->ensureOutputIsBeingCaptured();
+        $this->ensureOutputIsBeingCapturedForEmail();
 
         $addresses = Arr::wrap($addresses);
 
@@ -408,6 +408,18 @@ class Event
     public function emailWrittenOutputTo($addresses)
     {
         return $this->emailOutputTo($addresses, true);
+    }
+
+    /**
+     * @deprecated please use ensureOutputIsBeingCaptured
+     *
+     * Ensure that output is being captured for email.
+     *
+     * @return void
+     */
+    protected function ensureOutputIsBeingCapturedForEmail()
+    {
+        $this->ensureOutputIsBeingCaptured();
     }
 
     /**
