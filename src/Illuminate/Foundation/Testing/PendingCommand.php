@@ -48,6 +48,13 @@ class PendingCommand
     protected $expectedExitCode;
 
     /**
+     * Determine if command was called.
+     *
+     * @var bool
+     */
+    private $isCalled = false;
+
+    /**
      * Create a new pending console command run.
      *
      * @param  \PHPUnit\Framework\TestCase  $test
@@ -111,6 +118,8 @@ class PendingCommand
      */
     public function callNow()
     {
+        $this->isCalled = true;
+
         return $this->app[Kernel::class]->call($this->command, $this->parameters);
     }
 
@@ -175,6 +184,10 @@ class PendingCommand
      */
     public function __destruct()
     {
+        if ($this->isCalled) {
+            return;
+        }
+
         $this->mockConsoleOutput();
 
         try {
