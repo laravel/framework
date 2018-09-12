@@ -406,13 +406,13 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newFromBuilder($attributes = [], $connection = null, self $childModel = null)
     {
-        $model = $childModel ? : $this;
+        $model = $childModel ?: $this;
 
         $model = $model->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
 
-        $model->setConnection($connection ? : $model->getConnectionName());
+        $model->setConnection($connection ?: $model->getConnectionName());
 
         $model->fireModelEvent('retrieved', false);
 
