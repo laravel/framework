@@ -111,11 +111,9 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     public function assertTimesSent($expectedCount, $notification)
     {
-        $actualCount = collect($this->notifications)
-            ->flatten(1)
-            ->reduce(function ($count, $sent) use ($notification) {
-                return $count + count($sent[$notification] ?? []);
-            }, 0);
+        $actualCount = collect($this->notifications)->reduce(function ($count, $sent) use ($notification) {
+            return $count + \count($sent[$notification] ?? []);
+        }, 0);
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
@@ -169,11 +167,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
      */
     protected function notificationsFor($notifiable, $notification)
     {
-        if (isset($this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification])) {
-            return $this->notifications[get_class($notifiable)][$notifiable->getKey()][$notification];
-        }
-
-        return [];
+        return $this->notifications[\spl_object_hash($notifiable)][$notification] ?? [];
     }
 
     /**
@@ -206,7 +200,7 @@ class NotificationFake implements NotificationFactory, NotificationDispatcher
                 $notification->id = Str::uuid()->toString();
             }
 
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
+            $this->notifications[\spl_object_hash($notifiable)][get_class($notification)][] = [
                 'notification' => $notification,
                 'channels' => $notification->via($notifiable),
                 'notifiable' => $notifiable,
