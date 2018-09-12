@@ -265,7 +265,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the Closure to be used when building a type from a factory.
      * @param  string  $abstract
      * @param  $concrete
-     * @return  Closure
+     * @return \Closure
      */
     private function getFactoryClosure(string $abstract, $concrete)
     {
