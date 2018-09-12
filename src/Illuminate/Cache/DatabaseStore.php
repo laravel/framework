@@ -4,8 +4,10 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\ConnectionInterface;
 
 class DatabaseStore implements Store
@@ -78,7 +80,7 @@ class DatabaseStore implements Store
             return;
         }
 
-        return unserialize($cache->value);
+        return $this->unserialize($cache->value);
     }
 
     /**
@@ -93,7 +95,7 @@ class DatabaseStore implements Store
     {
         $key = $this->prefix.$key;
 
-        $value = serialize($value);
+        $value = $this->serialize($value);
 
         $expiration = $this->getTime() + (int) ($minutes * 60);
 
@@ -157,7 +159,7 @@ class DatabaseStore implements Store
 
             $cache = is_array($cache) ? (object) $cache : $cache;
 
-            $current = unserialize($cache->value);
+            $current = $this->unserialize($cache->value);
 
             // Here we'll call this callback function that was given to the function which
             // is used to either increment or decrement the function. We use a callback
@@ -172,7 +174,7 @@ class DatabaseStore implements Store
             // since database cache values are encrypted by default with secure storage
             // that can't be easily read. We will return the new value after storing.
             $this->table()->where('key', $prefixed)->update([
-                'value' => serialize($new),
+                'value' => $this->serialize($new),
             ]);
 
             return $new;
@@ -221,7 +223,9 @@ class DatabaseStore implements Store
      */
     public function flush()
     {
-        return (bool) $this->table()->delete();
+        $this->table()->delete();
+
+        return true;
     }
 
     /**
@@ -252,5 +256,37 @@ class DatabaseStore implements Store
     public function getPrefix()
     {
         return $this->prefix;
+    }
+
+    /**
+     * Serialize the given value.
+     *
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function serialize($value)
+    {
+        $result = serialize($value);
+
+        if ($this->connection instanceof PostgresConnection && Str::contains($result, "\0")) {
+            $result = base64_encode($result);
+        }
+
+        return $result;
+    }
+
+    /**
+     * Unserialize the given value.
+     *
+     * @param  string  $value
+     * @return mixed
+     */
+    protected function unserialize($value)
+    {
+        if ($this->connection instanceof PostgresConnection && ! Str::contains($value, [':', ';'])) {
+            $value = base64_decode($value);
+        }
+
+        return unserialize($value);
     }
 }

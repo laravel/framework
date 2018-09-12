@@ -9,9 +9,9 @@ class Logout
     use SerializesModels;
 
     /**
-     * The authenticationg guard implementation.
+     * The authentication guard name.
      *
-     * @var \Illuminate\Contracts\Auth\StatefulGuard
+     * @var string
      */
     public $guard;
 
@@ -25,7 +25,7 @@ class Logout
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\StatefulGuard  $guard
+     * @param  string $guard
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      * @return void
      */
