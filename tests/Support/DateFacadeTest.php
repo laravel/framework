@@ -78,7 +78,7 @@ class DateFacadeTest extends TestCase
             'locale' => 'fr',
         ]));
         $this->assertSame('fr', Date::now()->locale);
-        Date::swap(null);
+        Date::swap(Carbon::class);
         $this->assertSame('en', Date::now()->locale);
         include_once __DIR__.'/fixtures/CustomDateClass.php';
         Date::swap(\CustomDateClass::class);
