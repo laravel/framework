@@ -454,6 +454,30 @@ class AuthAccessGateTest extends TestCase
     }
 
     /**
+     * @dataProvider notCallableDataProvider
+     * @expectedException \InvalidArgumentException
+     */
+    public function test_define_second_parametter_should_be_string_or_callable($callback)
+    {
+        $gate = $this->getBasicGate();
+
+        $gate->define('foo', $callback);
+    }
+
+    /**
+     * @return array
+     */
+    public function notCallableDataProvider()
+    {
+        return [
+            [1],
+            [new \stdClass()],
+            [[]],
+            [1.1],
+        ];
+    }
+
+    /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage You are not an admin.
      */

@@ -4,11 +4,10 @@ namespace Illuminate\Cache;
 
 use Memcached;
 use ReflectionMethod;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Cache\LockProvider;
 
-class MemcachedStore extends TaggableStore implements LockProvider, Store
+class MemcachedStore extends TaggableStore implements LockProvider
 {
     use InteractsWithTime;
 
