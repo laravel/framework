@@ -341,11 +341,13 @@ class TestResponse
     /**
      * Assert that the given strings are contained in order within the response.
      *
-     * @param  array  $values
+     * @param  array|mixed  $values
      * @return $this
      */
-    public function assertSeeInOrder(array $values)
+    public function assertSeeInOrder($values)
     {
+        $values = is_array($values) ? $values : func_get_args();
+
         PHPUnit::assertThat($values, new SeeInOrder($this->getContent()));
 
         return $this;
@@ -367,11 +369,13 @@ class TestResponse
     /**
      * Assert that the given strings are contained in order within the response text.
      *
-     * @param  array  $values
+     * @param  array|mixed  $values
      * @return $this
      */
-    public function assertSeeTextInOrder(array $values)
+    public function assertSeeTextInOrder($values)
     {
+        $values = is_array($values) ? $values : func_get_args();
+
         PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
 
         return $this;

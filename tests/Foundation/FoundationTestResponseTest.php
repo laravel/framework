@@ -42,6 +42,8 @@ class FoundationTestResponseTest extends TestCase
 
         $response->assertSeeInOrder(['foo', 'bar', 'baz']);
 
+        $response->assertSeeInOrder('foo', 'bar', 'baz');
+
         $response->assertSeeInOrder(['foo', 'bar', 'baz', 'foo']);
     }
 
@@ -83,6 +85,8 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertSeeTextInOrder(['foobar', 'baz']);
+
+        $response->assertSeeTextInOrder('foobar', 'baz');
 
         $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
     }
