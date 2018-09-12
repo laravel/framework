@@ -401,15 +401,18 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      *
      * @param  array  $attributes
      * @param  string|null  $connection
+     * @param \Illuminate\Database\Eloquent\Model $childModel
      * @return static
      */
-    public function newFromBuilder($attributes = [], $connection = null)
+    public function newFromBuilder($attributes = [], $connection = null, self $childModel = null)
     {
-        $model = $this->newInstance([], true);
+        $model = $childModel ?: $this;
+
+        $model = $model->newInstance([], true);
 
         $model->setRawAttributes((array) $attributes, true);
 
-        $model->setConnection($connection ?: $this->getConnectionName());
+        $model->setConnection($connection ?: $model->getConnectionName());
 
         $model->fireModelEvent('retrieved', false);
 
