@@ -362,7 +362,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals(['date_2010-01-01 00:00:00', 'date_2011-01-01 00:00:00'], $builder->pluck('created_at')->all());
     }
 
-    public function testPluckWithoutModelGetterJustReturnTheAttributesFoundInDatabase()
+    public function testPluckWithoutModelGetterJustReturnsTheAttributesFoundInDatabase()
     {
         $builder = $this->getBuilder();
         $builder->getQuery()->shouldReceive('pluck')->with('name', '')->andReturn(new BaseCollection(['bar', 'baz']));
