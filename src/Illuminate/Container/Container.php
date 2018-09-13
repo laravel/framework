@@ -619,6 +619,8 @@ class Container implements ArrayAccess, ContainerContract
      * @param  string  $abstract
      * @param  array  $parameters
      * @return mixed
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolve($abstract, $parameters = [])
     {
@@ -642,10 +644,15 @@ class Container implements ArrayAccess, ContainerContract
         // We're ready to instantiate an instance of the concrete type registered for
         // the binding. This will instantiate the types, as well as resolve any of
         // its "nested" dependencies recursively until all have gotten resolved.
-        if ($this->isBuildable($concrete, $abstract)) {
-            $object = $this->build($concrete);
-        } else {
-            $object = $this->make($concrete);
+        try {
+            if ($this->isBuildable($concrete, $abstract)) {
+                $object = $this->build($concrete);
+            } else {
+                $object = $this->make($concrete);
+            }
+        } catch (BindingResolutionException $e) {
+            array_pop($this->with);
+            throw $e;
         }
 
         // If we defined any extenders for this type, we'll need to spin through them
@@ -805,6 +812,8 @@ class Container implements ArrayAccess, ContainerContract
      *
      * @param  array  $dependencies
      * @return array
+     *
+     * @throws \Illuminate\Contracts\Container\BindingResolutionException
      */
     protected function resolveDependencies(array $dependencies)
     {

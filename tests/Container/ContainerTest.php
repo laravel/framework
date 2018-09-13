@@ -1048,6 +1048,13 @@ class ContainerTest extends TestCase
         $container = new Container;
         $container->get('Taylor');
     }
+
+    public function testContainerHandlesUnresolvableOptionalDependencies()
+    {
+        $container = new Container;
+
+        $this->assertInstanceOf(C::class, $container->make(C::class, ['argument' => 'foo']));
+    }
 }
 
 class ContainerConcreteStub
@@ -1210,5 +1217,26 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     public function __construct()
     {
         static::$instantiations++;
+    }
+}
+
+class A
+{
+    public function __construct($unresolvable)
+    {
+    }
+}
+
+class B
+{
+    public function __construct(A $a = null)
+    {
+    }
+}
+
+class C
+{
+    public function __construct(B $b, $argument)
+    {
     }
 }
