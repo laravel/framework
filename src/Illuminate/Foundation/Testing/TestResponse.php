@@ -962,7 +962,7 @@ class TestResponse
      *
      * @return string
      */
-    public function getStreamedContent()
+    public function streamedContent()
     {
         if (! is_null($this->streamedContent)) {
             return $this->streamedContent;
