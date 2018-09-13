@@ -183,6 +183,69 @@ trait QueriesRelationships
      */
     public function withCount($relations)
     {
+        $relations = is_array($relations) ? $relations : func_get_args();
+
+        return $this->withAggregate($relations, 'count', '*');
+    }
+
+    /**
+     * Add subselect queries to sum the relations.
+     *
+     * @param  mixed  $relations
+     * @param string $column
+     * @return $this
+     */
+    public function withSum($relations, $column)
+    {
+        return $this->withAggregate($relations, 'sum', $column);
+    }
+
+    /**
+     * Add subselect queries to avg the relations.
+     *
+     * @param  mixed  $relations
+     * @param string $column
+     * @return $this
+     */
+    public function withAvg($relations, $column)
+    {
+        return $this->withAggregate($relations, 'avg', $column);
+    }
+
+    /**
+     * Add subselect queries to max the relations.
+     *
+     * @param  mixed  $relations
+     * @param string $column
+     * @return $this
+     */
+    public function withMax($relations, $column)
+    {
+        return $this->withAggregate($relations, 'max', $column);
+    }
+
+    /**
+     * Add subselect queries to min the relations.
+     *
+     * @param  mixed  $relations
+     * @param string $column
+     * @return $this
+     */
+    public function withMin($relations, $column)
+    {
+        return $this->withAggregate($relations, 'min', $column);
+    }
+
+    /**
+     * Add subselect queries to aggregate the relations.
+     *
+     * @param  mixed  $relations
+     * @param string  $aggregate
+     * @param  string  $column
+     * @return $this
+     */
+    public function withAggregate($relations, $aggregate, $column)
+    {
         if (empty($relations)) {
             return $this;
         }
@@ -191,7 +254,7 @@ trait QueriesRelationships
             $this->query->select([$this->query->from.'.*']);
         }
 
-        $relations = is_array($relations) ? $relations : func_get_args();
+        $relations = is_array($relations) ? $relations : [$relations];
 
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
@@ -210,8 +273,8 @@ trait QueriesRelationships
             // Here we will get the relationship count query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
-            $query = $relation->getRelationExistenceCountQuery(
-                $relation->getRelated()->newQuery(), $this
+            $query = $relation->getRelationExistenceAggregatesQuery(
+                $relation->getRelated()->newQuery(), $this, $aggregate, $column
             );
 
             $query->callScope($constraints);
@@ -225,9 +288,9 @@ trait QueriesRelationships
             // Finally we will add the proper result column alias to the query and run the subselect
             // statement against the query builder. Then we will return the builder instance back
             // to the developer for further constraint chaining that needs to take place on it.
-            $column = $alias ?? Str::snake($name.'_count');
+            $column_alias = $alias ?? Str::snake($name.'_'.strtolower($aggregate));
 
-            $this->selectSub($query, $column);
+            $this->selectSub($query, $column_alias);
         }
 
         return $this;
