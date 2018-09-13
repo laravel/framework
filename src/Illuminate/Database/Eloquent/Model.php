@@ -589,6 +589,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     }
 
     /**
+     * Update the model in the database. Force mass assignment.
+     *
+     * @param  array  $attributes
+     * @param  array  $options
+     * @return $this
+     */
+    public function forceUpdate(array $attributes = [], array $options = [])
+    {
+        return static::unguarded(function () use ($attributes, $options) {
+            return $this->update($attributes, $options);
+        });
+    }
+
+    /**
      * Save the model and all of its relationships.
      *
      * @return bool
