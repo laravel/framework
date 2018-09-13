@@ -898,6 +898,17 @@ class DatabaseEloquentModelTest extends TestCase
         );
     }
 
+    public function testForceUpdateMethodUpdatesModelWithGuardedAttributes()
+    {
+        $_SERVER['__eloquent.saved'] = false;
+        $model = new EloquentModelSaveStub;
+        $model->exists = true;
+        $model->guard(['*']);
+        $model->forceUpdate(['name' => 'Taylor']);
+        $this->assertTrue($_SERVER['__eloquent.saved']);
+        $this->assertEquals('Taylor', $model->name);
+    }
+
     public function testUnguardAllowsAnythingToBeSet()
     {
         $model = new EloquentModelStub;
