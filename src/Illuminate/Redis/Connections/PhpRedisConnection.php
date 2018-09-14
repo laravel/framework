@@ -215,6 +215,13 @@ class PhpRedisConnection extends Connection implements ConnectionContract
         return $this->executeRaw(array_merge(['zadd', $key], $dictionary));
     }
 
+    public function rpush($key,array $values)
+    {
+        array_unshift($values,$key);
+        return $this->command('rpush',$values);
+    }
+
+
     /**
      * Return elements with score between $min and $max.
      *
