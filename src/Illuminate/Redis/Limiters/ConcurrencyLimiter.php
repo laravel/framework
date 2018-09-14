@@ -90,7 +90,7 @@ class ConcurrencyLimiter
         $slots = array_map(function ($i) {
             return $this->name.$i;
         }, range(1, $this->maxLocks));
-        
+
         $args = array_merge(
             [$this->luaScript(), count($slots)],
             array_merge($slots, [$this->name, $this->releaseAfter])
