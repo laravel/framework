@@ -172,18 +172,19 @@ trait ConditionallyLoadsAttributes
      * @param  string  $table
      * @param  mixed  $value
      * @param  mixed  $default
+     * @param  string  $accessor
      * @return \Illuminate\Http\Resources\MissingValue|mixed
      */
-    protected function whenPivotLoaded($table, $value, $default = null)
+    protected function whenPivotLoaded($table, $value, $default = null, $accessor = 'pivot')
     {
         if (func_num_args() === 2) {
             $default = new MissingValue;
         }
 
         return $this->when(
-            $this->resource->pivot &&
-            ($this->resource->pivot instanceof $table ||
-             $this->resource->pivot->getTable() === $table),
+            $this->resource->$accessor &&
+            ($this->resource->$accessor instanceof $table ||
+             $this->resource->$accessor->getTable() === $table),
             ...[$value, $default]
         );
     }
