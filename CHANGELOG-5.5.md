@@ -1,5 +1,10 @@
 # Release Notes for 5.5.x
 
+## v5.5.42 (2018-08-08)
+
+### Changed
+- Make serialization of cookie values optional ([7fc1dc5...6550ae9](https://github.com/laravel/framework/compare/v5.5.41%E2%80%A6c5dc9c8))
+
 ## v5.5.41 (2018-08-01)
 
 ### Changed
