@@ -1,5 +1,23 @@
 # Release Notes for 5.5.x
 
+## v5.5.43 (2018-09-02)
+
+### Changed
+- Patch Blade's `@lang` directive so it now escapes HTML tags ([010c1a2](https://github.com/laravel/framework/commit/010c1a23ba2a9c04aa83154ba0c8b7dc5de862da))
+> **BREAKING CHANGE**: This change is known to have broken many applications. Please upgrade with caution. Check out the discussion on the issue in the commit's comments and in [#25408](https://github.com/laravel/framework/pull/25408).
+- Remove undefined variable from compact ([#25193](https://github.com/laravel/framework/pull/25193))
+- Update queue worker memory usage to use the "real" amount of memory used ([#25211](https://github.com/laravel/framework/pull/25211))
+- Use getter method for access primary key ([#25303](https://github.com/laravel/framework/pull/25303))
+- Use the getAttributes method on insert ([#25349](https://github.com/laravel/framework/pull/25349))
+
+### Fixed
+- Fix URL validation pattern ([#25197](https://github.com/laravel/framework/pull/25197)) 
+- Fix MorphTo lazy eager loading ([#25252](https://github.com/laravel/framework/pull/25252))
+- Handle AWS Connection Lost ([#25294](https://github.com/laravel/framework/pull/25294)) 
+- Make Auth/Recaller handle serialized and unserialized cookies ([#25301](https://github.com/laravel/framework/pull/25301))
+- Fix BelongsToMany with custom `$relatedKey` ([#25221](https://github.com/laravel/framework/pull/25221))
+- Fix `assertCookie()` since now cookies are unserialized by default ([#25347](https://github.com/laravel/framework/pull/25347))
+
 ## v5.5.42 (2018-08-08)
 
 ### Changed
