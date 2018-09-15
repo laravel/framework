@@ -25,7 +25,7 @@ trait GuardHelpers
     protected $provider;
 
     /**
-     * Determine if the current user is authenticated.
+     * Determine if the current user is authenticated, in other case throw the error.
      *
      * @return \Illuminate\Contracts\Auth\Authenticatable
      *
