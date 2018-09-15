@@ -1,5 +1,18 @@
 # Release Notes for 5.5.x
 
+## v5.5.41 (2018-08-01)
+
+### Changed
+- Update PostgresGrammar.php ([#23810](https://github.com/laravel/framework/pull/23810))
+- Check for timestamps when creating pivot model from raw attributes as well ([#23963](https://github.com/laravel/framework/pull/23963))
+- Added two Azure SQL Server "connection lost" messages ([#24566](https://github.com/laravel/framework/pull/24566)) ([#24954](https://github.com/laravel/framework/pull/24954))
+
+### Fixed
+- Added compatibility with MySQL 8.0.11 (GA) ([#24038](https://github.com/laravel/framework/pull/24038))
+- Fix unsetting http query parameters when fetching request by HEAD ([#24076](https://github.com/laravel/framework/pull/24076))
+- Validation bypass for `before` and `after` rules when paired with `date_format` rule. ([#24191](https://github.com/laravel/framework/pull/24191))
+- Fix `$withCount` binding problems ([cab365a](https://github.com/laravel/framework/commit/cab365a85a0fa3e4f7113390de4a5b31f64748e2))
+
 ## v5.5.40 (2018-03-30)
 
 ### Changed
