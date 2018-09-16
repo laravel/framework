@@ -705,6 +705,7 @@ class Connection implements ConnectionInterface
      * @param  array  $bindings
      * @param  \Closure  $callback
      * @return mixed
+     *
      * @throws \Illuminate\Database\QueryException
      */
     protected function handleQueryException($e, $query, $bindings, Closure $callback)

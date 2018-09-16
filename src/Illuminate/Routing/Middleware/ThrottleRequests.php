@@ -40,6 +40,7 @@ class ThrottleRequests
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @return mixed
+     *
      * @throws \Illuminate\Http\Exceptions\ThrottleRequestsException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)
@@ -87,6 +88,7 @@ class ThrottleRequests
      *
      * @param  \Illuminate\Http\Request  $request
      * @return string
+     *
      * @throws \RuntimeException
      */
     protected function resolveRequestSignature($request)
