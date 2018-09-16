@@ -2,18 +2,17 @@
 
 namespace Illuminate\Database\Schema\ColumnStub;
 
-
 abstract class FloatColumn extends DecimalColumn
 {
     /**
      * @param int $places
      * @return static
      */
-    abstract function places(int $places = 2);
+    abstract public function places(int $places = 2);
 
     /**
      * @param int $total
      * @return static
      */
-    abstract function total(int $total = 8);
+    abstract public function total(int $total = 8);
 }
