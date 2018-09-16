@@ -232,7 +232,6 @@ trait QueriesRelationships
 
         return $this;
     }
-    
     /**
      * Add sub select queries to get average the relations.
      *
@@ -240,7 +239,7 @@ trait QueriesRelationships
      * @param  string $fieldName field name to get its average
      * @return $this
      */
-    public function withAvg($relation , $fieldName)
+    public function withAvg($relation, $fieldName)
     {
         if (empty($relation)) {
             return $this;
@@ -258,23 +257,23 @@ trait QueriesRelationships
             $segments = explode(' ', $name);
             
             unset($alias);
-            
+
             if (count($segments) == 3 && Str::lower($segments[1]) == 'as') {
                 list($name, $alias) = [$segments[0], $segments[2]];
             }
 
             $relation = $this->getRelationWithoutConstraints($name);
-            
+
             // Here we will get the relationship count query and prepare to add it to the main query
             // as a sub-select. First, we'll get the "has" query and use that to get the relation
             // count query. We will normalize the relation name then append _count as the name.
             $query = $relation->getRelationExistenceAvgQuery(
-                $relation->getRelated()->newQuery(), $this , $fieldName
+                $relation->getRelated()->newQuery(), $this, $fieldName
             );
             $query->callScope($constraints);
 
             $query = $query->mergeConstraintsFrom($relation->getQuery())->toBase();
-            
+
             if (count($query->columns) > 1) {
                 $query->columns = [$query->columns[0]];
             }
