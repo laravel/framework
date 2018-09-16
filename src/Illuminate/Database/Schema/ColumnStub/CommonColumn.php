@@ -21,7 +21,7 @@ abstract class CommonColumn
      * @return static
      */
     abstract public function comment(string $comment);
-    
+
     /**
      * @param $default
      * @return static
