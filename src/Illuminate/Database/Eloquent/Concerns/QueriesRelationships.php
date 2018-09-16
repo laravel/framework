@@ -232,7 +232,7 @@ trait QueriesRelationships
 
         return $this;
     }
-    
+
     /**
      * Add sub select queries to get average the relations.
      *

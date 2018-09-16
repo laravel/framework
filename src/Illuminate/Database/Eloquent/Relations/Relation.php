@@ -203,13 +203,13 @@ abstract class Relation
      * @param  string $fieldName field name to get its average
      * @return \Illuminate\Database\Eloquent\Builder
      */
-     public function getRelationExistenceAvgQuery(Builder $query, Builder $parentQuery, $fieldName)
-     {
+    public function getRelationExistenceAvgQuery(Builder $query, Builder $parentQuery, $fieldName)
+    {
         return $this->getRelationExistenceQuery(
             $query, $parentQuery, new Expression('avg('.$fieldName.')')
         )->setBindings([], 'select');
-     }
-     
+    }
+
     /**
      * Add the constraints for an internal relationship existence query.
      *
