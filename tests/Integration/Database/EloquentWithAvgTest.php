@@ -50,6 +50,7 @@ class Model1 extends Model
     public $table = 'one';
     public $timestamps = false;
     protected $guarded = ['id'];
+
     public function twos()
     {
         return $this->hasMany(Model2::class, 'one_id');
