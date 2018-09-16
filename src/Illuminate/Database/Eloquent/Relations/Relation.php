@@ -209,9 +209,8 @@ abstract class Relation
         return $this->getRelationExistenceQuery(
             $query, $parentQuery, new Expression('avg('.$fieldName.')')
         )->setBindings([], 'select');
-     }
-    
-    
+    }
+
     /**
      * Add the constraints for an internal relationship existence query.
      *

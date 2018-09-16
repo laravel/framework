@@ -33,9 +33,9 @@ class EloquentWithAvgTest extends DatabaseTestCase
     {
         $one = Model1::create();
         Model2::insert([
-                            ['one_id' => $one->id , 'price' => 10],
-                            ['one_id' => $one->id , 'price' => 20],
-                            ['one_id' => $one->id , 'price' => 30]
+                            ['one_id' => $one->id, 'price' =>10],
+                            ['one_id' => $one->id, 'price' =>20],
+                            ['one_id' => $one->id, 'price' =>30],
                         ]);
         $results = Model1::withAvg('twos', 'price');
 
@@ -61,4 +61,3 @@ class Model2 extends Model
     public $timestamps = false;
     protected $guarded = ['id'];
 }
-
