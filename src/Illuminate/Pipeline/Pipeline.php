@@ -179,6 +179,7 @@ class Pipeline implements PipelineContract
      * Get the container instance.
      *
      * @return \Illuminate\Contracts\Container\Container
+     *
      * @throws \RuntimeException
      */
     protected function getContainer()

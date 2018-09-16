@@ -48,6 +48,7 @@ class ThrottleRequestsWithRedis extends ThrottleRequests
      * @param  int|string  $maxAttempts
      * @param  float|int  $decayMinutes
      * @return mixed
+     *
      * @throws \Symfony\Component\HttpKernel\Exception\HttpException
      */
     public function handle($request, Closure $next, $maxAttempts = 60, $decayMinutes = 1)

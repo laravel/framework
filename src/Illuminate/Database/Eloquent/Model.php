@@ -1144,7 +1144,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      * Clone the model into a new, non-existing instance.
      *
      * @param  array|null  $except
-     * @return \Illuminate\Database\Eloquent\Model
+     * @return static
      */
     public function replicate(array $except = null)
     {
