@@ -42,6 +42,7 @@ trait ThrottlesLogins
      *
      * @param  \Illuminate\Http\Request  $request
      * @return void
+     *
      * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendLockoutResponse(Request $request)
