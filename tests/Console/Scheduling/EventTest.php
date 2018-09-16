@@ -27,7 +27,7 @@ class EventTest extends TestCase
         $event->runInBackground();
 
         $commandSeparator = ($isWindows ? '&' : ';');
-        $scheduleId = '"framework' . DIRECTORY_SEPARATOR . 'schedule-c65b1c374c37056e0c57fccb0c08d724ce6f5043"';
+        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-c65b1c374c37056e0c57fccb0c08d724ce6f5043"';
         $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 {$commandSeparator} {$quote}".PHP_BINARY."{$quote} artisan schedule:finish {$scheduleId}) > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
     }
 
