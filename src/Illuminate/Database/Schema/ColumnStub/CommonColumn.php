@@ -6,6 +6,12 @@ namespace Illuminate\Database\Schema\ColumnStub;
 abstract class CommonColumn
 {
     /**
+     * @param bool $change
+     * @return static
+     */
+    abstract function change(bool $change = true);
+
+    /**
      * @param bool $index
      * @return static
      */
