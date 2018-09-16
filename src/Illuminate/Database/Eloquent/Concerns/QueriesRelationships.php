@@ -249,7 +249,7 @@ trait QueriesRelationships
         if (is_null($this->query->columns)) {
             $this->query->select([$this->query->from.'.*']);
         }
-        // Convert string $relation to array 
+        // Convert string $relation to array
         $relations = [0=>$relation];
         foreach ($this->parseWithRelations($relations) as $name => $constraints) {
             // First we will determine if the name has been aliased using an "as" clause on the name
