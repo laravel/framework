@@ -61,7 +61,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        return 'json_contains('.$this->wrap($column).', '.$value.')';
+        list($field, $path) = $this->wrapJsonFieldAndPath($column);
+
+        return 'json_contains('.$field.', '.$value.$path.')';
     }
 
     /**
@@ -317,16 +319,16 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $delimiter = Str::contains($value, '->>')
-            ? '->>'
-            : '->';
+        $delimiter = Str::contains($value, '->>') ? '->>' : '->';
 
-        $path = explode($delimiter, $value);
+        list($field, $path) = $this->wrapJsonFieldAndPath($value, $delimiter);
 
-        $field = $this->wrapSegments(explode('.', array_shift($path)));
+        $selector = 'json_extract('.$field.$path.')';
 
-        return sprintf('%s'.$delimiter.'\'$.%s\'', $field, collect($path)->map(function ($part) {
-            return '"'.$part.'"';
-        })->implode('.'));
+        if ($delimiter === '->>') {
+            $selector = 'json_unquote('.$selector.')';
+        }
+
+        return $selector;
     }
 }

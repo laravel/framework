@@ -6,22 +6,33 @@ use Memcached;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 /**
  * @group integration
  */
-class CacheLockTest extends TestCase
+class MemcachedCacheLockTest extends TestCase
 {
-    use InteractsWithRedis;
-
     public function setUp()
     {
         parent::setUp();
 
-        if (! class_exists(Memcached::class)) {
+        if (! extension_loaded('memcached')) {
             $this->markTestSkipped('Memcached module not installed');
         }
+
+        // Determine whether there is a running Memcached instance
+        $testConnection = new Memcached;
+        $testConnection->addServer(
+            env('MEMCACHED_HOST', '127.0.0.1'),
+            env('MEMCACHED_PORT', 11211)
+        );
+        $testConnection->getVersion();
+
+        if ($testConnection->getResultCode() > Memcached::RES_SUCCESS) {
+            $this->markTestSkipped('Memcached could not establish a connection');
+        }
+
+        $testConnection->quit();
     }
 
     public function test_memcached_locks_can_be_acquired_and_released()
@@ -35,19 +46,6 @@ class CacheLockTest extends TestCase
         Cache::store('memcached')->lock('foo')->release();
     }
 
-    public function test_redis_locks_can_be_acquired_and_released()
-    {
-        $this->ifRedisAvailable(function () {
-            Cache::store('redis')->lock('foo')->release();
-            $this->assertTrue(Cache::store('redis')->lock('foo', 10)->get());
-            $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
-            Cache::store('redis')->lock('foo')->release();
-            $this->assertTrue(Cache::store('redis')->lock('foo', 10)->get());
-            $this->assertFalse(Cache::store('redis')->lock('foo', 10)->get());
-            Cache::store('redis')->lock('foo')->release();
-        });
-    }
-
     public function test_memcached_locks_can_block_for_seconds()
     {
         Carbon::setTestNow();
@@ -59,21 +57,6 @@ class CacheLockTest extends TestCase
 
         Cache::store('memcached')->lock('foo')->release();
         $this->assertTrue(Cache::store('memcached')->lock('foo', 10)->block(1));
-    }
-
-    public function test_redis_locks_can_block_for_seconds()
-    {
-        $this->ifRedisAvailable(function () {
-            Carbon::setTestNow();
-
-            Cache::store('redis')->lock('foo')->release();
-            $this->assertEquals('taylor', Cache::store('redis')->lock('foo', 10)->block(1, function () {
-                return 'taylor';
-            }));
-
-            Cache::store('redis')->lock('foo')->release();
-            $this->assertTrue(Cache::store('redis')->lock('foo', 10)->block(1));
-        });
     }
 
     public function test_locks_can_run_callbacks()

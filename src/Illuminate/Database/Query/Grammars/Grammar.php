@@ -966,15 +966,16 @@ class Grammar extends BaseGrammar
      * Split the given JSON selector into the field and the optional path and wrap them separately.
      *
      * @param  string  $column
+     * @param  string  $delimiter
      * @return array
      */
-    protected function wrapJsonFieldAndPath($column)
+    protected function wrapJsonFieldAndPath($column, $delimiter = '->')
     {
-        $parts = explode('->', $column, 2);
+        $parts = explode($delimiter, $column, 2);
 
         $field = $this->wrap($parts[0]);
 
-        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
+        $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1], $delimiter) : '';
 
         return [$field, $path];
     }
@@ -983,11 +984,12 @@ class Grammar extends BaseGrammar
      * Wrap the given JSON path.
      *
      * @param  string  $value
+     * @param  string  $delimiter
      * @return string
      */
-    protected function wrapJsonPath($value)
+    protected function wrapJsonPath($value, $delimiter = '->')
     {
-        return '\'$."'.str_replace('->', '"."', $value).'"\'';
+        return '\'$."'.str_replace($delimiter, '"."', $value).'"\'';
     }
 
     /**
