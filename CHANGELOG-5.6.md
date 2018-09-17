@@ -1,5 +1,18 @@
 # Release Notes for 5.6.x
 
+## v5.6.35 (2018-08-27)
+
+### Added
+- Handle AWS Connection Lost ([#25295](https://github.com/laravel/framework/pull/25295))
+- Support JSON SELECT queries on SQLite ([#25328](https://github.com/laravel/framework/pull/25328))
+
+### Changed
+- Throw exception for has() with MorphTo relationship ([#25337](https://github.com/laravel/framework/pull/25337))
+
+### Fixed
+- Fix MorphTo eager loading and withoutGlobalScopes() ([#25331](https://github.com/laravel/framework/pull/25331))
+- Fix whereTime() on SQL Server ([#25316](https://github.com/laravel/framework/pull/25316))
+
 ## v5.6.34 (2018-08-21)
 
 ### Changed
