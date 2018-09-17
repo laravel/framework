@@ -7,6 +7,20 @@ interface Guard
     /**
      * Determine if the current user is authenticated.
      *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
+     */
+    public function authenticate();
+
+    /**
+     * Determine if the guard has a user instance.
+     *
+     * @return bool
+     */
+    public function hasUser();
+
+    /**
+     * Determine if the current user is authenticated.
+     *
      * @return bool
      */
     public function check();
