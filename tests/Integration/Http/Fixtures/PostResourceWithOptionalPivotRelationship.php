@@ -13,6 +13,11 @@ class PostResourceWithOptionalPivotRelationship extends PostResource
                     'foo' => 'bar',
                 ];
             }),
+            'custom_subscription' => $this->whenPivotLoadedAs('accessor', Subscription::class, function () {
+                return [
+                    'foo' => 'bar',
+                ];
+            }),
         ];
     }
 }
