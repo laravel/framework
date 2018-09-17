@@ -9,7 +9,7 @@ then
     exit 1
 fi
 
-CURRENT_BRANCH="5.7"
+CURRENT_BRANCH="5.5"
 
 for REMOTE in auth broadcasting bus cache config console container contracts cookie database encryption events filesystem hashing http log mail notifications pagination pipeline queue redis routing session support translation validation view
 do
