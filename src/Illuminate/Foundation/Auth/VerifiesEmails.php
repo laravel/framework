@@ -35,7 +35,7 @@ trait VerifiesEmails
             event(new Verified($request->user()));
         }
 
-        return redirect($this->redirectPath());
+        return redirect($this->redirectPath())->with('verified', true);
     }
 
     /**

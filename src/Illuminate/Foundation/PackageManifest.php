@@ -159,6 +159,7 @@ class PackageManifest
      *
      * @param  array  $manifest
      * @return void
+     *
      * @throws \Exception
      */
     protected function write(array $manifest)

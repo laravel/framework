@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Routing;
 
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Routing\UrlGenerator;
 use Illuminate\Routing\RouteCollection;
@@ -546,6 +547,20 @@ class RoutingUrlGeneratorTest extends TestCase
         $this->assertEquals($url->to('/'), $url->previous());
 
         $this->assertEquals($url->to('/foo'), $url->previous('/foo'));
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Route [not_exists_route] not defined.
+     */
+    public function testRouteNotDefinedException()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+
+        $url->route('not_exists_route');
     }
 }
 
