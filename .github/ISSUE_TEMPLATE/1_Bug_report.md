@@ -1,6 +1,6 @@
 ---
-name: "Bug Report"
-about: Report bugs and problems
+name: "🐛 Bug Report"
+about: Report general framework issues
 
 ---
 
