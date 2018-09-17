@@ -16,6 +16,8 @@ function remote()
     git remote add $1 $2 || true
 }
 
+git pull origin $CURRENT_BRANCH
+
 remote auth git@github.com:illuminate/auth.git
 remote broadcasting git@github.com:illuminate/broadcasting.git
 remote bus git@github.com:illuminate/bus.git
