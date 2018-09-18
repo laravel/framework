@@ -123,7 +123,6 @@ class AuthDatabaseUserProviderTest extends TestCase
         $this->assertTrue($result);
     }
 
-
     public function testCredentialValidationUsingUnknownAlgorithm()
     {
         $conn = m::mock('Illuminate\Database\Connection');
