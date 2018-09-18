@@ -171,7 +171,7 @@ abstract class GeneratorCommand extends Command
     {
         $stub = str_replace(
             ['DummyNamespace', 'DummyRootNamespace', 'NamespacedDummyUserModel'],
-            [$this->getNamespace($name), $this->rootNamespace(), config('auth.providers.users.model')],
+            [$this->getNamespace($name), $this->rootNamespace(), $this->userProviderModel()],
             $stub
         );
 
@@ -221,6 +221,19 @@ abstract class GeneratorCommand extends Command
     protected function rootNamespace()
     {
         return $this->laravel->getNamespace();
+    }
+
+    /**
+     * Get the configured model for the provider.
+     *
+     * @return string|null
+     */
+    protected function userProviderModel()
+    {
+        $guard = config('auth.defaults.guard');
+        $provider = config("auth.guards.{$guard}.provider");
+
+        return config("auth.providers.{$provider}.model");
     }
 
     /**
