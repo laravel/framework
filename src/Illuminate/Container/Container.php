@@ -166,7 +166,7 @@ class Container implements ArrayAccess, ContainerContract
     }
 
     /**
-     * Determine if the given id resolves to a class and if it is an instantiable class
+     * Determine if the given id resolves to a class and if it is an instantiable class.
      *
      * @param  string  $id
      * @return bool
@@ -176,7 +176,7 @@ class Container implements ArrayAccess, ContainerContract
         try {
             $reflector = new ReflectionClass($id);
             return $reflector->isInstantiable();
-        } catch(ReflectionException $e) {
+        } catch (ReflectionException $e) {
             return false;
         }
     }
