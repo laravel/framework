@@ -29,7 +29,7 @@ do
         git clone $REMOTE_URL .
         git checkout "$CURRENT_BRANCH";
 
-        git tag $1 -s -m "Release $1"
+        git tag $1
         git push origin --tags
     )
 done
