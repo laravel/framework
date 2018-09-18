@@ -1,5 +1,20 @@
 # Release Notes for 5.7.x
 
+## v5.7.4 (2018-09-18)
+
+### Added
+- Add 'verified' session boolean in `VerifiesEmails::verify` action ([#25638](https://github.com/laravel/framework/pull/25638))
+- Add Nelson Mandela to Inspirational Quotes ([#25599](https://github.com/laravel/framework/pull/25599))
+- Add `streamedContent` to `TestResponse` class ([#25469](https://github.com/laravel/framework/pull/25469), [#b3f583cd5efbc9e1b9482b00a7c22b00324e936e](https://github.com/laravel/framework/commit/b3f583cd5efbc9e1b9482b00a7c22b00324e936e))
+
+### Fixed
+- Fix app stub when register route option is set to false ([#25582](https://github.com/laravel/framework/pull/25582))
+- Fix artisan PendingCommand run method return value ([#25577](https://github.com/laravel/framework/pull/25577))
+- Support custom accessor on `whenPivotLoaded()` ([#25661](https://github.com/laravel/framework/pull/25661))
+
+### Changed
+- Remove `Hash::check()` for password verification ([#25677](https://github.com/laravel/framework/pull/25677))
+
 ## v5.7.3 (2018-09-11)
 
 ### Changed
