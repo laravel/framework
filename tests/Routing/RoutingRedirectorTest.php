@@ -19,7 +19,7 @@ class RoutingRedirectorTest extends TestCase
         $this->headers = m::mock('Symfony\Component\HttpFoundation\HeaderBag');
 
         $this->request = m::mock('Illuminate\Http\Request');
-        $this->request->shouldReceive('method')->andReturn('GET');
+        $this->request->shouldReceive('method')->andReturn('GET')->byDefault();
         $this->request->shouldReceive('route')->andReturn(true);
         $this->request->shouldReceive('ajax')->andReturn(false);
         $this->request->headers = $this->headers;
@@ -75,7 +75,7 @@ class RoutingRedirectorTest extends TestCase
 
     public function testGuestPutPreviousUrlInSession()
     {
-        $this->request->shouldReceive('method')->once()->andReturn('POST')->byDefault();
+        $this->request->shouldReceive('method')->once()->andReturn('POST');
         $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
         $this->url->shouldReceive('previous')->once()->andReturn('http://foo.com/bar');
 
