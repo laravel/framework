@@ -18,7 +18,7 @@ do
     echo "Releasing $REMOTE";
 
     TMP_DIR="/tmp/laravel-split"
-    REMOTE_URL=`git remote get-url $REMOTE`
+    REMOTE_URL="git@github.com:illuminate/$REMOTE.git"
 
     rm -rf $TMP_DIR;
     mkdir $TMP_DIR;
@@ -29,7 +29,7 @@ do
         git clone $REMOTE_URL .
         git checkout "$CURRENT_BRANCH";
 
-        git tag $1 -s -m "Release $1"
+        git tag $1
         git push origin --tags
     )
 done
