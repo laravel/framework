@@ -244,6 +244,31 @@ class ResourceTest extends TestCase
         ]);
     }
 
+    public function test_resources_may_have_optional_pivot_relationships_with_custom_accessor()
+    {
+        Route::get('/', function () {
+            $post = new Post(['id' => 5]);
+            $post->setRelation('accessor', new Subscription);
+
+            return new PostResourceWithOptionalPivotRelationship($post);
+        });
+
+        $response = $this->withoutExceptionHandling()->get(
+            '/', ['Accept' => 'application/json']
+        );
+
+        $response->assertStatus(200);
+
+        $response->assertExactJson([
+            'data' => [
+                'id' => 5,
+                'custom_subscription' => [
+                    'foo' => 'bar',
+                ],
+            ],
+        ]);
+    }
+
     public function test_resource_is_url_routable()
     {
         $post = new PostResource(new Post([

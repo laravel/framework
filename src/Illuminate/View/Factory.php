@@ -101,7 +101,7 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $path
-     * @param  array   $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      */
@@ -118,7 +118,7 @@ class Factory implements FactoryContract
      * Get the evaluated view contents for the given view.
      *
      * @param  string  $view
-     * @param  array   $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      */
@@ -142,7 +142,7 @@ class Factory implements FactoryContract
      * Get the first view that actually exists from the given list.
      *
      * @param  array  $views
-     * @param  array   $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      *
@@ -166,7 +166,7 @@ class Factory implements FactoryContract
      *
      * @param  bool  $condition
      * @param  string  $view
-     * @param  array   $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return string
      */
@@ -242,7 +242,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $view
      * @param  string  $path
-     * @param  array  $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Contracts\View\View
      */
     protected function viewInstance($view, $path, $data)

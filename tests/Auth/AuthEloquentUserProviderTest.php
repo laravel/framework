@@ -90,11 +90,22 @@ class AuthEloquentUserProviderTest extends TestCase
     {
         $conn = m::mock('Illuminate\Database\Connection');
         $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
-        $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
         $provider = new EloquentUserProvider($hasher, 'foo');
         $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
-        $user->shouldReceive('getAuthPassword')->once()->andReturn('hash');
-        $result = $provider->validateCredentials($user, ['password' => 'plain']);
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('$2y$10$TKh8H1.PfQx37YgCzwiKb.KjNyWgaHb9cbcoQgdIVFlYg7B77UdFm');
+        $result = $provider->validateCredentials($user, ['password' => 'secret']);
+
+        $this->assertTrue($result);
+    }
+
+    public function testCredentialValidationUsingUnknownAlgorithm()
+    {
+        $conn = m::mock('Illuminate\Database\Connection');
+        $hasher = m::mock('Illuminate\Contracts\Hashing\Hasher');
+        $provider = new EloquentUserProvider($hasher, 'foo');
+        $user = m::mock('Illuminate\Contracts\Auth\Authenticatable');
+        $user->shouldReceive('getAuthPassword')->once()->andReturn('$1$0590adc6$WVAjBIam8sJCgDieJGLey0');
+        $result = $provider->validateCredentials($user, ['password' => 's3cr3t']);
 
         $this->assertTrue($result);
     }
