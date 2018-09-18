@@ -84,9 +84,11 @@ class Redirector
     {
         $request = $this->generator->getRequest();
 
-        if ($request->method() === 'GET' && $request->route() && !$request->ajax()) {
-            $this->session->put('url.intended', $this->generator->full());
-        }
+        $intended = $request->method() === 'GET' && $request->route() && !$request->ajax() ?
+            $this->generator->full() :
+            $this->generator->previous();
+
+        $this->session->put('url.intended', $intended);
 
         return $this->to($path, $status, $headers, $secure);
     }
