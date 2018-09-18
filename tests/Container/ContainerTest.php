@@ -1021,7 +1021,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $this->assertTrue($container->has('Illuminate\Tests\Container\IContainerContractStub'));
+        $this->assertTrue($container->bound('Illuminate\Tests\Container\IContainerContractStub'));
     }
 
     public function testContainerCanBindAnyWord()
@@ -1047,6 +1047,12 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->get('Taylor');
+    }
+
+    public function testCanResolveUnknownEntry()
+    {
+        $container = new Container();
+        $this->assertTrue($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntry'));
     }
 }
 
@@ -1211,4 +1217,8 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     {
         static::$instantiations++;
     }
+}
+
+class ContainerTestUnknownEntry
+{
 }
