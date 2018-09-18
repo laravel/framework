@@ -18,7 +18,7 @@ do
     echo "Releasing $REMOTE";
 
     TMP_DIR="/tmp/laravel-split"
-    REMOTE_URL=`git remote get-url $REMOTE`
+    REMOTE_URL="git@github.com:illuminate/$REMOTE.git"
 
     rm -rf $TMP_DIR;
     mkdir $TMP_DIR;
