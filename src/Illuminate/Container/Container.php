@@ -6,6 +6,7 @@ use Closure;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
+use ReflectionException;
 use ReflectionParameter;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
@@ -161,7 +162,23 @@ class Container implements ArrayAccess, ContainerContract
     public function has($id)
     {
         return $this->bound($id) ||
-               class_exists($id);
+               $this->isInstantiable($id);
+    }
+
+    /**
+     * Determine if the given id resolves to a class and if it is an instantiable class
+     *
+     * @param  string  $id
+     * @return bool
+     */
+    private function isInstantiable($id)
+    {
+        try {
+            $reflector = new ReflectionClass($id);
+            return $reflector->isInstantiable();
+        } catch(ReflectionException $e) {
+            return false;
+        }
     }
 
     /**

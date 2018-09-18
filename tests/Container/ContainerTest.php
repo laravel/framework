@@ -1052,6 +1052,11 @@ class ContainerTest extends TestCase
     public function testCanResolveUnknownEntry()
     {
         $container = new Container();
+        $this->assertFalse($container->has('Taylor'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntryInterface'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntryTrait'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\AbstractContainerTestUnknownEntry'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntryPrivateConstructor'));
         $this->assertTrue($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntry'));
     }
 }
@@ -1219,6 +1224,26 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     }
 }
 
-class ContainerTestUnknownEntry
+interface ContainerTestUnknownEntryInterface
 {
+}
+
+trait ContainerTestUnknownEntryTrait
+{
+}
+
+abstract class AbstractContainerTestUnknownEntry
+{
+}
+
+class ContainerTestUnknownEntryPrivateConstructor
+{
+    private function __construct()
+    {
+    }
+}
+
+class ContainerTestUnknownEntry extends AbstractContainerTestUnknownEntry implements ContainerTestUnknownEntryInterface
+{
+    use ContainerTestUnknownEntryTrait;
 }
