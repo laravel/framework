@@ -1021,7 +1021,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $this->assertTrue($container->has('Illuminate\Tests\Container\IContainerContractStub'));
+        $this->assertTrue($container->bound('Illuminate\Tests\Container\IContainerContractStub'));
     }
 
     public function testContainerCanBindAnyWord()
@@ -1047,6 +1047,17 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $container->get('Taylor');
+    }
+
+    public function testCanResolveUnknownEntry()
+    {
+        $container = new Container();
+        $this->assertFalse($container->has('Taylor'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntryInterface'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntryTrait'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\AbstractContainerTestUnknownEntry'));
+        $this->assertFalse($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntryPrivateConstructor'));
+        $this->assertTrue($container->has('Illuminate\Tests\Container\ContainerTestUnknownEntry'));
     }
 }
 
@@ -1211,4 +1222,28 @@ class ContainerTestContextInjectInstantiations implements IContainerContractStub
     {
         static::$instantiations++;
     }
+}
+
+interface ContainerTestUnknownEntryInterface
+{
+}
+
+trait ContainerTestUnknownEntryTrait
+{
+}
+
+abstract class AbstractContainerTestUnknownEntry
+{
+}
+
+class ContainerTestUnknownEntryPrivateConstructor
+{
+    private function __construct()
+    {
+    }
+}
+
+class ContainerTestUnknownEntry extends AbstractContainerTestUnknownEntry implements ContainerTestUnknownEntryInterface
+{
+    use ContainerTestUnknownEntryTrait;
 }
