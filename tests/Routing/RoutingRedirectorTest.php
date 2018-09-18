@@ -70,6 +70,17 @@ class RoutingRedirectorTest extends TestCase
         $this->assertEquals('http://foo.com/login', $response->getTargetUrl());
     }
 
+    public function testGuestPutPreviousUrlInSession()
+    {
+        $this->request->shouldReceive('method')->andReturn('POST');
+        $this->session->shouldReceive('get')->once()->with('_previous.url')->andReturn('http://foo.com/bar');
+        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+
+        $response = $this->redirect->guest('login');
+
+        $this->assertEquals('http://foo.com/login', $response->getTargetUrl());
+    }
+
     public function testIntendedRedirectToIntendedUrlInSession()
     {
         $this->session->shouldReceive('pull')->with('url.intended', '/')->andReturn('http://foo.com/bar');
