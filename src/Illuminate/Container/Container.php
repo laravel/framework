@@ -160,7 +160,8 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function has($id)
     {
-        return $this->bound($id);
+        return $this->bound($id) ||
+               class_exists($id);
     }
 
     /**
