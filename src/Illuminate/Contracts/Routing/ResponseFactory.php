@@ -27,7 +27,7 @@ interface ResponseFactory
      * Create a new response for a given view.
      *
      * @param  string  $view
-     * @param  array  $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @param  int  $status
      * @param  array  $headers
      * @return \Illuminate\Http\Response

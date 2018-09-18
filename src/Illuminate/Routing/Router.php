@@ -260,7 +260,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  string  $uri
      * @param  string  $view
-     * @param  array  $data
+     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Routing\Route
      */
     public function view($uri, $view, $data = [])

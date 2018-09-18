@@ -6,7 +6,7 @@ use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 /**
  * @method static \Illuminate\Http\Response make(string $content = '', int $status = 200, array $headers = [])
- * @method static \Illuminate\Http\Response view(string $view, array $data = [], int $status = 200, array $headers = [])
+ * @method static \Illuminate\Http\Response view(string $view, \Illuminate\Contracts\Support\Arrayable | array $data = [], int $status = 200, array $headers = [])
  * @method static \Illuminate\Http\JsonResponse json(string | array $data = [], int $status = 200, array $headers = [], int $options = 0)
  * @method static \Illuminate\Http\JsonResponse jsonp(string $callback, string | array $data = [], int $status = 200, array $headers = [], int $options = 0)
  * @method static \Symfony\Component\HttpFoundation\StreamedResponse stream(\Closure $callback, int $status = 200, array $headers = [])
