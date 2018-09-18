@@ -20,8 +20,8 @@ class RoutingRedirectorTest extends TestCase
 
         $this->request = m::mock('Illuminate\Http\Request');
         $this->request->shouldReceive('method')->andReturn('GET')->byDefault();
-        $this->request->shouldReceive('route')->andReturn(true);
-        $this->request->shouldReceive('ajax')->andReturn(false);
+        $this->request->shouldReceive('route')->andReturn(true)->byDefault();
+        $this->request->shouldReceive('ajax')->andReturn(false)->byDefault();
         $this->request->headers = $this->headers;
 
         $this->url = m::mock('Illuminate\Routing\UrlGenerator');
