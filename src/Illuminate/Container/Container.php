@@ -175,6 +175,7 @@ class Container implements ArrayAccess, ContainerContract
     {
         try {
             $reflector = new ReflectionClass($id);
+
             return $reflector->isInstantiable();
         } catch (ReflectionException $e) {
             return false;
