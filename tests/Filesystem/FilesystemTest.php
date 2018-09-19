@@ -47,7 +47,8 @@ class FilesystemTest extends TestCase
         $files = new Filesystem;
         $files->chmod($this->tempDir.'/file.txt', 0755);
         $filePermission = substr(sprintf('%o', fileperms($this->tempDir.'/file.txt')), -4);
-        $this->assertEquals('0755', $filePermission);
+        $expectedPermissions = DIRECTORY_SEPARATOR == '\\' ? '0666' : '0755';
+        $this->assertEquals($expectedPermissions, $filePermission);
     }
 
     public function testGetChmod()
@@ -56,8 +57,9 @@ class FilesystemTest extends TestCase
         chmod($this->tempDir.'/file.txt', 0755);
 
         $files = new Filesystem;
-        $filePermisson = $files->chmod($this->tempDir.'/file.txt');
-        $this->assertEquals('0755', $filePermisson);
+        $filePermission = $files->chmod($this->tempDir.'/file.txt');
+        $expectedPermissions = DIRECTORY_SEPARATOR == '\\' ? '0666' : '0755';
+        $this->assertEquals($expectedPermissions, $filePermission);
     }
 
     public function testDeleteRemovesFiles()
