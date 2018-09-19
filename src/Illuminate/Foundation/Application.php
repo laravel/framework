@@ -521,6 +521,16 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     }
 
     /**
+     * Determine if the application is running in the console as http server.
+     *
+     * @return bool
+     */
+    public function runningInConsoleAsHttpServer()
+    {
+        return 'cli-server' === php_sapi_name();
+    }
+
+    /**
      * Determine if the application is running unit tests.
      *
      * @return bool

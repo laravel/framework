@@ -83,7 +83,7 @@ class HandleExceptions
             //
         }
 
-        if ($this->app->runningInConsole()) {
+        if ($this->app->runningInConsole() or $this->app->runningInConsoleAsHttpServer()) {
             $this->renderForConsole($e);
         } else {
             $this->renderHttpResponse($e);
