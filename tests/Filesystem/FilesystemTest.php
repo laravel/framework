@@ -512,7 +512,7 @@ class FilesystemTest extends TestCase
      * \Symfony\Component\Finder\Finder which uses
      * \Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator which uses
      * \Symfony\Component\Finder\SplFileInfo which locks directories on Windows ands cause problems
-     * on delete and create iterated directories
+     * on delete and create iterated directories.
      */
     private function skipSplDependentOnWindows()
     {
