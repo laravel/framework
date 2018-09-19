@@ -24,7 +24,7 @@ class Blueprint
     /**
      * The columns that should be added to the table.
      *
-     * @var \Illuminate\Database\Schema\ColumnDefinition[]
+     * @var \Illuminate\Database\Schema\ColumnStub\CommonColumn[]
      */
     protected $columns = [];
 
@@ -1257,7 +1257,7 @@ class Blueprint
      */
     public function addColumn($type, $name, array $parameters = [])
     {
-        $this->columns[] = $column = new ColumnDefinition(
+        $this->columns[] = $column = new Fluent(
             array_merge(compact('type', 'name'), $parameters)
         );
 
@@ -1318,7 +1318,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return \Illuminate\Database\Schema\ColumnStub\CommonColumn[]
      */
     public function getColumns()
     {
@@ -1338,7 +1338,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be added.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return \Illuminate\Database\Schema\ColumnStub\CommonColumn[]
      */
     public function getAddedColumns()
     {
@@ -1350,7 +1350,7 @@ class Blueprint
     /**
      * Get the columns on the blueprint that should be changed.
      *
-     * @return \Illuminate\Database\Schema\ColumnDefinition[]
+     * @return \Illuminate\Database\Schema\ColumnStub\CommonColumn[]
      */
     public function getChangedColumns()
     {
