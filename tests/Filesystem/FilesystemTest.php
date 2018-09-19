@@ -133,6 +133,8 @@ class FilesystemTest extends TestCase
 
     public function testFilesMethod()
     {
+        $this->skipSplDependentOnWindows();
+
         mkdir($this->tempDir.'/foo');
         file_put_contents($this->tempDir.'/foo/1.txt', '1');
         file_put_contents($this->tempDir.'/foo/2.txt', '2');
@@ -360,6 +362,8 @@ class FilesystemTest extends TestCase
 
     public function testAllFilesFindsFiles()
     {
+        $this->skipSplDependentOnWindows();
+
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         file_put_contents($this->tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
@@ -373,6 +377,8 @@ class FilesystemTest extends TestCase
 
     public function testDirectoriesFindsDirectories()
     {
+        $this->skipSplDependentOnWindows();
+
         mkdir($this->tempDir.'/foo');
         mkdir($this->tempDir.'/bar');
         $files = new Filesystem;
@@ -454,6 +460,8 @@ class FilesystemTest extends TestCase
 
     public function testFilesMethodReturnsFileInfoObjects()
     {
+        $this->skipSplDependentOnWindows();
+
         mkdir($this->tempDir.'/foo');
         file_put_contents($this->tempDir.'/foo/1.txt', '1');
         file_put_contents($this->tempDir.'/foo/2.txt', '2');
@@ -465,6 +473,8 @@ class FilesystemTest extends TestCase
 
     public function testAllFilesReturnsFileInfoObjects()
     {
+        $this->skipSplDependentOnWindows();
+
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         file_put_contents($this->tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
@@ -495,5 +505,19 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $filesystem = new Filesystem;
         $this->assertEquals('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash($this->tempDir.'/foo.txt'));
+    }
+
+    /**
+     * Skip Filesystem methods which use
+     * \Symfony\Component\Finder\Finder which uses
+     * \Symfony\Component\Finder\Iterator\RecursiveDirectoryIterator which uses
+     * \Symfony\Component\Finder\SplFileInfo which locks directories on Windows ands cause problems
+     * on delete and create iterated directories
+     */
+    private function skipSplDependentOnWindows()
+    {
+        if (DIRECTORY_SEPARATOR == '\\') {
+            $this->markTestSkipped('Skip \Symfony\Component\Finder\SplFileInfo dependent methods which broke other tests on Windows');
+        }
     }
 }
