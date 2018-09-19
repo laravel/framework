@@ -461,6 +461,34 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => '22:00'], $builder->getBindings());
     }
 
+    public function testWhereLikePostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', 'like', '1');
+        $this->assertEquals('select * from "users" where "id"::text like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', 'LIKE', '1');
+        $this->assertEquals('select * from "users" where "id"::text LIKE ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', 'ilike', '1');
+        $this->assertEquals('select * from "users" where "id"::text ilike ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', 'not like', '1');
+        $this->assertEquals('select * from "users" where "id"::text not like ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('users')->where('id', 'not ilike', '1');
+        $this->assertEquals('select * from "users" where "id"::text not ilike ?', $builder->toSql());
+        $this->assertEquals([0 => '1'], $builder->getBindings());
+    }
+
     public function testWhereDateSqlite()
     {
         $builder = $this->getSQLiteBuilder();
