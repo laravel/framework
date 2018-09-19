@@ -19,6 +19,18 @@ abstract class CommonColumn extends Fluent
     abstract public function change(bool $change = true);
 
     /**
+     * @param string $charset
+     * @return static
+     */
+    abstract public function charset(string $charset);
+
+    /**
+     * @param string $collation
+     * @return static
+     */
+    abstract public function collation(string $collation);
+
+    /**
      * @param string $comment
      * @return static
      */
@@ -35,6 +47,12 @@ abstract class CommonColumn extends Fluent
      * @return static
      */
     abstract public function index(bool $index = true);
+
+    /**
+     * @param bool|null $first
+     * @return static
+     */
+    abstract public function first(bool $first = true);
 
     /**
      * @param string $name
@@ -79,8 +97,20 @@ abstract class CommonColumn extends Fluent
     abstract public function type(string $type);
 
     /**
+     * @param string $expression
+     * @return static
+     */
+    abstract public function storedAs(string $expression);
+
+    /**
      * @param bool $unique
      * @return static
      */
     abstract public function unique(bool $unique = true);
+
+    /**
+     * @param string $expression
+     * @return static
+     */
+    abstract public function virtualAs(string $expression);
 }
