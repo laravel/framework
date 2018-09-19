@@ -15,6 +15,7 @@
 ### Changed
 - Remove `Hash::check()` for password verification ([#25677](https://github.com/laravel/framework/pull/25677))
 
+
 ## v5.7.3 (2018-09-11)
 
 ### Changed
@@ -40,6 +41,7 @@
 ### Deprecated
 - Make `ensureOutputIsBeingCapturedForEmail` method deprecated in `Illuminate/Console/Scheduling/Event.php`
  
+ 
 ## v5.7.2 (2018-09-06)
 
 ### Added
@@ -58,6 +60,7 @@
 ### Fixed
 - Do not send email verification if user is already verified ([#25450](https://github.com/laravel/framework/pull/25450))
 - Fixed required carbon version ([#394f79f9a6651b103f6e065cb4470b4b347239ea](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
+
 
 ## v5.7.1 (2018-09-04)
 
