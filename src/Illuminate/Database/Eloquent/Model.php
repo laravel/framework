@@ -7,6 +7,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\ForwardsCalls;
