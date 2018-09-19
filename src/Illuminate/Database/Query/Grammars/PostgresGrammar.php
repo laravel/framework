@@ -30,27 +30,16 @@ class PostgresGrammar extends Grammar
      */
     protected function whereBasic(Builder $query, $where)
     {
-        // Special treatment for like clauses. In order to make
-        // any column searchable, we need to convert it to text.
         if (Str::contains(strtolower($where['operator']), 'like')) {
-            return $this->whereBasicLike($query, $where);
+            return sprintf(
+                '%s::text %s %s',
+                $this->wrap($where['column']),
+                $where['operator'],
+                $this->parameter($where['value'])
+            );
         }
 
         return parent::whereBasic($query, $where);
-    }
-
-    /**
-     * Compile "where like", "where ilike", "where not like" and "where not ilike" clauses.
-     *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $where
-     * @return string
-     */
-    protected function whereBasicLike(Builder $query, $where)
-    {
-        $value = $this->parameter($where['value']);
-
-        return $this->wrap($where['column']).'::text '.$where['operator'].' '.$value;
     }
 
     /**
