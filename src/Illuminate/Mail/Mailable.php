@@ -133,6 +133,13 @@ class Mailable implements MailableContract, Renderable
     public $callbacks = [];
 
     /**
+     * The callback that should be invoked while building the view data.
+     *
+     * @var callable
+     */
+    public static $viewDataCallback;
+
+    /**
      * Send the message using the given mailer.
      *
      * @param  \Illuminate\Contracts\Mail\Mailer  $mailer
@@ -262,6 +269,10 @@ class Mailable implements MailableContract, Renderable
     public function buildViewData()
     {
         $data = $this->viewData;
+
+        if (static::$viewDataCallback) {
+            $data = array_merge($data, call_user_func(static::$viewDataCallback, $this));
+        }
 
         foreach ((new ReflectionClass($this))->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
             if ($property->getDeclaringClass()->getName() !== self::class) {
@@ -791,6 +802,17 @@ class Mailable implements MailableContract, Renderable
         $this->callbacks[] = $callback;
 
         return $this;
+    }
+
+    /**
+     * Register a callback to be called while building the view data.
+     *
+     * @param  callable  $callback
+     * @return void
+     */
+    public static function buildViewDataUsing(callable $callback)
+    {
+        static::$viewDataCallback = $callback;
     }
 
     /**
