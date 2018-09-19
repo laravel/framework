@@ -24,38 +24,33 @@ class PostgresGrammar extends Grammar
     /**
      * {@inheritdoc}
      *
-     * @param Builder $query
-     * @param array   $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereBasic(Builder $query, $where)
     {
         // Special treatment for like clauses. In order to make
         // any column searchable, we need to convert it to text.
-        if (Str::contains($where['operator'], 'like')) {
+        if (Str::contains(strtolower($where['operator']), 'like')) {
             return $this->whereBasicLike($query, $where);
         }
 
-        $value = $this->parameter($where['value']);
-
-        return $this->wrap($where['column']).' '.$where['operator'].' '.$value;
+        return parent::whereBasic($query, $where);
     }
 
     /**
-     * Compile a "where like" clause. Suffix column with text conversion
-     * to make numeric columns searchable.
+     * Compile "where like", "where ilike", "where not like" and "where not ilike" clauses.
      *
-     * @param Builder $query
-     * @param array   $where
-     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
      * @return string
      */
     protected function whereBasicLike(Builder $query, $where)
     {
         $value = $this->parameter($where['value']);
 
-        return $this->wrap($where['column']).' :: text '.$where['operator'].' '.$value;
+        return $this->wrap($where['column']).'::text '.$where['operator'].' '.$value;
     }
 
     /**
