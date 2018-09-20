@@ -820,9 +820,15 @@ class Builder
      * @param  string  $boolean
      * @param  bool    $not
      * @return $this
+     *
+     * @throws \InvalidArgumentException
      */
     public function whereIn($column, $values, $boolean = 'and', $not = false)
     {
+        if (!$this->isValidWhereInValues($values)) {
+            throw new InvalidArgumentException("Invalid values supplied to whereIn");
+        }
+
         $type = $not ? 'NotIn' : 'In';
 
         if ($values instanceof EloquentBuilder) {
@@ -864,6 +870,21 @@ class Builder
         }
 
         return $this;
+    }
+
+    /**
+     * Determine if $values is a valid argument to whereIn
+     *
+     * @param  mixed  $values
+     * @return bool
+     */
+    protected function isValidWhereInValues($values)
+    {
+        return $values instanceof EloquentBuilder ||
+            $values instanceof self ||
+            $values instanceof Closure ||
+            $values instanceof Arrayable ||
+            is_array($values);
     }
 
     /**

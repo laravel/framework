@@ -670,6 +670,26 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([0 => 1], $builder->getBindings());
     }
 
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid values supplied to whereIn
+     */
+    public function testWhereInThrowsExceptionOnAtomicValue()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->whereIn('id', 1);
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Invalid values supplied to whereIn
+     */
+    public function testOrWhereInThrowsExceptionOnAtomicValue()
+    {
+        $builder = $this->getBuilder();
+        $builder->select('*')->from('users')->where('id', '=', 1)->orWhereIn('id', 1);
+    }
+
     public function testEmptyWhereNotIns()
     {
         $builder = $this->getBuilder();
