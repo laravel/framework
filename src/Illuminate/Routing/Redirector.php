@@ -88,7 +88,9 @@ class Redirector
             $this->generator->full() :
             $this->generator->previous();
 
-        $this->session->put('url.intended', $intended);
+        if ($intended) {
+            $this->session->put('url.intended', $intended);
+        }
 
         return $this->to($path, $status, $headers, $secure);
     }
