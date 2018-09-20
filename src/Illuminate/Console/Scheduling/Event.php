@@ -297,9 +297,8 @@ class Event
     {
         $date = Carbon::now();
 
-        if ($this->timezone) {
-            $date->setTimezone($this->timezone);
-        }
+        $timezone = $this->timezone ?: config('app.scheduler_timezone', 'UTC');
+        $date->setTimezone($timezone);
 
         return CronExpression::factory($this->expression)->isDue($date->toDateTimeString());
     }

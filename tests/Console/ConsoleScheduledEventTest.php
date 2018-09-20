@@ -6,6 +6,7 @@ use Mockery as m;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\Scheduling\Event;
+use Illuminate\Config\Repository as Config;
 
 class ConsoleScheduledEventTest extends TestCase
 {
@@ -34,6 +35,10 @@ class ConsoleScheduledEventTest extends TestCase
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
+
+        $app->singleton('config', function () {
+            return $this->createConfig();
+        });
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php foo');
         $this->assertEquals('* * * * *', $event->getExpression());
@@ -78,6 +83,11 @@ class ConsoleScheduledEventTest extends TestCase
         $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
+
+        $app->singleton('config', function () {
+            return $this->createConfig();
+        });
+
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php foo');
@@ -86,6 +96,14 @@ class ConsoleScheduledEventTest extends TestCase
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php foo');
         $this->assertEquals('0 19 * * 3', $event->wednesdays()->at('19:00')->timezone('EST')->getExpression());
+        $this->assertTrue($event->isDue($app));
+
+        $app->singleton('config', function () {
+            return $this->createConfig('EST');
+        });
+
+        $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php foo');
+        $this->assertEquals('0 19 * * 3', $event->wednesdays()->at('19:00')->getExpression());
         $this->assertTrue($event->isDue($app));
     }
 
@@ -104,5 +122,19 @@ class ConsoleScheduledEventTest extends TestCase
 
         $this->assertFalse($event->unlessBetween('8:00', '10:00')->filtersPass($app));
         $this->assertTrue($event->unlessBetween('10:00', '11:00')->isDue($app));
+    }
+
+    /**
+     * Create a new config repository instance.
+     *
+     * @return \Illuminate\Config\Repository
+     */
+    protected function createConfig($timezone = 'UTC')
+    {
+        return new Config([
+            'app' => [
+                'scheduler_timezone' => $timezone,
+            ],
+        ]);
     }
 }
