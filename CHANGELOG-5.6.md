@@ -29,6 +29,7 @@
 - Fix MorphTo eager loading and withoutGlobalScopes() ([#25331](https://github.com/laravel/framework/pull/25331))
 - Fix whereTime() on SQL Server ([#25316](https://github.com/laravel/framework/pull/25316))
 
+
 ## v5.6.34 (2018-08-21)
 
 ### Changed
@@ -43,6 +44,7 @@
 
 ### Added
 - Added serialization parameters to helper functions decrypt and encrypt ([#25166](https://github.com/laravel/framework/pull/25166))
+
 
 ## v5.6.31 (2018-08-09)
 
@@ -63,6 +65,7 @@
 - Avoid an "Undefined offset: 0" if no job was pulled from redis queue ([#25020](https://github.com/laravel/framework/pull/25020))
 - Updating the Pluralizer class to respect the grammar rule ([#25063](https://github.com/laravel/framework/pull/25063))
 
+
 ## v5.6.29 (2018-07-26)
 
 ### Added
@@ -80,6 +83,7 @@
 ### Fixed
 - Fixed an issue when passing an array to Request::is() ([#24885](https://github.com/laravel/framework/pull/24885))
 - Fixed message string in NotificationFake::assertSentToTimes() ([#24929](https://github.com/laravel/framework/pull/24929))
+
 
 ## v5.6.28 (2018-07-17)
 
@@ -107,6 +111,7 @@
 - Allow accessing the value of the current migrator connection ([#24665](https://github.com/laravel/framework/pull/24665))
 - Check if configuration cache is valid after saving ([#24722](https://github.com/laravel/framework/pull/24722))
 - Except URIs from CheckForMaintenanceMode middleware ([#24740](https://github.com/laravel/framework/pull/24740))
+
 
 ## v5.6.26 (2018-06-20)
 
@@ -184,7 +189,6 @@
 - Fixed an issue with `Cache::increment()` when expiration is `null` ([#24228](https://github.com/laravel/framework/pull/24228))
 - Ignore non-where bindings in nested where constraints ([#24000](https://github.com/laravel/framework/pull/24000))
 - Fixed `withCount()` binding problems ([#24240](https://github.com/laravel/framework/pull/24240))
-
 
 
 ## v5.6.22 (2018-05-15)
