@@ -1,5 +1,21 @@
 # Release Notes for 5.6.x
 
+## v5.6.36 (2018-09-02)
+
+### Changed
+- Use higher order messages in Collection ([#25356](https://github.com/laravel/framework/pull/25356))
+- Use the getAttributes method on insert ([#25355](https://github.com/laravel/framework/pull/25355))
+
+### Fixed
+- `logoutOtherDevices` method in `Illuminate/Auth/SessionGuard.php` class breaks "remember me" cookie ([#25386](https://github.com/laravel/framework/pull/25386))
+- Fix self relation existence queries with custom keys ([#25397](https://github.com/laravel/framework/pull/25397))
+- Fix relationships with global scope columns ([#25368](https://github.com/laravel/framework/pull/25368))
+- Fix: revert model syncing after soft-delete ([#25392](https://github.com/laravel/framework/pull/25392))
+- Fix mailables always being queued for later if using Queueable trait ([#25378](https://github.com/laravel/framework/pull/25378))
+
+### Security
+- escape lang directive echos ([d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b](https://github.com/laravel/framework/commit/d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b))
+
 ## v5.6.35 (2018-08-27)
 
 ### Added
