@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
+use function judahnator\JsonManipulator\load_json;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
@@ -489,6 +490,12 @@ trait HasAttributes
             case 'array':
             case 'json':
                 return $this->fromJson($value);
+            case 'json_object':
+                $value ?: $this->attributes[$key] = '{}';
+                return load_json($this->attributes[$key]);
+            case 'json_array':
+                $value ?: $this->attributes[$key] = '[]';
+                return load_json($this->attributes[$key]);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));
             case 'date':
@@ -901,7 +908,7 @@ trait HasAttributes
      */
     protected function isJsonCastable($key)
     {
-        return $this->hasCast($key, ['array', 'json', 'object', 'collection']);
+        return $this->hasCast($key, ['array', 'json', 'json_array', 'json_object', 'object', 'collection']);
     }
 
     /**

@@ -2,6 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use judahnator\JsonManipulator\JsonArray;
+use judahnator\JsonManipulator\JsonObject;
+use function judahnator\JsonManipulator\load_json;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
@@ -35,6 +38,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
             $table->string('array_attributes');
             $table->string('json_attributes');
             $table->string('object_attributes');
+            $table->string('json_array_attributes');
+            $table->string('json_object_attributes');
             $table->timestamps();
         });
     }
@@ -59,6 +64,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
             'array_attributes' => ['key1'=>'value1'],
             'json_attributes' => ['json_key'=>'json_value'],
             'object_attributes' => ['json_key'=>'json_value'],
+            'json_array_attributes' => ['value1', 'value2'],
+            'json_object_attributes' => ['key1' => 'value1'],
         ]);
         $this->assertSame('{"key1":"value1"}', $model->getOriginal('array_attributes'));
         $this->assertSame(['key1'=>'value1'], $model->getAttribute('array_attributes'));
@@ -70,6 +77,13 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
         $stdClass = new \stdClass();
         $stdClass->json_key = 'json_value';
         $this->assertEquals($stdClass, $model->getAttribute('object_attributes'));
+
+        $this->assertSame('["value1","value2"]', $model->getOriginal('json_array_attributes'));
+        $this->assertSame('value1', $model->getAttribute('json_array_attributes')[0]);
+        $this->assertSame('value2', $model->getAttribute('json_array_attributes')[1]);
+
+        $this->assertSame('{"key1":"value1"}', $model->getOriginal('json_object_attributes'));
+        $this->assertSame('value1', $model->getAttribute('json_object_attributes')->key1);
     }
 
     public function testSavingCastedEmptyAttributesToDatabase()
@@ -79,6 +93,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
             'array_attributes' => [],
             'json_attributes' => [],
             'object_attributes' => [],
+            'json_array_attributes' => [],
+            'json_object_attributes' => new \stdClass(),
         ]);
         $this->assertSame('[]', $model->getOriginal('array_attributes'));
         $this->assertSame([], $model->getAttribute('array_attributes'));
@@ -88,6 +104,12 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 
         $this->assertSame('[]', $model->getOriginal('object_attributes'));
         $this->assertSame([], $model->getAttribute('object_attributes'));
+
+        $this->assertSame('[]', $model->getOriginal('json_array_attributes'));
+        $this->assertInstanceOf(JsonArray::class, $model->getAttribute('json_array_attributes'));
+
+        $this->assertSame('{}', $model->getOriginal('json_object_attributes'));
+        $this->assertInstanceOf(JsonObject::class, $model->getAttribute('json_object_attributes'));
     }
 
     /**
@@ -133,5 +155,7 @@ class TableForCasting extends Eloquent
         'array_attributes' => 'array',
         'json_attributes' => 'json',
         'object_attributes' => 'object',
+        'json_array_attributes' => 'json_array',
+        'json_object_attributes' => 'json_object'
     ];
 }
