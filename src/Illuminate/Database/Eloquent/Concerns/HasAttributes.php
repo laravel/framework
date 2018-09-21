@@ -1074,7 +1074,9 @@ trait HasAttributes
 
         foreach ($this->getAttributes() as $key => $value) {
             if (! $this->originalIsEquivalent($key, $value)) {
-                $dirty[$key] = $value;
+                $dirty[$key] = $this->hasCast($key)
+                    ? $this->castAttribute($key, $value)
+                    : $value;
             }
         }
 
