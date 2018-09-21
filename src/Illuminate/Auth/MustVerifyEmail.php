@@ -5,6 +5,13 @@ namespace Illuminate\Auth;
 trait MustVerifyEmail
 {
     /**
+     * Indicates if the user was verified during the current request lifecycle.
+     *
+     * @var bool
+     */
+    public $wasRecentlyVerified = false;
+
+    /**
      * Determine if the user has verified their email address.
      *
      * @return bool
@@ -21,7 +28,7 @@ trait MustVerifyEmail
      */
     public function markEmailAsVerified()
     {
-        return $this->forceFill([
+        return $this->wasRecentlyVerified = $this->forceFill([
             'email_verified_at' => $this->freshTimestamp(),
         ])->save();
     }
