@@ -15,20 +15,20 @@ class EventTest extends TestCase
 
     public function testBuildCommand()
     {
-        $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
+        $isWindows = DIRECTORY_SEPARATOR == '\\';
+        $quote = ($isWindows) ? '"' : "'";
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php -i');
 
-        $defaultOutput = (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
+        $defaultOutput = ($isWindows) ? 'NUL' : '/dev/null';
         $this->assertSame("php -i > {$quote}{$defaultOutput}{$quote} 2>&1", $event->buildCommand());
-
-        $quote = (DIRECTORY_SEPARATOR == '\\') ? '"' : "'";
 
         $event = new Event(m::mock('Illuminate\Console\Scheduling\EventMutex'), 'php -i');
         $event->runInBackground();
 
-        $defaultOutput = (DIRECTORY_SEPARATOR == '\\') ? 'NUL' : '/dev/null';
-        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 ; '".PHP_BINARY."' artisan schedule:finish \"framework/schedule-eeb46c93d45e928d62aaf684d727e213b7094822\") > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
+        $commandSeparator = ($isWindows ? '&' : ';');
+        $scheduleId = '"framework'.DIRECTORY_SEPARATOR.'schedule-eeb46c93d45e928d62aaf684d727e213b7094822"';
+        $this->assertSame("(php -i > {$quote}{$defaultOutput}{$quote} 2>&1 {$commandSeparator} {$quote}".PHP_BINARY."{$quote} artisan schedule:finish {$scheduleId}) > {$quote}{$defaultOutput}{$quote} 2>&1 &", $event->buildCommand());
     }
 
     public function testBuildCommandSendOutputTo()

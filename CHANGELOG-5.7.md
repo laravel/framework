@@ -1,5 +1,18 @@
 # Release Notes for 5.7.x
 
+## v5.7.5 (2018-09-20)
+
+### Added
+- Add callback hook for building mailable data in `\Illuminate\Mail\Mailable` ([7dc3d8d35ad8bcd3b18334a44320e3162b9f6dc1](https://github.com/laravel/framework/commit/7dc3d8d35ad8bcd3b18334a44320e3162b9f6dc1))
+
+### Fixed
+- Make any column searchable with `like` in PostgreSQL ([#25698](https://github.com/laravel/framework/pull/25698))
+- Remove trailing newline from hot url in `mix` helper ([#25699](https://github.com/laravel/framework/pull/25699))
+
+### Changed 
+- Revert of "Remove `Hash::check()` for password verification" ([2e78bf472832cd68ef7d80c73dbb722a62ee1429](https://github.com/laravel/framework/commit/2e78bf472832cd68ef7d80c73dbb722a62ee1429)) 
+ 
+ 
 ## v5.7.4 (2018-09-18)
 
 ### Added
@@ -14,6 +27,7 @@
 
 ### Changed
 - Remove `Hash::check()` for password verification ([#25677](https://github.com/laravel/framework/pull/25677))
+
 
 ## v5.7.3 (2018-09-11)
 
@@ -40,6 +54,7 @@
 ### Deprecated
 - Make `ensureOutputIsBeingCapturedForEmail` method deprecated in `Illuminate/Console/Scheduling/Event.php`
  
+ 
 ## v5.7.2 (2018-09-06)
 
 ### Added
@@ -58,6 +73,7 @@
 ### Fixed
 - Do not send email verification if user is already verified ([#25450](https://github.com/laravel/framework/pull/25450))
 - Fixed required carbon version ([#394f79f9a6651b103f6e065cb4470b4b347239ea](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
+
 
 ## v5.7.1 (2018-09-04)
 

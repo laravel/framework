@@ -1,5 +1,21 @@
 # Release Notes for 5.6.x
 
+## v5.6.36 (2018-09-02)
+
+### Changed
+- Use higher order messages in Collection ([#25356](https://github.com/laravel/framework/pull/25356))
+- Use the getAttributes method on insert ([#25355](https://github.com/laravel/framework/pull/25355))
+
+### Fixed
+- `logoutOtherDevices` method in `Illuminate/Auth/SessionGuard.php` class breaks "remember me" cookie ([#25386](https://github.com/laravel/framework/pull/25386))
+- Fix self relation existence queries with custom keys ([#25397](https://github.com/laravel/framework/pull/25397))
+- Fix relationships with global scope columns ([#25368](https://github.com/laravel/framework/pull/25368))
+- Fix: revert model syncing after soft-delete ([#25392](https://github.com/laravel/framework/pull/25392))
+- Fix mailables always being queued for later if using Queueable trait ([#25378](https://github.com/laravel/framework/pull/25378))
+
+### Security
+- escape lang directive echos ([d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b](https://github.com/laravel/framework/commit/d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b))
+
 ## v5.6.35 (2018-08-27)
 
 ### Added
@@ -12,6 +28,7 @@
 ### Fixed
 - Fix MorphTo eager loading and withoutGlobalScopes() ([#25331](https://github.com/laravel/framework/pull/25331))
 - Fix whereTime() on SQL Server ([#25316](https://github.com/laravel/framework/pull/25316))
+
 
 ## v5.6.34 (2018-08-21)
 
@@ -27,6 +44,7 @@
 
 ### Added
 - Added serialization parameters to helper functions decrypt and encrypt ([#25166](https://github.com/laravel/framework/pull/25166))
+
 
 ## v5.6.31 (2018-08-09)
 
@@ -47,6 +65,7 @@
 - Avoid an "Undefined offset: 0" if no job was pulled from redis queue ([#25020](https://github.com/laravel/framework/pull/25020))
 - Updating the Pluralizer class to respect the grammar rule ([#25063](https://github.com/laravel/framework/pull/25063))
 
+
 ## v5.6.29 (2018-07-26)
 
 ### Added
@@ -64,6 +83,7 @@
 ### Fixed
 - Fixed an issue when passing an array to Request::is() ([#24885](https://github.com/laravel/framework/pull/24885))
 - Fixed message string in NotificationFake::assertSentToTimes() ([#24929](https://github.com/laravel/framework/pull/24929))
+
 
 ## v5.6.28 (2018-07-17)
 
@@ -91,6 +111,7 @@
 - Allow accessing the value of the current migrator connection ([#24665](https://github.com/laravel/framework/pull/24665))
 - Check if configuration cache is valid after saving ([#24722](https://github.com/laravel/framework/pull/24722))
 - Except URIs from CheckForMaintenanceMode middleware ([#24740](https://github.com/laravel/framework/pull/24740))
+
 
 ## v5.6.26 (2018-06-20)
 
@@ -168,7 +189,6 @@
 - Fixed an issue with `Cache::increment()` when expiration is `null` ([#24228](https://github.com/laravel/framework/pull/24228))
 - Ignore non-where bindings in nested where constraints ([#24000](https://github.com/laravel/framework/pull/24000))
 - Fixed `withCount()` binding problems ([#24240](https://github.com/laravel/framework/pull/24240))
-
 
 
 ## v5.6.22 (2018-05-15)

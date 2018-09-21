@@ -152,14 +152,8 @@ class DatabaseUserProvider implements UserProvider
      */
     public function validateCredentials(UserContract $user, array $credentials)
     {
-        $hashed = $user->getAuthPassword();
-
-        if (strlen($hashed) === 0) {
-            return false;
-        }
-
-        return password_verify(
-            $credentials['password'], $hashed
+        return $this->hasher->check(
+            $credentials['password'], $user->getAuthPassword()
         );
     }
 }
