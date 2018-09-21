@@ -3,7 +3,6 @@
 namespace Illuminate\Database\Query\Grammars;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -319,16 +318,8 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        $delimiter = Str::contains($value, '->>') ? '->>' : '->';
+        list($field, $path) = $this->wrapJsonFieldAndPath($value);
 
-        list($field, $path) = $this->wrapJsonFieldAndPath($value, $delimiter);
-
-        $selector = 'json_extract('.$field.$path.')';
-
-        if ($delimiter === '->>') {
-            $selector = 'json_unquote('.$selector.')';
-        }
-
-        return $selector;
+        return 'json_unquote(json_extract('.$field.$path.'))';
     }
 }
