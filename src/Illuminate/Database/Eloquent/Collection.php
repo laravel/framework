@@ -255,7 +255,7 @@ class Collection extends BaseCollection implements QueueableCollection
 
         $freshModels = $model->newQueryWithoutScopes()
             ->with(is_string($with) ? func_get_args() : $with)
-            ->whereIn($model->getKeyName(), $this->modelKeys())
+            ->whereKey($this->modelKeys())
             ->get()
             ->getDictionary();
 
