@@ -36,8 +36,8 @@ trait InteractsWithDatabase
     protected function assertDatabaseMissing($table, array $data, $connection = null)
     {
         $this->assertThat(
-            $table, new ReverseConstraint(new HasInDatabase($this->getConnection($connection), $data)
-        ));
+            $table, new ReverseConstraint(new HasInDatabase($this->getConnection($connection), $data))
+        );
 
         return $this;
     }
