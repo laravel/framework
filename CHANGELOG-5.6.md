@@ -1,5 +1,11 @@
 # Release Notes for 5.6.x
 
+## v5.6.37 (2018-09-02)
+
+### Fixed
+- Fixed `MorphTo` lazy loading and `withoutGlobalScopes` method ([#25406](https://github.com/laravel/framework/pull/25406))
+
+
 ## v5.6.36 (2018-09-02)
 
 ### Changed
