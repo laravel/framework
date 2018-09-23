@@ -72,6 +72,16 @@ trait ManagesFrequencies
     }
 
     /**
+     * Schedule the event to run every minute.
+     *
+     * @return $this
+     */
+    public function minutely()
+    {
+        return $this->everyMinute();
+    }
+
+    /**
      * Schedule the event to run every five minutes.
      *
      * @return $this
