@@ -1,6 +1,19 @@
 # Release Notes for 5.7.x
 
-## v5.7.4 (2018-09-18)
+## [v5.7.5 (2018-09-20)](https://github.com/laravel/framework/compare/v5.7.4...v5.7.5)
+
+### Added
+- Add callback hook for building mailable data in `\Illuminate\Mail\Mailable` ([7dc3d8d35ad8bcd3b18334a44320e3162b9f6dc1](https://github.com/laravel/framework/commit/7dc3d8d35ad8bcd3b18334a44320e3162b9f6dc1))
+
+### Fixed
+- Make any column searchable with `like` in PostgreSQL ([#25698](https://github.com/laravel/framework/pull/25698))
+- Remove trailing newline from hot url in `mix` helper ([#25699](https://github.com/laravel/framework/pull/25699))
+
+### Changed 
+- Revert of "Remove `Hash::check()` for password verification" ([2e78bf472832cd68ef7d80c73dbb722a62ee1429](https://github.com/laravel/framework/commit/2e78bf472832cd68ef7d80c73dbb722a62ee1429)) 
+ 
+ 
+## [v5.7.4 (2018-09-18)](https://github.com/laravel/framework/compare/v5.7.3...v5.7.4)
 
 ### Added
 - Add 'verified' session boolean in `VerifiesEmails::verify` action ([#25638](https://github.com/laravel/framework/pull/25638))
@@ -15,7 +28,8 @@
 ### Changed
 - Remove `Hash::check()` for password verification ([#25677](https://github.com/laravel/framework/pull/25677))
 
-## v5.7.3 (2018-09-11)
+
+## [v5.7.3 (2018-09-11)](https://github.com/laravel/framework/compare/v5.7.2...v5.7.3)
 
 ### Changed
 - `__toString` method in `Illuminate/Auth/Access/Response.php` ([#25539](https://github.com/laravel/framework/pull/25539))
@@ -40,7 +54,8 @@
 ### Deprecated
 - Make `ensureOutputIsBeingCapturedForEmail` method deprecated in `Illuminate/Console/Scheduling/Event.php`
  
-## v5.7.2 (2018-09-06)
+ 
+## [v5.7.2 (2018-09-06)](https://github.com/laravel/framework/compare/v5.7.1...v5.7.2)
 
 ### Added
 - Added `moontoast/math` suggestion to `Support` module ([#79edf5c70c9a54c75e17da62ba3649f24b874e09](https://github.com/laravel/framework/commit/79edf5c70c9a54c75e17da62ba3649f24b874e09))
@@ -59,7 +74,8 @@
 - Do not send email verification if user is already verified ([#25450](https://github.com/laravel/framework/pull/25450))
 - Fixed required carbon version ([#394f79f9a6651b103f6e065cb4470b4b347239ea](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
 
-## v5.7.1 (2018-09-04)
+
+## [v5.7.1 (2018-09-04)](https://github.com/laravel/framework/compare/v5.7.0...v5.7.1)
 
 ### Fixed
 - Fixed an issue with basic auth when no field is defined
@@ -68,6 +84,6 @@
 - Remove X-UA-Compatible meta tag ([#25442](https://github.com/laravel/framework/pull/25442))
 - Added default array value for redis config ([#25443](https://github.com/laravel/framework/pull/25443))
 
-## v5.7.0 (2018-09-04)
+## [v5.7.0 (2018-09-04)](https://github.com/laravel/framework/compare/5.6...v5.7.0)
 
 Check the upgrade guide in the [Official Laravel Documentation](https://laravel.com/docs/5.7/upgrade).
