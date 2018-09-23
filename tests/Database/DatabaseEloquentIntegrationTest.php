@@ -1162,6 +1162,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals(['id' => 3, 'email' => 'taylorotwell@gmail.com'], $notStoredUser->toArray());
         $this->assertNull($freshNotStoredUser);
+        \Illuminate\Support\Carbon::setTestNow();
     }
 
     public function testFreshMethodOnCollection()
