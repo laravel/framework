@@ -48,7 +48,7 @@ class RouteListCommand extends Command
     protected $headers = ['Domain', 'Method', 'URI', 'Name', 'Action', 'Middleware'];
 
     /**
-     * The outputted columns when using the compact flag.
+     * The columns to display when using the "compact" flag.
      *
      * @var array
      */
@@ -147,7 +147,7 @@ class RouteListCommand extends Command
     protected function pluckColumns($routes)
     {
         return array_map(function ($route) {
-            return array_only($route, $this->getColumns());
+            return Arr::only($route, $this->getColumns());
         }, $routes);
     }
 
@@ -199,9 +199,7 @@ class RouteListCommand extends Command
      */
     protected function getHeaders()
     {
-        $columns = $this->getColumns();
-
-        return array_only($this->headers, array_keys($columns));
+        return Arr::only($this->headers, array_keys($this->getColumns()));
     }
 
     /**
