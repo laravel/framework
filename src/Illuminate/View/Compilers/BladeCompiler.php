@@ -474,7 +474,7 @@ class BladeCompiler extends Compiler implements CompilerInterface
      */
     public function directive($name, callable $handler)
     {
-        if (!preg_match('/^\w+(?:::\w+)?$/x', $name)) {
+        if (! preg_match('/^\w+(?:::\w+)?$/x', $name)) {
             throw new InvalidArgumentException("The directive name [{$name}] is not valid.");
         }
 
