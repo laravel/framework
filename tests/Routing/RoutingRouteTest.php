@@ -23,6 +23,19 @@ use Illuminate\Routing\Middleware\SubstituteBindings;
 
 class RoutingRouteTest extends TestCase
 {
+    public function testRouteMethodsShouldBeUppercasedAndUnique()
+    {
+        $route = new Route(['put', 'patch', 'PUT', 'POST'], 'foo', function () {
+            return 'bar';
+        });
+
+        $this->assertSame([
+            'PATCH',
+            'POST',
+            'PUT',
+        ], $route->methods());
+    }
+
     public function testBasicDispatchingOfRoutes()
     {
         $router = $this->getRouter();
