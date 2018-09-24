@@ -30,9 +30,9 @@ class RoutingRouteTest extends TestCase
         });
 
         $this->assertSame([
+            'PUT',
             'PATCH',
             'POST',
-            'PUT',
         ], $route->methods());
     }
 

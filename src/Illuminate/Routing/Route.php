@@ -152,9 +152,7 @@ class Route
             $methods[] = 'HEAD';
         }
 
-        sort($methods);
-
-        return $methods;
+        return array_values($methods);
     }
 
     /**
