@@ -467,10 +467,10 @@ class Str
      * @param  string|array  $needles
      * @return bool
      */
-    public static function startsWith($haystack, $needles)
+    public static function startsWith($haystack, $needles): bool
     {
         foreach ((array) $needles as $needle) {
-            if ($needle !== '' && substr($haystack, 0, strlen($needle)) === (string) $needle) {
+            if ($needle !== '' && strpos($haystack, (string) $needle) === 0) {
                 return true;
             }
         }
