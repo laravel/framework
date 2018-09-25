@@ -22,6 +22,7 @@ class DatabaseEloquentTimestampsTest extends TestCase
         $db->setAsGlobal();
 
         $this->createSchema();
+        Carbon::setTestNow(Carbon::now());
     }
 
     /**
