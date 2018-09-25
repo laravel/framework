@@ -108,7 +108,7 @@ class DatabaseEloquentModelTest extends TestCase
             'objectAttribute' => ['foo' => 'bar'],
             'arrayAttribute' => $obj,
             'jsonAttribute' => ['foo' => 'bar'],
-            'timestampAttribute' => '2017-03-18'
+            'timestampAttribute' => '2017-03-18',
         ];
 
         $model = new EloquentModelCastingStub;
