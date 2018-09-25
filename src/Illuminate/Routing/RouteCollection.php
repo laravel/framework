@@ -92,6 +92,7 @@ class RouteCollection implements Countable, IteratorAggregate
         // is used by the route. This will let us reverse route to controllers while
         // processing a request and easily generate URLs to the given controllers.
         $action = $route->getAction();
+
         if (isset($action['controller'])) {
             $this->addToActionList($action, $route);
         }
