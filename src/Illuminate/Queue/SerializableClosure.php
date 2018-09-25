@@ -2,7 +2,6 @@
 
 namespace Illuminate\Queue;
 
-use Illuminate\Queue\SerializesAndRestoresModelIdentifiers;
 use Opis\Closure\SerializableClosure as OpisSerializableClosure;
 
 class SerializableClosure extends OpisSerializableClosure
