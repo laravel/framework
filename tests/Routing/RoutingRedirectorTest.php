@@ -19,9 +19,11 @@ class RoutingRedirectorTest extends TestCase
         $this->headers = m::mock('Symfony\Component\HttpFoundation\HeaderBag');
 
         $this->request = m::mock('Illuminate\Http\Request');
+        $this->request->shouldReceive('isMethod')->andReturn(true)->byDefault();
         $this->request->shouldReceive('method')->andReturn('GET')->byDefault();
         $this->request->shouldReceive('route')->andReturn(true)->byDefault();
         $this->request->shouldReceive('ajax')->andReturn(false)->byDefault();
+        $this->request->shouldReceive('expectsJson')->andReturn(false)->byDefault();
         $this->request->headers = $this->headers;
 
         $this->url = m::mock('Illuminate\Routing\UrlGenerator');

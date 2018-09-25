@@ -25,7 +25,7 @@ if (! function_exists('abort')) {
     /**
      * Throw an HttpException with the given data.
      *
-     * @param  \Symfony\Component\HttpFoundation\Response|int     $code
+     * @param  \Symfony\Component\HttpFoundation\Response|\Illuminate\Contracts\Support\Responsable|int     $code
      * @param  string  $message
      * @param  array   $headers
      * @return void
