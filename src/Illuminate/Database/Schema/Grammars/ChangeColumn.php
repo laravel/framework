@@ -120,7 +120,7 @@ class ChangeColumn
 
         if ($fluent['type'] == 'json') {
             $options['customSchemaOptions'] = [
-                'collation' => ''
+                'collation' => '',
             ];
         }
 
