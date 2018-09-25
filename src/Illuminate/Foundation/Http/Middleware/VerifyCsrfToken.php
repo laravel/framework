@@ -73,7 +73,7 @@ class VerifyCsrfToken
             $this->tokensMatch($request)
         ) {
             return tap($next($request), function ($response) use ($request) {
-                if ($this->shouldAddHttpCookie()) {
+                if ($this->shouldAddXsrfTokenCookie()) {
                     $this->addCookieToResponse($request, $response);
                 }
             });
@@ -157,6 +157,16 @@ class VerifyCsrfToken
     }
 
     /**
+     * Determine if the cookie should be added to the response.
+     *
+     * @return bool
+     */
+    public function shouldAddXsrfTokenCookie()
+    {
+        return $this->addHttpCookie;
+    }
+
+    /**
      * Add the CSRF token to the response cookies.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -185,20 +195,5 @@ class VerifyCsrfToken
     public static function serialized()
     {
         return EncryptCookies::serialized('XSRF-TOKEN');
-    }
-
-    /*
-     * Get the decision to add the Http cookie to the request..
-     *
-     * @return bool
-     */
-
-    public function shouldAddHttpCookie()
-    {
-        if (method_exists($this, 'addHttpCookie')) {
-            return $this->addHttpCookie();
-        }
-
-        return property_exists($this, 'addHttpCookie') ? $this->addHttpCookie : true;
     }
 }
