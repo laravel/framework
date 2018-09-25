@@ -73,7 +73,7 @@ class VerifyCsrfToken
             $this->tokensMatch($request)
         ) {
             return tap($next($request), function ($response) use ($request) {
-                if ($this->addHttpCookie) {
+                if ($this->shouldAddXsrfTokenCookie()) {
                     $this->addCookieToResponse($request, $response);
                 }
             });
@@ -154,6 +154,16 @@ class VerifyCsrfToken
         }
 
         return $token;
+    }
+
+    /**
+     * Determine if the cookie should be added to the response.
+     *
+     * @return bool
+     */
+    public function shouldAddXsrfTokenCookie()
+    {
+        return $this->addHttpCookie;
     }
 
     /**

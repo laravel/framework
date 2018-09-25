@@ -82,7 +82,15 @@ class Redirector
      */
     public function guest($path, $status = 302, $headers = [], $secure = null)
     {
-        $this->session->put('url.intended', $this->generator->full());
+        $request = $this->generator->getRequest();
+
+        $intended = $request->method() == 'GET' && $request->route() && ! $request->expectsJson()
+                        ? $this->generator->full()
+                        : $this->generator->previous();
+
+        if ($intended) {
+            $this->session->put('url.intended', $intended);
+        }
 
         return $this->to($path, $status, $headers, $secure);
     }
