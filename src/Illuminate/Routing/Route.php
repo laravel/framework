@@ -129,17 +129,30 @@ class Route
      */
     public function __construct($methods, $uri, $action)
     {
+        $this->methods = $this->cleanMethods($methods);
         $this->uri = $uri;
-        $this->methods = (array) $methods;
         $this->action = $this->parseAction($action);
-
-        if (in_array('GET', $this->methods) && ! in_array('HEAD', $this->methods)) {
-            $this->methods[] = 'HEAD';
-        }
 
         if (isset($this->action['prefix'])) {
             $this->prefix($this->action['prefix']);
         }
+    }
+
+    /**
+     * Clean the methods.
+     *
+     * @param  mixed  $methods
+     * @return array
+     */
+    protected function cleanMethods($methods)
+    {
+        $methods = array_unique(array_map('strtoupper', (array) $methods));
+
+        if (in_array('GET', $methods) && ! in_array('HEAD', $methods)) {
+            $methods[] = 'HEAD';
+        }
+
+        return array_values($methods);
     }
 
     /**
