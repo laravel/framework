@@ -73,7 +73,7 @@ class VerifyCsrfToken
             $this->tokensMatch($request)
         ) {
             return tap($next($request), function ($response) use ($request) {
-                if ($this->addHttpCookie) {
+                if ($this->shouldAddHttpCookie()) {
                     $this->addCookieToResponse($request, $response);
                 }
             });
@@ -185,5 +185,20 @@ class VerifyCsrfToken
     public static function serialized()
     {
         return EncryptCookies::serialized('XSRF-TOKEN');
+    }
+
+    /*
+     * Get the decision to add the Http cookie to the request..
+     *
+     * @return bool
+     */
+
+    public function shouldAddHttpCookie()
+    {
+        if (method_exists($this, 'addHttpCookie')) {
+            return $this->addHttpCookie();
+        }
+
+        return property_exists($this, 'addHttpCookie') ? $this->addHttpCookie : true;
     }
 }
