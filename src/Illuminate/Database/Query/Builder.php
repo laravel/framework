@@ -373,7 +373,7 @@ class Builder
      * Add a join clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
@@ -413,7 +413,7 @@ class Builder
      * Add a "join where" clause to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string  $operator
      * @param  string  $second
      * @param  string  $type
@@ -429,7 +429,7 @@ class Builder
      *
      * @param  \Closure|\Illuminate\Database\Query\Builder|string $query
      * @param  string  $as
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @param  string  $type
@@ -453,7 +453,7 @@ class Builder
      * Add a left join to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
@@ -496,7 +496,7 @@ class Builder
      * Add a right join to the query.
      *
      * @param  string  $table
-     * @param  string  $first
+     * @param  \Closure|string  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
@@ -539,7 +539,7 @@ class Builder
      * Add a "cross join" clause to the query.
      *
      * @param  string  $table
-     * @param  string|null  $first
+     * @param  \Closure|string|null  $first
      * @param  string|null  $operator
      * @param  string|null  $second
      * @return \Illuminate\Database\Query\Builder|static
