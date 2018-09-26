@@ -194,13 +194,9 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonUpdateColumn($key, JsonExpression $value)
     {
-        $path = explode('->', $key);
+        list($field, $path) = $this->wrapJsonFieldAndPath($key);
 
-        $field = $this->wrapValue(array_shift($path));
-
-        $accessor = "'$.\"".implode('"."', $path)."\"'";
-
-        return "{$field} = json_set({$field}, {$accessor}, {$value->getValue()})";
+        return "{$field} = json_set({$field}{$path}, {$value->getValue()})";
     }
 
     /**
