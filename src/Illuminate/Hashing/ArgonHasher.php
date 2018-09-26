@@ -33,7 +33,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      *
      * @var bool
      */
-    protected $verifyAlgorithm = true;
+    protected $verifyAlgorithm = false;
 
     /**
      * Create a new hasher instance.
@@ -46,7 +46,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
         $this->time = $options['time'] ?? $this->time;
         $this->memory = $options['memory'] ?? $this->memory;
         $this->threads = $options['threads'] ?? $this->threads;
-        $this->verifyAlgorithm = $options['verifyAlgorithm'] ?? $this->verifyAlgorithm;
+        $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
     }
 
     /**

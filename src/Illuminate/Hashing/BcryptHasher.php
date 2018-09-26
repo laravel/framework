@@ -19,7 +19,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
      *
      * @var bool
      */
-    protected $verifyAlgorithm = true;
+    protected $verifyAlgorithm = false;
 
     /**
      * Create a new hasher instance.
@@ -30,7 +30,7 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     public function __construct(array $options = [])
     {
         $this->rounds = $options['rounds'] ?? $this->rounds;
-        $this->verifyAlgorithm = $options['verify_algorithm'] ?? $this->verifyAlgorithm;
+        $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
     }
 
     /**
