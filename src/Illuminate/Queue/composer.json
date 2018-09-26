@@ -21,6 +21,7 @@
         "illuminate/database": "5.7.*",
         "illuminate/filesystem": "5.7.*",
         "illuminate/support": "5.7.*",
+        "opis/closure": "^3.1",
         "symfony/debug": "^4.1",
         "symfony/process": "^4.1"
     },
