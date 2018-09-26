@@ -1076,7 +1076,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Alias for the "currentRouteNamed" method.
      *
-     * @param  dynamic  $patterns
+     * @param  mixed  ...$patterns
      * @return bool
      */
     public function is(...$patterns)
@@ -1087,7 +1087,7 @@ class Router implements RegistrarContract, BindingRegistrar
     /**
      * Determine if the current route matches a pattern.
      *
-     * @param  dynamic  $patterns
+     * @param  mixed  ...$patterns
      * @return bool
      */
     public function currentRouteNamed(...$patterns)
