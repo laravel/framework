@@ -25,11 +25,8 @@ class EventFakeTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'username' => 'root',
-            'password' => '',
-            'database' => 'forge',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
             'prefix' => '',
         ]);
     }
