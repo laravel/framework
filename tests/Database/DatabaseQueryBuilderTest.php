@@ -2029,6 +2029,10 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getMySqlBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', ?)', [null]);
         $builder->from('users')->update(['options->size' => null]);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', 45)', []);
+        $builder->from('users')->update(['options->size' => new Raw('45')]);
     }
 
     public function testMySqlWrappingJsonWithString()
