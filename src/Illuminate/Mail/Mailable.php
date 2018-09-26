@@ -381,7 +381,7 @@ class Mailable implements MailableContract, Renderable
                 FilesystemFactory::class
             )->disk($attachment['disk']);
 
-            return $message->attachData(
+            $message->attachData(
                 $storage->get($attachment['path']),
                 $attachment['name'] ?? basename($attachment['path']),
                 array_merge(['mime' => $storage->mimeType($attachment['path'])], $attachment['options'])
