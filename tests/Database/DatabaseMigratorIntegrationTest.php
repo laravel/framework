@@ -32,6 +32,9 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $container = new \Illuminate\Container\Container;
         $container->instance('db', $db->getDatabaseManager());
+        $container->bind('db.schema', function ($c) {
+            return $c['db']->connection()->getSchemaBuilder();
+        });
         \Illuminate\Support\Facades\Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
