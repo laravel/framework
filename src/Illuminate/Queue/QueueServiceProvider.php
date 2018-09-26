@@ -221,7 +221,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerOpisSecurityKey()
     {
-        if (Str::startsWith($key = config('app.key'), 'base64:')) {
+        if (Str::startsWith($key = $this->app['config']->get('app.key'), 'base64:')) {
             $key = base64_decode(substr($key, 7));
         }
 
