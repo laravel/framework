@@ -54,7 +54,9 @@ trait FormatsMessages
         // messages out of the translator service for this validation rule.
         $key = "validation.{$lowerRule}";
 
-        if ($key != ($value = $this->translator->trans($key))) {
+        $choice = trans('validation.attribute_gender.' . $attribute) == 'f' ? 1 : 0;
+
+        if ($key != ($value = $this->translator->transChoice($key, $choice))) {
             return $value;
         }
 
