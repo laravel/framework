@@ -45,6 +45,7 @@ class ModelMakeCommand extends GeneratorCommand
             $this->input->setOption('migration', true);
             $this->input->setOption('controller', true);
             $this->input->setOption('resource', true);
+            $this->input->setOption('policy', true);
         }
 
         if ($this->option('factory')) {
@@ -53,6 +54,10 @@ class ModelMakeCommand extends GeneratorCommand
 
         if ($this->option('migration')) {
             $this->createMigration();
+        }
+
+        if ($this->option('policy')) {
+            $this->createPolicy();
         }
 
         if ($this->option('controller') || $this->option('resource')) {
@@ -95,6 +100,21 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Create an ACL policy for the model.
+     *
+     * @return void
+     */
+    protected function createPolicy()
+    {
+        $factory = Str::studly(class_basename($this->argument('name')));
+
+        $this->call('make:policy', [
+            'name' => "{$factory}Policy",
+            '--model' => $this->argument('name'),
+        ]);
+    }
+
+    /**
      * Create a controller for the model.
      *
      * @return void
@@ -126,6 +146,17 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
+     * Get the default namespace for the class.
+     *
+     * @param  string  $rootNamespace
+     * @return string
+     */
+    protected function getDefaultNamespace($rootNamespace)
+    {
+        return $rootNamespace;
+    }
+
+    /**
      * Get the console command options.
      *
      * @return array
@@ -146,6 +177,8 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+
+            ['policy', 'o', InputOption::VALUE_NONE, 'Creates a policy for the model'],
         ];
     }
 }
