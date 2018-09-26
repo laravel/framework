@@ -23,16 +23,14 @@ class Preset
     /**
      * Update the "package.json" file.
      *
-     * @param  bool  $dev
+     * @param  string  $configurationKey
      * @return void
      */
-    protected static function updatePackages($dev = true)
+    protected static function updatePackages($configurationKey = 'devDependencies')
     {
         if (! file_exists(base_path('package.json'))) {
             return;
         }
-
-        $configurationKey = $dev ? 'devDependencies' : 'dependencies';
 
         $packages = json_decode(file_get_contents(base_path('package.json')), true);
 
