@@ -32,7 +32,6 @@ class JsonExpression extends Expression
                 return $value ? 'true' : 'false';
             case 'integer':
             case 'double':
-                return $value;
             case 'string':
                 return '?';
             case 'object':

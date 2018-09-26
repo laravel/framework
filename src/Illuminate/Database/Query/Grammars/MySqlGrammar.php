@@ -211,8 +211,7 @@ class MySqlGrammar extends Grammar
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
         $values = collect($values)->reject(function ($value, $column) {
-            return $this->isJsonSelector($column) &&
-                in_array(gettype($value), ['boolean', 'integer', 'double']);
+            return $this->isJsonSelector($column) && is_bool($value);
         })->all();
 
         return parent::prepareBindingsForUpdate($bindings, $values);
