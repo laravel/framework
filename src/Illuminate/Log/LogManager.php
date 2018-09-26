@@ -285,7 +285,7 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
+                Str::snake($this->app['config']['app.name'], '-'), $config['facility'] ?? LOG_USER, $this->level($config))
             ),
         ]);
     }
