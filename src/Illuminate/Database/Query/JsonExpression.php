@@ -30,6 +30,7 @@ class JsonExpression extends Expression
         switch ($type = gettype($value)) {
             case 'boolean':
                 return $value ? 'true' : 'false';
+            case 'NULL':
             case 'integer':
             case 'double':
             case 'string':
