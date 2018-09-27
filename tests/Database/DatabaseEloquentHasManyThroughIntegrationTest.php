@@ -163,7 +163,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             'email',
             'created_at',
             'updated_at',
-            'country_id',
+            '_first_key',
         ], array_keys($post->getAttributes()));
     }
 
@@ -175,7 +175,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertEquals([
             'title',
             'body',
-            'country_id',
+            '_first_key',
         ], array_keys($post->getAttributes()));
     }
 
@@ -195,7 +195,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'country_id', ], array_keys($post->getAttributes()));
+                '_first_key', ], array_keys($post->getAttributes()));
         });
     }
 
@@ -216,7 +216,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'country_id', ], array_keys($post->getAttributes()));
+                '_first_key', ], array_keys($post->getAttributes()));
         }
     }
 
@@ -235,7 +235,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'country_id', ], array_keys($post->getAttributes()));
+                '_first_key', ], array_keys($post->getAttributes()));
         });
     }
 
