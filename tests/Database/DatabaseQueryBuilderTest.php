@@ -2027,6 +2027,19 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->from('users')->where('id', '=', 0)->update(['options->size' => 45, 'updated_at' => '2015-05-26 22:02:06']);
     }
 
+    public function testPostgresUpdateWrappingJson()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['"John"']);
+        $builder->from('users')->update(['options->name->first_name' => 'John']);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"language"}\', \'null\')', []);
+        $builder->from('users')->update(['options->language' => new Raw("'null'")]);
+    }
+
     public function testMySqlWrappingJsonWithString()
     {
         $builder = $this->getMySqlBuilder();
