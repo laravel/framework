@@ -35,7 +35,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->register($provider);
 
-        $this->assertTrue(in_array($class, $app->getLoadedProviders()));
+        $this->assertArrayHasKey($class, $app->getLoadedProviders());
     }
 
     public function testClassesAreBoundWhenServiceProviderIsRegistered()
@@ -44,7 +44,7 @@ class FoundationApplicationTest extends TestCase
         $provider = new ServiceProviderForTestingThree($app);
         $app->register($provider);
 
-        $this->assertTrue(in_array(get_class($provider), $app->getLoadedProviders()));
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
 
         $this->assertInstanceOf(ConcreteClass::class, $app->make(AbstractClass::class));
     }
@@ -55,7 +55,7 @@ class FoundationApplicationTest extends TestCase
         $provider = new ServiceProviderForTestingThree($app);
         $app->register($provider);
 
-        $this->assertTrue(in_array(get_class($provider), $app->getLoadedProviders()));
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
 
         $instance = $app->make(AbstractClass::class);
 
@@ -70,7 +70,7 @@ class FoundationApplicationTest extends TestCase
         $app = new Application;
         $app->register($provider);
 
-        $this->assertTrue(in_array($class, $app->getLoadedProviders()));
+        $this->assertArrayHasKey($class, $app->getLoadedProviders());
     }
 
     public function testDeferredServicesMarkedAsBound()
