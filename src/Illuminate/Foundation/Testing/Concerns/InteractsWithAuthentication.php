@@ -15,7 +15,7 @@ trait InteractsWithAuthentication
      */
     public function actingAs(UserContract $user, $driver = null)
     {
-        $this->be($this->getNormalizeUser($user), $driver);
+        $this->be($this->getNormalizedUser($user), $driver);
 
         return $this;
     }
@@ -26,7 +26,7 @@ trait InteractsWithAuthentication
      * @param  \Illuminate\Contracts\Auth\Authenticatable $user
      * @return \Illuminate\Contracts\Auth\Authenticatable
      */
-    protected function getNormalizeUser(UserContract $user)
+    protected function getNormalizedUser(UserContract $user)
     {
         $user->wasRecentlyCreated = false;
 
