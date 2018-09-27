@@ -18,14 +18,14 @@ function remote()
 
 git pull origin $CURRENT_BRANCH
 
-for REPOSITORY in Broadcasting Bus Cache Config Console Container Contracts Cookie Database Encryption Events Filesystem Hashing Http Log Mail Notifications Pagination Pipeline Queue Redis Routing Session Support Translation Validation View
+for REMOTE in Broadcasting Bus Cache Config Console Container Contracts Cookie Database Encryption Events Filesystem Hashing Http Log Mail Notifications Pagination Pipeline Queue Redis Routing Session Support Translation Validation View
 do
-    echo "Splitting $REPOSITORY"
+    echo "Splitting $REMOTE"
 
-    LOWERCASE=$(echo $REPOSITORY | tr '[:upper:]' '[:lower:]')
+    LOWERCASE_REMOTE=$(echo $REMOTE | tr '[:upper:]' '[:lower:]')
 
-    remote $LOWERCASE git@github.com:illuminate/$LOWERCASE.git
-    split "src/Illuminate/$REPOSITORY" $LOWERCASE
+    remote $LOWERCASE_REMOTE git@github.com:illuminate/$LOWERCASE_REMOTE.git
+    split "src/Illuminate/$REMOTE" $LOWERCASE_REMOTE
 
-    echo "$REPOSITORY: done"
+    echo "$REMOTE: done"
 done
