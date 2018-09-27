@@ -2,8 +2,7 @@
 
 namespace Illuminate\Support\Facades;
 
-use ReflectionException;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\DateFactory;
 
 /**
  * @see https://carbon.nesbot.com/docs/
@@ -83,6 +82,8 @@ use Illuminate\Support\Carbon;
  */
 class Date extends Facade
 {
+    const DEFAULT_FACADE = DateFactory::class;
+
     /**
      * Get the registered name of the component.
      *
@@ -96,61 +97,18 @@ class Date extends Facade
     }
 
     /**
-     * Handle dynamic, static calls to the object.
+     * Resolve the facade root instance from the container.
      *
-     * @param  string  $method
-     * @param  array   $args
-     *
+     * @param  string  $name
      * @return mixed
-     *
-     * @throws \RuntimeException
      */
-    public static function __callStatic($method, $args)
+    protected static function resolveFacadeInstance($name)
     {
-        $root = null;
-
-        try {
-            $root = static::getFacadeRoot();
-        } catch (ReflectionException $exception) {
-            // We mute reflection exceptions as if have Carbon as fallback if the facade root is missing.
+        if (! isset(static::$resolvedInstance[$name]) && ! isset(static::$app, static::$app[$name])) {
+            $className = static::DEFAULT_FACADE;
+            static::swap(new $className);
         }
 
-        if (! $root) {
-            // Use Carbon class as root if not set
-            Date::swap($root = Carbon::class);
-        }
-
-        // If Date::swap(function () { ... }) with some closure or any callable has been called
-        if (is_callable($root)) {
-            // Then we create the date with Carbon then we pass it to this callable that can modify or replace
-            // This date object with any other value
-            return $root(Carbon::$method(...$args));
-        }
-
-        // If Date::swap(SomeClass::class)
-        if (is_string($root)) {
-            // If the given class support the method has a public static one, then we immediately call it and return
-            // the result. When using the default settings ($root == Carbon::class) then we enter this path.
-            if (method_exists($root, $method)) {
-                return $root::$method(...$args);
-            }
-
-            // Else, we create the date with Carbon
-            /** @var Carbon $date */
-            $date = Carbon::$method(...$args);
-
-            // If the given class has a public method `instance` (Carbon sub-class for example), then we use it
-            // to convert the object to an instance of the the chosen class
-            if (method_exists($root, 'instance')) {
-                return $root::instance($date);
-            }
-
-            // If the given class has no public method `instance`, we assume it has a DateTime compatible
-            // constructor and so we use it to create the new instance.
-            return new $root($date->format('Y-m-d H:i:s.u'), $date->getTimezone());
-        }
-
-        // If Date::swap($classicalFactory) such as a Carbon\Factory instance
-        return parent::__callStatic($method, $args);
+        return parent::resolveFacadeInstance($name);
     }
 }
