@@ -102,18 +102,13 @@ class Command extends SymfonyCommand
             $this->configureUsingFluentDefinition();
         } else {
             parent::__construct($this->name);
+            $this->specifyParameters();
         }
 
         // Once we have constructed the command, we'll set the description and other
-        // related properties of the command. If a signature wasn't used to build
-        // the command we'll set the arguments and the options on this command.
+        // related properties of the command.
         $this->setDescription($this->description);
-
         $this->setHidden($this->isHidden());
-
-        if (! isset($this->signature)) {
-            $this->specifyParameters();
-        }
     }
 
     /**
