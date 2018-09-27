@@ -86,6 +86,42 @@ class AuthorizeMiddlewareTest extends TestCase
         $this->assertEquals($response->content(), 'success');
     }
 
+    public function testSimpleAbilityWithStringParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user, $param) {
+            return $param === 'true';
+        });
+
+        $this->router->get('dashboard', [
+            'middleware' => Authorize::class.':view-dashboard,true',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard', 'GET'));
+
+        $this->assertEquals($response->content(), 'success');
+    }
+
+    public function testSimpleAbilityWithStringParameterFromRouteParameter()
+    {
+        $this->gate()->define('view-dashboard', function ($user, $param) {
+            return $param === 'true';
+        });
+
+        $this->router->get('dashboard/{route_parameter}', [
+            'middleware' => Authorize::class.':view-dashboard,route_parameter',
+            'uses' => function () {
+                return 'success';
+            },
+        ]);
+
+        $response = $this->router->dispatch(Request::create('dashboard/true', 'GET'));
+
+        $this->assertEquals($response->content(), 'success');
+    }
+
     /**
      * @expectedException \Illuminate\Auth\Access\AuthorizationException
      * @expectedExceptionMessage This action is unauthorized.
