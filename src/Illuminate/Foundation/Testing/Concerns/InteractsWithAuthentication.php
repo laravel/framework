@@ -22,7 +22,7 @@ trait InteractsWithAuthentication
     }
 
     /**
-     * Normalize the currently logged in user for the application
+     * Normalize the currently logged in user for the application.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
      */
