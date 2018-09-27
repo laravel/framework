@@ -107,11 +107,10 @@ class NotificationSender
     }
 
     /**
-     * Get the locale for the notification preferred by this notifiable.
+     * Get the notifiable's preferred locale for the notification.
      *
      * @param  mixed  $notifiable
      * @param  mixed  $notification
-     *
      * @return string|null
      */
     protected function preferredLocale($notifiable, $notification)
