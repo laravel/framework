@@ -65,8 +65,8 @@ class AuthorizesResourcesTest extends TestCase
     {
         $router = new Router(new \Illuminate\Events\Dispatcher);
 
-        $router->aliasMiddleware('can', '\Illuminate\Tests\Auth\AuthorizesResourcesMiddleware');
-        $router->get($method)->uses('\Illuminate\Tests\Auth\AuthorizesResourcesController@'.$method);
+        $router->aliasMiddleware('can', \Illuminate\Tests\Auth\AuthorizesResourcesMiddleware::class);
+        $router->get($method)->uses(\Illuminate\Tests\Auth\AuthorizesResourcesController::class.'@'.$method);
 
         $this->assertEquals(
             'caught '.$middleware,

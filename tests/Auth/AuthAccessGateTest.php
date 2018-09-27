@@ -336,7 +336,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
+        $gate->define('foo', \Illuminate\Tests\Auth\AccessGateTestClass::class.'@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -345,7 +345,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestInvokableClass');
+        $gate->define('foo', \Illuminate\Tests\Auth\AccessGateTestInvokableClass::class);
 
         $this->assertTrue($gate->check('foo'));
     }
