@@ -68,7 +68,7 @@ class DatabasePresenceVerifier implements PresenceVerifierInterface
     {
         $query = $this->table($collection)->whereIn($column, $values);
 
-        return $this->addConditions($query, $extra)->count();
+        return $this->addConditions($query, $extra)->distinct()->count($column);
     }
 
     /**
