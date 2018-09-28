@@ -1,5 +1,18 @@
 # Release Notes for 5.6.x
 
+## [v5.6.38 (2018-09-04)](https://github.com/laravel/framework/compare/v5.6.37...v5.6.38)
+
+### Fixed
+- Fix nullable MorphTo and $touches ([#25438](https://github.com/laravel/framework/pull/25438))
+- Allow load relations with similar keys using strict comparison ([#25429](https://github.com/laravel/framework/pull/25429))
+
+
+## v5.6.37 (2018-09-02)
+
+### Fixed
+- Fixed `MorphTo` lazy loading and `withoutGlobalScopes` method ([#25406](https://github.com/laravel/framework/pull/25406))
+
+
 ## v5.6.36 (2018-09-02)
 
 ### Changed
