@@ -42,24 +42,34 @@ class FoundationApplicationTest extends TestCase
     public function testClassesAreBoundWhenServiceProviderIsRegistered()
     {
         $app = new Application;
-        $provider = new ServiceProviderForTestingThree($app);
-        $app->register($provider);
-
-        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
-
-        $this->assertInstanceOf(ConcreteClass::class, $app->make(AbstractClass::class));
-    }
-
-    public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
-    {
-        $app = new Application;
-        $provider = new ServiceProviderForTestingThree($app);
-        $app->register($provider);
+        $app->register($provider = new class ($app) extends ServiceProvider {
+            public $bindings = [
+                AbstractClass::class => ConcreteClass::class
+            ];
+        });
 
         $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
 
         $instance = $app->make(AbstractClass::class);
 
+        $this->assertInstanceOf(ConcreteClass::class, $instance);
+        $this->assertNotSame($instance, $app->make(AbstractClass::class));
+    }
+
+    public function testSingletonsAreCreatedWhenServiceProviderIsRegistered()
+    {
+        $app = new Application;
+        $app->register($provider = new class ($app) extends ServiceProvider {
+            public $singletons = [
+                AbstractClass::class => ConcreteClass::class
+            ];
+        });
+
+        $this->assertArrayHasKey(get_class($provider), $app->getLoadedProviders());
+
+        $instance = $app->make(AbstractClass::class);
+
+        $this->assertInstanceOf(ConcreteClass::class, $instance);
         $this->assertSame($instance, $app->make(AbstractClass::class));
     }
 
@@ -283,25 +293,6 @@ class ApplicationMultiProviderStub extends ServiceProvider
         $this->app->singleton('bar', function ($app) {
             return $app['foo'].'bar';
         });
-    }
-}
-
-class ServiceProviderForTestingThree extends ServiceProvider
-{
-    public $bind = [
-        AbstractClass::class => ConcreteClass::class,
-    ];
-
-    public $singletons = [
-        AbstractClass::class => ConcreteClass::class,
-    ];
-
-    public function register()
-    {
-    }
-
-    public function boot()
-    {
     }
 }
 
