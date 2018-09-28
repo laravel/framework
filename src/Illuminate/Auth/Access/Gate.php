@@ -346,9 +346,6 @@ class Gate implements GateContract
             return $this->methodAllowsGuests($class, $method);
         }
 
-        // If the "class" is actually a callable array, it may be either
-        // two strings (when using a static method), or it could be a
-        // concrete instance of an object, plus the method's name.
         if (is_array($class)) {
             $className = is_string($class[0]) ? $class[0] : get_class($class[0]);
 
