@@ -410,7 +410,7 @@ class HasManyThrough extends Relation
             $columns = [$this->related->getTable().'.*'];
         }
 
-        return array_merge($columns, [$this->getQualifiedFirstKeyName()]);
+        return array_merge([$this->getQualifiedFirstKeyName()], $columns);
     }
 
     /**

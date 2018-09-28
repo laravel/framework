@@ -156,6 +156,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->seedData();
         $post = HasManyThroughTestCountry::first()->posts()->first();
         $this->assertEquals([
+            'country_id',
             'id',
             'user_id',
             'title',
@@ -163,7 +164,6 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             'email',
             'created_at',
             'updated_at',
-            'country_id',
         ], array_keys($post->getAttributes()));
     }
 
@@ -173,9 +173,9 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $post = HasManyThroughTestCountry::first()->posts()->first(['title', 'body']);
 
         $this->assertEquals([
+            'country_id',
             'title',
             'body',
-            'country_id',
         ], array_keys($post->getAttributes()));
     }
 
@@ -188,6 +188,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $country->posts()->chunk(10, function ($postsChunk) {
             $post = $postsChunk->first();
             $this->assertEquals([
+                'country_id',
                 'id',
                 'user_id',
                 'title',
@@ -195,7 +196,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'country_id', ], array_keys($post->getAttributes()));
+            ], array_keys($post->getAttributes()));
         });
     }
 
@@ -209,6 +210,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         foreach ($posts as $post) {
             $this->assertEquals([
+                'country_id',
                 'id',
                 'user_id',
                 'title',
@@ -216,7 +218,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'country_id', ], array_keys($post->getAttributes()));
+            ], array_keys($post->getAttributes()));
         }
     }
 
@@ -228,6 +230,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
 
         $country->posts()->each(function ($post) {
             $this->assertEquals([
+                'country_id',
                 'id',
                 'user_id',
                 'title',
@@ -235,7 +238,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'country_id', ], array_keys($post->getAttributes()));
+            ], array_keys($post->getAttributes()));
         });
     }
 

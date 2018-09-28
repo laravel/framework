@@ -27,6 +27,11 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
             $table->integer('owner_id')->nullable();
             $table->string('owner_slug')->nullable();
         });
+
+        Schema::create('projects', function ($table) {
+            $table->increments('id');
+            $table->integer('owner_id')->nullable();
+        });
     }
 
     /**
@@ -86,6 +91,18 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $this->assertEquals(1, $users->count());
     }
+
+    public function test_can_resolve_right_relation_from_model_accessed_from_has_many_through_relationship_if_similar_foreign_column_name()
+    {
+        $user = User::create(['name' => str_random()]);
+
+        $team1 = Team::create(['owner_id' => $user->id]);
+        $team2 = Team::create(['owner_id' => $user->id]);
+
+        $project = Project::create(['owner_id' => $team2->id]);
+
+        $this->assertTrue($user->ownedProjects->first()->owner->is($team2));
+    }
 }
 
 class User extends Model
@@ -107,6 +124,11 @@ class User extends Model
     public function teamMatesWithGlobalScope()
     {
         return $this->hasManyThrough(UserWithGlobalScope::class, Team::class, 'owner_id', 'team_id');
+    }
+
+    public function ownedProjects()
+    {
+        return $this->hasManyThrough(Project::class, Team::class, 'owner_id', 'owner_id');
     }
 }
 
@@ -131,4 +153,16 @@ class Team extends Model
     public $table = 'teams';
     public $timestamps = false;
     protected $guarded = ['id'];
+}
+
+class Project extends Model
+{
+    public $table = 'projects';
+    public $timestamps = false;
+    protected $guarded = ['id'];
+
+    public function owner()
+    {
+        return $this->belongsTo(Team::class);
+    }
 }
