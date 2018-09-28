@@ -2,6 +2,7 @@
 
 namespace Illuminate\Redis\Limiters;
 
+use Exception;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 
 class ConcurrencyLimiter
@@ -78,8 +79,9 @@ class ConcurrencyLimiter
                 return tap($callback(), function () use ($slot) {
                     $this->release($slot);
                 });
-            } catch (\Exception $exception) {
+            } catch (Exception $exception) {
                 $this->release($slot);
+
                 throw $exception;
             }
         }
