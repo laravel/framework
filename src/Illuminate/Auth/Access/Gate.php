@@ -332,7 +332,7 @@ class Gate implements GateContract
      * Determine whether the callback/method can be called with the given user.
      *
      * @param  \Illuminate\Contracts\Auth\Authenticatable|null  $user
-     * @param  \Closure|string  $class
+     * @param  \Closure|string|array  $class
      * @param  string|null $method
      * @return bool
      */
@@ -344,6 +344,15 @@ class Gate implements GateContract
 
         if (! is_null($method)) {
             return $this->methodAllowsGuests($class, $method);
+        }
+
+        // If the "class" is actually a callable array, it may be either
+        // two strings (when using a static method), or it could be a
+        // concrete instance of an object, plus the method's name.
+        if (is_array($class)) {
+            $className = is_string($class[0]) ? $class[0] : get_class($class[0]);
+
+            return $this->methodAllowsGuests($className, $class[1]);
         }
 
         return $this->callbackAllowsGuests($class);
