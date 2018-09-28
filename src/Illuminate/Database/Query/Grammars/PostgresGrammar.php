@@ -194,8 +194,30 @@ class PostgresGrammar extends Grammar
         // columns and convert it to a parameter value. Then we will concatenate a
         // list of the columns that can be added into this update query clauses.
         return collect($values)->map(function ($value, $key) {
+            if ($this->isJsonSelector($key)) {
+                return $this->compileJsonUpdateColumn($key, $value);
+            }
+
             return $this->wrap($key).' = '.$this->parameter($value);
         })->implode(', ');
+    }
+
+    /**
+     * Prepares a JSON column being updated using the JSONB_SET function.
+     *
+     * @param  string  $key
+     * @param  mixed  $value
+     * @return string
+     */
+    protected function compileJsonUpdateColumn($key, $value)
+    {
+        $parts = explode('->', $key);
+
+        $field = $this->wrap(array_shift($parts));
+
+        $path = '\'{"'.implode('","', $parts).'"}\'';
+
+        return "{$field} = jsonb_set({$field}::jsonb, {$path}, {$this->parameter($value)})";
     }
 
     /**
@@ -281,6 +303,12 @@ class PostgresGrammar extends Grammar
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
     {
+        $values = collect($values)->map(function ($value, $column) {
+            return $this->isJsonSelector($column) && ! $this->isExpression($value)
+                ? json_encode($value)
+                : $value;
+        })->all();
+
         // Update statements with "joins" in Postgres use an interesting syntax. We need to
         // take all of the bindings and put them on the end of this array since they are
         // added to the end of the "where" clause statements as typical where clauses.

@@ -24,6 +24,7 @@
         "league/flysystem": "^1.0.8",
         "monolog/monolog": "^1.12",
         "nesbot/carbon": "^1.26.3",
+        "opis/closure": "^3.1",
         "psr/container": "^1.0",
         "psr/simple-cache": "^1.0",
         "ramsey/uuid": "^3.7",

@@ -29,6 +29,13 @@ class ArgonHasher extends AbstractHasher implements HasherContract
     protected $threads = 2;
 
     /**
+     * Indicates whether to perform an algorithm check.
+     *
+     * @var bool
+     */
+    protected $verifyAlgorithm = false;
+
+    /**
      * Create a new hasher instance.
      *
      * @param  array  $options
@@ -39,6 +46,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
         $this->time = $options['time'] ?? $this->time;
         $this->memory = $options['memory'] ?? $this->memory;
         $this->threads = $options['threads'] ?? $this->threads;
+        $this->verifyAlgorithm = $options['verify'] ?? $this->verifyAlgorithm;
     }
 
     /**
@@ -85,7 +93,7 @@ class ArgonHasher extends AbstractHasher implements HasherContract
      */
     public function check($value, $hashedValue, array $options = [])
     {
-        if ($this->info($hashedValue)['algoName'] !== 'argon2i') {
+        if ($this->verifyAlgorithm && $this->info($hashedValue)['algoName'] !== 'argon2i') {
             throw new RuntimeException('This password does not use the Argon2i algorithm.');
         }
 

@@ -14,6 +14,7 @@ use Illuminate\Notifications\Notification;
 use Illuminate\Foundation\Events\LocaleUpdated;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 /**
@@ -45,6 +46,7 @@ class SendingNotificationsWithLocaleTest extends TestCase
             '*' => [
                 '*' => [
                     'en' => ['hi' => 'hello'],
+                    'es' => ['hi' => 'hola'],
                     'fr' => ['hi' => 'bonjour'],
                 ],
             ],
@@ -155,6 +157,83 @@ class SendingNotificationsWithLocaleTest extends TestCase
 
         $this->assertSame('en', Carbon::getLocale());
     }
+
+    public function test_locale_is_sent_with_notifiable_preferred_locale()
+    {
+        $recipient = new NotifiableEmailLocalePreferredUser([
+            'email' => 'test@mail.com',
+            'email_locale' => 'fr',
+        ]);
+
+        $recipient->notify(new GreetingMailNotification());
+
+        $this->assertContains('bonjour',
+            app('swift.transport')->messages()[0]->getBody()
+        );
+    }
+
+    public function test_locale_is_sent_with_notifiable_preferred_locale_for_multiple_recipients()
+    {
+        $recipients = [
+            new NotifiableEmailLocalePreferredUser([
+                'email' => 'test@mail.com',
+                'email_locale' => 'fr',
+            ]),
+            new NotifiableEmailLocalePreferredUser([
+                'email' => 'test.2@mail.com',
+                'email_locale' => 'es',
+            ]),
+            NotifiableLocalizedUser::forceCreate([
+                'email' => 'test.3@mail.com',
+            ]),
+        ];
+
+        NotificationFacade::send(
+            $recipients, new GreetingMailNotification()
+        );
+
+        $this->assertContains('bonjour',
+            app('swift.transport')->messages()[0]->getBody()
+        );
+        $this->assertContains('hola',
+            app('swift.transport')->messages()[1]->getBody()
+        );
+        $this->assertContains('hi',
+            app('swift.transport')->messages()[2]->getBody()
+        );
+    }
+
+    public function test_locale_is_sent_with_notification_selected_locale_overriding_notifiable_preferred_locale()
+    {
+        $recipient = new NotifiableEmailLocalePreferredUser([
+            'email' => 'test@mail.com',
+            'email_locale' => 'es',
+        ]);
+
+        $recipient->notify(
+            (new GreetingMailNotification())->locale('fr')
+        );
+
+        $this->assertContains('bonjour',
+            app('swift.transport')->messages()[0]->getBody()
+        );
+    }
+
+    public function test_locale_is_sent_with_facade_selected_locale_overriding_notifiable_preferred_locale()
+    {
+        $recipient = new NotifiableEmailLocalePreferredUser([
+            'email' => 'test@mail.com',
+            'email_locale' => 'es',
+        ]);
+
+        NotificationFacade::locale('fr')->send(
+            $recipient, new GreetingMailNotification()
+        );
+
+        $this->assertContains('bonjour',
+            app('swift.transport')->messages()[0]->getBody()
+        );
+    }
 }
 
 class NotifiableLocalizedUser extends Model
@@ -163,6 +242,21 @@ class NotifiableLocalizedUser extends Model
 
     public $table = 'users';
     public $timestamps = false;
+}
+
+class NotifiableEmailLocalePreferredUser extends Model implements HasLocalePreference
+{
+    use Notifiable;
+
+    protected $fillable = [
+        'email',
+        'email_locale',
+    ];
+
+    public function preferredLocale()
+    {
+        return $this->email_locale;
+    }
 }
 
 class GreetingMailNotification extends Notification

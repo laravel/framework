@@ -2002,7 +2002,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $result = $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
     }
 
-    public function testMySqlUpdateWithJsonRemovesBindingsCorrectly()
+    public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()
     {
         $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
         $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
@@ -2020,11 +2020,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
             ->once()
             ->with(
-                'update `users` set `options` = json_set(`options`, \'$."size"\', 45), `updated_at` = ? where `id` = ?',
-                ['2015-05-26 22:02:06', 0]
+                'update `users` set `options` = json_set(`options`, \'$."size"\', ?), `updated_at` = ? where `id` = ?',
+                [45, '2015-05-26 22:02:06', 0]
             );
         $builder = new Builder($connection, $grammar, $processor);
         $builder->from('users')->where('id', '=', 0)->update(['options->size' => 45, 'updated_at' => '2015-05-26 22:02:06']);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', ?)', [null]);
+        $builder->from('users')->update(['options->size' => null]);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', 45)', []);
+        $builder->from('users')->update(['options->size' => new Raw('45')]);
+    }
+
+    public function testPostgresUpdateWrappingJson()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['"John"']);
+        $builder->from('users')->update(['options->name->first_name' => 'John']);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"language"}\', \'null\')', []);
+        $builder->from('users')->update(['options->language' => new Raw("'null'")]);
     }
 
     public function testMySqlWrappingJsonWithString()

@@ -56,9 +56,9 @@ class HasherTest extends TestCase
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 
-        $argonHasher = new \Illuminate\Hashing\ArgonHasher;
+        $argonHasher = new \Illuminate\Hashing\ArgonHasher(['verify' => true]);
         $argonHashed = $argonHasher->make('password');
-        (new \Illuminate\Hashing\BcryptHasher)->check('password', $argonHashed);
+        (new \Illuminate\Hashing\BcryptHasher(['verify' => true]))->check('password', $argonHashed);
     }
 
     /**
@@ -66,9 +66,9 @@ class HasherTest extends TestCase
      */
     public function testBasicArgon2iVerification()
     {
-        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher;
+        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
-        (new \Illuminate\Hashing\ArgonHasher)->check('password', $bcryptHashed);
+        (new \Illuminate\Hashing\ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 
     /**
@@ -76,8 +76,8 @@ class HasherTest extends TestCase
      */
     public function testBasicArgon2idVerification()
     {
-        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher;
+        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
-        (new \Illuminate\Hashing\Argon2IdHasher)->check('password', $bcryptHashed);
+        (new \Illuminate\Hashing\Argon2IdHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 }
