@@ -163,7 +163,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
             'email',
             'created_at',
             'updated_at',
-            '_first_key',
+            'laravel_many_through_key',
         ], array_keys($post->getAttributes()));
     }
 
@@ -175,7 +175,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
         $this->assertEquals([
             'title',
             'body',
-            '_first_key',
+            'laravel_many_through_key',
         ], array_keys($post->getAttributes()));
     }
 
@@ -195,7 +195,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                '_first_key', ], array_keys($post->getAttributes()));
+                'laravel_many_through_key', ], array_keys($post->getAttributes()));
         });
     }
 
@@ -216,7 +216,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                '_first_key', ], array_keys($post->getAttributes()));
+                'laravel_many_through_key', ], array_keys($post->getAttributes()));
         }
     }
 
@@ -235,7 +235,7 @@ class DatabaseEloquentHasManyThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                '_first_key', ], array_keys($post->getAttributes()));
+                'laravel_many_through_key', ], array_keys($post->getAttributes()));
         });
     }
 

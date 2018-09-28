@@ -207,7 +207,7 @@ class HasManyThrough extends Relation
         // relationship as this will allow us to quickly access all of the related
         // models without having to do nested looping which will be quite slow.
         foreach ($results as $result) {
-            $dictionary[$result->_first_key][] = $result;
+            $dictionary[$result->laravel_many_through_key][] = $result;
         }
 
         return $dictionary;
@@ -410,7 +410,7 @@ class HasManyThrough extends Relation
             $columns = [$this->related->getTable().'.*'];
         }
 
-        return array_merge($columns, [$this->getQualifiedFirstKeyName().' as _first_key']);
+        return array_merge($columns, [$this->getQualifiedFirstKeyName().' as laravel_many_through_key']);
     }
 
     /**
