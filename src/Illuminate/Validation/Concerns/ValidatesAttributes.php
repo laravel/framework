@@ -611,7 +611,7 @@ trait ValidatesAttributes
         // that the columns being "verified" shares the given attribute's name.
         $column = $this->getQueryColumn($parameters, $attribute);
 
-        $expected = (is_array($value)) ? count($value) : 1;
+        $expected = is_array($value) ? count(array_unique($value)) : 1;
 
         return $this->getExistCount(
             $connection, $table, $column, $value, $parameters
