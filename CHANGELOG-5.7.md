@@ -1,5 +1,20 @@
 # Release Notes for 5.7.x
 
+## [v5.7.6 (2018-09-25)](https://github.com/laravel/framework/compare/v5.7.5...v5.7.6)
+
+### Added
+- Support MorphTo eager loading with selected columns ([#25662](https://github.com/laravel/framework/pull/25662))
+- Added possibility to define a complex condition (overwrite `shouldAddXsrfTokenCookie` method) for add cookie to response in `Middleware/VerifyCsrfToken.php`
+
+### Fixed
+- Fixed tag cache clearing when using Redis ([#25744](https://github.com/laravel/framework/pull/25744))
+- Fixed broken email subcopy template escaping ([#25723](https://github.com/laravel/framework/pull/25723))
+- Fixed MethodNotAllowedHTTPException on Intended Redirect ([#25739](https://github.com/laravel/framework/pull/25739))
+
+### Changed
+- Use url() function instead of plain url in `views/illustrated-layout.blade.php` ([25725](https://github.com/laravel/framework/pull/25725))
+
+
 ## [v5.7.5 (2018-09-20)](https://github.com/laravel/framework/compare/v5.7.4...v5.7.5)
 
 ### Added
