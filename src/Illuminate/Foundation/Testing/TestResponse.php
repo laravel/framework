@@ -57,18 +57,25 @@ class TestResponse
         return new static($response);
     }
 
-    public static function mergeAssociateArrayRecursive(array $a, array $b): array
+    /**
+     * Merge stdClass array and assoc array recursively.
+     * @param  array $arrayStdClass
+     * @param  array $arrayAssoc
+     * @return array
+     */
+    public static function mergeAssociateArrayRecursive(array $arrayStdClass, array $arrayAssoc): array
     {
-        $merged = $a;
+        $merged = $arrayStdClass;
 
-        foreach ($b as $k => $v) {
-            if (! empty($v)) {
-                if (is_array($v) && (empty($merged[$k]) || $merged[$k] == (object) [])) {
-                    // k-v map
-                    $merged[$k] = static::mergeAssociateArrayRecursive($merged[$k], $v);
-                } else {
-                    $merged[$k] = $v;
-                }
+        foreach ($arrayAssoc as $k => $v) {
+            if (empty($v)) {
+                continue;
+            }
+            if (is_array($v) && (empty($merged[$k]) || $merged[$k] == (object) [])) {
+                // k-v map
+                $merged[$k] = static::mergeAssociateArrayRecursive($merged[$k], $v);
+            } else {
+                $merged[$k] = $v;
             }
         }
 
@@ -703,8 +710,7 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponseStdClass = (array)json_decode($this->getContent());
-        $decodedResponseAssoc = json_decode($this->getContent(), true);
+        $decodedResponseStdClass = (array) json_decode($this->getContent());
 
         if (is_null($decodedResponseStdClass) || $decodedResponseStdClass === false) {
             if ($this->exception) {
@@ -714,11 +720,11 @@ class TestResponse
             }
         }
 
+        $decodedResponseAssoc = json_decode($this->getContent(), true);
+
         $decodedResponse = static::mergeAssociateArrayRecursive($decodedResponseStdClass, $decodedResponseAssoc);
 
-        $data = data_get($decodedResponse, $key);
-
-        return $data;
+        return data_get($decodedResponse, $key);
     }
 
     /**

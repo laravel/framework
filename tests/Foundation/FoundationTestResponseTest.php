@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Illuminate\Http\JsonResponse;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use PHPUnit\Framework\AssertionFailedError;
@@ -241,16 +241,16 @@ class FoundationTestResponseTest extends TestCase
     public function testAssertEmptyJsonObject()
     {
         $response = new TestResponse((new JsonResponse([
-            'payload' => (object) []
+            'payload' => (object) [],
         ])));
 
-        $response->assertExactJson(['payload' => (object)[]]);
+        $response->assertExactJson(['payload' => (object) []]);
     }
 
     public function testAssertEmptyJsonArray()
     {
         $response = new TestResponse((new JsonResponse([
-            'payload' => []
+            'payload' => [],
         ])));
 
         $response->assertExactJson(['payload' => []]);
