@@ -57,6 +57,24 @@ class TestResponse
         return new static($response);
     }
 
+    public static function mergeAssociateArrayRecursive(array $a, array $b): array
+    {
+        $merged = $a;
+
+        foreach ($b as $k => $v) {
+            if (! empty($v)) {
+                if (is_array($v) && (empty($merged[$k]) || $merged[$k] == (object) [])) {
+                    // k-v map
+                    $merged[$k] = static::mergeAssociateArrayRecursive($merged[$k], $v);
+                } else {
+                    $merged[$k] = $v;
+                }
+            }
+        }
+
+        return $merged;
+    }
+
     /**
      * Assert that the response has a successful status code.
      *
@@ -685,9 +703,10 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = json_decode($this->getContent(), true);
+        $decodedResponseStdClass = (array)json_decode($this->getContent());
+        $decodedResponseAssoc = json_decode($this->getContent(), true);
 
-        if (is_null($decodedResponse) || $decodedResponse === false) {
+        if (is_null($decodedResponseStdClass) || $decodedResponseStdClass === false) {
             if ($this->exception) {
                 throw $this->exception;
             } else {
@@ -695,7 +714,11 @@ class TestResponse
             }
         }
 
-        return data_get($decodedResponse, $key);
+        $decodedResponse = static::mergeAssociateArrayRecursive($decodedResponseStdClass, $decodedResponseAssoc);
+
+        $data = data_get($decodedResponse, $key);
+
+        return $data;
     }
 
     /**
