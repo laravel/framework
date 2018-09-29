@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Illuminate\Http\JsonResponse;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
@@ -235,6 +236,24 @@ class FoundationTestResponseTest extends TestCase
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissing(['id' => 20]);
+    }
+
+    public function testAssertEmptyJsonObject()
+    {
+        $response = new TestResponse((new JsonResponse([
+            'payload' => (object) []
+        ])));
+
+        $response->assertExactJson(['payload' => (object)[]]);
+    }
+
+    public function testAssertEmptyJsonArray()
+    {
+        $response = new TestResponse((new JsonResponse([
+            'payload' => []
+        ])));
+
+        $response->assertExactJson(['payload' => []]);
     }
 
     public function testAssertJsonMissingExact()
