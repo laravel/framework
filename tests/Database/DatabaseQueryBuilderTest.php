@@ -2337,8 +2337,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->shouldReceive('select')->once()
-                ->andReturn([(object)['id' => 1, 'name' => 'Albert']]);
-        $builder->select('*')->get()->map(function($user) {
+                ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
+        $builder->select('*')->get()->map(function ($user) {
             return $user['id'];
         });
     }
@@ -2347,7 +2347,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->shouldReceive('select')->once()
-            ->andReturn([(object)['id' => 1, 'name' => 'Albert']]);
+            ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
         $builder->select('*')->first()['id'];
     }
 
@@ -2355,8 +2355,8 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->shouldReceive('select')->once()
-            ->andReturn([(object)['id' => 1, 'name' => 'Albert']]);
-        $builder->select('*')->get()->map(function($user) {
+            ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
+        $builder->select('*')->get()->map(function ($user) {
             return $user->id;
         });
     }
@@ -2365,7 +2365,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getMySqlBuilderWithProcessor();
         $builder->getConnection()->shouldReceive('select')->once()
-            ->andReturn([(object)['id' => 1, 'name' => 'Albert']]);
+            ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
         $builder->select('*')->first()->id;
     }
 

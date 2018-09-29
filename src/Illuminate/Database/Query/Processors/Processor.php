@@ -18,9 +18,10 @@ class Processor
     {
         if (is_array($results)) {
             foreach ($results as $key => $result) {
-                $results[$key] = new DataWrap((array)$result);
+                $results[$key] = new DataWrap((array) $result);
             }
         }
+
         return $results;
     }
 
