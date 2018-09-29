@@ -3,6 +3,7 @@
 namespace Illuminate\Database\Query\Processors;
 
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\Query\DataWrap;
 
 class Processor
 {
@@ -15,6 +16,12 @@ class Processor
      */
     public function processSelect(Builder $query, $results)
     {
+        if (is_array($results)) {
+            foreach ($results as $key => $result) {
+                $results[$key] = new DataWrap((array) $result);
+            }
+        }
+
         return $results;
     }
 

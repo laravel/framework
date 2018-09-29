@@ -2333,6 +2333,42 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->select('*')->from('foo')->where('bar', '=', 'baz')->lock(false)->get();
     }
 
+    public function testSelectUseArrayAccess()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+                ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
+        $builder->select('*')->get()->map(function ($user) {
+            return $user['id'];
+        });
+    }
+
+    public function testFirstUseArrayAccess()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
+        $builder->select('*')->first()['id'];
+    }
+
+    public function testSelectUseStdClass()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
+        $builder->select('*')->get()->map(function ($user) {
+            return $user->id;
+        });
+    }
+
+    public function testFirstUseStdClass()
+    {
+        $builder = $this->getMySqlBuilderWithProcessor();
+        $builder->getConnection()->shouldReceive('select')->once()
+            ->andReturn([(object) ['id' => 1, 'name' => 'Albert']]);
+        $builder->select('*')->first()->id;
+    }
+
     public function testBindingOrder()
     {
         $expectedSql = 'select * from "users" inner join "othertable" on "bar" = ? where "registered" = ? group by "city" having "population" > ? order by match ("foo") against(?)';
