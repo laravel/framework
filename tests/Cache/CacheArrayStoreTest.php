@@ -32,7 +32,7 @@ class CacheArrayStoreTest extends TestCase
 
     public function testStoreItemForeverProperlyStoresInArray()
     {
-        $mock = $this->getMockBuilder('Illuminate\Cache\ArrayStore')->setMethods(['put'])->getMock();
+        $mock = $this->getMockBuilder(ArrayStore::class)->setMethods(['put'])->getMock();
         $mock->expects($this->once())->method('put')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo(0));
         $mock->forever('foo', 'bar');
     }

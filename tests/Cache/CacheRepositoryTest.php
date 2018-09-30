@@ -8,6 +8,12 @@ use Mockery as m;
 use DateTimeImmutable;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Cache\ArrayStore;
+use Illuminate\Cache\RedisStore;
+use Illuminate\Cache\Repository;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Cache\Store;
 
 class CacheRepositoryTest extends TestCase
 {
@@ -140,9 +146,9 @@ class CacheRepositoryTest extends TestCase
 
     public function testCacheAddCallsRedisStoreAdd()
     {
-        $store = m::mock(\Illuminate\Cache\RedisStore::class);
+        $store = m::mock(RedisStore::class);
         $store->shouldReceive('add')->once()->with('k', 'v', 60)->andReturn(true);
-        $repository = new \Illuminate\Cache\Repository($store);
+        $repository = new Repository($store);
         $this->assertTrue($repository->add('k', 'v', 60));
     }
 
@@ -230,8 +236,8 @@ class CacheRepositoryTest extends TestCase
 
     public function testAllTagsArePassedToTaggableStore()
     {
-        $store = m::mock('Illuminate\Cache\ArrayStore');
-        $repo = new \Illuminate\Cache\Repository($store);
+        $store = m::mock(ArrayStore::class);
+        $repo = new Repository($store);
 
         $taggedCache = m::mock();
         $taggedCache->shouldReceive('setDefaultCacheTime');
@@ -241,8 +247,8 @@ class CacheRepositoryTest extends TestCase
 
     protected function getRepository()
     {
-        $dispatcher = new \Illuminate\Events\Dispatcher(m::mock('Illuminate\Container\Container'));
-        $repository = new \Illuminate\Cache\Repository(m::mock('Illuminate\Contracts\Cache\Store'));
+        $dispatcher = new Dispatcher(m::mock(Container::class));
+        $repository = new Repository(m::mock(Store::class));
 
         $repository->setEventDispatcher($dispatcher);
 
