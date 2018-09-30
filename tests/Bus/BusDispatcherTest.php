@@ -10,8 +10,8 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Queue\Queue;
 use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Config\Repository as Config;
+use Illuminate\Contracts\Queue\ShouldQueue;
 
 class BusDispatcherTest extends TestCase
 {
