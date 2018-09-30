@@ -3282,6 +3282,9 @@ class ValidationValidatorTest extends TestCase
     {
         $trans = $this->getIlluminateArrayTranslator();
 
+        $v = new Validator($trans, [['bar' => 'baz']], ['*.foo' => 'sometimes|required|string']);
+        $this->assertTrue($v->passes());
+
         // $data = ['names' => [['second' => []]]];
         // $v = new Validator($trans, $data, ['names.*.second' => 'sometimes|required']);
         // $this->assertFalse($v->passes());
