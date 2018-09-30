@@ -18,7 +18,34 @@ function remote()
 
 git pull origin $CURRENT_BRANCH
 
-for REMOTE in Broadcasting Bus Cache Config Console Container Contracts Cookie Database Encryption Events Filesystem Hashing Http Log Mail Notifications Pagination Pipeline Queue Redis Routing Session Support Translation Validation View
+for REMOTE in \
+    Broadcasting \
+    Bus \
+    Cache \
+    Config \
+    Console \
+    Container \
+    Contracts \
+    Cookie \
+    Database \
+    Encryption \
+    Events \
+    Filesystem \
+    Hashing \
+    Http \
+    Log \
+    Mail \
+    Notifications \
+    Pagination \
+    Pipeline \
+    Queue \
+    Redis \
+    Routing \
+    Session \
+    Support \
+    Translation \
+    Validation \
+    View
 do
     echo "Splitting $REMOTE"
 
