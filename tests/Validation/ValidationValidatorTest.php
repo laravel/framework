@@ -998,6 +998,10 @@ class ValidationValidatorTest extends TestCase
         $trans->addLines(['validation.in_array' => 'The value of :attribute does not exist in :other.'], 'en');
         $v = new Validator($trans, ['foo' => [1, 2, 3], 'bar' => [1, 2]], ['foo.*' => 'in_array:bar.*']);
         $this->assertEquals('The value of foo.2 does not exist in bar.*.', $v->messages()->first('foo.2'));
+
+        $trans = $this->getIlluminateArrayTranslator();
+        $v = new Validator($trans, ['foo' => '1a', 'bar' => [1]], ['foo' => 'in_array:bar.*']);
+        $this->assertFalse($v->passes());
     }
 
     public function testValidateConfirmed()
