@@ -3,10 +3,14 @@
 namespace Illuminate\Tests\Cache;
 
 use DateTime;
+use stdClass;
 use DateInterval;
 use Mockery as m;
+use Illuminate\Cache\TagSet;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
+use Illuminate\Contracts\Cache\Store;
+use Illuminate\Cache\RedisTaggedCache;
 
 class CacheTaggedCacheTest extends TestCase
 {
@@ -80,13 +84,13 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testRedisCacheTagsPushForeverKeysCorrectly()
     {
-        $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $store = m::mock(Store::class);
+        $tagSet = m::mock(TagSet::class, [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
-        $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $redis = new RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
-        $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
+        $store->shouldReceive('connection')->andReturn($conn = m::mock(stdClass::class));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:forever_ref', 'prefix:'.sha1('foo|bar').':key1');
 
@@ -97,13 +101,13 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testRedisCacheTagsPushStandardKeysCorrectly()
     {
-        $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $store = m::mock(Store::class);
+        $tagSet = m::mock(TagSet::class, [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
         $tagSet->shouldReceive('getNames')->andReturn(['foo', 'bar']);
-        $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $redis = new RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
-        $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
+        $store->shouldReceive('connection')->andReturn($conn = m::mock(stdClass::class));
         $conn->shouldReceive('sadd')->once()->with('prefix:foo:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $conn->shouldReceive('sadd')->once()->with('prefix:bar:standard_ref', 'prefix:'.sha1('foo|bar').':key1');
         $store->shouldReceive('push')->with(sha1('foo|bar').':key1', 'key1:value');
@@ -113,12 +117,12 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testRedisCacheTagsCanBeFlushed()
     {
-        $store = m::mock('Illuminate\Contracts\Cache\Store');
-        $tagSet = m::mock('Illuminate\Cache\TagSet', [$store, ['foo', 'bar']]);
+        $store = m::mock(Store::class);
+        $tagSet = m::mock(TagSet::class, [$store, ['foo', 'bar']]);
         $tagSet->shouldReceive('getNamespace')->andReturn('foo|bar');
-        $redis = new \Illuminate\Cache\RedisTaggedCache($store, $tagSet);
+        $redis = new RedisTaggedCache($store, $tagSet);
         $store->shouldReceive('getPrefix')->andReturn('prefix:');
-        $store->shouldReceive('connection')->andReturn($conn = m::mock('stdClass'));
+        $store->shouldReceive('connection')->andReturn($conn = m::mock(stdClass::class));
 
         // Forever tag keys
         $conn->shouldReceive('smembers')->once()->with('prefix:foo:forever_ref')->andReturn(['key1', 'key2']);

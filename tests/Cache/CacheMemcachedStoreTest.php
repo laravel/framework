@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Cache;
 
 use Memcached;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\MemcachedStore;
 
@@ -63,12 +64,12 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        \Illuminate\Support\Carbon::setTestNow($now = \Illuminate\Support\Carbon::now());
+        Carbon::setTestNow($now = Carbon::now());
         $memcache = $this->getMockBuilder('Memcached')->setMethods(['set'])->getMock();
         $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60));
         $store = new MemcachedStore($memcache);
         $store->put('foo', 'bar', 1);
-        \Illuminate\Support\Carbon::setTestNow();
+        Carbon::setTestNow();
     }
 
     public function testIncrementMethodProperlyCallsMemcache()
@@ -127,7 +128,7 @@ class CacheMemcachedStoreTest extends TestCase
 
         $memcache = $this->getMockBuilder('Memcached')->setMethods(['flush'])->getMock();
         $memcache->expects($this->once())->method('flush')->willReturn(true);
-        $store = new \Illuminate\Cache\MemcachedStore($memcache);
+        $store = new MemcachedStore($memcache);
         $result = $store->flush();
         $this->assertTrue($result);
     }
