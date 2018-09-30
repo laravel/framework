@@ -131,6 +131,7 @@ class Encrypter implements EncrypterContract
      */
     public function decrypt($payload, $unserialize = true)
     {
+        $payload = urldecode($payload);
         $payload = $this->getJsonPayload($payload);
 
         $iv = base64_decode($payload['iv']);
