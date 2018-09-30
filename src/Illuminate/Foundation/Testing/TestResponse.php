@@ -67,6 +67,9 @@ class TestResponse
     {
         $merged = $arrayStdClass;
 
+        // If arrayAssoc key has in $arrayStdClass and value is not empty, replace here.
+        // This converts stdClass to accos array and leaves the empty stdClass
+
         foreach ($arrayAssoc as $k => $v) {
             if (empty($v)) {
                 continue;
