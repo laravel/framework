@@ -58,6 +58,34 @@ class TestResponse
     }
 
     /**
+     * Merge stdClass array and assoc array recursively.
+     * @param  array $arrayStdClass
+     * @param  array $arrayAssoc
+     * @return array
+     */
+    public static function mergeAssociateArrayRecursive(array $arrayStdClass, array $arrayAssoc): array
+    {
+        $merged = $arrayStdClass;
+
+        // If arrayAssoc key has in $arrayStdClass and value is not empty, replace here.
+        // This converts stdClass to accos array and leaves the empty stdClass
+
+        foreach ($arrayAssoc as $k => $v) {
+            if (empty($v)) {
+                continue;
+            }
+            if (is_array($v) && (empty($merged[$k]) || $merged[$k] == (object) [])) {
+                // k-v map
+                $merged[$k] = static::mergeAssociateArrayRecursive($merged[$k], $v);
+            } else {
+                $merged[$k] = $v;
+            }
+        }
+
+        return $merged;
+    }
+
+    /**
      * Assert that the response has a successful status code.
      *
      * @return $this
@@ -685,15 +713,19 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponse = json_decode($this->getContent(), true);
+        $decodedResponseStdClass = (array) json_decode($this->getContent());
 
-        if (is_null($decodedResponse) || $decodedResponse === false) {
+        if (is_null($decodedResponseStdClass) || $decodedResponseStdClass === false) {
             if ($this->exception) {
                 throw $this->exception;
             } else {
                 PHPUnit::fail('Invalid JSON was returned from the route.');
             }
         }
+
+        $decodedResponseAssoc = json_decode($this->getContent(), true);
+
+        $decodedResponse = static::mergeAssociateArrayRecursive($decodedResponseStdClass, $decodedResponseAssoc);
 
         return data_get($decodedResponse, $key);
     }
