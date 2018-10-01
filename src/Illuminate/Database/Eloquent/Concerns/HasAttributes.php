@@ -2,13 +2,13 @@
 
 namespace Illuminate\Database\Eloquent\Concerns;
 
-use function judahnator\JsonManipulator\load_json;
 use LogicException;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Support\Arrayable;
+use function judahnator\JsonManipulator\load_json;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Eloquent\JsonEncodingException;
@@ -492,9 +492,11 @@ trait HasAttributes
                 return $this->fromJson($value);
             case 'json_object':
                 $value ?: $this->attributes[$key] = '{}';
+
                 return load_json($this->attributes[$key]);
             case 'json_array':
                 $value ?: $this->attributes[$key] = '[]';
+
                 return load_json($this->attributes[$key]);
             case 'collection':
                 return new BaseCollection($this->fromJson($value));

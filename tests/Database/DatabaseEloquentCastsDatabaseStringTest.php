@@ -2,10 +2,9 @@
 
 namespace Illuminate\Tests\Database;
 
+use PHPUnit\Framework\TestCase;
 use judahnator\JsonManipulator\JsonArray;
 use judahnator\JsonManipulator\JsonObject;
-use function judahnator\JsonManipulator\load_json;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 
@@ -156,6 +155,6 @@ class TableForCasting extends Eloquent
         'json_attributes' => 'json',
         'object_attributes' => 'object',
         'json_array_attributes' => 'json_array',
-        'json_object_attributes' => 'json_object'
+        'json_object_attributes' => 'json_object',
     ];
 }
