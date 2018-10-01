@@ -24,6 +24,7 @@ use Illuminate\Support\Testing\Fakes\MailFake;
  * @method static bool hasQueued(string $mailable)
  *
  * @see \Illuminate\Mail\Mailer
+ * @see \Illuminate\Support\Testing\Fakes\MailFake
  */
 class Mail extends Facade
 {
