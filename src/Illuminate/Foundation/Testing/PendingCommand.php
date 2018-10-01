@@ -140,7 +140,7 @@ class PendingCommand
             }
         }
 
-        if ($this->expectedExitCode != null) {
+        if ($this->expectedExitCode !== null) {
             $this->test->assertTrue(
                 $exitCode == $this->expectedExitCode,
                 "Expected status code {$this->expectedExitCode} but received {$exitCode}."
