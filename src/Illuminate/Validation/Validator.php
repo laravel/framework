@@ -487,7 +487,7 @@ class Validator implements ValidatorContract
         $data = ValidationData::initializeAndGatherData($attribute, $this->data);
 
         return array_key_exists($attribute, $data)
-                    || in_array($attribute, array_keys($this->data));
+                    || array_key_exists($attribute, $this->data);
     }
 
     /**
@@ -552,7 +552,7 @@ class Validator implements ValidatorContract
         }
 
         if (isset($this->failedRules[$attribute]) &&
-            in_array('uploaded', array_keys($this->failedRules[$attribute]))) {
+            array_key_exists('uploaded', $this->failedRules[$attribute])) {
             return true;
         }
 
