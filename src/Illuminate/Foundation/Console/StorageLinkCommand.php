@@ -11,7 +11,8 @@ class StorageLinkCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'storage:link';
+    protected $signature = 'storage:link
+                            {--force : Force the operation to run when symlink already exists}';
 
     /**
      * The console command description.
@@ -27,11 +28,19 @@ class StorageLinkCommand extends Command
      */
     public function handle()
     {
+        $files = $this->laravel->make('files');
+
         if (file_exists(public_path('storage'))) {
-            return $this->error('The "public/storage" directory already exists.');
+            if (! $this->option('force')) {
+                $this->error('The "public/storage" directory already exists.');
+
+                return;
+            }
+
+            $files->delete(public_path('storage'));
         }
 
-        $this->laravel->make('files')->link(
+        $files->link(
             storage_path('app/public'), public_path('storage')
         );
 
