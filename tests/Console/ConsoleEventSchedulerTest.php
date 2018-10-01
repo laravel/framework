@@ -3,11 +3,14 @@
 namespace Illuminate\Tests\Console;
 
 use Mockery as m;
+use Illuminate\Console\Command;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Console\Scheduling\EventMutex;
+use Illuminate\Console\Scheduling\CacheEventMutex;
 use Illuminate\Console\Scheduling\SchedulingMutex;
+use Illuminate\Console\Scheduling\CacheSchedulingMutex;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
@@ -17,13 +20,11 @@ class ConsoleEventSchedulerTest extends TestCase
 
         $container = Container::getInstance();
 
-        $container->instance('Illuminate\Console\Scheduling\EventMutex', m::mock('Illuminate\Console\Scheduling\CacheEventMutex'));
+        $container->instance(EventMutex::class, m::mock(CacheEventMutex::class));
 
-        $container->instance('Illuminate\Console\Scheduling\SchedulingMutex', m::mock('Illuminate\Console\Scheduling\CacheSchedulingMutex'));
+        $container->instance(SchedulingMutex::class, m::mock(CacheSchedulingMutex::class));
 
-        $container->instance(
-            'Illuminate\Console\Scheduling\Schedule', $this->schedule = new Schedule(m::mock('Illuminate\Console\Scheduling\EventMutex'))
-        );
+        $container->instance(Schedule::class, $this->schedule = new Schedule(m::mock(EventMutex::class)));
     }
 
     public function tearDown()
@@ -104,7 +105,7 @@ class FooClassStub
     }
 }
 
-class ConsoleCommandStub extends \Illuminate\Console\Command
+class ConsoleCommandStub extends Command
 {
     protected $signature = 'foo:bar';
 
