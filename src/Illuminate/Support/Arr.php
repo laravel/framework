@@ -523,14 +523,14 @@ class Arr
             // If the key doesn't exist at this depth, we'll just create an
             // empty array to hold the next value, allowing us to create the
             // arrays to hold the final value at the correct depth.
-            if (isset($array) && !is_array($array)) {
+            if (isset($array) && ! is_array($array)) {
                 $array = [];
             }
 
             $array = &$array[$segment];
         }
 
-        return ($array = $value);
+        return $array = $value;
     }
 
     /**
