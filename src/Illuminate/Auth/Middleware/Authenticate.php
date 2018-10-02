@@ -66,7 +66,7 @@ class Authenticate
 
         $redirectTo = '';
 
-        if ( !$request->wantsJson() ) {
+        if (! $request->wantsJson()) {
             $redirectTo = $this->redirectTo($request);
         }
 
