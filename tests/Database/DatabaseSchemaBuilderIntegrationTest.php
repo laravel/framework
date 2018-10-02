@@ -71,4 +71,39 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
 
         $this->assertTrue($this->db->connection()->getSchemaBuilder()->hasColumn('table1', 'name'));
     }
+
+
+    public function testHasColumnAndIndexWithPrefixIndexDisabled()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => 'example_',
+            'prefix_index' => false,
+        ]);
+
+        $this->db->connection()->getSchemaBuilder()->create('table1', function ($table) {
+            $table->integer('id');
+            $table->string('name')->index();
+        });
+
+        $this->assertTrue(array_key_exists("table1_name_index", $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1')));
+    }
+
+    public function testHasColumnAndIndexWithPrefixIndexEnabled()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'prefix' => 'example_',
+            'prefix_index' => true,
+        ]);
+
+        $this->db->connection()->getSchemaBuilder()->create('table1', function ($table) {
+            $table->integer('id');
+            $table->string('name')->index();
+        });
+
+        $this->assertTrue(array_key_exists("example_table1_name_index", $this->db->connection()->getDoctrineSchemaManager()->listTableIndexes('example_table1')));
+    }
 }
