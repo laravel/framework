@@ -836,8 +836,11 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // type value or get this total count of records deleted for logging, etc.
         $count = 0;
 
-        $ids = $ids instanceof Collection ? $ids->all() :
-            (is_array($ids) ? $ids : func_get_args());
+        if ($ids instanceof Collection) {
+            $ids = $ids->all();
+        }
+
+        $ids = is_array($ids) ? $ids : func_get_args();
 
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
