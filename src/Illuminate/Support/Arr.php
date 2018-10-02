@@ -517,7 +517,14 @@ class Arr
             return $array = $value;
         }
 
-        $parent = null;
+        if (strpos($key, '.') === false) {
+            if (is_array($array)) {
+                return $array[$key] = $value;
+            }
+
+            return $array = [$key => $value];
+        }
+
         $segments = explode('.', $key);
 
         foreach ($segments as $segment) {
@@ -528,15 +535,10 @@ class Arr
                 $array = [];
             }
 
-            $parent = $array;
-
             $array = &$array[$segment];
         }
 
-        $array = $value;
-        $parent[$segment] = $value;
-
-        return $parent;
+        return $array = $value;
     }
 
     /**
