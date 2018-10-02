@@ -195,7 +195,7 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithCollection()
     {
-        $result = EloquentModelDestroyStub::destroy(new \Illuminate\Database\Eloquent\Collection([1,2,3]));
+        $result = EloquentModelDestroyStub::destroy(new \Illuminate\Database\Eloquent\Collection([1, 2, 3]));
     }
 
     public function testWithMethodCallsQueryBuilderCorrectly()
