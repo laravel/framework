@@ -1049,6 +1049,17 @@ class ContainerTest extends TestCase
         $container->get('Taylor');
     }
 
+    /**
+     * @expectedException \Psr\Container\ContainerExceptionInterface
+     */
+    public function testBoundEntriesThrowsContainerExceptionWhenNotResolvable()
+    {
+        $container = new Container;
+        $container->bind('Taylor', IContainerContractStub::class);
+
+        $container->get('Taylor');
+    }
+
     public function testContainerCanResolveClasses()
     {
         $container = new Container;
