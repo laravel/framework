@@ -71,9 +71,10 @@ class Blueprint
      *
      * @param  string  $table
      * @param  \Closure|null  $callback
+     * @param  string  $prefix
      * @return void
      */
-    public function __construct($table, Closure $callback = null, $prefix = null)
+    public function __construct($table, Closure $callback = null, $prefix = '')
     {
         $this->table = $table;
         $this->prefix = $prefix;
