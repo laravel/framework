@@ -3,11 +3,11 @@
 namespace Illuminate\Database\Eloquent\Relations;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\Concerns\IsPivot;
+use Illuminate\Database\Eloquent\Relations\Concerns\AsPivot;
 
 class Pivot extends Model
 {
-    use IsPivot;
+    use AsPivot;
 
     /**
      * The attributes that aren't mass assignable.
