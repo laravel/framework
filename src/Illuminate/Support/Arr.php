@@ -517,6 +517,7 @@ class Arr
             return $array = $value;
         }
 
+        $parent   = null;
         $segments = explode('.', $key);
 
         foreach ($segments as $segment) {
@@ -527,10 +528,16 @@ class Arr
                 $array = [];
             }
 
+            $parent = $array;
+
             $array = &$array[$segment];
         }
 
-        return $array = $value;
+        $array = $value;
+
+        $parent[$segment] = $value;
+
+        return $parent;
     }
 
     /**
