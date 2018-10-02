@@ -191,6 +191,17 @@ class DatabaseEloquentIntegrationTest extends TestCase
         }
     }
 
+    public function testModelRetrievalWithCallableClass()
+    {
+        EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
+        EloquentTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+
+        $this->assertEquals(2, EloquentTestUser::count());
+
+        $this->assertFalse(EloquentTestUser::where(new EmailQuery('taylorotwell@gmail.com'))->doesntExist());
+        $this->assertTrue(EloquentTestUser::where(new EmailQuery('mohamed@laravel.com'))->doesntExist());
+    }
+
     public function testBasicModelCollectionRetrieval()
     {
         EloquentTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
@@ -1819,5 +1830,20 @@ class EloquentTouchingComment extends Eloquent
     public function post()
     {
         return $this->belongsTo('Illuminate\Tests\Database\EloquentTouchingPost', 'post_id');
+    }
+}
+
+class EmailQuery
+{
+    protected $email;
+
+    public function __construct($email)
+    {
+        $this->email = $email;
+    }
+
+    public function __invoke($q)
+    {
+        return $q->where('email', $this->email);
     }
 }
