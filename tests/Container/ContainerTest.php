@@ -1041,12 +1041,20 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Container\EntryNotFoundException
+     * @expectedException \Psr\Container\ContainerExceptionInterface
      */
     public function testUnknownEntryThrowsException()
     {
         $container = new Container;
         $container->get('Taylor');
+    }
+
+    public function testContainerCanResolveClasses()
+    {
+        $container = new Container;
+        $class = $container->get(ContainerConcreteStub::class);
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 }
 

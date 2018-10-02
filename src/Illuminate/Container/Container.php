@@ -606,11 +606,7 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function get($id)
     {
-        if ($this->has($id)) {
-            return $this->resolve($id);
-        }
-
-        throw new EntryNotFoundException;
+        return $this->resolve($id);
     }
 
     /**
