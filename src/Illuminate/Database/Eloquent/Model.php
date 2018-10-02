@@ -7,6 +7,7 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -825,7 +826,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Destroy the models for the given IDs.
      *
-     * @param  array|int  $ids
+     * @param  \Illuminate\Support\Collection|array|int  $ids
      * @return int
      */
     public static function destroy($ids)
@@ -835,7 +836,8 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // type value or get this total count of records deleted for logging, etc.
         $count = 0;
 
-        $ids = is_array($ids) ? $ids : func_get_args();
+        $ids = $ids instanceof Collection ? $ids->all() :
+            (is_array($ids) ? $ids : func_get_args());
 
         // We will actually pull the models from the database table and call delete on
         // each of them individually so that their events get fired properly with a
