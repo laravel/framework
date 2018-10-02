@@ -1041,12 +1041,31 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException \Illuminate\Container\EntryNotFoundException
+     * @expectedException \ReflectionException
      */
     public function testUnknownEntryThrowsException()
     {
         $container = new Container;
         $container->get('Taylor');
+    }
+
+    /**
+     * @expectedException \Psr\Container\ContainerExceptionInterface
+     */
+    public function testBoundEntriesThrowsContainerExceptionWhenNotResolvable()
+    {
+        $container = new Container;
+        $container->bind('Taylor', IContainerContractStub::class);
+
+        $container->get('Taylor');
+    }
+
+    public function testContainerCanResolveClasses()
+    {
+        $container = new Container;
+        $class = $container->get(ContainerConcreteStub::class);
+
+        $this->assertInstanceOf(ContainerConcreteStub::class, $class);
     }
 }
 
