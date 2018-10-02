@@ -662,6 +662,20 @@ if (! function_exists('policy')) {
     }
 }
 
+if (! function_exists('can')) {
+    /**
+     * Determine if the authenticated user has a given ability.
+     *
+     * @param  string  $ability
+     * @param  array|mixed  $arguments
+     * @return bool
+     */
+    function can($ability, $arguments = [])
+    {
+        return app(Gate::class)->check($ability, $arguments);
+    }
+}
+
 if (! function_exists('public_path')) {
     /**
      * Get the path to the public folder.
