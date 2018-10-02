@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Events\Dispatcher;
 use Illuminate\Routing\Controller;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
@@ -63,10 +64,10 @@ class AuthorizesResourcesTest extends TestCase
      */
     protected function assertHasMiddleware($controller, $method, $middleware)
     {
-        $router = new Router(new \Illuminate\Events\Dispatcher);
+        $router = new Router(new Dispatcher);
 
-        $router->aliasMiddleware('can', \Illuminate\Tests\Auth\AuthorizesResourcesMiddleware::class);
-        $router->get($method)->uses(\Illuminate\Tests\Auth\AuthorizesResourcesController::class.'@'.$method);
+        $router->aliasMiddleware('can', AuthorizesResourcesMiddleware::class);
+        $router->get($method)->uses(AuthorizesResourcesController::class.'@'.$method);
 
         $this->assertEquals(
             'caught '.$middleware,

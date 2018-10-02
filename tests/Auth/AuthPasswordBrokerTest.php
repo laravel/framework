@@ -5,7 +5,11 @@ namespace Illuminate\Tests\Auth;
 use Mockery as m;
 use Illuminate\Support\Arr;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Mail\Mailer;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\PasswordBroker;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Auth\Passwords\TokenRepositoryInterface;
 
 class AuthPasswordBrokerTest extends TestCase
 {
@@ -38,7 +42,7 @@ class AuthPasswordBrokerTest extends TestCase
     public function testUserIsRetrievedByCredentials()
     {
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals($user, $broker->getUser(['foo']));
     }
@@ -47,7 +51,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $mocks = $this->getMocks();
         $broker = $this->getMockBuilder(\Illuminate\Auth\Passwords\PasswordBroker::class)->setMethods(['emailResetLink', 'getUri'])->setConstructorArgs(array_values($mocks))->getMock();
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $callback = function () {
         };
@@ -69,7 +73,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $creds = ['password' => 'foo', 'password_confirmation' => 'bar'];
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
         }));
@@ -79,7 +83,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $creds = ['password' => null, 'password_confirmation' => null];
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
         }));
@@ -89,7 +93,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $creds = ['password' => 'abc', 'password_confirmation' => 'abc'];
         $broker = $this->getBroker($mocks = $this->getMocks());
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
         }));
@@ -102,7 +106,7 @@ class AuthPasswordBrokerTest extends TestCase
         $broker->validator(function ($credentials) {
             return strlen($credentials['password']) >= 7;
         });
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBroker::INVALID_PASSWORD, $broker->reset($creds, function () {
         }));
@@ -112,7 +116,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         $creds = ['token' => 'token'];
         $broker = $this->getMockBuilder(\Illuminate\Auth\Passwords\PasswordBroker::class)->setMethods(['validateNewPassword'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();
-        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(Arr::except($creds, ['token']))->andReturn($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class));
+        $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(Arr::except($creds, ['token']))->andReturn($user = m::mock(CanResetPassword::class));
         $broker->expects($this->once())->method('validateNewPassword')->will($this->returnValue(true));
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
@@ -124,7 +128,7 @@ class AuthPasswordBrokerTest extends TestCase
     {
         unset($_SERVER['__password.reset.test']);
         $broker = $this->getMockBuilder(\Illuminate\Auth\Passwords\PasswordBroker::class)->setMethods(['validateReset', 'getPassword', 'getToken'])->setConstructorArgs(array_values($mocks = $this->getMocks()))->getMock();
-        $broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock(\Illuminate\Contracts\Auth\CanResetPassword::class)));
+        $broker->expects($this->once())->method('validateReset')->will($this->returnValue($user = m::mock(CanResetPassword::class)));
         $mocks['tokens']->shouldReceive('delete')->once()->with($user);
         $callback = function ($user, $password) {
             $_SERVER['__password.reset.test'] = compact('user', 'password');
@@ -144,9 +148,9 @@ class AuthPasswordBrokerTest extends TestCase
     protected function getMocks()
     {
         return [
-            'tokens' => m::mock(\Illuminate\Auth\Passwords\TokenRepositoryInterface::class),
-            'users'  => m::mock(\Illuminate\Contracts\Auth\UserProvider::class),
-            'mailer' => m::mock(\Illuminate\Contracts\Mail\Mailer::class),
+            'tokens' => m::mock(TokenRepositoryInterface::class),
+            'users'  => m::mock(UserProvider::class),
+            'mailer' => m::mock(Mailer::class),
             'view'   => 'resetLinkView',
         ];
     }
