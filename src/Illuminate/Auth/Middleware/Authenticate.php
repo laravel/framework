@@ -64,8 +64,14 @@ class Authenticate
             }
         }
 
+        $redirectTo = '';
+
+        if ( !$request->wantsJson() ) {
+            $redirectTo = $this->redirectTo($request);
+        }
+
         throw new AuthenticationException(
-            'Unauthenticated.', $guards, $this->redirectTo($request)
+            'Unauthenticated.', $guards, $redirectTo
         );
     }
 
