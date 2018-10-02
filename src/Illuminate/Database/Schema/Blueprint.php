@@ -22,7 +22,7 @@ class Blueprint
     protected $table;
 
     /**
-     * The prefix of the table the blueprint describes.
+     * The prefix of the table.
      *
      * @var string
      */

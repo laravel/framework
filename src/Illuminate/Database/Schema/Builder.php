@@ -273,7 +273,9 @@ class Builder
      */
     protected function createBlueprint($table, Closure $callback = null)
     {
-        $prefix = $this->connection->getConfig('prefix_indexes') ? $this->connection->getConfig('prefix') : '';
+        $prefix = $this->connection->getConfig('prefix_indexes')
+                    ? $this->connection->getConfig('prefix')
+                    : '';
 
         if (isset($this->resolver)) {
             return call_user_func($this->resolver, $table, $callback, $prefix);
