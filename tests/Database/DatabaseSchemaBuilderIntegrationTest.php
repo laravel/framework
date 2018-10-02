@@ -79,7 +79,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => 'example_',
-            'prefix_index' => false,
+            'prefix_indexes' => false,
         ]);
 
         $this->db->connection()->getSchemaBuilder()->create('table1', function ($table) {
@@ -96,7 +96,7 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
             'driver' => 'sqlite',
             'database' => ':memory:',
             'prefix' => 'example_',
-            'prefix_index' => true,
+            'prefix_indexes' => true,
         ]);
 
         $this->db->connection()->getSchemaBuilder()->create('table1', function ($table) {
