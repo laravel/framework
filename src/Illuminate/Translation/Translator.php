@@ -265,6 +265,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
 
         foreach ($replace as $key => $value) {
             $value = e($value);
+
             $line = str_replace(
                 [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],
                 [$value, Str::upper($value), Str::ucfirst($value)],
