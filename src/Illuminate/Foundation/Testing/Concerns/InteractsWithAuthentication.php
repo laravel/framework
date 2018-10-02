@@ -15,9 +15,7 @@ trait InteractsWithAuthentication
      */
     public function actingAs(UserContract $user, $driver = null)
     {
-        $this->be($user, $driver);
-
-        return $this;
+        return $this->be($user, $driver);
     }
 
     /**
