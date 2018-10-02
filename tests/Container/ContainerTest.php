@@ -1041,11 +1041,22 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException \Psr\Container\ContainerExceptionInterface
+     * @expectedException \ReflectionException
      */
     public function testUnknownEntryThrowsException()
     {
         $container = new Container;
+        $container->get('Taylor');
+    }
+
+    /**
+     * @expectedException \Psr\Container\ContainerExceptionInterface
+     */
+    public function testBoundEntriesThrowsContainerExceptionWhenNotResolvable()
+    {
+        $container = new Container;
+        $container->bind('Taylor', IContainerContractStub::class);
+
         $container->get('Taylor');
     }
 
