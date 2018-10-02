@@ -101,7 +101,6 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
-
     public function testDefaultCurrentTimestamp()
     {
         $base = new Blueprint('users', function ($table) {
