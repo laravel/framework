@@ -206,7 +206,7 @@ class SlackMessage
     /**
      * Get the color for the message.
      *
-     * @return string
+     * @return mixed
      */
     public function color()
     {
