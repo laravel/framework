@@ -517,24 +517,28 @@ class Arr
             return $array = $value;
         }
 
-        $keys = explode('.', $key);
-
-        while (count($keys) > 1) {
-            $key = array_shift($keys);
-
-            // If the key doesn't exist at this depth, we will just create an empty array
-            // to hold the next value, allowing us to create the arrays to hold final
-            // values at the correct depth. Then we'll keep digging into the array.
-            if (! isset($array[$key]) || ! is_array($array[$key])) {
-                $array[$key] = [];
+        if (strpos($key, '.') === false) {
+            if (! is_array($array)) {
+                $array = [];
             }
 
-            $array = &$array[$key];
+            return $array[$key] = $value;
         }
 
-        $array[array_shift($keys)] = $value;
+        $segments = explode('.', $key);
 
-        return $array;
+        foreach ($segments as $segment) {
+            // If the key doesn't exist at this depth, we'll just create an
+            // empty array to hold the next value, allowing us to create the
+            // arrays to hold the final value at the correct depth.
+            if (isset($array) && ! is_array($array)) {
+                $array = [];
+            }
+
+            $array = &$array[$segment];
+        }
+
+        return $array = $value;
     }
 
     /**
