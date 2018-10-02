@@ -3,6 +3,7 @@
 namespace Illuminate\Container;
 
 use Closure;
+use Exception;
 use ArrayAccess;
 use LogicException;
 use ReflectionClass;
@@ -606,7 +607,15 @@ class Container implements ArrayAccess, ContainerContract
      */
     public function get($id)
     {
-        return $this->resolve($id);
+        try {
+            return $this->resolve($id);
+        } catch (Exception $e) {
+            if ($this->has($id)) {
+                throw $e;
+            }
+
+            throw new EntryNotFoundException;
+        }
     }
 
     /**

@@ -1041,7 +1041,7 @@ class ContainerTest extends TestCase
     }
 
     /**
-     * @expectedException \Psr\Container\ContainerExceptionInterface
+     * @expectedException \Illuminate\Container\EntryNotFoundException
      */
     public function testUnknownEntryThrowsException()
     {
