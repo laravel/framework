@@ -18,7 +18,8 @@
         "php": "^7.1.3",
         "illuminate/container": "5.7.*",
         "illuminate/contracts": "5.7.*",
-        "illuminate/support": "5.7.*"
+        "illuminate/support": "5.7.*",
+        "judahnator/json-manipulator": "^1.2"
     },
     "autoload": {
         "psr-4": {
