@@ -518,11 +518,11 @@ class Arr
         }
 
         if (strpos($key, '.') === false) {
-            if (is_array($array)) {
-                return $array[$key] = $value;
+            if (! is_array($array)) {
+                $array = [];
             }
 
-            return $array = [$key => $value];
+            return $array[$key] = $value;
         }
 
         $segments = explode('.', $key);
