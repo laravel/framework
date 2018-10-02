@@ -7,7 +7,6 @@ use ArrayAccess;
 use JsonSerializable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use Illuminate\Support\Collection;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Traits\ForwardsCalls;
@@ -15,6 +14,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
@@ -836,7 +836,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // type value or get this total count of records deleted for logging, etc.
         $count = 0;
 
-        if ($ids instanceof Collection) {
+        if ($ids instanceof BaseCollection) {
             $ids = $ids->all();
         }
 
