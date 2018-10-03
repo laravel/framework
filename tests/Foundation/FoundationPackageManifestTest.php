@@ -18,7 +18,7 @@ class FoundationPackageManifestTest extends TestCase
     }
 
     /** @test */
-    function it_can_stores_a_previous_packages_manifest()
+    public function it_can_stores_a_previous_packages_manifest()
     {
         @unlink(__DIR__.'/fixtures/packages.php');
         @unlink(__DIR__.'/fixtures/packages-previous.php');
