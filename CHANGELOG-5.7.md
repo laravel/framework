@@ -19,7 +19,7 @@
 - Fix `be` method in `InteractsWithAuthentication` trait ([#25873](https://github.com/laravel/framework/pull/25873))
 - Fixes the error when $resource is null ([#25838](https://github.com/laravel/framework/pull/25838))
 - Attach all disk attachments and not only first one in the `Mail/Mailable.php` ([#25793](https://github.com/laravel/framework/pull/25793))
-- Fixed: in case if one job throw exception, than we will proceed to nex one ([#25820](https://github.com/laravel/framework/pull/25820))
+- Fixed: in case if one job throw exception, than we will proceed to next one ([#25820](https://github.com/laravel/framework/pull/25820))
 
 ### Changed
 - Trim model class name when passing in `Authorize.php` middleware ([#25849](https://github.com/laravel/framework/pull/25849))
