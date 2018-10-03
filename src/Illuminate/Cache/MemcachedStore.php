@@ -13,7 +13,7 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
     use InteractsWithTime;
 
     /**
-     * Maximum value of expire period that can be specified as delta (in minutes)
+     * Maximum value of expire period that can be specified as delta (in minutes).
      */
     const REALTIME_MAXDELTA_IN_MINUTES = 60 * 24 * 30;
 
@@ -212,7 +212,7 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
     }
 
     /**
-     * convert the given number of minutes to integer suitable for expire param
+     * convert the given number of minutes to integer suitable for expire param.
      *
      * If it doesn't exceeds 30 days, convert it to number of seconds
      * Otherwise, convert it to unixtime
