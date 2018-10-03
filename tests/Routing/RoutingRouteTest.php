@@ -1129,8 +1129,8 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', [
             'middlewares' => [
-                'index' => 'custom-foo-index'
-            ]
+                'index' => 'custom-foo-index',
+            ],
         ]);
         $routes = $router->getRoutes();
         $routes = $routes->getRoutes();
