@@ -2958,6 +2958,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"', $builder->toSql());
     }
 
+    public function testFromRawOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->fromRaw('dbo.[SomeNameWithRoundBrackets (test)]');
+        $this->assertEquals('select * from dbo.[SomeNameWithRoundBrackets (test)]', $builder->toSql());
+    }
+
     public function testFromRawWithWhereOnTheMainQuery()
     {
         $builder = $this->getBuilder();
