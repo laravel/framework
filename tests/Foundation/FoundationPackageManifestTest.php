@@ -16,4 +16,24 @@ class FoundationPackageManifestTest extends TestCase
         $this->assertEquals(['Foo' => 'Foo\\Facade'], $manifest->aliases());
         unlink(__DIR__.'/fixtures/packages.php');
     }
+
+    /** @test */
+    public function it_can_stores_a_previous_packages_manifest()
+    {
+        @unlink(__DIR__.'/fixtures/packages.php');
+        @unlink(__DIR__.'/fixtures/packages-previous.php');
+
+        $manifest = new PackageManifest(new Filesystem, __DIR__.'/fixtures', __DIR__.'/fixtures/packages.php');
+
+        $manifest->build();
+
+        $this->assertFileNotExists($manifest->previousManifestPath);
+
+        $manifest->storePreviousManifest();
+
+        $this->assertFileEquals($manifest->manifestPath, $manifest->previousManifestPath);
+
+        unlink(__DIR__.'/fixtures/packages.php');
+        unlink(__DIR__.'/fixtures/packages-previous.php');
+    }
 }
