@@ -293,6 +293,10 @@ class Arr
             return $array[$key] ?? value($default);
         }
 
+        $key = str_replace(['[', ']'], '.', $key);
+        $key = str_replace('..', '.', $key);
+        $key = trim($key, '.');
+
         foreach (explode('.', $key) as $segment) {
             if (static::accessible($array) && static::exists($array, $segment)) {
                 $array = $array[$segment];
