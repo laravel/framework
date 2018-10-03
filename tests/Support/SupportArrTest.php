@@ -273,6 +273,100 @@ class SupportArrTest extends TestCase
         $this->assertEmpty(Arr::get([], null, 'default'));
     }
 
+    public function testGetMultiDimension()
+    {
+        $array = [
+            'response' => [
+                'results' => [
+                    [
+                        'value' => 'one',
+                    ],
+                    [
+                        'value' => 'two',
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertEquals(['value' => 'two'], Arr::get($array, 'response.results[1]'));
+
+        $array = [
+            'response' => [
+                'results' => [
+                    [
+                        'value' => 'one',
+                    ],
+                    [
+                        'value' => 'two',
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertEquals('two', Arr::get($array, 'response.results[1].value'));
+
+        $array = [
+            'response' => [
+                'results' => [
+                    [
+                        [
+                            'item' => 'one',
+                        ],
+                        [
+                            'item' => 'two',
+                        ]
+                    ],
+                    [
+                        [
+                            'item' => 'three',
+                        ],
+                        [
+                            'item' => 'four',
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertEquals('three', Arr::get($array, 'response.results[1][0].item'));
+
+        $array = [
+            'response' => [
+                'results' => [
+                    [
+                       'product' => [
+                           'price' => 1,
+                           'images' => [
+                               [
+                                   'alt' => 'Abc 123',
+                               ],
+                               [
+                                   'alt' => 'Abc 234',
+                               ]
+                           ]
+                       ]
+                    ],
+                    [
+                        'product' => [
+                            'price' => 5,
+                            'images' => [
+                                [
+                                    'alt' => 'Abc 222',
+                                ],
+                                [
+                                    'alt' => 'Abc 333',
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $this->assertEquals('Abc 234', Arr::get($array, 'response.results.0.product.images.1.alt'));
+        $this->assertEquals('Abc 234', Arr::get($array, 'response.results[0].product.images.1.alt'));
+    }
+
     public function testHas()
     {
         $array = ['products.desk' => ['price' => 100]];
