@@ -703,6 +703,30 @@ class ContainerTest extends TestCase
         );
     }
 
+    public function testContextualBindingWorksForMultipleClasses()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->when([ContainerTestContextInjectTwo::class, ContainerTestContextInjectThree::class])->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
+
+        $this->assertInstanceOf(
+            ContainerImplementationStub::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
+        );
+
+        $this->assertInstanceOf(
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectTwo::class)->impl
+        );
+
+        $this->assertInstanceOf(
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectThree::class)->impl
+        );
+    }
+
     public function testContextualBindingDoesntOverrideNonContextualResolution()
     {
         $container = new Container;
@@ -1167,6 +1191,15 @@ class ContainerTestContextInjectTwo
     }
 }
 
+class ContainerTestContextInjectThree
+{
+    public $impl;
+
+    public function __construct(IContainerContractStub $impl)
+    {
+        $this->impl = $impl;
+    }
+}
 class ContainerStaticMethodStub
 {
     public static function inject(ContainerConcreteStub $stub, $default = 'taylor')
