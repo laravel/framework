@@ -1591,6 +1591,8 @@ trait ValidatesAttributes
      * @param  mixed  $second
      * @param  string  $operator
      * @return bool
+     *
+     * @throws \InvalidArgumentException
      */
     protected function compare($first, $second, $operator)
     {
