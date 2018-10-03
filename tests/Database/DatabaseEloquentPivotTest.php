@@ -16,7 +16,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPropertiesAreSetCorrectly()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->twice()->andReturn('connection');
         $parent->getConnection()->getQueryGrammar()->shouldReceive('getDateFormat')->andReturn('Y-m-d H:i:s');
         $parent->setDateFormat('Y-m-d H:i:s');
@@ -30,7 +30,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testMutatorsAreCalledFromConstructor()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromAttributes($parent, ['foo' => 'bar'], 'table', true);
@@ -40,7 +40,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testFromRawAttributesDoesNotDoubleMutate()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
         $pivot = DatabaseEloquentPivotTestJsonCastStub::fromRawAttributes($parent, ['foo' => json_encode(['name' => 'Taylor'])], 'table', true);
@@ -50,7 +50,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testFromRawAttributesDoesNotMutate()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
 
         $pivot = DatabaseEloquentPivotTestMutatorStub::fromRawAttributes($parent, ['foo' => 'bar'], 'table', true);
@@ -60,7 +60,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPropertiesUnchangedAreNotDirty()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
 
@@ -69,7 +69,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPropertiesChangedAreDirty()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar', 'shimy' => 'shake'], 'table', true);
         $pivot->shimy = 'changed';
@@ -79,7 +79,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testTimestampPropertyIsSetIfCreatedAtInAttributes()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
+        $parent = m::mock(Model::class.'[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
         $parent->shouldReceive('getDates')->andReturn([]);
         $pivot = DatabaseEloquentPivotTestDateStub::fromAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
@@ -91,7 +91,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testTimestampPropertyIsTrueWhenCreatingFromRawAttributes()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName,getDates]');
+        $parent = m::mock(Model::class.'[getConnectionName,getDates]');
         $parent->shouldReceive('getConnectionName')->andReturn('connection');
         $pivot = Pivot::fromRawAttributes($parent, ['foo' => 'bar', 'created_at' => 'foo'], 'table');
         $this->assertTrue($pivot->timestamps);
@@ -99,7 +99,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testKeysCanBeSetProperly()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model[getConnectionName]');
+        $parent = m::mock(Model::class.'[getConnectionName]');
         $parent->shouldReceive('getConnectionName')->once()->andReturn('connection');
         $pivot = Pivot::fromAttributes($parent, ['foo' => 'bar'], 'table');
         $pivot->setPivotKeys('foreign', 'other');
@@ -110,11 +110,11 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testDeleteMethodDeletesModelByKeys()
     {
-        $pivot = $this->getMockBuilder('Illuminate\Database\Eloquent\Relations\Pivot')->setMethods(['newQuery'])->getMock();
+        $pivot = $this->getMockBuilder(Pivot::class)->setMethods(['newQuery'])->getMock();
         $pivot->setPivotKeys('foreign', 'other');
         $pivot->foreign = 'foreign.value';
         $pivot->other = 'other.value';
-        $query = m::mock('stdClass');
+        $query = m::mock(stdClass::class);
         $query->shouldReceive('where')->once()->with(['foreign' => 'foreign.value', 'other' => 'other.value'])->andReturn($query);
         $query->shouldReceive('delete')->once()->andReturn(true);
         $pivot->expects($this->once())->method('newQuery')->will($this->returnValue($query));
@@ -131,7 +131,7 @@ class DatabaseEloquentPivotTest extends TestCase
 
     public function testPivotModelWithParentReturnsParentsTimestampColumns()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(Model::class);
         $parent->shouldReceive('getCreatedAtColumn')->andReturn('parent_created_at');
         $parent->shouldReceive('getUpdatedAtColumn')->andReturn('parent_updated_at');
 
@@ -153,7 +153,7 @@ class DatabaseEloquentPivotTest extends TestCase
     }
 }
 
-class DatabaseEloquentPivotTestDateStub extends \Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestDateStub extends Pivot
 {
     public function getDates()
     {
@@ -161,7 +161,7 @@ class DatabaseEloquentPivotTestDateStub extends \Illuminate\Database\Eloquent\Re
     }
 }
 
-class DatabaseEloquentPivotTestMutatorStub extends \Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestMutatorStub extends Pivot
 {
     private $mutatorCalled = false;
 
@@ -178,7 +178,7 @@ class DatabaseEloquentPivotTestMutatorStub extends \Illuminate\Database\Eloquent
     }
 }
 
-class DatabaseEloquentPivotTestJsonCastStub extends \Illuminate\Database\Eloquent\Relations\Pivot
+class DatabaseEloquentPivotTestJsonCastStub extends Pivot
 {
     protected $casts = [
         'foo' => 'json',
