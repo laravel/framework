@@ -12,6 +12,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Date;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
 use Illuminate\Validation\ValidationData;
@@ -240,7 +241,7 @@ trait ValidatesAttributes
     {
         try {
             if ($this->isTestingRelativeDateTime($value)) {
-                return new Carbon($value);
+                return Date::parse($value);
             }
 
             return new DateTime($value);
