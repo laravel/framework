@@ -313,7 +313,7 @@ class BelongsToMany extends Relation
     /**
      * Set a where clause for a pivot table column.
      *
-     * @param  string  $column
+     * @param  string|array  $column
      * @param  string  $operator
      * @param  mixed   $value
      * @param  string  $boolean
@@ -323,7 +323,16 @@ class BelongsToMany extends Relation
     {
         $this->pivotWheres[] = func_get_args();
 
-        return $this->where($this->table.'.'.$column, $operator, $value, $boolean);
+        // If the column is an array, we will assume that it is an array of key-value pairs
+        if (is_array($column)) {
+            foreach ($column as $key => $value) {
+                $pivotPrefixedColumn[$this->table.'.'.$key] = $value;
+            }
+        } else {
+            $pivotPrefixedColumn = $this->table.'.'.$column;
+        }
+
+        return $this->where($pivotPrefixedColumn, $operator, $value, $boolean);
     }
 
     /**
