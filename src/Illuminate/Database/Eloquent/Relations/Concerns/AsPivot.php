@@ -209,7 +209,7 @@ trait AsPivot
      */
     public function getCreatedAtColumn()
     {
-        return ($this->pivotParent)
+        return $this->pivotParent
             ? $this->pivotParent->getCreatedAtColumn()
             : parent::getCreatedAtColumn();
     }
@@ -221,7 +221,7 @@ trait AsPivot
      */
     public function getUpdatedAtColumn()
     {
-        return ($this->pivotParent)
+        return $this->pivotParent
             ? $this->pivotParent->getUpdatedAtColumn()
             : parent::getUpdatedAtColumn();
     }
