@@ -42,6 +42,10 @@ class PackageManifest
      */
     public $manifest;
 
+    public $previousManifestPath;
+
+    public $previousManifest;
+
     /**
      * Create a new package manifest instance.
      *
@@ -56,6 +60,12 @@ class PackageManifest
         $this->basePath = $basePath;
         $this->manifestPath = $manifestPath;
         $this->vendorPath = $basePath.'/vendor';
+
+        $this->previousManifestPath = str_replace('packages.php', 'packages-previous.php', $this->manifestPath);
+
+        $this->previousManifest = file_exists($this->previousManifestPath)
+            ? $this->files->getRequire($this->previousManifestPath)
+            : null;
     }
 
     /**
@@ -99,8 +109,19 @@ class PackageManifest
 
         $this->files->get($this->manifestPath, true);
 
-        return $this->manifest = file_exists($this->manifestPath) ?
-            $this->files->getRequire($this->manifestPath) : [];
+        return $this->loadManifest() ?? [];
+    }
+
+    /**
+     * Load the current package manifest.
+     *
+     * @return array
+     */
+    protected function loadManifest()
+    {
+        return $this->manifest = file_exists($this->manifestPath)
+            ? $this->files->getRequire($this->manifestPath)
+            : null;
     }
 
     /**
@@ -125,6 +146,15 @@ class PackageManifest
         })->reject(function ($configuration, $package) use ($ignore, $ignoreAll) {
             return $ignoreAll || in_array($package, $ignore);
         })->filter()->all());
+
+        $this->loadManifest();
+    }
+
+    public function storePreviousManifest()
+    {
+        @unlink($this->previousManifestPath);
+
+        @copy($this->manifestPath, $this->previousManifestPath);
     }
 
     /**

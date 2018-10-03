@@ -29,11 +29,17 @@ class PackageDiscoverCommand extends Command
      */
     public function handle(PackageManifest $manifest)
     {
+        $previousPackages = array_keys($manifest->previousManifest ?? []);
+
         $manifest->build();
 
         foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("Discovered Package: <info>{$package}</info>");
+            $new = in_array($package, $previousPackages) ? '' : ' <comment>(new)</comment>';
+
+            $this->line("Discovered Package: <info>{$package}</info>{$new}");
         }
+
+        $manifest->storePreviousManifest();
 
         $this->info('Package manifest generated successfully.');
     }
