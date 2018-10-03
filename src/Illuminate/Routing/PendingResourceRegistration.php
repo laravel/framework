@@ -137,6 +137,17 @@ class PendingResourceRegistration
     }
 
     /**
+     * @param  array|strings  $middlewares
+     * @return \Illuminate\Routing\PendingResourceRegistration
+     */
+    public function middlewares($middlewares)
+    {
+        $this->options['middlewares'] = $middlewares;
+
+        return $this;
+    }
+
+    /**
      * Set a middleware to the resource.
      *
      * @param  mixed  $middleware

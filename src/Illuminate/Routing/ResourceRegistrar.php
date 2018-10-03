@@ -360,7 +360,23 @@ class ResourceRegistrar
         $action = ['as' => $name, 'uses' => $controller.'@'.$method];
 
         if (isset($options['middleware'])) {
-            $action['middleware'] = $options['middleware'];
+            $action['middleware'] = is_array($options['middleware'])
+                ? implode(',', $options['middleware'])
+                : $options['middleware'];
+        }
+
+        if (isset($options['middlewares']) && isset($options['middlewares'][$method])) {
+            $middleware = $options['middlewares'][$method];
+
+            $middleware = is_array($middleware)
+                ? implode(',', $middleware)
+                : $middleware;
+
+            if (! isset($action['middleware'])) {
+                $action['middleware'] = $middleware;
+            } else {
+                $action['middleware'] .= ','.$middleware;
+            }
         }
 
         return $action;
