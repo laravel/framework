@@ -10,6 +10,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
 use Illuminate\Contracts\Routing\Registrar;
 use Illuminate\Routing\Middleware\SubstituteBindings;
@@ -220,7 +221,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelInstanceAsParameter()
     {
-        $instance = m::mock(\Illuminate\Database\Eloquent\Model::class);
+        $instance = m::mock(Model::class);
 
         $this->gate()->define('success', function ($user, $model) use ($instance) {
             $this->assertSame($model, $instance);

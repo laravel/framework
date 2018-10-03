@@ -8,6 +8,7 @@ use Illuminate\Cookie\CookieJar;
 use Illuminate\Auth\Events\Login;
 use Illuminate\Auth\SessionGuard;
 use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Auth\Events\Attempting;
 use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Contracts\Session\Session;
@@ -307,7 +308,7 @@ class AuthGuardTest extends TestCase
         $provider->shouldReceive('updateRememberToken')->once();
         $events->shouldReceive('dispatch')->once()->with(m::type(Authenticated::class));
         $mock->setUser($user);
-        $events->shouldReceive('dispatch')->once()->with(m::type(\Illuminate\Auth\Events\Logout::class));
+        $events->shouldReceive('dispatch')->once()->with(m::type(Logout::class));
         $mock->logout();
     }
 
