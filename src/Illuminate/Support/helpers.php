@@ -469,7 +469,7 @@ if (! function_exists('data_get')) {
                     $result[] = data_get($item, $key);
                 }
 
-                return $result;
+                return in_array('*', $key) ? Arr::collapse($result) : $result;
             }
 
             if (Arr::accessible($target) && Arr::exists($target, $segment)) {
