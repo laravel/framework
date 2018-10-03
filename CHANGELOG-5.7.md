@@ -1,5 +1,38 @@
 # Release Notes for 5.7.x
 
+## [v5.7.7 (2018-10-02)](https://github.com/laravel/framework/compare/v5.7.6...v5.7.7)
+
+### Added
+- Allow array callables to be passed to Gate::before() ([#25817](https://github.com/laravel/framework/pull/25817))
+- Mail recipient and notifiable can set preferred locale ([#25752](https://github.com/laravel/framework/pull/25752))
+- Always show seeder info ([#25872](https://github.com/laravel/framework/pull/25872))
+- Support JSON UPDATE queries on PostgreSQL ([#25797](https://github.com/laravel/framework/pull/25797))
+- Makes sure changing a database field to JSON does not include a collation ([#25741](https://github.com/laravel/framework/pull/25741))
+- Added Queued Closures ([#25777](https://github.com/laravel/framework/pull/25777))
+- Add the ability to skip algorithm checking ([#25468](https://github.com/laravel/framework/pull/25468), [5fd4b899cc42d266fab34ee2d5f92fb47ca34fd0](https://github.com/laravel/framework/commit/5fd4b899cc42d266fab34ee2d5f92fb47ca34fd0))
+- Add queue create payload hook ([3f68cbe3df82990c69e34309901fcefefdb65c95](https://github.com/laravel/framework/commit/3f68cbe3df82990c69e34309901fcefefdb65c95))
+- Authorize Middleware Accept String Parameters ([#25763](https://github.com/laravel/framework/pull/25763))
+
+### Fixed
+- Fix `each` method on BelongsToMany relationships ([#25832](https://github.com/laravel/framework/pull/25832))
+- Fix prefixed table indexes ([#25867](https://github.com/laravel/framework/pull/25867))
+- Fix `be` method in `InteractsWithAuthentication` trait ([#25873](https://github.com/laravel/framework/pull/25873))
+- Fixes the error when $resource is null ([#25838](https://github.com/laravel/framework/pull/25838))
+- Attach all disk attachments and not only first one in the `Mail/Mailable.php` ([#25793](https://github.com/laravel/framework/pull/25793))
+- Fixed: in case if one job throw exception, than we will proceed to nex one ([#25820](https://github.com/laravel/framework/pull/25820))
+
+### Changed
+- Trim model class name when passing in `Authorize.php` middleware ([#25849](https://github.com/laravel/framework/pull/25849))
+- Improve JSON UPDATE queries on MySQL ([#25794](https://github.com/laravel/framework/pull/25794))
+- Don't print the generated application key ([#25802](https://github.com/laravel/framework/pull/25802))
+- Improve "exists" validation with array values ([#25819](https://github.com/laravel/framework/pull/25819))
+- Only escape trans parameters ([98046cb0c81b418fb4046ade034f3d33a4172239](https://github.com/laravel/framework/commit/98046cb0c81b418fb4046ade034f3d33a4172239))
+- Added type check for assertExitCode(0) ([#25847](https://github.com/laravel/framework/pull/25847))
+
+### Changed (only realization)
+- Simplify `save` method `MorphOneOrMany` relation ([#25864](https://github.com/laravel/framework/pull/25864))
+
+
 ## [v5.7.6 (2018-09-25)](https://github.com/laravel/framework/compare/v5.7.5...v5.7.6)
 
 ### Added
