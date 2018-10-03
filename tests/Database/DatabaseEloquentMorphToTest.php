@@ -4,6 +4,8 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphTo;
 
 class DatabaseEloquentMorphToTest extends TestCase
@@ -90,12 +92,12 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testAssociateMethodSetsForeignKeyAndTypeOnModel()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelationAssociate($parent);
 
-        $associate = m::mock('Illuminate\Database\Eloquent\Model');
+        $associate = m::mock(Model::class);
         $associate->shouldReceive('getKey')->once()->andReturn(1);
         $associate->shouldReceive('getMorphClass')->once()->andReturn('Model');
 
@@ -108,7 +110,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testAssociateMethodIgnoresNullValue()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelationAssociate($parent);
@@ -122,7 +124,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function testDissociateMethodDeletesUnsetsKeyAndTypeOnModel()
     {
-        $parent = m::mock('Illuminate\Database\Eloquent\Model');
+        $parent = m::mock(Model::class);
         $parent->shouldReceive('getAttribute')->once()->with('foreign_key')->andReturn('foreign.value');
 
         $relation = $this->getRelation($parent);
@@ -136,9 +138,9 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     protected function getRelationAssociate($parent)
     {
-        $builder = m::mock('Illuminate\Database\Eloquent\Builder');
+        $builder = m::mock(Builder::class);
         $builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $related = m::mock('Illuminate\Database\Eloquent\Model');
+        $related = m::mock(Model::class);
         $related->shouldReceive('getKey')->andReturn(1);
         $related->shouldReceive('getTable')->andReturn('relation');
         $builder->shouldReceive('getModel')->andReturn($related);
@@ -148,19 +150,19 @@ class DatabaseEloquentMorphToTest extends TestCase
 
     public function getRelation($parent = null, $builder = null)
     {
-        $this->builder = $builder ?: m::mock('Illuminate\Database\Eloquent\Builder');
+        $this->builder = $builder ?: m::mock(Builder::class);
         $this->builder->shouldReceive('where')->with('relation.id', '=', 'foreign.value');
-        $this->related = m::mock('Illuminate\Database\Eloquent\Model');
+        $this->related = m::mock(Model::class);
         $this->related->shouldReceive('getKeyName')->andReturn('id');
         $this->related->shouldReceive('getTable')->andReturn('relation');
         $this->builder->shouldReceive('getModel')->andReturn($this->related);
         $parent = $parent ?: new EloquentMorphToModelStub;
 
-        return m::mock('Illuminate\Database\Eloquent\Relations\MorphTo[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
+        return m::mock(MorphTo::class.'[createModelByType]', [$this->builder, $parent, 'foreign_key', 'id', 'morph_type', 'relation']);
     }
 }
 
-class EloquentMorphToModelStub extends \Illuminate\Database\Eloquent\Model
+class EloquentMorphToModelStub extends Model
 {
     public $foreign_key = 'foreign.value';
 }

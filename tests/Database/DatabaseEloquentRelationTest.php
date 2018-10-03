@@ -3,9 +3,11 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
 
@@ -47,7 +49,7 @@ class DatabaseEloquentRelationTest extends TestCase
         $relation = new HasOne($builder, $parent, 'foreign_key', 'id');
         $related->shouldReceive('getTable')->andReturn('table');
         $related->shouldReceive('getUpdatedAtColumn')->andReturn('updated_at');
-        $now = \Illuminate\Support\Carbon::now();
+        $now = Carbon::now();
         $related->shouldReceive('freshTimestampString')->andReturn($now);
         $builder->shouldReceive('update')->once()->with(['updated_at' => $now]);
 
@@ -120,7 +122,7 @@ class DatabaseEloquentRelationTest extends TestCase
             $anotherBuilder->shouldReceive('where');
             $anotherBuilder->shouldReceive('withoutGlobalScopes')->andReturnSelf();
             $anotherRelation = new HasOne($anotherBuilder, $anotherParent, 'foreign_key', 'id');
-            $now = \Illuminate\Support\Carbon::now();
+            $now = Carbon::now();
             $anotherRelated->shouldReceive('freshTimestampString')->andReturn($now);
             $anotherBuilder->shouldReceive('update')->once()->with(['updated_at' => $now]);
 
@@ -214,7 +216,7 @@ class DatabaseEloquentRelationTest extends TestCase
         Relation::morphMap([EloquentRelationResetModelStub::class]);
 
         $this->assertEquals([
-            'reset' => 'Illuminate\Tests\Database\EloquentRelationResetModelStub',
+            'reset' => EloquentRelationResetModelStub::class,
         ], Relation::morphMap());
 
         Relation::morphMap([], false);
@@ -271,7 +273,7 @@ class EloquentRelationStub extends Relation
     {
     }
 
-    public function match(array $models, \Illuminate\Database\Eloquent\Collection $results, $relation)
+    public function match(array $models, Collection $results, $relation)
     {
     }
 

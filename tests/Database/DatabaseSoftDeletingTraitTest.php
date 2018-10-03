@@ -3,7 +3,9 @@
 namespace Illuminate\Tests\Database;
 
 use Mockery as m;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
@@ -14,9 +16,9 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testDeleteSetsSoftDeletedColumn()
     {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
-        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock('stdClass'));
+        $model->shouldReceive('newModelQuery')->andReturn($query = m::mock(stdClass::class));
         $query->shouldReceive('where')->once()->with('id', 1)->andReturn($query);
         $query->shouldReceive('update')->once()->with([
             'deleted_at' => 'date-time',
@@ -24,12 +26,12 @@ class DatabaseSoftDeletingTraitTest extends TestCase
         ]);
         $model->delete();
 
-        $this->assertInstanceOf(\Illuminate\Support\Carbon::class, $model->deleted_at);
+        $this->assertInstanceOf(Carbon::class, $model->deleted_at);
     }
 
     public function testRestore()
     {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(true);
         $model->shouldReceive('save')->once();
@@ -42,7 +44,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
     public function testRestoreCancel()
     {
-        $model = m::mock('Illuminate\Tests\Database\DatabaseSoftDeletingTraitStub');
+        $model = m::mock(DatabaseSoftDeletingTraitStub::class);
         $model->shouldDeferMissing();
         $model->shouldReceive('fireModelEvent')->with('restoring')->andReturn(false);
         $model->shouldReceive('save')->never();
@@ -53,7 +55,7 @@ class DatabaseSoftDeletingTraitTest extends TestCase
 
 class DatabaseSoftDeletingTraitStub
 {
-    use \Illuminate\Database\Eloquent\SoftDeletes;
+    use SoftDeletes;
     public $deleted_at;
     public $updated_at;
     public $timestamps = true;
@@ -90,7 +92,7 @@ class DatabaseSoftDeletingTraitStub
 
     public function freshTimestamp()
     {
-        return \Illuminate\Support\Carbon::now();
+        return Carbon::now();
     }
 
     public function fromDateTime()

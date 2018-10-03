@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
@@ -19,11 +20,11 @@ class DatabaseSchemaBlueprintTest extends TestCase
 
     public function testToSqlRunsCommandsFromBlueprint()
     {
-        $conn = m::mock('Illuminate\Database\Connection');
+        $conn = m::mock(Connection::class);
         $conn->shouldReceive('statement')->once()->with('foo');
         $conn->shouldReceive('statement')->once()->with('bar');
-        $grammar = m::mock('Illuminate\Database\Schema\Grammars\MySqlGrammar');
-        $blueprint = $this->getMockBuilder('Illuminate\Database\Schema\Blueprint')->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
+        $grammar = m::mock(MySqlGrammar::class);
+        $blueprint = $this->getMockBuilder(Blueprint::class)->setMethods(['toSql'])->setConstructorArgs(['users'])->getMock();
         $blueprint->expects($this->once())->method('toSql')->with($this->equalTo($conn), $this->equalTo($grammar))->will($this->returnValue(['foo', 'bar']));
 
         $blueprint->build($conn, $grammar);
@@ -107,7 +108,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->timestamp('created')->useCurrent();
         });
 
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(Connection::class);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `created` timestamp default CURRENT_TIMESTAMP not null'], $blueprint->toSql($connection, new MySqlGrammar));
@@ -128,7 +129,7 @@ class DatabaseSchemaBlueprintTest extends TestCase
             $table->unsignedDecimal('money', 10, 2)->useCurrent();
         });
 
-        $connection = m::mock('Illuminate\Database\Connection');
+        $connection = m::mock(Connection::class);
 
         $blueprint = clone $base;
         $this->assertEquals(['alter table `users` add `money` decimal(10, 2) unsigned not null'], $blueprint->toSql($connection, new MySqlGrammar));

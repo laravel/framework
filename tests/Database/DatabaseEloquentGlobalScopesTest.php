@@ -4,8 +4,10 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Capsule\Manager as DB;
-use Illuminate\Database\Eloquent\Model as Eloquent;
 
 class DatabaseEloquentGlobalScopesTest extends TestCase
 {
@@ -23,7 +25,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     {
         m::close();
 
-        Eloquent::unsetConnectionResolver();
+        Model::unsetConnectionResolver();
     }
 
     public function testGlobalScopeIsApplied()
@@ -123,7 +125,7 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
     }
 }
 
-class EloquentClosureGlobalScopesTestModel extends \Illuminate\Database\Eloquent\Model
+class EloquentClosureGlobalScopesTestModel extends Model
 {
     protected $table = 'table';
 
@@ -177,7 +179,7 @@ class EloquentClosureGlobalScopesWithOrTestModel extends EloquentClosureGlobalSc
     }
 }
 
-class EloquentGlobalScopesTestModel extends \Illuminate\Database\Eloquent\Model
+class EloquentGlobalScopesTestModel extends Model
 {
     protected $table = 'table';
 
@@ -189,9 +191,9 @@ class EloquentGlobalScopesTestModel extends \Illuminate\Database\Eloquent\Model
     }
 }
 
-class ActiveScope implements \Illuminate\Database\Eloquent\Scope
+class ActiveScope implements Scope
 {
-    public function apply(\Illuminate\Database\Eloquent\Builder $builder, \Illuminate\Database\Eloquent\Model $model)
+    public function apply(Builder $builder, Model $model)
     {
         return $builder->where('active', 1);
     }

@@ -4,7 +4,11 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Connection;
+use Illuminate\Database\Capsule\Manager;
 use Illuminate\Database\Schema\Blueprint;
+use Doctrine\DBAL\Schema\SqliteSchemaManager;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
@@ -92,11 +96,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testDropColumn()
     {
-        if (! class_exists('Doctrine\DBAL\Schema\SqliteSchemaManager')) {
+        if (! class_exists(SqliteSchemaManager::class)) {
             $this->markTestSkipped('Doctrine should be installed to run dropColumn tests');
         }
 
-        $db = new \Illuminate\Database\Capsule\Manager;
+        $db = new Manager;
 
         $db->addConnection([
             'driver' => 'sqlite',
@@ -144,11 +148,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     public function testRenameIndex()
     {
-        if (! class_exists('Doctrine\DBAL\Schema\SqliteSchemaManager')) {
+        if (! class_exists(SqliteSchemaManager::class)) {
             $this->markTestSkipped('Doctrine should be installed to run renameIndex tests');
         }
 
-        $db = new \Illuminate\Database\Capsule\Manager;
+        $db = new Manager;
 
         $db->addConnection([
             'driver' => 'sqlite',
@@ -773,11 +777,11 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
 
     protected function getConnection()
     {
-        return m::mock('Illuminate\Database\Connection');
+        return m::mock(Connection::class);
     }
 
     public function getGrammar()
     {
-        return new \Illuminate\Database\Schema\Grammars\SQLiteGrammar;
+        return new SQLiteGrammar;
     }
 }
