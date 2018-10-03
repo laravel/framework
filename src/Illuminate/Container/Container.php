@@ -142,7 +142,7 @@ class Container implements ArrayAccess, ContainerContract
         if (is_array($concrete)) {
             $alias = [];
 
-            foreach($concrete as $c) {
+            foreach ($concrete as $c) {
                 $alias[] = $this->getAlias($c);
             }
         } else {

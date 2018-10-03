@@ -62,7 +62,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     public function give($implementation)
     {
         if (is_array($this->concrete)) {
-            foreach($this->concrete as $c) {
+            foreach ($this->concrete as $c) {
                 $this->container->addContextualBinding($c, $this->needs, $implementation);
             }
         } else {
