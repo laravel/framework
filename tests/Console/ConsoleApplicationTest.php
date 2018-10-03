@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Console;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Contracts\Events\Dispatcher;
 use Symfony\Component\Console\Command\Command;
 use Illuminate\Contracts\Foundation\Application;
 
