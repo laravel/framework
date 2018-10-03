@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Console;
 use Mockery as m;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Foundation\Application;
 use Illuminate\Console\Scheduling\Event;
 use Illuminate\Console\Scheduling\EventMutex;
 
@@ -32,7 +33,7 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testBasicCronCompilation()
     {
-        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
 
@@ -76,7 +77,7 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testEventIsDueCheck()
     {
-        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
         Carbon::setTestNow(Carbon::create(2015, 1, 1, 0, 0, 0));
@@ -92,7 +93,7 @@ class ConsoleScheduledEventTest extends TestCase
 
     public function testTimeBetweenChecks()
     {
-        $app = m::mock('Illuminate\Foundation\Application[isDownForMaintenance,environment]');
+        $app = m::mock(Application::class.'[isDownForMaintenance,environment]');
         $app->shouldReceive('isDownForMaintenance')->andReturn(false);
         $app->shouldReceive('environment')->andReturn('production');
         Carbon::setTestNow(Carbon::now()->startOfDay()->addHours(9));
