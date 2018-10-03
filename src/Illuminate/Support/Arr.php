@@ -49,21 +49,13 @@ class Arr
         $results = [];
 
         foreach ($array as $values) {
-            if (is_array($values)) {
-                $results = array_merge($results, $values);
-            } elseif ($values instanceof Collection) {
-                $results = array_merge($results, $values->all());
-            } elseif (is_iterable($values)) {
-                foreach ($values as $key => $value) {
-                    if (is_int($key)) {
-                        $results[] = $value;
-                    } else {
-                        $results[$key] = $value;
-                    }
-                }
-            } else {
+            if ($values instanceof Collection) {
+                $values = $values->all();
+            } elseif (! is_array($values)) {
                 continue;
             }
+
+            $results = array_merge($results, $values);
         }
 
         return $results;
