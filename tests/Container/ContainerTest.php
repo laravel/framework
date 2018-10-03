@@ -70,34 +70,34 @@ class ContainerTest extends TestCase
     public function testAutoConcreteResolution()
     {
         $container = new Container;
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $container->make('Illuminate\Tests\Container\ContainerConcreteStub'));
+        $this->assertInstanceOf(ContainerConcreteStub::class, $container->make(ContainerConcreteStub::class));
     }
 
     public function testSharedConcreteResolution()
     {
         $container = new Container;
-        $container->singleton('Illuminate\Tests\Container\ContainerConcreteStub');
+        $container->singleton(ContainerConcreteStub::class);
 
-        $var1 = $container->make('Illuminate\Tests\Container\ContainerConcreteStub');
-        $var2 = $container->make('Illuminate\Tests\Container\ContainerConcreteStub');
+        $var1 = $container->make(ContainerConcreteStub::class);
+        $var2 = $container->make(ContainerConcreteStub::class);
         $this->assertSame($var1, $var2);
     }
 
     public function testAbstractToConcreteResolution()
     {
         $container = new Container;
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $class = $container->make('Illuminate\Tests\Container\ContainerDependentStub');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $class->impl);
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $class = $container->make(ContainerDependentStub::class);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $class->impl);
     }
 
     public function testNestedDependencyResolution()
     {
         $container = new Container;
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $class = $container->make('Illuminate\Tests\Container\ContainerNestedDependentStub');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerDependentStub', $class->inner);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $class->inner->impl);
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $class = $container->make(ContainerNestedDependentStub::class);
+        $this->assertInstanceOf(ContainerDependentStub::class, $class->inner);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $class->inner->impl);
     }
 
     public function testContainerIsPassedToResolvers()
@@ -236,14 +236,14 @@ class ContainerTest extends TestCase
         ContainerLazyExtendStub::$initialized = false;
 
         $container = new Container;
-        $container->bind('Illuminate\Tests\Container\ContainerLazyExtendStub');
-        $container->extend('Illuminate\Tests\Container\ContainerLazyExtendStub', function ($obj, $container) {
+        $container->bind(ContainerLazyExtendStub::class);
+        $container->extend(ContainerLazyExtendStub::class, function ($obj, $container) {
             $obj->init();
 
             return $obj;
         });
         $this->assertFalse(ContainerLazyExtendStub::$initialized);
-        $container->make('Illuminate\Tests\Container\ContainerLazyExtendStub');
+        $container->make(ContainerLazyExtendStub::class);
         $this->assertTrue(ContainerLazyExtendStub::$initialized);
     }
 
@@ -329,8 +329,8 @@ class ContainerTest extends TestCase
     public function testResolutionOfDefaultParameters()
     {
         $container = new Container;
-        $instance = $container->make('Illuminate\Tests\Container\ContainerDefaultValueStub');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $instance->stub);
+        $instance = $container->make(ContainerDefaultValueStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->stub);
         $this->assertEquals('taylor', $instance->default);
     }
 
@@ -365,7 +365,7 @@ class ContainerTest extends TestCase
     public function testResolvingCallbacksAreCalledForType()
     {
         $container = new Container;
-        $container->resolving('stdClass', function ($object) {
+        $container->resolving(stdClass::class, function ($object) {
             return $object->name = 'taylor';
         });
         $container->bind('foo', function () {
@@ -448,7 +448,7 @@ class ContainerTest extends TestCase
     public function testInternalClassWithDefaultParameters()
     {
         $container = new Container;
-        $container->make('Illuminate\Tests\Container\ContainerMixedPrimitiveStub', []);
+        $container->make(ContainerMixedPrimitiveStub::class, []);
     }
 
     /**
@@ -458,7 +458,7 @@ class ContainerTest extends TestCase
     public function testBindingResolutionExceptionMessage()
     {
         $container = new Container;
-        $container->make('Illuminate\Tests\Container\IContainerContractStub', []);
+        $container->make(IContainerContractStub::class, []);
     }
 
     /**
@@ -468,7 +468,7 @@ class ContainerTest extends TestCase
     public function testBindingResolutionExceptionMessageIncludesBuildStack()
     {
         $container = new Container;
-        $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne', []);
+        $container->make(ContainerTestContextInjectOne::class, []);
     }
 
     public function testCallWithDependencies()
@@ -478,14 +478,14 @@ class ContainerTest extends TestCase
             return func_get_args();
         });
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertEquals([], $result[1]);
 
         $result = $container->call(function (stdClass $foo, $bar = []) {
             return func_get_args();
         }, ['bar' => 'taylor']);
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
 
         $stub = new ContainerConcreteStub;
@@ -493,7 +493,7 @@ class ContainerTest extends TestCase
             return func_get_args();
         }, [ContainerConcreteStub::class => $stub]);
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertSame($stub, $result[1]);
 
         /*
@@ -506,7 +506,7 @@ class ContainerTest extends TestCase
         $this->assertInstanceOf('Closure', $result);
         $result = $result();
 
-        $this->assertInstanceOf('stdClass', $result[0]);
+        $this->assertInstanceOf(stdClass::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
     }
 
@@ -523,21 +523,21 @@ class ContainerTest extends TestCase
     public function testCallWithAtSignBasedClassReferences()
     {
         $container = new Container;
-        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@work', ['foo', 'bar']);
+        $result = $container->call(ContainerTestCallStub::class.'@work', ['foo', 'bar']);
         $this->assertEquals(['foo', 'bar'], $result);
 
         $container = new Container;
-        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@inject');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $result[0]);
+        $result = $container->call(ContainerTestCallStub::class.'@inject');
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
 
         $container = new Container;
-        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@inject', ['default' => 'foo']);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $result[0]);
+        $result = $container->call(ContainerTestCallStub::class.'@inject', ['default' => 'foo']);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
         $this->assertEquals('foo', $result[1]);
 
         $container = new Container;
-        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub', ['foo', 'bar'], 'work');
+        $result = $container->call(ContainerTestCallStub::class, ['foo', 'bar'], 'work');
         $this->assertEquals(['foo', 'bar'], $result);
     }
 
@@ -553,7 +553,7 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $result = $container->call('Illuminate\Tests\Container\ContainerStaticMethodStub::inject');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $result[0]);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
     }
 
@@ -561,21 +561,21 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $result = $container->call('Illuminate\Tests\Container\containerTestInject');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $result[0]);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $result[0]);
         $this->assertEquals('taylor', $result[1]);
     }
 
     public function testCallWithBoundMethod()
     {
         $container = new Container;
-        $container->bindMethod('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable', function ($stub) {
+        $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
-        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable');
+        $result = $container->call(ContainerTestCallStub::class.'@unresolvable');
         $this->assertEquals(['foo', 'bar'], $result);
 
         $container = new Container;
-        $container->bindMethod('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable', function ($stub) {
+        $container->bindMethod(ContainerTestCallStub::class.'@unresolvable', function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
@@ -585,14 +585,14 @@ class ContainerTest extends TestCase
     public function testBindMethodAcceptsAnArray()
     {
         $container = new Container;
-        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
-        $result = $container->call('Illuminate\Tests\Container\ContainerTestCallStub@unresolvable');
+        $result = $container->call(ContainerTestCallStub::class.'@unresolvable');
         $this->assertEquals(['foo', 'bar'], $result);
 
         $container = new Container;
-        $container->bindMethod([\Illuminate\Tests\Container\ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
+        $container->bindMethod([ContainerTestCallStub::class, 'unresolvable'], function ($stub) {
             return $stub->unresolvable('foo', 'bar');
         });
         $result = $container->call([new ContainerTestCallStub, 'unresolvable']);
@@ -603,61 +603,58 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStub');
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectTwo')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStub::class);
+        $container->when(ContainerTestContextInjectTwo::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
-        $one = $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-        $two = $container->make('Illuminate\Tests\Container\ContainerTestContextInjectTwo');
+        $one = $container->make(ContainerTestContextInjectOne::class);
+        $two = $container->make(ContainerTestContextInjectTwo::class);
 
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $one->impl);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStubTwo', $two->impl);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $one->impl);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $two->impl);
 
         /*
          * Test With Closures
          */
         $container = new Container;
 
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStub');
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectTwo')->needs('Illuminate\Tests\Container\IContainerContractStub')->give(function ($container) {
-            return $container->make('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStub::class);
+        $container->when(ContainerTestContextInjectTwo::class)->needs(IContainerContractStub::class)->give(function ($container) {
+            return $container->make(ContainerImplementationStubTwo::class);
         });
 
-        $one = $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-        $two = $container->make('Illuminate\Tests\Container\ContainerTestContextInjectTwo');
+        $one = $container->make(ContainerTestContextInjectOne::class);
+        $two = $container->make(ContainerTestContextInjectTwo::class);
 
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $one->impl);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStubTwo', $two->impl);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $one->impl);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $two->impl);
     }
 
     public function testContextualBindingWorksForExistingInstancedBindings()
     {
         $container = new Container;
 
-        $container->instance('Illuminate\Tests\Container\IContainerContractStub', new ContainerImplementationStub);
+        $container->instance(IContainerContractStub::class, new ContainerImplementationStub);
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
-        $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStubTwo',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne')->impl
-        );
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $container->make(ContainerTestContextInjectOne::class)->impl);
     }
 
     public function testContextualBindingWorksForNewlyInstancedBindings()
     {
         $container = new Container;
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
-        $container->instance('Illuminate\Tests\Container\IContainerContractStub', new ContainerImplementationStub);
+        $container->instance(IContainerContractStub::class, new ContainerImplementationStub);
 
         $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStubTwo',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne')->impl
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
         );
     }
 
@@ -666,13 +663,13 @@ class ContainerTest extends TestCase
         $container = new Container;
 
         $container->instance('stub', new ContainerImplementationStub);
-        $container->alias('stub', 'Illuminate\Tests\Container\IContainerContractStub');
+        $container->alias('stub', IContainerContractStub::class);
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
         $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStubTwo',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne')->impl
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
         );
     }
 
@@ -680,14 +677,14 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
         $container->instance('stub', new ContainerImplementationStub);
-        $container->alias('stub', 'Illuminate\Tests\Container\IContainerContractStub');
+        $container->alias('stub', IContainerContractStub::class);
 
         $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStubTwo',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne')->impl
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
         );
     }
 
@@ -695,14 +692,38 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
         $container->bind('stub', ContainerImplementationStub::class);
-        $container->alias('stub', 'Illuminate\Tests\Container\IContainerContractStub');
+        $container->alias('stub', IContainerContractStub::class);
 
         $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStubTwo',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne')->impl
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
+        );
+    }
+
+    public function testContextualBindingWorksForMultipleClasses()
+    {
+        $container = new Container;
+
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+
+        $container->when([ContainerTestContextInjectTwo::class, ContainerTestContextInjectThree::class])->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
+
+        $this->assertInstanceOf(
+            ContainerImplementationStub::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
+        );
+
+        $this->assertInstanceOf(
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectTwo::class)->impl
+        );
+
+        $this->assertInstanceOf(
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectThree::class)->impl
         );
     }
 
@@ -711,18 +732,18 @@ class ContainerTest extends TestCase
         $container = new Container;
 
         $container->instance('stub', new ContainerImplementationStub);
-        $container->alias('stub', 'Illuminate\Tests\Container\IContainerContractStub');
+        $container->alias('stub', IContainerContractStub::class);
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectTwo')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectTwo::class)->needs(IContainerContractStub::class)->give(ContainerImplementationStubTwo::class);
 
         $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStubTwo',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectTwo')->impl
+            ContainerImplementationStubTwo::class,
+            $container->make(ContainerTestContextInjectTwo::class)->impl
         );
 
         $this->assertInstanceOf(
-            'Illuminate\Tests\Container\ContainerImplementationStub',
-            $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne')->impl
+            ContainerImplementationStub::class,
+            $container->make(ContainerTestContextInjectOne::class)->impl
         );
     }
 
@@ -732,17 +753,17 @@ class ContainerTest extends TestCase
 
         $container = new Container;
 
-        $container->instance('Illuminate\Tests\Container\IContainerContractStub', new ContainerImplementationStub);
-        $container->instance('Illuminate\Tests\Container\ContainerTestContextInjectInstantiations', new ContainerTestContextInjectInstantiations);
+        $container->instance(IContainerContractStub::class, new ContainerImplementationStub);
+        $container->instance(ContainerTestContextInjectInstantiations::class, new ContainerTestContextInjectInstantiations);
 
         $this->assertEquals(1, ContainerTestContextInjectInstantiations::$instantiations);
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('Illuminate\Tests\Container\IContainerContractStub')->give('Illuminate\Tests\Container\ContainerTestContextInjectInstantiations');
+        $container->when(ContainerTestContextInjectOne::class)->needs(IContainerContractStub::class)->give(ContainerTestContextInjectInstantiations::class);
 
-        $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-        $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-        $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-        $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
+        $container->make(ContainerTestContextInjectOne::class);
+        $container->make(ContainerTestContextInjectOne::class);
+        $container->make(ContainerTestContextInjectOne::class);
+        $container->make(ContainerTestContextInjectOne::class);
 
         $this->assertEquals(1, ContainerTestContextInjectInstantiations::$instantiations);
     }
@@ -750,20 +771,20 @@ class ContainerTest extends TestCase
     public function testContainerTags()
     {
         $container = new Container;
-        $container->tag('Illuminate\Tests\Container\ContainerImplementationStub', 'foo', 'bar');
-        $container->tag('Illuminate\Tests\Container\ContainerImplementationStubTwo', ['foo']);
+        $container->tag(ContainerImplementationStub::class, 'foo', 'bar');
+        $container->tag(ContainerImplementationStubTwo::class, ['foo']);
 
         $this->assertCount(1, $container->tagged('bar'));
         $this->assertCount(2, $container->tagged('foo'));
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $container->tagged('foo')[0]);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $container->tagged('bar')[0]);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $container->tagged('foo')[0]);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $container->tagged('bar')[0]);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $container->tagged('foo')[1]);
 
         $container = new Container;
-        $container->tag(['Illuminate\Tests\Container\ContainerImplementationStub', 'Illuminate\Tests\Container\ContainerImplementationStubTwo'], ['foo']);
+        $container->tag([ContainerImplementationStub::class, ContainerImplementationStubTwo::class], ['foo']);
         $this->assertCount(2, $container->tagged('foo'));
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $container->tagged('foo')[0]);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStubTwo', $container->tagged('foo')[1]);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $container->tagged('foo')[0]);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $container->tagged('foo')[1]);
 
         $this->assertEmpty($container->tagged('this_tag_does_not_exist'));
     }
@@ -772,10 +793,10 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
         $containerConcreteStub = new ContainerConcreteStub;
-        $container->instance('Illuminate\Tests\Container\ContainerConcreteStub', $containerConcreteStub);
-        $this->assertTrue($container->isShared('Illuminate\Tests\Container\ContainerConcreteStub'));
-        $container->forgetInstance('Illuminate\Tests\Container\ContainerConcreteStub');
-        $this->assertFalse($container->isShared('Illuminate\Tests\Container\ContainerConcreteStub'));
+        $container->instance(ContainerConcreteStub::class, $containerConcreteStub);
+        $this->assertTrue($container->isShared(ContainerConcreteStub::class));
+        $container->forgetInstance(ContainerConcreteStub::class);
+        $this->assertFalse($container->isShared(ContainerConcreteStub::class));
     }
 
     public function testForgetInstancesForgetsAllInstances()
@@ -853,16 +874,16 @@ class ContainerTest extends TestCase
     public function testContainerCanInjectSimpleVariable()
     {
         $container = new Container;
-        $container->when('Illuminate\Tests\Container\ContainerInjectVariableStub')->needs('$something')->give(100);
-        $instance = $container->make('Illuminate\Tests\Container\ContainerInjectVariableStub');
+        $container->when(ContainerInjectVariableStub::class)->needs('$something')->give(100);
+        $instance = $container->make(ContainerInjectVariableStub::class);
         $this->assertEquals(100, $instance->something);
 
         $container = new Container;
-        $container->when('Illuminate\Tests\Container\ContainerInjectVariableStub')->needs('$something')->give(function ($container) {
-            return $container->make('Illuminate\Tests\Container\ContainerConcreteStub');
+        $container->when(ContainerInjectVariableStub::class)->needs('$something')->give(function ($container) {
+            return $container->make(ContainerConcreteStub::class);
         });
-        $instance = $container->make('Illuminate\Tests\Container\ContainerInjectVariableStub');
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerConcreteStub', $instance->something);
+        $instance = $container->make(ContainerInjectVariableStub::class);
+        $this->assertInstanceOf(ContainerConcreteStub::class, $instance->something);
     }
 
     public function testContainerGetFactory()
@@ -894,19 +915,19 @@ class ContainerTest extends TestCase
     {
         $container = new Container;
 
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $container->alias('Illuminate\Tests\Container\IContainerContractStub', 'interface-stub');
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $container->alias(IContainerContractStub::class, 'interface-stub');
 
-        $container->alias('Illuminate\Tests\Container\ContainerImplementationStub', 'stub-1');
+        $container->alias(ContainerImplementationStub::class, 'stub-1');
 
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectOne')->needs('interface-stub')->give('stub-1');
-        $container->when('Illuminate\Tests\Container\ContainerTestContextInjectTwo')->needs('interface-stub')->give('Illuminate\Tests\Container\ContainerImplementationStubTwo');
+        $container->when(ContainerTestContextInjectOne::class)->needs('interface-stub')->give('stub-1');
+        $container->when(ContainerTestContextInjectTwo::class)->needs('interface-stub')->give(ContainerImplementationStubTwo::class);
 
-        $one = $container->make('Illuminate\Tests\Container\ContainerTestContextInjectOne');
-        $two = $container->make('Illuminate\Tests\Container\ContainerTestContextInjectTwo');
+        $one = $container->make(ContainerTestContextInjectOne::class);
+        $two = $container->make(ContainerTestContextInjectTwo::class);
 
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStub', $one->impl);
-        $this->assertInstanceOf('Illuminate\Tests\Container\ContainerImplementationStubTwo', $two->impl);
+        $this->assertInstanceOf(ContainerImplementationStub::class, $one->impl);
+        $this->assertInstanceOf(ContainerImplementationStubTwo::class, $two->impl);
     }
 
     public function testResolvingCallbacksShouldBeFiredWhenCalledWithAliases()
@@ -1013,15 +1034,15 @@ class ContainerTest extends TestCase
     public function testCanBuildWithoutParameterStackWithConstructors()
     {
         $container = new Container;
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
         $this->assertInstanceOf(ContainerDependentStub::class, $container->build(ContainerDependentStub::class));
     }
 
     public function testContainerKnowsEntry()
     {
         $container = new Container;
-        $container->bind('Illuminate\Tests\Container\IContainerContractStub', 'Illuminate\Tests\Container\ContainerImplementationStub');
-        $this->assertTrue($container->has('Illuminate\Tests\Container\IContainerContractStub'));
+        $container->bind(IContainerContractStub::class, ContainerImplementationStub::class);
+        $this->assertTrue($container->has(IContainerContractStub::class));
     }
 
     public function testContainerCanBindAnyWord()
@@ -1170,6 +1191,15 @@ class ContainerTestContextInjectTwo
     }
 }
 
+class ContainerTestContextInjectThree
+{
+    public $impl;
+
+    public function __construct(IContainerContractStub $impl)
+    {
+        $this->impl = $impl;
+    }
+}
 class ContainerStaticMethodStub
 {
     public static function inject(ContainerConcreteStub $stub, $default = 'taylor')

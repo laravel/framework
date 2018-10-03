@@ -31,7 +31,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      * Create a new contextual binding builder.
      *
      * @param  \Illuminate\Container\Container  $container
-     * @param  string  $concrete
+     * @param  string|array  $concrete
      * @return void
      */
     public function __construct(Container $container, $concrete)
@@ -61,8 +61,14 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
      */
     public function give($implementation)
     {
-        $this->container->addContextualBinding(
-            $this->concrete, $this->needs, $implementation
-        );
+        if (is_array($this->concrete)) {
+            foreach ($this->concrete as $c) {
+                $this->container->addContextualBinding($c, $this->needs, $implementation);
+            }
+        } else {
+            $this->container->addContextualBinding(
+                $this->concrete, $this->needs, $implementation
+            );
+        }
     }
 }

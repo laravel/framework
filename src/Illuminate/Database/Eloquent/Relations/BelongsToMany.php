@@ -674,6 +674,24 @@ class BelongsToMany extends Relation
     }
 
     /**
+     * Execute a callback over each item while chunking.
+     *
+     * @param  callable  $callback
+     * @param  int  $count
+     * @return bool
+     */
+    public function each(callable $callback, $count = 1000)
+    {
+        return $this->chunk($count, function ($results) use ($callback) {
+            foreach ($results as $key => $value) {
+                if ($callback($value, $key) === false) {
+                    return false;
+                }
+            }
+        });
+    }
+
+    /**
      * Hydrate the pivot table relationship on the models.
      *
      * @param  array  $models

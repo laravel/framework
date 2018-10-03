@@ -14,6 +14,7 @@ use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Contracts\Queue\QueueableEntity;
 use Illuminate\Database\Eloquent\Relations\Pivot;
 use Illuminate\Contracts\Queue\QueueableCollection;
+use Illuminate\Support\Collection as BaseCollection;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Database\ConnectionResolverInterface as Resolver;
 
@@ -825,7 +826,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     /**
      * Destroy the models for the given IDs.
      *
-     * @param  array|int  $ids
+     * @param  \Illuminate\Support\Collection|array|int  $ids
      * @return int
      */
     public static function destroy($ids)
@@ -834,6 +835,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // for the operation. The developers can then check this number as a boolean
         // type value or get this total count of records deleted for logging, etc.
         $count = 0;
+
+        if ($ids instanceof BaseCollection) {
+            $ids = $ids->all();
+        }
 
         $ids = is_array($ids) ? $ids : func_get_args();
 

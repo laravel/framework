@@ -49,6 +49,20 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo', $t->get('foo::bar.foo'));
     }
 
+    public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLReplacements()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'breeze :foo']);
+        $this->assertSame('breeze &lt;p&gt;test&lt;/p&gt;', $t->trans('foo.bar', ['foo' => '<p>test</p>'], 'en'));
+    }
+
+    public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
+    {
+        $t = new \Illuminate\Translation\Translator($this->getLoader(), 'en');
+        $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'breeze <p>test</p>']);
+        $this->assertSame('breeze <p>test</p>', $t->trans('foo.bar', [], 'en'));
+    }
+
     public function testGetMethodProperlyLoadsAndRetrievesItemWithCapitalization()
     {
         $t = $this->getMockBuilder('Illuminate\Translation\Translator')->setMethods(null)->setConstructorArgs([$this->getLoader(), 'en'])->getMock();

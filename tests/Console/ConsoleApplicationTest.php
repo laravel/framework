@@ -4,6 +4,9 @@ namespace Illuminate\Tests\Console;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Events\Dispatcher;
+use Symfony\Component\Console\Command\Command;
+use Illuminate\Contracts\Foundation\Application;
 
 class ConsoleApplicationTest extends TestCase
 {
@@ -15,8 +18,8 @@ class ConsoleApplicationTest extends TestCase
     public function testAddSetsLaravelInstance()
     {
         $app = $this->getMockConsole(['addToParent']);
-        $command = m::mock('Illuminate\Console\Command');
-        $command->shouldReceive('setLaravel')->once()->with(m::type('Illuminate\Contracts\Foundation\Application'));
+        $command = m::mock(\Illuminate\Console\Command::class);
+        $command->shouldReceive('setLaravel')->once()->with(m::type(Application::class));
         $app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->will($this->returnValue($command));
         $result = $app->add($command);
 
@@ -26,7 +29,7 @@ class ConsoleApplicationTest extends TestCase
     public function testLaravelNotSetOnSymfonyCommands()
     {
         $app = $this->getMockConsole(['addToParent']);
-        $command = m::mock('Symfony\Component\Console\Command\Command');
+        $command = m::mock(Command::class);
         $command->shouldReceive('setLaravel')->never();
         $app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->will($this->returnValue($command));
         $result = $app->add($command);
@@ -37,8 +40,8 @@ class ConsoleApplicationTest extends TestCase
     public function testResolveAddsCommandViaApplicationResolution()
     {
         $app = $this->getMockConsole(['addToParent']);
-        $command = m::mock('Symfony\Component\Console\Command\Command');
-        $app->getLaravel()->shouldReceive('make')->once()->with('foo')->andReturn(m::mock('Symfony\Component\Console\Command\Command'));
+        $command = m::mock(Command::class);
+        $app->getLaravel()->shouldReceive('make')->once()->with('foo')->andReturn(m::mock(Command::class));
         $app->expects($this->once())->method('addToParent')->with($this->equalTo($command))->will($this->returnValue($command));
         $result = $app->resolve('foo');
 
@@ -50,7 +53,7 @@ class ConsoleApplicationTest extends TestCase
         $app = m::mock('Illuminate\Contracts\Foundation\Application', ['version' => '5.8']);
         $events = m::mock('Illuminate\Contracts\Events\Dispatcher', ['dispatch' => null]);
 
-        return $this->getMockBuilder('Illuminate\Console\Application')->setMethods($methods)->setConstructorArgs([
+        return $this->getMockBuilder(\Illuminate\Console\Application::class)->setMethods($methods)->setConstructorArgs([
             $app, $events, 'test-version',
         ])->getMock();
     }

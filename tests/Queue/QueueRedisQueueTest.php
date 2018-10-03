@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Queue;
 
 use Mockery as m;
+use Illuminate\Queue\Queue;
 use PHPUnit\Framework\TestCase;
 
 class QueueRedisQueueTest extends TestCase
@@ -21,6 +22,23 @@ class QueueRedisQueueTest extends TestCase
 
         $id = $queue->push('foo', ['data']);
         $this->assertEquals('foo', $id);
+    }
+
+    public function testPushProperlyPushesJobOntoRedisWithCustomPayloadHook()
+    {
+        $queue = $this->getMockBuilder('Illuminate\Queue\RedisQueue')->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock('Illuminate\Contracts\Redis\Factory'), 'default'])->getMock();
+        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'id' => 'foo', 'attempts' => 0]));
+
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['custom' => 'taylor'];
+        });
+
+        $id = $queue->push('foo', ['data']);
+        $this->assertEquals('foo', $id);
+
+        Queue::createPayloadUsing(null);
     }
 
     public function testDelayedPushProperlyPushesJobOntoRedis()

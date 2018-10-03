@@ -52,6 +52,7 @@ class FreshCommand extends Command
             '--path' => $this->input->getOption('path'),
             '--realpath' => $this->input->getOption('realpath'),
             '--force' => true,
+            '--step' => $this->option('step'),
         ]);
 
         if ($this->needsSeeding()) {
@@ -131,6 +132,8 @@ class FreshCommand extends Command
             ['seed', null, InputOption::VALUE_NONE, 'Indicates if the seed task should be re-run'],
 
             ['seeder', null, InputOption::VALUE_OPTIONAL, 'The class name of the root seeder'],
+
+            ['step', null, InputOption::VALUE_NONE, 'Force the migrations to be run so they can be rolled back individually'],
         ];
     }
 }

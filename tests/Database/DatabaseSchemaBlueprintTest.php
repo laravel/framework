@@ -47,6 +47,24 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
     }
 
+    public function testIndexDefaultNamesWhenPrefixSupplied()
+    {
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->unique(['foo', 'bar']);
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('prefix_users_foo_bar_unique', $commands[0]->index);
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->index('foo');
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('prefix_users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo', null, 'prefix_');
+        $blueprint->spatialIndex('coordinates');
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('prefix_geo_coordinates_spatialindex', $commands[0]->index);
+    }
+
     public function testDropIndexDefaultNames()
     {
         $blueprint = new Blueprint('users');
@@ -63,6 +81,24 @@ class DatabaseSchemaBlueprintTest extends TestCase
         $blueprint->dropSpatialIndex(['coordinates']);
         $commands = $blueprint->getCommands();
         $this->assertEquals('geo_coordinates_spatialindex', $commands[0]->index);
+    }
+
+    public function testDropIndexDefaultNamesWhenPrefixSupplied()
+    {
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->dropUnique(['foo', 'bar']);
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('prefix_users_foo_bar_unique', $commands[0]->index);
+
+        $blueprint = new Blueprint('users', null, 'prefix_');
+        $blueprint->dropIndex(['foo']);
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('prefix_users_foo_index', $commands[0]->index);
+
+        $blueprint = new Blueprint('geo', null, 'prefix_');
+        $blueprint->dropSpatialIndex(['coordinates']);
+        $commands = $blueprint->getCommands();
+        $this->assertEquals('prefix_geo_coordinates_spatialindex', $commands[0]->index);
     }
 
     public function testDefaultCurrentTimestamp()

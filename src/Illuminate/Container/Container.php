@@ -134,12 +134,22 @@ class Container implements ArrayAccess, ContainerContract
     /**
      * Define a contextual binding.
      *
-     * @param  string  $concrete
+     * @param  string|array  $concrete
      * @return \Illuminate\Contracts\Container\ContextualBindingBuilder
      */
     public function when($concrete)
     {
-        return new ContextualBindingBuilder($this, $this->getAlias($concrete));
+        if (is_array($concrete)) {
+            $alias = [];
+
+            foreach ($concrete as $c) {
+                $alias[] = $this->getAlias($c);
+            }
+        } else {
+            $alias = $this->getAlias($concrete);
+        }
+
+        return new ContextualBindingBuilder($this, $alias);
     }
 
     /**
