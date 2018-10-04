@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -522,24 +523,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $eagers = $builder->getEagerLoads();
 
         $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
-        $this->assertInstanceOf('Closure', $eagers['orders']);
-        $this->assertInstanceOf('Closure', $eagers['orders.lines']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
         $builder->with('orders', 'orders.lines');
         $eagers = $builder->getEagerLoads();
 
         $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
-        $this->assertInstanceOf('Closure', $eagers['orders']);
-        $this->assertInstanceOf('Closure', $eagers['orders.lines']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
         $builder->with(['orders.lines']);
         $eagers = $builder->getEagerLoads();
 
         $this->assertEquals(['orders', 'orders.lines'], array_keys($eagers));
-        $this->assertInstanceOf('Closure', $eagers['orders']);
-        $this->assertInstanceOf('Closure', $eagers['orders.lines']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders.lines']);
 
         $builder = $this->getBuilder();
         $builder->with(['orders' => function () {
@@ -555,7 +556,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         }]);
         $eagers = $builder->getEagerLoads();
 
-        $this->assertInstanceOf('Closure', $eagers['orders']);
+        $this->assertInstanceOf(Closure::class, $eagers['orders']);
         $this->assertNull($eagers['orders']());
         $this->assertEquals('foo', $eagers['orders.lines']());
     }

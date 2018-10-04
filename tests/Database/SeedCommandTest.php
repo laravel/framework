@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery;
+use Mockery as m;
 use Illuminate\Database\Seeder;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
@@ -19,19 +19,19 @@ class SeedCommandTest extends TestCase
         $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
         $output = new NullOutput;
 
-        $seeder = Mockery::mock(Seeder::class);
+        $seeder = m::mock(Seeder::class);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();
         $seeder->shouldReceive('setCommand')->once()->andReturnSelf();
         $seeder->shouldReceive('__invoke')->once();
 
-        $resolver = Mockery::mock(ConnectionResolverInterface::class);
+        $resolver = m::mock(ConnectionResolverInterface::class);
         $resolver->shouldReceive('setDefaultConnection')->once()->with('sqlite');
 
-        $container = Mockery::mock(Container::class);
+        $container = m::mock(Container::class);
         $container->shouldReceive('call');
         $container->shouldReceive('environment')->once()->andReturn('testing');
         $container->shouldReceive('make')->with('DatabaseSeeder')->andReturn($seeder);
-        $container->shouldReceive('make')->with(OutputStyle::class, Mockery::any())->andReturn(
+        $container->shouldReceive('make')->with(OutputStyle::class, m::any())->andReturn(
             new OutputStyle($input, $output)
         );
 
@@ -47,6 +47,6 @@ class SeedCommandTest extends TestCase
 
     protected function tearDown()
     {
-        Mockery::close();
+        m::close();
     }
 }
