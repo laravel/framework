@@ -77,7 +77,10 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
             Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
@@ -118,7 +121,10 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
             Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
@@ -158,7 +164,10 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
             Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
@@ -188,7 +197,10 @@ class SendingMailNotificationsTest extends TestCase
 
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
-            $notification->toMail($user)->toArray(),
+            array_merge($notification->toMail($user)->toArray(), [
+                '__laravel_notification' => get_class($notification),
+                '__laravel_notification_queued' => false,
+            ]),
             Mockery::on(function ($closure) {
                 $message = Mockery::mock(\Illuminate\Mail\Message::class);
 
