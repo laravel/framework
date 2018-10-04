@@ -123,7 +123,7 @@ class SupportServiceProviderTest extends TestCase
         $this->assertEquals(['developers' => [['name' => 'Taylor'], ['name' => 'Abigail']]], $provider->testMergeConfigs($array1, $array2));
 
         $array1 = ['jobs' => ['first'  => 'Programmer']];
-        $array2 = ['jobs' => ['second' => 'Teacher',]];
+        $array2 = ['jobs' => ['second' => 'Teacher']];
         $this->assertEquals(['jobs'  => ['first'  => 'Programmer', 'second' => 'Teacher']], $provider->testMergeConfigs($array1, $array2));
 
         $array1 = [0 => ['first' => 'Programmer']];
