@@ -1,5 +1,23 @@
 # Release Notes for 5.7.x
 
+## [v5.7.8 (2018-10-04)](https://github.com/laravel/framework/compare/v5.7.7...v5.7.8)
+
+### Added
+- Add `--step` to `migrate:fresh` command ([#25897](https://github.com/laravel/framework/pull/25897))
+- Allow `destroy` method in `Model` to accept a collection of ids ([#25878](https://github.com/laravel/framework/pull/25878))
+- Add AsPivot trait ([#25851](https://github.com/laravel/framework/pull/25851))
+
+### Fixed
+- Fixed wrap table for sql server ([#25896](https://github.com/laravel/framework/pull/25896))
+
+### Changed
+- Use "optimize:clear" in "app:name" command ([#25922](https://github.com/laravel/framework/pull/25922))
+- Revert of "html string support in translator" ([e626ab32a4afec90f80641fbcd00e6b79d15cd3a](https://github.com/laravel/framework/commit/e626ab32a4afec90f80641fbcd00e6b79d15cd3a))
+
+### Changed (only realization)
+- Simplify code for contextual binding ([e2476c1cdfeffd1c4432ec8dc1f733815f70c000](https://github.com/laravel/framework/commit/e2476c1cdfeffd1c4432ec8dc1f733815f70c000))
+
+
 ## [v5.7.7 (2018-10-02)](https://github.com/laravel/framework/compare/v5.7.6...v5.7.7)
 
 ### Added
