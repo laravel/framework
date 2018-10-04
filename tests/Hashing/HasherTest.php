@@ -3,12 +3,15 @@
 namespace Illuminate\Tests\Hashing;
 
 use PHPUnit\Framework\TestCase;
+use Illuminate\Hashing\ArgonHasher;
+use Illuminate\Hashing\BcryptHasher;
+use Illuminate\Hashing\Argon2IdHasher;
 
 class HasherTest extends TestCase
 {
     public function testBasicBcryptHashing()
     {
-        $hasher = new \Illuminate\Hashing\BcryptHasher;
+        $hasher = new BcryptHasher;
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -23,7 +26,7 @@ class HasherTest extends TestCase
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 
-        $hasher = new \Illuminate\Hashing\ArgonHasher;
+        $hasher = new ArgonHasher;
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -38,7 +41,7 @@ class HasherTest extends TestCase
             $this->markTestSkipped('PHP not compiled with Argon2id hashing support.');
         }
 
-        $hasher = new \Illuminate\Hashing\Argon2IdHasher;
+        $hasher = new Argon2IdHasher;
         $value = $hasher->make('password');
         $this->assertNotSame('password', $value);
         $this->assertTrue($hasher->check('password', $value));
@@ -56,9 +59,9 @@ class HasherTest extends TestCase
             $this->markTestSkipped('PHP not compiled with Argon2i hashing support.');
         }
 
-        $argonHasher = new \Illuminate\Hashing\ArgonHasher(['verify' => true]);
+        $argonHasher = new ArgonHasher(['verify' => true]);
         $argonHashed = $argonHasher->make('password');
-        (new \Illuminate\Hashing\BcryptHasher(['verify' => true]))->check('password', $argonHashed);
+        (new BcryptHasher(['verify' => true]))->check('password', $argonHashed);
     }
 
     /**
@@ -66,9 +69,9 @@ class HasherTest extends TestCase
      */
     public function testBasicArgon2iVerification()
     {
-        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher(['verify' => true]);
+        $bcryptHasher = new BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
-        (new \Illuminate\Hashing\ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
+        (new ArgonHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 
     /**
@@ -76,8 +79,8 @@ class HasherTest extends TestCase
      */
     public function testBasicArgon2idVerification()
     {
-        $bcryptHasher = new \Illuminate\Hashing\BcryptHasher(['verify' => true]);
+        $bcryptHasher = new BcryptHasher(['verify' => true]);
         $bcryptHashed = $bcryptHasher->make('password');
-        (new \Illuminate\Hashing\Argon2IdHasher(['verify' => true]))->check('password', $bcryptHashed);
+        (new Argon2IdHasher(['verify' => true]))->check('password', $bcryptHashed);
     }
 }
