@@ -21,6 +21,13 @@ abstract class ServiceProvider
     protected $defer = false;
 
     /**
+     * Indicates if the configs should be merged recursivelyly.
+     *
+     * @var bool
+     */
+    protected $recursivelyMergeConfigs = false;
+
+    /**
      * The paths that should be published.
      *
      * @var array
@@ -56,7 +63,41 @@ abstract class ServiceProvider
     {
         $config = $this->app['config']->get($key, []);
 
-        $this->app['config']->set($key, array_merge(require $path, $config));
+        $this->app['config']->set($key, $this->mergeConfigs(require $path, $config));
+    }
+
+    /**
+     * Merges the 2 given configs together, and if supplied, it will do it recursively.
+     *
+     * @param  array  $original
+     * @param  array  $merging
+     * @return array
+     */
+    protected function mergeConfigs($original, $merging)
+    {
+        $array = array_merge($original, $merging);
+
+        if (! $this->recursivelyMergeConfigs) {
+            return $array;
+        }
+
+        foreach ($original as $key => $value) {
+            if (! is_array($value)) {
+                continue;
+            }
+
+            if (! Arr::exists($merging, $key)) {
+                continue;
+            }
+
+            if (is_integer($key)) {
+                continue;
+            }
+
+            $array[$key] = $this->mergeConfigs($value, $merging[$key]);
+        }
+
+        return $array;
     }
 
     /**
