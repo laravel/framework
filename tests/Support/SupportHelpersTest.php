@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use stdClass;
 use ArrayAccess;
 use Mockery as m;
+use ArrayIterator;
 use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -432,6 +433,63 @@ class SupportHelpersTest extends TestCase
                 ],
             ],
         ];
+
+        $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
+        $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name', 'irrelevant'));
+        $this->assertEquals([], data_get($array, 'posts.*.users.*.name'));
+    }
+
+    public function testDataGetWithNestedArrayIterators()
+    {
+        $array = new ArrayIterator([
+            new ArrayIterator(['name' => 'taylor', 'email' => 'taylorotwell@gmail.com']),
+            new ArrayIterator(['name' => 'abigail']),
+            new ArrayIterator(['name' => 'dayle']),
+        ]);
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, '*.name'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, '*.email', 'irrelevant'));
+
+        $array = new ArrayIterator([
+            'users' => new ArrayIterator([
+                new ArrayIterator(['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com']),
+                new ArrayIterator(['first' => 'abigail', 'last' => 'otwell']),
+                new ArrayIterator(['first' => 'dayle', 'last' => 'rees']),
+            ]),
+            'posts' => null,
+        ]);
+
+        $this->assertEquals(['taylor', 'abigail', 'dayle'], data_get($array, 'users.*.first'));
+        $this->assertEquals(['taylorotwell@gmail.com', null, null], data_get($array, 'users.*.email', 'irrelevant'));
+        $this->assertEquals('not found', data_get($array, 'posts.*.date', 'not found'));
+        $this->assertNull(data_get($array, 'posts.*.date'));
+    }
+
+    public function testDataGetWithDoubleNestedArrayIteratorsCollapsesResult()
+    {
+        $array = new ArrayIterator([
+            'posts' => new ArrayIterator([
+                new ArrayIterator([
+                    'comments' => new ArrayIterator([
+                        new ArrayIterator(['author' => 'taylor', 'likes' => 4]),
+                        new ArrayIterator(['author' => 'abigail', 'likes' => 3]),
+                    ]),
+                ]),
+                new ArrayIterator([
+                    'comments' => new ArrayIterator([
+                        new ArrayIterator(['author' => 'abigail', 'likes' => 2]),
+                        new ArrayIterator(['author' => 'dayle']),
+                    ]),
+                ]),
+                new ArrayIterator([
+                    'comments' => new ArrayIterator([
+                        new ArrayIterator(['author' => 'dayle']),
+                        new ArrayIterator(['author' => 'taylor', 'likes' => 1]),
+                    ]),
+                ]),
+            ]),
+        ]);
 
         $this->assertEquals(['taylor', 'abigail', 'abigail', 'dayle', 'dayle', 'taylor'], data_get($array, 'posts.*.comments.*.author'));
         $this->assertEquals([4, 3, 2, null, null, 1], data_get($array, 'posts.*.comments.*.likes'));
