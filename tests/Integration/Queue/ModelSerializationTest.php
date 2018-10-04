@@ -4,7 +4,9 @@ namespace Illuminate\Tests\Integration\Queue;
 
 use Schema;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @group integration
@@ -135,7 +137,7 @@ class ModelSerializationTest extends TestCase
         ]);
 
         $serialized = serialize(new ModelSerializationTestClass(
-            new \Illuminate\Database\Eloquent\Collection([$user, $user2])
+            new Collection([$user, $user2])
         ));
 
         unserialize($serialized);
@@ -191,7 +193,7 @@ class ModelSerializationTest extends TestCase
     public function it_serializes_an_empty_collection()
     {
         $serialized = serialize(new ModelSerializationTestClass(
-            new \Illuminate\Database\Eloquent\Collection([])
+            new Collection([])
         ));
 
         unserialize($serialized);
@@ -245,7 +247,7 @@ class Product extends Model
 
 class ModelSerializationTestClass
 {
-    use \Illuminate\Queue\SerializesModels;
+    use SerializesModels;
 
     public $user;
 
@@ -257,7 +259,7 @@ class ModelSerializationTestClass
 
 class ModelRelationSerializationTestClass
 {
-    use \Illuminate\Queue\SerializesModels;
+    use SerializesModels;
 
     public $order;
 

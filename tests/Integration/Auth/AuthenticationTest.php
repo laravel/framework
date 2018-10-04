@@ -2,10 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Auth;
 
+use Illuminate\Auth\Events\Login;
 use Orchestra\Testbench\TestCase;
+use Illuminate\Auth\Events\Failed;
+use Illuminate\Auth\Events\Logout;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Auth\Events\Attempting;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Auth\EloquentUserProvider;
+use Illuminate\Auth\Events\Authenticated;
 use Illuminate\Tests\Integration\Auth\Fixtures\AuthenticationTestUser;
 
 /**
@@ -123,13 +128,13 @@ class AuthenticationTest extends TestCase
         );
         $this->assertFalse($this->app['auth']->check());
         $this->assertNull($this->app['auth']->user());
-        Event::assertDispatched(\Illuminate\Auth\Events\Attempting::class, function ($event) {
+        Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
 
             return true;
         });
-        Event::assertDispatched(\Illuminate\Auth\Events\Failed::class, function ($event) {
+        Event::assertDispatched(Failed::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(['email' => 'wrong', 'password' => 'password'], $event->credentials);
             $this->assertNull($event->user);
@@ -151,19 +156,19 @@ class AuthenticationTest extends TestCase
         $this->assertInstanceOf(AuthenticationTestUser::class, $this->app['auth']->user());
         $this->assertTrue($this->app['auth']->check());
 
-        Event::assertDispatched(\Illuminate\Auth\Events\Attempting::class, function ($event) {
+        Event::assertDispatched(Attempting::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(['email' => 'email', 'password' => 'password'], $event->credentials);
 
             return true;
         });
-        Event::assertDispatched(\Illuminate\Auth\Events\Login::class, function ($event) {
+        Event::assertDispatched(Login::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
             return true;
         });
-        Event::assertDispatched(\Illuminate\Auth\Events\Authenticated::class, function ($event) {
+        Event::assertDispatched(Authenticated::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
@@ -194,7 +199,7 @@ class AuthenticationTest extends TestCase
 
         $this->app['auth']->logout();
         $this->assertNull($this->app['auth']->user());
-        Event::assertDispatched(\Illuminate\Auth\Events\Logout::class, function ($event) {
+        Event::assertDispatched(Logout::class, function ($event) {
             $this->assertEquals('web', $event->guard);
             $this->assertEquals(1, $event->user->id);
 
