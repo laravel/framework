@@ -51,6 +51,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     protected $selector;
 
     /**
+     * A parameter that determines if parameters should be escaped.
+     *
+     * @var bool
+     */
+    protected $escaping_params = true;
+
+    /**
      * Create a new translator instance.
      *
      * @param  \Illuminate\Contracts\Translation\Loader  $loader
@@ -94,10 +101,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  string  $key
      * @param  array   $replace
      * @param  string  $locale
+     * @param  bool    $escaping_params
      * @return string|array|null
      */
-    public function trans($key, array $replace = [], $locale = null)
+    public function trans($key, array $replace = [], $locale = null, $escaping_params = false)
     {
+        $this->escaping_params = $escaping_params;
+
         return $this->get($key, $replace, $locale);
     }
 
@@ -142,13 +152,16 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * Get the translation for a given key from the JSON translation files.
      *
      * @param  string  $key
-     * @param  array  $replace
+     * @param  array   $replace
      * @param  string  $locale
+     * @param  bool    $escaping_params
      * @return string|array|null
      */
-    public function getFromJson($key, array $replace = [], $locale = null)
+    public function getFromJson($key, array $replace = [], $locale = null, $escaping_params = true)
     {
         $locale = $locale ?: $this->locale;
+
+        $this->escaping_params = $escaping_params;
 
         // For JSON translations, there is only one file per locale, so we will simply load
         // that file and then we will be ready to check the array for the key. These are
@@ -178,10 +191,13 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @param  int|array|\Countable  $number
      * @param  array   $replace
      * @param  string  $locale
+     * @param  bool    $escaping_params
      * @return string
      */
-    public function transChoice($key, $number, array $replace = [], $locale = null)
+    public function transChoice($key, $number, array $replace = [], $locale = null, $escaping_params = true)
     {
+        $this->escaping_params = $escaping_params;
+
         return $this->choice($key, $number, $replace, $locale);
     }
 
@@ -264,7 +280,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            $value = e($value);
+            if ($this->escaping_params) {
+                $value = e($value);
+            }
 
             $line = str_replace(
                 [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],

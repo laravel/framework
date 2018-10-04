@@ -903,15 +903,16 @@ if (! function_exists('trans')) {
      * @param  string  $key
      * @param  array   $replace
      * @param  string  $locale
+     * @param  bool    $escaping_params
      * @return \Illuminate\Contracts\Translation\Translator|string|array|null
      */
-    function trans($key = null, $replace = [], $locale = null)
+    function trans($key = null, $replace = [], $locale = null, $escaping_params = true)
     {
         if (is_null($key)) {
             return app('translator');
         }
 
-        return app('translator')->trans($key, $replace, $locale);
+        return app('translator')->trans($key, $replace, $locale, $escaping_params);
     }
 }
 
@@ -923,11 +924,12 @@ if (! function_exists('trans_choice')) {
      * @param  int|array|\Countable  $number
      * @param  array   $replace
      * @param  string  $locale
+     * @param  bool    $escaping_params
      * @return string
      */
-    function trans_choice($key, $number, array $replace = [], $locale = null)
+    function trans_choice($key, $number, array $replace = [], $locale = null, $escaping_params = true)
     {
-        return app('translator')->transChoice($key, $number, $replace, $locale);
+        return app('translator')->transChoice($key, $number, $replace, $locale, $escaping_params);
     }
 }
 
@@ -936,13 +938,14 @@ if (! function_exists('__')) {
      * Translate the given message.
      *
      * @param  string  $key
-     * @param  array  $replace
+     * @param  array   $replace
      * @param  string  $locale
+     * @param  bool    $escaping_params
      * @return string|array|null
      */
-    function __($key, $replace = [], $locale = null)
+    function __($key, $replace = [], $locale = null, $escaping_params = true)
     {
-        return app('translator')->getFromJson($key, $replace, $locale);
+        return app('translator')->getFromJson($key, $replace, $locale, $escaping_params);
     }
 }
 
