@@ -36,8 +36,8 @@ class ModelNotFoundException extends RuntimeException
         $this->message = "No query results for model [{$model}]";
 
         $this->message = count($this->ids) > 0
-            ? $this->message . ' ' . implode(', ', $this->ids)
-            : $this->message . '.';
+            ? $this->message.' '.implode(', ', $this->ids)
+            : $this->message.'.';
 
         return $this;
     }
