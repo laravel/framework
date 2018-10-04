@@ -8,7 +8,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcaster extends Broadcaster
 {
-    use UsePusherChannelsNames;
+    use UsePusherChannelConventions;
 
     /**
      * The Redis instance.

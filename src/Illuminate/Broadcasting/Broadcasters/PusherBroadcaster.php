@@ -10,7 +10,7 @@ use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class PusherBroadcaster extends Broadcaster
 {
-    use UsePusherChannelsNames;
+    use UsePusherChannelConventions;
 
     /**
      * The Pusher SDK instance.

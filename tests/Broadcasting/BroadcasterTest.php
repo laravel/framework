@@ -253,7 +253,7 @@ class BroadcasterTest extends TestCase
      */
     public function testChannelNameMatchPattern($channel, $pattern, $shouldMatch)
     {
-        $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchPattern($channel, $pattern));
+        $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));
     }
 
     public function channelNameMatchPatternProvider() {
@@ -302,9 +302,9 @@ class FakeBroadcaster extends Broadcaster
         return parent::retrieveUser($request, $channel);
     }
 
-    public function channelNameMatchPattern($channel, $pattern)
+    public function channelNameMatchesPattern($channel, $pattern)
     {
-        return parent::channelNameMatchPattern($channel, $pattern);
+        return parent::channelNameMatchesPattern($channel, $pattern);
     }
 }
 

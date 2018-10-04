@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Broadcasting;
 
 use Illuminate\Broadcasting\Broadcasters\Broadcaster;
-use Illuminate\Broadcasting\Broadcasters\UsePusherChannelsNames;
+use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 
-class UsePusherChannelsNamesTest extends TestCase
+class UsePusherChannelConventionsTest extends TestCase
 {
     /**
      * @var \Illuminate\Broadcasting\Broadcasters\RedisBroadcaster
@@ -93,7 +93,7 @@ class UsePusherChannelsNamesTest extends TestCase
 
 class FakeBroadcasterUsingPusherChannelsNames extends Broadcaster
 {
-    use UsePusherChannelsNames;
+    use UsePusherChannelConventions;
 
     public function auth($request)
     {

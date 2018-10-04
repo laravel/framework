@@ -27,7 +27,7 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @var array
      */
-    protected $channelsOptions = [];
+    protected $channelOptions = [];
 
     /**
      * The binding registrar instance.
@@ -48,7 +48,7 @@ abstract class Broadcaster implements BroadcasterContract
     {
         $this->channels[$channel] = $callback;
 
-        $this->channelsOptions[$channel] = $options;
+        $this->channelOptions[$channel] = $options;
 
         return $this;
     }
@@ -65,7 +65,7 @@ abstract class Broadcaster implements BroadcasterContract
     protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
-            if (! $this->channelNameMatchPattern($channel, $pattern)) {
+            if (! $this->channelNameMatchesPattern($channel, $pattern)) {
                 continue;
             }
 
@@ -273,26 +273,7 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Retrieve options for a certain channel
-     *
-     * @param  string  $channel
-     * @return array
-     */
-    protected function retrieveChannelOptions($channel)
-    {
-        foreach ($this->channelsOptions as $pattern => $opts) {
-            if (! $this->channelNameMatchPattern($channel, $pattern)) {
-                continue;
-            }
-
-            return $opts;
-        }
-
-        return [];
-    }
-
-    /**
-     * Retrieve request user using optional guards
+     * Retrieve the authenticated user using the configured guard (if any).
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $channel
@@ -308,9 +289,7 @@ abstract class Broadcaster implements BroadcasterContract
             return $request->user();
         }
 
-        $guards = Arr::wrap($guards);
-
-        foreach ($guards as $guard) {
+        foreach (Arr::wrap($guards) as $guard) {
             if ($user = $request->user($guard)) {
                 return $user;
             }
@@ -320,13 +299,32 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
+     * Retrieve options for a certain channel
+     *
+     * @param  string  $channel
+     * @return array
+     */
+    protected function retrieveChannelOptions($channel)
+    {
+        foreach ($this->channelOptions as $pattern => $options) {
+            if (! $this->channelNameMatchesPattern($channel, $pattern)) {
+                continue;
+            }
+
+            return $options;
+        }
+
+        return [];
+    }
+
+    /**
      * Check if channel name from request match a pattern from registered channels
      *
      * @param  string  $channel
      * @param  string  $pattern
      * @return bool
      */
-    protected function channelNameMatchPattern($channel, $pattern)
+    protected function channelNameMatchesPattern($channel, $pattern)
     {
         return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
     }

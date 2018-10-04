@@ -4,7 +4,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Str;
 
-trait UsePusherChannelsNames
+trait UsePusherChannelConventions
 {
     /**
      * Return true if channel is protected by authentication
