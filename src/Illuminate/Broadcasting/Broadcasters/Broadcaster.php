@@ -5,6 +5,7 @@ namespace Illuminate\Broadcasting\Broadcasters;
 use Exception;
 use ReflectionClass;
 use ReflectionFunction;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\UrlRoutable;
@@ -22,6 +23,13 @@ abstract class Broadcaster implements BroadcasterContract
     protected $channels = [];
 
     /**
+     * The registered channel options.
+     *
+     * @var array
+     */
+    protected $channelsOptions = [];
+
+    /**
      * The binding registrar instance.
      *
      * @var \Illuminate\Contracts\Routing\BindingRegistrar
@@ -33,11 +41,14 @@ abstract class Broadcaster implements BroadcasterContract
      *
      * @param  string  $channel
      * @param  callable|string  $callback
+     * @param  array  $options
      * @return $this
      */
-    public function channel($channel, $callback)
+    public function channel($channel, $callback, $options = [])
     {
         $this->channels[$channel] = $callback;
+
+        $this->channelsOptions[$channel] = $options;
 
         return $this;
     }
@@ -54,7 +65,7 @@ abstract class Broadcaster implements BroadcasterContract
     protected function verifyUserCanAccessChannel($request, $channel)
     {
         foreach ($this->channels as $pattern => $callback) {
-            if (! Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel)) {
+            if (! $this->channelNameMatchPattern($channel, $pattern)) {
                 continue;
             }
 
@@ -62,7 +73,7 @@ abstract class Broadcaster implements BroadcasterContract
 
             $handler = $this->normalizeChannelHandlerToCallable($callback);
 
-            if ($result = $handler($request->user(), ...$parameters)) {
+            if ($result = $handler($this->retrieveUser($request, $channel), ...$parameters)) {
                 return $this->validAuthenticationResponse($request, $result);
             }
         }
@@ -259,5 +270,64 @@ abstract class Broadcaster implements BroadcasterContract
                 ->make($callback)
                 ->join(...$args);
         };
+    }
+
+    /**
+     * Retrieve options for a certain channel
+     *
+     * @param  string  $channel
+     * @return array
+     */
+    protected function retrieveChannelOptions($channel)
+    {
+        foreach ($this->channelsOptions as $pattern => $opts) {
+            if (! $this->channelNameMatchPattern($channel, $pattern)) {
+                continue;
+            }
+
+            return $opts;
+        }
+
+        return [];
+    }
+
+    /**
+     * Retrieve request user using optional guards
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $channel
+     * @return mixed
+     */
+    protected function retrieveUser($request, $channel)
+    {
+        $options = $this->retrieveChannelOptions($channel);
+
+        $guards = $options['guards'] ?? null;
+
+        if (is_null($guards)) {
+            return $request->user();
+        }
+
+        $guards = Arr::wrap($guards);
+
+        foreach ($guards as $guard) {
+            if ($user = $request->user($guard)) {
+                return $user;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Check if channel name from request match a pattern from registered channels
+     *
+     * @param  string  $channel
+     * @param  string  $pattern
+     * @return bool
+     */
+    protected function channelNameMatchPattern($channel, $pattern)
+    {
+        return Str::is(preg_replace('/\{(.*?)\}/', '*', $pattern), $channel);
     }
 }

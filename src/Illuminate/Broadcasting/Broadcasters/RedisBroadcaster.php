@@ -3,12 +3,13 @@
 namespace Illuminate\Broadcasting\Broadcasters;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Redis\Factory as Redis;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 class RedisBroadcaster extends Broadcaster
 {
+    use UsePusherChannelsNames;
+
     /**
      * The Redis instance.
      *
@@ -46,14 +47,12 @@ class RedisBroadcaster extends Broadcaster
      */
     public function auth($request)
     {
-        if (Str::startsWith($request->channel_name, ['private-', 'presence-']) &&
-            ! $request->user()) {
+        $channelName = $this->normalizeChannelName($request->channel_name);
+
+        if ($this->isGuardedChannel($request->channel_name) &&
+            ! $this->retrieveUser($request, $channelName)) {
             throw new AccessDeniedHttpException;
         }
-
-        $channelName = Str::startsWith($request->channel_name, 'private-')
-                            ? Str::replaceFirst('private-', '', $request->channel_name)
-                            : Str::replaceFirst('presence-', '', $request->channel_name);
 
         return parent::verifyUserCanAccessChannel(
             $request, $channelName
@@ -73,8 +72,10 @@ class RedisBroadcaster extends Broadcaster
             return json_encode($result);
         }
 
+        $channelName = $this->normalizeChannelName($request->channel_name);
+
         return json_encode(['channel_data' => [
-            'user_id' => $request->user()->getAuthIdentifier(),
+            'user_id' => $this->retrieveUser($request, $channelName)->getAuthIdentifier(),
             'user_info' => $result,
         ]]);
     }
