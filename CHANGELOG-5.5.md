@@ -1,5 +1,15 @@
 # Release Notes for 5.5.x
 
+## v5.5.44 (2018-10-04)
+
+### Changed
+- Revert of "Patch Blade's `@lang` directive", so it is not escapes HTML tags ([0b7b3713e81fe571c244c2cf5d1f5085b6985f96](https://github.com/laravel/framework/commit/0b7b3713e81fe571c244c2cf5d1f5085b6985f96))
+
+### Fixed
+- Fix pivot timestamp columns without parent ([#25746](https://github.com/laravel/framework/pull/25746))
+- Fix "sometimes" validation ([#25852](https://github.com/laravel/framework/pull/25852))
+
+
 ## v5.5.43 (2018-09-02)
 
 ### Changed
