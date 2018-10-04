@@ -13,10 +13,10 @@ trait WithoutEvents
      */
     public function disableEventsForAllTests()
     {
-        if (method_exists($this, 'withoutEvents')) {
-            $this->withoutEvents();
-        } else {
+        if (! method_exists($this, 'withoutEvents')) {
             throw new Exception('Unable to disable events. ApplicationTrait not used.');
         }
+
+        $this->withoutEvents();
     }
 }

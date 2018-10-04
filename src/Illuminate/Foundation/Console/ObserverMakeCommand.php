@@ -69,11 +69,9 @@ class ObserverMakeCommand extends GeneratorCommand
 
         $namespaceModel = $this->laravel->getNamespace().$model;
 
-        if (Str::startsWith($model, '\\')) {
-            $stub = str_replace('NamespacedDummyModel', trim($model, '\\'), $stub);
-        } else {
-            $stub = str_replace('NamespacedDummyModel', $namespaceModel, $stub);
-        }
+        $stub = Str::startsWith($model, '\\')
+            ? str_replace('NamespacedDummyModel', trim($model, '\\'), $stub)
+            : str_replace('NamespacedDummyModel', $namespaceModel, $stub);
 
         $stub = str_replace(
             "use {$namespaceModel};\nuse {$namespaceModel};", "use {$namespaceModel};", $stub

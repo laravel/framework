@@ -13,10 +13,10 @@ trait WithoutMiddleware
      */
     public function disableMiddlewareForAllTests()
     {
-        if (method_exists($this, 'withoutMiddleware')) {
-            $this->withoutMiddleware();
-        } else {
+        if (! method_exists($this, 'withoutMiddleware')) {
             throw new Exception('Unable to disable middleware. MakesHttpRequests trait not used.');
         }
+
+        $this->withoutMiddleware();
     }
 }
