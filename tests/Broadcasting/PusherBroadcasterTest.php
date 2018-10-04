@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
 
 class PusherBroadcasterTest extends TestCase
 {
@@ -25,7 +25,7 @@ class PusherBroadcasterTest extends TestCase
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return true;
         });
 
@@ -42,7 +42,7 @@ class PusherBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return false;
         });
 
@@ -56,7 +56,7 @@ class PusherBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return true;
         });
 
@@ -68,7 +68,7 @@ class PusherBroadcasterTest extends TestCase
     public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
     {
         $returnData = [1, 2, 3, 4];
-        $this->broadcaster->channel('test', function() use ($returnData) {
+        $this->broadcaster->channel('test', function () use ($returnData) {
             return $returnData;
         });
 
@@ -85,8 +85,7 @@ class PusherBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
     {
-        $this->broadcaster->channel('test', function() {
-            return;
+        $this->broadcaster->channel('test', function () {
         });
 
         $this->broadcaster->auth(
@@ -99,7 +98,7 @@ class PusherBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return [1, 2, 3, 4];
         });
 
@@ -113,7 +112,7 @@ class PusherBroadcasterTest extends TestCase
         $request = $this->getMockRequestWithUserForChannel('private-test');
 
         $data = [
-            'auth' => 'abcd:efgh'
+            'auth' => 'abcd:efgh',
         ];
 
         $this->pusher->shouldReceive('socket_auth')
