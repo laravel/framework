@@ -1126,6 +1126,18 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals('foo-bars/{foo_bar}', $routes[0]->uri());
         $this->assertEquals('prefix.foo-bars.show', $routes[0]->getName());
 
+        $router = $this->getRouter();
+        $router->resource('foo', 'FooController', [
+            'middlewares' => [
+                'index' => 'custom-foo-index',
+            ],
+        ]);
+        $routes = $router->getRoutes();
+        $routes = $routes->getRoutes();
+
+        $this->assertEquals('custom-foo-index', $routes[0]->action['middleware']);
+        $this->assertArrayNotHasKey('middleware', $routes[1]->action);
+
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
             'edit' => 'modifier',
