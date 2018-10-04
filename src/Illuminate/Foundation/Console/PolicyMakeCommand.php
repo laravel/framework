@@ -55,6 +55,7 @@ class PolicyMakeCommand extends GeneratorCommand
     protected function replaceUserNamespace($stub)
     {
         $model = $this->userProviderModel();
+
         if (! $model) {
             return $stub;
         }
