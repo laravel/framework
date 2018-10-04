@@ -280,7 +280,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            if($this->escaping_params) {
+            if ($this->escaping_params) {
                 $value = e($value);
             }
 
