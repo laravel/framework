@@ -16,6 +16,7 @@ use Illuminate\Database\Migrations\DatabaseMigrationRepository;
 class DatabaseMigratorIntegrationTest extends TestCase
 {
     protected $db;
+    protected $migrator;
 
     /**
      * Bootstrap Eloquent.
