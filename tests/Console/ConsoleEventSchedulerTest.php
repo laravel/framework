@@ -14,6 +14,11 @@ use Illuminate\Console\Scheduling\CacheSchedulingMutex;
 
 class ConsoleEventSchedulerTest extends TestCase
 {
+    /**
+     * @var Schedule
+     */
+    private $schedule;
+
     public function setUp()
     {
         parent::setUp();

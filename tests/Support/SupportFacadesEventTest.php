@@ -13,6 +13,8 @@ use Illuminate\Support\Testing\Fakes\EventFake;
 
 class SupportFacadesEventTest extends TestCase
 {
+    private $events;
+
     protected function setUp()
     {
         parent::setUp();

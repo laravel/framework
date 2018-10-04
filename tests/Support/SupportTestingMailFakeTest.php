@@ -11,6 +11,16 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class SupportTestingMailFakeTest extends TestCase
 {
+    /**
+     * @var MailFake
+     */
+    private $fake;
+
+    /**
+     * @var MailableStub
+     */
+    private $mailable;
+
     protected function setUp()
     {
         parent::setUp();

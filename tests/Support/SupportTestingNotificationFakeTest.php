@@ -11,6 +11,21 @@ use Illuminate\Support\Testing\Fakes\NotificationFake;
 
 class SupportTestingNotificationFakeTest extends TestCase
 {
+    /**
+     * @var NotificationFake
+     */
+    private $fake;
+
+    /**
+     * @var NotificationStub
+     */
+    private $notification;
+
+    /**
+     * @var UserStub
+     */
+    private $user;
+
     protected function setUp()
     {
         parent::setUp();

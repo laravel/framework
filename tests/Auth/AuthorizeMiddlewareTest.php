@@ -19,6 +19,7 @@ class AuthorizeMiddlewareTest extends TestCase
 {
     protected $container;
     protected $user;
+    protected $router;
 
     public function tearDown()
     {
