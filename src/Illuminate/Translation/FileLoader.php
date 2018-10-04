@@ -25,7 +25,7 @@ class FileLoader implements Loader
     /**
      * All of the registered paths to JSON translation files.
      *
-     * @var string
+     * @var array
      */
     protected $jsonPaths = [];
 
