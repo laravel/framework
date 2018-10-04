@@ -299,7 +299,7 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Retrieve options for a certain channel
+     * Retrieve options for a certain channel.
      *
      * @param  string  $channel
      * @return array
@@ -318,7 +318,7 @@ abstract class Broadcaster implements BroadcasterContract
     }
 
     /**
-     * Check if channel name from request match a pattern from registered channels
+     * Check if channel name from request match a pattern from registered channels.
      *
      * @param  string  $channel
      * @param  string  $pattern

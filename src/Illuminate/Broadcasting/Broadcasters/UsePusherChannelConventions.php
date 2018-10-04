@@ -7,7 +7,7 @@ use Illuminate\Support\Str;
 trait UsePusherChannelConventions
 {
     /**
-     * Return true if channel is protected by authentication
+     * Return true if channel is protected by authentication.
      *
      * @param  string  $channel
      * @return bool
@@ -18,7 +18,7 @@ trait UsePusherChannelConventions
     }
 
     /**
-     * Remove prefix from channel name
+     * Remove prefix from channel name.
      *
      * @param  string  $channel
      * @return string
@@ -30,6 +30,7 @@ trait UsePusherChannelConventions
                 ? Str::replaceFirst('private-', '', $channel)
                 : Str::replaceFirst('presence-', '', $channel);
         }
+
         return $channel;
     }
 }

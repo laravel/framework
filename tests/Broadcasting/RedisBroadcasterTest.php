@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 
 class RedisBroadcasterTest extends TestCase
 {
@@ -27,7 +27,7 @@ class RedisBroadcasterTest extends TestCase
 
     public function testAuthCallValidAuthenticationResponseWithPrivateChannelWhenCallbackReturnTrue()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return true;
         });
 
@@ -44,7 +44,7 @@ class RedisBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenCallbackReturnFalse()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return false;
         });
 
@@ -58,7 +58,7 @@ class RedisBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPrivateChannelWhenRequestUserNotFound()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return true;
         });
 
@@ -70,7 +70,7 @@ class RedisBroadcasterTest extends TestCase
     public function testAuthCallValidAuthenticationResponseWithPresenceChannelWhenCallbackReturnAnArray()
     {
         $returnData = [1, 2, 3, 4];
-        $this->broadcaster->channel('test', function() use ($returnData) {
+        $this->broadcaster->channel('test', function () use ($returnData) {
             return $returnData;
         });
 
@@ -87,8 +87,7 @@ class RedisBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenCallbackReturnNull()
     {
-        $this->broadcaster->channel('test', function() {
-            return;
+        $this->broadcaster->channel('test', function () {
         });
 
         $this->broadcaster->auth(
@@ -101,7 +100,7 @@ class RedisBroadcasterTest extends TestCase
      */
     public function testAuthThrowAccessDeniedHttpExceptionWithPresenceChannelWhenRequestUserNotFound()
     {
-        $this->broadcaster->channel('test', function() {
+        $this->broadcaster->channel('test', function () {
             return [1, 2, 3, 4];
         });
 
@@ -136,7 +135,7 @@ class RedisBroadcasterTest extends TestCase
             ]),
             $this->broadcaster->validAuthenticationResponse($request, [
                 'a' => 'b',
-                'c' => 'd'
+                'c' => 'd',
             ])
         );
     }

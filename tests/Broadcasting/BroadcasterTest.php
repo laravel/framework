@@ -100,19 +100,22 @@ class BroadcasterTest extends TestCase
 
     public function testCanRegisterChannelsWithoutOptions()
     {
-        $this->broadcaster->channel('somechannel', function () {});
+        $this->broadcaster->channel('somechannel', function () {
+        });
     }
 
     public function testCanRegisterChannelsWithOptions()
     {
-        $options = [ 'a' => [ 'b', 'c' ] ];
-        $this->broadcaster->channel('somechannel', function () {}, $options);
+        $options = ['a' => ['b', 'c']];
+        $this->broadcaster->channel('somechannel', function () {
+        }, $options);
     }
 
     public function testCanRetrieveChannelsOptions()
     {
-        $options = [ 'a' => [ 'b', 'c' ] ];
-        $this->broadcaster->channel('somechannel', function () {}, $options);
+        $options = ['a' => ['b', 'c']];
+        $this->broadcaster->channel('somechannel', function () {
+        }, $options);
 
         $this->assertEquals(
             $options,
@@ -122,8 +125,9 @@ class BroadcasterTest extends TestCase
 
     public function testCanRetrieveChannelsOptionsUsingAChannelNameContainingArgs()
     {
-        $options = [ 'a' => [ 'b', 'c' ] ];
-        $this->broadcaster->channel('somechannel.{id}.test.{text}', function () {}, $options);
+        $options = ['a' => ['b', 'c']];
+        $this->broadcaster->channel('somechannel.{id}.test.{text}', function () {
+        }, $options);
 
         $this->assertEquals(
             $options,
@@ -133,9 +137,11 @@ class BroadcasterTest extends TestCase
 
     public function testCanRetrieveChannelsOptionsWhenMultipleChannelsAreRegistered()
     {
-        $options = [ 'a' => [ 'b', 'c' ] ];
-        $this->broadcaster->channel('somechannel', function () {});
-        $this->broadcaster->channel('someotherchannel', function () {}, $options);
+        $options = ['a' => ['b', 'c']];
+        $this->broadcaster->channel('somechannel', function () {
+        });
+        $this->broadcaster->channel('someotherchannel', function () {
+        }, $options);
 
         $this->assertEquals(
             $options,
@@ -145,8 +151,9 @@ class BroadcasterTest extends TestCase
 
     public function testDontRetrieveChannelsOptionsWhenChannelDoesntExists()
     {
-        $options = [ 'a' => [ 'b', 'c' ] ];
-        $this->broadcaster->channel('somechannel', function () {}, $options);
+        $options = ['a' => ['b', 'c']];
+        $this->broadcaster->channel('somechannel', function () {
+        }, $options);
 
         $this->assertEquals(
             [],
@@ -156,7 +163,8 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserWithoutGuard()
     {
-        $this->broadcaster->channel('somechannel', function () {});
+        $this->broadcaster->channel('somechannel', function () {
+        });
 
         $request = m::mock(\Illuminate\Http\Request::class);
         $request->shouldReceive('user')
@@ -172,7 +180,8 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserWithOneGuardUsingAStringForSpecifyingGuard()
     {
-        $this->broadcaster->channel('somechannel', function () {}, ['guards' => 'myguard']);
+        $this->broadcaster->channel('somechannel', function () {
+        }, ['guards' => 'myguard']);
 
         $request = m::mock(\Illuminate\Http\Request::class);
         $request->shouldReceive('user')
@@ -188,9 +197,10 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserWithMultipleGuardsAndRespectGuardsOrder()
     {
-        $this->broadcaster->channel('somechannel', function () {}, ['guards' => ['myguard1', 'myguard2']]);
-        $this->broadcaster->channel('someotherchannel', function () {}, ['guards' => ['myguard2', 'myguard1']]);
-
+        $this->broadcaster->channel('somechannel', function () {
+        }, ['guards' => ['myguard1', 'myguard2']]);
+        $this->broadcaster->channel('someotherchannel', function () {
+        }, ['guards' => ['myguard2', 'myguard1']]);
 
         $request = m::mock(\Illuminate\Http\Request::class);
         $request->shouldReceive('user')
@@ -216,7 +226,8 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserDontUseDefaultGuardWhenOneGuardSpecified()
     {
-        $this->broadcaster->channel('somechannel', function () {}, ['guards' => 'myguard']);
+        $this->broadcaster->channel('somechannel', function () {
+        }, ['guards' => 'myguard']);
 
         $request = m::mock(\Illuminate\Http\Request::class);
         $request->shouldReceive('user')
@@ -231,7 +242,8 @@ class BroadcasterTest extends TestCase
 
     public function testRetrieveUserDontUseDefaultGuardWhenMultipleGuardsSpecified()
     {
-        $this->broadcaster->channel('somechannel', function () {}, ['guards' => ['myguard1', 'myguard2']]);
+        $this->broadcaster->channel('somechannel', function () {
+        }, ['guards' => ['myguard1', 'myguard2']]);
 
         $request = m::mock(\Illuminate\Http\Request::class);
         $request->shouldReceive('user')
@@ -256,7 +268,8 @@ class BroadcasterTest extends TestCase
         $this->assertEquals($shouldMatch, $this->broadcaster->channelNameMatchesPattern($channel, $pattern));
     }
 
-    public function channelNameMatchPatternProvider() {
+    public function channelNameMatchPatternProvider()
+    {
         return [
             ['something', 'something', true],
             ['something.23', 'something.{id}', true],
@@ -358,5 +371,4 @@ class DummyBroadcastingChannel
 
 class DummyUser
 {
-
 }

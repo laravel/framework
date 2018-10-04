@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Broadcasting;
 
-use Illuminate\Broadcasting\Broadcasters\Broadcaster;
-use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Broadcasting\Broadcasters\Broadcaster;
+use Illuminate\Broadcasting\Broadcasters\UsePusherChannelConventions;
 
 class UsePusherChannelConventionsTest extends TestCase
 {
@@ -74,18 +74,18 @@ class UsePusherChannelConventionsTest extends TestCase
         foreach ($prefixesInfos as $prefixInfos) {
             foreach ($channels as $channel) {
                 $tests[] = [
-                    $prefixInfos['prefix'] . $channel,
+                    $prefixInfos['prefix'].$channel,
                     $channel,
                     $prefixInfos['guarded'],
                 ];
             }
         }
 
-        $tests[] = ['private-private-test' , 'private-test', true];
-        $tests[] = ['private-presence-test' , 'presence-test', true];
-        $tests[] = ['presence-private-test' , 'private-test', true];
-        $tests[] = ['presence-presence-test' , 'presence-test', true];
-        $tests[] = ['public-test' , 'public-test', false];
+        $tests[] = ['private-private-test', 'private-test', true];
+        $tests[] = ['private-presence-test', 'presence-test', true];
+        $tests[] = ['presence-private-test', 'private-test', true];
+        $tests[] = ['presence-presence-test', 'presence-test', true];
+        $tests[] = ['public-test', 'public-test', false];
 
         return $tests;
     }
