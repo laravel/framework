@@ -20,6 +20,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 class SendingMailNotificationsTest extends TestCase
 {
     public $mailer;
+    public $markdown;
 
     public function tearDown()
     {

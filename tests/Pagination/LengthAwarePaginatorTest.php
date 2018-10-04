@@ -7,6 +7,11 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class LengthAwarePaginatorTest extends TestCase
 {
+    /**
+     * @var LengthAwarePaginator
+     */
+    private $p;
+
     public function setUp()
     {
         $this->p = new LengthAwarePaginator($array = ['item1', 'item2', 'item3', 'item4'], 4, 2, 2);

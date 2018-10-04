@@ -11,6 +11,16 @@ use PHPUnit\Framework\Constraint\ExceptionMessage;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
+    /**
+     * @var QueueFake
+     */
+    private $fake;
+
+    /**
+     * @var JobStub
+     */
+    private $job;
+
     protected function setUp()
     {
         parent::setUp();
