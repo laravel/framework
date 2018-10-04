@@ -265,7 +265,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            $value = $value instanceof HtmlString ? $value->toHtml() : e($value);
+            // $value = $value instanceof HtmlString ? $value->toHtml() : e($value);
 
             $line = str_replace(
                 [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],
