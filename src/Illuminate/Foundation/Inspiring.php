@@ -19,7 +19,7 @@ class Inspiring
      */
     public static function quote()
     {
-        return Collection::make([
+        return collect([
             'When there is no desire, all things are at peace. - Laozi',
             'Simplicity is the ultimate sophistication. - Leonardo da Vinci',
             'Simplicity is the essence of happiness. - Cedric Bledsoe',
