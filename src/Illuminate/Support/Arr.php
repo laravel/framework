@@ -256,11 +256,11 @@ class Arr
             while (count($parts) > 1) {
                 $part = array_shift($parts);
 
-                if (isset($array[$part]) && is_array($array[$part])) {
-                    $array = &$array[$part];
-                } else {
+                if (! isset($array[$part]) || ! is_array($array[$part])) {
                     continue 2;
                 }
+
+                $array = &$array[$part];
             }
 
             unset($array[array_shift($parts)]);
