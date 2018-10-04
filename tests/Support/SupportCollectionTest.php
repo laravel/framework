@@ -1405,18 +1405,18 @@ class SupportCollectionTest extends TestCase
     {
         $c = new Collection([[1, 'a'], [2, 'b']]);
 
-        $result = $c->mapSpread(function ($number, $character) use (&$result) {
+        $result = $c->mapSpread(function ($number, $character) {
             return "{$number}-{$character}";
         });
         $this->assertEquals(['1-a', '2-b'], $result->all());
 
-        $result = $c->mapSpread(function ($number, $character, $key) use (&$result) {
+        $result = $c->mapSpread(function ($number, $character, $key) {
             return "{$number}-{$character}-{$key}";
         });
         $this->assertEquals(['1-a-0', '2-b-1'], $result->all());
 
         $c = new Collection([new Collection([1, 'a']), new Collection([2, 'b'])]);
-        $result = $c->mapSpread(function ($number, $character, $key) use (&$result) {
+        $result = $c->mapSpread(function ($number, $character, $key) {
             return "{$number}-{$character}-{$key}";
         });
         $this->assertEquals(['1-a-0', '2-b-1'], $result->all());
