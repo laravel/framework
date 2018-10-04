@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View\Blade;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
 abstract class AbstractBladeTestCase extends TestCase
@@ -12,7 +13,7 @@ abstract class AbstractBladeTestCase extends TestCase
 
     public function setUp()
     {
-        $this->compiler = new BladeCompiler(m::mock('Illuminate\Filesystem\Filesystem'), __DIR__);
+        $this->compiler = new BladeCompiler(m::mock(Filesystem::class), __DIR__);
         parent::setUp();
     }
 
