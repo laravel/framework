@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Validation;
 
+use Closure;
 use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -51,7 +52,7 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
         $builder->shouldReceive('where')->with('baz', 'taylor');
         $builder->shouldReceive('where')->with('faz', true);
         $builder->shouldReceive('where')->with('not', '!=', 'admin');
-        $builder->shouldReceive('where')->with(m::type('Closure'))->andReturnUsing(function () use ($builder, $closure) {
+        $builder->shouldReceive('where')->with(m::type(Closure::class))->andReturnUsing(function () use ($builder, $closure) {
             $closure($builder);
         });
         $builder->shouldReceive('where')->with('closure', 1);

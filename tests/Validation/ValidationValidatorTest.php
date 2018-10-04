@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\File\File;
 use Illuminate\Contracts\Validation\ImplicitRule;
 use Illuminate\Validation\PresenceVerifierInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -250,7 +251,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, [], ['name' => 'required']);
         $v->setContainer($container = m::mock(Container::class));
         $v->addReplacer('required', 'Foo@bar');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock(stdClass::class));
         $foo->shouldReceive('bar')->once()->andReturn('replaced!');
         $v->passes();
         $v->messages()->setFormat(':message');
@@ -3159,7 +3160,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
         $v->setContainer($container = m::mock(Container::class));
         $v->addExtension('foo', 'Foo@bar');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock(stdClass::class));
         $foo->shouldReceive('bar')->once()->andReturn(false);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -3173,7 +3174,7 @@ class ValidationValidatorTest extends TestCase
         $v = new Validator($trans, ['name' => 'taylor'], ['name' => 'foo']);
         $v->setContainer($container = m::mock(Container::class));
         $v->addExtension('foo', 'Foo');
-        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock('stdClass'));
+        $container->shouldReceive('make')->once()->with('Foo')->andReturn($foo = m::mock(stdClass::class));
         $foo->shouldReceive('validate')->once()->andReturn(false);
         $this->assertFalse($v->passes());
         $v->messages()->setFormat(':message');
@@ -4212,7 +4213,7 @@ class ValidationValidatorTest extends TestCase
 
     protected function getTranslator()
     {
-        return m::mock(\Illuminate\Contracts\Translation\Translator::class);
+        return m::mock(TranslatorContract::class);
     }
 
     public function getIlluminateArrayTranslator()
