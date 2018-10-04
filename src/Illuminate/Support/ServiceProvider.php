@@ -90,7 +90,7 @@ abstract class ServiceProvider
                 continue;
             }
 
-            if (is_integer($key)) {
+            if (is_numeric($key)) {
                 continue;
             }
 
