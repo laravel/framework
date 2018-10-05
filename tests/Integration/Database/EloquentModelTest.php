@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 
@@ -33,7 +34,7 @@ class EloquentModelTest extends DatabaseTestCase
         ]);
 
         $user->fill([
-            'nullable_date' => $now = \Illuminate\Support\Carbon::now(),
+            'nullable_date' => $now = Carbon::now(),
         ]);
         $this->assertTrue($user->isDirty('nullable_date'));
 

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
+use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\MorphOne;
 use Illuminate\Database\Eloquent\Relations\Relation;
@@ -283,7 +284,7 @@ class DatabaseEloquentMorphTest extends TestCase
         require_once __DIR__.'/stubs/EloquentModelNamespacedStub.php';
 
         Relation::morphMap([
-            $alias => 'Foo\Bar\EloquentModelNamespacedStub',
+            $alias => EloquentModelNamespacedStub::class,
         ]);
 
         $builder = m::mock(Builder::class);
@@ -291,7 +292,7 @@ class DatabaseEloquentMorphTest extends TestCase
         $builder->shouldReceive('where')->once()->with('table.morph_id', '=', 1);
         $related = m::mock(Model::class);
         $builder->shouldReceive('getModel')->andReturn($related);
-        $parent = m::mock('Foo\Bar\EloquentModelNamespacedStub');
+        $parent = m::mock(EloquentModelNamespacedStub::class);
         $parent->shouldReceive('getAttribute')->with('id')->andReturn(1);
         $parent->shouldReceive('getMorphClass')->andReturn($alias);
         $builder->shouldReceive('where')->once()->with('table.morph_type', $alias);

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
@@ -362,7 +363,7 @@ class FoundationTestResponseTest extends TestCase
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
-            $response->setContent(\Mockery::mock(View::class, $content));
+            $response->setContent(m::mock(View::class, $content));
         });
 
         return TestResponse::fromBaseResponse($baseResponse);

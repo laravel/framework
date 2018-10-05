@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use PDO;
 use Mockery as m;
 use ReflectionProperty;
 use PHPUnit\Framework\TestCase;
@@ -42,10 +43,10 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function testConnectionCanBeCreated()
     {
-        $this->assertInstanceOf('PDO', $this->db->connection()->getPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection()->getReadPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getPdo());
-        $this->assertInstanceOf('PDO', $this->db->connection('read_write')->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection()->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection()->getReadPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getPdo());
+        $this->assertInstanceOf(PDO::class, $this->db->connection('read_write')->getReadPdo());
     }
 
     public function testSingleConnectionNotCreatedUntilNeeded()
@@ -56,8 +57,8 @@ class DatabaseConnectionFactoryTest extends TestCase
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
-        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
-        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
     public function testReadWriteConnectionsNotCreatedUntilNeeded()
@@ -68,8 +69,8 @@ class DatabaseConnectionFactoryTest extends TestCase
         $readPdo = new ReflectionProperty(get_class($connection), 'readPdo');
         $readPdo->setAccessible(true);
 
-        $this->assertNotInstanceOf('PDO', $pdo->getValue($connection));
-        $this->assertNotInstanceOf('PDO', $readPdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $pdo->getValue($connection));
+        $this->assertNotInstanceOf(PDO::class, $readPdo->getValue($connection));
     }
 
     /**

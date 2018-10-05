@@ -4,12 +4,13 @@ namespace Illuminate\Tests\View;
 
 use stdClass;
 use PHPUnit\Framework\TestCase;
+use Illuminate\View\Engines\EngineResolver;
 
 class ViewEngineResolverTest extends TestCase
 {
     public function testResolversMayBeResolved()
     {
-        $resolver = new \Illuminate\View\Engines\EngineResolver;
+        $resolver = new EngineResolver;
         $resolver->register('foo', function () {
             return new stdClass;
         });
@@ -23,7 +24,7 @@ class ViewEngineResolverTest extends TestCase
      */
     public function testResolverThrowsExceptionOnUnknownEngine()
     {
-        $resolver = new \Illuminate\View\Engines\EngineResolver;
+        $resolver = new EngineResolver;
         $resolver->resolve('foo');
     }
 }

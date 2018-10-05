@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use SplFileInfo;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use League\Flysystem\Adapter\Ftp;
@@ -139,8 +140,8 @@ class FilesystemTest extends TestCase
         mkdir($this->tempDir.'/foo/bar');
         $files = new Filesystem;
         $results = $files->files($this->tempDir.'/foo');
-        $this->assertInstanceOf('SplFileInfo', $results[0]);
-        $this->assertInstanceOf('SplFileInfo', $results[1]);
+        $this->assertInstanceOf(SplFileInfo::class, $results[0]);
+        $this->assertInstanceOf(SplFileInfo::class, $results[1]);
         unset($files);
     }
 

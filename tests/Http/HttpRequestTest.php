@@ -5,8 +5,11 @@ namespace Illuminate\Tests\Http;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Session\Store;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Http\UploadedFile;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Symfony\Component\HttpFoundation\File\UploadedFile as SymfonyUploadedFile;
 
 class HttpRequestTest extends TestCase
 {
@@ -350,8 +353,8 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('Taylor', $request['name']);
         $this->assertEquals('Bob', $request->input('foo', 'Bob'));
 
-        $request = Request::create('/', 'GET', [], [], ['file' => new \Symfony\Component\HttpFoundation\File\UploadedFile(__FILE__, 'foo.php')]);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request['file']);
+        $request = Request::create('/', 'GET', [], [], ['file' => new SymfonyUploadedFile(__FILE__, 'foo.php')]);
+        $this->assertInstanceOf(SymfonyUploadedFile::class, $request['file']);
     }
 
     public function testArrayAccess()
@@ -484,7 +487,7 @@ class HttpRequestTest extends TestCase
             ],
         ];
         $request = Request::create('/', 'GET', [], [], $files);
-        $this->assertInstanceOf('Symfony\Component\HttpFoundation\File\UploadedFile', $request->file('foo'));
+        $this->assertInstanceOf(SymfonyUploadedFile::class, $request->file('foo'));
     }
 
     public function testHasFileMethod()
@@ -597,14 +600,14 @@ class HttpRequestTest extends TestCase
 
     public function testAllInputReturnsInputAndFiles()
     {
-        $file = $this->getMockBuilder('Illuminate\Http\UploadedFile')->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => 'bar'], [], ['baz' => $file]);
         $this->assertEquals(['foo' => 'bar', 'baz' => $file, 'boom' => 'breeze'], $request->all());
     }
 
     public function testAllInputReturnsNestedInputAndFiles()
     {
-        $file = $this->getMockBuilder('Illuminate\Http\UploadedFile')->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
+        $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
         $request = Request::create('/?boom=breeze', 'GET', ['foo' => ['bar' => 'baz']], [], ['foo' => ['photo' => $file]]);
         $this->assertEquals(['foo' => ['bar' => 'baz', 'photo' => $file], 'boom' => 'breeze'], $request->all());
     }
@@ -666,7 +669,7 @@ class HttpRequestTest extends TestCase
     public function testOldMethodCallsSession()
     {
         $request = Request::create('/', 'GET');
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('getOldInput')->once()->with('foo', 'bar')->andReturn('boom');
         $request->setLaravelSession($session);
         $this->assertEquals('boom', $request->old('foo', 'bar'));
@@ -675,7 +678,7 @@ class HttpRequestTest extends TestCase
     public function testFlushMethodCallsSession()
     {
         $request = Request::create('/', 'GET');
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once();
         $request->setLaravelSession($session);
         $request->flush();
@@ -956,7 +959,7 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashCallsSessionFlashInputWithInputData()
     {
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor', 'email' => 'foo']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
@@ -965,7 +968,7 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashOnlyCallsFlashWithProperParameters()
     {
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);
@@ -974,7 +977,7 @@ class HttpRequestTest extends TestCase
 
     public function testHttpRequestFlashExceptCallsFlashWithProperParameters()
     {
-        $session = m::mock('Illuminate\Session\Store');
+        $session = m::mock(Store::class);
         $session->shouldReceive('flashInput')->once()->with(['name' => 'Taylor']);
         $request = Request::create('/', 'GET', ['name' => 'Taylor', 'email' => 'foo']);
         $request->setLaravelSession($session);

@@ -2,7 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery;
+use Mockery as m;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
@@ -49,7 +49,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
             new Filesystem
         );
 
-        $output = Mockery::mock(OutputStyle::class);
+        $output = m::mock(OutputStyle::class);
         $output->shouldReceive('writeln');
 
         $this->migrator->setOutput($output);

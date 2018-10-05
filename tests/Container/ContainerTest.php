@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Container;
 
+use Closure;
 use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
@@ -503,7 +504,7 @@ class ContainerTest extends TestCase
             return func_get_args();
         }, ['bar' => 'taylor']);
 
-        $this->assertInstanceOf('Closure', $result);
+        $this->assertInstanceOf(Closure::class, $result);
         $result = $result();
 
         $this->assertInstanceOf(stdClass::class, $result[0]);
@@ -933,7 +934,7 @@ class ContainerTest extends TestCase
     public function testResolvingCallbacksShouldBeFiredWhenCalledWithAliases()
     {
         $container = new Container;
-        $container->alias('stdClass', 'std');
+        $container->alias(stdClass::class, 'std');
         $container->resolving('std', function ($object) {
             return $object->name = 'taylor';
         });

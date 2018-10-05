@@ -6,10 +6,13 @@ use stdClass;
 use Exception;
 use ArrayAccess;
 use Mockery as m;
+use ArrayIterator;
+use CachingIterator;
 use ReflectionClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use Illuminate\Support\HtmlString;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
 
@@ -184,9 +187,9 @@ class SupportCollectionTest extends TestCase
 
     public function testToArrayCallsToArrayOnEachItemInCollection()
     {
-        $item1 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item1 = m::mock(Arrayable::class);
         $item1->shouldReceive('toArray')->once()->andReturn('foo.array');
-        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2 = m::mock(Arrayable::class);
         $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
         $c = new Collection([$item1, $item2]);
         $results = $c->toArray();
@@ -196,9 +199,9 @@ class SupportCollectionTest extends TestCase
 
     public function testJsonSerializeCallsToArrayOrJsonSerializeOnEachItemInCollection()
     {
-        $item1 = m::mock('JsonSerializable');
+        $item1 = m::mock(JsonSerializable::class);
         $item1->shouldReceive('jsonSerialize')->once()->andReturn('foo.json');
-        $item2 = m::mock('Illuminate\Contracts\Support\Arrayable');
+        $item2 = m::mock(Arrayable::class);
         $item2->shouldReceive('toArray')->once()->andReturn('bar.array');
         $c = new Collection([$item1, $item2]);
         $results = $c->jsonSerialize();
@@ -305,14 +308,14 @@ class SupportCollectionTest extends TestCase
     public function testIterable()
     {
         $c = new Collection(['foo']);
-        $this->assertInstanceOf('ArrayIterator', $c->getIterator());
+        $this->assertInstanceOf(ArrayIterator::class, $c->getIterator());
         $this->assertEquals(['foo'], $c->getIterator()->getArrayCopy());
     }
 
     public function testCachingIterator()
     {
         $c = new Collection(['foo']);
-        $this->assertInstanceOf('CachingIterator', $c->getCachingIterator());
+        $this->assertInstanceOf(CachingIterator::class, $c->getCachingIterator());
     }
 
     public function testFilter()
@@ -472,16 +475,16 @@ class SupportCollectionTest extends TestCase
             $c->where('v', '<', null)->values()->all()
         );
 
-        $c = new Collection([['v' => 1], ['v' => new \Illuminate\Support\HtmlString('hello')]]);
+        $c = new Collection([['v' => 1], ['v' => new HtmlString('hello')]]);
         $this->assertEquals(
-            [['v' => new \Illuminate\Support\HtmlString('hello')]],
+            [['v' => new HtmlString('hello')]],
             $c->where('v', 'hello')->values()->all()
         );
 
         $c = new Collection([['v' => 1], ['v' => 'hello']]);
         $this->assertEquals(
             [['v' => 'hello']],
-            $c->where('v', new \Illuminate\Support\HtmlString('hello'))->values()->all()
+            $c->where('v', new HtmlString('hello'))->values()->all()
         );
 
         $c = new Collection([['v' => 1], ['v' => 2], ['v' => null]]);

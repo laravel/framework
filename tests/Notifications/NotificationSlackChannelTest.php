@@ -2,9 +2,12 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
+use Mockery as m;
+use GuzzleHttp\Client;
 use Mockery\MockInterface;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Channels\SlackWebhookChannel;
@@ -25,14 +28,14 @@ class NotificationSlackChannelTest extends TestCase
     {
         parent::setUp();
 
-        $this->guzzleHttp = Mockery::mock('GuzzleHttp\Client');
+        $this->guzzleHttp = m::mock(Client::class);
 
         $this->slackChannel = new SlackWebhookChannel($this->guzzleHttp);
     }
 
     public function tearDown()
     {
-        Mockery::close();
+        m::close();
     }
 
     /**
@@ -191,7 +194,7 @@ class NotificationSlackChannelTest extends TestCase
 
 class NotificationSlackChannelTestNotifiable
 {
-    use \Illuminate\Notifications\Notifiable;
+    use Notifiable;
 
     public function routeNotificationForSlack()
     {
@@ -208,7 +211,7 @@ class NotificationSlackChannelTestNotification extends Notification
                     ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
-                        $timestamp = Mockery::mock(\Illuminate\Support\Carbon::class);
+                        $timestamp = m::mock(Carbon::class);
                         $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
@@ -235,7 +238,7 @@ class NotificationSlackChannelTestNotificationWithImageIcon extends Notification
                     ->to('#ghost-talk')
                     ->content('Content')
                     ->attachment(function ($attachment) {
-                        $timestamp = Mockery::mock(\Illuminate\Support\Carbon::class);
+                        $timestamp = m::mock(Carbon::class);
                         $timestamp->shouldReceive('getTimestamp')->andReturn(1234567890);
                         $attachment->title('Laravel', 'https://laravel.com')
                                    ->content('Attachment Content')
