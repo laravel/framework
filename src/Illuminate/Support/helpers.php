@@ -997,6 +997,35 @@ if (! function_exists('str_start')) {
     }
 }
 
+if (! function_exists('str_wrap')) {
+    /**
+     * Wraps string with single instance of given value.
+     *
+     * @param  string  $value
+     * @param  string  $wrap
+     * @return string
+     */
+    function str_wrap($value, $wrap)
+    {
+        return Str::finish(Str::start($value, $wrap), $wrap);
+    }
+}
+
+if (! function_exists('stringify')) {
+    /**
+     * Stringify given scalar value.
+     * E.g. true -> 'true', 0 -> '0', null -> 'null', 10.0 -> '10.0' etc.
+     * Note: It does not work for octal represented integers etc, i.e. 0123 (Octal 83) will get stringified to '83' instead of '0123'.
+     *
+     * @param  mixed       $value
+     * @return string|null
+     */
+    function stringify($value)
+    {
+        return is_scalar($value) ? (is_string($value) ? $value : var_export($value, true)) : null;
+    }
+}
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.

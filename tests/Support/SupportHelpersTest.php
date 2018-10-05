@@ -298,6 +298,23 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('/test/string', Str::start('//test/string', '/'));
     }
 
+    public function testStrWrap()
+    {
+        $this->assertSame('/test/string/', str_wrap('test/string', '/'));
+        $this->assertSame('/test/string/', str_wrap('/test/string', '/'));
+        $this->assertSame('/test/string/', str_wrap('//test/string/', '/'));
+    }
+
+    public function testStringify()
+    {
+        $this->assertSame('true', stringify(true));
+        $this->assertSame('false', stringify(false));
+        $this->assertSame('123', stringify(123));
+        $this->assertSame('-123', stringify(-123));
+        $this->assertSame('1.234', stringify(1.234));
+        $this->assertSame('string', stringify('string'));
+    }
+
     public function testSnakeCase()
     {
         $this->assertEquals('foo_bar', Str::snake('fooBar'));
