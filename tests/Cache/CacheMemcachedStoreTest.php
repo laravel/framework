@@ -15,7 +15,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder('stdClass')->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->with($this->equalTo('foo:bar'))->will($this->returnValue(null));
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(1));
         $store = new MemcachedStore($memcache, 'foo');
@@ -28,7 +28,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['get', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder('stdClass')->setMethods(['get', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('get')->will($this->returnValue('bar'));
         $memcache->expects($this->once())->method('getResultCode')->will($this->returnValue(0));
         $store = new MemcachedStore($memcache);
@@ -41,7 +41,7 @@ class CacheMemcachedStoreTest extends TestCase
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $memcache = $this->getMockBuilder(stdClass::class)->setMethods(['getMulti', 'getResultCode'])->getMock();
+        $memcache = $this->getMockBuilder('stdClass')->setMethods(['getMulti', 'getResultCode'])->getMock();
         $memcache->expects($this->once())->method('getMulti')->with(
             ['foo:foo', 'foo:bar', 'foo:baz']
         )->will($this->returnValue([
@@ -58,39 +58,18 @@ class CacheMemcachedStoreTest extends TestCase
         ]));
     }
 
-    /**
-     * @param int  $minutes
-     * @param int  $expectedExpire
-     * @param bool $useUnixtime
-     * @dataProvider setMethodProperlyCallsMemcacheProvider
-     */
-    public function testSetMethodProperlyCallsMemcache($minutes, $expectedExpire, $useUnixtime)
+    public function testSetMethodProperlyCallsMemcache()
     {
         if (! class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
         Carbon::setTestNow($now = Carbon::now());
-        if ($useUnixtime) {
-            $expectedExpire += $now->timestamp;
-        }
         $memcache = $this->getMockBuilder('Memcached')->setMethods(['set'])->getMock();
-        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($expectedExpire));
+        $memcache->expects($this->once())->method('set')->with($this->equalTo('foo'), $this->equalTo('bar'), $this->equalTo($now->timestamp + 60));
         $store = new MemcachedStore($memcache);
-        $store->put('foo', 'bar', $minutes);
+        $store->put('foo', 'bar', 1);
         Carbon::setTestNow();
-    }
-
-    public function setMethodProperlyCallsMemcacheProvider()
-    {
-        return [
-            '-1min' => [-1, 0, false],
-            '0' => [0, 0, false],
-            '1min' => [1, 60, false],
-            '30days' => [30 * 24 * 60, 30 * 24 * 60 * 60, false],
-            '30days+1min' => [30 * 24 * 60 + 1, 30 * 24 * 60 * 60 + 60, true],
-            '31days' => [31 * 24 * 60, 31 * 24 * 60 * 60, true],
-            ];
     }
 
     public function testIncrementMethodProperlyCallsMemcache()
