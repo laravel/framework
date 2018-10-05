@@ -49,8 +49,8 @@ class MigrationCreator
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
-        // First we will get the stub file for the migration, which serves as a type
-        // of template for the migration. Once we have those we will populate the
+        // First, we will get the stub file for the migration, which serves as a type
+        // of template for the migration. Once we have those, we will populate the
         // various place-holders, save the file, and run the post create event.
         $stub = $this->getStub($table, $create);
 
@@ -60,7 +60,7 @@ class MigrationCreator
         );
 
         // Next, we will fire any hooks that are supposed to fire after a migration is
-        // created. Once that is done we'll be ready to return the full path to the
+        // created. Once that is done, we'll be ready to return the full path to the
         // migration file so it can be used however it's needed by the developer.
         $this->firePostCreateHooks($table);
 
@@ -96,7 +96,7 @@ class MigrationCreator
         }
 
         // We also have stubs for creating new tables and modifying existing tables
-        // to save the developer some typing when they are creating a new tables
+        // to save the developer some typing when creating new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
         $stub = $create ? 'create.stub' : 'update.stub';
 
@@ -116,7 +116,7 @@ class MigrationCreator
         $stub = str_replace('DummyClass', $this->getClassName($name), $stub);
 
         // Here we will replace the table place-holders with the table specified by
-        // the developer, which is useful for quickly creating a tables creation
+        // the developer, which is useful for quickly creating a table creation
         // or update migration from the console instead of typing it manually.
         if (! is_null($table)) {
             $stub = str_replace('DummyTable', $table, $stub);
