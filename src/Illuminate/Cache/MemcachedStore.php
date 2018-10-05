@@ -13,13 +13,6 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
     use InteractsWithTime;
 
     /**
-     * The maximum value that can be specified as an expiration delta.
-     *
-     * @var int
-     */
-    const REALTIME_MAXDELTA_IN_MINUTES = 43200;
-
-    /**
      * The Memcached instance.
      *
      * @var \Memcached
