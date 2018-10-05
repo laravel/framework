@@ -885,11 +885,23 @@ class TestResponse
     /**
      * Assert that the session has no errors.
      *
+     * @param  string|array  $keys
+     * @param  string  $errorBag
      * @return $this
      */
-    public function assertSessionHasNoErrors()
+    public function assertSessionHasNoErrors($keys = [], $errorBag = 'default')
     {
-        $this->assertSessionMissing('errors');
+        $keys = (array) $keys;
+
+        if (empty($keys)) {
+            return $this->assertSessionMissing('errors');
+        }
+
+        $errors = $this->session()->get('errors')->getBag($errorBag);
+
+        foreach ($keys as $key) {
+            PHPUnit::assertFalse($errors->has($key), "Session has an unexpected error: $key");
+        }
 
         return $this;
     }
