@@ -227,14 +227,6 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      */
     protected function calculateExpiration($minutes)
     {
-        if ($minutes <= 0) {
-            return 0;
-        }
-
-        if ($minutes <= self::REALTIME_MAXDELTA_IN_MINUTES) {
-            return (int) $minutes * 60;
-        }
-
         return $this->toTimestamp($minutes);
     }
 
