@@ -633,6 +633,32 @@ if (! function_exists('now')) {
     }
 }
 
+if (! function_exists('epoch')) {
+    /**
+     * Returns current Unix epoch time.
+     *
+     * @param  \DateTimeZone|string|null $tz
+     * @return int
+     */
+    function epoch($tz = null)
+    {
+        return now($tz)->unix();
+    }
+}
+
+if (! function_exists('millitime')) {
+    /**
+     * Return current Unix timestamp with milliseconds.
+     *
+     * @param  \DateTimeZone|string|null $tz
+     * @return int
+     */
+    function millitime($tz = null)
+    {
+        return (int) now($tz)->getPreciseTimestamp(3);
+    }
+}
+
 if (! function_exists('old')) {
     /**
      * Retrieve an old input item.

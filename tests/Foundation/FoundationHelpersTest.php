@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Foundation;
 
 use Mockery as m;
+use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 
@@ -81,5 +82,13 @@ class FoundationHelpersTest extends TestCase
         $this->assertEquals('/versioned.css', $result);
 
         unlink(public_path('mix-manifest.json'));
+    }
+
+    public function testEpochAndMillitime()
+    {
+        Carbon::setTestNow(Carbon::create(2018, 10, 5, 19, 14, 45));
+
+        $this->assertSame(1538766885, epoch());
+        $this->assertSame(1538766885000, millitime());
     }
 }
