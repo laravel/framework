@@ -371,6 +371,8 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string|null  $queue
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function queue($view, $queue = null)
     {
@@ -414,6 +416,8 @@ class Mailer implements MailerContract, MailQueueContract
      * @param  string|array|\Illuminate\Contracts\Mail\Mailable  $view
      * @param  string|null  $queue
      * @return mixed
+     *
+     * @throws \InvalidArgumentException
      */
     public function later($delay, $view, $queue = null)
     {
