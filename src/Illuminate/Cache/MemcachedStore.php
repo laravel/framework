@@ -13,9 +13,11 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
     use InteractsWithTime;
 
     /**
-     * Maximum value of expire period that can be specified as delta (in minutes).
+     * The maximum value that can be specified as an expiration delta.
+     *
+     * @var int
      */
-    const REALTIME_MAXDELTA_IN_MINUTES = 60 * 24 * 30;
+    const REALTIME_MAXDELTA_IN_MINUTES = 43200;
 
     /**
      * The Memcached instance.
@@ -108,7 +110,9 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      */
     public function put($key, $value, $minutes)
     {
-        $this->memcached->set($this->prefix.$key, $value, $this->toExpireParam($minutes));
+        $this->memcached->set(
+            $this->prefix.$key, $value, $this->calculateExpiration($minutes)
+        );
     }
 
     /**
@@ -126,7 +130,9 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
             $prefixedValues[$this->prefix.$key] = $value;
         }
 
-        $this->memcached->setMulti($prefixedValues, $this->toExpireParam($minutes));
+        $this->memcached->setMulti(
+            $prefixedValues, $this->calculateExpiration($minutes)
+        );
     }
 
     /**
@@ -139,7 +145,9 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
      */
     public function add($key, $value, $minutes)
     {
-        return $this->memcached->add($this->prefix.$key, $value, $this->toExpireParam($minutes));
+        return $this->memcached->add(
+            $this->prefix.$key, $value, $this->calculateExpiration($minutes)
+        );
     }
 
     /**
@@ -212,22 +220,19 @@ class MemcachedStore extends TaggableStore implements LockProvider, Store
     }
 
     /**
-     * convert the given number of minutes to integer suitable for expire param.
-     *
-     * If it doesn't exceeds 30 days, convert it to number of seconds
-     * Otherwise, convert it to unixtime
+     * Get the expiration time of the key.
      *
      * @param  int  $minutes
      * @return int
      */
-    protected function toExpireParam($minutes)
+    protected function calculateExpiration($minutes)
     {
         if ($minutes <= 0) {
-            return 0; // never expire
+            return 0;
         }
 
         if ($minutes <= self::REALTIME_MAXDELTA_IN_MINUTES) {
-            return $minutes * 60;
+            return (int) $minutes * 60;
         }
 
         return $this->toTimestamp($minutes);
