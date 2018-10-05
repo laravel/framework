@@ -53,7 +53,7 @@ class ValidationException extends Exception
      */
     public function __construct($validator, $response = null, $errorBag = 'default')
     {
-        parent::__construct(trans('validation.failed'));
+        parent::__construct(__('validation.failed'));
 
         $this->response = $response;
         $this->errorBag = $errorBag;
