@@ -2,8 +2,14 @@
 
 namespace Illuminate\Tests\Queue;
 
+use stdClass;
+use Exception;
 use Mockery as m;
+use Pheanstalk\Job;
+use Pheanstalk\Pheanstalk;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Queue\Jobs\BeanstalkdJob;
 
 class QueueBeanstalkdJobTest extends TestCase
 {
@@ -16,7 +22,7 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('stdClass'));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(stdClass::class));
         $handler->shouldReceive('fire')->once()->with($job, ['data']);
 
         $job->fire();
@@ -26,10 +32,10 @@ class QueueBeanstalkdJobTest extends TestCase
     {
         $job = $this->getJob();
         $job->getPheanstalkJob()->shouldReceive('getData')->once()->andReturn(json_encode(['job' => 'foo', 'data' => ['data']]));
-        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock('Illuminate\Tests\Queue\BeanstalkdJobTestFailedTest'));
-        $handler->shouldReceive('failed')->once()->with(['data'], m::type('Exception'));
+        $job->getContainer()->shouldReceive('make')->once()->with('foo')->andReturn($handler = m::mock(BeanstalkdJobTestFailedTest::class));
+        $handler->shouldReceive('failed')->once()->with(['data'], m::type(Exception::class));
 
-        $job->failed(new \Exception);
+        $job->failed(new Exception);
     }
 
     public function testDeleteRemovesTheJobFromBeanstalkd()
@@ -43,7 +49,7 @@ class QueueBeanstalkdJobTest extends TestCase
     public function testReleaseProperlyReleasesJobOntoBeanstalkd()
     {
         $job = $this->getJob();
-        $job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), \Pheanstalk\Pheanstalk::DEFAULT_PRIORITY, 0);
+        $job->getPheanstalk()->shouldReceive('release')->once()->with($job->getPheanstalkJob(), Pheanstalk::DEFAULT_PRIORITY, 0);
 
         $job->release();
     }
@@ -58,10 +64,10 @@ class QueueBeanstalkdJobTest extends TestCase
 
     protected function getJob()
     {
-        return new \Illuminate\Queue\Jobs\BeanstalkdJob(
-            m::mock('Illuminate\Container\Container'),
-            m::mock('Pheanstalk\Pheanstalk'),
-            m::mock('Pheanstalk\Job'),
+        return new BeanstalkdJob(
+            m::mock(Container::class),
+            m::mock(Pheanstalk::class),
+            m::mock(Job::class),
             'connection-name',
             'default'
         );

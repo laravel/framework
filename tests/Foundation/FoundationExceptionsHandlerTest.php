@@ -2,16 +2,22 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use stdClass;
 use Exception;
 use Mockery as m;
+use RuntimeException;
 use Psr\Log\LoggerInterface;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Routing\Redirector;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Routing\ResponseFactory;
 use Illuminate\Config\Repository as Config;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Foundation\Exceptions\Handler;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -27,7 +33,7 @@ class FoundationExceptionsHandlerTest extends TestCase
     {
         $this->config = m::mock(Config::class);
 
-        $this->request = m::mock('stdClass');
+        $this->request = m::mock(stdClass::class);
 
         $this->container = Container::setInstance(new Container);
 
@@ -35,10 +41,10 @@ class FoundationExceptionsHandlerTest extends TestCase
             return $this->config;
         });
 
-        $this->container->singleton('Illuminate\Contracts\Routing\ResponseFactory', function () {
-            return new \Illuminate\Routing\ResponseFactory(
-                m::mock(\Illuminate\Contracts\View\Factory::class),
-                m::mock(\Illuminate\Routing\Redirector::class)
+        $this->container->singleton(ResponseFactoryContract::class, function () {
+            return new ResponseFactory(
+                m::mock(Factory::class),
+                m::mock(Redirector::class)
             );
         });
 
@@ -56,7 +62,7 @@ class FoundationExceptionsHandlerTest extends TestCase
         $this->container->instance(LoggerInterface::class, $logger);
         $logger->shouldReceive('error')->withArgs(['Exception message', m::hasKey('exception')]);
 
-        $this->handler->report(new \RuntimeException('Exception message'));
+        $this->handler->report(new RuntimeException('Exception message'));
     }
 
     public function testReturnsJsonWithStackTraceWhenAjaxRequestAndDebugTrue()

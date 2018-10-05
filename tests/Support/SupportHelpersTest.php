@@ -10,6 +10,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Optional;
+use Illuminate\Contracts\Support\Htmlable;
 
 class SupportHelpersTest extends TestCase
 {
@@ -254,7 +255,7 @@ class SupportHelpersTest extends TestCase
     {
         $str = 'A \'quote\' is <b>bold</b>';
         $this->assertEquals('A &#039;quote&#039; is &lt;b&gt;bold&lt;/b&gt;', e($str));
-        $html = m::mock('Illuminate\Contracts\Support\Htmlable');
+        $html = m::mock(Htmlable::class);
         $html->shouldReceive('toHtml')->andReturn($str);
         $this->assertEquals($str, e($html));
     }
@@ -700,17 +701,17 @@ class SupportHelpersTest extends TestCase
     public function testClassUsesRecursiveShouldReturnTraitsOnParentClasses()
     {
         $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive('Illuminate\Tests\Support\SupportTestClassTwo'));
+        class_uses_recursive(SupportTestClassTwo::class));
     }
 
     public function testClassUsesRecursiveAcceptsObject()
     {
         $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
+            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
         class_uses_recursive(new SupportTestClassTwo));
     }
@@ -718,9 +719,9 @@ class SupportHelpersTest extends TestCase
     public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
         $this->assertSame([
-            'Illuminate\Tests\Support\SupportTestTraitTwo' => 'Illuminate\Tests\Support\SupportTestTraitTwo',
-            'Illuminate\Tests\Support\SupportTestTraitOne' => 'Illuminate\Tests\Support\SupportTestTraitOne',
-            'Illuminate\Tests\Support\SupportTestTraitThree' => 'Illuminate\Tests\Support\SupportTestTraitThree',
+            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class => SupportTestTraitOne::class,
+            SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
         class_uses_recursive(SupportTestClassThree::class));
     }

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Exception;
 use Mockery as m;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
@@ -199,11 +200,11 @@ class DatabaseEloquentRelationTest extends TestCase
                 $this->assertTrue($related::isIgnoringTouch());
                 $this->assertTrue($relatedChild::isIgnoringTouch());
 
-                throw new \Exception();
+                throw new Exception();
             });
 
             $this->fail('Exception was not thrown');
-        } catch (\Exception $exception) {
+        } catch (Exception $exception) {
             // Does nothing.
         }
 

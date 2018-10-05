@@ -2,27 +2,30 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery;
+use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Channels\BroadcastChannel;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
     public function tearDown()
     {
-        Mockery::close();
+        m::close();
     }
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
-        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('dispatch')->once()->with(Mockery::type('Illuminate\Notifications\Events\BroadcastNotificationCreated'));
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(m::type(BroadcastNotificationCreated::class));
         $channel = new BroadcastChannel($events);
         $channel->send($notifiable, $notification);
     }
@@ -31,9 +34,9 @@ class NotificationBroadcastChannelTest extends TestCase
     {
         $notification = new CustomChannelsTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
-        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
+        $event = new BroadcastNotificationCreated(
             $notifiable, $notification, $notification->toArray($notifiable)
         );
 
@@ -46,9 +49,9 @@ class NotificationBroadcastChannelTest extends TestCase
     {
         $notification = new CustomEventNameTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
-        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
+        $event = new BroadcastNotificationCreated(
             $notifiable, $notification, $notification->toArray($notifiable)
         );
 
@@ -61,9 +64,9 @@ class NotificationBroadcastChannelTest extends TestCase
     {
         $notification = new CustomEventNameTestNotification;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
-        $event = new \Illuminate\Notifications\Events\BroadcastNotificationCreated(
+        $event = new BroadcastNotificationCreated(
             $notifiable, $notification, $notification->toArray($notifiable)
         );
 
@@ -76,10 +79,10 @@ class NotificationBroadcastChannelTest extends TestCase
     {
         $notification = new TestNotificationBroadCastedNow;
         $notification->id = 1;
-        $notifiable = Mockery::mock();
+        $notifiable = m::mock();
 
-        $events = Mockery::mock('Illuminate\Contracts\Events\Dispatcher');
-        $events->shouldReceive('dispatch')->once()->with(Mockery::on(function ($event) {
+        $events = m::mock(Dispatcher::class);
+        $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
             return $event->connection == 'sync';
         }));
         $channel = new BroadcastChannel($events);
@@ -130,6 +133,6 @@ class TestNotificationBroadCastedNow extends Notification
 
     public function toBroadcast()
     {
-        return (new \Illuminate\Notifications\Messages\BroadcastMessage([]))->onConnection('sync');
+        return (new BroadcastMessage([]))->onConnection('sync');
     }
 }

@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use stdClass;
 use ArrayObject;
 use Illuminate\Support\Arr;
+use InvalidArgumentException;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
@@ -482,19 +483,19 @@ class SupportArrTest extends TestCase
 
         try {
             Arr::random([]);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $exceptions++;
         }
 
         try {
             Arr::random([], 1);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $exceptions++;
         }
 
         try {
             Arr::random([], 2);
-        } catch (\InvalidArgumentException $e) {
+        } catch (InvalidArgumentException $e) {
             $exceptions++;
         }
 

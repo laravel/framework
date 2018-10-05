@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use Closure;
 use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
@@ -108,7 +109,7 @@ class DatabaseMigrationRepositoryTest extends TestCase
         $connectionMock = m::mock(Connection::class);
         $repo->getConnectionResolver()->shouldReceive('connection')->with(null)->andReturn($connectionMock);
         $repo->getConnection()->shouldReceive('getSchemaBuilder')->once()->andReturn($schema);
-        $schema->shouldReceive('create')->once()->with('migrations', m::type('Closure'));
+        $schema->shouldReceive('create')->once()->with('migrations', m::type(Closure::class));
 
         $repo->createRepository();
     }

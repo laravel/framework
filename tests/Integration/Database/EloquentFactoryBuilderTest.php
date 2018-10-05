@@ -7,6 +7,7 @@ use Orchestra\Testbench\TestCase;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Collection;
 
 /**
  * @group integration
@@ -175,8 +176,8 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $instances = factory(FactoryBuildableUser::class, 3)->make();
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $users);
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Collection::class, $instances);
+        $this->assertInstanceOf(Collection::class, $users);
+        $this->assertInstanceOf(Collection::class, $instances);
         $this->assertCount(3, $users);
         $this->assertCount(3, $instances);
         $this->assertCount(3, FactoryBuildableUser::find($users->pluck('id')->toArray()));

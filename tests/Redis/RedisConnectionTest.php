@@ -6,6 +6,8 @@ use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\RedisManager;
 use Illuminate\Foundation\Application;
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Redis\Connections\Connection;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 class RedisConnectionTest extends TestCase
@@ -581,13 +583,13 @@ class RedisConnectionTest extends TestCase
     public function it_dispatches_query_event()
     {
         foreach ($this->connections() as $redis) {
-            $redis->setEventDispatcher($events = m::mock('Illuminate\Contracts\Events\Dispatcher'));
+            $redis->setEventDispatcher($events = m::mock(Dispatcher::class));
 
             $events->shouldReceive('dispatch')->once()->with(m::on(function ($event) {
                 $this->assertEquals('get', $event->command);
                 $this->assertEquals(['foobar'], $event->parameters);
                 $this->assertEquals('default', $event->connectionName);
-                $this->assertInstanceOf('\Illuminate\Redis\Connections\Connection', $event->connection);
+                $this->assertInstanceOf(Connection::class, $event->connection);
 
                 return true;
             }));

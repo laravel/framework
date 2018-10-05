@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Closure;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -134,7 +135,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $cache = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -144,7 +145,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->increment('foo'));
 
         $cache->value = serialize('bar');
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -154,7 +155,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->increment('foo'));
 
         $cache->value = serialize(2);
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -173,7 +174,7 @@ class CacheDatabaseStoreTest extends TestCase
         $table = m::mock(stdClass::class);
         $cache = m::mock(stdClass::class);
 
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -183,7 +184,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->decrement('foo'));
 
         $cache->value = serialize('bar');
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);
@@ -193,7 +194,7 @@ class CacheDatabaseStoreTest extends TestCase
         $this->assertFalse($store->decrement('foo'));
 
         $cache->value = serialize(3);
-        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type('Closure'))->andReturnUsing(function ($closure) {
+        $store->getConnection()->shouldReceive('transaction')->once()->with(m::type(Closure::class))->andReturnUsing(function ($closure) {
             return $closure();
         });
         $store->getConnection()->shouldReceive('table')->once()->with('table')->andReturn($table);

@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use PDO;
+use DateTime;
 use Exception;
 use Mockery as m;
 use PDOException;
@@ -357,7 +358,7 @@ class DatabaseConnectionTest extends TestCase
 
     public function testPrepareBindings()
     {
-        $date = m::mock('DateTime');
+        $date = m::mock(DateTime::class);
         $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
         $bindings = ['test' => $date];
         $conn = $this->getMockConnection();
