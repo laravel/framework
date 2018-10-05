@@ -208,11 +208,13 @@ class Mailable implements MailableContract, Renderable
      */
     public function render()
     {
-        Container::getInstance()->call([$this, 'build']);
+        return $this->withLocale($this->locale, function () {
+            Container::getInstance()->call([$this, 'build']);
 
-        return Container::getInstance()->make('mailer')->render(
-            $this->buildView(), $this->buildViewData()
-        );
+            return Container::getInstance()->make('mailer')->render(
+                $this->buildView(), $this->buildViewData()
+            );
+        });
     }
 
     /**
