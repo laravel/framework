@@ -90,9 +90,9 @@ class AuthPasswordBrokerTest extends TestCase
         }));
     }
 
-    public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters()
+    public function testRedirectReturnedByRemindWhenPasswordsLessThanEightCharacters()
     {
-        $creds = ['password' => 'abc', 'password_confirmation' => 'abc'];
+        $creds = ['password' => 'abcdefg', 'password_confirmation' => 'abcdefg'];
         $broker = $this->getBroker($mocks = $this->getMocks());
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
