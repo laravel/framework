@@ -11,11 +11,6 @@ use Illuminate\Queue\Jobs\RedisJob;
 
 class QueueRedisJobTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();

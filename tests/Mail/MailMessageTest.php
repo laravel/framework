@@ -21,15 +21,8 @@ class MailMessageTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         $this->swift = m::mock(\Swift_Mime_Message::class);
         $this->message = new Message($this->swift);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testFromMethod()

@@ -13,11 +13,6 @@ use Illuminate\Database\PostgresConnection;
 
 class CacheDatabaseStoreTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testNullIsReturnedWhenItemNotFound()
     {
         $store = $this->getStore();

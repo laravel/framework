@@ -10,11 +10,6 @@ use Illuminate\Notifications\Messages\DatabaseMessage;
 
 class NotificationDatabaseChannelTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationDatabaseChannelTestNotification;

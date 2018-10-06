@@ -11,11 +11,6 @@ use Illuminate\Database\Query\Processors\Processor;
 
 class DatabaseProcessorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testInsertGetIdProcessing()
     {
         $pdo = $this->createMock(ProcessorTestPDOStub::class);

@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Cache\Repository;
@@ -14,14 +13,11 @@ class RedisCacheIntegrationTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
         $this->setUpRedis();
     }
 
     public function tearDown()
     {
-        parent::tearDown();
-        m::close();
         $this->tearDownRedis();
     }
 

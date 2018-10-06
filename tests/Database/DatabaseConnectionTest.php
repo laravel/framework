@@ -25,11 +25,6 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseConnectionTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSettingDefaultCallsGetDefaultGrammar()
     {
         $connection = $this->getMockConnection();

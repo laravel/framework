@@ -17,7 +17,7 @@ class ThrottleRequestsTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function getEnvironmentSetUp($app)

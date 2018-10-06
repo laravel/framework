@@ -11,11 +11,6 @@ use Illuminate\Database\Schema\Grammars\MySqlGrammar;
 
 class DatabaseMySqlSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint('users');

@@ -19,11 +19,6 @@ use Illuminate\Database\Query\Builder as BaseBuilder;
 
 class DatabaseEloquentBuilderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFindMethod()
     {
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);

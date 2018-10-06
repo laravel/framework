@@ -10,11 +10,6 @@ use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
 class DatabaseEloquentMorphToManyTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testEagerConstraintsAreProperlyAdded()
     {
         $relation = $this->getRelation();

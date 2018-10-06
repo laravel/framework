@@ -16,7 +16,6 @@ class RedisConnectionTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
         $this->setUpRedis();
 
         if (! isset($this->redis['phpredis'])) {
@@ -30,7 +29,6 @@ class RedisConnectionTest extends TestCase
 
     public function tearDown()
     {
-        parent::tearDown();
         $this->tearDownRedis();
     }
 

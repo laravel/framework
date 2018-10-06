@@ -9,11 +9,6 @@ use Illuminate\Database\Eloquent\Relations\Pivot;
 
 class DatabaseEloquentPivotTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPropertiesAreSetCorrectly()
     {
         $parent = m::mock(Model::class.'[getConnectionName]');

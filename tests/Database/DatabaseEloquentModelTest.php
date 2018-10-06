@@ -30,17 +30,12 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         Carbon::setTestNow(Carbon::now());
     }
 
     public function tearDown()
     {
-        parent::tearDown();
-
-        m::close();
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();

@@ -12,16 +12,12 @@ class CacheFileStoreTest extends TestCase
 {
     public function setUp()
     {
-        parent::setUp();
-
         Carbon::setTestNow(Carbon::now());
     }
 
     public function tearDown()
     {
-        parent::tearDown();
-
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testNullIsReturnedIfFileDoesntExist()

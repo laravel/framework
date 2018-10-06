@@ -15,17 +15,12 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 {
     public function setUp()
     {
-        parent::setUp();
-
         Carbon::setTestNow(Carbon::now());
     }
 
     public function tearDown()
     {
-        parent::tearDown();
-
-        m::close();
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testCreateInsertsNewRecordIntoTable()

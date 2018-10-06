@@ -9,11 +9,6 @@ use Illuminate\Filesystem\Filesystem;
 
 class ViewFileViewFinderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicViewFinding()
     {
         $finder = $this->getFinder();

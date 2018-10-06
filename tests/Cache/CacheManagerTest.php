@@ -2,17 +2,11 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\CacheManager;
 
 class CacheManagerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCustomDriverClosureBoundObjectIsCacheManager()
     {
         $cacheManager = new CacheManager([

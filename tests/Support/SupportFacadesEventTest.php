@@ -17,8 +17,6 @@ class SupportFacadesEventTest extends TestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->events = m::spy(Dispatcher::class);
 
         $container = new Container;
@@ -30,8 +28,6 @@ class SupportFacadesEventTest extends TestCase
     public function tearDown()
     {
         Event::clearResolvedInstances();
-
-        m::close();
     }
 
     public function testFakeFor()

@@ -12,11 +12,6 @@ use Illuminate\Database\Console\Migrations\ResetCommand;
 
 class DatabaseMigrationResetCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testResetCommandCallsMigratorWithProperArguments()
     {
         $command = new ResetCommand($migrator = m::mock(Migrator::class));

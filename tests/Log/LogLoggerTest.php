@@ -12,11 +12,6 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class LogLoggerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMethodsPassErrorAdditionsToMonolog()
     {
         $writer = new Logger($monolog = m::mock(Monolog::class));

@@ -11,11 +11,6 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class BroadcasterTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
         $broadcaster = new FakeBroadcaster;

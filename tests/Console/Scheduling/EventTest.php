@@ -9,11 +9,6 @@ use Illuminate\Console\Scheduling\EventMutex;
 
 class EventTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBuildCommand()
     {
         $isWindows = DIRECTORY_SEPARATOR == '\\';

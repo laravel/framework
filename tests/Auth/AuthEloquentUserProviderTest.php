@@ -12,11 +12,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthEloquentUserProviderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRetrieveByIDReturnsUser()
     {
         $provider = $this->getProviderMock();

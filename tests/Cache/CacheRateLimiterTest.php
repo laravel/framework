@@ -9,11 +9,6 @@ use Illuminate\Contracts\Cache\Repository as Cache;
 
 class CacheRateLimiterTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testTooManyAttemptsReturnTrueIfAlreadyLockedOut()
     {
         $cache = m::mock(Cache::class);

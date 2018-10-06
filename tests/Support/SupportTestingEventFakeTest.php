@@ -13,7 +13,6 @@ class SupportTestingEventFakeTest extends TestCase
 {
     protected function setUp()
     {
-        parent::setUp();
         $this->fake = new EventFake(m::mock(Dispatcher::class));
     }
 

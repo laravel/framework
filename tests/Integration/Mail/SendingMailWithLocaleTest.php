@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Mockery as m;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
@@ -21,8 +20,6 @@ class SendingMailWithLocaleTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        m::close();
     }
 
     protected function getEnvironmentSetUp($app)
@@ -44,11 +41,6 @@ class SendingMailWithLocaleTest extends TestCase
                 ],
             ],
         ]);
-    }
-
-    public function setUp()
-    {
-        parent::setUp();
     }
 
     public function test_mail_is_sent_with_default_locale()

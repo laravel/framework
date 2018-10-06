@@ -17,8 +17,6 @@ class SupportCarbonTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         Carbon::setTestNow($this->now = Carbon::create(2017, 6, 27, 13, 14, 15, 'UTC'));
     }
 
@@ -26,8 +24,6 @@ class SupportCarbonTest extends TestCase
     {
         Carbon::setTestNow();
         Carbon::serializeUsing(null);
-
-        parent::tearDown();
     }
 
     public function testInstance()

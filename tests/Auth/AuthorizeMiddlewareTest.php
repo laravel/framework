@@ -22,15 +22,8 @@ class AuthorizeMiddlewareTest extends TestCase
     protected $user;
     protected $router;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function setUp()
     {
-        parent::setUp();
-
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);

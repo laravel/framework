@@ -27,7 +27,6 @@ class ValidationValidatorTest extends TestCase
     public function tearDown()
     {
         Carbon::setTestNow();
-        m::close();
     }
 
     public function testSometimesWorksOnNestedArrays()

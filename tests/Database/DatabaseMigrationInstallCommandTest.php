@@ -12,11 +12,6 @@ use Illuminate\Database\Migrations\MigrationRepositoryInterface;
 
 class DatabaseMigrationInstallCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFireCallsRepositoryToInstall()
     {
         $command = new InstallCommand($repo = m::mock(MigrationRepositoryInterface::class));

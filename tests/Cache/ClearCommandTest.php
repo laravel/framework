@@ -40,8 +40,6 @@ class ClearCommandTest extends TestCase
      */
     protected function setUp()
     {
-        parent::setUp();
-
         $this->cacheManager = m::mock(CacheManager::class);
         $this->files = m::mock(Filesystem::class);
         $this->cacheRepository = m::mock(Repository::class);
@@ -50,11 +48,6 @@ class ClearCommandTest extends TestCase
         $app = new Application;
         $app['path.storage'] = __DIR__;
         $this->command->setLaravel($app);
-    }
-
-    public function tearDown()
-    {
-        m::close();
     }
 
     public function testClearWithNoStoreArgument()

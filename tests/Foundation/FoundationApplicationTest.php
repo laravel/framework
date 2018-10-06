@@ -12,11 +12,6 @@ use Illuminate\Foundation\Bootstrap\RegisterFacades;
 
 class FoundationApplicationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSetLocaleSetsLocaleAndFiresLocaleChangedEvent()
     {
         $app = new Application;

@@ -11,11 +11,6 @@ use Illuminate\Contracts\Encryption\Encrypter;
 
 class EncryptedSessionStoreTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSessionIsProperlyEncrypted()
     {
         $session = $this->getSession();
