@@ -24,8 +24,6 @@ class SupportCarbonTest extends TestCase
     {
         Carbon::setTestNow();
         Carbon::serializeUsing(null);
-
-        parent::tearDown();
     }
 
     public function testInstance()

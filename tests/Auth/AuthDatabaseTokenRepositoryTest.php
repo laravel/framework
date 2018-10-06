@@ -20,8 +20,6 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
 
     public function tearDown()
     {
-        parent::tearDown();
-
         Carbon::setTestNow();
     }
 

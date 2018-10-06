@@ -17,8 +17,6 @@ class CacheFileStoreTest extends TestCase
 
     public function tearDown()
     {
-        parent::tearDown();
-
         Carbon::setTestNow();
     }
 

@@ -18,7 +18,6 @@ class RedisCacheIntegrationTest extends TestCase
 
     public function tearDown()
     {
-        parent::tearDown();
         $this->tearDownRedis();
     }
 
