@@ -11,11 +11,6 @@ use Illuminate\Database\ConnectionResolverInterface;
 
 class ValidationDatabasePresenceVerifierTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicCount()
     {
         $verifier = new DatabasePresenceVerifier($db = m::mock(ConnectionResolverInterface::class));

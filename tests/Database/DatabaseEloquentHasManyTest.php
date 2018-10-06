@@ -12,11 +12,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMakeMethodDoesNotSaveNewModel()
     {
         $relation = $this->getRelation();

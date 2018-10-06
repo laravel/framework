@@ -9,11 +9,6 @@ use Illuminate\View\Compilers\CompilerInterface;
 
 class ViewCompilerEngineTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testViewsMayBeRecompiledAndRendered()
     {
         $engine = $this->getEngine();

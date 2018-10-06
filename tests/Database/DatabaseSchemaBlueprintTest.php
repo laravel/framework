@@ -13,11 +13,6 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSchemaBlueprintTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testToSqlRunsCommandsFromBlueprint()
     {
         $conn = m::mock(Connection::class);

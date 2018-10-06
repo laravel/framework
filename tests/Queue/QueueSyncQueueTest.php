@@ -13,11 +13,6 @@ use Illuminate\Contracts\Queue\QueueableEntity;
 
 class QueueSyncQueueTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushShouldFireJobInstantly()
     {
         unset($_SERVER['__sync.test']);

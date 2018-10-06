@@ -9,11 +9,6 @@ use Illuminate\Notifications\SendQueuedNotifications;
 
 class NotificationSendQueuedNotificationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testNotificationsCanBeSent()
     {
         $job = new SendQueuedNotifications('notifiables', 'notification');

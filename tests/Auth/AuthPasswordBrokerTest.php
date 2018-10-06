@@ -14,11 +14,6 @@ use Illuminate\Contracts\Auth\PasswordBroker as PasswordBrokerContract;
 
 class AuthPasswordBrokerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testIfUserIsNotFoundErrorRedirectIsReturned()
     {
         $mocks = $this->getMocks();

@@ -14,11 +14,6 @@ use Illuminate\Database\Eloquent\Relations\Relation;
 
 class DatabaseEloquentRelationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSetRelationFail()
     {
         $parent = new EloquentRelationResetModelStub;

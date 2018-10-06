@@ -9,11 +9,6 @@ use Illuminate\Filesystem\Filesystem;
 
 class FoundationComposerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDumpAutoloadRunsTheCorrectCommand()
     {
         $escape = '\\' === DIRECTORY_SEPARATOR ? '"' : '\'';

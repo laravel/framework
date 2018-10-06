@@ -28,7 +28,6 @@ class ConsoleScheduledEventTest extends TestCase
     {
         date_default_timezone_set($this->defaultTimezone);
         Carbon::setTestNow(null);
-        m::close();
     }
 
     public function testBasicCronCompilation()

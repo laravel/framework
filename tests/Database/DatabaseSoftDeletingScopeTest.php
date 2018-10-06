@@ -15,11 +15,6 @@ use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testApplyingScopeToABuilder()
     {
         $scope = m::mock(SoftDeletingScope::class.'[extend]');

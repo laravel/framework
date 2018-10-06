@@ -15,11 +15,6 @@ use Illuminate\Contracts\Support\Renderable;
 
 class ViewTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDataCanBeSetOnView()
     {
         $view = $this->getView();

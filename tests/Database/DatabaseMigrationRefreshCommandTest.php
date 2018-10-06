@@ -16,11 +16,6 @@ use Symfony\Component\Console\Application as ConsoleApplication;
 
 class DatabaseMigrationRefreshCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRefreshCommandCallsCommandsWithProperArguments()
     {
         $command = new RefreshCommand($migrator = m::mock(Migrator::class));

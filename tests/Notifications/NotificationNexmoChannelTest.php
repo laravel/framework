@@ -11,11 +11,6 @@ use Illuminate\Notifications\Channels\NexmoSmsChannel;
 
 class NotificationNexmoChannelTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSmsIsSentViaNexmo()
     {
         $notification = new NotificationNexmoChannelTestNotification;

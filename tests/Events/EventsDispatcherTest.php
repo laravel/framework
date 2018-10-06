@@ -14,11 +14,6 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 
 class EventsDispatcherTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicEventExecution()
     {
         unset($_SERVER['__event.test']);

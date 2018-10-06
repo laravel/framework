@@ -14,11 +14,6 @@ use Illuminate\Contracts\Support\Htmlable;
 
 class SupportHelpersTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testArrayDot()
     {
         $array = Arr::dot(['name' => 'taylor', 'languages' => ['php' => true]]);

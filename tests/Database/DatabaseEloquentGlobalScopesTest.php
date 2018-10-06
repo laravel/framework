@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Scope;
@@ -23,8 +22,6 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 
     public function tearDown()
     {
-        m::close();
-
         Model::unsetConnectionResolver();
     }
 

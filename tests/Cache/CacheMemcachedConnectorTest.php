@@ -9,11 +9,6 @@ use Illuminate\Cache\MemcachedConnector;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testServersAreAddedCorrectly()
     {
         $memcached = $this->memcachedMockWithAddServer();

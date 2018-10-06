@@ -22,8 +22,6 @@ class FilesystemTest extends TestCase
 
     public function tearDown()
     {
-        m::close();
-
         $files = new Filesystem;
         $files->deleteDirectory($this->tempDir);
     }

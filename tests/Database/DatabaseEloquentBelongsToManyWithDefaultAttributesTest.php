@@ -10,11 +10,6 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testwithPivotValueMethodSetsWhereConditionsForFetching()
     {
         $relation = $this->getMockBuilder(BelongsToMany::class)->setMethods(['touchIfTouching'])->setConstructorArgs($this->getRelationArguments())->getMock();

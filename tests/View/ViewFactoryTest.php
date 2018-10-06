@@ -22,11 +22,6 @@ use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 
 class ViewFactoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMakeCreatesNewViewInstanceWithProperPathAndEngine()
     {
         unset($_SERVER['__test.view']);

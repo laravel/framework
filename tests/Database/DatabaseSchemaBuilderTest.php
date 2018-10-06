@@ -10,11 +10,6 @@ use Illuminate\Database\Schema\Builder;
 
 class DatabaseSchemaBuilderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testHasTableCorrectlyCallsGrammar()
     {
         $connection = m::mock(Connection::class);

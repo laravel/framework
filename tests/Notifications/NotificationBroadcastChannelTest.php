@@ -13,11 +13,6 @@ use Illuminate\Notifications\Events\BroadcastNotificationCreated;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
         $notification = new NotificationBroadcastChannelTestNotification;

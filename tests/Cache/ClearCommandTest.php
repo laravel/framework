@@ -52,11 +52,6 @@ class ClearCommandTest extends TestCase
         $this->command->setLaravel($app);
     }
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testClearWithNoStoreArgument()
     {
         $this->files->shouldReceive('exists')->andReturn(true);

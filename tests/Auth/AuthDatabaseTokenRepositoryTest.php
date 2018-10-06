@@ -24,7 +24,6 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     {
         parent::tearDown();
 
-        m::close();
         Carbon::setTestNow(null);
     }
 

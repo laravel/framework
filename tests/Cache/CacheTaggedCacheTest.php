@@ -14,11 +14,6 @@ use Illuminate\Cache\RedisTaggedCache;
 
 class CacheTaggedCacheTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCacheCanBeSavedWithMultipleTags()
     {
         $store = new ArrayStore;
