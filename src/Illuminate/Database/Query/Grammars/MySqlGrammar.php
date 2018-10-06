@@ -74,7 +74,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonLength($column, $operator, $value)
     {
-        list($field, $path) = $this->wrapJsonFieldAndPath($column);
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_length('.$field.$path.') '.$operator.' '.$value;
     }
@@ -194,7 +194,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonUpdateColumn($key, JsonExpression $value)
     {
-        list($field, $path) = $this->wrapJsonFieldAndPath($key);
+        [$field, $path] = $this->wrapJsonFieldAndPath($key);
 
         return "{$field} = json_set({$field}{$path}, {$value->getValue()})";
     }
