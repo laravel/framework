@@ -5,7 +5,7 @@
 ### Fixed
 - Fixed broken email sub-copy template escaping ([#25734](https://github.com/laravel/framework/pull/25734))
 - Fixed required carbon version ([394f79f](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
-- Fixed translation escaping ([25858](https://github.com/laravel/framework/pull/25858), [4c46500](https://github.com/laravel/framework/commit/4c465007bbf51d7f269871cd76b6d99de7df90bb))
+- Fixed translation escaping ([#25858](https://github.com/laravel/framework/pull/25858), [4c46500](https://github.com/laravel/framework/commit/4c465007bbf51d7f269871cd76b6d99de7df90bb))
 
 
 ## [v5.6.38 (2018-09-04)](https://github.com/laravel/framework/compare/v5.6.37...v5.6.38)
