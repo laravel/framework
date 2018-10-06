@@ -9,11 +9,6 @@ use Illuminate\Translation\FileLoader;
 
 class TranslationFileLoaderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testLoadMethodWithoutNamespacesProperlyCallsLoader()
     {
         $loader = new FileLoader($files = m::mock(Filesystem::class), __DIR__);

@@ -9,11 +9,6 @@ use Illuminate\Contracts\Redis\Factory;
 
 class CacheRedisStoreTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testGetReturnsNullWhenNotFound()
     {
         $redis = $this->getRedis();

@@ -12,11 +12,6 @@ use Illuminate\Database\Console\Migrations\RollbackCommand;
 
 class DatabaseMigrationRollbackCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRollbackCommandCallsMigratorWithProperArguments()
     {
         $command = new RollbackCommand($migrator = m::mock(Migrator::class));

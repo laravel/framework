@@ -9,11 +9,6 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeElseGuestStatementsTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testIfStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

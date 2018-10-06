@@ -13,11 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 class SessionStoreTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testSessionIsLoadedFromHandler()
     {
         $session = $this->getSession();

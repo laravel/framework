@@ -12,11 +12,6 @@ use Illuminate\Database\Console\Migrations\MigrateCommand;
 
 class DatabaseMigrationMigrateCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicMigrationsCallMigratorWithProperArguments()
     {
         $command = new MigrateCommand($migrator = m::mock(Migrator::class));

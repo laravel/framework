@@ -12,11 +12,6 @@ use Illuminate\Contracts\Auth\Authenticatable;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testRetrieveByIDReturnsUserWhenUserIsFound()
     {
         $conn = m::mock(Connection::class);

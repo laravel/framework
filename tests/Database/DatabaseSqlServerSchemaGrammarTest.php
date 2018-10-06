@@ -10,11 +10,6 @@ use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
 
 class DatabaseSqlServerSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint('users');

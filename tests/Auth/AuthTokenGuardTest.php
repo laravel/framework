@@ -10,11 +10,6 @@ use Illuminate\Contracts\Auth\UserProvider;
 
 class AuthTokenGuardTest extends TestCase
 {
-    protected function tearDown()
-    {
-        m::close();
-    }
-
     public function testUserCanBeRetrievedByQueryStringVariable()
     {
         $provider = m::mock(UserProvider::class);

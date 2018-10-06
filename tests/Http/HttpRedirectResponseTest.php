@@ -14,11 +14,6 @@ use Illuminate\Contracts\Support\MessageProvider;
 
 class HttpRedirectResponseTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testHeaderOnRedirect()
     {
         $response = new RedirectResponse('foo.bar');

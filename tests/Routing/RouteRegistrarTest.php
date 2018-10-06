@@ -23,11 +23,6 @@ class RouteRegistrarTest extends TestCase
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
     }
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMiddlewareFluentRegistration()
     {
         $this->router->middleware(['one', 'two'])->get('users', function () {

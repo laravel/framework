@@ -13,11 +13,6 @@ use Illuminate\Database\Connectors\SqlServerConnector;
 
 class DatabaseConnectorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testOptionResolution()
     {
         $connector = new Connector;

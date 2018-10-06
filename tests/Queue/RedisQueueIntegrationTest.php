@@ -32,7 +32,6 @@ class RedisQueueIntegrationTest extends TestCase
         Carbon::setTestNow(null);
         parent::tearDown();
         $this->tearDownRedis();
-        m::close();
     }
 
     /**

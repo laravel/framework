@@ -11,11 +11,6 @@ use Illuminate\Contracts\Translation\Loader;
 
 class TranslationTranslatorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testHasMethodReturnsFalseWhenReturnedTranslationIsNull()
     {
         $t = $this->getMockBuilder(Translator::class)->setMethods(['get'])->setConstructorArgs([$this->getLoader(), 'en'])->getMock();
