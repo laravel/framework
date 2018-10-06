@@ -18,8 +18,6 @@ class RouteRegistrarTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         $this->router = new Router(m::mock(Dispatcher::class), Container::getInstance());
     }
 

@@ -23,7 +23,6 @@ class SupportTestingMailFakeTest extends TestCase
 
     protected function setUp()
     {
-        parent::setUp();
         $this->fake = new MailFake;
         $this->mailable = new MailableStub;
     }

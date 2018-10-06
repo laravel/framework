@@ -16,7 +16,6 @@ class RedisConnectionTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
         $this->setUpRedis();
 
         if (! isset($this->redis['phpredis'])) {

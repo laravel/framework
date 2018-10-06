@@ -28,7 +28,6 @@ class SupportTestingNotificationFakeTest extends TestCase
 
     protected function setUp()
     {
-        parent::setUp();
         $this->fake = new NotificationFake;
         $this->notification = new NotificationStub;
         $this->user = new UserStub;

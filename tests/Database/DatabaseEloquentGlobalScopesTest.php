@@ -12,8 +12,6 @@ class DatabaseEloquentGlobalScopesTest extends TestCase
 {
     public function setUp()
     {
-        parent::setUp();
-
         tap(new DB)->addConnection([
             'driver'    => 'sqlite',
             'database'  => ':memory:',

@@ -36,8 +36,6 @@ class RepositoryTest extends TestCase
                 'z' => 'zoo',
             ],
         ]);
-
-        parent::setUp();
     }
 
     public function testConstruct()

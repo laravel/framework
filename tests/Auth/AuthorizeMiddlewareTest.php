@@ -24,8 +24,6 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function setUp()
     {
-        parent::setUp();
-
         $this->user = new stdClass;
 
         Container::setInstance($this->container = new Container);

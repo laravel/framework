@@ -12,8 +12,6 @@ class CacheFileStoreTest extends TestCase
 {
     public function setUp()
     {
-        parent::setUp();
-
         Carbon::setTestNow(Carbon::now());
     }
 

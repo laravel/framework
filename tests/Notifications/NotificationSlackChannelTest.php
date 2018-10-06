@@ -26,8 +26,6 @@ class NotificationSlackChannelTest extends TestCase
 
     protected function setUp()
     {
-        parent::setUp();
-
         $this->guzzleHttp = m::mock(Client::class);
 
         $this->slackChannel = new SlackWebhookChannel($this->guzzleHttp);
