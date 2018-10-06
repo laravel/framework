@@ -366,7 +366,7 @@ class Handler implements ExceptionHandlerContract
     /**
      * Render the given HttpException.
      *
-     * @param  HttpExceptionInterface  $e
+     * @param  \Symfony\Component\HttpKernel\Exception\HttpExceptionInterface  $e
      * @return \Symfony\Component\HttpFoundation\Response
      */
     protected function renderHttpException(HttpExceptionInterface $e)
