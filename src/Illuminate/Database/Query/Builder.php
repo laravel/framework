@@ -2632,6 +2632,21 @@ class Builder
     }
 
     /**
+     * Toggle a boolean column's value.
+     *
+     * @param  string  $column
+     * @return int
+     */
+    public function toggle($column)
+    {
+        $wrapped = $this->grammar->wrap($column);
+
+        $columns = array_merge([$column => $this->raw("!$wrapped")]);
+
+        return $this->update($columns);
+    }
+
+    /**
      * Delete a record from the database.
      *
      * @param  mixed  $id
