@@ -24,7 +24,7 @@ class AuthDatabaseTokenRepositoryTest extends TestCase
     {
         parent::tearDown();
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testCreateInsertsNewRecordIntoTable()

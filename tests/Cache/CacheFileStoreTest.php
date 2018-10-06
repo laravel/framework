@@ -21,7 +21,7 @@ class CacheFileStoreTest extends TestCase
     {
         parent::tearDown();
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     public function testNullIsReturnedIfFileDoesntExist()

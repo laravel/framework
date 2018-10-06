@@ -39,7 +39,7 @@ class DatabaseEloquentModelTest extends TestCase
     {
         parent::tearDown();
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
 
         Model::unsetEventDispatcher();
         Carbon::resetToStringFormat();

@@ -30,7 +30,7 @@ class EloquentMorphManyTest extends DatabaseTestCase
             $table->timestamps();
         });
 
-        Carbon::setTestNow(null);
+        Carbon::setTestNow();
     }
 
     /**
