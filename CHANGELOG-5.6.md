@@ -4,8 +4,8 @@
 
 ### Fixed
 - Fixed broken email sub-copy template escaping ([#25734](https://github.com/laravel/framework/pull/25734))
-- Fixed required carbon version ([394f79f9a6651b103f6e065cb4470b4b347239ea](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
-- Fixed translation escaping ([25858](https://github.com/laravel/framework/pull/25858), [4c465007bbf51d7f269871cd76b6d99de7df90bb](https://github.com/laravel/framework/commit/4c465007bbf51d7f269871cd76b6d99de7df90bb))
+- Fixed required carbon version ([394f79f](https://github.com/laravel/framework/commit/394f79f9a6651b103f6e065cb4470b4b347239ea))
+- Fixed translation escaping ([#25858](https://github.com/laravel/framework/pull/25858), [4c46500](https://github.com/laravel/framework/commit/4c465007bbf51d7f269871cd76b6d99de7df90bb))
 
 
 ## [v5.6.38 (2018-09-04)](https://github.com/laravel/framework/compare/v5.6.37...v5.6.38)
@@ -35,7 +35,7 @@
 - Fix mailables always being queued for later if using Queueable trait ([#25378](https://github.com/laravel/framework/pull/25378))
 
 ### Security
-- escape lang directive echos ([d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b](https://github.com/laravel/framework/commit/d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b))
+- escape lang directive echos ([d3c0a36](https://github.com/laravel/framework/commit/d3c0a369057d0b6ebf29b5f51c903b1a85e3e09b))
 
 ## v5.6.35 (2018-08-27)
 
