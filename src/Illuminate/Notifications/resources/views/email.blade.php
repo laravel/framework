@@ -56,7 +56,7 @@
     'into your web browser: [:actionURL](:actionURL)',
     [
         'actionText' => $actionText,
-        'actionURL' => $actionUrl
+        'actionURL' => $actionUrl,
     ]
 )
 @endcomponent
