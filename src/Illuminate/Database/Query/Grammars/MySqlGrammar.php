@@ -60,7 +60,7 @@ class MySqlGrammar extends Grammar
      */
     protected function compileJsonContains($column, $value)
     {
-        list($field, $path) = $this->wrapJsonFieldAndPath($column);
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_contains('.$field.', '.$value.$path.')';
     }
@@ -313,7 +313,7 @@ class MySqlGrammar extends Grammar
      */
     protected function wrapJsonSelector($value)
     {
-        list($field, $path) = $this->wrapJsonFieldAndPath($value);
+        [$field, $path] = $this->wrapJsonFieldAndPath($value);
 
         return 'json_unquote(json_extract('.$field.$path.'))';
     }
