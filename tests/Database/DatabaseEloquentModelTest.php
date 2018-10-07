@@ -138,13 +138,13 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub(['attributes' => 1, 'connection' => 2, 'table' => 3]);
         unset($model['table']);
 
-        $this->assertTrue(isset($model['attributes']));
+        $this->assertArrayHasKey('attributes', $model);
         $this->assertEquals($model['attributes'], 1);
-        $this->assertTrue(isset($model['connection']));
+        $this->assertArrayHasKey('connection', $model);
         $this->assertEquals($model['connection'], 2);
-        $this->assertFalse(isset($model['table']));
+        $this->assertArrayNotHasKey('table', $model);
         $this->assertEquals($model['table'], null);
-        $this->assertFalse(isset($model['with']));
+        $this->assertArrayNotHasKey('with', $model);
     }
 
     public function testOnly()
@@ -727,7 +727,7 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('abby', $array['partner']['name']);
         $this->assertNull($array['group']);
         $this->assertEquals([], $array['multi']);
-        $this->assertFalse(isset($array['password']));
+        $this->assertArrayNotHasKey('password', $array);
 
         $model->setAppends(['appendable']);
         $array = $model->toArray();

@@ -1310,7 +1310,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
-        $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+        $this->assertArrayNotHasKey('route.test.controller.except.middleware', $_SERVER);
     }
 
     public function testControllerRoutingArrayCallable()
@@ -1330,7 +1330,7 @@ class RoutingRouteTest extends TestCase
         $this->assertEquals(Response::class, $_SERVER['route.test.controller.middleware.class']);
         $this->assertEquals(0, $_SERVER['route.test.controller.middleware.parameters.one']);
         $this->assertEquals(['foo', 'bar'], $_SERVER['route.test.controller.middleware.parameters.two']);
-        $this->assertFalse(isset($_SERVER['route.test.controller.except.middleware']));
+        $this->assertArrayNotHasKey('route.test.controller.except.middleware', $_SERVER);
         $action = $router->getRoutes()->getRoutes()[0]->getAction()['controller'];
         $this->assertEquals(RouteTestControllerStub::class.'@index', $action);
     }

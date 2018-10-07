@@ -37,13 +37,13 @@ class LogLoggerTest extends TestCase
         });
 
         $writer->error('foo');
-        $this->assertTrue(isset($_SERVER['__log.level']));
+        $this->assertArrayHasKey('__log.level', $_SERVER);
         $this->assertEquals('error', $_SERVER['__log.level']);
         unset($_SERVER['__log.level']);
-        $this->assertTrue(isset($_SERVER['__log.message']));
+        $this->assertArrayHasKey('__log.message', $_SERVER);
         $this->assertEquals('foo', $_SERVER['__log.message']);
         unset($_SERVER['__log.message']);
-        $this->assertTrue(isset($_SERVER['__log.context']));
+        $this->assertArrayHasKey('__log.context', $_SERVER);
         $this->assertEquals([], $_SERVER['__log.context']);
         unset($_SERVER['__log.context']);
     }
