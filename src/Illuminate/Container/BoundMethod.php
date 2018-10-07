@@ -124,6 +124,7 @@ class BoundMethod
      *
      * @param  callable|string $callback
      * @return \ReflectionFunctionAbstract
+     *
      * @throws \ReflectionException
      */
     protected static function getCallReflector($callback)
