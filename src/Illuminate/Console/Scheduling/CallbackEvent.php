@@ -2,6 +2,7 @@
 
 namespace Illuminate\Console\Scheduling;
 
+use Closure;
 use LogicException;
 use InvalidArgumentException;
 use Illuminate\Contracts\Container\Container;
@@ -161,6 +162,6 @@ class CallbackEvent extends Event
             return $this->description;
         }
 
-        return is_string($this->callback) ? $this->callback : 'Closure';
+        return is_string($this->callback) ? $this->callback : Closure::class;
     }
 }

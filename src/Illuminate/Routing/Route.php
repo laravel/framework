@@ -703,7 +703,7 @@ class Route
      */
     public function getActionName()
     {
-        return $this->action['controller'] ?? 'Closure';
+        return $this->action['controller'] ?? Closure::class;
     }
 
     /**
