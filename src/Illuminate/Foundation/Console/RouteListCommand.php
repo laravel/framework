@@ -149,7 +149,7 @@ class RouteListCommand extends Command
     protected function getMiddleware($route)
     {
         return collect($route->gatherMiddleware())->map(function ($middleware) {
-            return $middleware instanceof Closure ? 'Closure' : $middleware;
+            return $middleware instanceof Closure ? Closure::class : $middleware;
         })->implode(',');
     }
 
