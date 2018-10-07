@@ -392,7 +392,7 @@ class ContainerTest extends TestCase
         $container->instance('object', new stdClass);
         $container->alias('object', 'alias');
 
-        $this->assertArrayHasKey('object' ,$container);
+        $this->assertArrayHasKey('object', $container);
         $this->assertArrayHasKey('alias', $container);
     }
 
