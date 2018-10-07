@@ -350,12 +350,13 @@ trait InteractsWithPivotTable
      * Detach models from the relationship.
      *
      * @param  mixed  $ids
+     * @param  array  $attributes
      * @param  bool  $touch
      * @return int
      */
-    public function detach($ids = null, $touch = true)
+    public function detach($ids = null, $attributes = [], $touch = true)
     {
-        $query = $this->newPivotQuery();
+        $query = $this->newPivotQuery()->where($attributes);
 
         // If associated IDs were passed to the method we will only delete those
         // associations, otherwise all of the association ties will be broken.
