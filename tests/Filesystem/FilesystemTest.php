@@ -41,6 +41,16 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
+    public function testReplaceStoresFiles()
+    {
+        $files = new Filesystem;
+        $files->replace($this->tempDir.'/file.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
+
+        $files->replace($this->tempDir.'/file.txt', 'Something Else');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something Else');
+    }
+
     public function testSetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
@@ -495,5 +505,34 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         $filesystem = new Filesystem;
         $this->assertEquals('acbd18db4cc2f85cedef654fccc4a4d8', $filesystem->hash($this->tempDir.'/foo.txt'));
+    }
+
+    public function testPermissions()
+    {
+        file_put_contents($this->tempDir.'/foo.txt', 'foo');
+        chmod($this->tempDir.'/foo.txt', 0123);
+
+        $filesystem = new Filesystem;
+        $this->assertEquals(0123, $filesystem->permissions($this->tempDir.'/foo.txt'));
+    }
+
+    public function testOwner()
+    {
+        $uid = posix_geteuid();
+        file_put_contents($this->tempDir.'/foo.txt', 'foo');
+        chown($this->tempDir.'/foo.txt', $uid);
+
+        $filesystem = new Filesystem;
+        $this->assertEquals($uid, $filesystem->owner($this->tempDir.'/foo.txt'));
+    }
+
+    public function testGroup()
+    {
+        $gid = posix_getegid();
+        file_put_contents($this->tempDir.'/foo.txt', 'foo');
+        chown($this->tempDir.'/foo.txt', $gid);
+
+        $filesystem = new Filesystem;
+        $this->assertEquals($gid, $filesystem->group($this->tempDir.'/foo.txt'));
     }
 }
