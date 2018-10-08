@@ -2,8 +2,8 @@
 
 namespace Illuminate\Filesystem;
 
-use ErrorException;
 use Exception;
+use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Traits\Macroable;

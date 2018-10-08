@@ -2,7 +2,6 @@
 
 namespace Illuminate\Foundation;
 
-use Exception;
 use Illuminate\Filesystem\Filesystem;
 
 class PackageManifest
@@ -164,6 +163,6 @@ class PackageManifest
      */
     protected function write(array $manifest)
     {
-        $this->files->replace($this->manifestPath, '<?php return ' . var_export($manifest, true) . ';');
+        $this->files->replace($this->manifestPath, '<?php return '.var_export($manifest, true).';');
     }
 }
