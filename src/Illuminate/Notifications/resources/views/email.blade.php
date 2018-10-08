@@ -51,12 +51,12 @@
 @component('mail::subcopy')
 @lang(
     "If you’re having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
-    'into your web browser: ',
+    'into your web browser: [:actionURL](:actionURL)',
     [
-        'actionText' => $actionText
+        'actionText' => $actionText,
+        'actionUrl' => $actionUrl
     ]
 )
-[{{ $actionUrl }}]({!! $actionUrl !!})
 @endcomponent
 @endisset
 @endcomponent

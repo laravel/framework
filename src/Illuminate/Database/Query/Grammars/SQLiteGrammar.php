@@ -153,7 +153,7 @@ class SQLiteGrammar extends Grammar
      */
     protected function compileJsonLength($column, $operator, $value)
     {
-        list($field, $path) = $this->wrapJsonFieldAndPath($column);
+        [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_array_length('.$field.$path.') '.$operator.' '.$value;
     }
