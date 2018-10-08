@@ -1046,6 +1046,67 @@ class Builder
     }
 
     /**
+     * Add a where between column statement to the query.
+     *
+     * @param  mixed   $value
+     * @param  string  $first
+     * @param  string  $second
+     * @param  string  $boolean
+     * @param  bool    $not
+     * @return $this
+     */
+    public function whereBetweenColumn($value, $first, $second, $boolean = 'and', $not = false)
+    {
+        $type = 'betweenColumn';
+
+        $this->wheres[] = compact('type', 'value', 'first', 'second', 'boolean', 'not');
+
+        $this->addBinding($value, 'where');
+
+        return $this;
+    }
+
+    /**
+     * Add an or where between column statement to the query.
+     *
+     * @param  mixed   $value
+     * @param  string  $first
+     * @param  string  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereBetweenColumn($value, $first, $second)
+    {
+        return $this->whereBetweenColumn($value, $first, $second, 'or');
+    }
+
+    /**
+     * Add a where not between column statement to the query.
+     *
+     * @param  mixed   $value
+     * @param  string  $first
+     * @param  string  $second
+     * @param  string  $boolean
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function whereNotBetweenColumn($value, $first, $second, $boolean = 'and')
+    {
+        return $this->whereBetweenColumn($value, $first, $second, $boolean, true);
+    }
+
+    /**
+     * Add an or where not between column statement to the query.
+     *
+     * @param  mixed   $value
+     * @param  string  $first
+     * @param  string  $second
+     * @return \Illuminate\Database\Query\Builder|static
+     */
+    public function orWhereNotBetweenColumn($value, $first, $second)
+    {
+        return $this->whereNotBetweenColumn($value, $first, $second, 'or');
+    }
+
+    /**
      * Add an "or where not null" clause to the query.
      *
      * @param  string  $column

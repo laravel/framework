@@ -340,6 +340,22 @@ class Grammar extends BaseGrammar
     }
 
     /**
+     * Compile a "between column" where clause.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param  array  $where
+     * @return string
+     */
+    protected function whereBetweenColumn(Builder $query, $where)
+    {
+        $between = $where['not'] ? 'not between' : 'between';
+
+        $value = $this->parameter($where['value']);
+
+        return $value.' '.$between.' '.$this->wrap($where['first']).' and '.$this->wrap($where['second']);
+    }
+
+    /**
      * Compile a "where date" clause.
      *
      * @param  \Illuminate\Database\Query\Builder  $query
