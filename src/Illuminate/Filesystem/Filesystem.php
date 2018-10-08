@@ -151,7 +151,6 @@ class Filesystem
         if (file_exists($path)) {
             // Copy over the permissions and owner from the original file.
             chmod($tempPath, (int) base_convert(substr((string) decoct(fileperms($path)), -3), 8, 10));
-            chown($tempPath, fileowner($path));
             chgrp($tempPath, filegroup($path));
         }
 
