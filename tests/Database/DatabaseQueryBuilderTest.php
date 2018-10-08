@@ -1675,14 +1675,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSQLiteMultipleInserts()
-    {
-        $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"', ['foo', 'taylor', 'bar', 'dayle'])->andReturn(true);
-        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['email' => 'bar', 'name' => 'dayle']]);
-        $this->assertTrue($result);
-    }
-
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
