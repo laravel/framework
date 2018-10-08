@@ -42,6 +42,16 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
+    public function testReplaceStoresFiles()
+    {
+        $files = new Filesystem;
+        $files->replace($this->tempDir.'/file.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
+
+        $files->replace($this->tempDir.'/file.txt', 'Something Else');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something Else');
+    }
+
     public function testSetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
