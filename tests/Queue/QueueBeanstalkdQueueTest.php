@@ -12,11 +12,6 @@ use Illuminate\Queue\Jobs\BeanstalkdJob;
 
 class QueueBeanstalkdQueueTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoBeanstalkd()
     {
         $queue = new BeanstalkdQueue(m::mock(Pheanstalk::class), 'default', 60);

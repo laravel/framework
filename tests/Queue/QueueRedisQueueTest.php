@@ -11,11 +11,6 @@ use Illuminate\Contracts\Redis\Factory;
 
 class QueueRedisQueueTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoRedis()
     {
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();

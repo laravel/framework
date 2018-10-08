@@ -33,11 +33,6 @@ class NotificationSlackChannelTest extends TestCase
         $this->slackChannel = new SlackWebhookChannel($this->guzzleHttp);
     }
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     /**
      * @dataProvider payloadDataProvider
      * @param Notification $notification

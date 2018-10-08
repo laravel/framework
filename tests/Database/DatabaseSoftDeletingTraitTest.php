@@ -9,11 +9,6 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDeleteSetsSoftDeletedColumn()
     {
         $model = m::mock(DatabaseSoftDeletingTraitStub::class);

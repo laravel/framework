@@ -19,11 +19,6 @@ class DatabaseEloquentHasOneTest extends TestCase
 
     protected $parent;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testHasOneWithDefault()
     {
         $relation = $this->getRelation()->withDefault();

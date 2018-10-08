@@ -26,8 +26,6 @@ class SendingMailNotificationsTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        m::close();
     }
 
     protected function getEnvironmentSetUp($app)

@@ -15,11 +15,6 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
     protected $related;
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBelongsToWithDefault()
     {
         $relation = $this->getRelation()->withDefault(); //belongsTo relationships

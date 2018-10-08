@@ -18,11 +18,6 @@ use Illuminate\Contracts\Events\Dispatcher;
 
 class MailMailerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMailerSendSendsMessageWithProperViewContent()
     {
         unset($_SERVER['__mailer.test']);

@@ -19,11 +19,6 @@ use Illuminate\Support\Testing\Fakes\QueueFake;
 
 class MailableQueuedTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testQueuedMailableSent()
     {
         $queueFake = new QueueFake(new Application);

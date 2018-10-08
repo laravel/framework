@@ -10,11 +10,6 @@ use Illuminate\Contracts\Encryption\Encrypter;
 
 class QueueManagerTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testDefaultConnectionCanBeResolved()
     {
         $app = [

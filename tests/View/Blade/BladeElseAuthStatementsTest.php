@@ -9,11 +9,6 @@ use Illuminate\View\Compilers\BladeCompiler;
 
 class BladeElseAuthStatementsTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testElseAuthStatementsAreCompiled()
     {
         $compiler = new BladeCompiler($this->getFiles(), __DIR__);

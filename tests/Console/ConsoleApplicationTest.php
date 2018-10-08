@@ -12,11 +12,6 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 class ConsoleApplicationTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testAddSetsLaravelInstance()
     {
         $app = $this->getMockConsole(['addToParent']);

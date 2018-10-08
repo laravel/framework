@@ -12,11 +12,6 @@ use Illuminate\Queue\DatabaseQueue;
 
 class QueueDatabaseQueueUnitTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPushProperlyPushesJobOntoDatabase()
     {
         $queue = $this->getMockBuilder(DatabaseQueue::class)->setMethods(['currentTime'])->setConstructorArgs([$database = m::mock(Connection::class), 'table', 'default'])->getMock();

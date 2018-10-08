@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Mail;
 
-use Mockery as m;
 use Illuminate\Mail\Mailable;
 use Illuminate\Support\Carbon;
 use Orchestra\Testbench\TestCase;
@@ -21,8 +20,6 @@ class SendingMailWithLocaleTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        m::close();
     }
 
     protected function getEnvironmentSetUp($app)

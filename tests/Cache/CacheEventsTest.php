@@ -14,11 +14,6 @@ use Illuminate\Cache\Events\KeyForgotten;
 
 class CacheEventsTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testHasTriggersEvents()
     {
         $dispatcher = $this->getDispatcher();

@@ -20,8 +20,6 @@ class CallQueuedHandlerTest extends TestCase
     public function tearDown()
     {
         parent::tearDown();
-
-        m::close();
     }
 
     public function test_job_can_be_dispatched()

@@ -25,6 +25,9 @@
             </exclude>
         </whitelist>
     </filter>
+    <listeners>
+        <listener class="Illuminate\Tests\TestListener" file="./tests/TestListener.php"/>
+    </listeners>
     <php>
       <!--
       <env name="REDIS_HOST" value="127.0.0.1" />

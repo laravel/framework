@@ -12,11 +12,6 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 
 class DatabaseSQLiteSchemaGrammarTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicCreateTable()
     {
         $blueprint = new Blueprint('users');

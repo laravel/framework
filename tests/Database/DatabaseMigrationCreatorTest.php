@@ -9,11 +9,6 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 class DatabaseMigrationCreatorTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicCreateMethodStoresMigrationFile()
     {
         $creator = $this->getCreator();

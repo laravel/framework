@@ -21,11 +21,6 @@ use Illuminate\Contracts\Encryption\Encrypter;
 
 class AuthGuardTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testBasicReturnsNullOnValidAttempt()
     {
         [$session, $provider, $request, $cookie] = $this->getMocks();

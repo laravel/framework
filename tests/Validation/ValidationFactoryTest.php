@@ -11,11 +11,6 @@ use Illuminate\Contracts\Translation\Translator as TranslatorInterface;
 
 class ValidationFactoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testMakeMethodCreatesValidValidator()
     {
         $translator = m::mock(TranslatorInterface::class);

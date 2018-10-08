@@ -21,11 +21,6 @@ class SupportServiceProviderTest extends TestCase
         $two->boot();
     }
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testPublishableServiceProviders()
     {
         $toPublish = ServiceProvider::publishableProviders();

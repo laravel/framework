@@ -14,11 +14,6 @@ use Illuminate\Database\Migrations\MigrationCreator;
 
 class SessionTableCommandTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testCreateMakesMigration()
     {
         $command = new SessionTableCommandTestStub(

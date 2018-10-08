@@ -12,11 +12,6 @@ use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testServicesAreRegisteredWhenManifestIsNotRecompiled()
     {
         $app = m::mock(Application::class);

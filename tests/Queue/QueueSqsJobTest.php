@@ -50,11 +50,6 @@ class QueueSqsJobTest extends TestCase
         ];
     }
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFireProperlyCallsTheJobHandler()
     {
         $job = $this->getJob();

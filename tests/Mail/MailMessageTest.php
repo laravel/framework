@@ -27,11 +27,6 @@ class MailMessageTest extends TestCase
         $this->message = new Message($this->swift);
     }
 
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testFromMethod()
     {
         $this->swift->shouldReceive('setFrom')->once()->with('foo@bar.baz', 'Foo');

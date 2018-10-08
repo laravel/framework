@@ -11,11 +11,6 @@ use Illuminate\Contracts\Notifications\Dispatcher;
 
 class NotificationRoutesNotificationsTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testNotificationCanBeDispatched()
     {
         $container = new Container;

@@ -10,11 +10,6 @@ use Illuminate\Support\Collection as BaseCollection;
 
 class DatabaseEloquentCollectionTest extends TestCase
 {
-    public function tearDown()
-    {
-        m::close();
-    }
-
     public function testAddingItemsToCollection()
     {
         $c = new Collection(['foo']);
