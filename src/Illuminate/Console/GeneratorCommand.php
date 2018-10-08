@@ -72,6 +72,8 @@ abstract class GeneratorCommand extends Command
         $this->files->put($path, $this->buildClass($name));
 
         $this->info($this->type.' created successfully.');
+
+        $this->launchInEditor($path);
     }
 
     /**
@@ -247,5 +249,24 @@ abstract class GeneratorCommand extends Command
         return [
             ['name', InputArgument::REQUIRED, 'The name of the class'],
         ];
+    }
+
+    /**
+     * Takes the newly generated file, and attempts to launch in the OS's default editor
+     * for .php files
+     * @param $path
+     */
+    protected function launchInEditor($path)
+    {
+        $editors = [
+            '/usr/bin/open',
+            '/usr/bin/xdg-open',
+        ];
+
+        foreach ($editors as $editor) {
+            if (file_exists($editor)) {
+                `$editor $path`;
+            }
+        }
     }
 }
