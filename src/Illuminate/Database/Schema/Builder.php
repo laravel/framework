@@ -216,7 +216,7 @@ class Builder
     }
 
     /**
-     * Drop all views from the database.
+     * Get all of the table names for the database.
      *
      * @return void
      *
