@@ -52,7 +52,7 @@ trait InteractsWithQueue
      * Release the job back into the queue.
      *
      * @param  int   $delay
-     * @return void
+     * @return mixed
      */
     public function release($delay = 0)
     {
