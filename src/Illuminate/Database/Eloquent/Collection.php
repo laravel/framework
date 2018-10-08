@@ -63,7 +63,7 @@ class Collection extends BaseCollection implements QueueableCollection
         return $this;
     }
 
-     /**
+    /**
      * Load a set of relationship counts onto the collection.
      *
      * @param  array|string  $relations
