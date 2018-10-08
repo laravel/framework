@@ -3,6 +3,7 @@
 namespace Illuminate\Filesystem;
 
 use ErrorException;
+use Exception;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Support\Traits\Macroable;
@@ -55,14 +56,21 @@ class Filesystem
 
         if ($handle) {
             try {
-                if (flock($handle, LOCK_SH)) {
-                    clearstatcache(true, $path);
+                // First we try a non-block lock to prevent deadlocks on filesystems that don't support locks.
+                $lockSuccessful = flock($handle, LOCK_SH | LOCK_NB, $wouldBlock);
 
-                    $contents = fread($handle, $this->size($path) ?: 1);
+                // If there is no lock but it's because the lock would block, do a blocking lock to wait for the lock.
+                if (! $lockSuccessful && $wouldBlock) {
+                    $lockSuccessful = flock($handle, LOCK_SH, $wouldBlock);
+                }
 
+                clearstatcache(true, $path);
+                $contents = fread($handle, $this->size($path) ?: 1);
+            } finally {
+                if ($lockSuccessful) {
                     flock($handle, LOCK_UN);
                 }
-            } finally {
+
                 fclose($handle);
             }
         }
@@ -119,7 +127,72 @@ class Filesystem
      */
     public function put($path, $contents, $lock = false)
     {
-        return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+        $bytesWritten = false;
+
+        // Opening the file for writing without truncating.
+        $handle = fopen($path, 'cb');
+        if ($handle) {
+            $lockSuccessful = false;
+
+            try {
+                if ($lock) {
+                    // First we try a non-blocking lock to prevent deadlocks on filesystems that don't support locks.
+                    $lockSuccessful = flock($handle, LOCK_EX | LOCK_NB, $wouldBlock);
+
+                    // If there is no lock because the lock would block, do a blocking lock to wait for the lock.
+                    if (! $lockSuccessful && $wouldBlock) {
+                        $lockSuccessful = flock($handle, LOCK_EX, $wouldBlock);
+                    }
+                }
+
+                // We manually truncate the file because we opened the file with 'cb' earlier.
+                ftruncate($handle, 0);
+                $bytesWritten = fwrite($handle, $contents);
+            } finally {
+                if ($lockSuccessful) {
+                    flock($handle, LOCK_UN);
+                }
+
+                fclose($handle);
+            }
+        }
+
+        return $bytesWritten;
+    }
+
+    /**
+     * Write the contents of a file, replacing it atomically if it already exists.
+     *
+     * @param string $path
+     * @param string $content
+     * @throws Exception
+     */
+    public function replace($path, $content)
+    {
+        // Just in case path already exists and is a symlink, we want to make sure we get the real path.
+        clearstatcache(true, $path);
+        $realPath = realpath($path);
+        if ($realPath) {
+            $path = $realPath;
+        }
+
+        $dirName = dirname($path);
+        if (! is_writable($dirName)) {
+            throw new Exception("Replacing $path requires it's parent directory to be writable.");
+        }
+
+        // Write out the contents to a temp file, so we can rename the file atomically.
+        $tempPath = tempnam($dirName, basename($path));
+        $this->put($tempPath, $content);
+
+        if (file_exists($path)) {
+            // Copy over the permissions and owner from the original file.
+            chmod($tempPath, $this->permissions($path));
+            chown($tempPath, $this->owner($path));
+            chgrp($tempPath, $this->group($path));
+        }
+
+        rename($tempPath, $path);
     }
 
     /**
@@ -581,5 +654,58 @@ class Filesystem
     public function cleanDirectory($directory)
     {
         return $this->deleteDirectory($directory, true);
+    }
+
+    /**
+     * Return permissions in a format that can be used by chmod().
+     *
+     * This function only returns the lowest 12 bytes (or last 3 octal digits) for compatibility.
+     *
+     * @param string $path Path to the file.
+     * @return int
+     * @throws FileNotFoundException
+     */
+    public function permissions(string $path): int
+    {
+        if (! file_exists($path)) {
+            throw new FileNotFoundException("File does not exist at path {$path}");
+        }
+
+        $perms = fileperms($path);
+
+        // Convert perms to octal so we only grab the last three digits
+        $perms = substr((string) decoct($perms), -3);
+
+        return (int) base_convert($perms, 8, 10);
+    }
+
+    /**
+     * Get the owner of a file.
+     *
+     * @param string $path Path to the file.
+     * @return int The user ID in numerical format.
+     * @throws FileNotFoundException
+     */
+    public function owner(string $path)
+    {
+        if (! file_exists($path)) {
+            throw new FileNotFoundException("File does not exist at path {$path}");
+        }
+
+        return fileowner($path);
+    }
+
+    /**
+     * @param string $path
+     * @return int The group ID in numerical format.
+     * @throws FileNotFoundException
+     */
+    public function group(string $path)
+    {
+        if (! file_exists($path)) {
+            throw new FileNotFoundException("File does not exist at path {$path}");
+        }
+
+        return filegroup($path);
     }
 }
