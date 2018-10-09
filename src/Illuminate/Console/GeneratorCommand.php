@@ -5,6 +5,7 @@ namespace Illuminate\Console;
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 abstract class GeneratorCommand extends Command
 {
@@ -33,6 +34,13 @@ abstract class GeneratorCommand extends Command
         parent::__construct();
 
         $this->files = $files;
+
+        $this->addOption(
+            'open',
+            'o',
+            InputOption::VALUE_NONE,
+            'Launch the generated file in your .php editor'
+        );
     }
 
     /**
@@ -73,7 +81,9 @@ abstract class GeneratorCommand extends Command
 
         $this->info($this->type.' created successfully.');
 
-        $this->launchInEditor($path);
+        if ($this->input->getOption('open')) {
+            $this->launchInEditor($path);
+        }
     }
 
     /**
@@ -263,7 +273,7 @@ abstract class GeneratorCommand extends Command
             '/usr/bin/open',
             '/usr/bin/xdg-open',
         ]);
-        
+
         foreach ($editors as $editor) {
             if (file_exists($editor)) {
                 shell_exec("$editor $path");
