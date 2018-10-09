@@ -922,8 +922,6 @@ class TestResponse
     public function assertSessionHasNoErrors()
     {
         return $this->assertSessionMissing('errors');
-
-        return $this;
     }
 
     /**
