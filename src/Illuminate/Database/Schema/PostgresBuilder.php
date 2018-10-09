@@ -80,7 +80,7 @@ class PostgresBuilder extends Builder
      *
      * @return array
      */
-    protected function getAllTables()
+    public function getAllTables()
     {
         return $this->connection->select(
             $this->grammar->compileGetAllTables($this->connection->getConfig('schema'))
