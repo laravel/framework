@@ -1,6 +1,6 @@
 # Release Notes for 5.7.x
 
-## [v5.7.8 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
+## [v5.7.9 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
 
 ### Added
 - Support custom user provider names in generator commands ([#25681](https://github.com/laravel/framework/pull/25681))
