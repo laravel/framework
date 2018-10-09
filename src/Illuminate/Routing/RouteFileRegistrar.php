@@ -27,6 +27,8 @@ class RouteFileRegistrar
      */
     public function register($routes)
     {
+        $router = $this->router;
+
         require $routes;
     }
 }
