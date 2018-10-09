@@ -258,14 +258,16 @@ abstract class GeneratorCommand extends Command
      */
     protected function launchInEditor($path)
     {
-        $editors = [
+        $editors = array_filter([
+            env('ARTISAN_LAUNCHER_PATH'),
             '/usr/bin/open',
             '/usr/bin/xdg-open',
-        ];
-
+        ]);
+        
         foreach ($editors as $editor) {
             if (file_exists($editor)) {
-                `$editor $path`;
+                shell_exec("$editor $path");
+                return;
             }
         }
     }
