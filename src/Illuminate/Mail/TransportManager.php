@@ -118,7 +118,7 @@ class TransportManager extends Manager
 
         return new MailgunTransport(
             $this->guzzle($config),
-            $config['secret'], $config['domain'], $config['api_endpoint']
+            $config['secret'], $config['domain'], $config['api_region_endpoint']
         );
     }
 
