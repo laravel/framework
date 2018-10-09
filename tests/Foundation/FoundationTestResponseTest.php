@@ -8,6 +8,7 @@ use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -33,6 +34,25 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertViewHas('foo');
+    }
+
+    public function testAssertViewHasModel()
+    {
+        $model = new class extends Model {
+            public function is($model)
+            {
+                return $this == $model;
+            }
+        };
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'getData' => ['foo' => $model],
+        ]);
+
+        $response->original->foo = $model;
+
+        $response->assertViewHas('foo', $model);
     }
 
     public function testAssertSeeInOrder()
