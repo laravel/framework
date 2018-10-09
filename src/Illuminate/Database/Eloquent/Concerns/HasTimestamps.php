@@ -122,4 +122,14 @@ trait HasTimestamps
     {
         return static::UPDATED_AT;
     }
+
+    /**
+     * Get the fully qualified "updated at" column.
+     *
+     * @return string
+     */
+    public function getQualifiedUpdatedAtColumn()
+    {
+        return $this->getTable().'.'.$this->getUpdatedAtColumn();
+    }
 }
