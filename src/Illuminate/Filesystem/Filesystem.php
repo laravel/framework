@@ -126,6 +126,8 @@ class Filesystem
     /**
      * Write the contents of a file, replacing it atomically if it already exists.
      *
+     * This will also replace the target file permissions.
+     *
      * @param string $path
      * @param string $content
      * @throws Exception
@@ -144,15 +146,9 @@ class Filesystem
             throw new Exception("Replacing $path requires it's parent directory to be writable.");
         }
 
-        // Write out the contents to a temp file, so we can rename the file atomically.
+        // Write out the contents to a temp file, so we then can rename the file atomically.
         $tempPath = tempnam($dirName, basename($path));
-        $this->put($tempPath, $content);
-
-        if (file_exists($path)) {
-            // Copy over the permissions and owner from the original file.
-            chmod($tempPath, (int) base_convert(substr((string) decoct(fileperms($path)), -3), 8, 10));
-            chgrp($tempPath, filegroup($path));
-        }
+        file_put_contents($tempPath, $content);
 
         rename($tempPath, $path);
     }
