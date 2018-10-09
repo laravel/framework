@@ -27,6 +27,13 @@ class MailgunTransport extends Transport
      * @var string
      */
     protected $domain;
+    
+    /**
+     * The Mailgun region API end-point.
+     *
+     * @var string
+     */
+    protected $regionEndpoint;
 
     /**
      * The Mailgun API end-point.
@@ -43,10 +50,11 @@ class MailgunTransport extends Transport
      * @param  string  $domain
      * @return void
      */
-    public function __construct(ClientInterface $client, $key, $domain)
+    public function __construct(ClientInterface $client, $key, $domain, $regionEndpoint)
     {
         $this->key = $key;
         $this->client = $client;
+        $this->regionEndpoint = $regionEndpoint;
         $this->setDomain($domain);
     }
 
@@ -161,7 +169,7 @@ class MailgunTransport extends Transport
      */
     public function setDomain($domain)
     {
-        $this->url = 'https://api.mailgun.net/v3/'.$domain.'/messages.mime';
+        $this->url = 'https://'.$this->regionEndpoint.'/v3/'.$domain.'/messages.mime';
 
         return $this->domain = $domain;
     }
