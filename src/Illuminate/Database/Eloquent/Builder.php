@@ -822,10 +822,15 @@ class Builder
             return $values;
         }
 
-        return Arr::add(
-            $values, $this->model->getUpdatedAtColumn(),
-            $this->model->freshTimestampString()
-        );
+        if (count($this->getQuery()->joins) > 0) {
+            $column = $this->model->getQualifiedUpdatedAtColumn();
+        } else {
+            $column = $this->model->getUpdatedAtColumn();
+        }
+
+        return array_merge($values, [
+            $column => $this->model->freshTimestampString(),
+        ]);
     }
 
     /**
