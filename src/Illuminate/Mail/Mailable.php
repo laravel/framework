@@ -176,6 +176,8 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
+        Container::getInstance()->call([$this, 'build']);
+        
         return $queue->connection($connection)->pushOn(
             $queueName ?: null, new SendQueuedMailable($this)
         );
