@@ -35,12 +35,7 @@ abstract class GeneratorCommand extends Command
 
         $this->files = $files;
 
-        $this->addOption(
-            'open',
-            'o',
-            InputOption::VALUE_NONE,
-            'Launch the generated file in your .php editor'
-        );
+        $this->addOpenOption();
     }
 
     /**
@@ -280,5 +275,18 @@ abstract class GeneratorCommand extends Command
                 return;
             }
         }
+    }
+
+    /**
+     * Defines the command option to launch generated files
+     */
+    protected function addOpenOption()
+    {
+        $this->addOption(
+            'open',
+            'o',
+            InputOption::VALUE_NONE,
+            'Launch the generated file in your .php editor'
+        );
     }
 }
