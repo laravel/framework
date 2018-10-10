@@ -58,7 +58,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $teamMates = $user->teamMatesWithGlobalScope;
 
-        $this->assertEquals(['id' => 2, 'laravel_many_through_key' => 1], $teamMates[0]->getAttributes());
+        $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
     }
 
     public function test_has_self()
