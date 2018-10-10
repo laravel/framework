@@ -46,7 +46,8 @@ class RoutingSortedMiddlewareTest extends TestCase
         $this->assertEquals(['First', 'Second'], (new SortedMiddleware(['First', 'Second'], ['Second', 'First']))->all());
 
         $closure = function () {
-        };
+                                    //
+};
         $this->assertEquals(['Second', $closure], (new SortedMiddleware(['First', 'Second'], ['Second', $closure]))->all());
     }
 }

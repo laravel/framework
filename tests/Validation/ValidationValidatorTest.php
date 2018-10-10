@@ -1859,7 +1859,8 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $closure = function () {
-        };
+                                    //
+};
         $v = new Validator($trans, [['email' => 'foo', 'type' => 'bar']], [
             '*.email' => (new Unique('users'))->where($closure),
             '*.type' => (new Exists('user_types'))->where($closure),

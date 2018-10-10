@@ -365,7 +365,8 @@ class WorkerFakeJob
     public function __construct($callback = null)
     {
         $this->callback = $callback ?: function () {
-        };
+                                    //
+};
     }
 
     public function fire()
@@ -451,4 +452,5 @@ class WorkerFakeJob
 
 class LoopBreakerException extends RuntimeException
 {
+                                    //
 }
