@@ -10,6 +10,8 @@ class ViewPhpEngineTest extends TestCase
 {
     public function tearDown()
     {
+        parent::tearDown();
+
         m::close();
     }
 
@@ -17,6 +19,6 @@ class ViewPhpEngineTest extends TestCase
     {
         $engine = new PhpEngine;
         $this->assertEquals('Hello World
-', $engine->get(__DIR__.'/fixtures/basic.php'));
+', $engine->get(__DIR__.'/Fixtures/basic.php'));
     }
 }

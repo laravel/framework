@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View;
 
 use Closure;
 use ArrayAccess;
+use Illuminate\Tests\View\Fixtures\DataObjectStub;
 use Mockery as m;
 use Illuminate\View\View;
 use Illuminate\View\Factory;
@@ -17,6 +18,8 @@ class ViewTest extends TestCase
 {
     public function tearDown()
     {
+        parent::tearDown();
+
         m::close();
     }
 
@@ -237,9 +240,4 @@ class ViewTest extends TestCase
             $data
         );
     }
-}
-
-class DataObjectStub
-{
-    public $foo = 'bar';
 }
