@@ -479,7 +479,6 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo.txt', 'foo');
         file_put_contents($this->tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
-        $allFiles = [];
         $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles($this->tempDir));
     }
 

@@ -91,7 +91,7 @@ class EloquentFactoryBuilderTest extends TestCase
         });
 
         $factory->afterCreatingState(FactoryBuildableUser::class, 'with_callable_server', function (FactoryBuildableUser $user, Generator $faker) {
-            $server = factory(FactoryBuildableServer::class)
+            factory(FactoryBuildableServer::class)
                 ->state('callable')
                 ->create(['user_id' => $user->id]);
         });

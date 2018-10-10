@@ -1983,7 +1983,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = new Builder($connection, $grammar, $processor);
 
-        $result = $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
+        $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
     }
 
     public function testMySqlUpdateWrappingNestedJson()
@@ -2001,7 +2001,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = new Builder($connection, $grammar, $processor);
 
-        $result = $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
+        $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
     }
 
     public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()

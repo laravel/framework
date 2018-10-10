@@ -91,7 +91,7 @@ class ViewFactoryTest extends TestCase
         $factory->getEngineResolver()->shouldReceive('resolve')->with('php')->andReturn($engine = m::mock(Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->with('php');
         $factory->addExtension('php', 'php');
-        $view = $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
+        $factory->first(['bar', 'view'], ['foo' => 'bar'], ['baz' => 'boom']);
     }
 
     public function testRenderEachCreatesViewForEachItemInArray()

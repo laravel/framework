@@ -201,8 +201,8 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         $tag3 = Tag::create(['name' => str_random()]);
         $tag4 = Tag::create(['name' => str_random()]);
         $tag5 = Tag::create(['name' => str_random()]);
-        $tag6 = Tag::create(['name' => str_random()]);
-        $tag7 = Tag::create(['name' => str_random()]);
+        Tag::create(['name' => str_random()]);
+        Tag::create(['name' => str_random()]);
 
         $post->tags()->attach(Tag::all());
 
@@ -284,7 +284,7 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
     {
         $post = Post::create(['title' => str_random()]);
 
-        $tag = Tag::create(['name' => str_random()]);
+        Tag::create(['name' => str_random()]);
 
         $post->tags()->attach(Tag::all());
 

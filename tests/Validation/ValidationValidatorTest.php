@@ -498,8 +498,7 @@ class ValidationValidatorTest extends TestCase
 
         $trans = $this->getIlluminateArrayTranslator();
         $trans->addLines(['validation.alliteration' => ':attribute needs to begin with the same letter as :other'], 'en');
-        $customAttributes = ['firstname' => 'Firstname', 'lastname' => 'Lastname'];
-        $v = new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
+        new Validator($trans, ['firstname' => 'Bob', 'lastname' => 'Smith'], ['lastname' => 'alliteration:firstname']);
     }
 
     public function testCustomValidationLinesAreRespected()

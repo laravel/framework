@@ -61,7 +61,7 @@ class MailableQueuedTest extends TestCase
     {
         $app = new Application;
         $container = Container::getInstance();
-        $disk = $this->getMockBuilder(Filesystem::class)
+        $this->getMockBuilder(Filesystem::class)
             ->getMock();
         $filesystemFactory = $this->getMockBuilder(FilesystemManager::class)
             ->setConstructorArgs([$app])
