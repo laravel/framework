@@ -7,6 +7,7 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
 use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Tests\Redis\Fixtures\ConcurrencyLimiterMockThatDoesntRelease;
 
 /**
  * @group redislimiters
@@ -151,13 +152,5 @@ class ConcurrentLimiterTest extends TestCase
     private function redis()
     {
         return $this->redis['predis']->connection();
-    }
-}
-
-class ConcurrencyLimiterMockThatDoesntRelease extends ConcurrencyLimiter
-{
-    protected function release($Key)
-    {
-        //
     }
 }
