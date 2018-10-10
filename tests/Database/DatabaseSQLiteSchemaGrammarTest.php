@@ -133,7 +133,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('geo');
         $blueprint->dropSpatialIndex(['coordinates']);
-          $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testRenameTable()
@@ -239,7 +239,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('geo');
         $blueprint->spatialIndex('coordinates');
-          $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     /**
@@ -250,7 +250,7 @@ class DatabaseSQLiteSchemaGrammarTest extends TestCase
     {
         $blueprint = new Blueprint('geo');
         $blueprint->point('coordinates')->spatialIndex();
-          $blueprint->toSql($this->getConnection(), $this->getGrammar());
+        $blueprint->toSql($this->getConnection(), $this->getGrammar());
     }
 
     public function testAddingIncrementingID()

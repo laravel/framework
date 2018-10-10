@@ -193,17 +193,17 @@ class DatabaseEloquentModelTest extends TestCase
 
     public function testFindMethodUseWritePdo()
     {
-       EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
+        EloquentModelFindWithWritePdoStub::onWriteConnection()->find(1);
     }
 
     public function testDestroyMethodCallsQueryBuilderCorrectly()
     {
-         EloquentModelDestroyStub::destroy(1, 2, 3);
+        EloquentModelDestroyStub::destroy(1, 2, 3);
     }
 
     public function testDestroyMethodCallsQueryBuilderCorrectlyWithCollection()
     {
-         EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
+        EloquentModelDestroyStub::destroy(new Collection([1, 2, 3]));
     }
 
     public function testWithMethodCallsQueryBuilderCorrectly()
@@ -1364,7 +1364,7 @@ class DatabaseEloquentModelTest extends TestCase
     public function testGetModelAttributeMethodThrowsExceptionIfNotRelation()
     {
         $model = new EloquentModelStub;
-         $model->incorrectRelationStub;
+        $model->incorrectRelationStub;
     }
 
     public function testModelIsBootedOnUnserialize()
@@ -1376,7 +1376,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = null;
         EloquentModelBootingTestStub::unboot();
         $this->assertFalse(EloquentModelBootingTestStub::isBooted());
-         unserialize($string);
+        unserialize($string);
         $this->assertTrue(EloquentModelBootingTestStub::isBooted());
     }
 

@@ -22,7 +22,7 @@ class DatabaseEloquentMorphTest extends TestCase
 
     public function testMorphOneSetsProperConstraints()
     {
-         $this->getOneRelation();
+        $this->getOneRelation();
     }
 
     public function testMorphOneEagerConstraintsAreProperlyAdded()
@@ -44,7 +44,7 @@ class DatabaseEloquentMorphTest extends TestCase
      */
     public function testMorphManySetsProperConstraints()
     {
-         $this->getManyRelation();
+        $this->getManyRelation();
     }
 
     public function testMorphManyEagerConstraintsAreProperlyAdded()

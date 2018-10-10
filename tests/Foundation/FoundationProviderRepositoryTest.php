@@ -58,7 +58,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
 
-       $repo->load(['foo', 'bar']);
+        $repo->load(['foo', 'bar']);
     }
 
     public function testShouldRecompileReturnsCorrectValue()
