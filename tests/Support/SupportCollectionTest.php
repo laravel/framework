@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Support;
 use stdClass;
 use Exception;
 use ArrayAccess;
+use ArrayObject;
 use Mockery as m;
 use ArrayIterator;
 use CachingIterator;
@@ -2389,13 +2390,13 @@ class SupportCollectionTest extends TestCase
 
     public function testCollectionFromTraversable()
     {
-        $collection = new Collection(new \ArrayObject([1, 2, 3]));
+        $collection = new Collection(new ArrayObject([1, 2, 3]));
         $this->assertEquals([1, 2, 3], $collection->toArray());
     }
 
     public function testCollectionFromTraversableWithKeys()
     {
-        $collection = new Collection(new \ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
+        $collection = new Collection(new ArrayObject(['foo' => 1, 'bar' => 2, 'baz' => 3]));
         $this->assertEquals(['foo' => 1, 'bar' => 2, 'baz' => 3], $collection->toArray());
     }
 

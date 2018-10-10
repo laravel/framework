@@ -470,7 +470,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/2.txt', '2');
         mkdir($this->tempDir.'/foo/bar');
         $files = new Filesystem;
-        $this->assertContainsOnlyInstancesOf(\SplFileInfo::class, $files->files($this->tempDir.'/foo'));
+        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->files($this->tempDir.'/foo'));
         unset($files);
     }
 
@@ -480,7 +480,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
         $allFiles = [];
-        $this->assertContainsOnlyInstancesOf(\SplFileInfo::class, $files->allFiles($this->tempDir));
+        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles($this->tempDir));
     }
 
     public function testCreateFtpDriver()
