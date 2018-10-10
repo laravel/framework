@@ -35,9 +35,11 @@ class ProcessorTestPDOStub extends PDO
 {
     public function __construct()
     {
+        //
     }
 
     public function lastInsertId($sequence = null)
     {
+        //
     }
 }

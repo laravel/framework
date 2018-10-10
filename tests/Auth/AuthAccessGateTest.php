@@ -230,6 +230,7 @@ class AuthAccessGateTest extends TestCase
             return true;
         });
         $gate->before(function () {
+            //
         });
 
         $this->assertTrue($gate->check('foo'));

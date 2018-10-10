@@ -36,6 +36,7 @@ class QueuedListenersTest extends TestCase
 
 class QueuedListenersTestEvent
 {
+    //
 }
 
 class QueuedListenersTestListenerShouldQueue implements ShouldQueue

@@ -31,21 +31,25 @@ class BroadcasterTest extends TestCase
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, $nonModel) {
+            //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', $callback);
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
 
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
+            //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
         $this->assertEquals(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
 
         $callback = function ($user) {
+            //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
 
         $callback = function ($user, $something) {
+            //
         };
         $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
@@ -61,6 +65,7 @@ class BroadcasterTest extends TestCase
         });
         $container->instance(BindingRegistrar::class, $binder);
         $callback = function ($user, $model) {
+            //
         };
         $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
         $this->assertEquals(['bound'], $parameters);
@@ -84,7 +89,9 @@ class BroadcasterTest extends TestCase
     public function testCanRegisterChannelsAsClasses()
     {
         $this->broadcaster->channel('something', function () {
+            //
         });
+
         $this->broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
     }
 
@@ -94,6 +101,7 @@ class BroadcasterTest extends TestCase
     public function testNotFoundThrowsHttpException()
     {
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
+            //
         };
         $this->broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
     }
@@ -290,14 +298,17 @@ class FakeBroadcaster extends Broadcaster
 {
     public function auth($request)
     {
+        //
     }
 
     public function validAuthenticationResponse($request, $result)
     {
+        //
     }
 
     public function broadcast(array $channels, $event, array $payload = [])
     {
+        //
     }
 
     public function extractAuthParameters($pattern, $channel, $callback)
