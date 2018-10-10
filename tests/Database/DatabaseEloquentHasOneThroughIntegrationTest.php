@@ -159,7 +159,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
             'email',
             'created_at',
             'updated_at',
-            'position_id',
+            'laravel_through_key',
         ], array_keys($contract->getAttributes()));
     }
 
@@ -171,7 +171,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
         $this->assertEquals([
             'title',
             'body',
-            'position_id',
+            'laravel_through_key',
         ], array_keys($contract->getAttributes()));
     }
 
@@ -191,7 +191,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'position_id', ], array_keys($contract->getAttributes()));
+                'laravel_through_key', ], array_keys($contract->getAttributes()));
         });
     }
 
@@ -212,7 +212,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'position_id', ], array_keys($contract->getAttributes()));
+                'laravel_through_key', ], array_keys($contract->getAttributes()));
         }
     }
 
@@ -231,7 +231,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
                 'email',
                 'created_at',
                 'updated_at',
-                'position_id', ], array_keys($contract->getAttributes()));
+                'laravel_through_key', ], array_keys($contract->getAttributes()));
         });
     }
 
