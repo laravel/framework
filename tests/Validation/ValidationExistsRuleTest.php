@@ -10,6 +10,7 @@ use Illuminate\Validation\Rules\Exists;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
 use Illuminate\Validation\DatabasePresenceVerifier;
+use Illuminate\Tests\Validation\Fixtures\EloquentTestUser;
 
 class ValidationExistsRuleTest extends TestCase
 {
@@ -20,6 +21,8 @@ class ValidationExistsRuleTest extends TestCase
      */
     public function setUp()
     {
+        parent::tearDown();
+
         $db = new DB;
 
         $db->addConnection([
@@ -170,14 +173,4 @@ class ValidationExistsRuleTest extends TestCase
             new ArrayLoader, 'en'
         );
     }
-}
-
-/**
- * Eloquent Models.
- */
-class EloquentTestUser extends Eloquent
-{
-    protected $table = 'users';
-    protected $guarded = [];
-    public $timestamps = false;
 }
