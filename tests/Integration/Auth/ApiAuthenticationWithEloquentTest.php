@@ -48,5 +48,5 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
 class User extends \Illuminate\Foundation\Auth\User
 {
-                                    //
+    //
 }

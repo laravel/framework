@@ -55,8 +55,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['foo'])->andReturn($user = m::mock(CanResetPassword::class));
         $mocks['tokens']->shouldReceive('create')->once()->with($user)->andReturn('token');
         $callback = function () {
-                                    //
-};
+            //
+        };
         $user->shouldReceive('sendPasswordResetNotification')->with('token');
 
         $this->assertEquals(PasswordBrokerContract::RESET_LINK_SENT, $broker->sendResetLink(['foo'], $callback));
@@ -68,8 +68,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with(['creds'])->andReturn(null);
 
         $this->assertEquals(PasswordBrokerContract::INVALID_USER, $broker->reset(['creds'], function () {
-                                    //
-}));
+            //
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordsDontMatch()
@@ -79,8 +79,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-                                    //
-}));
+            //
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordNotSet()
@@ -90,8 +90,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-                                    //
-}));
+            //
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordsLessThanSixCharacters()
@@ -101,8 +101,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-                                    //
-}));
+            //
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenPasswordDoesntPassValidator()
@@ -115,8 +115,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['users']->shouldReceive('retrieveByCredentials')->once()->with($creds)->andReturn($user = m::mock(CanResetPassword::class));
 
         $this->assertEquals(PasswordBrokerContract::INVALID_PASSWORD, $broker->reset($creds, function () {
-                                    //
-}));
+            //
+        }));
     }
 
     public function testRedirectReturnedByRemindWhenRecordDoesntExistInTable()
@@ -128,8 +128,8 @@ class AuthPasswordBrokerTest extends TestCase
         $mocks['tokens']->shouldReceive('exists')->with($user, 'token')->andReturn(false);
 
         $this->assertEquals(PasswordBrokerContract::INVALID_TOKEN, $broker->reset($creds, function () {
-                                    //
-}));
+            //
+        }));
     }
 
     public function testResetRemovesRecordOnReminderTableAndCallsCallback()

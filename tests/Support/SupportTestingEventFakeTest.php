@@ -99,5 +99,5 @@ class SupportTestingEventFakeTest extends TestCase
 
 class EventStub
 {
-                                    //
+    //
 }

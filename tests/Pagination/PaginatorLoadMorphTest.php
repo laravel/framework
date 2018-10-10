@@ -20,8 +20,8 @@ class PaginatorLoadMorphTest extends TestCase
         $items->shouldReceive('loadMorph')->once()->with('parentable', $relations);
 
         $p = (new class extends AbstractPaginator {
-                                    //
-})->setCollection($items);
+            //
+        })->setCollection($items);
 
         $this->assertSame($p, $p->loadMorph('parentable', $relations));
     }

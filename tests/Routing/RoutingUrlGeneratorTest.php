@@ -230,8 +230,8 @@ class RoutingUrlGeneratorTest extends TestCase
          */
         $url->defaults(['locale' => 'en']);
         $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
-                                    //
-}]);
+            //
+        }]);
         $routes->add($route);
 
         $this->assertEquals('/', $url->route('plain', [], false));
@@ -496,8 +496,8 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {
-                                    //
-}]);
+            //
+        }]);
         $routes->add($route);
 
         $this->assertEquals('http://www.foo.com:8080/foo', $url->route('foo'));

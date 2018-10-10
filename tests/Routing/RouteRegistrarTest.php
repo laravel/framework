@@ -553,5 +553,5 @@ class RouteRegistrarControllerStub
 
 class RouteRegistrarMiddlewareStub
 {
-                                    //
+    //
 }

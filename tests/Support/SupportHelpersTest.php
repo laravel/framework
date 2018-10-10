@@ -955,7 +955,7 @@ class SupportHelpersTest extends TestCase
 
 trait SupportTestTraitOne
 {
-                                    //
+    //
 }
 
 trait SupportTestTraitTwo
@@ -970,12 +970,12 @@ class SupportTestClassOne
 
 class SupportTestClassTwo extends SupportTestClassOne
 {
-                                    //
+    //
 }
 
 trait SupportTestTraitThree
 {
-                                    //
+    //
 }
 
 class SupportTestClassThree extends SupportTestClassTwo

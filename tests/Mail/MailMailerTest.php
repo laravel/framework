@@ -141,8 +141,8 @@ class MailMailerTest extends TestCase
             $this->assertEquals(['taylorotwell@gmail.com' => 'Taylor Otwell'], $message->getFrom());
         });
         $mailer->send('foo', ['data'], function ($m) {
-                                    //
-});
+            //
+        });
     }
 
     public function testFailedRecipientsAreAppendedAndCanBeRetrieved()
@@ -158,8 +158,8 @@ class MailMailerTest extends TestCase
         $mailer->setSwiftMailer($swift);
 
         $mailer->send('foo', ['data'], function ($m) {
-                                    //
-});
+            //
+        });
 
         $this->assertEquals(['taylorotwell@gmail.com'], $mailer->failures());
     }
@@ -177,8 +177,8 @@ class MailMailerTest extends TestCase
         $this->setSwiftMailer($mailer);
         $mailer->getSwiftMailer()->shouldReceive('send')->once()->with(m::type(Swift_Message::class), []);
         $mailer->send('foo', ['data'], function ($m) {
-                                    //
-});
+            //
+        });
     }
 
     public function testMacroable()
