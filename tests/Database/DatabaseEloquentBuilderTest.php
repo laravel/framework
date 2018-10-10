@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Database;
 use Closure;
 use stdClass;
 use Mockery as m;
+use Carbon\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
@@ -1049,6 +1050,24 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->oldest('foo');
     }
 
+    public function testUpdate()
+    {
+        Carbon::setTestNow($now = '2017-10-10 10:10:10');
+
+        $query = new BaseBuilder(m::mock(ConnectionInterface::class), new Grammar, m::mock(Processor::class));
+        $builder = new Builder($query);
+        $model = new EloquentBuilderTestStub;
+        $this->mockConnectionForModel($model, '');
+        $builder->setModel($model);
+        $builder->getConnection()->shouldReceive('update')->once()
+            ->with('update "table" set "table"."updated_at" = ?, "foo" = ?', [$now, 'bar'])->andReturn(1);
+
+        $result = $builder->update(['foo' => 'bar']);
+        $this->assertEquals(1, $result);
+
+        Carbon::setTestNow(null);
+    }
+
     protected function mockConnectionForModel($model, $database)
     {
         $grammarClass = 'Illuminate\Database\Query\Grammars\\'.$database.'Grammar';
@@ -1083,6 +1102,11 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         return $query;
     }
+}
+
+class EloquentBuilderTestStub extends Model
+{
+    protected $table = 'table';
 }
 
 class EloquentBuilderTestScopeStub extends Model

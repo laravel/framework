@@ -857,9 +857,11 @@ class Builder
             return $values;
         }
 
-        return Arr::add(
-            $values, $this->model->getUpdatedAtColumn(),
-            $this->model->freshTimestampString()
+        $column = $this->qualifyColumn($this->model->getUpdatedAtColumn());
+
+        return array_merge(
+            [$column => $this->model->freshTimestampString()],
+            $values
         );
     }
 
