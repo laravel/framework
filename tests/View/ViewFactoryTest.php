@@ -24,6 +24,8 @@ class ViewFactoryTest extends TestCase
 {
     public function tearDown()
     {
+        parent::tearDown();
+
         m::close();
     }
 
@@ -336,7 +338,7 @@ class ViewFactoryTest extends TestCase
     public function testComponentHandling()
     {
         $factory = $this->getFactory();
-        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
+        $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/Fixtures/component.php');
         $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine);
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent('component', ['name' => 'Taylor']);
@@ -497,8 +499,8 @@ class ViewFactoryTest extends TestCase
         $engine->getCompiler()->shouldReceive('isExpired')->twice()->andReturn(false);
         $factory = $this->getFactory();
         $factory->getEngineResolver()->shouldReceive('resolve')->twice()->andReturn($engine);
-        $factory->getFinder()->shouldReceive('find')->once()->with('layout')->andReturn(__DIR__.'/fixtures/section-exception-layout.php');
-        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn(__DIR__.'/fixtures/section-exception.php');
+        $factory->getFinder()->shouldReceive('find')->once()->with('layout')->andReturn(__DIR__.'/Fixtures/section-exception-layout.php');
+        $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn(__DIR__.'/Fixtures/section-exception.php');
         $factory->getDispatcher()->shouldReceive('dispatch')->times(4);
 
         $factory->make('view')->render();

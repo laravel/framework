@@ -12,11 +12,13 @@ use Illuminate\Support\MessageBag;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Tests\View\Fixtures\DataObjectStub;
 
 class ViewTest extends TestCase
 {
     public function tearDown()
     {
+        parent::tearDown();
         m::close();
     }
 
@@ -25,6 +27,7 @@ class ViewTest extends TestCase
         $view = $this->getView();
         $view->with('foo', 'bar');
         $view->with(['baz' => 'boom']);
+
         $this->assertEquals(['foo' => 'bar', 'baz' => 'boom'], $view->getData());
 
         $view = $this->getView();
@@ -237,9 +240,4 @@ class ViewTest extends TestCase
             $data
         );
     }
-}
-
-class DataObjectStub
-{
-    public $foo = 'bar';
 }
