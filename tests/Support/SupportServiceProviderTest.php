@@ -111,6 +111,7 @@ class ServiceProviderForTestingOne extends ServiceProvider
 {
     public function register()
     {
+        //
     }
 
     public function boot()
@@ -124,6 +125,7 @@ class ServiceProviderForTestingTwo extends ServiceProvider
 {
     public function register()
     {
+        //
     }
 
     public function boot()

@@ -106,4 +106,5 @@ class NotificationStub extends Notification
 
 class UserStub extends User
 {
+    //
 }

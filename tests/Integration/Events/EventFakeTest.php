@@ -82,6 +82,7 @@ class Post extends Model
 
 class NonImportantEvent
 {
+    //
 }
 
 class PostObserver

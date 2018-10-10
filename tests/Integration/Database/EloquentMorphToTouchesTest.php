@@ -65,4 +65,5 @@ class Comment extends Model
 
 class Post extends Model
 {
+    //
 }

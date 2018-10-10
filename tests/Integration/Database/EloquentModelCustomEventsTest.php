@@ -56,4 +56,5 @@ class TestModel1 extends Model
 
 class CustomEvent
 {
+    //
 }

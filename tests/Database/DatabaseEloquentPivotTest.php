@@ -187,4 +187,5 @@ class DatabaseEloquentPivotTestJsonCastStub extends Pivot
 
 class DummyModel extends Model
 {
+    //
 }

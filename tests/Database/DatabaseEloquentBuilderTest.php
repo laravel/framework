@@ -443,8 +443,10 @@ class DatabaseEloquentBuilderTest extends TestCase
     {
         $builder = m::mock(Builder::class.'[eagerLoadRelation]', [$this->getMockQueryBuilder()]);
         $nop1 = function () {
+            //
         };
         $nop2 = function () {
+            //
         };
         $builder->setEagerLoads(['foo' => $nop1, 'foo.bar' => $nop2]);
         $builder->shouldAllowMockingProtectedMethods()->shouldReceive('eagerLoadRelation')->with(['models'], 'foo', $nop1)->andReturn(['foo']);
@@ -692,6 +694,7 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         // Remove the global scope so it doesn't interfere with any other tests
         EloquentBuilderTestModelCloseRelatedStub::addGlobalScope('withCount', function ($query) {
+            //
         });
 
         $this->assertEquals('select "id", (select count(*) from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id") as "foo_count" from "eloquent_builder_test_model_parent_stubs"', $builder->toSql());
@@ -1167,6 +1170,7 @@ class EloquentBuilderTestModelCloseRelatedStub extends Model
 
 class EloquentBuilderTestModelFarRelatedStub extends Model
 {
+    //
 }
 
 class EloquentBuilderTestModelSelfRelatedStub extends Model

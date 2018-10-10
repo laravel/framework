@@ -303,4 +303,5 @@ class DatabaseEloquentMorphTest extends TestCase
 
 class EloquentMorphResetModelStub extends Model
 {
+    //
 }
