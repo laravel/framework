@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Auth;
 
+use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\GenericUser;
@@ -45,7 +46,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
     public function testRetrieveByTokenReturnsUser()
     {
-        $mockUser = new \stdClass();
+        $mockUser = new stdClass();
         $mockUser->remember_token = 'a';
 
         $conn = m::mock(Connection::class);
@@ -72,7 +73,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
     public function testRetrieveByBadTokenReturnsNull()
     {
-        $mockUser = new \stdClass();
+        $mockUser = new stdClass();
         $mockUser->remember_token = null;
 
         $conn = m::mock(Connection::class);

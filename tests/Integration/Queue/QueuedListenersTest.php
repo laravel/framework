@@ -2,6 +2,8 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
+use Event;
+use Queue;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Events\CallQueuedListener;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -13,20 +15,20 @@ class QueuedListenersTest extends TestCase
 {
     public function test_listeners_can_be_queued_optionally()
     {
-        \Queue::fake();
+        Queue::fake();
 
-        \Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldQueue::class);
-        \Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldNotQueue::class);
+        Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldQueue::class);
+        Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldNotQueue::class);
 
-        \Event::dispatch(
+        Event::dispatch(
             new QueuedListenersTestEvent()
         );
 
-        \Queue::assertPushed(CallQueuedListener::class, function ($job) {
+        Queue::assertPushed(CallQueuedListener::class, function ($job) {
             return $job->class == QueuedListenersTestListenerShouldQueue::class;
         });
 
-        \Queue::assertNotPushed(CallQueuedListener::class, function ($job) {
+        Queue::assertNotPushed(CallQueuedListener::class, function ($job) {
             return $job->class == QueuedListenersTestListenerShouldNotQueue::class;
         });
     }

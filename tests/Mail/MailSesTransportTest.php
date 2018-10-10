@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Swift_Message;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -38,7 +39,7 @@ class MailSesTransportTest extends TestCase
 
     public function testSend()
     {
-        $message = new \Swift_Message('Foo subject', 'Bar body');
+        $message = new Swift_Message('Foo subject', 'Bar body');
         $message->setSender('myself@example.com');
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');

@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Http;
 
+use stdClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\JsonResponse;
@@ -19,7 +20,7 @@ class HttpJsonResponseTest extends TestCase
     {
         $response = new JsonResponse($data);
 
-        $this->assertInstanceOf(\stdClass::class, $response->getData());
+        $this->assertInstanceOf(stdClass::class, $response->getData());
         $this->assertEquals('bar', $response->getData()->foo);
     }
 
@@ -97,8 +98,8 @@ class HttpJsonResponseTest extends TestCase
         $resource = tmpfile();
 
         // Recursion can't be encoded
-        $recursiveObject = new \stdClass();
-        $objectB = new \stdClass();
+        $recursiveObject = new stdClass();
+        $objectB = new stdClass();
         $recursiveObject->b = $objectB;
         $objectB->a = $recursiveObject;
 

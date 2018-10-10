@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Throwable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\Limiters\ConcurrencyLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
@@ -38,7 +39,7 @@ class ConcurrentLimiterTest extends TestCase
             (new ConcurrencyLimiterMockThatDoesntRelease($this->redis(), 'key', 2, 5))->block(0, function () use (&$store) {
                 $store[] = 3;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
@@ -82,7 +83,7 @@ class ConcurrentLimiterTest extends TestCase
             $lock->block(0, function () use (&$store) {
                 $store[] = 2;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
@@ -112,7 +113,7 @@ class ConcurrentLimiterTest extends TestCase
             $lock->block(0, function () use (&$store) {
                 $store[] = 2;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
@@ -140,7 +141,7 @@ class ConcurrentLimiterTest extends TestCase
             $lock->block(2, function () use (&$store) {
                 $store[] = 2;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 

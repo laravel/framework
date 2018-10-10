@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Filesystem;
 
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
@@ -186,7 +187,7 @@ class FilesystemAdapterTest extends TestCase
 
     public function testStreamInvalidResourceThrows()
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }

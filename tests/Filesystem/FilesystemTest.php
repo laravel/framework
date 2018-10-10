@@ -42,6 +42,16 @@ class FilesystemTest extends TestCase
         $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
     }
 
+    public function testReplaceStoresFiles()
+    {
+        $files = new Filesystem;
+        $files->replace($this->tempDir.'/file.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Hello World');
+
+        $files->replace($this->tempDir.'/file.txt', 'Something Else');
+        $this->assertStringEqualsFile($this->tempDir.'/file.txt', 'Something Else');
+    }
+
     public function testSetChmod()
     {
         file_put_contents($this->tempDir.'/file.txt', 'Hello World');
@@ -460,7 +470,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/foo/2.txt', '2');
         mkdir($this->tempDir.'/foo/bar');
         $files = new Filesystem;
-        $this->assertContainsOnlyInstancesOf(\SplFileInfo::class, $files->files($this->tempDir.'/foo'));
+        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->files($this->tempDir.'/foo'));
         unset($files);
     }
 
@@ -470,7 +480,7 @@ class FilesystemTest extends TestCase
         file_put_contents($this->tempDir.'/bar.txt', 'bar');
         $files = new Filesystem;
         $allFiles = [];
-        $this->assertContainsOnlyInstancesOf(\SplFileInfo::class, $files->allFiles($this->tempDir));
+        $this->assertContainsOnlyInstancesOf(SplFileInfo::class, $files->allFiles($this->tempDir));
     }
 
     public function testCreateFtpDriver()
