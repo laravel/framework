@@ -5,14 +5,17 @@ namespace Illuminate\Routing;
 class RouteFileRegistrar
 {
     /**
+     * The router instance.
+     *
      * @var \Illuminate\Routing\Router
      */
     protected $router;
 
     /**
-     * RegisterRouteFile constructor.
+     * Create a new route file registrar instance.
      *
-     * @param \Illuminate\Routing\Router $router
+     * @param  \Illuminate\Routing\Router  $router
+     * @return void
      */
     public function __construct(Router $router)
     {
@@ -20,9 +23,9 @@ class RouteFileRegistrar
     }
 
     /**
-     * Register the route file.
+     * Require the given routes file.
      *
-     * @param  $routes
+     * @param  string  $routes
      * @return void
      */
     public function register($routes)
