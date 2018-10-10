@@ -275,6 +275,10 @@ abstract class GeneratorCommand extends Command
                 return;
             }
         }
+
+        if (windows_os()) {
+            shell_exec("start $path");
+        }
     }
 
     /**
