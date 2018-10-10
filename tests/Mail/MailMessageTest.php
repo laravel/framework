@@ -4,9 +4,9 @@ namespace Illuminate\Tests\Mail;
 
 use stdClass;
 use Mockery as m;
+use Swift_Mime_Message;
 use Illuminate\Mail\Message;
 use PHPUnit\Framework\TestCase;
-use Swift_Mime_Message;
 
 class MailMessageTest extends TestCase
 {

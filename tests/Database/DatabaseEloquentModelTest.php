@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
-use Foo\Bar\EloquentModelNamespacedStub;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -14,6 +13,7 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
+use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;

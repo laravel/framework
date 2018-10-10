@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
+use stdClass;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
-use stdClass;
 
 class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 {

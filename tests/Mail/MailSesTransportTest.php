@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Mail;
 
+use Swift_Message;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
@@ -9,7 +10,6 @@ use Illuminate\Support\Collection;
 use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
-use Swift_Message;
 
 class MailSesTransportTest extends TestCase
 {

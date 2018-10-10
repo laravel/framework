@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Support;
 
-use ArrayObject;
 use stdClass;
 use Exception;
 use ArrayAccess;
+use ArrayObject;
 use Mockery as m;
 use ArrayIterator;
 use CachingIterator;

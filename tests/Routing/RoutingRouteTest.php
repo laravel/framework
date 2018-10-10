@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
-use Illuminate\Tests\Routing\RouteModelInterface;
 use stdClass;
 use Exception;
 use Illuminate\Support\Str;

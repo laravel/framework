@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Http;
 
+use stdClass;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\Arrayable;
-use stdClass;
 
 class HttpJsonResponseTest extends TestCase
 {

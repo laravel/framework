@@ -2,9 +2,6 @@
 
 namespace Illuminate\Tests\Routing;
 
-use Illuminate\Tests\Routing\RouteRegistrarControllerStubOne;
-use Illuminate\Tests\Routing\RouteRegistrarControllerStubThree;
-use Illuminate\Tests\Routing\RouteRegistrarControllerStubTwo;
 use Mockery as m;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
