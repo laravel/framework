@@ -26,7 +26,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub();  //ie Blog
+        $newModel = new EloquentBelongsToModelStub;  //ie Blog
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -41,7 +41,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub();
+        $newModel = new EloquentBelongsToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -56,7 +56,7 @@ class DatabaseEloquentBelongsToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentBelongsToModelStub();
+        $newModel = new EloquentBelongsToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 

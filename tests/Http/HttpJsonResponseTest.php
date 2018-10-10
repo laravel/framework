@@ -98,8 +98,8 @@ class HttpJsonResponseTest extends TestCase
         $resource = tmpfile();
 
         // Recursion can't be encoded
-        $recursiveObject = new stdClass();
-        $objectB = new stdClass();
+        $recursiveObject = new stdClass;
+        $objectB = new stdClass;
         $recursiveObject->b = $objectB;
         $objectB->a = $recursiveObject;
 

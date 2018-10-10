@@ -1165,7 +1165,7 @@ class SupportCollectionTest extends TestCase
 
     public function testRandomOnEmptyCollection()
     {
-        $data = new Collection();
+        $data = new Collection;
 
         $random = $data->random(0);
         $this->assertInstanceOf(Collection::class, $random);
@@ -2736,7 +2736,7 @@ class SupportCollectionTest extends TestCase
 
     public function testPutAddsItemToCollection()
     {
-        $collection = new Collection();
+        $collection = new Collection;
         $this->assertSame([], $collection->toArray());
         $collection->put('foo', 1);
         $this->assertSame(['foo' => 1], $collection->toArray());
@@ -2748,7 +2748,7 @@ class SupportCollectionTest extends TestCase
 
     public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty()
     {
-        $collection = new Collection();
+        $collection = new Collection;
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
         $collection->foo;

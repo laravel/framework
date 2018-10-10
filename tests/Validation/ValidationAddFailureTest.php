@@ -14,7 +14,7 @@ class ValidationAddFailureTest extends TestCase
      */
     public function makeValidator()
     {
-        $mainTest = new ValidationValidatorTest();
+        $mainTest = new ValidationValidatorTest;
         $trans = $mainTest->getIlluminateArrayTranslator();
         $validator = new Validator($trans, ['foo' => ['bar' => ['baz' => '']]], ['foo.bar.baz' => 'sometimes|required']);
 

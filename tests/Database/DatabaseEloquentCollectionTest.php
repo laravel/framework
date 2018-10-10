@@ -364,7 +364,7 @@ class DatabaseEloquentCollectionTest extends TestCase
 
     public function testEmptyCollectionStayEmptyOnFresh()
     {
-        $c = new Collection();
+        $c = new Collection;
         $this->assertEquals($c, $c->fresh());
     }
 }

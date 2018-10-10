@@ -51,7 +51,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentMorphToModelStub();
+        $newModel = new EloquentMorphToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -66,7 +66,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentMorphToModelStub();
+        $newModel = new EloquentMorphToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
@@ -81,7 +81,7 @@ class DatabaseEloquentMorphToTest extends TestCase
 
         $this->builder->shouldReceive('first')->once()->andReturnNull();
 
-        $newModel = new EloquentMorphToModelStub();
+        $newModel = new EloquentMorphToModelStub;
 
         $this->related->shouldReceive('newInstance')->once()->andReturn($newModel);
 
