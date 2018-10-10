@@ -4,6 +4,7 @@ namespace Illuminate\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
@@ -33,6 +34,8 @@ abstract class GeneratorCommand extends Command
         parent::__construct();
 
         $this->files = $files;
+
+        $this->addOpenOption();
     }
 
     /**
@@ -72,6 +75,10 @@ abstract class GeneratorCommand extends Command
         $this->files->put($path, $this->buildClass($name));
 
         $this->info($this->type.' created successfully.');
+
+        if ($this->input->getOption('open')) {
+            $this->launchInEditor($path);
+        }
     }
 
     /**
@@ -247,5 +254,44 @@ abstract class GeneratorCommand extends Command
         return [
             ['name', InputArgument::REQUIRED, 'The name of the class'],
         ];
+    }
+
+    /**
+     * Takes the newly generated file, and attempts to launch in the OS's default editor
+     * for .php files.
+     * @param $path
+     */
+    protected function launchInEditor($path)
+    {
+        $editors = array_filter([
+            env('ARTISAN_LAUNCHER_PATH'),
+            '/usr/bin/open',
+            '/usr/bin/xdg-open',
+        ]);
+
+        foreach ($editors as $editor) {
+            if (file_exists($editor)) {
+                shell_exec("$editor $path");
+
+                return;
+            }
+        }
+
+        if (windows_os()) {
+            shell_exec("start $path");
+        }
+    }
+
+    /**
+     * Defines the command option to launch generated files.
+     */
+    protected function addOpenOption()
+    {
+        $this->addOption(
+            'open',
+            'o',
+            InputOption::VALUE_NONE,
+            'Launch the generated file in your .php editor'
+        );
     }
 }
