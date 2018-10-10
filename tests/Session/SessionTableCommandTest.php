@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 use Illuminate\Session\Console\SessionTableCommand;
 use Illuminate\Database\Migrations\MigrationCreator;
+use Illuminate\Tests\Session\Fixtures\SessionTableCommandTestStub;
 
 class SessionTableCommandTest extends TestCase
 {
@@ -43,13 +44,5 @@ class SessionTableCommandTest extends TestCase
     protected function runCommand($command, $input = [])
     {
         return $command->run(new ArrayInput($input), new NullOutput);
-    }
-}
-
-class SessionTableCommandTestStub extends SessionTableCommand
-{
-    public function call($command, array $arguments = [])
-    {
-        //
     }
 }
