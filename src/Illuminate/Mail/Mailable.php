@@ -149,7 +149,6 @@ class Mailable implements MailableContract, Renderable
     {
         $this->withLocale($this->locale, function () use ($mailer) {
             Container::getInstance()->call([$this, 'build']);
-
             $mailer->send($this->buildView(), $this->buildViewData(), function ($message) {
                 $this->buildFrom($message)
                      ->buildRecipients($message)
@@ -176,6 +175,8 @@ class Mailable implements MailableContract, Renderable
 
         $queueName = property_exists($this, 'queue') ? $this->queue : null;
 
+        Container::getInstance()->call([$this, 'build']);
+        
         return $queue->connection($connection)->pushOn(
             $queueName ?: null, new SendQueuedMailable($this)
         );
