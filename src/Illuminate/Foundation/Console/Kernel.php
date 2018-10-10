@@ -242,6 +242,8 @@ class Kernel implements KernelContract
      * @param  array  $parameters
      * @param  \Symfony\Component\Console\Output\OutputInterface  $outputBuffer
      * @return int
+     *
+     * @throws \Symfony\Component\Console\Exception\CommandNotFoundException
      */
     public function call($command, array $parameters = [], $outputBuffer = null)
     {
