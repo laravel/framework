@@ -28,6 +28,7 @@ namespace Illuminate\Support\Facades;
  * @method static \Illuminate\Routing\Route permanentRedirect(string $uri, string $destination)
  * @method static \Illuminate\Routing\Route view(string $uri, string $view, array $data = [])
  * @method static void bind(string $key, string|callable $binder)
+ * @method static void model(string $key, string $class, \Closure|null $callback = null)
  * @method static \Illuminate\Routing\Route current()
  * @method static string|null currentRouteName()
  * @method static string|null currentRouteAction()
