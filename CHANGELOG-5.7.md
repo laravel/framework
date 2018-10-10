@@ -1,5 +1,30 @@
 # Release Notes for 5.7.x
 
+## [v5.7.9 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
+
+### Added
+- Support custom user provider names in generator commands ([#25681](https://github.com/laravel/framework/pull/25681))
+- Added 401 Exception view ([#26002](https://github.com/laravel/framework/pull/26002))
+- Added `Categorical imperative` quote to `Inspiring.php` ([#25968](https://github.com/laravel/framework/pull/25968))
+- Mailable `render` method respects `Mailable@locale` property ([#25990](https://github.com/laravel/framework/pull/25990))
+- Added some meta data to the notification mails ([477273c](https://github.com/laravel/framework/commit/477273c72be8b253b6421c69f3e37b5bf4c3a185))
+- Added `Macroable` trait to `PendingResourceRegistration` ([#25947](https://github.com/laravel/framework/pull/25947))
+- Added `assertSessionDoesntHaveErrors` method to `TestResponse.php` ([#25949](https://github.com/laravel/framework/pull/25949), [3005706](https://github.com/laravel/framework/commit/3005706abb411d1468adbff6627ff26351afe446))
+- Enable passing options to custom presets ([#25930](https://github.com/laravel/framework/pull/25930))
+
+### Fixed
+- Fix missing `illuminate/support` dependency in `illuminate/container` ([#25955](https://github.com/laravel/framework/pull/25955))
+- Extend grammar ([#25944](https://github.com/laravel/framework/pull/25944))
+
+### Changed
+- Improved PSR-11 implementation ([#25870](https://github.com/laravel/framework/pull/25870))
+- Changed the sentence of error 403 view from unauthorised to forbidden ([#26002](https://github.com/laravel/framework/pull/26002))
+- Revert email lang template changes ([#25963](https://github.com/laravel/framework/pull/25963))
+- Added model checking in `assertViewHas` ([#26012](https://github.com/laravel/framework/pull/26012))
+
+### Changed realization
+- Inline `Arr::pluck()` in `data_get()` ([#25938](https://github.com/laravel/framework/pull/25938))
+
 ## [v5.7.8 (2018-10-04)](https://github.com/laravel/framework/compare/v5.7.7...v5.7.8)
 
 ### Added
