@@ -921,7 +921,17 @@ class TestResponse
      */
     public function assertSessionHasNoErrors()
     {
-        return $this->assertSessionMissing('errors');
+        $hasErrors = $this->session()->has('errors');
+
+        $errors = $hasErrors ? $this->session()->get('errors')->all() : [];
+
+        PHPUnit::assertFalse(
+            $hasErrors,
+            'Session has unexpected errors: '.PHP_EOL.
+            json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
+        );
+
+        return $this;
     }
 
     /**
