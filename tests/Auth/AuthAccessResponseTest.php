@@ -15,7 +15,7 @@ class AuthAccessResponseTest extends TestCase
         $response = new Response('some data');
         $this->assertSame('some data', (string) $response);
 
-        $response = new Response();
+        $response = new Response;
         $this->assertSame('', (string) $response);
     }
 }

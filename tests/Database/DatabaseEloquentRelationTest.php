@@ -200,7 +200,7 @@ class DatabaseEloquentRelationTest extends TestCase
                 $this->assertTrue($related::isIgnoringTouch());
                 $this->assertTrue($relatedChild::isIgnoringTouch());
 
-                throw new Exception();
+                throw new Exception;
             });
 
             $this->fail('Exception was not thrown');

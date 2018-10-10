@@ -65,7 +65,7 @@ class EventFakeTest extends TestCase
         Event::fake(NonImportantEvent::class);
         Post::observe([PostObserver::class]);
 
-        $post = new Post();
+        $post = new Post;
         $post->title = 'xyz';
         $post->save();
 

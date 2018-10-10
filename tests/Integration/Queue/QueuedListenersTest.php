@@ -21,7 +21,7 @@ class QueuedListenersTest extends TestCase
         Event::listen(QueuedListenersTestEvent::class, QueuedListenersTestListenerShouldNotQueue::class);
 
         Event::dispatch(
-            new QueuedListenersTestEvent()
+            new QueuedListenersTestEvent
         );
 
         Queue::assertPushed(CallQueuedListener::class, function ($job) {

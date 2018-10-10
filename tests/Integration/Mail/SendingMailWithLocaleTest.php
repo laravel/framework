@@ -53,7 +53,7 @@ class SendingMailWithLocaleTest extends TestCase
 
     public function test_mail_is_sent_with_default_locale()
     {
-        Mail::to('test@mail.com')->send(new TestMail());
+        Mail::to('test@mail.com')->send(new TestMail);
 
         $this->assertContains('name',
             app('swift.transport')->messages()[0]->getBody()
@@ -62,7 +62,7 @@ class SendingMailWithLocaleTest extends TestCase
 
     public function test_mail_is_sent_with_selected_locale()
     {
-        Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
+        Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
 
         $this->assertContains('esm',
             app('swift.transport')->messages()[0]->getBody()
@@ -93,7 +93,7 @@ class SendingMailWithLocaleTest extends TestCase
             'email_locale' => 'ar',
         ]);
 
-        Mail::to($recipient)->send(new TestMail());
+        Mail::to($recipient)->send(new TestMail);
 
         $this->assertContains('esm',
             app('swift.transport')->messages()[0]->getBody()
@@ -107,7 +107,7 @@ class SendingMailWithLocaleTest extends TestCase
             'email_locale' => 'en',
         ]);
 
-        Mail::to($recipient)->locale('ar')->send(new TestMail());
+        Mail::to($recipient)->locale('ar')->send(new TestMail);
 
         $this->assertContains('esm',
             app('swift.transport')->messages()[0]->getBody()
@@ -126,7 +126,7 @@ class SendingMailWithLocaleTest extends TestCase
             'email_locale' => 'en',
         ]);
 
-        Mail::to($toRecipient)->cc($ccRecipient)->send(new TestMail());
+        Mail::to($toRecipient)->cc($ccRecipient)->send(new TestMail);
 
         $this->assertContains('esm',
             app('swift.transport')->messages()[0]->getBody()
@@ -146,7 +146,7 @@ class SendingMailWithLocaleTest extends TestCase
             ]),
         ];
 
-        Mail::to($recipients)->send(new TestMail());
+        Mail::to($recipients)->send(new TestMail);
 
         $this->assertContains('name',
             app('swift.transport')->messages()[0]->getBody()
@@ -155,8 +155,8 @@ class SendingMailWithLocaleTest extends TestCase
 
     public function test_locale_is_set_back_to_default_after_mail_sent()
     {
-        Mail::to('test@mail.com')->locale('ar')->send(new TestMail());
-        Mail::to('test@mail.com')->send(new TestMail());
+        Mail::to('test@mail.com')->locale('ar')->send(new TestMail);
+        Mail::to('test@mail.com')->send(new TestMail);
 
         $this->assertEquals('en', app('translator')->getLocale());
 

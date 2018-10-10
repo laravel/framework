@@ -64,7 +64,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
     public function testResettingNotificationId()
     {
-        $notification = new NotificationStub();
+        $notification = new NotificationStub;
 
         $this->fake->send($this->user, $notification);
 
