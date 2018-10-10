@@ -5,6 +5,7 @@ namespace Illuminate\Tests\Validation;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Tests\Validation\Fixtures\EloquentModelStub;
 
 class ValidationUniqueRuleTest extends TestCase
 {
@@ -36,10 +37,4 @@ class ValidationUniqueRuleTest extends TestCase
         $rule->where('foo', 'bar');
         $this->assertEquals('unique:table,column,"1",id_column,foo,bar', (string) $rule);
     }
-}
-
-class EloquentModelStub extends Model
-{
-    protected $primaryKey = 'id_column';
-    protected $guarded = [];
 }

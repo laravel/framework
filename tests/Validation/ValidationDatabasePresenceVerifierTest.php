@@ -13,6 +13,8 @@ class ValidationDatabasePresenceVerifierTest extends TestCase
 {
     public function tearDown()
     {
+        parent::tearDown();
+
         m::close();
     }
 

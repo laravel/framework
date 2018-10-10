@@ -1,6 +1,6 @@
 <?php
 
-namespace Illuminate\Tests\Validation\fixtures;
+namespace Illuminate\Tests\Validation\Fixtures;
 
 use Illuminate\Contracts\Support\Arrayable;
 
