@@ -927,7 +927,7 @@ class TestResponse
 
         PHPUnit::assertFalse(
             $hasErrors,
-            'Session has unexpected errors: '.PHP_EOL.
+            'Session has unexpected errors: '.PHP_EOL.PHP_EOL.
             json_encode($errors, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES)
         );
 
