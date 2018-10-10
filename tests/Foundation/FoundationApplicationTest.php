@@ -237,7 +237,7 @@ class ApplicationDeferredSharedServiceProviderStub extends ServiceProvider
     public function register()
     {
         $this->app->singleton('foo', function () {
-            return new \stdClass;
+            return new stdClass;
         });
     }
 }
@@ -250,7 +250,7 @@ class ApplicationDeferredServiceProviderCountStub extends ServiceProvider
     public function register()
     {
         static::$count++;
-        $this->app['foo'] = new \stdClass;
+        $this->app['foo'] = new stdClass;
     }
 }
 

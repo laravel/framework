@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
+use Swift_Message;
 
 class MailSesTransportTest extends TestCase
 {
@@ -38,7 +39,7 @@ class MailSesTransportTest extends TestCase
 
     public function testSend()
     {
-        $message = new \Swift_Message('Foo subject', 'Bar body');
+        $message = new Swift_Message('Foo subject', 'Bar body');
         $message->setSender('myself@example.com');
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');

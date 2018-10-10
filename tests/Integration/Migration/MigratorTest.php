@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Integration\Migration;
 
 use Orchestra\Testbench\TestCase;
+use PDOException;
 
 class MigratorTest extends TestCase
 {
@@ -36,7 +37,7 @@ class MigratorTest extends TestCase
     {
         try {
             $this->app->make('db')->select("SELECT COUNT(*) FROM $table");
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return false;
         }
 

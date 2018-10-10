@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
+use Illuminate\Tests\Routing\RouteModelInterface;
 use stdClass;
 use Exception;
 use Illuminate\Support\Str;
@@ -841,11 +842,11 @@ class RoutingRouteTest extends TestCase
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
-        $container->bind(\Illuminate\Tests\Routing\RouteModelInterface::class, RouteModelBindingStub::class);
+        $container->bind(RouteModelInterface::class, RouteModelBindingStub::class);
         $router->get('foo/{bar}', ['middleware' => SubstituteBindings::class, 'uses' => function ($name) {
             return $name;
         }]);
-        $router->model('bar', \Illuminate\Tests\Routing\RouteModelInterface::class);
+        $router->model('bar', RouteModelInterface::class);
         $this->assertEquals('TAYLOR', $router->dispatch(Request::create('foo/taylor', 'GET'))->getContent());
     }
 

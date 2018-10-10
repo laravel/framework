@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Database;
 
 use DateTime;
+use Foo\Bar\EloquentModelNamespacedStub;
 use stdClass;
 use Exception;
 use Mockery as m;
@@ -1212,7 +1213,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelWithoutTableStub;
         $this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-        $namespacedModel = new \Foo\Bar\EloquentModelNamespacedStub;
+        $namespacedModel = new EloquentModelNamespacedStub;
         $this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
 
