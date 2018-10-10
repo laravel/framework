@@ -545,8 +545,8 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
         $post1->delete();
-        $post2 = $abigail->posts()->create(['title' => 'Second Title']);
-        $post3 = $abigail->posts()->create(['title' => 'Third Title']);
+        $abigail->posts()->create(['title' => 'Second Title']);
+        $abigail->posts()->create(['title' => 'Third Title']);
 
         $user = SoftDeletesTestUser::withCount('posts')->orderBy('postsCount', 'desc')->first();
         $this->assertEquals(2, $user->posts_count);
@@ -659,7 +659,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
-        $comment1 = $post1->comments()->create([
+        $post1->comments()->create([
             'body' => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
             'owner_id' => $abigail->id,
@@ -701,7 +701,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     protected function createUsers()
     {
         $taylor = SoftDeletesTestUser::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
-        $abigail = SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
+        SoftDeletesTestUser::create(['id' => 2, 'email' => 'abigailotwell@gmail.com']);
 
         $taylor->delete();
     }

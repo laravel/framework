@@ -522,7 +522,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testHasOnSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
-        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         $this->assertTrue(isset($user->friends[0]->id));
 
@@ -535,7 +535,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testWhereHasOnSelfReferencingBelongsToManyRelationship()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
-        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         $results = EloquentTestUser::whereHas('friends', function ($query) {
             $query->where('email', 'abigailotwell@gmail.com');
@@ -549,7 +549,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
-        $nestedFriend = $friend->friends()->create(['email' => 'foo@gmail.com']);
+        $friend->friends()->create(['email' => 'foo@gmail.com']);
 
         $results = EloquentTestUser::has('friends.friends')->get();
 
@@ -561,7 +561,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
-        $nestedFriend = $friend->friends()->create(['email' => 'foo@gmail.com']);
+        $friend->friends()->create(['email' => 'foo@gmail.com']);
 
         $results = EloquentTestUser::whereHas('friends.friends', function ($query) {
             $query->where('email', 'foo@gmail.com');
@@ -574,7 +574,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testHasOnSelfReferencingBelongsToManyRelationshipWithWherePivot()
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
-        $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
+        $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
 
         $results = EloquentTestUser::has('friendsOne')->get();
 
@@ -586,7 +586,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $user = EloquentTestUser::create(['email' => 'taylorotwell@gmail.com']);
         $friend = $user->friends()->create(['email' => 'abigailotwell@gmail.com']);
-        $nestedFriend = $friend->friends()->create(['email' => 'foo@gmail.com']);
+        $friend->friends()->create(['email' => 'foo@gmail.com']);
 
         $results = EloquentTestUser::has('friendsOne.friendsTwo')->get();
 
@@ -597,7 +597,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testHasOnSelfReferencingBelongsToRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
         $results = EloquentTestPost::has('parentPost')->get();
 
@@ -617,7 +617,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testWhereHasOnSelfReferencingBelongsToRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
         $results = EloquentTestPost::whereHas('parentPost', function ($query) {
             $query->where('name', 'Parent Post');
@@ -631,7 +631,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
 
         $results = EloquentTestPost::has('parentPost.parentPost')->get();
 
@@ -643,7 +643,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
 
         $results = EloquentTestPost::whereHas('parentPost.parentPost', function ($query) {
             $query->where('name', 'Grandparent Post');
@@ -656,7 +656,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testHasOnSelfReferencingHasManyRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
         $results = EloquentTestPost::has('childPosts')->get();
 
@@ -667,7 +667,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     public function testWhereHasOnSelfReferencingHasManyRelationship()
     {
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'user_id' => 1]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 2]);
 
         $results = EloquentTestPost::whereHas('childPosts', function ($query) {
             $query->where('name', 'Child Post');
@@ -681,7 +681,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
 
         $results = EloquentTestPost::has('childPosts.childPosts')->get();
 
@@ -693,7 +693,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
     {
         $grandParentPost = EloquentTestPost::create(['name' => 'Grandparent Post', 'user_id' => 1]);
         $parentPost = EloquentTestPost::create(['name' => 'Parent Post', 'parent_id' => $grandParentPost->id, 'user_id' => 2]);
-        $childPost = EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
+        EloquentTestPost::create(['name' => 'Child Post', 'parent_id' => $parentPost->id, 'user_id' => 3]);
 
         $results = EloquentTestPost::whereHas('childPosts.childPosts', function ($query) {
             $query->where('name', 'Child Post');
@@ -1255,7 +1255,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
             'updated_at' => '2017-11-14 08:23:19.734',
         ]);
 
-        $attribute = $model->fromDateTime($model->getAttribute('updated_at'));
+        $model->fromDateTime($model->getAttribute('updated_at'));
     }
 
     public function testUpdatingChildModelTouchesParent()

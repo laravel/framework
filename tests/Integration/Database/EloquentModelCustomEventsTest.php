@@ -31,7 +31,7 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
 
         TestModel1::flushEventListeners();
 
-        $user = TestModel1::create();
+        TestModel1::create();
 
         $this->assertFalse($_SERVER['fired_event']);
     }
@@ -40,7 +40,7 @@ class EloquentModelCustomEventsTest extends DatabaseTestCase
     {
         $_SERVER['fired_event'] = false;
 
-        $user = TestModel1::create();
+        TestModel1::create();
 
         $this->assertTrue($_SERVER['fired_event']);
     }

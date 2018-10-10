@@ -100,7 +100,7 @@ class ModelSerializationTest extends TestCase
             'email' => 'mohamed@laravel.com',
         ]);
 
-        $user2 = ModelSerializationTestUser::on('custom')->create([
+        ModelSerializationTestUser::on('custom')->create([
             'email' => 'taylor@laravel.com',
         ]);
 

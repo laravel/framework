@@ -75,7 +75,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('where')->once()->with('foo_table.foo', '=', 'bar');
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $result = $builder->findOrFail('bar', ['column']);
+        $builder->findOrFail('bar', ['column']);
     }
 
     /**
@@ -87,7 +87,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->setModel($this->getMockModel());
         $builder->getQuery()->shouldReceive('whereIn')->once()->with('foo_table.foo', [1, 2]);
         $builder->shouldReceive('get')->with(['column'])->andReturn(new Collection([1]));
-        $result = $builder->findOrFail([1, 2], ['column']);
+        $builder->findOrFail([1, 2], ['column']);
     }
 
     /**
@@ -98,7 +98,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder = m::mock(Builder::class.'[first]', [$this->getMockQueryBuilder()]);
         $builder->setModel($this->getMockModel());
         $builder->shouldReceive('first')->with(['column'])->andReturn(null);
-        $result = $builder->firstOrFail(['column']);
+        $builder->firstOrFail(['column']);
     }
 
     public function testFindWithMany()
@@ -484,7 +484,7 @@ class DatabaseEloquentBuilderTest extends TestCase
         $relationQuery->shouldReceive('with')->once()->with(['lines' => null, 'lines.details' => null]);
         $builder->setEagerLoads(['orders' => null, 'orders.lines' => null, 'orders.lines.details' => null]);
 
-        $relation = $builder->getRelation('orders');
+        $builder->getRelation('orders');
     }
 
     public function testGetRelationProperlySetsNestedRelationshipsWithSimilarNames()
@@ -503,8 +503,8 @@ class DatabaseEloquentBuilderTest extends TestCase
 
         $builder->setEagerLoads(['orders' => null, 'ordersGroups' => null, 'ordersGroups.lines' => null, 'ordersGroups.lines.details' => null]);
 
-        $relation = $builder->getRelation('orders');
-        $relation = $builder->getRelation('ordersGroups');
+        $builder->getRelation('orders');
+        $builder->getRelation('ordersGroups');
     }
 
     /**

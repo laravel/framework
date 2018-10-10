@@ -24,7 +24,6 @@ class FoundationProviderRepositoryTest extends TestCase
         $repo = m::mock(ProviderRepository::class.'[createProvider,loadManifest,shouldRecompile]', [$app, m::mock(Filesystem::class), [__DIR__.'/services.php']]);
         $repo->shouldReceive('loadManifest')->once()->andReturn(['eager' => ['foo'], 'deferred' => ['deferred'], 'providers' => ['providers'], 'when' => []]);
         $repo->shouldReceive('shouldRecompile')->once()->andReturn(false);
-        $provider = m::mock(ServiceProvider::class);
 
         $app->shouldReceive('register')->once()->with('foo');
         $app->shouldReceive('runningInConsole')->andReturn(false);
@@ -59,7 +58,7 @@ class FoundationProviderRepositoryTest extends TestCase
         $app->shouldReceive('runningInConsole')->andReturn(false);
         $app->shouldReceive('addDeferredServices')->once()->with(['foo.provides1' => 'foo', 'foo.provides2' => 'foo']);
 
-        $manifest = $repo->load(['foo', 'bar']);
+        $repo->load(['foo', 'bar']);
     }
 
     public function testShouldRecompileReturnsCorrectValue()
