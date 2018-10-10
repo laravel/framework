@@ -19,6 +19,7 @@ use Illuminate\Contracts\Support\Arrayable;
 /**
  * @property-read HigherOrderCollectionProxy $average
  * @property-read HigherOrderCollectionProxy $avg
+ * @property-read HigherOrderCollectionProxy $boundaries
  * @property-read HigherOrderCollectionProxy $contains
  * @property-read HigherOrderCollectionProxy $each
  * @property-read HigherOrderCollectionProxy $every
@@ -56,8 +57,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @var array
      */
     protected static $proxies = [
-        'average', 'avg', 'contains', 'each', 'every', 'filter', 'first',
-        'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
+        'average', 'avg', 'boundaries', 'contains', 'each', 'every', 'filter',
+        'first', 'flatMap', 'groupBy', 'keyBy', 'map', 'max', 'min', 'partition',
         'reject', 'sortBy', 'sortByDesc', 'sum', 'unique',
     ];
 
@@ -1123,6 +1124,20 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         })->reduce(function ($result, $value) {
             return is_null($result) || $value < $result ? $value : $result;
         });
+    }
+
+    /**
+     * Get the boundaries for a given key.
+     *
+     * @param  callable|string|null  $callback
+     * @return mixed
+     */
+    public function boundaries($callback = null)
+    {
+        return [
+            $this->min($callback),
+            $this->max($callback),
+        ];
     }
 
     /**
