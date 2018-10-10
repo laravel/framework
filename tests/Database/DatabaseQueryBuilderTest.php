@@ -2730,11 +2730,12 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals([1], $builder->getBindings());
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The number of columns must match the number of values
+     */
     public function testWhereRowValuesArityMismatch()
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The number of columns must match the number of values');
-
         $builder = $this->getBuilder();
         $builder->select('*')->from('orders')->whereRowValues(['last_update'], '<', [1, 2]);
     }

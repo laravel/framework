@@ -29,11 +29,10 @@ class EncryptionTest extends TestCase
 
     /**
      * @test
+     * @expectedException \RuntimeException
      */
     public function encryption_will_not_be_instantiable_when_missing_app_key()
     {
-        $this->expectException(RuntimeException::class);
-
         $this->app['config']->set('app.key', null);
 
         $this->app->make('encrypter');

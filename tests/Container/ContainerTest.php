@@ -866,13 +866,14 @@ class ContainerTest extends TestCase
         $this->assertEquals($container->getAlias('foo'), 'ConcreteStub');
     }
 
+    /**
+     * @expectedException \LogicException
+     * @expectedExceptionMessage [name] is aliased to itself.
+     */
     public function testItThrowsExceptionWhenAbstractIsSameAsAlias()
     {
         $container = new Container;
         $container->alias('name', 'name');
-
-        $this->expectException('LogicException');
-        $this->expectExceptionMessage('[name] is aliased to itself.');
 
         $container->getAlias('name');
     }

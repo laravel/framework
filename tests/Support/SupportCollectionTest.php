@@ -2746,11 +2746,13 @@ class SupportCollectionTest extends TestCase
         $this->assertSame(['foo' => 3, 'bar' => ['nested' => 'two']], $collection->toArray());
     }
 
+    /**
+     * @expectedException \Exception
+     * @expectedExceptionMessage Property [foo] does not exist on this collection instance.
+     */
     public function testItThrowsExceptionWhenTryingToAccessNoProxyProperty()
     {
         $collection = new Collection;
-        $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Property [foo] does not exist on this collection instance.');
         $collection->foo;
     }
 

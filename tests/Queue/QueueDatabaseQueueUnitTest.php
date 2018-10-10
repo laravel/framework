@@ -53,10 +53,11 @@ class QueueDatabaseQueueUnitTest extends TestCase
         $queue->later(10, 'foo', ['data']);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testFailureToCreatePayloadFromObject()
     {
-        $this->expectException('InvalidArgumentException');
-
         $job = new stdClass;
         $job->invalid = "\xc3\x28";
 
@@ -71,10 +72,11 @@ class QueueDatabaseQueueUnitTest extends TestCase
         ]);
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testFailureToCreatePayloadFromArray()
     {
-        $this->expectException('InvalidArgumentException');
-
         $queue = $this->getMockForAbstractClass(Queue::class);
         $class = new ReflectionClass(Queue::class);
 

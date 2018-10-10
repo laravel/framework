@@ -48,6 +48,9 @@ class QueueWorkerTest extends TestCase
         $this->events->shouldHaveReceived('dispatch')->with(m::type(JobProcessed::class))->once();
     }
 
+    /**
+     * @expectedException \Illuminate\Tests\Queue\LoopBreakerException
+     */
     public function test_worker_can_work_until_queue_is_empty()
     {
         $workerOptions = new WorkerOptions;
@@ -57,8 +60,6 @@ class QueueWorkerTest extends TestCase
             $firstJob = new WorkerFakeJob,
             $secondJob = new WorkerFakeJob,
         ]]);
-
-        $this->expectException(LoopBreakerException::class);
 
         $worker->daemon('default', 'queue', $workerOptions);
 

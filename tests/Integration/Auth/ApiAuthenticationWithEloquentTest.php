@@ -31,16 +31,14 @@ class ApiAuthenticationWithEloquentTest extends TestCase
 
     /**
      * @test
+     * @expectedException \Illuminate\Database\QueryException
+     * @expectedExceptionMessage SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES) (SQL: select * from `users` where `api_token` = whatever limit 1)
      */
     public function authentication_via_api_with_eloquent_using_wrong_database_credentials_should_not_cause_infinite_loop()
     {
         Route::get('/auth', function () {
             return 'success';
         })->middleware('auth:api');
-
-        $this->expectException(QueryException::class);
-
-        $this->expectExceptionMessage("SQLSTATE[HY000] [1045] Access denied for user 'root'@'localhost' (using password: YES) (SQL: select * from `users` where `api_token` = whatever limit 1)");
 
         $this->withoutExceptionHandling()->get('/auth', ['Authorization' => 'Bearer whatever']);
     }

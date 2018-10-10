@@ -73,10 +73,12 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals('Hello World', $filesystemAdapter->get('file.txt'));
     }
 
+    /**
+     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function testGetFileNotFound()
     {
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
-        $this->expectException(FileNotFoundException::class);
         $filesystemAdapter->get('file.txt');
     }
 
@@ -168,9 +170,11 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals($original_content, $secondFilesystemAdapter->get('copy.txt'));
     }
 
+    /**
+     * @expectedException \Illuminate\Contracts\Filesystem\FileExistsException
+     */
     public function testStreamToExistingFileThrows()
     {
-        $this->expectException(FileExistsException::class);
         $this->filesystem->write('file.txt', 'Hello World');
         $this->filesystem->write('existing.txt', 'Dear Kate');
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
@@ -178,16 +182,20 @@ class FilesystemAdapterTest extends TestCase
         $filesystemAdapter->writeStream('existing.txt', $readStream);
     }
 
+    /**
+     * @expectedException \Illuminate\Contracts\Filesystem\FileNotFoundException
+     */
     public function testReadStreamNonExistentFileThrows()
     {
-        $this->expectException(FileNotFoundException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->readStream('nonexistent.txt');
     }
 
+    /**
+     * @expectedException \InvalidArgumentException
+     */
     public function testStreamInvalidResourceThrows()
     {
-        $this->expectException(InvalidArgumentException::class);
         $filesystemAdapter = new FilesystemAdapter($this->filesystem);
         $filesystemAdapter->writeStream('file.txt', 'foo bar');
     }

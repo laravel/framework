@@ -66,9 +66,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeInOrder(['foo', 'bar', 'baz', 'foo']);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertSeeInOrderCanFail()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = $this->makeMockResponse([
             'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
@@ -77,9 +79,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeInOrder(['baz', 'bar', 'foo']);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertSeeInOrderCanFail2()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = $this->makeMockResponse([
             'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
@@ -108,9 +112,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'baz', 'foo']);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertSeeTextInOrderCanFail()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
@@ -119,9 +125,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['baz', 'foobar']);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertSeeTextInOrderCanFail2()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
@@ -130,9 +138,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertSeeTextInOrder(['foobar', 'qux', 'baz']);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertHeader()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $baseResponse = tap(new Response, function ($response) {
             $response->header('Location', '/foo');
@@ -199,9 +209,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonFragment(['id' => 10]);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertJsonFragmentCanFail()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
@@ -249,9 +261,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonCount(4);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertJsonMissing()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
@@ -268,18 +282,22 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonMissingExact(['id' => 20, 'foo' => 'baz']);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertJsonMissingExactCanFail()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissingExact(['id' => 20]);
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertJsonMissingExactCanFail2()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
@@ -308,9 +326,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonMissingValidationErrors('foo');
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertJsonMissingValidationErrorsCanFail()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
@@ -325,9 +345,11 @@ class FoundationTestResponseTest extends TestCase
         $response->assertJsonMissingValidationErrors('foo');
     }
 
+    /**
+     * @expectedException \PHPUnit\Framework\AssertionFailedError
+     */
     public function testAssertJsonMissingValidationErrorsCanFail2()
     {
-        $this->expectException(AssertionFailedError::class);
 
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
