@@ -518,7 +518,7 @@ class ContainerTest extends TestCase
     public function testCallWithAtSignBasedClassReferencesWithoutMethodThrowsException()
     {
         $container = new Container;
-        $result = $container->call('ContainerTestCallStub');
+        $container->call('ContainerTestCallStub');
     }
 
     public function testCallWithAtSignBasedClassReferences()
@@ -825,7 +825,7 @@ class ContainerTest extends TestCase
             return new ContainerConcreteStub;
         }, true);
         $container->alias('ConcreteStub', 'ContainerConcreteStub');
-        $concreteStubInstance = $container->make('ConcreteStub');
+        $container->make('ConcreteStub');
         $this->assertTrue($container->resolved('ConcreteStub'));
         $this->assertTrue($container->isAlias('ContainerConcreteStub'));
         $this->assertArrayHasKey('ConcreteStub', $container->getBindings());
@@ -848,7 +848,7 @@ class ContainerTest extends TestCase
         $this->assertFalse($container->resolved('ConcreteStub'));
         $this->assertFalse($container->resolved('foo'));
 
-        $concreteStubInstance = $container->make('ConcreteStub');
+        $container->make('ConcreteStub');
 
         $this->assertTrue($container->resolved('ConcreteStub'));
         $this->assertTrue($container->resolved('foo'));

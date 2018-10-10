@@ -92,7 +92,6 @@ class AuthEloquentUserProviderTest extends TestCase
 
     public function testCredentialValidation()
     {
-        $conn = m::mock(Connection::class);
         $hasher = m::mock(Hasher::class);
         $hasher->shouldReceive('check')->once()->with('plain', 'hash')->andReturn(true);
         $provider = new EloquentUserProvider($hasher, 'foo');

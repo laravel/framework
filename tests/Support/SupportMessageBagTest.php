@@ -93,7 +93,6 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('foo', 'bar');
         $container->add('foo', 'baz');
-        $messages = $container->getMessages();
         $this->assertEquals('bar', $container->first('foo'));
     }
 
@@ -101,7 +100,6 @@ class SupportMessageBagTest extends TestCase
     {
         $container = new MessageBag;
         $container->setFormat(':message');
-        $messages = $container->getMessages();
         $this->assertEquals('', $container->first('foo'));
     }
 
@@ -111,7 +109,6 @@ class SupportMessageBagTest extends TestCase
         $container->setFormat(':message');
         $container->add('name.first', 'jon');
         $container->add('name.last', 'snow');
-        $messages = $container->getMessages();
         $this->assertEquals('jon', $container->first('name.*'));
     }
 

@@ -158,7 +158,7 @@ class SupportArrTest extends TestCase
     {
         // Flat arrays are unaffected
         $array = ['#foo', '#bar', '#baz'];
-        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten(['#foo', '#bar', '#baz']));
+        $this->assertEquals(['#foo', '#bar', '#baz'], Arr::flatten($array));
 
         // Nested arrays are flattened with existing flat items
         $array = [['#foo', '#bar'], '#baz'];
