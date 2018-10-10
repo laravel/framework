@@ -4,8 +4,8 @@ namespace Illuminate\Console;
 
 use Illuminate\Support\Str;
 use Illuminate\Filesystem\Filesystem;
-use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Input\InputArgument;
 
 abstract class GeneratorCommand extends Command
 {
@@ -258,7 +258,7 @@ abstract class GeneratorCommand extends Command
 
     /**
      * Takes the newly generated file, and attempts to launch in the OS's default editor
-     * for .php files
+     * for .php files.
      * @param $path
      */
     protected function launchInEditor($path)
@@ -272,6 +272,7 @@ abstract class GeneratorCommand extends Command
         foreach ($editors as $editor) {
             if (file_exists($editor)) {
                 shell_exec("$editor $path");
+
                 return;
             }
         }
@@ -282,7 +283,7 @@ abstract class GeneratorCommand extends Command
     }
 
     /**
-     * Defines the command option to launch generated files
+     * Defines the command option to launch generated files.
      */
     protected function addOpenOption()
     {
