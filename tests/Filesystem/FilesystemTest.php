@@ -484,7 +484,7 @@ class FilesystemTest extends TestCase
 
     public function testCreateFtpDriver()
     {
-        $filesystem = new FilesystemManager(new Application());
+        $filesystem = new FilesystemManager(new Application);
 
         $driver = $filesystem->createFtpDriver([
             'host' => 'ftp.example.com',

@@ -32,7 +32,7 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage', 'to'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub();
+        $mailable = new MailableQueableStub;
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
@@ -46,7 +46,7 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub();
+        $mailable = new MailableQueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
         $mailable->attach('foo.jpg', $attachmentOption);
         $this->assertInternalType('array', $mailable->attachments);
@@ -75,7 +75,7 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub();
+        $mailable = new MailableQueableStub;
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
 
         $mailable->attachFromStorage('/', 'foo.jpg', $attachmentOption);

@@ -1190,7 +1190,7 @@ class DatabaseEloquentIntegrationTest extends TestCase
 
         $this->assertEquals($users->map->fresh(), $users->fresh());
 
-        $users = new Collection();
+        $users = new Collection;
         $this->assertEquals($users->map->fresh(), $users->fresh());
     }
 

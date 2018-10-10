@@ -194,7 +194,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub()));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 10]);
     }
@@ -203,7 +203,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub()));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 1]);
     }

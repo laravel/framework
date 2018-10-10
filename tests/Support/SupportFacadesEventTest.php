@@ -37,14 +37,14 @@ class SupportFacadesEventTest extends TestCase
     public function testFakeFor()
     {
         Event::fakeFor(function () {
-            (new FakeForStub())->dispatch();
+            (new FakeForStub)->dispatch();
 
             Event::assertDispatched(EventStub::class);
         });
 
         $this->events->shouldReceive('dispatch')->once();
 
-        (new FakeForStub())->dispatch();
+        (new FakeForStub)->dispatch();
     }
 
     public function testFakeForSwapsDispatchers()

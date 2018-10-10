@@ -494,7 +494,7 @@ class AuthAccessGateTest extends TestCase
     {
         return [
             [1],
-            [new stdClass()],
+            [new stdClass],
             [[]],
             [1.1],
         ];

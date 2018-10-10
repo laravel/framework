@@ -175,7 +175,7 @@ class Store implements Session
      */
     public function exists($key)
     {
-        $placeholder = new stdClass();
+        $placeholder = new stdClass;
 
         return ! collect(is_array($key) ? $key : func_get_args())->contains(function ($key) use ($placeholder) {
             return $this->get($key, $placeholder) === $placeholder;

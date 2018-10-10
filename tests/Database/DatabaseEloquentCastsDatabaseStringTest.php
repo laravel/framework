@@ -68,7 +68,7 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
         $this->assertSame(['json_key'=>'json_value'], $model->getAttribute('json_attributes'));
 
         $this->assertSame('{"json_key":"json_value"}', $model->getOriginal('object_attributes'));
-        $stdClass = new stdClass();
+        $stdClass = new stdClass;
         $stdClass->json_key = 'json_value';
         $this->assertEquals($stdClass, $model->getAttribute('object_attributes'));
     }

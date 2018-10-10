@@ -115,7 +115,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $queue = 'my-test-queue';
         $this->fake->bulk([
             $this->job,
-            new JobStub(),
+            new JobStub,
         ], null, $queue);
 
         $this->fake->assertPushedOn($queue, JobStub::class);
