@@ -13,6 +13,7 @@ use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Eloquent\Model;
+use Foo\Bar\EloquentModelNamespacedStub;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\InteractsWithTime;
 use Illuminate\Contracts\Events\Dispatcher;
@@ -1212,7 +1213,7 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelWithoutTableStub;
         $this->assertEquals('eloquent_model_without_table_stubs', $model->getTable());
 
-        $namespacedModel = new \Foo\Bar\EloquentModelNamespacedStub;
+        $namespacedModel = new EloquentModelNamespacedStub;
         $this->assertEquals('eloquent_model_namespaced_stubs', $namespacedModel->getTable());
     }
 

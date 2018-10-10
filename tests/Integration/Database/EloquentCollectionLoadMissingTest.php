@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentCollectionLoadMissingTest;
 
+use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -50,11 +51,11 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
     {
         $posts = Post::with('comments', 'user')->get();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $posts->loadMissing('comments.parent.revisions:revisions.comment_id', 'user:id');
 
-        $this->assertCount(2, \DB::getQueryLog());
+        $this->assertCount(2, DB::getQueryLog());
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertTrue($posts[0]->comments[1]->parent->relationLoaded('revisions'));
         $this->assertArrayNotHasKey('id', $posts[0]->comments[1]->parent->revisions[0]->getAttributes());
@@ -64,13 +65,13 @@ class EloquentCollectionLoadMissingTest extends DatabaseTestCase
     {
         $posts = Post::with('comments')->get();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $posts->loadMissing(['comments.parent' => function ($query) {
             $query->select('id');
         }]);
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
         $this->assertTrue($posts[0]->comments[0]->relationLoaded('parent'));
         $this->assertArrayNotHasKey('post_id', $posts[0]->comments[1]->parent->getAttributes());
     }

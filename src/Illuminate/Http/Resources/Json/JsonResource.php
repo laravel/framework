@@ -93,7 +93,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
 
         if (is_array($data)) {
             $data = $data;
-        } elseif ($data instanceof Arrayable || $data instanceof Collection) {
+        } elseif ($data instanceof Arrayable) {
             $data = $data->toArray();
         } elseif ($data instanceof JsonSerializable) {
             $data = $data->jsonSerialize();

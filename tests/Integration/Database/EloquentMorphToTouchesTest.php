@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToTouchesTest;
 
+use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -33,20 +34,20 @@ class EloquentMorphToTouchesTest extends DatabaseTestCase
     {
         $comment = (new Comment)->commentable()->associate(Post::first());
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $comment->save();
 
-        $this->assertCount(2, \DB::getQueryLog());
+        $this->assertCount(2, DB::getQueryLog());
     }
 
     public function test_null()
     {
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         Comment::create();
 
-        $this->assertCount(1, \DB::getQueryLog());
+        $this->assertCount(1, DB::getQueryLog());
     }
 }
 

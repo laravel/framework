@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Throwable;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Redis\Limiters\DurationLimiter;
 use Illuminate\Contracts\Redis\LimiterTimeoutException;
@@ -40,7 +41,7 @@ class DurationLimiterTest extends TestCase
             (new DurationLimiter($this->redis(), 'key', 2, 2))->block(0, function () use (&$store) {
                 $store[] = 3;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 
@@ -70,7 +71,7 @@ class DurationLimiterTest extends TestCase
             (new DurationLimiter($this->redis(), 'key', 1, 1))->block(0, function () use (&$store) {
                 $store[] = 2;
             });
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             $this->assertInstanceOf(LimiterTimeoutException::class, $e);
         }
 

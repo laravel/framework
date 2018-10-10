@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Notifications;
 
 use Mockery as m;
+use Nexmo\Client;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
@@ -22,7 +23,7 @@ class NotificationNexmoChannelTest extends TestCase
         $notifiable = new NotificationNexmoChannelTestNotifiable;
 
         $channel = new NexmoSmsChannel(
-            $nexmo = m::mock(\Nexmo\Client::class), '4444444444'
+            $nexmo = m::mock(Client::class), '4444444444'
         );
 
         $nexmo->shouldReceive('message->send')->with([
@@ -41,7 +42,7 @@ class NotificationNexmoChannelTest extends TestCase
         $notifiable = new NotificationNexmoChannelTestNotifiable;
 
         $channel = new NexmoSmsChannel(
-            $nexmo = m::mock(\Nexmo\Client::class), '4444444444'
+            $nexmo = m::mock(Client::class), '4444444444'
         );
 
         $nexmo->shouldReceive('message->send')->with([
