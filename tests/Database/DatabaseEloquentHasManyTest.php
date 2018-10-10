@@ -258,6 +258,18 @@ class DatabaseEloquentHasManyTest extends TestCase
         $this->assertEquals($colin, $instances[1]);
     }
 
+    public function testLimit()
+    {
+        $relation = $this->getRelation();
+        $relation->getQuery()->shouldReceive('partitionLimit')->once()->with(10, 'table.foreign_key');
+        $relation->limit(10);
+
+        $relation = $this->getRelation();
+        $relation->getParent()->exists = true;
+        $relation->getQuery()->shouldReceive('limit')->once()->with(10);
+        $relation->limit(10);
+    }
+
     protected function getRelation()
     {
         $builder = m::mock(Builder::class);

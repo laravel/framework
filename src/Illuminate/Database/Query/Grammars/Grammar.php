@@ -46,6 +46,14 @@ class Grammar extends BaseGrammar
      */
     public function compileSelect(Builder $query)
     {
+        if ($query->partitionLimit) {
+            if (is_null($query->columns)) {
+                $query->columns = ['*'];
+            }
+
+            return $this->compilePartitionLimit($query);
+        }
+
         // If the query does not have any columns set, we'll set the columns to the
         // * character to just get all of the columns from the database. Then we
         // can build the query and concatenate all the pieces together as one.
@@ -691,6 +699,55 @@ class Grammar extends BaseGrammar
     protected function compileOffset(Builder $query, $offset)
     {
         return 'offset '.(int) $offset;
+    }
+
+    /**
+     * Compile a partition limit clause for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compilePartitionLimit(Builder $query)
+    {
+        $components = $this->compileComponents($query);
+
+        $partition = 'partition by '.$this->wrap($query->partitionLimit['column']);
+
+        $components['columns'] .= $this->compileOver($partition, $components['orders'] ?? '');
+
+        unset($components['orders']);
+
+        $sql = $this->concatenate($components);
+
+        $limit = (int) $query->partitionLimit['value'];
+
+        return $this->compileTableExpression($sql, '<= '.$limit);
+    }
+
+    /**
+     * Compile the over statement for a table expression.
+     *
+     * @param  string  $partition
+     * @param  string  $orderings
+     * @return string
+     */
+    protected function compileOver($partition, $orderings)
+    {
+        $over = trim($partition.' '.$orderings);
+
+        return ', row_number() over ('.$over.') as row_num';
+    }
+
+    /**
+     * Compile a common table expression for the query.
+     *
+     * @param  string  $sql
+     * @param  string  $constraint
+     * @return string
+     */
+    protected function compileTableExpression($sql, $constraint)
+    {
+        return 'select * from ('.$sql.') as temp_table where row_num '.$constraint.' order by row_num';
     }
 
     /**

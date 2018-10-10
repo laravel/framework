@@ -2,7 +2,9 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use PDO;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
 
@@ -78,6 +80,60 @@ class MySqlGrammar extends Grammar
         [$field, $path] = $this->wrapJsonFieldAndPath($column);
 
         return 'json_length('.$field.$path.') '.$operator.' '.$value;
+    }
+
+    /**
+     * Compile a partition limit clause for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compilePartitionLimit(Builder $query)
+    {
+        $version = $query->getConnection()->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if (version_compare($version, '8.0.11') >= 0) {
+            return parent::compilePartitionLimit($query);
+        }
+
+        return $this->compileLegacyPartitionLimit($query);
+    }
+
+    /**
+     * Compile a partition limit clause for the query on MySQL < 8.0.
+     *
+     * Derived from https://softonsofa.com/tweaking-eloquent-relations-how-to-get-n-related-models-per-parent/.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compileLegacyPartitionLimit(Builder $query)
+    {
+        $column = Str::after($query->partitionLimit['column'], '.');
+
+        if ($query->joins && Str::contains(end($query->columns), ' as pivot_')) {
+            $column = 'pivot_'.$column;
+        }
+
+        $column = $this->wrap($column);
+
+        $partition = ', @row_num := if(@partition = '.$column.', @row_num + 1, 1) as row_num, @partition := '.$column;
+
+        $orders = (array) $query->orders;
+
+        array_unshift($orders, ['column' => $query->partitionLimit['column'], 'direction' => 'asc']);
+
+        $query->orders = $orders;
+
+        $components = $this->compileComponents($query);
+
+        $sql = $this->concatenate($components);
+
+        $from = '(select @row_num := 0, @partition := 0) as laravel_vars, ('.$sql.') as temp_table';
+
+        $limit = (int) $query->partitionLimit['value'];
+
+        return 'select temp_table.*'.$partition.' from '.$from.' having row_num <= '.$limit.' order by row_num';
     }
 
     /**

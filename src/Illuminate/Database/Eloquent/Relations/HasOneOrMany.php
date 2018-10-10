@@ -360,6 +360,34 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
+     * Alias to set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function take($value)
+    {
+        return $this->limit($value);
+    }
+
+    /**
+     * Set the "limit" value of the query.
+     *
+     * @param  int  $value
+     * @return $this
+     */
+    public function limit($value)
+    {
+        if ($this->parent->exists) {
+            $this->query->limit($value);
+        } else {
+            $this->query->partitionLimit($value, $this->getQualifiedForeignKeyName());
+        }
+
+        return $this;
+    }
+
+    /**
      * Get a relationship join table hash.
      *
      * @return string

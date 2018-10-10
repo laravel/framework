@@ -166,17 +166,10 @@ class SqlServerGrammar extends Grammar
      */
     protected function compileAnsiOffset(Builder $query, $components)
     {
-        // An ORDER BY clause is required to make this offset query work, so if one does
-        // not exist we'll just create a dummy clause to trick the database and so it
-        // does not complain about the queries for not having an "order by" clause.
-        if (empty($components['orders'])) {
-            $components['orders'] = 'order by (select 0)';
-        }
-
         // We need to add the row number to the query so we can compare it to the offset
         // and limit values given for the statements. So we will add an expression to
         // the "select" that will give back the row numbers on each of the records.
-        $components['columns'] .= $this->compileOver($components['orders']);
+        $components['columns'] .= $this->compileOver('', $components['orders'] ?? '');
 
         unset($components['orders']);
 
@@ -185,32 +178,28 @@ class SqlServerGrammar extends Grammar
         // set we will just handle the offset only since that is all that matters.
         $sql = $this->concatenate($components);
 
-        return $this->compileTableExpression($sql, $query);
+        $constraint = $this->compileRowConstraint($query);
+
+        return $this->compileTableExpression($sql, $constraint);
     }
 
     /**
      * Compile the over statement for a table expression.
      *
+     * @param  string  $partition
      * @param  string  $orderings
      * @return string
      */
-    protected function compileOver($orderings)
+    protected function compileOver($partition, $orderings)
     {
-        return ", row_number() over ({$orderings}) as row_num";
-    }
+        // An ORDER BY clause is required to make this offset query work, so if one does
+        // not exist we'll just create a dummy clause to trick the database and so it
+        // does not complain about the queries for not having an "order by" clause.
+        if (empty($orderings)) {
+            $orderings = 'order by (select 0)';
+        }
 
-    /**
-     * Compile a common table expression for a query.
-     *
-     * @param  string  $sql
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @return string
-     */
-    protected function compileTableExpression($sql, $query)
-    {
-        $constraint = $this->compileRowConstraint($query);
-
-        return "select * from ({$sql}) as temp_table where row_num {$constraint} order by row_num";
+        return parent::compileOver($partition, $orderings);
     }
 
     /**

@@ -132,6 +132,13 @@ class Builder
     public $limit;
 
     /**
+     * The maximum number of records to return per partition.
+     *
+     * @var array
+     */
+    public $partitionLimit;
+
+    /**
      * The number of records to skip.
      *
      * @var int
@@ -1898,6 +1905,22 @@ class Builder
                         return isset($order['column'])
                                ? $order['column'] === $column : false;
                     })->values()->all();
+    }
+
+    /**
+     * Add a "partition limit" clause to the query.
+     *
+     * @param  int  $value
+     * @param  string  $column
+     * @return $this
+     */
+    public function partitionLimit($value, $column)
+    {
+        if ($value >= 0) {
+            $this->partitionLimit = compact('value', 'column');
+        }
+
+        return $this;
     }
 
     /**

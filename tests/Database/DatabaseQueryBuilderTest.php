@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Database;
 
+use PDO;
 use stdClass;
 use Mockery as m;
 use InvalidArgumentException;
@@ -1026,6 +1027,86 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder = $this->getBuilder();
         $builder->select('*')->from('users')->forPage(-2, 0);
         $this->assertEquals('select * from "users" limit 0 offset 0', $builder->toSql());
+    }
+
+    public function testPartitionLimitMySql()
+    {
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('8.0.11');
+        $builder->select('*')->from('posts')->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select *, row_number() over (partition by `user_id`) as row_num from `posts`) as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('8.0.11');
+        $builder->select('id', 'user_id')->from('posts')->latest()->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select `id`, `user_id`, row_number() over (partition by `user_id` order by `created_at` desc) as row_num from `posts`) as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('5.7.9');
+        $builder->select('*')->from('posts')->partitionLimit(10, 'user_id');
+        $expected = 'select temp_table.*, @row_num := if(@partition = `user_id`, @row_num + 1, 1) as row_num, @partition := `user_id` from (select @row_num := 0, @partition := 0) as laravel_vars, (select * from `posts` order by `user_id` asc) as temp_table having row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('5.7.9');
+        $builder->select('id', 'user_id')->from('posts')->latest()->partitionLimit(10, 'posts.user_id');
+        $expected = 'select temp_table.*, @row_num := if(@partition = `user_id`, @row_num + 1, 1) as row_num, @partition := `user_id` from (select @row_num := 0, @partition := 0) as laravel_vars, (select `id`, `user_id` from `posts` order by `posts`.`user_id` asc, `created_at` desc) as temp_table having row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('5.7.9');
+        $builder->select('roles.*, role_user.user_id as pivot_user_id')->from('posts')->join('role_user', 'roles.id', '=', 'role_user.role_id')->latest()->partitionLimit(10, 'role_user.user_id');
+        $expected = 'select temp_table.*, @row_num := if(@partition = `pivot_user_id`, @row_num + 1, 1) as row_num, @partition := `pivot_user_id` from (select @row_num := 0, @partition := 0) as laravel_vars, (select `roles`.`*, role_user`.`user_id` as `pivot_user_id` from `posts` inner join `role_user` on `roles`.`id` = `role_user`.`role_id` order by `role_user`.`user_id` asc, `created_at` desc) as temp_table having row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+    }
+
+    public function testPartitionLimitPostgres()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->select('*')->from('posts')->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select *, row_number() over (partition by "user_id") as row_num from "posts") as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getPostgresBuilder();
+        $builder->select('id', 'user_id')->from('posts')->latest()->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select "id", "user_id", row_number() over (partition by "user_id" order by "created_at" desc) as row_num from "posts") as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+    }
+
+    public function testPartitionLimitSqlite()
+    {
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('3.25.0');
+        $builder->select('*')->from('posts')->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select *, row_number() over (partition by "user_id") as row_num from "posts") as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('3.25.0');
+        $builder->select('id', 'user_id')->from('posts')->latest()->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select "id", "user_id", row_number() over (partition by "user_id" order by "created_at" desc) as row_num from "posts") as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getSQLiteBuilder();
+        $builder->getConnection()->shouldReceive('getPdo->getAttribute')->with(PDO::ATTR_SERVER_VERSION)->andReturn('3.24.0');
+        $builder->select('*')->from('posts')->partitionLimit(10, 'user_id');
+        $expected = 'select * from "posts"';
+        $this->assertEquals($expected, $builder->toSql());
+    }
+
+    public function testPartitionLimitSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('*')->from('posts')->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select *, row_number() over (partition by [user_id] order by (select 0)) as row_num from [posts]) as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
+
+        $builder = $this->getSqlServerBuilder();
+        $builder->select('id', 'user_id')->from('posts')->latest()->partitionLimit(10, 'user_id');
+        $expected = 'select * from (select [id], [user_id], row_number() over (partition by [user_id] order by [created_at] desc) as row_num from [posts]) as temp_table where row_num <= 10 order by row_num';
+        $this->assertEquals($expected, $builder->toSql());
     }
 
     public function testGetCountForPaginationWithBindings()

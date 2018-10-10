@@ -2,6 +2,7 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
+use PDO;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
@@ -53,6 +54,25 @@ class SQLiteGrammar extends Grammar
         }
 
         return $sql;
+    }
+
+    /**
+     * Compile a partition limit clause for the query.
+     *
+     * @param  \Illuminate\Database\Query\Builder  $query
+     * @return string
+     */
+    protected function compilePartitionLimit(Builder $query)
+    {
+        $version = $query->getConnection()->getPdo()->getAttribute(PDO::ATTR_SERVER_VERSION);
+
+        if (version_compare($version, '3.25.0') >= 0) {
+            return parent::compilePartitionLimit($query);
+        }
+
+        $query->partitionLimit = null;
+
+        return $this->compileSelect($query);
     }
 
     /**
