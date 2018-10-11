@@ -218,7 +218,8 @@ class Migrator
      */
     protected function getMigrationsForRollback(array $options)
     {
-        if (($steps = $options['step'] ?? 0) > 0) {
+        $steps = $options['step'] ?? 0;
+        if ($steps != 0) {
             return $this->repository->getMigrations($steps);
         }
 
