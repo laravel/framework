@@ -17,7 +17,7 @@ class HasOneThrough extends HasManyThrough
      */
     public function getResults()
     {
-        return $this->query->first() ?: $this->getDefaultFor($this->farParent);
+        return $this->first() ?: $this->getDefaultFor($this->farParent);
     }
 
     /**

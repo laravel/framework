@@ -84,6 +84,7 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
         $contract = HasOneThroughDefaultTestPosition::first()->contract;
         $this->assertEquals('A title', $contract->title);
+        $this->assertArrayNotHasKey('email', $contract->getAttributes());
 
         $this->resetDefault();
     }
