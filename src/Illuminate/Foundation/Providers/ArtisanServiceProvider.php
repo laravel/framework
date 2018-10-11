@@ -614,7 +614,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerOptimizeCommand()
     {
-        $this->app->singleton('command.optimize', function ($app) {
+        $this->app->singleton('command.optimize', function () {
             return new OptimizeCommand;
         });
     }
@@ -638,7 +638,7 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerOptimizeClearCommand()
     {
-        $this->app->singleton('command.optimize.clear', function ($app) {
+        $this->app->singleton('command.optimize.clear', function () {
             return new OptimizeClearCommand;
         });
     }
