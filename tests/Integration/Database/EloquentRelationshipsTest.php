@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
@@ -34,6 +35,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(MorphMany::class, $post->likes());
         $this->assertInstanceOf(BelongsToMany::class, $post->viewers());
         $this->assertInstanceOf(HasManyThrough::class, $post->lovers());
+        $this->assertInstanceOf(HasOneThrough::class, $post->contract());
         $this->assertInstanceOf(MorphToMany::class, $post->tags());
         $this->assertInstanceOf(MorphTo::class, $post->postable());
     }
@@ -52,6 +54,7 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(CustomMorphMany::class, $post->likes());
         $this->assertInstanceOf(CustomBelongsToMany::class, $post->viewers());
         $this->assertInstanceOf(CustomHasManyThrough::class, $post->lovers());
+        $this->assertInstanceOf(CustomHasOneThrough::class, $post->contract());
         $this->assertInstanceOf(CustomMorphToMany::class, $post->tags());
         $this->assertInstanceOf(CustomMorphTo::class, $post->postable());
     }
@@ -97,6 +100,11 @@ class Post extends Model
     public function lovers()
     {
         return $this->hasManyThrough(FakeRelationship::class, FakeRelationship::class);
+    }
+
+    public function contract()
+    {
+        return $this->hasOneThrough(FakeRelationship::class, FakeRelationship::class);
     }
 
     public function tags()
@@ -149,6 +157,12 @@ class CustomPost extends Post
         return new CustomHasManyThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
     }
 
+    protected function newHasOneThrough(Builder $query, Model $farParent, Model $throughParent, $firstKey,
+        $secondKey, $localKey, $secondLocalKey
+    ) {
+        return new CustomHasOneThrough($query, $farParent, $throughParent, $firstKey, $secondKey, $localKey, $secondLocalKey);
+    }
+
     protected function newMorphToMany(Builder $query, Model $parent, $name, $table, $foreignPivotKey,
         $relatedPivotKey, $parentKey, $relatedKey, $relationName = null, $inverse = false)
     {
@@ -195,6 +209,10 @@ class CustomBelongsToMany extends BelongsToMany
 class CustomHasManyThrough extends HasManyThrough
 {
     //
+}
+
+class CustomHasOneThrough extends HasOneThrough
+{
 }
 
 class CustomMorphToMany extends MorphToMany
