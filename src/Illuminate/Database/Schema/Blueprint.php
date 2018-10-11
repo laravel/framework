@@ -546,6 +546,10 @@ class Blueprint
      */
     public function integer($column, $autoIncrement = false, $unsigned = false)
     {
+        if (! is_bool($autoIncrement)) {
+            $autoIncrement = false;
+        }
+        
         return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -559,6 +563,10 @@ class Blueprint
      */
     public function tinyInteger($column, $autoIncrement = false, $unsigned = false)
     {
+        if (! is_bool($autoIncrement)) {
+            $autoIncrement = false;
+        }
+        
         return $this->addColumn('tinyInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -572,6 +580,10 @@ class Blueprint
      */
     public function smallInteger($column, $autoIncrement = false, $unsigned = false)
     {
+        if (! is_bool($autoIncrement)) {
+            $autoIncrement = false;
+        }
+        
         return $this->addColumn('smallInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -585,6 +597,10 @@ class Blueprint
      */
     public function mediumInteger($column, $autoIncrement = false, $unsigned = false)
     {
+        if (! is_bool($autoIncrement)) {
+            $autoIncrement = false;
+        }
+        
         return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -598,6 +614,10 @@ class Blueprint
      */
     public function bigInteger($column, $autoIncrement = false, $unsigned = false)
     {
+        if (! is_bool($autoIncrement)) {
+            $autoIncrement = false;
+        }
+        
         return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
