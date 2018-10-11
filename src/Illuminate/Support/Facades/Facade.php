@@ -55,6 +55,22 @@ abstract class Facade
     }
 
     /**
+     * Initiate a mock expectation that a method should not be called on the facade.
+     *
+     * @return \Mockery\Expectation
+     */
+    public static function shouldNotReceive()
+    {
+        $name = static::getFacadeAccessor();
+
+        $mock = static::isMock()
+                    ? static::$resolvedInstance[$name]
+                    : static::createFreshMockInstance();
+
+        return $mock->shouldNotReceive(...func_get_args());
+    }
+
+    /**
      * Create a fresh mock instance for the given class.
      *
      * @return \Mockery\Expectation
