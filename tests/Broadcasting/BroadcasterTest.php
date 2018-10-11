@@ -11,6 +11,18 @@ use Illuminate\Broadcasting\Broadcasters\Broadcaster;
 
 class BroadcasterTest extends TestCase
 {
+    /**
+     * @var \Illuminate\Tests\Broadcasting\FakeBroadcaster
+     */
+    public $broadcaster;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->broadcaster = new FakeBroadcaster;
+    }
+
     public function tearDown()
     {
         m::close();
@@ -18,30 +30,28 @@ class BroadcasterTest extends TestCase
 
     public function testExtractingParametersWhileCheckingForUserAccess()
     {
-        $broadcaster = new FakeBroadcaster;
-
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, $nonModel) {
             //
         };
-        $parameters = $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', $callback);
+        $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', $callback);
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
 
         $callback = function ($user, BroadcasterTestEloquentModelStub $model, BroadcasterTestEloquentModelStub $model2, $something) {
             //
         };
-        $parameters = $broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
+        $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{model2}.{nonModel}', 'asd.1.uid.something', $callback);
         $this->assertEquals(['model.1.instance', 'model.uid.instance', 'something'], $parameters);
 
         $callback = function ($user) {
             //
         };
-        $parameters = $broadcaster->extractAuthParameters('asd', 'asd', $callback);
+        $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
 
         $callback = function ($user, $something) {
             //
         };
-        $parameters = $broadcaster->extractAuthParameters('asd', 'asd', $callback);
+        $parameters = $this->broadcaster->extractAuthParameters('asd', 'asd', $callback);
         $this->assertEquals([], $parameters);
 
         /*
@@ -57,16 +67,14 @@ class BroadcasterTest extends TestCase
         $callback = function ($user, $model) {
             //
         };
-        $parameters = $broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
+        $parameters = $this->broadcaster->extractAuthParameters('something.{model}', 'something.1', $callback);
         $this->assertEquals(['bound'], $parameters);
         Container::setInstance(new Container);
     }
 
     public function testCanUseChannelClasses()
     {
-        $broadcaster = new FakeBroadcaster;
-
-        $parameters = $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', DummyBroadcastingChannel::class);
+        $parameters = $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', DummyBroadcastingChannel::class);
         $this->assertEquals(['model.1.instance', 'something'], $parameters);
     }
 
@@ -75,19 +83,15 @@ class BroadcasterTest extends TestCase
      */
     public function testUnknownChannelAuthHandlerTypeThrowsException()
     {
-        $broadcaster = new FakeBroadcaster;
-
-        $broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
+        $this->broadcaster->extractAuthParameters('asd.{model}.{nonModel}', 'asd.1.something', 123);
     }
 
     public function testCanRegisterChannelsAsClasses()
     {
-        $broadcaster = new FakeBroadcaster;
-
-        $broadcaster->channel('something', function () {
+        $this->broadcaster->channel('something', function () {
             //
         });
-        $broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
+        $this->broadcaster->channel('somethingelse', DummyBroadcastingChannel::class);
     }
 
     /**
@@ -95,11 +99,10 @@ class BroadcasterTest extends TestCase
      */
     public function testNotFoundThrowsHttpException()
     {
-        $broadcaster = new FakeBroadcaster;
         $callback = function ($user, BroadcasterTestEloquentModelNotFoundStub $model) {
             //
         };
-        $broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
+        $this->broadcaster->extractAuthParameters('asd.{model}', 'asd.1', $callback);
     }
 }
 
