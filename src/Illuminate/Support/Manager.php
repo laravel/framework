@@ -84,9 +84,9 @@ abstract class Manager
      */
     protected function createDriver($driver)
     {
-        // We'll check to see if a creator method exists for the given driver. If not we
-        // will check for a custom driver creator, which allows developers to create
+        // We'll check for a custom driver creator, which allows developers to create
         // drivers using their own customized driver creator Closure to create it.
+        // If not we will check to see if a creator method exists for the given driver.
         if (isset($this->customCreators[$driver])) {
             return $this->callCustomCreator($driver);
         } else {
