@@ -71,20 +71,6 @@ class HasOneThrough extends HasManyThrough
      */
     public function newRelatedInstanceFor(Model $parent)
     {
-        return $this->related->newInstance()->setAttribute(
-            $this->getForeignKeyName(), $parent->{$this->localKey}
-        );
-    }
-
-    /**
-     * Get the plain foreign key.
-     *
-     * @return string
-     */
-    public function getForeignKeyName()
-    {
-        $segments = explode('.', $this->getQualifiedForeignKeyName());
-
-        return end($segments);
+        return $this->related->newInstance();
     }
 }
