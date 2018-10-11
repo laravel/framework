@@ -168,6 +168,15 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertEquals('taylor', $instance->name);
     }
 
+    public function testNewInstanceReturnsNewInstanceWithTableSet()
+    {
+        $model = new EloquentModelStub;
+        $model->setTable('test');
+        $newInstance = $model->newInstance();
+
+        $this->assertEquals('test', $newInstance->getTable());
+    }
+
     public function testCreateMethodSavesNewModel()
     {
         $_SERVER['__eloquent.saved'] = false;

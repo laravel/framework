@@ -53,13 +53,6 @@ class TranslationTranslatorTest extends TestCase
         $this->assertEquals('foo', $t->get('foo::bar.foo'));
     }
 
-    // public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLReplacements()
-    // {
-    //     $t = new Translator($this->getLoader(), 'en');
-    //     $t->getLoader()->shouldReceive('load')->once()->with('en', 'foo', '*')->andReturn(['bar' => 'breeze :foo']);
-    //     $this->assertSame('breeze &lt;p&gt;test&lt;/p&gt;', $t->trans('foo.bar', ['foo' => '<p>test</p>'], 'en'));
-    // }
-
     public function testTransMethodProperlyLoadsAndRetrievesItemWithHTMLInTheMessage()
     {
         $t = new Translator($this->getLoader(), 'en');
