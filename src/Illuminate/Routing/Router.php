@@ -587,7 +587,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Return the response returned by the given route.
      *
      * @param  string  $name
-     * @return mixed
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function respondWithRoute($name)
     {
@@ -613,7 +613,7 @@ class Router implements RegistrarContract, BindingRegistrar
      * Dispatch the request to a route and return the response.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function dispatchToRoute(Request $request)
     {
@@ -640,7 +640,7 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Illuminate\Routing\Route  $route
-     * @return mixed
+     * @return \Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     protected function runRoute(Request $request, Route $route)
     {
