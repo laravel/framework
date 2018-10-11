@@ -787,6 +787,8 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $value
      * @param  \Illuminate\Routing\Route  $route
      * @return mixed
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     protected function performBinding($key, $value, $route)
     {
@@ -924,8 +926,6 @@ class Router implements RegistrarContract, BindingRegistrar
      * @param  string  $class
      * @param  \Closure|null  $callback
      * @return void
-     *
-     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function model($key, $class, Closure $callback = null)
     {
