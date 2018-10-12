@@ -1285,6 +1285,19 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get and remove an item from the collection.
+     *
+     * @param  callable|null  $callback
+     * @param  mixed  $default
+     * @return mixed
+     */
+    public function pullFirst($callback, $default = null)
+    {
+        $key = Arr::firstKey($this->items, $callback);
+        return is_null($key) ? $default : Arr::pull($this->items, $key);
+    }
+
+    /**
      * Put an item in the collection by key.
      *
      * @param  mixed  $key

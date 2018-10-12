@@ -1936,6 +1936,34 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('foo', $value);
     }
 
+    public function testPullFirstRemovesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $e = $c->pullFirst(function($e){
+            return $e == 'bar';
+        });
+        $this->assertEquals([0 => 'foo', 2 => 'baz'], $c->all());
+    }
+
+    public function testPullFirstRetrievesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $e = $c->pullFirst(function($e){
+            return $e == 'bar';
+        });
+        $this->assertEquals('bar', $e);
+    }
+
+    public function testPullFirstReturnsDefault()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $e = $c->pullFirst(function($e){
+            return false;
+        }, 'baz');
+        $this->assertEquals(['foo', 'bar'], $c->all());
+        $this->assertEquals('baz', $e);
+    }
+
     public function testRejectRemovesElementsPassingTruthTest()
     {
         $c = new Collection(['foo', 'bar']);
