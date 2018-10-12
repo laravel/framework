@@ -162,6 +162,7 @@ class Arr
     public static function first($array, callable $callback = null, $default = null)
     {
         $key = static::firstKey($array, $callback);
+
         return is_null($key) ? $default : static::get($array, $key);
     }
 
