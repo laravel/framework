@@ -549,7 +549,7 @@ class Blueprint
         if (! is_bool($autoIncrement)) {
             $autoIncrement = false;
         }
-        
+
         return $this->addColumn('integer', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -566,7 +566,7 @@ class Blueprint
         if (! is_bool($autoIncrement)) {
             $autoIncrement = false;
         }
-        
+
         return $this->addColumn('tinyInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -583,7 +583,7 @@ class Blueprint
         if (! is_bool($autoIncrement)) {
             $autoIncrement = false;
         }
-        
+
         return $this->addColumn('smallInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -600,7 +600,7 @@ class Blueprint
         if (! is_bool($autoIncrement)) {
             $autoIncrement = false;
         }
-        
+
         return $this->addColumn('mediumInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
@@ -617,7 +617,7 @@ class Blueprint
         if (! is_bool($autoIncrement)) {
             $autoIncrement = false;
         }
-        
+
         return $this->addColumn('bigInteger', $column, compact('autoIncrement', 'unsigned'));
     }
 
