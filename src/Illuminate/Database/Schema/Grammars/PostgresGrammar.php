@@ -437,6 +437,38 @@ class PostgresGrammar extends Grammar
         return 'text';
     }
 
+    private function generatableColumn($type, Fluent $column)
+    {
+        if (! $column->autoIncrement && $column->generatedAs === null) {
+            return $type;
+        }
+
+        if ($column->autoIncrement && $column->generatedAs === null) {
+            $serial = [
+                'integer' => 'serial',
+                'bigint' => 'bigserial',
+                'smallint' => 'smallserial',
+            ];
+
+            return $serial[$type];
+        }
+
+        // Identity column but not a primary key
+        $always = $column->always ? 'always' : 'by default';
+        $options = '';
+
+        if (! is_bool($column->generatedAs) && ((string) $column->generatedAs !== '')) {
+            $options = sprintf(' (%s)', $column->generatedAs);
+        }
+
+        return sprintf(
+            '%s generated %s as identity%s',
+            $type,
+            $always,
+            $options
+        );
+    }
+
     /**
      * Create the column definition for an integer type.
      *
@@ -445,7 +477,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeInteger(Fluent $column)
     {
-        return $column->autoIncrement ? 'serial' : 'integer';
+        return $this->generatableColumn('integer', $column);
     }
 
     /**
@@ -456,7 +488,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeBigInteger(Fluent $column)
     {
-        return $column->autoIncrement ? 'bigserial' : 'bigint';
+        return $this->generatableColumn('bigint', $column);
     }
 
     /**
@@ -467,7 +499,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeMediumInteger(Fluent $column)
     {
-        return $column->autoIncrement ? 'serial' : 'integer';
+        return $this->generatableColumn('integer', $column);
     }
 
     /**
@@ -478,7 +510,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeTinyInteger(Fluent $column)
     {
-        return $column->autoIncrement ? 'smallserial' : 'smallint';
+        return $this->generatableColumn('smallint', $column);
     }
 
     /**
@@ -489,7 +521,7 @@ class PostgresGrammar extends Grammar
      */
     protected function typeSmallInteger(Fluent $column)
     {
-        return $column->autoIncrement ? 'smallserial' : 'smallint';
+        return $this->generatableColumn('smallint', $column);
     }
 
     /**
@@ -854,7 +886,7 @@ class PostgresGrammar extends Grammar
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)
     {
-        if (in_array($column->type, $this->serials) && $column->autoIncrement) {
+        if ((in_array($column->type, $this->serials) || ($column->generatedAs !== null)) && $column->autoIncrement) {
             return ' primary key';
         }
     }
