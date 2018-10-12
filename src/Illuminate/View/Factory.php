@@ -149,6 +149,7 @@ class Factory implements FactoryContract
      * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
      * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
+     *
      * @throws \InvalidArgumentException
      */
     public function first(array $views, $data = [], $mergeData = [])
@@ -292,6 +293,7 @@ class Factory implements FactoryContract
      *
      * @param  string  $path
      * @return \Illuminate\Contracts\View\Engine
+     *
      * @throws \InvalidArgumentException
      */
     public function getEngineFromPath($path)
