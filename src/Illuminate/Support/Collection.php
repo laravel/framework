@@ -672,6 +672,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Get the first key from the collection.
+     *
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public function firstKey(callable $callback = null)
+    {
+        return Arr::firstKey($this->items, $callback);
+    }
+
+    /**
      * Get the first item by the given key value pair.
      *
      * @param  string  $key
@@ -1293,7 +1304,8 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function pullFirst($callback, $default = null)
     {
-        $key = Arr::firstKey($this->items, $callback);
+        $key = $this->firstKey($callback);
+
         return is_null($key) ? $default : Arr::pull($this->items, $key);
     }
 
