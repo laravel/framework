@@ -437,38 +437,6 @@ class PostgresGrammar extends Grammar
         return 'text';
     }
 
-    private function generatableColumn($type, Fluent $column)
-    {
-        if (! $column->autoIncrement && $column->generatedAs === null) {
-            return $type;
-        }
-
-        if ($column->autoIncrement && $column->generatedAs === null) {
-            $serial = [
-                'integer' => 'serial',
-                'bigint' => 'bigserial',
-                'smallint' => 'smallserial',
-            ];
-
-            return $serial[$type];
-        }
-
-        // Identity column but not a primary key
-        $always = $column->always ? 'always' : 'by default';
-        $options = '';
-
-        if (! is_bool($column->generatedAs) && ((string) $column->generatedAs !== '')) {
-            $options = sprintf(' (%s)', $column->generatedAs);
-        }
-
-        return sprintf(
-            '%s generated %s as identity%s',
-            $type,
-            $always,
-            $options
-        );
-    }
-
     /**
      * Create the column definition for an integer type.
      *
@@ -522,6 +490,41 @@ class PostgresGrammar extends Grammar
     protected function typeSmallInteger(Fluent $column)
     {
         return $this->generatableColumn('smallint', $column);
+    }
+
+    /**
+     * Create the column definition for a generatable column.
+     *
+     * @param  string  $type
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function generatableColumn($type, Fluent $column)
+    {
+        if (! $column->autoIncrement && is_null($column->generatedAs)) {
+            return $type;
+        }
+
+        if ($column->autoIncrement && is_null($column->generatedAs)) {
+            return with([
+                'integer' => 'serial',
+                'bigint' => 'bigserial',
+                'smallint' => 'smallserial',
+            ])[$type];
+        }
+
+        $options = '';
+
+        if (! is_bool($column->generatedAs) && ! empty($column->generatedAs)) {
+            $options = sprintf(' (%s)', $column->generatedAs);
+        }
+
+        return sprintf(
+            '%s generated %s as identity%s',
+            $type,
+            $column->always ? 'always' : 'by default',
+            $options
+        );
     }
 
     /**
