@@ -224,7 +224,7 @@ class Factory implements FactoryContract
     /**
      * Convert any first level data key passed to a view into camelCase if it's using invalid case
      * for php variable naming, like kebab-case for example. The regex comes directly from
-     * http://www.php.net/manual/en/language.variables.basics.php
+     * http://www.php.net/manual/en/language.variables.basics.php.
      *
      * @param $data
      * @return array
@@ -307,7 +307,7 @@ class Factory implements FactoryContract
         $extensions = array_keys($this->extensions);
 
         return Arr::first($extensions, function ($value) use ($path) {
-            return Str::endsWith($path, '.' . $value);
+            return Str::endsWith($path, '.'.$value);
         });
     }
 
