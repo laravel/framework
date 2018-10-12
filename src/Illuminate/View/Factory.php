@@ -146,8 +146,8 @@ class Factory implements FactoryContract
      * Get the first view that actually exists from the given list.
      *
      * @param  array  $views
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
+     * @param  array   $mergeData
      * @return \Illuminate\Contracts\View\View
      * @throws \InvalidArgumentException
      */
@@ -169,8 +169,8 @@ class Factory implements FactoryContract
      *
      * @param  bool  $condition
      * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @param  array  $mergeData
+     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
+     * @param  array   $mergeData
      * @return string
      */
     public function renderWhen($condition, $view, $data = [], $mergeData = [])
