@@ -19,42 +19,36 @@ class Factory implements FactoryContract
         Concerns\ManagesLoops,
         Concerns\ManagesStacks,
         Concerns\ManagesTranslations;
-
     /**
      * The engine implementation.
      *
      * @var \Illuminate\View\Engines\EngineResolver
      */
     protected $engines;
-
     /**
      * The view finder implementation.
      *
      * @var \Illuminate\View\ViewFinderInterface
      */
     protected $finder;
-
     /**
      * The event dispatcher instance.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
     protected $events;
-
     /**
      * The IoC container instance.
      *
      * @var \Illuminate\Contracts\Container\Container
      */
     protected $container;
-
     /**
      * Data that should be available to all templates.
      *
      * @var array
      */
     protected $shared = [];
-
     /**
      * The extension to engine bindings.
      *
@@ -65,14 +59,12 @@ class Factory implements FactoryContract
         'php' => 'php',
         'css' => 'file',
     ];
-
     /**
      * The view composer events.
      *
      * @var array
      */
     protected $composers = [];
-
     /**
      * The number of active rendering operations.
      *
@@ -83,9 +75,9 @@ class Factory implements FactoryContract
     /**
      * Create a new view factory instance.
      *
-     * @param  \Illuminate\View\Engines\EngineResolver  $engines
-     * @param  \Illuminate\View\ViewFinderInterface  $finder
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  \Illuminate\View\Engines\EngineResolver $engines
+     * @param  \Illuminate\View\ViewFinderInterface    $finder
+     * @param  \Illuminate\Contracts\Events\Dispatcher $events
      * @return void
      */
     public function __construct(EngineResolver $engines, ViewFinderInterface $finder, Dispatcher $events)
@@ -100,13 +92,15 @@ class Factory implements FactoryContract
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
-     * @param  array   $mergeData
+     * @param  string                                        $path
+     * @param  \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param  array                                         $mergeData
      * @return \Illuminate\Contracts\View\View
      */
     public function file($path, $data = [], $mergeData = [])
     {
+        $data = $this->normalizeDataKeys($data);
+
         $data = array_merge($mergeData, $this->parseData($data));
 
         return tap($this->viewInstance($path, $path, $data), function ($view) {
@@ -117,9 +111,9 @@ class Factory implements FactoryContract
     /**
      * Get the evaluated view contents for the given view.
      *
-     * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
-     * @param  array   $mergeData
+     * @param  string                                        $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param  array                                         $mergeData
      * @return \Illuminate\Contracts\View\View
      */
     public function make($view, $data = [], $mergeData = [])
@@ -127,6 +121,8 @@ class Factory implements FactoryContract
         $path = $this->finder->find(
             $view = $this->normalizeName($view)
         );
+
+        $data = $this->normalizeDataKeys($data);
 
         // Next, we will create the view instance and call the view creator for the view
         // which can set any data, etc. Then we will return the view instance back to
@@ -141,11 +137,10 @@ class Factory implements FactoryContract
     /**
      * Get the first view that actually exists from the given list.
      *
-     * @param  array  $views
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
-     * @param  array   $mergeData
+     * @param  array                                         $views
+     * @param  \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param  array                                         $mergeData
      * @return \Illuminate\Contracts\View\View
-     *
      * @throws \InvalidArgumentException
      */
     public function first(array $views, $data = [], $mergeData = [])
@@ -164,10 +159,10 @@ class Factory implements FactoryContract
     /**
      * Get the rendered content of the view based on a given condition.
      *
-     * @param  bool  $condition
-     * @param  string  $view
-     * @param  \Illuminate\Contracts\Support\Arrayable|array   $data
-     * @param  array   $mergeData
+     * @param  bool                                          $condition
+     * @param  string                                        $view
+     * @param  \Illuminate\Contracts\Support\Arrayable|array $data
+     * @param  array                                         $mergeData
      * @return string
      */
     public function renderWhen($condition, $view, $data = [], $mergeData = [])
@@ -182,10 +177,10 @@ class Factory implements FactoryContract
     /**
      * Get the rendered contents of a partial from a loop.
      *
-     * @param  string  $view
-     * @param  array   $data
-     * @param  string  $iterator
-     * @param  string  $empty
+     * @param  string $view
+     * @param  array  $data
+     * @param  string $iterator
+     * @param  string $empty
      * @return string
      */
     public function renderEach($view, $data, $iterator, $empty = 'raw|')
@@ -208,8 +203,8 @@ class Factory implements FactoryContract
         // with "raw|" for convenience and to let this know that it is a string.
         else {
             $result = Str::startsWith($empty, 'raw|')
-                        ? substr($empty, 4)
-                        : $this->make($empty)->render();
+                ? substr($empty, 4)
+                : $this->make($empty)->render();
         }
 
         return $result;
@@ -227,9 +222,25 @@ class Factory implements FactoryContract
     }
 
     /**
+     * Convert any first level data key passed to a view into camelCase if it's using invalid case
+     * for php variable naming, like kebab-case for example. The regex comes directly from
+     * http://www.php.net/manual/en/language.variables.basics.php
+     *
+     * @param $data
+     * @return array
+     */
+    protected function normalizeDataKeys($data)
+    {
+        return array_combine(array_map(function ($key) {
+            $isKeyLegal = preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $key);
+            return ! $isKeyLegal ? Str::camel($key) : $key;
+        }, array_keys($data)), $data);
+    }
+
+    /**
      * Parse the given data into a raw array.
      *
-     * @param  mixed  $data
+     * @param  mixed $data
      * @return array
      */
     protected function parseData($data)
@@ -240,9 +251,9 @@ class Factory implements FactoryContract
     /**
      * Create a new view instance from the given arguments.
      *
-     * @param  string  $view
-     * @param  string  $path
-     * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
+     * @param  string                                        $view
+     * @param  string                                        $path
+     * @param  \Illuminate\Contracts\Support\Arrayable|array $data
      * @return \Illuminate\Contracts\View\View
      */
     protected function viewInstance($view, $path, $data)
@@ -253,7 +264,7 @@ class Factory implements FactoryContract
     /**
      * Determine if a given view exists.
      *
-     * @param  string  $view
+     * @param  string $view
      * @return bool
      */
     public function exists($view)
@@ -270,9 +281,8 @@ class Factory implements FactoryContract
     /**
      * Get the appropriate view engine for the given path.
      *
-     * @param  string  $path
+     * @param  string $path
      * @return \Illuminate\Contracts\View\Engine
-     *
      * @throws \InvalidArgumentException
      */
     public function getEngineFromPath($path)
@@ -289,7 +299,7 @@ class Factory implements FactoryContract
     /**
      * Get the extension used by the view file.
      *
-     * @param  string  $path
+     * @param  string $path
      * @return string
      */
     protected function getExtension($path)
@@ -297,15 +307,15 @@ class Factory implements FactoryContract
         $extensions = array_keys($this->extensions);
 
         return Arr::first($extensions, function ($value) use ($path) {
-            return Str::endsWith($path, '.'.$value);
+            return Str::endsWith($path, '.' . $value);
         });
     }
 
     /**
      * Add a piece of shared data to the environment.
      *
-     * @param  array|string  $key
-     * @param  mixed  $value
+     * @param  array|string $key
+     * @param  mixed        $value
      * @return mixed
      */
     public function share($key, $value = null)
@@ -352,7 +362,7 @@ class Factory implements FactoryContract
     /**
      * Add a location to the array of view locations.
      *
-     * @param  string  $location
+     * @param  string $location
      * @return void
      */
     public function addLocation($location)
@@ -363,8 +373,8 @@ class Factory implements FactoryContract
     /**
      * Add a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param  string       $namespace
+     * @param  string|array $hints
      * @return $this
      */
     public function addNamespace($namespace, $hints)
@@ -377,8 +387,8 @@ class Factory implements FactoryContract
     /**
      * Prepend a new namespace to the loader.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param  string       $namespace
+     * @param  string|array $hints
      * @return $this
      */
     public function prependNamespace($namespace, $hints)
@@ -391,8 +401,8 @@ class Factory implements FactoryContract
     /**
      * Replace the namespace hints for the given namespace.
      *
-     * @param  string  $namespace
-     * @param  string|array  $hints
+     * @param  string       $namespace
+     * @param  string|array $hints
      * @return $this
      */
     public function replaceNamespace($namespace, $hints)
@@ -405,9 +415,9 @@ class Factory implements FactoryContract
     /**
      * Register a valid view extension and its engine.
      *
-     * @param  string    $extension
-     * @param  string    $engine
-     * @param  \Closure  $resolver
+     * @param  string   $extension
+     * @param  string   $engine
+     * @param  \Closure $resolver
      * @return void
      */
     public function addExtension($extension, $engine, $resolver = null)
@@ -481,7 +491,7 @@ class Factory implements FactoryContract
     /**
      * Set the view finder instance.
      *
-     * @param  \Illuminate\View\ViewFinderInterface  $finder
+     * @param  \Illuminate\View\ViewFinderInterface $finder
      * @return void
      */
     public function setFinder(ViewFinderInterface $finder)
@@ -512,7 +522,7 @@ class Factory implements FactoryContract
     /**
      * Set the event dispatcher instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher  $events
+     * @param  \Illuminate\Contracts\Events\Dispatcher $events
      * @return void
      */
     public function setDispatcher(Dispatcher $events)
@@ -533,7 +543,7 @@ class Factory implements FactoryContract
     /**
      * Set the IoC container instance.
      *
-     * @param  \Illuminate\Contracts\Container\Container  $container
+     * @param  \Illuminate\Contracts\Container\Container $container
      * @return void
      */
     public function setContainer(Container $container)
@@ -544,8 +554,8 @@ class Factory implements FactoryContract
     /**
      * Get an item from the shared data.
      *
-     * @param  string  $key
-     * @param  mixed   $default
+     * @param  string $key
+     * @param  mixed  $default
      * @return mixed
      */
     public function shared($key, $default = null)
