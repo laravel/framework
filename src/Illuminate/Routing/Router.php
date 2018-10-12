@@ -757,6 +757,8 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return \Illuminate\Routing\Route
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function substituteBindings($route)
     {
@@ -774,6 +776,8 @@ class Router implements RegistrarContract, BindingRegistrar
      *
      * @param  \Illuminate\Routing\Route  $route
      * @return void
+     *
+     * @throws \Illuminate\Database\Eloquent\ModelNotFoundException
      */
     public function substituteImplicitBindings($route)
     {
