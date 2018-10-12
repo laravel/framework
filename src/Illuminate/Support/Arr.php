@@ -161,23 +161,37 @@ class Arr
      */
     public static function first($array, callable $callback = null, $default = null)
     {
+        $key = static::firstKey($array, $callback);
+
+        return is_null($key) ? $default : static::get($array, $key);
+    }
+
+    /**
+     * Return the first key in an array passing a given truth test.
+     *
+     * @param  array  $array
+     * @param  callable|null  $callback
+     * @return mixed
+     */
+    public static function firstKey($array, callable $callback = null)
+    {
         if (is_null($callback)) {
             if (empty($array)) {
-                return value($default);
+                return null;
             }
 
-            foreach ($array as $item) {
-                return $item;
+            foreach ($array as $key => $item) {
+                return $key;
             }
         }
 
         foreach ($array as $key => $value) {
             if (call_user_func($callback, $value, $key)) {
-                return $value;
+                return $key;
             }
         }
 
-        return value($default);
+        return null;
     }
 
     /**

@@ -50,6 +50,21 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('default', $result);
     }
 
+    public function testFirstKeyReturnsFirstItemInCollection()
+    {
+        $c = new Collection(['a' => 'foo', 'b' => 'bar']);
+        $this->assertEquals('a', $c->firstKey());
+    }
+
+    public function testFirstKeyWithCallback()
+    {
+        $data = new Collection(['foo', 'bar', 'baz']);
+        $result = $data->firstKey(function ($value) {
+            return $value === 'bar';
+        });
+        $this->assertEquals(1, $result);
+    }
+
     public function testFirstWhere()
     {
         $data = new Collection([
@@ -1934,6 +1949,34 @@ class SupportCollectionTest extends TestCase
         $c = new Collection([]);
         $value = $c->pull(0, 'foo');
         $this->assertEquals('foo', $value);
+    }
+
+    public function testPullFirstRemovesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $e = $c->pullFirst(function ($e) {
+            return $e == 'bar';
+        });
+        $this->assertEquals([0 => 'foo', 2 => 'baz'], $c->all());
+    }
+
+    public function testPullFirstRetrievesItemFromCollection()
+    {
+        $c = new Collection(['foo', 'bar', 'baz']);
+        $e = $c->pullFirst(function ($e) {
+            return $e == 'bar';
+        });
+        $this->assertEquals('bar', $e);
+    }
+
+    public function testPullFirstReturnsDefault()
+    {
+        $c = new Collection(['foo', 'bar']);
+        $e = $c->pullFirst(function ($e) {
+            return false;
+        }, 'baz');
+        $this->assertEquals(['foo', 'bar'], $c->all());
+        $this->assertEquals('baz', $e);
     }
 
     public function testRejectRemovesElementsPassingTruthTest()
