@@ -233,6 +233,7 @@ class Factory implements FactoryContract
     {
         return array_combine(array_map(function ($key) {
             $isKeyLegal = preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $key);
+
             return ! $isKeyLegal ? Str::camel($key) : $key;
         }, array_keys($data)), $data);
     }
