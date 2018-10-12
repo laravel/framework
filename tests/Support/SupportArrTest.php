@@ -149,6 +149,17 @@ class SupportArrTest extends TestCase
         $this->assertEquals('a', Arr::firstKey($array));
     }
 
+    public function testFirstKeyReturnsNull()
+    {
+        $array = [100, 200, 300];
+
+        $value = Arr::firstKey($array, function ($value) {
+            return $value >= 400;
+        });
+
+        $this->assertNull($value);
+    }
+
     public function testLast()
     {
         $array = [100, 200, 300];
