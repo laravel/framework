@@ -107,6 +107,8 @@ class Factory implements FactoryContract
      */
     public function file($path, $data = [], $mergeData = [])
     {
+        $data = $this->normalizeDataKeys($data);
+
         $data = array_merge($mergeData, $this->parseData($data));
 
         return tap($this->viewInstance($path, $path, $data), function ($view) {
@@ -127,6 +129,8 @@ class Factory implements FactoryContract
         $path = $this->finder->find(
             $view = $this->normalizeName($view)
         );
+
+        $data = $this->normalizeDataKeys($data);
 
         // Next, we will create the view instance and call the view creator for the view
         // which can set any data, etc. Then we will return the view instance back to
@@ -208,8 +212,8 @@ class Factory implements FactoryContract
         // with "raw|" for convenience and to let this know that it is a string.
         else {
             $result = Str::startsWith($empty, 'raw|')
-                        ? substr($empty, 4)
-                        : $this->make($empty)->render();
+                ? substr($empty, 4)
+                : $this->make($empty)->render();
         }
 
         return $result;
@@ -224,6 +228,23 @@ class Factory implements FactoryContract
     protected function normalizeName($name)
     {
         return ViewName::normalize($name);
+    }
+
+    /**
+     * Convert any first level data key passed to a view into camelCase if it's using invalid case
+     * for php variable naming, like kebab-case for example. The regex comes directly from
+     * http://www.php.net/manual/en/language.variables.basics.php.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function normalizeDataKeys($data)
+    {
+        return array_combine(array_map(function ($key) {
+            $isKeyLegal = preg_match('/^[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*$/', $key);
+
+            return ! $isKeyLegal ? Str::camel($key) : $key;
+        }, array_keys($data)), $data);
     }
 
     /**

@@ -474,6 +474,39 @@ class ViewFactoryTest extends TestCase
         $factory->make('vendor/package::foo.bar');
     }
 
+    public function testFirstLevelDataKeysAreNormalizedProperlyToBeAccessibleAsPhpVariables()
+    {
+        unset($_SERVER['__test.view']);
+
+        $factory = $this->getFactory();
+        $factory->getFinder()->shouldReceive('find')->atLeast()->times(4)->with('view')->andReturn('path.php');
+        $factory->getEngineResolver()->shouldReceive('resolve')->atLeast()->times(4)->with('php')->andReturn($engine = m::mock(Engine::class));
+        $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
+        $factory->setDispatcher(new Dispatcher);
+        $factory->creator('view', function ($view) {
+            $_SERVER['__test.view'] = $view;
+        });
+        $factory->addExtension('php', 'php');
+
+        // camelCase: unchanged
+        $view = $factory->make('view', ['fooBar' => 'baz']);
+        $this->assertArrayHasKey('fooBar', $_SERVER['__test.view']->getData());
+
+        // snake_case: unchanged
+        $view = $factory->make('view', ['foo_bar' => 'baz']);
+        $this->assertArrayHasKey('foo_bar', $_SERVER['__test.view']->getData());
+
+        // StudlyCase: unchanged
+        $view = $factory->make('view', ['FooBar' => 'baz']);
+        $this->assertArrayHasKey('FooBar', $_SERVER['__test.view']->getData());
+
+        // kebab-case: to camelCase
+        $view = $factory->make('view', ['foo-bar' => 'baz']);
+        $this->assertArrayHasKey('fooBar', $_SERVER['__test.view']->getData());
+
+        unset($_SERVER['__test.view']);
+    }
+
     /**
      * @expectedException \InvalidArgumentException
      */
