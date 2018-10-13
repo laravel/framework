@@ -177,8 +177,7 @@ abstract class ServiceProvider
         }
 
         static::$publishGroups[$group] = array_merge(
-            static::$publishGroups[$group],
-            $paths
+            static::$publishGroups[$group], $paths
         );
     }
 
