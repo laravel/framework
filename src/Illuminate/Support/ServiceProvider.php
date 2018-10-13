@@ -134,7 +134,7 @@ abstract class ServiceProvider
      * Register paths to be published by the publish command.
      *
      * @param  array  $paths
-     * @param  string  $groups
+     * @param  mixed  $groups
      * @return void
      */
     protected function publishes(array $paths, $groups = null)
