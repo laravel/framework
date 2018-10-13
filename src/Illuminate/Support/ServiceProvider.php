@@ -67,7 +67,7 @@ abstract class ServiceProvider
      */
     protected function loadRoutesFrom($path)
     {
-        if (!$this->app->routesAreCached()) {
+        if (! $this->app->routesAreCached()) {
             require $path;
         }
     }
@@ -143,7 +143,7 @@ abstract class ServiceProvider
 
         static::$publishes[$class] = array_merge(static::$publishes[$class], $paths);
 
-        if (!is_null($groups)) {
+        if (! is_null($groups)) {
             foreach ((array) $groups as $group) {
                 $this->addPublishGroup($group, $paths);
             }
@@ -158,7 +158,7 @@ abstract class ServiceProvider
      */
     protected function ensurePublishArrayInitialized($class)
     {
-        if (!array_key_exists($class, static::$publishes)) {
+        if (! array_key_exists($class, static::$publishes)) {
             static::$publishes[$class] = [];
         }
     }
@@ -172,7 +172,7 @@ abstract class ServiceProvider
      */
     protected function addPublishGroup($group, $paths)
     {
-        if (!array_key_exists($group, static::$publishGroups)) {
+        if (! array_key_exists($group, static::$publishGroups)) {
             static::$publishGroups[$group] = [];
         }
 
@@ -191,7 +191,7 @@ abstract class ServiceProvider
      */
     public static function pathsToPublish($provider = null, $group = null)
     {
-        if (!is_null($paths = static::pathsForProviderOrGroup($provider, $group))) {
+        if (! is_null($paths = static::pathsForProviderOrGroup($provider, $group))) {
             return $paths;
         }
 
@@ -229,7 +229,7 @@ abstract class ServiceProvider
      */
     protected static function pathsForProviderAndGroup($provider, $group)
     {
-        if (!empty(static::$publishes[$provider]) && !empty(static::$publishGroups[$group])) {
+        if (! empty(static::$publishes[$provider]) && ! empty(static::$publishGroups[$group])) {
             return array_intersect_key(static::$publishes[$provider], static::$publishGroups[$group]);
         }
 
