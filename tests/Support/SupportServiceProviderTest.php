@@ -47,7 +47,7 @@ class SupportServiceProviderTest extends TestCase
         $toPublish = ServiceProvider::pathsToPublish(ServiceProviderForTestingOne::class);
         $this->assertArrayHasKey('source/unmarked/one', $toPublish, 'Service provider does not return expected published path key.');
         $this->assertArrayHasKey('source/tagged/one', $toPublish, 'Service provider does not return expected published path key.');
-        $this->assertEquals(['source/unmarked/one' => 'destination/unmarked/one', 'source/tagged/one' => 'destination/tagged/one'], $toPublish, 'Service provider does not return expected set of published paths.');
+        $this->assertEquals(['source/unmarked/one' => 'destination/unmarked/one', 'source/tagged/one' => 'destination/tagged/one', 'source/tagged/multiple' => 'destination/tagged/multiple'], $toPublish, 'Service provider does not return expected set of published paths.');
     }
 
     public function testMultipleAssetsArePublishedCorrectly()
