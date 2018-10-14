@@ -44,11 +44,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
             $this->assertEquals('select "foo", "bar" from "users"', $sql);
         });
+        $builder->getConnection()->shouldReceive('select')->once()->andReturnUsing(function ($sql) {
+            $this->assertEquals('select "baz" from "users"', $sql);
+        });
 
         $builder->from('users')->get();
         $this->assertNull($builder->columns);
 
         $builder->from('users')->get(['foo', 'bar']);
+        $this->assertNull($builder->columns);
+
+        $builder->from('users')->get('baz');
         $this->assertNull($builder->columns);
 
         $this->assertEquals('select * from "users"', $builder->toSql());
