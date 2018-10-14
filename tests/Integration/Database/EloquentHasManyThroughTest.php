@@ -42,7 +42,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
         $mate1 = User::create(['name' => str_random(), 'team_id' => $team1->id]);
         $mate2 = User::create(['name' => str_random(), 'team_id' => $team2->id]);
 
-        $notMember = User::create(['name' => str_random()]);
+        User::create(['name' => str_random()]);
 
         $this->assertEquals([$mate1->id, $mate2->id], $user->teamMates->pluck('id')->toArray());
         $this->assertEquals([$user->id], User::has('teamMates')->pluck('id')->toArray());
@@ -58,7 +58,7 @@ class EloquentHasManyThroughTest extends DatabaseTestCase
 
         $teamMates = $user->teamMatesWithGlobalScope;
 
-        $this->assertEquals(['id' => 2, 'owner_id' => 1], $teamMates[0]->getAttributes());
+        $this->assertEquals(['id' => 2, 'laravel_through_key' => 1], $teamMates[0]->getAttributes());
     }
 
     public function test_has_self()

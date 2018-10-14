@@ -2,6 +2,7 @@
 
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToLazyEagerLoadingTest;
 
+use DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
@@ -49,11 +50,11 @@ class EloquentMorphToLazyEagerLoadingTest extends DatabaseTestCase
     {
         $comments = Comment::all();
 
-        \DB::enableQueryLog();
+        DB::enableQueryLog();
 
         $comments->load('commentable');
 
-        $this->assertCount(3, \DB::getQueryLog());
+        $this->assertCount(3, DB::getQueryLog());
         $this->assertTrue($comments[0]->relationLoaded('commentable'));
         $this->assertTrue($comments[0]->commentable->relationLoaded('user'));
         $this->assertTrue($comments[1]->relationLoaded('commentable'));

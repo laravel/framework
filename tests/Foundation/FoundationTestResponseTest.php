@@ -2,11 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
+use Mockery as m;
 use JsonSerializable;
 use Illuminate\Http\Response;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Database\Eloquent\Model;
 use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -32,6 +34,25 @@ class FoundationTestResponseTest extends TestCase
         ]);
 
         $response->assertViewHas('foo');
+    }
+
+    public function testAssertViewHasModel()
+    {
+        $model = new class extends Model {
+            public function is($model)
+            {
+                return $this == $model;
+            }
+        };
+
+        $response = $this->makeMockResponse([
+            'render' => 'hello world',
+            'getData' => ['foo' => $model],
+        ]);
+
+        $response->original->foo = $model;
+
+        $response->assertViewHas('foo', $model);
     }
 
     public function testAssertSeeInOrder()
@@ -173,7 +194,7 @@ class FoundationTestResponseTest extends TestCase
 
         $response->assertJsonFragment(['foo' => 'bar 0', 'bar' => ['foo' => 'bar 0', 'bar' => 'foo 0']]);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub()));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 10]);
     }
@@ -182,7 +203,7 @@ class FoundationTestResponseTest extends TestCase
     {
         $this->expectException(AssertionFailedError::class);
 
-        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub()));
+        $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 1]);
     }
@@ -362,7 +383,7 @@ class FoundationTestResponseTest extends TestCase
     private function makeMockResponse($content)
     {
         $baseResponse = tap(new Response, function ($response) use ($content) {
-            $response->setContent(\Mockery::mock(View::class, $content));
+            $response->setContent(m::mock(View::class, $content));
         });
 
         return TestResponse::fromBaseResponse($baseResponse);

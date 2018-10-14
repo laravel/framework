@@ -79,7 +79,7 @@ class AppNameCommand extends Command
 
         $this->composer->dumpAutoloads();
 
-        $this->call('clear-compiled');
+        $this->call('optimize:clear');
     }
 
     /**

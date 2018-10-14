@@ -2,6 +2,7 @@
 
 namespace Illuminate\Filesystem;
 
+use Exception;
 use ErrorException;
 use FilesystemIterator;
 use Symfony\Component\Finder\Finder;
@@ -120,6 +121,41 @@ class Filesystem
     public function put($path, $contents, $lock = false)
     {
         return file_put_contents($path, $contents, $lock ? LOCK_EX : 0);
+    }
+
+    /**
+     * Write the contents of a file, replacing it atomically if it already exists.
+     *
+     * This will also replace the target file permissions.
+     *
+     * @param  string  $path
+     * @param  string  $content
+     * @return void
+     *
+     * @throws \Exception
+     */
+    public function replace($path, $content)
+    {
+        // If the path already exists and is a symlink, make sure we get the real path...
+        clearstatcache(true, $path);
+
+        $realPath = realpath($path);
+
+        if ($realPath) {
+            $path = $realPath;
+        }
+
+        $dirName = dirname($path);
+
+        if (! is_writable($dirName)) {
+            throw new Exception("Replacing [{$path}] requires that its parent directory is writable.");
+        }
+
+        $tempPath = tempnam($dirName, basename($path));
+
+        file_put_contents($tempPath, $content);
+
+        rename($tempPath, $path);
     }
 
     /**

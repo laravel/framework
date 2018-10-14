@@ -115,6 +115,7 @@ class FoundationAuthorizesRequestsTraitTest extends TestCase
 
 class FoundationAuthorizesRequestTestClass
 {
+    //
 }
 
 class FoundationAuthorizesRequestTestPolicy

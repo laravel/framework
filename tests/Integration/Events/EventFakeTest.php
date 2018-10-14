@@ -25,11 +25,8 @@ class EventFakeTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
-            'username' => 'root',
-            'password' => '',
-            'database' => 'forge',
+            'driver' => 'sqlite',
+            'database' => ':memory:',
             'prefix' => '',
         ]);
     }
@@ -68,7 +65,7 @@ class EventFakeTest extends TestCase
         Event::fake(NonImportantEvent::class);
         Post::observe([PostObserver::class]);
 
-        $post = new Post();
+        $post = new Post;
         $post->title = 'xyz';
         $post->save();
 
@@ -85,6 +82,7 @@ class Post extends Model
 
 class NonImportantEvent
 {
+    //
 }
 
 class PostObserver

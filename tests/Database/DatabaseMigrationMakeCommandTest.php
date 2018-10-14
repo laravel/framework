@@ -4,6 +4,11 @@ namespace Illuminate\Tests\Database;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Support\Composer;
+use Illuminate\Foundation\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\NullOutput;
+use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
 
 class DatabaseMigrationMakeCommandTest extends TestCase
@@ -16,10 +21,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateDumpsAutoload()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            $composer = m::mock('Illuminate\Support\Composer')
+            $creator = m::mock(MigrationCreator::class),
+            $composer = m::mock(Composer::class)
         );
-        $app = new \Illuminate\Foundation\Application;
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
@@ -31,10 +36,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateGivesCreatorProperArguments()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
         );
-        $app = new \Illuminate\Foundation\Application;
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
@@ -45,10 +50,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
         );
-        $app = new \Illuminate\Foundation\Application;
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
@@ -59,10 +64,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateGivesCreatorProperArgumentsWhenTableIsSet()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
         );
-        $app = new \Illuminate\Foundation\Application;
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
@@ -73,10 +78,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testBasicCreateGivesCreatorProperArgumentsWhenCreateTablePatternIsFound()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
         );
-        $app = new \Illuminate\Foundation\Application;
+        $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
         $creator->shouldReceive('create')->once()->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
@@ -87,10 +92,10 @@ class DatabaseMigrationMakeCommandTest extends TestCase
     public function testCanSpecifyPathToCreateMigrationsIn()
     {
         $command = new MigrateMakeCommand(
-            $creator = m::mock('Illuminate\Database\Migrations\MigrationCreator'),
-            m::mock('Illuminate\Support\Composer')->shouldIgnoreMissing()
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
         );
-        $app = new \Illuminate\Foundation\Application;
+        $app = new Application;
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
         $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true);
@@ -99,6 +104,6 @@ class DatabaseMigrationMakeCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new \Symfony\Component\Console\Input\ArrayInput($input), new \Symfony\Component\Console\Output\NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput);
     }
 }

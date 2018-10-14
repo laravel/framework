@@ -120,7 +120,7 @@ class LogManager implements LoggerInterface
     protected function tap($name, Logger $logger)
     {
         foreach ($this->configurationFor($name)['tap'] ?? [] as $tap) {
-            list($class, $arguments) = $this->parseTap($tap);
+            [$class, $arguments] = $this->parseTap($tap);
 
             $this->app->make($class)->__invoke($logger, ...explode(',', $arguments));
         }
@@ -285,7 +285,7 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                $this->app['config']['app.name'], $config['facility'] ?? LOG_USER, $this->level($config))
+                Str::snake($this->app['config']['app.name'], '-'), $config['facility'] ?? LOG_USER, $this->level($config))
             ),
         ]);
     }

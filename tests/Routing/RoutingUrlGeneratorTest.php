@@ -230,6 +230,7 @@ class RoutingUrlGeneratorTest extends TestCase
          */
         $url->defaults(['locale' => 'en']);
         $route = new Route(['GET'], 'foo', ['as' => 'defaults', 'domain' => '{locale}.example.com', function () {
+            //
         }]);
         $routes->add($route);
 
@@ -495,6 +496,7 @@ class RoutingUrlGeneratorTest extends TestCase
         );
 
         $route = new Route(['GET'], 'foo/{one}/{two?}/{three?}', ['as' => 'foo', function () {
+            //
         }]);
         $routes->add($route);
 

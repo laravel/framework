@@ -32,10 +32,12 @@ class Connector
      * @param  array   $config
      * @param  array   $options
      * @return \PDO
+     *
+     * @throws \Exception
      */
     public function createConnection($dsn, array $config, array $options)
     {
-        list($username, $password) = [
+        [$username, $password] = [
             $config['username'] ?? null, $config['password'] ?? null,
         ];
 

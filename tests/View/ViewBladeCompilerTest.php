@@ -4,6 +4,7 @@ namespace Illuminate\Tests\View;
 
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\View\Compilers\BladeCompiler;
 
 class ViewBladeCompilerTest extends TestCase
@@ -94,6 +95,6 @@ class ViewBladeCompilerTest extends TestCase
 
     protected function getFiles()
     {
-        return m::mock('Illuminate\Filesystem\Filesystem');
+        return m::mock(Filesystem::class);
     }
 }

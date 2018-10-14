@@ -2,11 +2,21 @@
 
 namespace Illuminate\Tests\Database;
 
+use stdClass;
 use Mockery as m;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Query\Grammars\Grammar;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Query\Expression as Raw;
+use Illuminate\Database\Query\Processors\Processor;
+use Illuminate\Database\Query\Grammars\MySqlGrammar;
+use Illuminate\Database\Query\Grammars\SQLiteGrammar;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
+use Illuminate\Database\Query\Grammars\SqlServerGrammar;
+use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Pagination\AbstractPaginator as Paginator;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
@@ -1665,14 +1675,6 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertTrue($result);
     }
 
-    public function testSQLiteMultipleInserts()
-    {
-        $builder = $this->getSQLiteBuilder();
-        $builder->getConnection()->shouldReceive('insert')->once()->with('insert into "users" ("email", "name") select ? as "email", ? as "name" union all select ? as "email", ? as "name"', ['foo', 'taylor', 'bar', 'dayle'])->andReturn(true);
-        $result = $builder->from('users')->insert([['email' => 'foo', 'name' => 'taylor'], ['email' => 'bar', 'name' => 'dayle']]);
-        $this->assertTrue($result);
-    }
-
     public function testInsertGetIdMethod()
     {
         $builder = $this->getBuilder();
@@ -1685,7 +1687,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getBuilder();
         $builder->getProcessor()->shouldReceive('processInsertGetId')->once()->with($builder, 'insert into "users" ("email", "bar") values (?, bar)', ['foo'], 'id')->andReturn(1);
-        $result = $builder->from('users')->insertGetId(['email' => 'foo', 'bar' => new \Illuminate\Database\Query\Expression('bar')], 'id');
+        $result = $builder->from('users')->insertGetId(['email' => 'foo', 'bar' => new Raw('bar')], 'id');
         $this->assertEquals(1, $result);
     }
 
@@ -1799,7 +1801,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $builder = $this->getPostgresBuilder();
         $builder->getConnection()->shouldReceive('update')->once()->with('update "users" set "email" = ?, "name" = ? where "id" = ?', ['foo', 'bar', 1])->andReturn(1);
-        $result = $builder->from('users')->where('id', '=', 1)->update(['email' => 'foo', 'name' => 'bar']);
+        $result = $builder->from('users')->where('id', '=', 1)->update(['users.email' => 'foo', 'name' => 'bar']);
         $this->assertEquals(1, $result);
     }
 
@@ -1829,10 +1831,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testUpdateOrInsertMethod()
     {
-        $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,insert]', [
-            m::mock('Illuminate\Database\ConnectionInterface'),
-            new \Illuminate\Database\Query\Grammars\Grammar,
-            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        $builder = m::mock(Builder::class.'[where,exists,insert]', [
+            m::mock(ConnectionInterface::class),
+            new Grammar,
+            m::mock(Processor::class),
         ]);
 
         $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
@@ -1841,10 +1843,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $this->assertTrue($builder->updateOrInsert(['email' => 'foo'], ['name' => 'bar']));
 
-        $builder = m::mock('Illuminate\Database\Query\Builder[where,exists,update]', [
-            m::mock('Illuminate\Database\ConnectionInterface'),
-            new \Illuminate\Database\Query\Grammars\Grammar,
-            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        $builder = m::mock(Builder::class.'[where,exists,update]', [
+            m::mock(ConnectionInterface::class),
+            new Grammar,
+            m::mock(Processor::class),
         ]);
 
         $builder->shouldReceive('where')->once()->with(['email' => 'foo'])->andReturn(m::self());
@@ -1942,7 +1944,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->getConnection()->shouldReceive('statement')->once()->with('truncate "users"', []);
         $builder->from('users')->truncate();
 
-        $sqlite = new \Illuminate\Database\Query\Grammars\SQLiteGrammar;
+        $sqlite = new SQLiteGrammar;
         $builder = $this->getBuilder();
         $builder->from('users');
         $this->assertEquals([
@@ -1968,10 +1970,10 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testMySqlUpdateWrappingJson()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
 
-        $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
+        $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
@@ -1981,15 +1983,15 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = new Builder($connection, $grammar, $processor);
 
-        $result = $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
+        $builder->from('users')->where('active', '=', 1)->update(['name->first_name' => 'John', 'name->last_name' => 'Doe']);
     }
 
     public function testMySqlUpdateWrappingNestedJson()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
 
-        $connection = $this->createMock('Illuminate\Database\ConnectionInterface');
+        $connection = $this->createMock(ConnectionInterface::class);
         $connection->expects($this->once())
                     ->method('update')
                     ->with(
@@ -1999,15 +2001,15 @@ class DatabaseQueryBuilderTest extends TestCase
 
         $builder = new Builder($connection, $grammar, $processor);
 
-        $result = $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
+        $builder->from('users')->where('active', '=', 1)->update(['meta->name->first_name' => 'John', 'meta->name->last_name' => 'Doe']);
     }
 
-    public function testMySqlUpdateWithJsonRemovesBindingsCorrectly()
+    public function testMySqlUpdateWithJsonPreparesBindingsCorrectly()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
 
-        $connection = m::mock('Illuminate\Database\ConnectionInterface');
+        $connection = m::mock(ConnectionInterface::class);
         $connection->shouldReceive('update')
                     ->once()
                     ->with(
@@ -2020,11 +2022,32 @@ class DatabaseQueryBuilderTest extends TestCase
         $connection->shouldReceive('update')
             ->once()
             ->with(
-                'update `users` set `options` = json_set(`options`, \'$."size"\', 45), `updated_at` = ? where `id` = ?',
-                ['2015-05-26 22:02:06', 0]
+                'update `users` set `options` = json_set(`options`, \'$."size"\', ?), `updated_at` = ? where `id` = ?',
+                [45, '2015-05-26 22:02:06', 0]
             );
         $builder = new Builder($connection, $grammar, $processor);
         $builder->from('users')->where('id', '=', 0)->update(['options->size' => 45, 'updated_at' => '2015-05-26 22:02:06']);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', ?)', [null]);
+        $builder->from('users')->update(['options->size' => null]);
+
+        $builder = $this->getMySqlBuilder();
+        $builder->getConnection()->shouldReceive('update')->once()->with('update `users` set `options` = json_set(`options`, \'$."size"\', 45)', []);
+        $builder->from('users')->update(['options->size' => new Raw('45')]);
+    }
+
+    public function testPostgresUpdateWrappingJson()
+    {
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"name","first_name"}\', ?)', ['"John"']);
+        $builder->from('users')->update(['users.options->name->first_name' => 'John']);
+
+        $builder = $this->getPostgresBuilder();
+        $builder->getConnection()->shouldReceive('update')
+            ->with('update "users" set "options" = jsonb_set("options"::jsonb, \'{"language"}\', \'null\')', []);
+        $builder->from('users')->update(['options->language' => new Raw("'null'")]);
     }
 
     public function testMySqlWrappingJsonWithString()
@@ -2194,7 +2217,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $method = 'whereFooBarAndBazOrQux';
         $parameters = ['corge', 'waldo', 'fred'];
-        $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
+        $builder = m::mock(Builder::class)->makePartial();
 
         $builder->shouldReceive('where')->with('foo_bar', '=', $parameters[0], 'and')->once()->andReturnSelf();
         $builder->shouldReceive('where')->with('baz', '=', $parameters[1], 'and')->once()->andReturnSelf();
@@ -2207,7 +2230,7 @@ class DatabaseQueryBuilderTest extends TestCase
     {
         $method = 'whereIosVersionAndAndroidVersionOrOrientation';
         $parameters = ['6.1', '4.2', 'Vertical'];
-        $builder = m::mock('Illuminate\Database\Query\Builder')->makePartial();
+        $builder = m::mock(Builder::class)->makePartial();
 
         $builder->shouldReceive('where')->with('ios_version', '=', '6.1', 'and')->once()->andReturnSelf();
         $builder->shouldReceive('where')->with('android_version', '=', '4.2', 'and')->once()->andReturnSelf();
@@ -2436,7 +2459,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(3, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -2457,7 +2480,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(2, 2)->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -2477,7 +2500,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->never()->with(2, 2);
         $builder->shouldReceive('get')->times(1)->andReturn($chunk1);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -2497,7 +2520,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPage')->once()->with(1, 0)->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunk(0, function ($results) use ($callbackAssertor) {
@@ -2518,7 +2541,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 11, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(3)->andReturn($chunk1, $chunk2, $chunk3);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk3);
@@ -2539,7 +2562,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 2, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk2);
 
@@ -2557,7 +2580,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(0, 0, 'someIdField')->andReturnSelf();
         $builder->shouldReceive('get')->times(1)->andReturn($chunk);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->never();
 
         $builder->chunkById(0, function ($results) use ($callbackAssertor) {
@@ -2576,7 +2599,7 @@ class DatabaseQueryBuilderTest extends TestCase
         $builder->shouldReceive('forPageAfterId')->once()->with(2, 10, 'table.id')->andReturnSelf();
         $builder->shouldReceive('get')->times(2)->andReturn($chunk1, $chunk2);
 
-        $callbackAssertor = m::mock('stdClass');
+        $callbackAssertor = m::mock(stdClass::class);
         $callbackAssertor->shouldReceive('doSomething')->once()->with($chunk1);
         $callbackAssertor->shouldReceive('doSomething')->never()->with($chunk2);
 
@@ -2692,7 +2715,7 @@ class DatabaseQueryBuilderTest extends TestCase
 
     public function testWhereRowValuesArityMismatch()
     {
-        $this->expectException('InvalidArgumentException');
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The number of columns must match the number of values');
 
         $builder = $this->getBuilder();
@@ -2928,6 +2951,13 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals('select * from (select max(last_seen_at) as last_seen_at from "user_sessions") as "sessions"', $builder->toSql());
     }
 
+    public function testFromRawOnSqlServer()
+    {
+        $builder = $this->getSqlServerBuilder();
+        $builder->fromRaw('dbo.[SomeNameWithRoundBrackets (test)]');
+        $this->assertEquals('select * from dbo.[SomeNameWithRoundBrackets (test)]', $builder->toSql());
+    }
+
     public function testFromRawWithWhereOnTheMainQuery()
     {
         $builder = $this->getBuilder();
@@ -2938,50 +2968,50 @@ class DatabaseQueryBuilderTest extends TestCase
 
     protected function getBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\Grammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new Grammar;
+        $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     protected function getPostgresBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\PostgresGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new PostgresGrammar;
+        $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     protected function getMySqlBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new MySqlGrammar;
+        $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     protected function getSQLiteBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\SQLiteGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new SQLiteGrammar;
+        $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     protected function getSqlServerBuilder()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\SqlServerGrammar;
-        $processor = m::mock('Illuminate\Database\Query\Processors\Processor');
+        $grammar = new SqlServerGrammar;
+        $processor = m::mock(Processor::class);
 
-        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     protected function getMySqlBuilderWithProcessor()
     {
-        $grammar = new \Illuminate\Database\Query\Grammars\MySqlGrammar;
-        $processor = new \Illuminate\Database\Query\Processors\MySqlProcessor;
+        $grammar = new MySqlGrammar;
+        $processor = new MySqlProcessor;
 
-        return new Builder(m::mock('Illuminate\Database\ConnectionInterface'), $grammar, $processor);
+        return new Builder(m::mock(ConnectionInterface::class), $grammar, $processor);
     }
 
     /**
@@ -2989,10 +3019,10 @@ class DatabaseQueryBuilderTest extends TestCase
      */
     protected function getMockQueryBuilder()
     {
-        return m::mock('Illuminate\Database\Query\Builder', [
-            m::mock('Illuminate\Database\ConnectionInterface'),
-            new \Illuminate\Database\Query\Grammars\Grammar,
-            m::mock('Illuminate\Database\Query\Processors\Processor'),
+        return m::mock(Builder::class, [
+            m::mock(ConnectionInterface::class),
+            new Grammar,
+            m::mock(Processor::class),
         ])->makePartial();
     }
 }

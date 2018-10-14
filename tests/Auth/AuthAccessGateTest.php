@@ -26,6 +26,28 @@ class AuthAccessGateTest extends TestCase
         $this->assertFalse($gate->check('bar'));
     }
 
+    public function test_before_can_take_an_array_callback()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->before([new AccessGateTestBeforeCallback, 'allowEverything']);
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
+    public function test_before_can_take_an_array_callback_with_static_method()
+    {
+        $gate = new Gate(new Container, function () {
+            return null;
+        });
+
+        $gate->before([AccessGateTestBeforeCallback::class, 'allowEverything']);
+
+        $this->assertTrue($gate->check('anything'));
+    }
+
     public function test_before_can_allow_guests()
     {
         $gate = new Gate(new Container, function () {
@@ -208,6 +230,7 @@ class AuthAccessGateTest extends TestCase
             return true;
         });
         $gate->before(function () {
+            //
         });
 
         $this->assertTrue($gate->check('foo'));
@@ -336,7 +359,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestClass@foo');
+        $gate->define('foo', AccessGateTestClass::class.'@foo');
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -345,7 +368,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
 
-        $gate->define('foo', '\Illuminate\Tests\Auth\AccessGateTestInvokableClass');
+        $gate->define('foo', AccessGateTestInvokableClass::class);
 
         $this->assertTrue($gate->check('foo'));
     }
@@ -471,7 +494,7 @@ class AuthAccessGateTest extends TestCase
     {
         return [
             [1],
-            [new \stdClass()],
+            [new stdClass],
             [[]],
             [1.1],
         ];
@@ -795,6 +818,19 @@ class AccessGateTestPolicyWithNonGuestBefore
     }
 
     public function update($user, AccessGateTestDummy $dummy)
+    {
+        return true;
+    }
+}
+
+class AccessGateTestBeforeCallback
+{
+    public static function allowEverything($user = null)
+    {
+        return true;
+    }
+
+    public static function allowEverythingStatically($user = null)
     {
         return true;
     }

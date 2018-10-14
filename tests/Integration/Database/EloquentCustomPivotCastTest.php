@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Integration\Database;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
 /**
  * @group integration
@@ -161,7 +162,7 @@ class CustomPivotCastTestProject extends Model
     }
 }
 
-class CustomPivotCastTestCollaborator extends \Illuminate\Database\Eloquent\Relations\Pivot
+class CustomPivotCastTestCollaborator extends Pivot
 {
     protected $casts = [
         'permissions' => 'json',
