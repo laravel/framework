@@ -112,7 +112,7 @@ trait ThrottlesLogins
     /**
      * Get the number of minutes to throttle for.
      *
-     * @return int
+     * @return int|array
      */
     public function decayMinutes()
     {
