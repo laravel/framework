@@ -471,7 +471,7 @@ class Mailer implements MailerContract, MailQueueContract
      * Send a Swift Message instance.
      *
      * @param  \Swift_Message  $message
-     * @return void
+     * @return int|null
      */
     protected function sendSwiftMessage($message)
     {
