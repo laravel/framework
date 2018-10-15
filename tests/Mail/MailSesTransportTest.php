@@ -44,7 +44,7 @@ class MailSesTransportTest extends TestCase
         $message->setTo('me@example.com');
         $message->setBcc('you@example.com');
 
-        $client = $this->getMockBuilder('Aws\Ses\SesClient')
+        $client = $this->getMockBuilder(SesClient::class)
             ->setMethods(['sendRawEmail'])
             ->disableOriginalConstructor()
             ->getMock();
