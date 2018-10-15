@@ -66,4 +66,36 @@ class CacheRateLimiterTest extends TestCase
 
         $rateLimiter->clear('key');
     }
+
+    public function testFirstHitInArray()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('has')->once()->with('key:timer')->andReturn(false);
+        $cache->shouldReceive('has')->once()->with('key:step')->andReturn(false);
+        $cache->shouldReceive('add')->once()->with('key:step', 0, 1440);
+        $cache->shouldReceive('get')->once()->with('key:step', 0);
+        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
+        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(false);
+        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('put')->once()->with('key', 1, 1);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->hit('key', [1, 2, 3]);
+    }
+
+    public function testSecondOrMoreHitInArray()
+    {
+        $cache = m::mock(Cache::class);
+        $cache->shouldReceive('has')->once()->with('key:timer')->andReturn(false);
+        $cache->shouldReceive('has')->once()->with('key:step')->andReturn(true);
+        $cache->shouldReceive('increment')->once()->with('key:step');
+        $cache->shouldReceive('get')->once()->with('key:step', 0);
+        $cache->shouldReceive('add')->once()->with('key:timer', m::type('int'), 1)->andReturn(true);
+        $cache->shouldReceive('add')->once()->with('key', 0, 1)->andReturn(false);
+        $cache->shouldReceive('increment')->once()->with('key')->andReturn(1);
+        $cache->shouldReceive('put')->once()->with('key', 1, 1);
+        $rateLimiter = new RateLimiter($cache);
+
+        $rateLimiter->hit('key', [1, 2, 3]);
+    }
 }

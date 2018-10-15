@@ -64,7 +64,7 @@ class RateLimiter
                     $this->cache->increment($key.':step');
                 }
             }
-            $step = $this->cache->get($key.':step', 0);
+            $step = (int) $this->cache->get($key.':step', 0);
             $step = $step < count($decayMinutes) ? $step : count($decayMinutes) - 1;
             $decayMinutes = $decayMinutes[$step];
         }
