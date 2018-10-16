@@ -80,9 +80,16 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
         $this->assertSame('["value1","value2"]', $model->getOriginal('json_array_attributes'));
         $this->assertSame('value1', $model->getAttribute('json_array_attributes')[0]);
         $this->assertSame('value2', $model->getAttribute('json_array_attributes')[1]);
+        $model->getAttribute('json_array_attributes')[1] = 'value2-edited';
+        $this->assertSame('value2-edited', $model->getAttribute('json_array_attributes')[1]);
 
         $this->assertSame('{"key1":"value1"}', $model->getOriginal('json_object_attributes'));
         $this->assertSame('value1', $model->getAttribute('json_object_attributes')->key1);
+        $model->getAttribute('json_object_attributes')->key1 = 'value1-edited';
+        $model->getAttribute('json_object_attributes')->newkey = 'new-value';
+        $this->assertSame('value1-edited', $model->getAttribute('json_object_attributes')->key1);
+        $this->assertSame('new-value', $model->getAttribute('json_object_attributes')->newkey);
+
     }
 
     public function testSavingCastedEmptyAttributesToDatabase()
