@@ -7,6 +7,13 @@ use Illuminate\Support\Str;
 trait InteractsWithContentTypes
 {
     /**
+     * Indicates whether to force/expect a json response, regardless of desired content type.
+     *
+     * @var bool
+     */
+    protected $forceJson = false;
+
+    /**
      * Determine if the given content types match.
      *
      * @param  string  $actual
@@ -41,7 +48,7 @@ trait InteractsWithContentTypes
      */
     public function expectsJson()
     {
-        return ($this->ajax() && ! $this->pjax() && $this->acceptsAnyContentType()) || $this->wantsJson();
+        return $this->forceJson || ($this->ajax() && ! $this->pjax() && $this->acceptsAnyContentType()) || $this->wantsJson();
     }
 
     /**
@@ -54,6 +61,18 @@ trait InteractsWithContentTypes
         $acceptable = $this->getAcceptableContentTypes();
 
         return isset($acceptable[0]) && Str::contains($acceptable[0], ['/json', '+json']);
+    }
+
+    /**
+     * Force json response.
+     *
+     * @return $this
+     */
+    public function forceJson()
+    {
+        $this->forceJson = true;
+
+        return $this;
     }
 
     /**

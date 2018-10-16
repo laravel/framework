@@ -598,6 +598,14 @@ class HttpRequestTest extends TestCase
         $this->assertNull(Request::create('/', 'GET', [], [], [], ['HTTP_ACCEPT' => 'application/*'])->prefers('text/html'));
     }
 
+    public function testCanForceJsonResponse()
+    {
+        $request = Request::create('', 'GET');
+        $this->assertEquals($request, $request->forceJson());
+        $this->assertTrue($request->expectsJson());
+        $this->assertFalse($request->wantsJson());
+    }
+
     public function testAllInputReturnsInputAndFiles()
     {
         $file = $this->getMockBuilder(UploadedFile::class)->setConstructorArgs([__FILE__, 'photo.jpg'])->getMock();
