@@ -5,6 +5,7 @@ namespace Illuminate\Validation\Concerns;
 use DateTime;
 use Countable;
 use Exception;
+use Ramsey\Uuid\Uuid;
 use Throwable;
 use DateTimeZone;
 use DateTimeInterface;
@@ -1541,6 +1542,22 @@ trait ValidatesAttributes
         $~ixu';
 
         return preg_match($pattern, $value) > 0;
+    }
+
+    /**
+     * Validate that an attribute is a valid UUID.
+     *
+     * @param  string $attribute
+     * @param  mixed  $value
+     * @return bool
+     */
+    public function validateUuid($attribute, $value)
+    {
+        if (!is_string($value)) {
+            return false;
+        }
+
+        return Uuid::isValid($value);
     }
 
     /**
