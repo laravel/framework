@@ -43,7 +43,7 @@ trait QueriesRelationships
                         : 'getRelationExistenceCountQuery';
 
         $hasQuery = $relation->{$method}(
-            $relation->getRelated()->newQuery(), $this
+            $relation->getRelated()->newQueryWithoutRelationships(), $this
         );
 
         // Next we will call any given callback as an "anonymous" scope so they can get the
