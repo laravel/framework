@@ -5,9 +5,9 @@ namespace Illuminate\Validation\Concerns;
 use DateTime;
 use Countable;
 use Exception;
-use Ramsey\Uuid\Uuid;
 use Throwable;
 use DateTimeZone;
+use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1553,7 +1553,7 @@ trait ValidatesAttributes
      */
     public function validateUuid($attribute, $value)
     {
-        if (!is_string($value)) {
+        if (! is_string($value)) {
             return false;
         }
 
