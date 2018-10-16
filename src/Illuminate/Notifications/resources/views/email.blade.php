@@ -33,6 +33,13 @@
 @endcomponent
 @endisset
 
+{{-- Panel --}}
+@isset($panelText)
+@component('mail::panel')
+{{ $panelText }}
+@endcomponent
+@endisset
+
 {{-- Outro Lines --}}
 @foreach ($outroLines as $line)
 {{ $line }}
