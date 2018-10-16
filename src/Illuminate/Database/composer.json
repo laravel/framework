@@ -19,7 +19,7 @@
         "illuminate/container": "5.7.*",
         "illuminate/contracts": "5.7.*",
         "illuminate/support": "5.7.*",
-        "judahnator/json-manipulator": "^1.2"
+        "judahnator/json-manipulator": "^2.0"
     },
     "autoload": {
         "psr-4": {
