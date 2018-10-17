@@ -303,8 +303,6 @@ class SQLiteGrammar extends Grammar
 
         $path = count($parts) > 1 ? ', '.$this->wrapJsonPath($parts[1]) : '';
 
-        $selector = 'json_extract('.$field.$path.')';
-
-        return $selector;
+        return 'json_extract('.$field.$path.')';
     }
 }
