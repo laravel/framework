@@ -1556,10 +1556,6 @@ trait ValidatesAttributes
             return false;
         }
 
-        if ($value === '00000000-0000-0000-0000-000000000000') {
-            return true;
-        }
-
         return preg_match('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/D', $value);
     }
 
