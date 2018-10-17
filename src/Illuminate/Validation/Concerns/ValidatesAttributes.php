@@ -7,7 +7,6 @@ use Countable;
 use Exception;
 use Throwable;
 use DateTimeZone;
-use Ramsey\Uuid\Uuid;
 use DateTimeInterface;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -1557,7 +1556,11 @@ trait ValidatesAttributes
             return false;
         }
 
-        return Uuid::isValid($value);
+        if ($value === '00000000-0000-0000-0000-000000000000') {
+            return true;
+        }
+
+        return preg_match('/^[0-9A-Fa-f]{8}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{4}-[0-9A-Fa-f]{12}$/D', $value);
     }
 
     /**
