@@ -420,7 +420,7 @@ class Str
         $title = static::ascii($title, $language);
 
         // Convert all dashes/underscores into separator
-        $flip = $separator == '-' ? '_' : '-';
+        $flip = $separator === '-' ? '_' : '-';
 
         $title = preg_replace('!['.preg_quote($flip).']+!u', $separator, $title);
 

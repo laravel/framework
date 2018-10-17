@@ -3,7 +3,7 @@
 @if (! empty($greeting))
 # {{ $greeting }}
 @else
-@if ($level == 'error')
+@if ($level === 'error')
 # @lang('Whoops!')
 @else
 # @lang('Hello!')

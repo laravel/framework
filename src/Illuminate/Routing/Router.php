@@ -1251,7 +1251,7 @@ class Router implements RegistrarContract, BindingRegistrar
             return $this->macroCall($method, $parameters);
         }
 
-        if ($method == 'middleware') {
+        if ($method === 'middleware') {
             return (new RouteRegistrar($this))->attribute($method, is_array($parameters[0]) ? $parameters[0] : $parameters);
         }
 
