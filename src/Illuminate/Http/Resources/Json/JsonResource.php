@@ -91,9 +91,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
             $request = $request ?: Container::getInstance()->make('request')
         );
 
-        if (is_array($data)) {
-            $data = $data;
-        } elseif ($data instanceof Arrayable) {
+        if ($data instanceof Arrayable) {
             $data = $data->toArray();
         } elseif ($data instanceof JsonSerializable) {
             $data = $data->jsonSerialize();
