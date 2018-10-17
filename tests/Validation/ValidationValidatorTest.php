@@ -3,24 +3,24 @@
 namespace Illuminate\Tests\Validation;
 
 use DateTime;
+use Mockery as m;
 use DateTimeImmutable;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\Translation\Translator as TranslatorContract;
-use Illuminate\Contracts\Validation\ImplicitRule;
-use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Carbon;
-use Illuminate\Translation\ArrayLoader;
+use PHPUnit\Framework\TestCase;
+use Illuminate\Container\Container;
+use Illuminate\Validation\Validator;
 use Illuminate\Translation\Translator;
-use Illuminate\Validation\PresenceVerifierInterface;
+use Illuminate\Translation\ArrayLoader;
 use Illuminate\Validation\Rules\Exists;
 use Illuminate\Validation\Rules\Unique;
+use Illuminate\Contracts\Validation\Rule;
 use Illuminate\Validation\ValidationData;
-use Illuminate\Validation\Validator;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\HttpFoundation\File\File;
+use Illuminate\Contracts\Validation\ImplicitRule;
+use Illuminate\Validation\PresenceVerifierInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 
 class ValidationValidatorTest extends TestCase
 {
@@ -4252,7 +4252,7 @@ class ValidationValidatorTest extends TestCase
         return [
             ['not a valid uuid so we can test this'],
             ['zf6f8cb0-c57d-11e1-9b21-0800200c9a66'],
-            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1' . PHP_EOL],
+            ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'.PHP_EOL],
             ['145a1e72-d11d-11e8-a8d5-f2801f1b9fd1 '],
             [' 145a1e72-d11d-11e8-a8d5-f2801f1b9fd1'],
             ['145a1e72-d11d-11e8-a8d5-f2z01f1b9fd1'],
