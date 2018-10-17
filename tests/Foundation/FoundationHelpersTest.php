@@ -83,4 +83,29 @@ class FoundationHelpersTest extends TestCase
 
         unlink(public_path('mix-manifest.json'));
     }
+
+    public function testMixReturnsHotUrl()
+    {
+        app()->singleton('path.public', function () {
+            return __DIR__;
+        });
+
+        $hotFile = public_path('hot');
+
+        try {
+            file_put_contents($hotFile, 'http://localhost:8080/');
+
+            $this->assertEquals('//localhost:8080/app.css', mix('app.css'));
+
+            file_put_contents($hotFile, "http://localhost:8081\n");
+
+            $this->assertEquals('//localhost:8081/app.css', mix('app.css'));
+
+            file_put_contents($hotFile, 'invalid-url');
+
+            $this->assertEquals('//localhost:8080/app.css', mix('app.css'));
+        } finally {
+            unlink($hotFile);
+        }
+    }
 }
