@@ -629,6 +629,6 @@ class Arr
             return [];
         }
 
-        return ! is_array($value) ? [$value] : $value;
+        return is_array($value) ? $value : [$value];
     }
 }
