@@ -105,7 +105,9 @@ class Listener
         // options available for the command. This will produce the final command
         // line array that we will pass into a Symfony process object for processing.
         $command = $this->createCommand(
-            $connection, $queue, $options
+            $connection,
+            $queue,
+            $options
         );
 
         // If the environment is set, we will append it to the command array so the
@@ -116,7 +118,11 @@ class Listener
         }
 
         return new Process(
-            $command, $this->commandPath, null, null, $options->timeout
+            $command,
+            $this->commandPath,
+            null,
+            null,
+            $options->timeout
         );
     }
 
@@ -142,7 +148,7 @@ class Listener
      */
     protected function createCommand($connection, $queue, ListenerOptions $options)
     {
-        return [
+        return array_filter([
             $this->phpBinary(),
             $this->artisanBinary(),
             'queue:work',
@@ -153,7 +159,7 @@ class Listener
             "--memory={$options->memory}",
             "--sleep={$options->sleep}",
             "--tries={$options->maxTries}",
-        ];
+        ]);
     }
 
     /**
