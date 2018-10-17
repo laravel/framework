@@ -1130,7 +1130,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * Get the boundaries for a given key.
      *
      * @param  callable|string|null  $callback
-     * @return mixed
+     * @return array
      */
     public function boundaries($callback = null)
     {
