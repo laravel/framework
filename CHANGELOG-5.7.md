@@ -1,5 +1,32 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added loadCount method to eloquent collections ([#25997](https://github.com/laravel/framework/pull/25997))
+- Added support for identity columns in PostgreSQL 10+ ([#26096](https://github.com/laravel/framework/pull/26096))
+- Allowed passing a model instance directly to `assertSoftDeleted` method in `Foundation/Testing/Concerns/InteractsWithDatabase.php` ([#26133](https://github.com/laravel/framework/pull/26133))
+
+### Fixed
+- Fixed `whereHas` and `$withCount` bindings from `polymorphic relationships` ([#26145](https://github.com/laravel/framework/pull/26145))
+- Fixed `getTable` method in Model ([#26085](https://github.com/laravel/framework/pull/26085))
+- Fixed filesystem locking hangs in `PackageManifest::build()` ([#26010](https://github.com/laravel/framework/pull/26010), [98b8256](https://github.com/laravel/framework/commit/98b8256f350d468cfc6b9fe2c2b0efb4103810a4))
+- Fixed `Illuminate/Http/Testing/File.php` for Symfony 4.1 components ([#26080](https://github.com/laravel/framework/pull/26080))
+- Fixed URL in `Notifications/resources/views/email.blade.php` ([22ca105](https://github.com/laravel/framework/commit/22ca105c0b1759c95f79e553c1977ffd2a013d05))
+- Fixed `hasValidSignature` method when someone send a `null` signature in `UrlGenerator.php` ([#26132](https://github.com/laravel/framework/pull/26132))
+- Fixed autocomplete for container in ServiceProvider for cases when someone developed packages ([#26063](https://github.com/laravel/framework/pull/26063))
+- Fixed `ColumnDefinition::default` typehint ([#26041](https://github.com/laravel/framework/pull/26041))
+
+### Changed
+- Define mix as const in `react-stubs/webpack.mix.js` and `vue-stubs/webpack.mix.js` presets ([#26119](https://github.com/laravel/framework/pull/26119))
+- Make `assertSessionHasNoErrors` in `TestResponse.php` print the unexpected errors  ([#26039](https://github.com/laravel/framework/pull/26039), [e6bdf8a](https://github.com/laravel/framework/commit/e6bdf8af7790db485856ecde0448b353d0cb15ca))
+
+### Changed realization
+- Simplified `formatAction` in `UrlGenerator.php` ([#26121](https://github.com/laravel/framework/pull/26121))
+- Delete unneeded type check in `resolve` method in `JsonResource` class, since it will never be `true` ([#26053](https://github.com/laravel/framework/pull/26053))
+- Prefer stricter comparison for non-empty strings. ([#26139](https://github.com/laravel/framework/pull/26139))
+
+
 ## [v5.7.9 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
 
 ### Added
