@@ -61,7 +61,6 @@ class ModelSerializationTest extends TestCase
         });
     }
 
-    
     public function test_it_serialize_user_on_default_connection()
     {
         $user = ModelSerializationTestUser::create([
@@ -89,7 +88,6 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals('taylor@laravel.com', $unSerialized->user[1]->email);
     }
 
-    
     public function test_it_serialize_user_on_different_connection()
     {
         $user = ModelSerializationTestUser::on('custom')->create([
@@ -118,7 +116,6 @@ class ModelSerializationTest extends TestCase
     }
 
     /**
-     *
      * @expectedException \LogicException
      * @expectedExceptionMessage  Queueing collections with multiple model connections is not supported.
      */
@@ -139,7 +136,6 @@ class ModelSerializationTest extends TestCase
         unserialize($serialized);
     }
 
-    
     public function test_it_reloads_relationships()
     {
         $order = tap(Order::create(), function (Order $order) {
@@ -160,7 +156,6 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($unSerialized->order->getRelations(), $order->getRelations());
     }
 
-    
     public function test_it_reloads_nested_relationships()
     {
         $order = tap(Order::create(), function (Order $order) {
@@ -181,7 +176,6 @@ class ModelSerializationTest extends TestCase
         $this->assertEquals($nestedUnSerialized->order->getRelations(), $order->getRelations());
     }
 
-    
     public function test_it_serializes_an_empty_collection()
     {
         $serialized = serialize(new ModelSerializationTestClass(

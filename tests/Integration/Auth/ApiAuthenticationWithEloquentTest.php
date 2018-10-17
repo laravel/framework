@@ -29,7 +29,6 @@ class ApiAuthenticationWithEloquentTest extends TestCase
         ]);
     }
 
-    
     public function test_authentication_via_api_with_eloquent_using_wrong_database_credentials_should_not_cause_infinite_loop()
     {
         Route::get('/auth', function () {

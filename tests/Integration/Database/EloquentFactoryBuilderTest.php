@@ -145,7 +145,6 @@ class EloquentFactoryBuilderTest extends TestCase
         });
     }
 
-    
     public function test_creating_factory_models()
     {
         $user = factory(FactoryBuildableUser::class)->create();
@@ -155,7 +154,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertTrue($user->is($dbUser));
     }
 
-    
     public function test_creating_factory_models_overriding_attributes()
     {
         $user = factory(FactoryBuildableUser::class)->create(['name' => 'Zain']);
@@ -163,7 +161,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertEquals('Zain', $user->name);
     }
 
-    
     public function test_creating_collection_of_models()
     {
         $users = factory(FactoryBuildableUser::class, 3)->create();
@@ -178,7 +175,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertCount(0, FactoryBuildableUser::find($instances->pluck('id')->toArray()));
     }
 
-    
     public function test_creating_models_with_callable_state()
     {
         $server = factory(FactoryBuildableServer::class)->create();
@@ -190,7 +186,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertEquals('callable', $callableServer->status);
     }
 
-    
     public function test_creating_models_with_inline_state()
     {
         $server = factory(FactoryBuildableServer::class)->create();
@@ -201,7 +196,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertEquals('inline', $inlineServer->status);
     }
 
-    
     public function test_creating_models_with_relationships()
     {
         factory(FactoryBuildableUser::class, 2)
@@ -214,7 +208,6 @@ class EloquentFactoryBuilderTest extends TestCase
             });
     }
 
-    
     public function test_creating_models_on_custom_connection()
     {
         $user = factory(FactoryBuildableUser::class)
@@ -227,7 +220,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertTrue($user->is($dbUser));
     }
 
-    
     public function test_creating_models_with_after_callback()
     {
         $team = factory(FactoryBuildableTeam::class)->create();
@@ -235,7 +227,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertTrue($team->users->contains($team->owner));
     }
 
-    
     public function test_creating_models_with_after_callback_state()
     {
         $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->create();
@@ -244,7 +235,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertNotNull($user->servers->where('status', 'callable')->first());
     }
 
-    
     public function test_making_models_with_a_custom_connection()
     {
         $user = factory(FactoryBuildableUser::class)
@@ -254,7 +244,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertEquals('alternative-connection', $user->getConnectionName());
     }
 
-    
     public function test_making_models_with_after_callback()
     {
         $user = factory(FactoryBuildableUser::class)->make();
@@ -262,7 +251,6 @@ class EloquentFactoryBuilderTest extends TestCase
         $this->assertNotNull($user->profile);
     }
 
-    
     public function test_making_models_with_after_callback_state()
     {
         $user = factory(FactoryBuildableUser::class)->state('with_callable_server')->make();

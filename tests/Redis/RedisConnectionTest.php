@@ -34,7 +34,6 @@ class RedisConnectionTest extends TestCase
         $this->tearDownRedis();
     }
 
-    
     public function test_it_sets_values_with_expiry()
     {
         foreach ($this->connections() as $redis) {
@@ -63,7 +62,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_deletes_keys()
     {
         foreach ($this->connections() as $redis) {
@@ -84,7 +82,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_checks_for_existence()
     {
         foreach ($this->connections() as $redis) {
@@ -100,7 +97,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_expires_keys()
     {
         foreach ($this->connections() as $redis) {
@@ -122,7 +118,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_renames_keys()
     {
         foreach ($this->connections() as $redis) {
@@ -145,7 +140,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_adds_members_to_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -177,7 +171,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_counts_members_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -191,7 +184,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_increments_score_of_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -203,7 +195,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_sets_key_if_not_exists()
     {
         foreach ($this->connections() as $redis) {
@@ -219,7 +210,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_sets_hash_field_if_not_exists()
     {
         foreach ($this->connections() as $redis) {
@@ -235,7 +225,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_calculates_intersection_of_sorted_sets_and_stores()
     {
         foreach ($this->connections() as $redis) {
@@ -265,7 +254,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_calculates_union_of_sorted_sets_and_stores()
     {
         foreach ($this->connections() as $redis) {
@@ -298,7 +286,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_returns_range_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -312,7 +299,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_returns_rev_range_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -326,7 +312,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_returns_range_by_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -344,7 +329,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_returns_rev_range_by_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -362,7 +346,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_returns_rank_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -375,7 +358,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_returns_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -388,7 +370,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_removes_members_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -404,7 +385,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_removes_members_by_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -416,7 +396,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_removes_members_by_rank_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
@@ -428,7 +407,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_sets_multiple_hash_fields()
     {
         foreach ($this->connections() as $redis) {
@@ -442,7 +420,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_gets_multiple_hash_fields()
     {
         foreach ($this->connections() as $redis) {
@@ -460,7 +437,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_runs_eval()
     {
         foreach ($this->connections() as $redis) {
@@ -471,7 +447,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_runs_pipes()
     {
         foreach ($this->connections() as $redis) {
@@ -490,7 +465,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_runs_transactions()
     {
         foreach ($this->connections() as $redis) {
@@ -509,7 +483,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_runs_raw_command()
     {
         foreach ($this->connections() as $redis) {
@@ -523,7 +496,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_dispatches_query_event()
     {
         foreach ($this->connections() as $redis) {
@@ -544,7 +516,6 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    
     public function test_it_persists_connection()
     {
         if (PHP_ZTS) {

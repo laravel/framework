@@ -35,7 +35,6 @@ class EloquentWithCountTest extends DatabaseTestCase
         });
     }
 
-    
     public function test_it_basic()
     {
         $one = Model1::create();

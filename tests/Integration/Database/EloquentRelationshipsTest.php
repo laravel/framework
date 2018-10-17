@@ -20,7 +20,6 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
  */
 class EloquentRelationshipsTest extends TestCase
 {
-    
     public function test_standard_relationships()
     {
         $post = new Post;
@@ -36,7 +35,6 @@ class EloquentRelationshipsTest extends TestCase
         $this->assertInstanceOf(MorphTo::class, $post->postable());
     }
 
-    
     public function test_overridden_relationships()
     {
         $post = new CustomPost;
