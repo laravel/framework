@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Support;
 
 use stdClass;
-use Exception;
 use ArrayAccess;
 use ArrayObject;
 use Mockery as m;

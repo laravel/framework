@@ -4,7 +4,6 @@ namespace Illuminate\Tests\Database;
 
 use stdClass;
 use Mockery as m;
-use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\ConnectionInterface;

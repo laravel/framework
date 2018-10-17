@@ -2,7 +2,6 @@
 
 namespace Illuminate\Tests\Integration\Encryption;
 
-use RuntimeException;
 use Orchestra\Testbench\TestCase;
 use Illuminate\Encryption\Encrypter;
 use Illuminate\Encryption\EncryptionServiceProvider;

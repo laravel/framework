@@ -9,7 +9,6 @@ use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\View\View;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Database\Eloquent\Model;
-use PHPUnit\Framework\AssertionFailedError;
 use Illuminate\Foundation\Testing\TestResponse;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
@@ -71,7 +70,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertSeeInOrderCanFail()
     {
-
         $response = $this->makeMockResponse([
             'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
         ]);
@@ -84,7 +82,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertSeeInOrderCanFail2()
     {
-
         $response = $this->makeMockResponse([
             'render' => '<ul><li>foo</li><li>bar</li><li>baz</li><li>foo</li></ul>',
         ]);
@@ -117,7 +114,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertSeeTextInOrderCanFail()
     {
-
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
         ]);
@@ -130,7 +126,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertSeeTextInOrderCanFail2()
     {
-
         $response = $this->makeMockResponse([
             'render' => 'foo<strong>bar</strong> baz <strong>foo</strong>',
         ]);
@@ -143,7 +138,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertHeader()
     {
-
         $baseResponse = tap(new Response, function ($response) {
             $response->header('Location', '/foo');
         });
@@ -214,7 +208,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertJsonFragmentCanFail()
     {
-
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonFragment(['id' => 1]);
@@ -266,7 +259,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertJsonMissing()
     {
-
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissing(['id' => 20]);
@@ -287,7 +279,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertJsonMissingExactCanFail()
     {
-
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissingExact(['id' => 20]);
@@ -298,7 +289,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertJsonMissingExactCanFail2()
     {
-
         $response = TestResponse::fromBaseResponse(new Response(new JsonSerializableSingleResourceWithIntegersStub));
 
         $response->assertJsonMissingExact(['id' => 20, 'foo' => 'bar']);
@@ -331,7 +321,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertJsonMissingValidationErrorsCanFail()
     {
-
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
                     'foo' => [],
@@ -350,7 +339,6 @@ class FoundationTestResponseTest extends TestCase
      */
     public function testAssertJsonMissingValidationErrorsCanFail2()
     {
-
         $baseResponse = tap(new Response, function ($response) {
             $response->setContent(json_encode(['errors' => [
                     'foo' => [],
