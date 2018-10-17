@@ -2006,12 +2006,12 @@ class Builder
     /**
      * Execute the query as a "select" statement.
      *
-     * @param  array  $columns
+     * @param  array|string  $columns
      * @return \Illuminate\Support\Collection
      */
     public function get($columns = ['*'])
     {
-        return collect($this->onceWithColumns($columns, function () {
+        return collect($this->onceWithColumns(Arr::wrap($columns), function () {
             return $this->processor->processSelect($this, $this->runSelect());
         }));
     }
