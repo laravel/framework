@@ -167,36 +167,6 @@ class DatabaseEloquentCollectionTest extends TestCase
         $this->assertEquals(['results'], $c->all());
     }
 
-    public function testLoadCountMethodEagerLoadsGivenRelationshipCounts()
-    {
-        $mockQuery = m::mock(stdClass::class);
-        $mockExistingModel = m::mock(stdClass::class);
-        $mockRetrieveModel = m::mock(stdClass::class);
-        $c = $this->getMockBuilder(Collection::class)->setMethods(['first', 'find'])->setConstructorArgs([[$mockExistingModel]])->getMock();
-        $c->expects($this->exactly(2))->method('first')->will($this->returnValue($mockExistingModel));
-        $c->expects($this->once())->method('find')->with('model_key_value')->will($this->returnValue($mockExistingModel));
-        $mockQuery->shouldReceive('whereKey')->once()->with(['model_key_value'])->andReturn($mockQuery);
-        $mockQuery->shouldReceive('select')->once()->with('model_key_name')->andReturn($mockQuery);
-        $mockQuery->shouldReceive('withCount')->once()->with(['bar', 'baz'])->andReturn($mockQuery);
-        $mockQuery->shouldReceive('get')->once()->andReturn($mockQuery);
-        $mockQuery->shouldReceive('each')->once()->with(m::on(function ($value) use ($mockRetrieveModel) {
-            if (! is_callable($value)) {
-                return false;
-            }
-            $value($mockRetrieveModel);
-
-            return true;
-        }));
-        $mockExistingModel->shouldReceive('getKey')->once()->andReturn('model_key_value');
-        $mockExistingModel->shouldReceive('newModelQuery')->once()->andReturn($mockQuery);
-        $mockExistingModel->shouldReceive('getKeyName')->once()->andReturn('model_key_name');
-        $mockExistingModel->shouldReceive('forceFill')->once()->with(['bar_count' => 1, 'baz_count' => 2]);
-        $mockRetrieveModel->shouldReceive('getKey')->once()->andReturn('model_key_value');
-        $mockRetrieveModel->shouldReceive('getAttributes')->once()->andReturn(['model_key_name' => 'model_key_value', 'bar_count' => 1, 'baz_count' => 2]);
-        $mockRetrieveModel->shouldReceive('getKeyName')->once()->andReturn('model_key_name');
-        $c->loadCount(['bar', 'baz']);
-    }
-
     public function testCollectionDictionaryReturnsModelKeys()
     {
         $one = m::mock(Model::class);
