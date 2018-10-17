@@ -299,7 +299,7 @@ class AuthAccessGateTest extends TestCase
         $gate = $this->getBasicGate();
 
         $gate->after(function ($user, $ability, $result) {
-            return $ability == 'allow' ? true : false;
+            return $ability == 'allow';
         });
 
         $gate->after(function ($user, $ability, $result) {
