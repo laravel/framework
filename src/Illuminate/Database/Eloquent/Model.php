@@ -960,9 +960,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public function newQueryWithoutRelationships()
     {
-        return $this->registerGlobalScopes(
-            $this->newEloquentBuilder($this->newBaseQueryBuilder())->setModel($this)
-        );
+        return $this->registerGlobalScopes($this->newModelQuery());
     }
 
     /**
