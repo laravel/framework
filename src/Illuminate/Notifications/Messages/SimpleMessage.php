@@ -64,6 +64,13 @@ class SimpleMessage
     public $actionUrl;
 
     /**
+     * The text / label for the panel.
+     *
+     * @var string
+     */
+    public $panelText;
+
+    /**
      * Indicate that the notification gives information about a successful operation.
      *
      * @return $this
@@ -160,7 +167,7 @@ class SimpleMessage
     {
         if ($line instanceof Action) {
             $this->action($line->text, $line->url);
-        } elseif (! $this->actionText) {
+        } elseif (! $this->actionText && ! $this->panelText) {
             $this->introLines[] = $this->formatLine($line);
         } else {
             $this->outroLines[] = $this->formatLine($line);
@@ -204,6 +211,19 @@ class SimpleMessage
     }
 
     /**
+     * Configure the panel block.
+     *
+     * @param  string  $text
+     * @return $this
+     */
+    public function panel($text)
+    {
+        $this->panelText = $text;
+
+        return $this;
+    }
+
+    /**
      * Get an array representation of the message.
      *
      * @return array
@@ -219,6 +239,7 @@ class SimpleMessage
             'outroLines' => $this->outroLines,
             'actionText' => $this->actionText,
             'actionUrl' => $this->actionUrl,
+            'panelText' => $this->panelText,
         ];
     }
 }
