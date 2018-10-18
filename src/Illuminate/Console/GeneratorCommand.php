@@ -210,7 +210,7 @@ abstract class GeneratorCommand extends Command
      */
     protected function getNameInput()
     {
-        return trim($this->argument('name'));
+        return ucfirst(trim($this->argument('name')));
     }
 
     /**
