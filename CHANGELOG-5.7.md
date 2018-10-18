@@ -5,7 +5,8 @@
 ### Added
 - Added loadCount method to eloquent collections ([#25997](https://github.com/laravel/framework/pull/25997))
 - Added support for identity columns in PostgreSQL 10+ ([#26096](https://github.com/laravel/framework/pull/26096))
-- Allowed passing a model instance directly to `assertSoftDeleted` method in `Foundation/Testing/Concerns/InteractsWithDatabase.php` ([#26133](https://github.com/laravel/framework/pull/26133))
+- Allowed passing a model instance directly to `assertSoftDeleted` method in `Foundation/Testing/Concerns/InteractsWithDatabase.php` ([#26133](https://github.com/laravel/framework/pull/26133) , [#26148](https://github.com/laravel/framework/pull/26148))
+- Added possibility to define exclude methods on registered `apiResource` ([#26149](https://github.com/laravel/framework/pull/26149))
 
 ### Fixed
 - Fixed `whereHas` and `$withCount` bindings from `polymorphic relationships` ([#26145](https://github.com/laravel/framework/pull/26145))
@@ -20,11 +21,14 @@
 ### Changed
 - Define mix as const in `react-stubs/webpack.mix.js` and `vue-stubs/webpack.mix.js` presets ([#26119](https://github.com/laravel/framework/pull/26119))
 - Make `assertSessionHasNoErrors` in `TestResponse.php` print the unexpected errors  ([#26039](https://github.com/laravel/framework/pull/26039), [e6bdf8a](https://github.com/laravel/framework/commit/e6bdf8af7790db485856ecde0448b353d0cb15ca))
+- Replaced the remaining occurrences of `newQuery()` to `newModelQuery()` in UPDATE/DELETE queries. ([#26158](https://github.com/laravel/framework/pull/26158))
 
 ### Changed realization
+- Reversed ternary condition in `Arr::wrap` to make it clearer ([#26150](https://github.com/laravel/framework/pull/26150))
 - Simplified `formatAction` in `UrlGenerator.php` ([#26121](https://github.com/laravel/framework/pull/26121))
-- Delete unneeded type check in `resolve` method in `JsonResource` class, since it will never be `true` ([#26053](https://github.com/laravel/framework/pull/26053))
-- Prefer stricter comparison for non-empty strings. ([#26139](https://github.com/laravel/framework/pull/26139))
+- Simplified `isChainOfObjects` method in `Support/Testing/Fakes/QueueFake.php` ([#26151](https://github.com/laravel/framework/pull/26151))
+- Deleted unneeded code ([#26053](https://github.com/laravel/framework/pull/26053), [#26162](https://github.com/laravel/framework/pull/26162), [#26160](https://github.com/laravel/framework/pull/26160), [#26159](https://github.com/laravel/framework/pull/26159), [#26152](https://github.com/laravel/framework/pull/26152))
+- Prefer stricter comparison ([#26139](https://github.com/laravel/framework/pull/26139), [#26157](https://github.com/laravel/framework/pull/26157))
 
 
 ## [v5.7.9 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
