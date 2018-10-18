@@ -479,6 +479,8 @@ trait HasAttributes
             case 'float':
             case 'double':
                 return $this->fromFloat($value);
+            case 'decimal':
+                return $this->asDecimal($value, explode(':', $this->getCasts()[$key], 2)[1]);
             case 'string':
                 return (string) $value;
             case 'bool':
@@ -515,6 +517,10 @@ trait HasAttributes
             return 'custom_datetime';
         }
 
+        if ($this->isDecimalCast($this->getCasts()[$key])) {
+            return 'decimal';
+        }
+
         return trim(strtolower($this->getCasts()[$key]));
     }
 
@@ -528,6 +534,17 @@ trait HasAttributes
     {
         return strncmp($cast, 'date:', 5) === 0 ||
                strncmp($cast, 'datetime:', 9) === 0;
+    }
+
+    /**
+     * Determine if the cast type is a decimal cast.
+     *
+     * @param  string  $cast
+     * @return bool
+     */
+    protected function isDecimalCast($cast)
+    {
+        return strncmp($cast, 'decimal:', 8) === 0;
     }
 
     /**
@@ -698,6 +715,18 @@ trait HasAttributes
             default:
                 return (float) $value;
         }
+    }
+
+    /**
+     * Return a decimal as string.
+     *
+     * @param  float  $value
+     * @param  int  $value
+     * @return string
+     */
+    protected function asDecimal($value, $decimals)
+    {
+        return number_format($value, $decimals, '.', '');
     }
 
     /**
