@@ -19,10 +19,7 @@ class MigratorTest extends TestCase
         ]);
     }
 
-    /**
-     * @test
-     */
-    public function dont_display_output_when_output_object_is_not_available()
+    public function test_dont_display_output_when_output_object_is_not_available()
     {
         $migrator = $this->app->make('migrator');
 

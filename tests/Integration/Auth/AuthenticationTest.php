@@ -64,18 +64,12 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function basic_auth_protects_route()
+    public function test_basic_auth_protects_route()
     {
         $this->get('basic')->assertStatus(401);
     }
 
-    /**
-     * @test
-     */
-    public function basic_auth_passes_on_correct_credentials()
+    public function test_basic_auth_passes_on_correct_credentials()
     {
         $response = $this->get('basic', [
             'Authorization' => 'Basic '.base64_encode('email:password'),
@@ -85,10 +79,7 @@ class AuthenticationTest extends TestCase
         $this->assertEquals('email', $response->decodeResponseJson()['email']);
     }
 
-    /**
-     * @test
-     */
-    public function basic_auth_respects_additional_conditions()
+    public function test_basic_auth_respects_additional_conditions()
     {
         AuthenticationTestUser::create([
             'username' => 'username2',
@@ -106,20 +97,14 @@ class AuthenticationTest extends TestCase
         ])->assertStatus(200);
     }
 
-    /**
-     * @test
-     */
-    public function basic_auth_fails_on_wrong_credentials()
+    public function test_basic_auth_fails_on_wrong_credentials()
     {
         $this->get('basic', [
             'Authorization' => 'Basic '.base64_encode('email:wrong_password'),
         ])->assertStatus(401);
     }
 
-    /**
-     * @test
-     */
-    public function logging_in_fails_via_attempt()
+    public function test_logging_in_fails_via_attempt()
     {
         Event::fake();
 
@@ -143,10 +128,7 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function logging_in_succeeds_via_attempt()
+    public function test_logging_in_succeeds_via_attempt()
     {
         Event::fake();
 
@@ -176,9 +158,6 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
     public function test_logging_in_using_id()
     {
         $this->app['auth']->loginUsingId(1);
@@ -187,9 +166,6 @@ class AuthenticationTest extends TestCase
         $this->assertFalse($this->app['auth']->loginUsingId(1000));
     }
 
-    /**
-     * @test
-     */
     public function test_logging_out()
     {
         Event::fake();
@@ -207,10 +183,7 @@ class AuthenticationTest extends TestCase
         });
     }
 
-    /**
-     * @test
-     */
-    public function logging_in_out_via_attempt_remembering()
+    public function test_logging_in_out_via_attempt_remembering()
     {
         $this->assertTrue(
             $this->app['auth']->attempt(['email' => 'email', 'password' => 'password'], true)
@@ -228,10 +201,7 @@ class AuthenticationTest extends TestCase
         $this->assertNotEquals($oldToken, $user->getRememberToken());
     }
 
-    /**
-     * @test
-     */
-    public function auth_via_attempt_remembering()
+    public function test_auth_via_attempt_remembering()
     {
         $provider = new EloquentUserProvider(app('hash'), AuthenticationTestUser::class);
 
