@@ -721,7 +721,7 @@ trait HasAttributes
      * Return a decimal as string.
      *
      * @param  float  $value
-     * @param  int  $value
+     * @param  int  $decimals
      * @return string
      */
     protected function asDecimal($value, $decimals)
