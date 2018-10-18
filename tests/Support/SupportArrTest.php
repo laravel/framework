@@ -430,6 +430,16 @@ class SupportArrTest extends TestCase
         $this->assertSame('foo=bar&bar=', Arr::query(['foo' => 'bar', 'bar' => '']));
     }
 
+    public function testSortedQuery()
+    {
+        $this->assertSame('', Arr::query([]));
+        $this->assertSame('foo=bar', Arr::query(['foo' => 'bar'], true));
+        $this->assertSame('bar=baz&foo=bar', Arr::query(['foo' => 'bar', 'bar' => 'baz'], true));
+        $this->assertSame('bar=1&foo=bar', Arr::query(['foo' => 'bar', 'bar' => true], true));
+        $this->assertSame('foo=bar', Arr::query(['foo' => 'bar', 'bar' => null], true));
+        $this->assertSame('bar=&foo=bar', Arr::query(['foo' => 'bar', 'bar' => ''], true));
+    }
+
     public function testRandom()
     {
         $random = Arr::random(['foo', 'bar', 'baz']);

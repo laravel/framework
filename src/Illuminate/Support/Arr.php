@@ -598,10 +598,15 @@ class Arr
      * Convert the array into a query string.
      *
      * @param  array  $array
+     * @param  bool  $sorted
      * @return string
      */
-    public static function query($array)
+    public static function query($array, $sorted = false)
     {
+        if ($sorted === true) {
+            ksort($array);
+        }
+
         return http_build_query($array, null, '&', PHP_QUERY_RFC3986);
     }
 
