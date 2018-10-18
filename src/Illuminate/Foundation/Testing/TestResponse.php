@@ -368,7 +368,7 @@ class TestResponse
      */
     public function assertSeeText($value)
     {
-        PHPUnit::assertContains((string) $value, strip_tags($this->getContent()));
+        PHPUnit::assertContains((string) $value, html_entity_decode(strip_tags($this->getContent()), ENT_QUOTES));
 
         return $this;
     }
@@ -381,7 +381,7 @@ class TestResponse
      */
     public function assertSeeTextInOrder(array $values)
     {
-        PHPUnit::assertThat($values, new SeeInOrder(strip_tags($this->getContent())));
+        PHPUnit::assertThat($values, new SeeInOrder(html_entity_decode(strip_tags($this->getContent()), ENT_QUOTES)));
 
         return $this;
     }
@@ -407,7 +407,7 @@ class TestResponse
      */
     public function assertDontSeeText($value)
     {
-        PHPUnit::assertNotContains((string) $value, strip_tags($this->getContent()));
+        PHPUnit::assertNotContains((string) $value, html_entity_decode(strip_tags($this->getContent()), ENT_QUOTES));
 
         return $this;
     }
