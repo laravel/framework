@@ -2104,6 +2104,36 @@ class SupportCollectionTest extends TestCase
         $this->assertNull($c->min());
     }
 
+    public function testGettingBoundariesFromCollection()
+    {
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 15], (object) ['foo' => 20]]);
+        $this->assertSame([10, 20], $c->boundaries(function ($item) {
+            return $item->foo;
+        }));
+        $this->assertSame([10, 20], $c->boundaries('foo'));
+        $this->assertSame([10, 20], $c->boundaries->foo);
+
+        $c = new Collection([['foo' => 10], ['foo' => 15], ['foo' => 20]]);
+        $this->assertSame([10, 20], $c->boundaries('foo'));
+        $this->assertSame([10, 20], $c->boundaries->foo);
+
+        $c = new Collection([['foo' => 10], ['foo' => 15], ['foo' => 20], ['foo' => null]]);
+        $this->assertSame([10, 20], $c->boundaries('foo'));
+        $this->assertSame([10, 20], $c->boundaries->foo);
+
+        $c = new Collection([1, 2, 3, 4, 5]);
+        $this->assertSame([1, 5], $c->boundaries());
+
+        $c = new Collection([1, null, 3, 4, 5]);
+        $this->assertSame([1, 5], $c->boundaries());
+
+        $c = new Collection([0, 1, 2, 3, 4]);
+        $this->assertSame([0, 4], $c->boundaries());
+
+        $c = new Collection;
+        $this->assertSame([null, null], $c->boundaries());
+    }
+
     public function testOnly()
     {
         $data = new Collection(['first' => 'Taylor', 'last' => 'Otwell', 'email' => 'taylorotwell@gmail.com']);
