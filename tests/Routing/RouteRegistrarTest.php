@@ -335,6 +335,17 @@ class RouteRegistrarTest extends TestCase
         $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
     }
 
+    public function testCanExcludeMethodsOnRegisteredApiResource()
+    {
+        $this->router->apiResource('users', RouteRegistrarControllerStub::class)
+                     ->except(['index', 'show', 'store']);
+
+        $this->assertCount(2, $this->router->getRoutes());
+
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.update'));
+        $this->assertTrue($this->router->getRoutes()->hasNamedRoute('users.destroy'));
+    }
+
     public function testCanRegisterApiResourcesWithExceptOption()
     {
         $this->router->apiResources([
