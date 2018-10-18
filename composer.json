@@ -115,6 +115,7 @@
         "ext-posix": "Required to use all features of the queue worker.",
         "aws/aws-sdk-php": "Required to use the SQS queue driver and SES mail driver (^3.0).",
         "doctrine/dbal": "Required to rename columns and drop SQLite columns (^2.6).",
+        "filp/whoops": "Required for friendly error pages in development (^2.1.4).",
         "fzaninotto/faker": "Required to use the eloquent factory builder (^1.4).",
         "guzzlehttp/guzzle": "Required to use the Mailgun and Mandrill mail drivers and the ping methods on schedules (^6.0).",
         "laravel/tinker": "Required to use the tinker console command (^1.0).",
