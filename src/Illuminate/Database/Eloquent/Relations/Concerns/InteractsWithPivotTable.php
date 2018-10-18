@@ -507,7 +507,7 @@ trait InteractsWithPivotTable
      */
     protected function castKeys(array $keys)
     {
-        return (array) array_map(function ($v) {
+        return array_map(function ($v) {
             return $this->castKey($v);
         }, $keys);
     }
