@@ -32,7 +32,7 @@
         }
     },
     "suggest": {
-        "illuminate/container": "Required to use the container (5.7.*)."
+        "illuminate/container": "Required to use the container filesystem factory (5.7.*)."
     },
     "config": {
         "sort-packages": true
