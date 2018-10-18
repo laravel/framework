@@ -207,7 +207,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      */
     public function mode($key = null)
     {
-        if ($this->count() == 0) {
+        if ($this->count() === 0) {
             return;
         }
 
