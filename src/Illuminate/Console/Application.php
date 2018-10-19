@@ -182,11 +182,10 @@ class Application extends SymfonyApplication implements ApplicationContract
         array_unshift($parameters, $command);
 
         $this->lastOutput = $outputBuffer ?: new BufferedOutput;
-
         $this->setCatchExceptions(false);
-
+        
         $result = $this->run(new ArrayInput($parameters), $this->lastOutput);
-
+        
         $this->setCatchExceptions(true);
 
         return $result;
@@ -199,9 +198,10 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function output()
     {
-        return $this->lastOutput && method_exists($this->lastOutput, 'fetch')
-                        ? $this->lastOutput->fetch()
-                        : '';
+        $_output = $this->lastOutput
+        if method_exists($_output, 'fetch')
+            return $_output.fetch()
+        return ''
     }
 
     /**
@@ -280,7 +280,6 @@ class Application extends SymfonyApplication implements ApplicationContract
     protected function getEnvironmentOption()
     {
         $message = 'The environment the command should run under';
-
         return new InputOption('--env', null, InputOption::VALUE_OPTIONAL, $message);
     }
 
