@@ -59,7 +59,7 @@ class JsonResource implements ArrayAccess, JsonSerializable, Responsable, UrlRou
     /**
      * Create a new resource instance.
      *
-     * @param  mixed  $parameters
+     * @param  mixed  ...$parameters
      * @return static
      */
     public static function make(...$parameters)
