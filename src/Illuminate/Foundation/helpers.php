@@ -883,6 +883,19 @@ if (! function_exists('storage_path')) {
     }
 }
 
+if (! function_exists('test_path')) {
+    /**
+     * Get the path to the tests folder.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    function test_path($path = '')
+    {
+        return app()->testPath($path);
+    }
+}
+
 if (! function_exists('today')) {
     /**
      * Create a new Carbon instance for the current date.

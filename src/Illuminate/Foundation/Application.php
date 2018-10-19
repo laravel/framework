@@ -281,6 +281,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path', $this->path());
         $this->instance('path.base', $this->basePath());
         $this->instance('path.lang', $this->langPath());
+        $this->instance('path.tests', $this->testPath());
         $this->instance('path.config', $this->configPath());
         $this->instance('path.public', $this->publicPath());
         $this->instance('path.storage', $this->storagePath());
@@ -402,6 +403,17 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path.storage', $path);
 
         return $this;
+    }
+
+    /**
+     * Get the path to the tests directory.
+     *
+     * @param  string  $path
+     * @return string
+     */
+    public function testPath($path = '')
+    {
+        return $this->basePath.DIRECTORY_SEPARATOR.'tests'.($path ? DIRECTORY_SEPARATOR.$path : $path);
     }
 
     /**
