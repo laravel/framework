@@ -199,10 +199,10 @@ class Application extends SymfonyApplication implements ApplicationContract
      */
     public function output()
     {
-        $_output = $this->lastOutput
+        $_output = $this->lastOutput;
         if (method_exists($_output, 'fetch'))
-            return $_output.fetch()
-        return ''
+            return $_output.fetch();
+        return '';
     }
 
     /**
