@@ -32,17 +32,13 @@ class GenerateLinksCommand extends Command
 
                 if (file_exists($link)) {
                     $this->error("The [$link] directory already exists.");
-                }
-
-                else {
+                } else {
                     $this->laravel->make('files')->link($target, $link);
 
                     $this->info("The [$link] directory has been linked to [$target].");
                 }
             }
-        }
-
-        else {
+        } else {
             $this->warn('No links defined in filesystem configuration.');
         }
     }
