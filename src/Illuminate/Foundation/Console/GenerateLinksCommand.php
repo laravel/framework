@@ -29,7 +29,6 @@ class GenerateLinksCommand extends Command
     {
         if ($links = $this->laravel['config']['filesystems.links']) {
             foreach ($links as $link => $target) {
-
                 if (file_exists($link)) {
                     $this->error("The [$link] directory already exists.");
                 } else {
