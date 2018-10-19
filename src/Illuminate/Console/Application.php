@@ -182,7 +182,9 @@ class Application extends SymfonyApplication implements ApplicationContract
         array_unshift($parameters, $command);
 
         $this->lastOutput = $outputBuffer ?: new BufferedOutput;
+        
         $this->setCatchExceptions(false);
+        
         $result = $this->run(new ArrayInput($parameters), $this->lastOutput);
         
         $this->setCatchExceptions(true);
