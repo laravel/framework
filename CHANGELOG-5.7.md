@@ -7,6 +7,8 @@
 - Added support for identity columns in PostgreSQL 10+ ([#26096](https://github.com/laravel/framework/pull/26096))
 - Allowed passing a model instance directly to `assertSoftDeleted` method in `Foundation/Testing/Concerns/InteractsWithDatabase.php` ([#26133](https://github.com/laravel/framework/pull/26133) , [#26148](https://github.com/laravel/framework/pull/26148))
 - Added possibility to define exclude methods on registered `apiResource` ([#26149](https://github.com/laravel/framework/pull/26149))
+- Added `filp/whoops` to `suggest` in `composer.json` ([#26180](https://github.com/laravel/framework/pull/26180))
+- Added `mock` and `spy` methods to `Foundation/Testing/Concerns/InteractsWithContainer.php` ([#26171](https://github.com/laravel/framework/pull/26171), [b50f9f3](https://github.com/laravel/framework/commit/b50f9f3bc8c1ee03c22ee8cc0ac37179fb28a1c9))
 
 ### Fixed
 - Fixed `whereHas` and `$withCount` bindings from `polymorphic relationships` ([#26145](https://github.com/laravel/framework/pull/26145))
@@ -22,6 +24,7 @@
 - Define mix as const in `react-stubs/webpack.mix.js` and `vue-stubs/webpack.mix.js` presets ([#26119](https://github.com/laravel/framework/pull/26119))
 - Make `assertSessionHasNoErrors` in `TestResponse.php` print the unexpected errors  ([#26039](https://github.com/laravel/framework/pull/26039), [e6bdf8a](https://github.com/laravel/framework/commit/e6bdf8af7790db485856ecde0448b353d0cb15ca))
 - Replaced the remaining occurrences of `newQuery()` to `newModelQuery()` in UPDATE/DELETE queries. ([#26158](https://github.com/laravel/framework/pull/26158))
+- Improved `findOrFail()` exceptions in `BelongsToMany.php` and `HasManyThrough.php` relations ([#26182](https://github.com/laravel/framework/pull/26182))
 
 ### Changed realization
 - Reversed ternary condition in `Arr::wrap` to make it clearer ([#26150](https://github.com/laravel/framework/pull/26150))
