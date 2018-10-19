@@ -24,6 +24,16 @@ class UploadedFile extends SymfonyUploadedFile
     }
 
     /**
+     * Get the file's extension supplied by the client.
+     *
+     * @return string
+     */
+    public function clientExtension()
+    {
+        return $this->guessClientExtension();
+    }
+
+    /**
      * Store the uploaded file on a filesystem disk.
      *
      * @param  string  $path
