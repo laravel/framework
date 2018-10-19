@@ -196,7 +196,7 @@ class Factory implements FactoryContract
         // an instance of the partial view to the final result HTML passing in the
         // iterated value of this data array, allowing the views to access them.
         if (count($data) > 0) {
-        	$this->addLoop($data);
+            $this->addLoop($data);
             foreach ($data as $key => $value) {
                 $result .= $this->make(
                     $view, ['key' => $key, $iterator => $value, 'loop' => $this->getLastLoop()]
