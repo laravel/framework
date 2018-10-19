@@ -97,11 +97,13 @@ class ViewFactoryTest extends TestCase
     public function testRenderEachCreatesViewForEachItemInArray()
     {
         $factory = m::mock(Factory::class.'[make]', $this->getFactoryArgs());
-        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'bar', 'value' => 'baz'])->andReturn($mockView1 = m::mock(stdClass::class));
-        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'breeze', 'value' => 'boom'])->andReturn($mockView2 = m::mock(stdClass::class));
+        $loopFactory = $this->getFactory();
+        $loopFactory->addLoop(['bar' => 'baz', 'breeze' => 'boom']);
+        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'bar', 'value' => 'baz', 'loop' => $loopFactory->getLastLoop()])->andReturn($mockView1 = m::mock(stdClass::class));
+        $loopFactory->incrementLoopIndices();
+        $factory->shouldReceive('make')->once()->with('foo', ['key' => 'breeze', 'value' => 'boom', 'loop' => $loopFactory->getLastLoop()])->andReturn($mockView2 = m::mock(stdClass::class));
         $mockView1->shouldReceive('render')->once()->andReturn('dayle');
         $mockView2->shouldReceive('render')->once()->andReturn('rees');
-
         $result = $factory->renderEach('foo', ['bar' => 'baz', 'breeze' => 'boom'], 'value');
 
         $this->assertEquals('daylerees', $result);

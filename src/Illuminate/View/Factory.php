@@ -198,13 +198,12 @@ class Factory implements FactoryContract
         if (count($data) > 0) {
         	$this->addLoop($data);
             foreach ($data as $key => $value) {
-            	$this->incrementLoopIndices();
                 $result .= $this->make(
                     $view, ['key' => $key, $iterator => $value, 'loop' => $this->getLastLoop()]
                 )->render();
+                $this->incrementLoopIndices();
             }
         }
-
         // If there is no data in the array, we will render the contents of the empty
         // view. Alternatively, the "empty view" could be a raw string that begins
         // with "raw|" for convenience and to let this know that it is a string.
