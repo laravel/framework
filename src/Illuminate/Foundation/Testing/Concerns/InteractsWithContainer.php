@@ -3,7 +3,7 @@
 namespace Illuminate\Foundation\Testing\Concerns;
 
 use Closure;
-use Mockery as m;
+use Mockery;
 
 trait InteractsWithContainer
 {
@@ -42,7 +42,7 @@ trait InteractsWithContainer
      */
     protected function mock($abstract, Closure $mock)
     {
-        return $this->instance($abstract, m::mock($abstract, $mock));
+        return $this->instance($abstract, Mockery::mock($abstract, $mock));
     }
 
     /**
@@ -54,6 +54,6 @@ trait InteractsWithContainer
      */
     protected function spy($abstract, Closure $mock)
     {
-        return $this->instance($abstract, m::spy($abstract, $mock));
+        return $this->instance($abstract, Mockery::spy($abstract, $mock));
     }
 }
