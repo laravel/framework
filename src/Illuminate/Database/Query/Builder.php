@@ -825,24 +825,15 @@ class Builder
     {
         $type = $not ? 'NotIn' : 'In';
 
-        if ($values instanceof EloquentBuilder) {
-            $values = $values->getQuery();
-        }
-
         // If the value is a query builder instance we will assume the developer wants to
         // look for any values that exists within this given query. So we will add the
         // query accordingly so that this query is properly executed when it is run.
-        if ($values instanceof self) {
-            return $this->whereInExistingQuery(
-                $column, $values, $boolean, $not
-            );
-        }
+        if ($values instanceof self || $values instanceof EloquentBuilder || $values instanceof Closure) {
+            [$query, $bindings] = $this->createSub($values);
 
-        // If the value of the where in clause is actually a Closure, we will assume that
-        // the developer is using a full sub-select for this "in" statement, and will
-        // execute those Closures, then we can re-construct the entire sub-selects.
-        if ($values instanceof Closure) {
-            return $this->whereInSub($column, $values, $boolean, $not);
+            $values = [new Expression($query)];
+
+            $this->addBinding($bindings, 'where');
         }
 
         // Next, if the value is Arrayable we need to cast it to its raw array form so we
@@ -857,11 +848,7 @@ class Builder
         // Finally we'll add a binding for each values unless that value is an expression
         // in which case we will just skip over it since it will be the query as a raw
         // string and not as a parameterized place-holder to be replaced by the PDO.
-        foreach ($values as $value) {
-            if (! $value instanceof Expression) {
-                $this->addBinding($value, 'where');
-            }
-        }
+        $this->addBinding($this->cleanBindings($values), 'where');
 
         return $this;
     }
@@ -901,51 +888,6 @@ class Builder
     public function orWhereNotIn($column, $values)
     {
         return $this->whereNotIn($column, $values, 'or');
-    }
-
-    /**
-     * Add a where in with a sub-select to the query.
-     *
-     * @param  string   $column
-     * @param  \Closure $callback
-     * @param  string   $boolean
-     * @param  bool     $not
-     * @return $this
-     */
-    protected function whereInSub($column, Closure $callback, $boolean, $not)
-    {
-        $type = $not ? 'NotInSub' : 'InSub';
-
-        // To create the exists sub-select, we will actually create a query and call the
-        // provided callback with the query so the developer may set any of the query
-        // conditions they want for the in clause, then we'll put it in this array.
-        call_user_func($callback, $query = $this->forSubQuery());
-
-        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
-
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
-    }
-
-    /**
-     * Add an external sub-select to the query.
-     *
-     * @param  string   $column
-     * @param  \Illuminate\Database\Query\Builder|static  $query
-     * @param  string   $boolean
-     * @param  bool     $not
-     * @return $this
-     */
-    protected function whereInExistingQuery($column, $query, $boolean, $not)
-    {
-        $type = $not ? 'NotInSub' : 'InSub';
-
-        $this->wheres[] = compact('type', 'column', 'query', 'boolean');
-
-        $this->addBinding($query->getBindings(), 'where');
-
-        return $this;
     }
 
     /**

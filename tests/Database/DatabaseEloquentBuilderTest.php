@@ -989,6 +989,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $builder->whereKeyNot($collection);
     }
 
+    public function testWhereIn()
+    {
+        $model = new EloquentBuilderTestNestedStub;
+        $this->mockConnectionForModel($model, '');
+        $query = $model->newQuery()->withoutGlobalScopes()->whereIn('foo', $model->newQuery()->select('id'));
+        $expected = 'select * from "table" where "foo" in (select "id" from "table" where "table"."deleted_at" is null)';
+        $this->assertEquals($expected, $query->toSql());
+    }
+
     public function testLatestWithoutColumnWithCreatedAt()
     {
         $model = $this->getMockModel();
