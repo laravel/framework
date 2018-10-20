@@ -2583,22 +2583,13 @@ class Builder
      */
     public function updateOrInsert(array $attributes, array $values = [])
     {
-        DB::beginTransaction();
-        
-        try {
+        DB::transaction(function () use ($attributes, $values) {
             if (! $this->where($attributes)->exists()) {
                 return $this->insert(array_merge($attributes, $values));
             }
 
             return (bool) $this->take(1)->update($values);
-            DB::commit();
-        } catch (\Throwable $e) {
-            DB:rollback();
-            throw $e;
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
+        }, 5);
         
         return 0;
     }
