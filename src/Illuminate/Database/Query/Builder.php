@@ -9,6 +9,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use InvalidArgumentException;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Contracts\Support\Arrayable;
@@ -2582,11 +2583,22 @@ class Builder
      */
     public function updateOrInsert(array $attributes, array $values = [])
     {
-        if (! $this->where($attributes)->exists()) {
-            return $this->insert(array_merge($attributes, $values));
-        }
+        DB::beginTransaction();
+        
+        try {
+            if (! $this->where($attributes)->exists()) {
+                return $this->insert(array_merge($attributes, $values));
+            }
 
-        return (bool) $this->take(1)->update($values);
+            return (bool) $this->take(1)->update($values);
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB:rollback();
+            throw $e;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**
