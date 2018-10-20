@@ -2599,6 +2599,8 @@ class Builder
             DB::rollBack();
             throw $e;
         }
+        
+        return 0;
     }
 
     /**
