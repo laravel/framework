@@ -85,7 +85,7 @@ trait BuildsQueries
      */
     public function last($columns = ['*'])
     {
-        return $this->take(1)->latest()->first($columns);
+        return $this->latest()->first($columns);
     }
 
     /**
