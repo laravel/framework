@@ -1490,6 +1490,17 @@ class DatabaseQueryBuilderTest extends TestCase
         $this->assertEquals(['foo' => 'bar'], $results);
     }
 
+    public function testLastMethodReturnsLastResult()
+    {
+        $builder = $this->getBuilder();
+        $builder->getConnection()->shouldReceive('select')->once()->with('select * from "users" where "age" > ? order by "created_at" desc limit 1', [18], true)->andReturn([['foo' => 'bar'], ['baz' => 'bar']]);
+        $builder->getProcessor()->shouldReceive('processSelect')->once()->with($builder, [['foo' => 'bar'], ['baz' => 'bar']])->andReturnUsing(function ($query, $results) {
+            return $results;
+        });
+        $results = $builder->from('users')->where('age', '>', 18)->last();
+        $this->assertEquals(['foo' => 'bar'], $results);
+    }
+
     public function testPluckMethodGetsCollectionOfColumnValues()
     {
         $builder = $this->getBuilder();
