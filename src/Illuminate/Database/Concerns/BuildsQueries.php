@@ -78,14 +78,14 @@ trait BuildsQueries
     }
 
     /**
-     * Execut the query and get the last result.
+     * Execute the query and get the last result.
      *
      * @param array  $columns
      * @return \Illuminate\Database\Eloquent\Model|object|static|null
      */
     public function last($columns = ['*'])
     {
-        return $this->take(1)->latest()->get($columns)->first();
+        return $this->take(1)->latest()->first($columns);
     }
 
     /**
