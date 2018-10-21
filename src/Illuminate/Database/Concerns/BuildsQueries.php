@@ -78,6 +78,17 @@ trait BuildsQueries
     }
 
     /**
+     * Execut the query and get the last result.
+     *
+     * @param array  $columns
+     * @return \Illuminate\Database\Eloquent\Model|object|static|null
+     */
+    public function last($columns = ['*'])
+    {
+        return $this->take(1)->latest()->get($columns)->first();
+    }
+
+    /**
      * Apply the callback's query changes if the given "value" is true.
      *
      * @param  mixed  $value
