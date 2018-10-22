@@ -1546,7 +1546,7 @@ trait ValidatesAttributes
     /**
      * Validate that an attribute is a valid UUID.
      *
-     * @param  string $attribute
+     * @param  string  $attribute
      * @param  mixed  $value
      * @return bool
      */
