@@ -381,7 +381,7 @@ class Router implements RegistrarContract, BindingRegistrar
     protected function updateGroupStack(array $attributes)
     {
         if (! empty($this->groupStack)) {
-            $attributes = $this->mergeWithLastGroup(...func_get_args());
+            $attributes = $this->mergeWithLastGroup($attributes);
         }
 
         $this->groupStack[] = $attributes;
