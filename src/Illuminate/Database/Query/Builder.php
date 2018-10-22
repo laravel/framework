@@ -828,7 +828,9 @@ class Builder
         // If the value is a query builder instance we will assume the developer wants to
         // look for any values that exists within this given query. So we will add the
         // query accordingly so that this query is properly executed when it is run.
-        if ($values instanceof self || $values instanceof EloquentBuilder || $values instanceof Closure) {
+        if ($values instanceof self ||
+            $values instanceof EloquentBuilder ||
+            $values instanceof Closure) {
             [$query, $bindings] = $this->createSub($values);
 
             $values = [new Expression($query)];
