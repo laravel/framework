@@ -526,6 +526,14 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $this->assertCount(1, $users);
     }
 
+    public function testWhereDoesntHaveWithNestedDeletedRelationship()
+    {
+        $this->createUsers();
+
+        $users = SoftDeletesTestUser::doesntHave('posts.comments')->get();
+        $this->assertCount(1, $users);
+    }
+
     public function testWhereHasWithNestedDeletedRelationshipAndWithTrashedCondition()
     {
         $this->createUsers();

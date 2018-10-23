@@ -876,6 +876,15 @@ class DatabaseEloquentBuilderTest extends TestCase
         $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id")', $builder->toSql());
     }
 
+    public function testDoesntHaveNested()
+    {
+        $model = new EloquentBuilderTestModelParentStub;
+
+        $builder = $model->doesntHave('foo.bar');
+
+        $this->assertEquals('select * from "eloquent_builder_test_model_parent_stubs" where not exists (select * from "eloquent_builder_test_model_close_related_stubs" where "eloquent_builder_test_model_parent_stubs"."foo_id" = "eloquent_builder_test_model_close_related_stubs"."id" and exists (select * from "eloquent_builder_test_model_far_related_stubs" where "eloquent_builder_test_model_close_related_stubs"."id" = "eloquent_builder_test_model_far_related_stubs"."eloquent_builder_test_model_close_related_stub_id"))', $builder->toSql());
+    }
+
     public function testOrDoesntHave()
     {
         $model = new EloquentBuilderTestModelParentStub;
