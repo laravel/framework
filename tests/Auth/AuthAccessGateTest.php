@@ -15,6 +15,7 @@ class AuthAccessGateTest extends TestCase
     {
         $gate = $this->getBasicGate();
         $UnUsedVaribale = 'Un used variable';
+        $NextVar = 'yes added';
 
         $gate->define('foo', function ($user) {
             return true;
