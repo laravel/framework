@@ -542,6 +542,26 @@ class EloquentBelongsToManyTest extends DatabaseTestCase
         }
     }
 
+    public function test_can_update_existing_pivot_using_arrayable_of_ids()
+    {
+        $tags = new Collection([
+            $tag1 = Tag::create(['name' => str_random()]),
+            $tag2 = Tag::create(['name' => str_random()]),
+        ]);
+        $post = Post::create(['title' => str_random()]);
+
+        DB::table('posts_tags')->insert([
+            ['post_id' => $post->id, 'tag_id' => $tag1->id, 'flag' => 'empty'],
+            ['post_id' => $post->id, 'tag_id' => $tag2->id, 'flag' => 'empty'],
+        ]);
+
+        $post->tagsWithExtraPivot()->updateExistingPivot($tags, ['flag' => 'exclude']);
+
+        foreach ($post->tagsWithExtraPivot as $tag) {
+            $this->assertEquals('exclude', $tag->pivot->flag);
+        }
+    }
+
     public function test_can_update_existing_pivot_using_model()
     {
         $tag = Tag::create(['name' => str_random()]);
