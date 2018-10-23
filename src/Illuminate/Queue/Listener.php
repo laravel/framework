@@ -3,7 +3,6 @@
 namespace Illuminate\Queue;
 
 use Closure;
-use Illuminate\Support\ProcessUtils;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\PhpExecutableFinder;
 
@@ -38,13 +37,6 @@ class Listener
     protected $maxTries = 0;
 
     /**
-     * The queue worker command line.
-     *
-     * @var string
-     */
-    protected $workerCommand;
-
-    /**
      * The output handler callback.
      *
      * @var \Closure|null
@@ -60,19 +52,6 @@ class Listener
     public function __construct($commandPath)
     {
         $this->commandPath = $commandPath;
-        $this->workerCommand = $this->buildCommandTemplate();
-    }
-
-    /**
-     * Build the environment specific worker command.
-     *
-     * @return string
-     */
-    protected function buildCommandTemplate()
-    {
-        $command = 'queue:work %s --once --queue=%s --delay=%s --memory=%s --sleep=%s --tries=%s';
-
-        return "{$this->phpBinary()} {$this->artisanBinary()} {$command}";
     }
 
     /**
@@ -82,9 +61,7 @@ class Listener
      */
     protected function phpBinary()
     {
-        return ProcessUtils::escapeArgument(
-            (new PhpExecutableFinder)->find(false)
-        );
+        return (new PhpExecutableFinder)->find(false);
     }
 
     /**
@@ -94,9 +71,7 @@ class Listener
      */
     protected function artisanBinary()
     {
-        return defined('ARTISAN_BINARY')
-                        ? ProcessUtils::escapeArgument(ARTISAN_BINARY)
-                        : ProcessUtils::escapeArgument('artisan');
+        return defined('ARTISAN_BINARY') ? ARTISAN_BINARY : 'artisan';
     }
 
     /**
@@ -126,24 +101,25 @@ class Listener
      */
     public function makeProcess($connection, $queue, ListenerOptions $options)
     {
-        $command = $this->workerCommand;
+        $command = $this->createCommand(
+            $connection,
+            $queue,
+            $options
+        );
 
-        // If the environment is set, we will append it to the command string so the
+        // If the environment is set, we will append it to the command array so the
         // workers will run under the specified environment. Otherwise, they will
         // just run under the production environment which is not always right.
         if (isset($options->environment)) {
             $command = $this->addEnvironment($command, $options);
         }
 
-        // Next, we will just format out the worker commands with all of the various
-        // options available for the command. This will produce the final command
-        // line that we will pass into a Symfony process object for processing.
-        $command = $this->formatCommand(
-            $command, $connection, $queue, $options
-        );
-
         return new Process(
-            $command, $this->commandPath, null, null, $options->timeout
+            $command,
+            $this->commandPath,
+            null,
+            null,
+            $options->timeout
         );
     }
 
@@ -152,31 +128,37 @@ class Listener
      *
      * @param  string  $command
      * @param  \Illuminate\Queue\ListenerOptions  $options
-     * @return string
+     * @return array
      */
     protected function addEnvironment($command, ListenerOptions $options)
     {
-        return $command.' --env='.ProcessUtils::escapeArgument($options->environment);
+        return array_merge($command, ["--env={$options->environment}"]);
     }
 
     /**
-     * Format the given command with the listener options.
+     * Create the command with the listener options.
      *
-     * @param  string  $command
      * @param  string  $connection
      * @param  string  $queue
      * @param  \Illuminate\Queue\ListenerOptions  $options
-     * @return string
+     * @return array
      */
-    protected function formatCommand($command, $connection, $queue, ListenerOptions $options)
+    protected function createCommand($connection, $queue, ListenerOptions $options)
     {
-        return sprintf(
-            $command,
-            ProcessUtils::escapeArgument($connection),
-            ProcessUtils::escapeArgument($queue),
-            $options->delay, $options->memory,
-            $options->sleep, $options->maxTries
-        );
+        return array_filter([
+            $this->phpBinary(),
+            $this->artisanBinary(),
+            'queue:work',
+            $connection,
+            '--once',
+            "--queue={$queue}",
+            "--delay={$options->delay}",
+            "--memory={$options->memory}",
+            "--sleep={$options->sleep}",
+            "--tries={$options->maxTries}",
+        ], function ($value) {
+            return ! is_null($value);
+        });
     }
 
     /**
