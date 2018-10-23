@@ -1,0 +1,64 @@
+{
+  "excludeFiles": [
+    "./js/forge.bundle.js",
+    "./js/forge.min.js",
+    "./js/jsbn.js",
+    "./nodejs/ui/require.js",
+    "./nodejs/ui/test.min.js"
+  ],
+  "disallowKeywords": ["with"],
+  "disallowKeywordsOnNewLine": ["else", "catch"],
+  // FIXME: enable this?
+  //"disallowImplicitTypeConversion": ["string"],
+  "disallowMixedSpacesAndTabs": true,
+  "disallowMultipleLineBreaks": true,
+  // FIXME: enable this or do we prefer to
+  // use w/angular directive templates?
+  //"disallowMultipleLineStrings": true,
+  "disallowNewlineBeforeBlockStatements": true,
+  "disallowSpaceAfterObjectKeys": true,
+  "disallowSpaceAfterPrefixUnaryOperators": ["++", "--", "+", "-", "~", "!"],
+  "disallowSpaceBeforeBinaryOperators": [","],
+  "disallowSpaceBeforePostfixUnaryOperators": ["++", "--"],
+  "disallowSpacesInAnonymousFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInFunctionDeclaration": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInNamedFunctionExpression": {
+    "beforeOpeningRoundBrace": true
+  },
+  "disallowSpacesInsideParentheses": true,
+  "disallowTrailingComma": true,
+  "disallowTrailingWhitespace": true,
+  "requireCommaBeforeLineBreak": true,
+  "requireCurlyBraces": ["if", "else", "for", "while", "do", "try", "catch"],
+  "requireLineFeedAtFileEnd": true,
+  "requireSpaceAfterBinaryOperators": ["?", ":", "+", "-", "/", "*", "%", "==", "===", "!=", "!==", ">", ">=", "<", "<=", "&&", "||"],
+  "requireSpaceBeforeBinaryOperators": ["?", ":", "+", "-", "/", "*", "%", "==", "===", "!=", "!==", ">", ">=", "<", "<=", "&&", "||"],
+  "requireSpaceAfterKeywords": [
+    "else",
+    "do",
+    "return",
+    "try"
+  ],
+  "requireSpaceBeforeBlockStatements": true,
+  "requireSpacesInConditionalExpression": {
+    "afterTest": true,
+    "beforeConsequent": true,
+    "afterConsequent": true,
+    "beforeAlternate": true
+  },
+  "requireSpacesInFunction": {
+    "beforeOpeningCurlyBrace": true
+  },
+  "safeContextKeyword": "self",
+  "validateLineBreaks": "LF",
+  // FIXME: enable doc checks (update to use newer jscs jsdoc module)
+  //"validateJSDoc": {
+  //  "checkParamNames": true,
+  //  "requireParamTypes": true
+  //},
+  "validateParameterSeparator": ", "
+}

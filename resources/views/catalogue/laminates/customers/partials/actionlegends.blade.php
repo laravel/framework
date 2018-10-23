@@ -1,0 +1,24 @@
+<i class="fa fa-info-circle text-light-blue" aria-hidden="true"></i> 
+<i class="fa fa-fw fa-plus-square text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">Add to Shortlist</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="fa fa-fw fa-cart-plus text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">Add to Shortlist with Room / Combination</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="fa fa-eye text-black legends" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">View Laminate Details</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="fa fa-fw fa-search text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">Compare Laminates</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="fa fa-fw fa-edit text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">Edit Selection</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="fa fa-fw fa-check-circle text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">Finalize a shortlisted selection and submit to HECHPE Designer for Review</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="ion ion-clipboard text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">View Notes</span>&nbsp;
+<span class="pipe-color">|</span>&nbsp;
+<i class="fa fa-fw fa-trash text-black" aria-hidden="true"></i>&nbsp; 
+<span class="text-center no-text-transform">Delete Selection</span>&nbsp;

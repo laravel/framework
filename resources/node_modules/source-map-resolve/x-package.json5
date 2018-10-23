@@ -1,0 +1,83 @@
+{
+  name: "source-map-resolve",
+  version: "0.3.1",
+  author: "Simon Lydell",
+  license: "MIT",
+  description: "Resolve the source map and/or sources for a generated file.",
+  keywords: [
+    "source map",
+    "sourcemap",
+    "source",
+    "map",
+    "sourceMappingURL",
+    "resolve",
+    "resolver",
+    "locate",
+    "locator",
+    "find",
+    "finder"
+  ],
+  overlay: {
+    npm: {
+      repository: "lydell/source-map-resolve",
+      main: "lib/source-map-resolve-node.js",
+      browser: "source-map-resolve.js",
+      scripts: {
+        lint: "jshint lib/ test/",
+        unit: "node test/source-map-resolve.js && node test/windows.js",
+        test: "npm run lint && npm run unit",
+        build: "node generate-source-map-resolve.js"
+      },
+      dependencies: {
+        "source-map-url": "~0.3.0",
+        "atob": "~1.1.0",
+        "urix": "~0.1.0",
+        // resolve-url is a dependency in package.json even though it is not
+        // needed in Node.js, to allow using npm as a package manager for
+        // browser projects too.
+        "resolve-url": "~0.2.1"
+      },
+      devDependencies: {
+        "tape": "~2.5.0",
+        "jshint": "~2.4.3",
+        "setimmediate": "~1.0.1",
+        "Base64": "~0.2.0",
+        "simple-asyncify": "~0.1.0"
+      },
+      testling: {
+        files: "test/source-map-resolve.js",
+        browsers: [
+          "ie/8..latest",
+          "chrome/latest",
+          "firefox/latest",
+          "opera/12",
+          "opera/latest",
+          "safari/5",
+          "iphone/6",
+          "android-browser/4"
+        ]
+      }
+    },
+    component: {
+      repo: "lydell/source-map-resolve",
+      main: "source-map-resolve.js",
+      scripts: [
+        "source-map-resolve.js"
+      ],
+      dependencies: {
+        "lydell/source-map-url": "~0.3.0",
+        "lydell/resolve-url": "~0.2.1"
+      }
+    },
+    bower: {
+      authors: ["Simon Lydell"],
+      ignore: [
+        ".*"
+      ],
+      dependencies: {
+        "source-map-url": "~0.3.0",
+        "resolve-url": "~0.2.1"
+      }
+    }
+  }
+}

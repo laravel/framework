@@ -1,0 +1,46 @@
+#!/bin/sh
+#
+# This shell script sets up the software to be built using 'make'. In 
+# order to perform a build from a fresh source tree, do the following:
+#
+# 1. ./build-setup
+# 2. make
+#
+# If you don't want ./configure to be run automatically, you can do
+# the following: ./build-setup -s
+
+# Process command line options
+SKIP_CONFIGURE=0
+for arg in "$*"
+do
+   case $arg in
+      "-s" | "--setup-only" ) SKIP_CONFIGURE=1 ;;
+   esac
+done
+
+# Check and add potential aclocal dirs
+MAYBE_AC_DIRS="
+   /usr/local/share/aclocal
+   /opt/local/share/aclocal
+   /sw/share/aclocal
+   "
+ACDIRS="-I m4"
+for dir in $MAYBE_AC_DIRS; do
+   if test -d $dir; then
+      ACDIRS="$ACDIRS -I $dir"
+   fi
+done
+
+# Run aclocal on the set of local ac scripts
+cd setup
+aclocal $ACDIRS
+# Generate the configure script
+autoconf && mv configure ..
+cd ..
+
+# Run the configure script if "-s" isn't a command line option
+if [ $SKIP_CONFIGURE -eq 0 ]; then
+   # Run the configure script in default development mode
+   ./configure $*
+fi
+

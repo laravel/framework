@@ -1,0 +1,7 @@
+<flex-config>
+   <compiler>
+      <source-path>
+         <path-element>flash</path-element>
+      </source-path>
+   </compiler>
+</flex-config>

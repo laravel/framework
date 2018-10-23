@@ -1,0 +1,110 @@
+# Makefile for Forge
+
+# Top-level build and dist dir
+BUILD_DIR=@FORGE_DIR@/build
+TOP_DIST_DIR=@FORGE_DIR@/dist
+DIST_DIR=$(TOP_DIST_DIR)/forge
+
+_FLASH := $(DIST_DIR)/SocketPool.swf
+ifeq (@BUILD_FLASH@,yes)
+FLASH := $(_FLASH)
+else
+ifeq (@USE_PRE_BUILT_FLASH@,yes)
+FLASH := $(_FLASH)
+endif
+endif
+JS_SOURCES := $(wildcard js/*.js)
+JS_DIST := $(JS_SOURCES:js/%.js=$(DIST_DIR)/%.js)
+JS_DIST_MIN := $(JS_DIST:%.js=%.min.js)
+TESTS_FORGE_LINK := @FORGE_DIR@/tests/forge
+
+ifeq (@BUILD_PYTHON_MODULES@,yes)
+SSL_SESSIONS_DIR = \
+	$(TOP_DIST_DIR)/forge_ssl/lib/python@PYTHON_VERSION@/site-packages
+SSL_SESSIONS_FILES = \
+	$(SSL_SESSIONS_DIR)/_forge_ssl.so \
+	$(SSL_SESSIONS_DIR)/forge/ssl.py
+endif
+
+# Whether or not to print commands as they are being executed, helpful for
+# debugging the build system.
+ifdef PRINT_COMMANDS
+PCMD=
+else
+PCMD=@
+endif
+
+.PHONY: all build-all update-all verbose clean verbose-commands
+
+# debug flags for flash build
+ifeq (@MXMLC_DEBUG_MODE@,yes)
+FLASH_FLAGS = \
+	-debug=true \
+	-define=CONFIG::debugging,true \
+	-define=CONFIG::release,false
+else
+FLASH_FLAGS = \
+	-debug=false \
+	-define=CONFIG::debugging,false \
+	-define=CONFIG::release,true
+endif
+
+all: $(BUILD_DIR) $(DIST_DIR) $(FLASH) $(JS_DIST) $(TESTS_FORGE_LINK) $(SSL_SESSIONS_FILES)
+	@echo "forge build complete."
+
+build-all: all
+
+update-all:
+	@git pull && ./build-setup && make all
+
+$(BUILD_DIR):
+	$(PCMD) mkdir -p $@
+$(DIST_DIR):
+	$(PCMD) mkdir -p $@
+
+ifeq (@BUILD_FLASH@,yes)
+$(DIST_DIR)/SocketPool.swf: flash/SocketPool.as flash/PooledSocket.as flash/SocketEvent.as
+	@echo "Building $@..."
+	$(PCMD) @MXMLC@ $(FLASH_FLAGS) \
+		-load-config+=build-flash.xml \
+		-output=$@ $<
+else
+ifeq (@USE_PRE_BUILT_FLASH@,yes)
+$(DIST_DIR)/SocketPool.swf: @FORGE_DIR@/swf/SocketPool.swf
+	@echo "Copying pre-built $(@F)..."
+	$(PCMD) cp $< $@
+endif
+endif
+
+$(DIST_DIR)/%.js: js/%.js
+	@echo "Linking $@..."
+	$(PCMD) ln -sf $(realpath $<) $@
+
+$(TESTS_FORGE_LINK): $(DIST_DIR)
+	@echo "Linking $@..."
+	$(PCMD) ln -sf $(realpath $<) $@
+
+ifeq (@BUILD_PYTHON_MODULES@,yes)
+$(SSL_SESSIONS_DIR)/_forge_ssl.so: \
+	@FORGE_DIR@/tests/forge_ssl/forge/_ssl.c \
+	@FORGE_DIR@/tests/forge_ssl/forge/socketmodule.h \
+	@FORGE_DIR@/tests/forge_ssl/setup.py
+$(SSL_SESSIONS_DIR)/forge/ssl.py: \
+	@FORGE_DIR@/tests/forge_ssl/forge/ssl.py \
+	@FORGE_DIR@/tests/forge_ssl/setup.py
+	(cd @FORGE_DIR@/tests/forge_ssl && \
+	@PYTHON@ setup.py \
+	   build --build-base $(BUILD_DIR) \
+	   install --prefix=$(TOP_DIST_DIR)/forge_ssl)
+	@# fix distutils timestamp issue
+	@# (sub-seconds of source file are truncated on target so rebuild is
+	@# always triggered)
+	@touch $@
+endif
+
+clean:
+	$(PCMD) rm -rf $(BUILD_DIR) $(TOP_DIST_DIR)
+	@echo "Removed all generated files."
+
+verbose-commands:
+	PRINT_COMMANDS=true $(MAKE) all

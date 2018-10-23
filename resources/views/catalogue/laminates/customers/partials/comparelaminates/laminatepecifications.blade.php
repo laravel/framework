@@ -1,0 +1,21 @@
+<div class="pd-8 box-header img-content"><strong>Image&nbsp;</strong></div>
+<div class="pd-8"><strong>Number&nbsp;</strong></div>
+<div class="pd-8"><strong>Brand&nbsp;</strong></div>
+<div class="pd-8"><strong>Sub Brand&nbsp;</strong></div>
+<div class="pd-8"><strong>Category&nbsp;</strong></div>
+<div class="pd-8"><strong>Range&nbsp;</strong></div>
+<div class="pd-8"><strong>Surface Finish&nbsp;</strong></div>
+<div class="pd-8"><strong>Textured Surface&nbsp;</strong></div>
+<div class="pd-8"><strong>Glossiness&nbsp;</strong></div>
+<div class="pd-8"><strong>Edgeband&nbsp;</strong></div>
+<div class="pd-8"><strong>Scratch Resistant&nbsp;</strong></div>
+<div class="pd-8"><strong>Color Fast&nbsp;</strong></div>
+<div class="pd-8"><strong>Heat Resistant&nbsp;</strong></div>
+<div class="pd-8"><strong>Stain Resistant&nbsp;</strong></div>
+<div class="pd-8"><strong>Superior Gloss Level&nbsp;</strong></div>
+<div class="pd-8"><strong>Thickness Tolerance&nbsp;</strong></div>
+<div class="pd-8"><strong>Surface Water Resistance&nbsp;</strong></div>
+<div class="pd-8"><strong>Boiling Water Resistance&nbsp;</strong></div>
+<div class="pd-8"><strong>Hight Temperature Resistance&nbsp;</strong></div>
+<div class="pd-8"><strong>Price (<i class="fa fa-inr"></i>)&nbsp;</strong></div>
+<div class="pd-8"><strong>Swatch Image&nbsp;</strong></div>

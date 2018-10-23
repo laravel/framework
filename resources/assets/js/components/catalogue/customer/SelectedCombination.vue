@@ -1,0 +1,116 @@
+<template> 
+    <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+            <thead style="border-top: 1px solid #f4f4f4" class="bg-light-blue text-center">
+                <tr>
+                    <th class="text-center text-vertical-align pd-10" width="2%">#</th>
+                    <th class="text-center text-vertical-align pd-10" width="8%">Image</th> 
+                    <th class="text-center text-vertical-align" width="8%">Brand</th>
+                    <th class="text-center text-vertical-align" width="10%">Design Name</th>
+                    <th class="text-center text-vertical-align" width="12%">Design Number</th>
+                    <th class="text-center text-vertical-align" width="13%">Type</th>
+                    <th class="text-center text-vertical-align" width="11%">Surface Finish</th>
+                    <th class="text-center text-vertical-align" width="6%">Glossiness</th>
+                    <th class="text-center text-vertical-align" width="14%">Edgeband availibility</th>
+                    <th class="text-center text-vertical-align" width="16%">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="(laminate, index) in selectedCombination">
+                    <td class="text-center text-vertical-align" width="2%">{{ index+1 }}</td>
+                    <td class="text-center text-vertical-align" width="8%"> 
+                        <div class="image-link">
+                            <a :href="CdnUrl+JSON.parse(laminate.FullSheetImage)[0].Path">
+                                <img :src="CdnUrl+JSON.parse(laminate.FullSheetImage)[0].Path" alt="Sample Laminate" class="fullimage-thumbnail cursor-zoom-in" :title="JSON.parse(laminate.FullSheetImage)[0].UserFileName" @click.prevent="$parent.$options.methods.initializeFSheetThumbnailsPopup(laminate.FullSheetImage, CdnUrl)">
+                            </a>
+                        </div>
+                    </td>
+                    <td class="text-center text-vertical-align" width="8%">{{getBrand(laminate.Brand)}}</td>
+                    <td class="text-center text-vertical-align" width="10%">{{ laminate.DesignName }}</td>
+                    <td class="text-center text-vertical-align" width="12%">{{ laminate.DesignNo }}</td>
+                    <td class="text-center text-vertical-align" width="13%" v-html="getCategory(laminate.SurfaceCategory)"></td>
+                    <td class="text-center text-vertical-align" width="11%" v-html="getFinish(laminate.SurfaceFinish)"></td>
+                    <td class="text-center text-vertical-align" width="6%">{{laminate.Glossy === "1" ? "Yes" : "No" }}</td>
+                    <td class="text-center text-vertical-align" width="14%">{{laminate.Edgeband === "1" ? "Yes" : "No"}}</td>
+                    <td class="text-vertical-align text-center pd-0" width="16%">
+                        <span title="Remove" class="cursor-pointer" @click.prevent="removeLaminate(laminate.LaminateId)">
+                           <i class="fa fa-fw fa-remove"></i>&nbsp;Remove from Combination
+                        </span>
+                    </td>
+                </tr>
+            </tbody>
+        </table> 
+    </div>
+</template>
+
+<script>
+    // Child component
+    export default {
+        props: {
+            "selected-combination": {
+                type: Array
+            }
+        },
+        data() {
+            return {
+                CdnUrl: '',
+                brands: [],
+                SurfaceCategories: [],
+                SurfaceFinishs: []
+            };
+        },
+        created() {
+            this.CdnUrl = this.$root.CdnUrl;
+            this.brands = this.$root.brands;
+            this.SurfaceCategories = this.$root.SurfaceCategories;
+            this.SurfaceFinishs = this.$root.SurfaceFinishs;
+        },
+        methods: {
+            // emit an event to inform parent(Vue) element about activity
+            removeLaminate(id) {
+                this.$emit("deletelaminate", {
+                    "Id": id,
+                    "ShortlistedCombinations": this.$root.ShortlistedCombinations,
+                    "GenerelSearchcombinations": this.$root.SearchResult ,
+                    "HechpeSuggCombinations": this.$root.HechpeSuggestions 
+                });
+            },
+            getBrand($brandId) {
+                let brand = _.find(this.brands, {'Id': $brandId});
+                if (typeof brand !== "undefined") {
+                    return brand.Name;
+                }
+                return 'N/A';
+            },
+            // Get Surface type for provided id  
+            getCategory(categoryId) {
+                if (categoryId) {
+                    if (this.SurfaceCategories.length > 0) {
+                        let catagory = _.find(this.SurfaceCategories, ["Id", categoryId]);
+                        if (catagory !== "undefined") {
+                            return catagory.Name;
+                        }
+                        return categoryId;
+                    }
+                }
+                return '<small>N/A</small>';
+            },
+            // Get Surface finish for provided id  
+            getFinish(finishId) {
+                if (finishId) {
+                    let isNumber = parseInt(finishId);
+                    if(!isNaN(isNumber)) {
+                        if (this.SurfaceFinishs.length > 0) {
+                            let finish = _.find(this.SurfaceFinishs, ["Id", finishId]);
+                            if (finish !== "undefined") {
+                                return finish.Name;
+                            }
+                        }
+                    }
+                    return finishId;
+                }
+                return '<small>N/A</small>';
+            }
+        }
+    }
+</script>

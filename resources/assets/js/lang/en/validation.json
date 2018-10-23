@@ -1,0 +1,13 @@
+{
+    "required": ":attribute can't be blank.",
+    "confirmed": ":attribute confirmation does not match.",
+    "alphabet": "Only alphabets are accepted as :attribute.",
+    "same": ":this should be same as :that.",
+    "size": ":attribute size should not exceed {0} KB.",
+    "image": "Only images are accepted as :attribute.",
+    "minlength": ":attribute should be at least {0} characters long.",
+    "maxlength": "Maximum {0} characters are allowed in :attribute.",
+    "length": ":attribute should be :length :type in length.",
+    "invalid": "Invalid :attribute. Check and try again.",
+    "digits": "Invalid :attribute. It contains only numerics."
+}

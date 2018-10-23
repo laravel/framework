@@ -1,0 +1,15 @@
+sudo: false
+
+language: node_js
+
+node_js:
+  - "0.10"
+  - "0.12"
+  - "4"
+  - "6"
+  - "stable"
+
+script:
+  - npm run lint
+  - npm test
+  - npm run coverage
