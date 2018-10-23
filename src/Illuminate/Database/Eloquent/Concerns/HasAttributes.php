@@ -698,6 +698,18 @@ trait HasAttributes
     }
 
     /**
+     * Decode the given JSON back into an array or object.
+     *
+     * @param  string  $value
+     * @param  bool  $asObject
+     * @return mixed
+     */
+    public function fromJson($value, $asObject = false)
+    {
+        return json_decode($value, ! $asObject);
+    }
+
+    /**
      * Decode the given float.
      *
      * @param  mixed  $value
@@ -727,18 +739,6 @@ trait HasAttributes
     protected function asDecimal($value, $decimals)
     {
         return number_format($value, $decimals, '.', '');
-    }
-
-    /**
-     * Decode the given JSON back into an array or object.
-     *
-     * @param  string  $value
-     * @param  bool  $asObject
-     * @return mixed
-     */
-    public function fromJson($value, $asObject = false)
-    {
-        return json_decode($value, ! $asObject);
     }
 
     /**
