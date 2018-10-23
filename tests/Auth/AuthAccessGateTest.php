@@ -14,6 +14,7 @@ class AuthAccessGateTest extends TestCase
     public function test_basic_closures_can_be_defined()
     {
         $gate = $this->getBasicGate();
+        $UnUsedVaribale = 'Un used variable';
 
         $gate->define('foo', function ($user) {
             return true;
