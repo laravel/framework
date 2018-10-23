@@ -101,9 +101,6 @@ class Listener
      */
     public function makeProcess($connection, $queue, ListenerOptions $options)
     {
-        // First, we will just create the worker commands with all of the various
-        // options available for the command. This will produce the final command
-        // line array that we will pass into a Symfony process object for processing.
         $command = $this->createCommand(
             $connection,
             $queue,
@@ -144,7 +141,7 @@ class Listener
      * @param  string  $connection
      * @param  string  $queue
      * @param  \Illuminate\Queue\ListenerOptions  $options
-     * @return string
+     * @return array
      */
     protected function createCommand($connection, $queue, ListenerOptions $options)
     {
