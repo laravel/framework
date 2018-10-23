@@ -1,5 +1,39 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added loadCount method to eloquent collections ([#25997](https://github.com/laravel/framework/pull/25997))
+- Added support for identity columns in PostgreSQL 10+ ([#26096](https://github.com/laravel/framework/pull/26096))
+- Allowed passing a model instance directly to `assertSoftDeleted` method in `Foundation/Testing/Concerns/InteractsWithDatabase.php` ([#26133](https://github.com/laravel/framework/pull/26133) , [#26148](https://github.com/laravel/framework/pull/26148))
+- Added possibility to define exclude methods on registered `apiResource` ([#26149](https://github.com/laravel/framework/pull/26149))
+- Added `filp/whoops` to `suggest` in `composer.json` ([#26180](https://github.com/laravel/framework/pull/26180))
+- Added `mock` and `spy` methods to `Foundation/Testing/Concerns/InteractsWithContainer.php` ([#26171](https://github.com/laravel/framework/pull/26171), [b50f9f3](https://github.com/laravel/framework/commit/b50f9f3bc8c1ee03c22ee8cc0ac37179fb28a1c9))
+
+### Fixed
+- Fixed `whereHas` and `$withCount` bindings from `polymorphic relationships` ([#26145](https://github.com/laravel/framework/pull/26145))
+- Fixed `getTable` method in Model ([#26085](https://github.com/laravel/framework/pull/26085))
+- Fixed filesystem locking hangs in `PackageManifest::build()` ([#26010](https://github.com/laravel/framework/pull/26010), [98b8256](https://github.com/laravel/framework/commit/98b8256f350d468cfc6b9fe2c2b0efb4103810a4))
+- Fixed `Illuminate/Http/Testing/File.php` for Symfony 4.1 components ([#26080](https://github.com/laravel/framework/pull/26080))
+- Fixed URL in `Notifications/resources/views/email.blade.php` ([22ca105](https://github.com/laravel/framework/commit/22ca105c0b1759c95f79e553c1977ffd2a013d05))
+- Fixed `hasValidSignature` method when someone send a `null` signature in `UrlGenerator.php` ([#26132](https://github.com/laravel/framework/pull/26132))
+- Fixed autocomplete for container in ServiceProvider for cases when someone developed packages ([#26063](https://github.com/laravel/framework/pull/26063))
+- Fixed `ColumnDefinition::default` typehint ([#26041](https://github.com/laravel/framework/pull/26041))
+
+### Changed
+- Define mix as const in `react-stubs/webpack.mix.js` and `vue-stubs/webpack.mix.js` presets ([#26119](https://github.com/laravel/framework/pull/26119))
+- Make `assertSessionHasNoErrors` in `TestResponse.php` print the unexpected errors  ([#26039](https://github.com/laravel/framework/pull/26039), [e6bdf8a](https://github.com/laravel/framework/commit/e6bdf8af7790db485856ecde0448b353d0cb15ca))
+- Replaced the remaining occurrences of `newQuery()` to `newModelQuery()` in UPDATE/DELETE queries. ([#26158](https://github.com/laravel/framework/pull/26158))
+- Improved `findOrFail()` exceptions in `BelongsToMany.php` and `HasManyThrough.php` relations ([#26182](https://github.com/laravel/framework/pull/26182))
+
+### Changed realization
+- Reversed ternary condition in `Arr::wrap` to make it clearer ([#26150](https://github.com/laravel/framework/pull/26150))
+- Simplified `formatAction` in `UrlGenerator.php` ([#26121](https://github.com/laravel/framework/pull/26121))
+- Simplified `isChainOfObjects` method in `Support/Testing/Fakes/QueueFake.php` ([#26151](https://github.com/laravel/framework/pull/26151))
+- Deleted unneeded code ([#26053](https://github.com/laravel/framework/pull/26053), [#26162](https://github.com/laravel/framework/pull/26162), [#26160](https://github.com/laravel/framework/pull/26160), [#26159](https://github.com/laravel/framework/pull/26159), [#26152](https://github.com/laravel/framework/pull/26152))
+- Prefer stricter comparison ([#26139](https://github.com/laravel/framework/pull/26139), [#26157](https://github.com/laravel/framework/pull/26157))
+
+
 ## [v5.7.9 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
 
 ### Added

@@ -56,7 +56,7 @@ trait InteractsWithDatabase
     protected function assertSoftDeleted($table, array $data = [], $connection = null)
     {
         if ($table instanceof Model) {
-            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()]);
+            return $this->assertSoftDeleted($table->getTable(), [$table->getKeyName() => $table->getKey()], $table->getConnectionName());
         }
 
         $this->assertThat(

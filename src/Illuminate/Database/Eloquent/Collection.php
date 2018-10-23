@@ -64,6 +64,32 @@ class Collection extends BaseCollection implements QueueableCollection
     }
 
     /**
+     * Load a set of relationship counts onto the collection.
+     *
+     * @param  array|string  $relations
+     * @return $this
+     */
+    public function loadCount($relations)
+    {
+        if ($this->isEmpty()) {
+            return $this;
+        }
+
+        $query = $this->first()->newModelQuery()
+            ->whereKey($this->modelKeys())
+            ->select($this->first()->getKeyName())
+            ->withCount(...func_get_args());
+
+        $query->get()->each(function ($model) {
+            $this->find($model->getKey())->forceFill(
+                Arr::except($model->getAttributes(), $model->getKeyName())
+            );
+        });
+
+        return $this;
+    }
+
+    /**
      * Load a set of relationships onto the collection if they are not already eager loaded.
      *
      * @param  array|string  $relations

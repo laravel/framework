@@ -34,10 +34,7 @@ class RedisConnectionTest extends TestCase
         $this->tearDownRedis();
     }
 
-    /**
-     * @test
-     */
-    public function it_sets_values_with_expiry()
+    public function test_it_sets_values_with_expiry()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed', 'EX', 5, 'NX');
@@ -65,10 +62,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_deletes_keys()
+    public function test_it_deletes_keys()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -88,10 +82,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_checks_for_existence()
+    public function test_it_checks_for_existence()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -106,10 +97,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_expires_keys()
+    public function test_it_expires_keys()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -130,10 +118,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_renames_keys()
+    public function test_it_renames_keys()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('one', 'mohamed');
@@ -155,10 +140,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_adds_members_to_sorted_set()
+    public function test_it_adds_members_to_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', 1, 'mohamed');
@@ -189,10 +171,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_counts_members_in_sorted_set()
+    public function test_it_counts_members_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
@@ -205,10 +184,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_increments_score_of_sorted_set()
+    public function test_it_increments_score_of_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 10]);
@@ -219,10 +195,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_sets_key_if_not_exists()
+    public function test_it_sets_key_if_not_exists()
     {
         foreach ($this->connections() as $redis) {
             $redis->set('name', 'mohamed');
@@ -237,10 +210,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_sets_hash_field_if_not_exists()
+    public function test_it_sets_hash_field_if_not_exists()
     {
         foreach ($this->connections() as $redis) {
             $redis->hset('person', 'name', 'mohamed');
@@ -255,10 +225,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_calculates_intersection_of_sorted_sets_and_stores()
+    public function test_it_calculates_intersection_of_sorted_sets_and_stores()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
@@ -287,10 +254,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_calculates_union_of_sorted_sets_and_stores()
+    public function test_it_calculates_union_of_sorted_sets_and_stores()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set1', ['jeffrey' => 1, 'matt' => 2, 'taylor' => 3]);
@@ -322,10 +286,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_range_in_sorted_set()
+    public function test_it_returns_range_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -338,10 +299,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_rev_range_in_sorted_set()
+    public function test_it_returns_rev_range_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -354,10 +312,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_range_by_score_in_sorted_set()
+    public function test_it_returns_range_by_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -374,10 +329,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_rev_range_by_score_in_sorted_set()
+    public function test_it_returns_rev_range_by_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -394,10 +346,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_rank_in_sorted_set()
+    public function test_it_returns_rank_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -409,10 +358,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_returns_score_in_sorted_set()
+    public function test_it_returns_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10]);
@@ -424,10 +370,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_removes_members_in_sorted_set()
+    public function test_it_removes_members_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
@@ -442,10 +385,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_removes_members_by_score_in_sorted_set()
+    public function test_it_removes_members_by_score_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
@@ -456,10 +396,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_removes_members_by_rank_in_sorted_set()
+    public function test_it_removes_members_by_rank_in_sorted_set()
     {
         foreach ($this->connections() as $redis) {
             $redis->zadd('set', ['jeffrey' => 1, 'matt' => 5, 'taylor' => 10, 'adam' => 11]);
@@ -470,10 +407,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_sets_multiple_hash_fields()
+    public function test_it_sets_multiple_hash_fields()
     {
         foreach ($this->connections() as $redis) {
             $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
@@ -486,10 +420,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_gets_multiple_hash_fields()
+    public function test_it_gets_multiple_hash_fields()
     {
         foreach ($this->connections() as $redis) {
             $redis->hmset('hash', ['name' => 'mohamed', 'hobby' => 'diving']);
@@ -506,10 +437,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_runs_eval()
+    public function test_it_runs_eval()
     {
         foreach ($this->connections() as $redis) {
             $redis->eval('redis.call("set", KEYS[1], ARGV[1])', 1, 'name', 'mohamed');
@@ -519,10 +447,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_runs_pipes()
+    public function test_it_runs_pipes()
     {
         foreach ($this->connections() as $redis) {
             $result = $redis->pipeline(function ($pipe) {
@@ -540,10 +465,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_runs_transactions()
+    public function test_it_runs_transactions()
     {
         foreach ($this->connections() as $redis) {
             $result = $redis->transaction(function ($pipe) {
@@ -561,10 +483,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_runs_raw_command()
+    public function test_it_runs_raw_command()
     {
         foreach ($this->connections() as $redis) {
             $redis->executeRaw(['SET', 'test:raw:1', '1']);
@@ -577,10 +496,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_dispatches_query_event()
+    public function test_it_dispatches_query_event()
     {
         foreach ($this->connections() as $redis) {
             $redis->setEventDispatcher($events = m::mock(Dispatcher::class));
@@ -600,10 +516,7 @@ class RedisConnectionTest extends TestCase
         }
     }
 
-    /**
-     * @test
-     */
-    public function it_persists_connection()
+    public function test_it_persists_connection()
     {
         if (PHP_ZTS) {
             $this->markTestSkipped('PhpRedis does not support persistent connections with PHP_ZTS enabled.');
