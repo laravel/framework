@@ -112,10 +112,9 @@ class Redirector
     }
 
     /**
-     * Set intended url.
+     * Set the intended url.
      *
      * @param  string  $url
-     *
      * @return void
      */
     public function setIntendedUrl($url)
