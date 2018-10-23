@@ -43,6 +43,13 @@ class VerifyCsrfToken
     protected $addHttpCookie = true;
 
     /**
+     * The message that is passed to exception.
+     *
+     * @var string
+     */
+    protected $message = '';
+
+    /**
      * Create a new middleware instance.
      *
      * @param  \Illuminate\Foundation\Application  $app
@@ -79,9 +86,7 @@ class VerifyCsrfToken
             });
         }
 
-        $message = __('Sorry, your session has expired. Please refresh and try again.');
-
-        throw new TokenMismatchException($message);
+        throw new TokenMismatchException($this->message);
     }
 
     /**
