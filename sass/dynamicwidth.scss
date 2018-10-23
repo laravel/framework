@@ -1,0 +1,22 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 9 May, 2018, 11:56:36 AM
+    Author     : praveen
+*/
+
+$class-slug: (
+wd: width,
+);
+
+@each $class-name, $class-style in $class-slug {
+    @for $i from 0 through 100 {
+        .#{$class-name}-#{$i}{
+            #{$class-style}: 0 + $i+% !important;
+        }
+    }
+}
+

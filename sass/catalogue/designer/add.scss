@@ -1,0 +1,232 @@
+.design-no {
+    padding-left: 3%;
+}
+.design-name {
+    font-size: 14px;   
+}
+img.note-thumbnail  {
+    max-width: 100%;
+    height: 241px;
+}
+.fullimage-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 10px 10px 10px 0px !important;
+}
+.btn-block {
+    margin: 6px auto !important;
+    border-radius: 0px !important;
+    width: 7em !important;
+}
+.btn:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+li.attachmentList{
+    display: inline; 
+    max-width: 8em; 
+    margin: 3px;
+    background-color: orange;
+    color: white;
+    font-weight: 600; 
+}
+.removeFile {
+    position: absolute !important;
+    right: 4px !important;
+    top: 2px !important;
+    font-size: 16px;
+}
+.attachmentList div{
+    display: inline-block !important;
+    word-break: break-all !important;
+    margin-right: 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 7em;
+}
+ul.list-group {
+    list-style-type: none;
+    overflow: hidden;
+}
+ul.list-group > li {
+    float: left;
+}
+ul.list-group > li a {
+    display: block;
+    text-decoration: none;
+}
+.list-group-item {
+    padding: 3px 3px;
+}
+.button-search {
+    border-radius: 0px !important;
+    width: 8em !important;
+    margin-right: 1.5em;
+    padding: 5px;
+}
+.modal-header, .modal-footer {
+    padding: 7px 15px;
+}
+.callout, .alert {
+    font-size: 17px;
+}
+
+#SelectionSaveOverLay{
+    color: green;
+}
+
+#ShortListLaminateOverlay, #SelectionSaveOverLay {
+    position: absolute;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+#Rooms ~ .select2 .select2-selection {
+    height: auto !important;
+}
+span.select2 {
+    display: block !important;
+    width: 100% !important;
+}
+.select2-selection__rendered {
+    padding-left: 0px;
+}
+#Rooms ~ .select2 .select2-selection__rendered {
+    padding-left: 10px;
+}
+.table {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+@media (max-width: 767px) {
+    .button-search {
+        margin-top: 15px !important;
+    }
+}
+
+#SiteDetails {
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: #EEEEEE;
+    margin-top: 4px;
+}
+.custom-info-block {
+    margin-top: -2.7em;
+}
+.user-info {
+    margin-top: -19px;
+    font-size: 14px;
+}
+@media (max-width: 768px) {
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+    #siteInfo {
+        margin-top: -20px;
+    }
+}
+@media (max-width:415px) {
+    .user-info{
+        display: inline-block;
+    }
+}
+@media (min-width:1024px) {
+    #siteInfo {
+        margin-top: -2em !important;
+        position: relative !important;
+    }
+}
+.check-icon {
+    color: green;
+    font-size: 17px;
+}
+div#AddNewSuggestionPage .button-custom {
+    border-radius: 0px !important;
+    width: 10em !important;
+    padding: 5px;
+}
+.fa-plus-square {
+    color: #0C7FC6;
+    font-size: 17px;
+}
+.view-more {
+    margin-top: 15px !important;
+}
+img.laminate-full-image {
+    max-width: 100%;
+    height: 241px;
+}
+.note-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 5px 0px 0px 0px !important;
+}
+@media (max-width:768px) {
+    .note-thumbnail {
+        margin: 5px 0px 10px 0px !important;
+    }
+}
+.pipe-color {
+    font-weight: 900;
+    color: darkorange;
+}
+.help-icon {
+    color: #2489c5;
+    font-size: 18px;
+}
+.download-icon {
+    font-size: 20px;
+}
+.element-container {
+    position: relative;
+    width: 50%;
+}
+.overlay-img {
+  opacity: 1;
+  transition: .5s ease;
+  backface-visibility: hidden;
+}
+.middle {
+  transition: .5s ease;
+  opacity: 0;
+  position: absolute;
+  top: 94%;
+  left: 41%;
+  transform: translate(-50%, -50%);
+  -ms-transform: translate(-50%, -50%)
+}
+.element-container:hover .overlay-img {
+  opacity: 0.2;
+}
+.element-container:hover .middle {
+  opacity: 1;
+}
+.text-decoration {
+    text-decoration: underline;
+}
+.EdgebandStatus {
+    font-weight: 600;
+    font-size: 14px;
+    color: #444; 
+}
+h4.text-primary{
+    font-size: 16px;
+    color: #2489c5;
+    font-weight: 500;
+}
+.usageList{
+    word-break: break-all;
+}

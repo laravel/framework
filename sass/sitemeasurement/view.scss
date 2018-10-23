@@ -1,0 +1,167 @@
+@import "../_variables.scss";
+#RoomNotesSection .modal {
+    text-align: left;
+}
+.note-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 10px 10px 10px 0px !important;
+}
+.notes-images {
+    width: 400px !important;
+    height: 400px;
+    margin: 10px 10px 10px 0px !important;
+}
+#RoomNotesSection .modal-body {
+    max-height: 600px;
+    overflow: auto;
+}
+.room-legends {
+    font-size: 10px;
+}
+h2.room-measure-title {
+    font-weight: 500;
+}
+.user-info {
+    margin-top: -19px;
+    font-size: 14px;
+}
+.custom-info-block {
+    margin-top: -2.7em;
+}
+@media (max-width: 768px) {
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+    .measurement-caution {
+        margin-top: -21px;
+    }
+}
+@media (min-width:770px) {
+    .measurement-caution {
+        margin-top: -30px;
+    }
+}
+@media (max-width:415px) {
+    .user-info{
+        display: inline-block;
+    }
+}
+.videoIcon {
+  position: relative;
+  font-size: 50px;
+  top: 14px;
+  margin: 10px 10px 10px 0px !important;
+}
+.modal-header, .modal-footer {
+    padding: 7px 15px;
+}
+.table-responsive img.note-thumbnail {
+    width: 50px !important;
+    height: 30px !important;
+    margin: 0px !important;
+}
+#RoomsTableView {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+.view-notes-btn {
+    width: 7em;
+    border-radius: 0;
+}
+#SiteDetails {
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: #EEEEEE;
+    margin-top: 4px
+}
+.status-bgc {
+    font-size: 89%;
+    background-color: #2489c5 !important;
+}
+.btn:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+.btn-custom {
+    border-radius: 0px !important;
+    width: 10em !important;
+    margin-right: 1.5em;
+}
+.back-btn {
+    width: 5em !important;
+}
+.button-custom {
+    width: 5em !important;
+}
+.measurement-caution {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+}
+#RoomsTableView .fa-eye {
+    color: #000000;
+    font-size: 19px;
+    cursor: pointer;
+}
+#RoomNotesSection i.ion-clipboard {
+    font-size: 19px;
+    cursor: pointer;
+}
+#ViewSiteMPage .info-icon {
+    font-size: 17px;
+    color: #fff;   
+}
+#ViewSiteMPage .help-icon {
+    font-size: 18px;
+    color: #2489c5;
+}
+.form-overlay {
+    position: absolute;
+    top: 1px !important;
+    left: 0px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: $LoaderBackgroundColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+.loader {
+    border: 2px solid #dcdcdc;
+    border-radius: 50%;
+    border-top: 2px solid #8a8a8a;
+    animation: spin 0.8s linear infinite;
+}
+.small.loader {
+    top: 32px !important;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+}
+.large.loader {
+    width: 50px;
+    height: 50px;
+}
+.loader-text {
+    padding-top: 0.5em;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.pipe-color {
+    font-weight: 900;
+    color: darkorange;
+}
+#RoomsTableView .ion-images {
+    color: #000000;
+    font-size: 19px;
+    cursor: pointer;
+}

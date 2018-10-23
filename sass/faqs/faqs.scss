@@ -1,0 +1,14 @@
+input.search {
+    border-radius: 0px !important;
+}
+.btn-default {
+    background-color: #fff !important;
+}
+.btn-default:hover {
+    background-color: #e1e1e1 !important;
+    color: white;
+}
+.form-control:focus {
+    outline: 0;
+    box-shadow: inset 0 1px 1px #e1e1e1, 0 0 8px #e1e1e1;
+}

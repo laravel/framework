@@ -1,0 +1,98 @@
+/*
+    Aim        : Edit Room or Combination for the Selection style
+*/
+/* 
+    Created on : 27 Feb, 2018, 12:40:03 PM
+    Author     : Suraj Bande
+*/
+
+img.note-thumbnail  {
+    max-width: 100%;
+    height: 241px;
+}
+.fullimage-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+}
+.btn-block {
+    margin: 6px auto !important;
+    border-radius: 0px !important;
+    width: 7em !important;
+}
+.button-search {
+    border-radius: 0px !important;
+}
+.modal-header, .modal-footer {
+    padding: 7px 15px;
+}
+#Room ~ .select2 .select2-selection {
+    height: auto !important;
+}
+span.select2 {
+    display: block !important;
+    width: 100% !important;
+}
+.select2-selection__rendered {
+    padding-left: 0px;
+}
+#Room ~ .select2 .select2-selection__rendered {
+    padding-left: 10px;
+}
+.table {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+.btn:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+.cominations-action-btn {
+    display: block;
+    color: orange;
+    text-decoration: none;
+    font-weight: 600;
+}
+@media (max-width: 767px) {
+    .button-search {
+        margin-top: 15px !important;
+    }
+}
+.check-icon {
+    color: green;
+    font-size: 15px;
+}
+.fa-plus-square {
+    color: #0C7FC6;
+    font-size: 15px;
+}
+.fa-remove {
+    color: red;
+    font-size: 15px;
+}
+#FormUpdatedOverLay{
+    color: green;
+}
+.check-mark{
+    font-size: 50px!important;
+}
+.callout, .alert {
+    font-size: 17px;
+}
+#CancelBtn {
+    margin-right: 1.5em;
+    border-color: #ddd !important;
+}
+div#FinalizeCimbinationPage .btn {
+    border-radius: 0px;
+}
+.back-btn {
+    margin-top: -2.8em;
+    margin-bottom: 7px;
+}
+.autocomplete-image {
+    height: 30px;
+    width: 40px;
+    padding-right: 3px;
+}
+#SearchLaminatesBox .ui-menu-item {
+   text-align: left;
+}

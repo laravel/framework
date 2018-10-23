@@ -1,0 +1,100 @@
+div.form-overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+#CategorySaveOverLay, #SurfaceFinishSaveOverLay, #SurfaceRangeSaveOverLay{
+    color: green;
+}
+.loader {
+    border: 2px solid #dcdcdc;
+    border-radius: 50%;
+    border-top: 2px solid #8a8a8a;
+    animation: spin 0.8s linear infinite;
+}
+.small.loader {
+    top: 32px !important;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+}
+.large.loader {
+    width: 50px;
+    height: 50px;
+}
+.loader-text {
+    padding-top: 0.5em;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+.modal-header, .modal-footer {
+    padding: 13px 15px;
+}
+.button-custom {
+    width: 6em;
+}
+.callout-info {
+    font-size: 17px;
+}
+.VueTables__limit {
+    display: none;
+}
+.VueTables__table thead > tr > th,
+.VueTables__table tbody > tr > td {
+    text-align: center;
+    vertical-align: middle;
+}
+.VueTables__search-field label {
+    display: none;
+}
+.VueTables__table .map-id {
+    width: 6%;
+}
+.VueTables__table .map-name {
+    width: 30%;
+    cursor: pointer;
+}
+.VueTables__table .map-desc {
+    width: 44%;
+    cursor: pointer;  
+}
+.VueTables__table .map-status{
+    width: 10%;
+}
+.VueTables__table .map-action {
+    width: 10%;
+}
+.VueTables__sort-icon {
+    cursor: pointer;  
+    color: white;
+}
+.VueTables__table .desc-id {
+    width: 6%;
+}
+.VueTables__table .desc-enquirystatus {
+    width: 32%;
+    cursor: pointer; 
+}
+.VueTables__table .desc-desc {
+    width: 40%;
+    cursor: pointer;  
+}
+.VueTables__table .desc-status{
+    width: 14%;
+}
+.VueTables__table .desc-action {
+    width: 8%;
+}

@@ -1,0 +1,392 @@
+@import "../_variables.scss";
+.btn {
+    border-radius: 0px !important;
+}
+#AddRoomFormOverlay, 
+#DeleteRoomFormOverlay, 
+#EditRoomMFormOverlay, 
+#EditSiteMFormOverlay, 
+#DeleteFireSpFormOverlay, 
+#DeleteAcFormOverlay, 
+#UpdateSiteLoader, 
+#AddAcFormOverlay, 
+#EditAcFormOverlay, 
+#AddFireSpFormOverlay, 
+#EditFireSpFormOverlay {
+    position: absolute;
+    top: 1px !important;
+    left: 0px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: $LoaderBackgroundColor;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+.loader {
+    border: 2px solid #dcdcdc;
+    border-radius: 50%;
+    border-top: 2px solid #8a8a8a;
+    animation: spin 0.8s linear infinite;
+}
+.small.loader {
+    top: 32px !important;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+}
+.large.loader {
+    width: 50px;
+    height: 50px;
+}
+.loader-text {
+    padding-top: 0.5em;
+}
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+#windowsTable td, 
+#EditwindowsTable td, 
+#EditDoorsTable td, 
+#RoomsizeTable td, 
+#EditRoomsizeTable td, 
+#DoorsTable td, 
+#FurnituresTable td, 
+#EditFurtnitureTable td {
+    padding-top: 0px !important;
+    padding-right: 5px !important;
+    padding-bottom: 5px !important;
+} 
+tr.room-size td {
+    border-right: 0;
+}
+#EditSiteMeasurementPage .fa-plus-square,
+.fa-pencil-square,
+.fa-trash,
+.fa-minus-square,
+.gallery-icon {
+    color: #000000;
+    font-size: 19px;
+    cursor: pointer;
+}
+.caution i {
+    font-size: 11px !important;
+}
+#RoomNotesSection i.ion-clipboard {
+    font-size: 19px;
+    cursor: pointer;
+}
+h2.room-measure-title {
+    font-weight: 500;
+}
+.all-border{
+    border-bottom: 1px solid #f4f4f4;
+    border-top: 1px solid #f4f4f4;
+}
+.note-thumbnail {
+    width: 50px !important;
+    height: 30px !important;
+}
+.attachmentlinks a {
+    color: #444!important;
+}
+.room-header {
+    padding: 0px 0px 0px 10px !important;
+}
+@media (max-width: 990px) {
+
+    #AddRoomTableResponsive{
+        overflow: scroll !important;
+    }
+
+    #EditRoomResponsiveTable {
+        overflow: scroll !important;
+    }
+
+    .add-notes-icons {
+        padding-left: 15px !important;
+        padding-bottom: 8px;
+    }
+}
+.select2-roomarea {
+    margin-top: -7px;
+}
+.caution {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+}
+.room-attachments {
+    font-weight: 500;
+    font-size: 16px;
+}
+.select2-results__group {
+    background-color : #DDDDDD;
+}
+.window-quantity {
+    font-weight: 600;
+    font-size: 16px;
+    margin-top: -3px;
+}
+.room-legends {
+    font-size: 10px;
+}
+.site-action-btn {
+    margin-right: 1.5em;
+}
+@media only screen and (max-device-width:479px) {
+    .site-action-buttons {
+        text-align: center;
+    }
+    #CancelBtn, #EditRoomCancelBtn {
+        margin-top: 9px;
+    }
+}
+@media only screen and (min-device-width: 480px) and (max-device-width: 580px){
+    .site-reset-btn {
+        margin-top: 1.5em;
+    }
+}
+
+@media only screen and (min-device-width: 768px) and (max-device-width: 812px){
+    .site-reset-btn {
+        margin-top: 1.5em;
+    }
+}
+.room-input-fontsize {
+    font-size: 12px;
+}
+
+#RoomNotesSection .modal {
+    text-align: left;
+}
+.notes-images {
+    width: 400px !important;
+    height: 400px;
+    margin: 10px 10px 10px 0px !important;
+}
+#RoomNotesSection .modal-body {
+    max-height: 460px;
+    overflow: auto;
+}
+.user-info {
+    margin-top: -19px;
+    font-size: 14px;
+}
+.custom-info-block {
+    margin-top: -2.7em;
+}
+
+@media (max-width: 769px) {
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+    #siteInfo {
+        margin-top: -20px;
+    }
+    .caution-div {
+        margin-top: -18px !important;
+    }
+    .measurement-caution {
+        margin-top: 0px;
+    }
+    h2.room-measure-title {
+        margin-bottom: -18px;
+    }
+    .wall-attachments {
+        margin-bottom: -19px !important;
+    }
+}
+@media (min-width:770px) {
+    .measurement-caution {
+        margin-top: -30px;
+    }
+}
+@media (max-width:415px) {
+    .user-info{
+        display: inline-block;
+    }
+}
+#SiteDetails {
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: #EEEEEE;
+    margin-top: 4px
+}
+
+li.attachmentList{
+    display: inline; 
+    max-width: 8em; 
+    margin: 3px;
+}
+.removeFile {
+    position: absolute !important;
+    right: 4px !important;
+    top: 2px !important;
+    font-size: 16px;
+}
+.attachmentList div{
+    display: inline-block !important;
+    word-break: break-all !important;
+    margin-right: 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 7em;
+}
+ul.list-group {
+    list-style-type: none;
+    overflow: hidden;
+}
+ul.list-group > li {
+    float: left;
+}
+ul.list-group > li a {
+    display: block;
+    text-decoration: none;
+}
+.list-group-item {
+    padding: 3px 3px;
+}
+.pipe-color {
+    font-weight: 900;
+    color: darkorange;
+}
+.modal-header, .modal-footer {
+    padding: 7px 15px;
+}
+div#EditSiteMeasurementPage i:hover {
+    opacity: 0.6;
+}
+.btn:hover:not(.btn-attachmentupload) {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+span#UploadFiles-error, 
+#EditSMCopy-error, 
+#EditChecklistCopy-error,
+#UploadRoomPics-error, 
+#UploadEditRoomPics-error {
+    margin-top: 0px;
+}
+#RoomsTable {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+.btn-custom {
+    border-radius: 0px !important;
+    width: 10em !important;
+    margin-right: 1.5em;
+}
+.back-btn {
+    width: 4em !important;
+}
+.button-custom {
+    width: 5em !important;
+}
+@media (min-width: 769px) {
+    #AddRoomModal .modal-lg {
+        width: 1108px;
+    }
+    #EditRoomModal .modal-lg {
+        width: 1108px;
+    }
+    .caution-div {
+        padding-top: 11px !important;
+    }
+    #AddAcTable td input[type='text'], #EditAcTable td input[type='text'], #AddFSPTable td input[type='text'], 
+    #EditFSPTable td input[type='text'] {
+        width: 50%;
+        height: auto;
+        padding: 3px 0px;
+        font-size: 12px;
+        margin-left: 33px;
+        line-height: 1.5;
+    }
+}
+.help-icon {
+    font-size: 18px;
+    color: #2489c5;
+}
+#AddRoomModal .modal-header {
+    border: none;
+}
+.remove-sprikler {
+    position: relative;
+    top: 7px;
+    left: 2px;
+}
+.fire-sp-file, 
+.edit-fire-sp-file {
+    width: 89%;
+    float: left;
+}
+#WallDirectionAttachments-error {
+    margin-top: -25px;
+}
+#EditWallDirectionAttachments-error {
+    margin-top: -4px;
+}
+.info-icon {
+    font-size: 17px;
+    color: #fff;   
+}
+span[id^="FireSpAttachment_"], 
+span[id^="EditFireSpAttachment_"] {
+    display: inherit;
+}
+#windowsTable td input, 
+#EditwindowsTable td input, 
+#EditDoorsTable td input, 
+#RoomsizeTable td input, 
+#EditRoomsizeTable td input, 
+#DoorsTable td input, 
+#FurnituresTable td input, 
+#EditFurtnitureTable td input,
+#RoomsizeTable td input {
+    width: 90% !important;   
+    height: auto;
+    padding: 2px 0px;
+}
+select.designitem-dropdown {
+    height: 18px !important;
+    font-size: 11px !important;
+}
+td input {
+    text-align: center;
+}
+.text-info {
+    color: #2489c5;
+}
+#AddRoomTableResponsive {
+    margin-bottom: -13px;
+}
+.img-thumbnail {
+    height: 53px;
+    width: 50px;
+}
+table#EditFSPTable td:last-child {
+  border :none !important;
+  background-color: #ffffff;
+}
+table#EditFSPTable th:last-child {
+  border :none !important;
+  background-color: #ffffff;
+  border-top: white !important;
+}
+table#EditFSPTable thead {
+    border-top: 0px !important;
+}
+table#EditFSPTable {
+    border-color: white !important;
+}
+.edit-remove-sprikler {
+    margin-left: -16px;
+}

@@ -1,0 +1,80 @@
+.caution {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+}
+.removeFile {
+    position: absolute !important;
+    right: 4px !important;
+    top: 2px !important;
+    font-size: 16px;
+}
+.label-error {
+    border-color: #ff0000 !important;
+}
+.user-info {
+    margin-top: -19px;
+    font-size: 14px;
+}
+.custom-info-block {
+    margin-top: -2.7em;
+}
+@media (max-width: 768px) {
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+    #siteInfo {
+        margin-top: -20px;
+    }
+}
+@media (max-width:415px) {
+    .user-info{
+        display: inline-block;
+    }
+}
+#SiteDetails {
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: #EEEEEE;
+    margin-top: 4px
+}
+.pipe-color {
+    font-weight: 900;
+    color: darkorange;
+}
+ul.create-site > li.attachments{
+    display: inline; 
+    max-width: 8em; 
+    margin: 3px;
+}
+.attachments div{
+    display: inline-block !important;
+    word-break: break-all !important;
+    margin-right: 12px !important;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 7em;
+}
+ul.list-group {
+    list-style-type: none;
+    overflow: hidden;
+}
+ul.list-group > li {
+    float: left;
+}
+ul.list-group > li a {
+    display: block;
+    text-decoration: none;
+}
+.list-group-item {
+    padding: 3px 3px;
+}
+span#SMCopy-error, #ChecklistCopy-error, #SiteImages-error {
+    margin-top: 0px;
+}
+.site-images {
+    margin-top: -15px;
+}

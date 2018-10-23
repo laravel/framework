@@ -1,0 +1,18 @@
+.fullimage-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 5px 0px 0px 0px !important;
+}
+@media (max-width:768px) {
+    .fullimage-thumbnail {
+        margin: 5px 0px 10px 0px !important;
+    }
+}
+.table {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+.help-icon {
+    color: #2489c5;
+    font-size: 18px;
+}

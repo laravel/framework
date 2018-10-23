@@ -1,0 +1,81 @@
+.note-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 10px 10px 10px 0px !important;
+}
+.fa-plus-square {
+    color: #0C7FC6;  
+    font-size: 15px;
+}
+.btn {
+    border-radius: 0px;
+}
+.btn:hover:not(.btn-default) {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+#LaminatesComparisonPage .search {
+    font-weight: 400;
+    border-radius: 0px;
+    background-color: #fff !important;
+    min-width: 70px;
+}
+.input-group-sm .btn-default {
+    border-radius: 0px !important;
+    color: black;
+    margin-left: -1px !important;
+    color: black !important;
+}
+.input-group-sm .btn-default i {
+    color: black;
+}
+.fa-remove {
+    color: red;
+    font-size: 15px;
+}
+.btn-custom {
+    border-color: #ddd !important;
+}
+.check-icon {
+    color: green;
+    font-size: 15px;
+}
+#FormUpdatedOverLay{
+    color: green;
+}
+.check-mark{
+    font-size: 50px !important;
+}
+.table {
+    table-layout: auto !important;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+#CancelBtn {
+    margin-right: 1.5em;
+    border-color: #ddd !important;
+}
+.callout, .alert {
+    font-size: 17px;
+}
+.custom-info-block {
+    margin-top: -2.7em;
+}
+.img-content{
+    margin-top: 3.5em;
+}
+.no-sample-img{
+    margin-bottom: 3.5em;
+}
+.vs-color {
+    color: darkorange;
+}
+@media (max-width: 768px) {
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+}
+.autocomplete-image{
+    width: 50px !important;
+    height: 50px !important;
+}

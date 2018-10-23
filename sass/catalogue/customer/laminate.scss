@@ -1,0 +1,245 @@
+table.table ul.dropdown-menu {
+    left: auto;
+    right: 0px !important;
+    z-index: 10000;
+}
+div#CreateLaminatesCataloguePage .button-custom {
+    border-radius: 0px !important;
+    width: 11em !important;
+    margin-right: 1.5em;
+    padding: 5px;
+}
+.btn-custom {
+    border-color: #ddd !important;
+}
+.box-header {
+    transition-delay: 1.3s;
+}
+div#CreateLaminatesCataloguePage .button-search {
+    border-radius: 0px !important;
+    margin-right: 1.5em;
+}
+.note-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 10px 10px 10px 0px !important;
+}
+.modal-header, .modal-footer {
+    padding: 7px 15px;
+}
+.design-no {
+    padding-left: 5%;
+}
+.full-view-heading > span {
+    color: orange;
+}
+.design-name {
+    font-size: 14px;   
+}
+img.laminate-full-image {
+    max-width: 100%;
+    height: 241px;
+}
+div#CreateLaminatesCataloguePage .input-group {
+    margin: 3px !important;
+}
+table#ComparisonTable thead > th {
+    padding: 3px;
+}
+div#CreateLaminatesCataloguePage .btn {
+    border-radius: 0px;
+}
+#ShortlistedCombinations td {
+    text-align: center;
+    vertical-align: middle;
+}
+#CompareLaminateModal .btn-default {
+    border-radius: 0px !important;
+    color: black;
+    margin-left: -1px !important;
+    color: black !important;
+}
+#CompareLaminateModal .btn-default i {
+    color: black;
+}
+#CompareLaminateModal .search {
+    font-weight: 400;
+    border-radius: 0px;
+    background-color: #fff !important;
+}
+.cominations-action-btn {
+    text-decoration: none;
+}
+#ShortlistedCombinations thead {
+    border-top: 1px solid #f4f4f4 !important;
+}
+.box-comments .comment-text {
+    word-wrap: break-word !important;
+}
+#DeleteCombinationFormOverlay {
+    position: absolute;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+#LaminateFormOverlay, #ShortListLaminateOverlay, #SelectionSaveOverLay {
+    position: absolute;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+div#CreateLaminatesCataloguePage .table {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+div#CreateLaminatesCataloguePage .btn:hover:not(.btn-default) {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+/*div#CreateLaminatesCataloguePage .fa-search, .fa-pencil, .fa-trash, .ion-clipboard, .fa-cart-plus, .fa-eye, .fa-pencil-square-o, .fa-plus-square, .fa-check-circle {
+    color: #222;
+    font-size: 17px;
+    cursor: pointer
+}*/
+div#CreateLaminatesCataloguePage i:hover:not(.fa-info-circle){
+    opacity: 0.6;
+}
+@media (max-width: 767px) {
+    .button-search {
+        margin-bottom: 10px !important;
+    }
+    .search-btn {
+        margin-top: 12px !important;
+        text-align: center;
+    }
+}
+.sorting_asc:after {
+    content: "" !important;
+}
+#ShortlistedCombinations_info {
+    display: none;
+}
+.full-image {
+    width: 50px !important;
+    height: 50px !important;
+}
+.pagination {
+    cursor: pointer;
+}
+.no-room-text > small > i {
+    color: grey;
+}
+.no-room-text > small > i:hover {
+    color: black;
+}
+table#ShortlistedCombinations tr.lightblue {
+    background-color: #F1F1F1 !important;
+}
+table#ShortlistedCombinations tr.white {
+    background-color: #FFFFFF !important;
+}
+#SelectionSaveOverLay{
+    color: green;
+}
+.check-mark{
+    font-size: 50px!important;
+}
+.callout, .alert {
+    font-size: 17px;
+}
+.download-icon {
+    font-size: 20px;
+}
+.element-container {
+    position: relative;
+    width: 50%;
+}
+.overlay-img {
+    opacity: 1;
+    transition: .5s ease;
+    backface-visibility: hidden;
+}
+.middle {
+    transition: .5s ease;
+    opacity: 0;
+    position: absolute;
+    top: 94%;
+    left: 41%;
+    transform: translate(-50%, -50%);
+    -ms-transform: translate(-50%, -50%)
+}
+.element-container:hover .overlay-img {
+    opacity: 0.2;
+}
+.element-container:hover .middle {
+    opacity: 1;
+}
+.caution {
+    font-size: 11px !important;
+    font-weight: 400 !important;
+}
+.pipe-color {
+    font-weight: 900;
+    color: darkorange;
+}
+.addNew-block {
+    margin-top: -0.8em;
+    margin-bottom: -5px !important;
+}
+#AddLaminateButton {
+    margin-right: 0px !important;
+}
+@media (max-width: 768px) {
+    .addNew-block {
+        margin-top: -16px !important;
+        margin-bottom: -5px !important;
+        text-align: right !important;
+    }
+}
+select#Room {
+    padding: 0px;
+    padding-right: 5px;
+    height: 25px;
+    font-size: 12px;
+}
+
+.EdgebandStatus {
+    font-weight: 600;
+    font-size: 14px;
+    color: #444; 
+}
+h4.text-primary{
+    font-size: 16px;
+    color: #2489c5;
+    font-weight: 500;
+}
+.usageList{
+    word-break: break-all;
+}
+.autocomplete-image {
+    height: 30px;
+    width: 40px;
+    padding-right: 3px;
+}
+#SearchLaminatesBox .ui-menu-item {
+   text-align: left;
+}

@@ -1,0 +1,143 @@
+img.note-thumbnail  {
+    max-width: 100%;
+    height: 241px;
+}
+.fullimage-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 10px 10px 10px 0px !important;
+}
+.btn-block {
+    margin: 6px auto !important;
+    border-radius: 0px !important;
+    width: 7em !important;
+}
+.button-search {
+    border-radius: 0px !important;
+    width: 8em !important;
+    margin-right: 1.5em;
+    padding: 5px;
+}
+.modal-header, .modal-footer {
+    padding: 7px 15px;
+}
+#Room ~ .select2 .select2-selection {
+    height: auto !important;
+}
+span.select2 {
+    display: block !important;
+    width: 100% !important;
+}
+.select2-selection__rendered {
+    padding-left: 0px;
+}
+#Room ~ .select2 .select2-selection__rendered {
+    padding-left: 10px;
+}
+.table {
+    table-layout: auto;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+.btn:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+.cominations-action-btn {
+    display: block;
+    color: orange;
+    text-decoration: none;
+    font-weight: 600;
+}
+@media (max-width: 767px) {
+    .button-search {
+        margin-top: 15px !important;
+    }
+}
+#SiteDetails {
+    border-style: solid;
+    border-color: white;
+    border-width: 1px;
+    background-color: #EEEEEE;
+    margin-top: 10px;
+}
+
+.custom-info-block {
+    margin-top: -2.7em;
+}
+@media (max-width: 768px) {
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: center !important;
+    }
+}
+.user-info {
+    margin-top: -19px;
+    font-size: 14px;
+}
+
+.fa-remove {
+    color: red;
+    font-size: 17px;
+}
+#siteInfo {
+    margin-bottom: -25px;
+    position: relative;
+    top: -35px;
+}
+
+.fa-plus-square {
+    color: #0C7FC6;
+    font-size: 17px;
+}
+.check-icon {
+    color: green;
+    font-size: 17px;
+}
+   
+.callout, .alert{
+    font-size: 17px;
+}
+
+#SelectionSaveOverLay{
+    color: green;
+}
+
+div#FinalizeSMCatalogPage .button-custom {
+    border-radius: 0px !important;
+    width: 10em !important;
+}
+
+#ShortListLaminateOverlay {
+    position: absolute;
+    top: 0px !important;
+    left: 0px !important;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+.pipe-color {
+    font-weight: 900;
+    color: darkorange;
+}
+
+.help-icon {
+    color: #2489c5;
+    font-size: 18px;
+}
+
+.idpro-codespan {
+    color: crimson;
+    background-color: #f1f1f1;
+    font-size: 105%;
+    margin: 0px 4px 0px 1px;
+    padding: 3px 8px;
+    border-radius: 0px;
+}

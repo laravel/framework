@@ -1,0 +1,95 @@
+.custom-info-block {
+    margin-top: -2.7em;
+}
+@media (max-width: 768px){
+    .custom-info-block {
+        margin-top: -10px !important;
+        margin-bottom: 6px !important;
+        text-align: right !important;
+    }
+    .site-address-block {
+        margin-top: -11px !important;
+    }
+}
+.user-info {
+    margin-top: -19px;
+    font-size: 14px;
+}
+@media (max-width: 415px){
+    .user-info {
+        display: inline-block;
+    }
+}
+.site-address-block {
+    background-color: #EEEEEE;
+    padding-top: 5px;
+    padding-right: 10px;
+    min-height: 70px;
+    margin-top: -47px;
+    padding-bottom: 5px;
+}
+#GoodUsePerHeaderTitle {
+    color: #333;
+    font-weight: 700;
+    font-size: 14px;
+}
+.callout, .alert {
+    font-size: 17px;
+}
+#ChecklistResultBody table.table ul.dropdown-menu {
+    left: auto;
+    right: 0px !important;
+    z-index: 10000;
+}
+.work-timings {
+    font-size: 14px;
+    font-weight: 700;
+    color: #444;
+}
+small {
+ font-size: 85% !important;    
+}
+.modal-loader {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    font-size: 30px;
+    padding: 1em 0;
+}
+.uploaded-files > span {
+   display: inline-block; 
+}
+label[for="PowerCutTime"] {
+    display:none;
+}
+label[for="WorkersRestRoom"] {
+    display:none;
+}
+label[for="ParkingLocation"] {
+    display:none;
+}
+label[for="NoCPerCopyForIntWork[]"] {
+    display: none;
+}
+label[for="NoCPerCopyForCivilWork[]"] {
+    display: none;
+}
+span.select2 {
+    display: block !important;
+    width: 100% !important;
+}
+.text-error {
+    color: red;
+}
+.content-header>h1>small {
+    font-size: 15px !important;
+}
+#ChecklistGoToTop {
+    position: fixed;
+    bottom: 73px;
+    right: 30px;
+    z-index: 99;
+    border: none;
+    outline: none; 
+}

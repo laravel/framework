@@ -1,0 +1,26 @@
+$class-slug: (
+pd: padding, 
+pd-lt: padding-left, 
+pd-rt: padding-right, 
+pd-tp: padding-top, 
+pd-bt: padding-bottom,
+mr: margin, 
+mr-lt: margin-left, 
+mr-rt: margin-right, 
+mr-tp: margin-top, 
+mr-bt: margin-bottom
+);
+
+@each $class-name, $class-style in $class-slug {
+    @for $i from 0 through 100 {
+        .#{$class-name}-#{$i}{
+            #{$class-style}: 0px + $i !important;
+        }
+    }
+}
+
+    
+
+    
+  
+

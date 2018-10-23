@@ -1,0 +1,88 @@
+.note-thumbnail {
+    width: 50px !important;
+    height: 50px !important;
+    margin: 10px 10px 10px 0px !important;
+}
+.fa-plus-square {
+    color: #0C7FC6;  
+    font-size: 15px;
+}
+.btn {
+    border-radius: 0px;
+}
+.btn:hover:not(.btn-default) {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+#LaminatesComparisonPage .search {
+    font-weight: 400;
+    border-radius: 0px;
+    background-color: #fff !important;
+    min-width: 70px;
+}
+.input-group-sm .btn-default {
+    border-radius: 0px !important;
+    color: black;
+    margin-left: -1px !important;
+    color: black !important;
+}
+.input-group-sm .btn-default i {
+    color: black;
+}
+.fa-remove {
+    color: red;
+    font-size: 15px;
+}
+.btn-custom {
+    border-color: #ddd !important;
+}
+.check-icon {
+    color: green;
+    font-size: 15px;
+}
+#FormUpdatedOverLay{
+    color: green;
+}
+.check-mark{
+    font-size: 50px !important;
+}
+.table {
+    table-layout: auto !important;
+    box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1), 0 4px 16px 0 rgba(0, 0, 0, 0.0); 
+}
+#CancelBtn {
+    margin-right: 1.5em;
+    border-color: #ddd !important;
+}
+.callout-info, .alert {
+    font-size: 17px;
+}
+.text-primary {
+    color: #2489c5;
+    font-weight: 500;
+}
+.comparelams-title small {
+    color: darkorange;
+    font-weight: 400;
+}
+.img-content {
+    margin-top: 2.5em;
+    margin-bottom: 1.1em;
+}
+.no-sample-img {
+    margin-bottom: 3.5em;
+}
+.back-btn {
+    margin-top: -2.8em;
+    margin-bottom: 7px;
+}
+input.search {
+    min-width: 155px !important;
+}
+.autocomplete-image {
+    height: 30px;
+    width: 40px;
+    padding-right: 3px;
+}
+.ui-menu-item {
+   text-align: left;
+}

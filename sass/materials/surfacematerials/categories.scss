@@ -1,0 +1,111 @@
+div.form-overlay {
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    background-color: rgba(255, 255, 255, 0.7);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 30px;
+    user-select: none;
+    cursor: default;
+    flex-direction: column;
+}
+
+.loader {
+    border: 2px solid #dcdcdc;
+    border-radius: 50%;
+    border-top: 2px solid #8a8a8a;
+    animation: spin 0.8s linear infinite;
+}
+
+.small.loader {
+    top: 32px !important;
+    right: 10px;
+    width: 20px;
+    height: 20px;
+}
+
+.large.loader {
+    width: 50px;
+    height: 50px;
+}
+.loader-text {
+    padding-top: 0.5em;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.modal-header, .modal-footer {
+    padding: 13px 15px;
+}
+
+.button-custom {
+    width: 6em;
+}
+
+.callout-info {
+    font-size: 17px;
+}
+
+#BrandsPage .VueTables__limit {
+    display: none;
+}
+
+.VueTables__search-field label {
+    display: none;
+}
+
+.VueTables__table thead > tr > th, .VueTables__table tbody > tr > td {
+    text-align: center;
+    vertical-align: middle;
+}
+
+.VueTables__sort-icon {
+    color: darkgrey;
+    cursor: pointer;
+}
+
+#BrandsPage .VueTables__table .brand-id {
+    width: 4%;
+}
+
+#BrandsPage .VueTables__table .brand-name {
+    width: 15%;
+}
+
+#BrandsPage .VueTables__table .brand-desc {
+    width: 26%;
+}
+
+#BrandsPage .VueTables__table .brand-category {
+    width: 15%;
+}
+
+#BrandsPage .VueTables__table .brand-warranty {
+    width: 9%;
+}
+
+#BrandsPage .VueTables__table .brand-guarantee {
+    width: 9%;
+}
+
+#BrandsPage .VueTables__table .brand-status {
+    width: 11%;
+}
+
+#BrandsPage .VueTables__table .brand-action {
+    width: 11%;
+}
+
+@media (max-height: 568px) {
+    .button-custom {
+        margin-top: 5px !important;
+    }
+}

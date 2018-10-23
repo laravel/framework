@@ -1,0 +1,63 @@
+@import "variables";
+@import url('https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400');
+
+body {
+    background-color: $lightgray;
+}
+.app {
+    position: absolute;
+    top: 0%;
+    left: 0%;
+    width: 100%;
+    height: auto;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    align-items: center;
+    font-weight: 300;
+    font-family: 'Source Sans Pro';
+}
+.app a {
+    color: #3c8dbc;
+    text-decoration: none;
+}
+.item {
+    padding: 5px;
+    height: auto;
+}
+.aside-item {
+    font-size: 96px !important;
+    text-align: right;
+}
+.header-item {
+    text-align: left;
+    padding: 0 2.5em;
+}
+.header-item h2 {
+    font-weight: 400;
+    margin-bottom: 10px;
+}
+.text-yellow {
+    color: #f39c12;
+}
+.text-red {
+    color: #dd4b39;
+}
+.description {
+    color: $SiteBlack;
+    font-size: 14px;
+    font-weight: 400;
+}
+@media all and (max-width: 991px) {
+    .app {
+        flex-direction: column;
+    }
+    .aside-item {
+        text-align: center;
+        padding-right: 0px;
+        height: 110px;
+    }
+    .header-item {
+        text-align: center;
+    }
+}
