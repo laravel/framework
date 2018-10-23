@@ -79,7 +79,9 @@ class VerifyCsrfToken
             });
         }
 
-        throw new TokenMismatchException;
+        $message = __('Sorry, your session has expired. Please refresh and try again.');
+
+        throw new TokenMismatchException($message);
     }
 
     /**
