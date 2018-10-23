@@ -89,7 +89,7 @@ class Redirector
                         : $this->generator->previous();
 
         if ($intended) {
-            $this->session->put('url.intended', $intended);
+            $this->setIntendedUrl($intended);
         }
 
         return $this->to($path, $status, $headers, $secure);
@@ -109,6 +109,18 @@ class Redirector
         $path = $this->session->pull('url.intended', $default);
 
         return $this->to($path, $status, $headers, $secure);
+    }
+
+    /**
+     * Set intended url.
+     *
+     * @param  string  $url
+     *
+     * @return void
+     */
+    public function setIntendedUrl($url)
+    {
+        $this->session->put('url.intended', $url);
     }
 
     /**

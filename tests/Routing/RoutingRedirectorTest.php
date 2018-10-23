@@ -160,4 +160,12 @@ class RoutingRedirectorTest extends TestCase
         $response = $this->redirect->home();
         $this->assertEquals('http://foo.com/bar', $response->getTargetUrl());
     }
+
+    public function testItSetsValidIntendedUrl()
+    {
+        $this->session->shouldReceive('put')->once()->with('url.intended', 'http://foo.com/bar');
+
+        $result = $this->redirect->setIntendedUrl('http://foo.com/bar');
+        $this->assertNull($result);
+    }
 }
