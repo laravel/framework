@@ -1667,13 +1667,13 @@ class SupportCollectionTest extends TestCase
 
     public function testGettingMaxItemsFromCollection()
     {
-        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $c = new Collection([(object) ['foo' => 20], (object) ['foo' => null], (object) ['foo' => 10]]);
         $this->assertEquals(20, $c->max(function ($item) {
             return $item->foo;
         }));
         $this->assertEquals(20, $c->max('foo'));
 
-        $c = new Collection([['foo' => 10], ['foo' => 20]]);
+        $c = new Collection([['foo' => 20], ['foo' => null], ['foo' => 10]]);
         $this->assertEquals(20, $c->max('foo'));
 
         $c = new Collection([1, 2, 3, 4, 5]);
@@ -1685,13 +1685,13 @@ class SupportCollectionTest extends TestCase
 
     public function testGettingMinItemsFromCollection()
     {
-        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => 20]]);
+        $c = new Collection([(object) ['foo' => 10], (object) ['foo' => null], (object) ['foo' => 20]]);
         $this->assertEquals(10, $c->min(function ($item) {
             return $item->foo;
         }));
         $this->assertEquals(10, $c->min('foo'));
 
-        $c = new Collection([['foo' => 10], ['foo' => 20]]);
+        $c = new Collection([['foo' => 10], ['foo' => null], ['foo' => 20]]);
         $this->assertEquals(10, $c->min('foo'));
 
         $c = new Collection([1, 2, 3, 4, 5]);
