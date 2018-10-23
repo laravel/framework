@@ -1,6 +1,6 @@
 # Release Notes for 5.7.x
 
-## Unreleased
+## [v5.7.10 (2018-10-23)](https://github.com/laravel/framework/compare/v5.7.9...v5.7.10)
 
 ### Added
 - Added loadCount method to eloquent collections ([#25997](https://github.com/laravel/framework/pull/25997))
@@ -9,6 +9,8 @@
 - Added possibility to define exclude methods on registered `apiResource` ([#26149](https://github.com/laravel/framework/pull/26149))
 - Added `filp/whoops` to `suggest` in `composer.json` ([#26180](https://github.com/laravel/framework/pull/26180))
 - Added `mock` and `spy` methods to `Foundation/Testing/Concerns/InteractsWithContainer.php` ([#26171](https://github.com/laravel/framework/pull/26171), [b50f9f3](https://github.com/laravel/framework/commit/b50f9f3bc8c1ee03c22ee8cc0ac37179fb28a1c9))
+- Added `uuid` validation rule to validator ([#26135](https://github.com/laravel/framework/pull/26135))
+- NotificationFake can assert preferred locale ([#26205](https://github.com/laravel/framework/pull/26205))
 
 ### Fixed
 - Fixed `whereHas` and `$withCount` bindings from `polymorphic relationships` ([#26145](https://github.com/laravel/framework/pull/26145))
@@ -32,6 +34,7 @@
 - Simplified `isChainOfObjects` method in `Support/Testing/Fakes/QueueFake.php` ([#26151](https://github.com/laravel/framework/pull/26151))
 - Deleted unneeded code ([#26053](https://github.com/laravel/framework/pull/26053), [#26162](https://github.com/laravel/framework/pull/26162), [#26160](https://github.com/laravel/framework/pull/26160), [#26159](https://github.com/laravel/framework/pull/26159), [#26152](https://github.com/laravel/framework/pull/26152))
 - Prefer stricter comparison ([#26139](https://github.com/laravel/framework/pull/26139), [#26157](https://github.com/laravel/framework/pull/26157))
+- Removed duplicated code from `Router::updateGroupStack` method ([#26206](https://github.com/laravel/framework/pull/26206), [6debff6](https://github.com/laravel/framework/commit/6debff6affba9224c778e32cc3c00e00a66cb9dd))
 
 
 ## [v5.7.9 (2018-10-09)](https://github.com/laravel/framework/compare/v5.7.8...v5.7.9)
