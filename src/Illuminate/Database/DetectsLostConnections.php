@@ -35,6 +35,7 @@ trait DetectsLostConnections
             'Physical connection is not usable',
             'TCP Provider: Error code 0x68',
             'Name or service not known',
+            'ORA-03114',
         ]);
     }
 }
