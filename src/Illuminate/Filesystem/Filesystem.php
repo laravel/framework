@@ -152,6 +152,8 @@ class Filesystem
         }
 
         $tempPath = tempnam($dirName, basename($path));
+        // Remove tempPath because it will be created with incorrect permissions
+        unlink($tempPath);
 
         file_put_contents($tempPath, $content);
 
