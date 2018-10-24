@@ -55,13 +55,12 @@ plugins:
   enabled: true
   config: tslint.json
 exclude_patterns:
-  config/
-  db/
-  dist/
-  features/
-  **/node_modules/
-  script/
-  **/spec/
-  **/vendor/
-  **/*_test.go
-  **/*.d.ts
+- "config/"
+- "db/"
+- "dist/"
+- "features/"
+- "**/node_modules/"
+- "script/"
+- "**/spec/"
+- "**/vendor/"
+- "**/*.d.ts"
