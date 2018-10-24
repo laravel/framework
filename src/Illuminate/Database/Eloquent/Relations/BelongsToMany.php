@@ -361,7 +361,7 @@ class BelongsToMany extends Relation
      * In addition, new pivot records will receive this value.
      *
      * @param  string|array $column
-     * @param  mixed        $value
+     * @param  mixed $value
      * @return $this
      */
     public function withPivotValue($column, $value = null)
