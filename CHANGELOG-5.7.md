@@ -1,5 +1,20 @@
 # Release Notes for 5.7.x
 
+## [v5.7.11 (2018-10-24)](https://github.com/laravel/framework/compare/v5.7.10...v5.7.11)
+
+### Added
+- Added `decimal:<num>` cast to Model ([#26173](https://github.com/laravel/framework/pull/26173))
+- Allowed updateExistingPivot to receive an arrayable item ([#26167](https://github.com/laravel/framework/pull/26167))
+- Added `setIntendedUrl` method to `Routing/Redirector.php` ([#26227](https://github.com/laravel/framework/pull/26227))
+- Added `ORA-03114` string to `DetectsLostConnections` trait ([#26233](https://github.com/laravel/framework/pull/26233))
+
+### Fixed
+- Fixed an issue where the worker process would not be killed by the listener when the timeout is exceeded ([#25981](https://github.com/laravel/framework/pull/25981))
+
+### Changed
+- Reverted filesystem changes which were done in [#26010](https://github.com/laravel/framework/pull/26010) ([#26231](https://github.com/laravel/framework/pull/26231))
+
+
 ## [v5.7.10 (2018-10-23)](https://github.com/laravel/framework/compare/v5.7.9...v5.7.10)
 
 ### Added
