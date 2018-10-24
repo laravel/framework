@@ -19,6 +19,7 @@ use Illuminate\Foundation\Console\MailMakeCommand;
 use Illuminate\Foundation\Console\OptimizeCommand;
 use Illuminate\Foundation\Console\RuleMakeCommand;
 use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\ClassMakeCommand;
 use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\RouteListCommand;
@@ -136,6 +137,7 @@ class ArtisanServiceProvider extends ServiceProvider
         'AuthMake' => 'command.auth.make',
         'CacheTable' => 'command.cache.table',
         'ChannelMake' => 'command.channel.make',
+        'ClassMake' => 'command.class.make',
         'ConsoleMake' => 'command.console.make',
         'ControllerMake' => 'command.controller.make',
         'EventGenerate' => 'command.event.generate',
@@ -261,6 +263,18 @@ class ArtisanServiceProvider extends ServiceProvider
     {
         $this->app->singleton('command.channel.make', function ($app) {
             return new ChannelMakeCommand($app['files']);
+        });
+    }
+
+    /**
+     * Register the command.
+     *
+     * @return void
+     */
+    protected function registerClassMakeCommand()
+    {
+        $this->app->singleton('command.class.make', function ($app) {
+            return new ClassMakeCommand($app['files']);
         });
     }
 
