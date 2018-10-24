@@ -3,15 +3,15 @@ checks:
   argument-count:
     enabled: true
     config:
-      threshold: 4
+      threshold: 5
   complex-logic:
     enabled: true
     config:
-      threshold: 4
+      threshold: 10
   file-lines:
     enabled: true
     config:
-      threshold: 2500
+      threshold: 1500
   method-complexity:
     enabled: true
     config:
@@ -19,11 +19,11 @@ checks:
   method-count:
     enabled: true
     config:
-      threshold: 20
+      threshold: 25
   method-lines:
     enabled: true
     config:
-      threshold: 25
+      threshold: 50
   nested-control-flow:
     enabled: true
     config:
@@ -40,3 +40,28 @@ checks:
     enabled: true
     config:
       threshold: #language-specific defaults. overrides affect all languages.
+plugins:
+ phpcodesniffer:
+  enabled: true
+ csslint:
+  enabled: true
+ phpmd:
+  enabled: true
+ sass-lint:
+  enabled: true
+ stylelint:
+  enabled: true
+ tslint:
+  enabled: true
+  config: tslint.json
+exclude_patterns:
+  config/
+  db/
+  dist/
+  features/
+  **/node_modules/
+  script/
+  **/spec/
+  **/vendor/
+  **/*_test.go
+  **/*.d.ts
