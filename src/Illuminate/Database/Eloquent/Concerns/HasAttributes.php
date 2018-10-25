@@ -732,12 +732,16 @@ trait HasAttributes
     /**
      * Return a decimal as string.
      *
-     * @param  float  $value
-     * @param  int  $decimals
+     * @param  mixed $value
+     * @param  int   $decimals
      * @return string
      */
     protected function asDecimal($value, $decimals)
     {
+        if ($value instanceof \Decimal\Decimal) {
+            return $value->toFixed($decimals, false, PHP_ROUND_HALF_UP);
+        }
+
         return number_format($value, $decimals, '.', '');
     }
 
