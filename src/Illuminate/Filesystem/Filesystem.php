@@ -123,6 +123,31 @@ class Filesystem
     }
 
     /**
+     * Write the contents of a file, replacing it atomically if it already exists.
+     *
+     * This will replace the target file permissions. It also resolves symlinks to replace the symlink's target file.
+     *
+     * @param string $path
+     * @param string $content
+     */
+    public function replace($path, $content)
+    {
+        // Just in case path already exists and is a symlink, we want to make sure we get the real path.
+        clearstatcache(true, $path);
+        $path = realpath($path) ?: $path;
+
+        // Write out the contents to a temp file, so we then can rename the file atomically.
+        $tempPath = tempnam(dirname($path), basename($path));
+
+        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600.
+        chmod($tempPath, 0777 - umask());
+
+        file_put_contents($tempPath, $content);
+
+        rename($tempPath, $path);
+    }
+
+    /**
      * Prepend to a file.
      *
      * @param  string  $path
