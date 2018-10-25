@@ -55,7 +55,7 @@ class DatabaseChannel
     {
         return [
             'id' => $notification->id,
-            'type' => $notification->type_alias ?? get_class($notification),
+            'type' => $notification->typeAlias ?? get_class($notification),
             'data' => $this->getData($notifiable, $notification),
             'read_at' => null,
         ];
