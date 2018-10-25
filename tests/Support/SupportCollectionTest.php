@@ -1109,6 +1109,31 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals('taylor,dayle', $data->implode(','));
     }
 
+    public function testExplode()
+    {
+        $data = new Collection('taylor:mohamed');
+        $this->assertEquals(['taylor', 'mohamed'], $data->explode(':'));
+        $this->assertEquals(['taylor:mohamed'], $data->explode());
+
+        $data = new Collection(['taylor:mohamed']);
+        $this->assertEquals(['taylor', 'mohamed'], $data->explode(':'));
+        $this->assertEquals(['taylor:mohamed'], $data->explode());
+
+        $data = new Collection([['taylor/mohamed'],['taylor/mohamed']]);
+        $this->assertEquals([['taylor','mohamed'],['taylor', 'mohamed']], $data->explode('/'));
+        $this->assertEquals([['taylor/mohamed'],['taylor/mohamed']], $data->explode());
+
+        $data = new Collection([['taylor/mohamed'], ['taylor/mohamed'], ['taylor/mohamed']]);
+        $this->assertEquals([['taylor','mohamed'], ['taylor', 'mohamed'], ['taylor', 'mohamed']], $data->explode('/'));
+        $this->assertEquals([['taylor/mohamed'], ['taylor/mohamed'], ['taylor/mohamed']], $data->explode());
+
+        $data = new Collection([['name' => 'taylor/bar', 'email' => 'taylor/foo'], ['name' => 'mohamed/bar', 'email' => 'mohamed/foo']]);
+        $this->assertEquals([['taylor','foo'], ['mohamed', 'foo']], $data->explode('/', 'email'));
+        $this->assertEquals([['taylor','bar'], ['mohamed', 'bar']], $data->explode('/', 'name'));
+        $this->assertEquals([['name' => 'taylor/bar', 'email' => 'taylor/foo'], ['name' => 'mohamed/bar', 'email' => 'mohamed/foo']], $data->explode());
+
+    }
+
     public function testTake()
     {
         $data = new Collection(['taylor', 'dayle', 'shawn']);

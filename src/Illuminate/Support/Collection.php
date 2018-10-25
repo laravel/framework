@@ -844,6 +844,40 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         return implode($value, $this->items);
     }
 
+
+    /**
+     * Concatenate values of a given key as a string.
+     *
+     * @param  string  $value
+     * @param  string  $glue
+     * @return string
+     */
+    public function explode($glue = null, $value = null)
+    {
+        $first = $this->first();
+
+        if(is_null($glue))
+        {
+            return $this->toArray();
+        }
+
+        if(is_array($first) || is_object($first))
+        {
+            if(! is_null($value)) {
+                return $this->pluck($value)->map(function($item) use($glue) {
+                    return explode($glue, $item);
+                })->toArray();
+            }
+
+            return $this->flatten()->values()->map(function($item) use($glue) {
+                return explode($glue, $item);
+            })->toArray();
+        }
+
+        return explode($glue, $first);
+    }
+
+
     /**
      * Intersect the collection with the given items.
      *
