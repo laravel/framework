@@ -1131,7 +1131,6 @@ class SupportCollectionTest extends TestCase
         $this->assertEquals([['taylor','foo'], ['mohamed', 'foo']], $data->explode('/', 'email'));
         $this->assertEquals([['taylor','bar'], ['mohamed', 'bar']], $data->explode('/', 'name'));
         $this->assertEquals([['name' => 'taylor/bar', 'email' => 'taylor/foo'], ['name' => 'mohamed/bar', 'email' => 'mohamed/foo']], $data->explode());
-
     }
 
     public function testTake()

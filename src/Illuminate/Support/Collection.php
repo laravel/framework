@@ -846,17 +846,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
 
 
     /**
-     * Concatenate values of a given key as a string.
+     * splitting values by a string delimiter.
      *
      * @param  string  $value
-     * @param  string  $glue
-     * @return string
+     * @param  string  $delimiter
+     * @return array
      */
-    public function explode($glue = null, $value = null)
+    public function explode($delimiter = null, $value = null)
     {
         $first = $this->first();
 
-        if(is_null($glue))
+        if(is_null($delimiter))
         {
             return $this->toArray();
         }
@@ -864,17 +864,17 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         if(is_array($first) || is_object($first))
         {
             if(! is_null($value)) {
-                return $this->pluck($value)->map(function($item) use($glue) {
-                    return explode($glue, $item);
+                return $this->pluck($value)->map(function($item) use($delimiter) {
+                    return explode($delimiter, $item);
                 })->toArray();
             }
 
-            return $this->flatten()->values()->map(function($item) use($glue) {
-                return explode($glue, $item);
+            return $this->flatten()->values()->map(function($item) use($delimiter) {
+                return explode($delimiter, $item);
             })->toArray();
         }
 
-        return explode($glue, $first);
+        return explode($delimiter, $first);
     }
 
 
