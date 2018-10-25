@@ -86,7 +86,7 @@ class RefreshCommand extends Command
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
             '--step' => $step,
-            '--force' => $force,
+            '--force' => true,
         ]);
     }
 
@@ -104,7 +104,7 @@ class RefreshCommand extends Command
             '--database' => $database,
             '--path' => $path,
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => $force,
+            '--force' => true,
         ]);
     }
 
@@ -129,7 +129,7 @@ class RefreshCommand extends Command
         $this->call('db:seed', [
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => $this->option('force'),
+            '--force' => true,
         ]);
     }
 
