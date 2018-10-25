@@ -44,6 +44,27 @@ class QueueRedisQueueTest extends TestCase
         Queue::createPayloadUsing(null);
     }
 
+    public function testPushProperlyPushesJobOntoRedisWithTwoCustomPayloadHook()
+    {
+        $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
+        $queue->expects($this->once())->method('getRandomId')->will($this->returnValue('foo'));
+        $redis->shouldReceive('connection')->once()->andReturn($redis);
+        $redis->shouldReceive('rpush')->once()->with('queues:default', json_encode(['displayName' => 'foo', 'job' => 'foo', 'maxTries' => null, 'timeout' => null, 'data' => ['data'], 'custom' => 'taylor', 'bar' => 'foo', 'id' => 'foo', 'attempts' => 0]));
+
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['custom' => 'taylor'];
+        });
+
+        Queue::createPayloadUsing(function ($connection, $queue, $payload) {
+            return ['bar' => 'foo'];
+        });
+
+        $id = $queue->push('foo', ['data']);
+        $this->assertEquals('foo', $id);
+
+        Queue::createPayloadUsing(null);
+    }
+
     public function testDelayedPushProperlyPushesJobOntoRedis()
     {
         $queue = $this->getMockBuilder(RedisQueue::class)->setMethods(['availableAt', 'getRandomId'])->setConstructorArgs([$redis = m::mock(Factory::class), 'default'])->getMock();
