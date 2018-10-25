@@ -107,7 +107,7 @@ class FreshCommand extends Command
         $this->call('db:seed', [
             '--database' => $database,
             '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => $this->option('force'),
+            '--force' => true,
         ]);
     }
 
