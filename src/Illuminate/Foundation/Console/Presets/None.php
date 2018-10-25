@@ -55,5 +55,6 @@ class None extends Preset
     {
         file_put_contents(resource_path('sass/app.scss'), ''.PHP_EOL);
         copy(__DIR__.'/none-stubs/app.js', resource_path('js/app.js'));
+        copy(__DIR__.'/none-stubs/bootstrap.js', resource_path('js/bootstrap.js'));
     }
 }
