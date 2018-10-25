@@ -27,9 +27,9 @@ abstract class Queue
     /**
      * The create payload callback.
      *
-     * @var callable|null
+     * @var callable[]
      */
-    protected static $createPayloadCallback;
+    protected static $createPayloadCallback = [];
 
     /**
      * Push a new job onto the queue.
@@ -197,7 +197,11 @@ abstract class Queue
      */
     public static function createPayloadUsing($callback)
     {
-        static::$createPayloadCallback = $callback;
+        if (is_null($callback)) {
+            static::$createPayloadCallback = [];
+        } else {
+            static::$createPayloadCallback[] = $callback;
+        }
     }
 
     /**
@@ -209,10 +213,12 @@ abstract class Queue
      */
     protected function withCreatePayloadHooks($queue, array $payload)
     {
-        if (static::$createPayloadCallback) {
-            return array_merge($payload, call_user_func(
-                static::$createPayloadCallback, $this->getConnectionName(), $queue, $payload
-            ));
+        if (! empty(static::$createPayloadCallback)) {
+            foreach (static::$createPayloadCallback as $callback) {
+                $payload = array_merge($payload, call_user_func(
+                    $callback, $this->getConnectionName(), $queue, $payload
+                ));
+            }
         }
 
         return $payload;
