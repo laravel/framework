@@ -238,6 +238,18 @@ class Str
     }
 
     /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param  string|array  $pattern
+     * @param  string  $value
+     * @return bool
+     */
+    public static function match($pattern, $value)
+    {
+        return static::is($pattern, $value);
+    }
+
+    /**
      * Limit the number of words in a string.
      *
      * @param  string  $value
