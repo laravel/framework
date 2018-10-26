@@ -129,7 +129,6 @@ class DatabaseEloquentHasOneThroughIntegrationTest extends TestCase
 
     /**
      * @expectedException \Illuminate\Database\Eloquent\ModelNotFoundException
-     * @expectedExceptionMessage No query results for model [Illuminate\Tests\Database\HasOneThroughTestContract].
      */
     public function testFindOrFailThrowsAnException()
     {
