@@ -87,6 +87,7 @@ trait ManagesTransactions
      * @return void
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     public function beginTransaction()
     {
@@ -101,6 +102,9 @@ trait ManagesTransactions
      * Create a transaction within the database.
      *
      * @return void
+     *
+     * @throws \Exception
+     * @throws \Throwable
      */
     protected function createTransaction()
     {
@@ -134,6 +138,7 @@ trait ManagesTransactions
      * @return void
      *
      * @throws \Exception
+     * @throws \Throwable
      */
     protected function handleBeginTransactionException($e)
     {
