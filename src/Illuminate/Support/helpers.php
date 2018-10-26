@@ -881,6 +881,20 @@ if (! function_exists('str_limit')) {
     }
 }
 
+if (! function_exists('str_match')) {
+    /**
+     * Determine if a given string matches a given pattern.
+     *
+     * @param  string|array  $pattern
+     * @param  string  $value
+     * @return bool
+     */
+    function str_match($pattern, $value)
+    {
+        return Str::is($pattern, $value);
+    }
+}
+
 if (! function_exists('str_plural')) {
     /**
      * Get the plural form of an English word.
