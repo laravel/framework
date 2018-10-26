@@ -360,13 +360,14 @@ class DatabaseConnectionTest extends TestCase
     {
         $date = m::mock(DateTime::class);
         $date->shouldReceive('format')->once()->with('foo')->andReturn('bar');
-        $bindings = ['test' => $date];
+        $bindings = ['test' => $date, 'is_test' => true];
         $conn = $this->getMockConnection();
         $grammar = m::mock(Grammar::class);
         $grammar->shouldReceive('getDateFormat')->once()->andReturn('foo');
+        $grammar->shouldReceive('formatBoolValue')->once()->with(true)->andReturn('foo');
         $conn->setQueryGrammar($grammar);
         $result = $conn->prepareBindings($bindings);
-        $this->assertEquals(['test' => 'bar'], $result);
+        $this->assertEquals(['test' => 'bar', 'is_test' => 'foo'], $result);
     }
 
     public function testLogQueryFiresEventsIfSet()

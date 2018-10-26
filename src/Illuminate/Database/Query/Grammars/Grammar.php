@@ -1034,4 +1034,13 @@ class Grammar extends BaseGrammar
     {
         return $this->operators;
     }
+
+    /**
+     * @param bool $value
+     * @return mixed
+     */
+    public function formatBoolValue(bool $value)
+    {
+        return (int) $value;
+    }
 }

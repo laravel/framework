@@ -398,4 +398,13 @@ class PostgresGrammar extends Grammar
             return "'$attribute'";
         }, $path);
     }
+
+    /**
+     * @param bool $value
+     * @return mixed
+     */
+    public function formatBoolValue(bool $value)
+    {
+        return $value;
+    }
 }

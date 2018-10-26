@@ -594,7 +594,7 @@ class Connection implements ConnectionInterface
             if ($value instanceof DateTimeInterface) {
                 $bindings[$key] = $value->format($grammar->getDateFormat());
             } elseif (is_bool($value)) {
-                $bindings[$key] = (int) $value;
+                $bindings[$key] = $grammar->formatBoolValue($value);
             }
         }
 
