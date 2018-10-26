@@ -7,7 +7,7 @@ interface Encrypter
     /**
      * Encrypt the given value.
      *
-     * @param  string  $value
+     * @param  mixed  $value
      * @param  bool  $serialize
      * @return string
      */
@@ -16,7 +16,7 @@ interface Encrypter
     /**
      * Decrypt the given value.
      *
-     * @param  string  $payload
+     * @param  mixed  $payload
      * @param  bool  $unserialize
      * @return string
      */
