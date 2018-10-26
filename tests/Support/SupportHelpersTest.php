@@ -298,6 +298,15 @@ class SupportHelpersTest extends TestCase
         $this->assertEquals('/test/string', Str::start('//test/string', '/'));
     }
 
+    public function testStrWrap()
+    {
+        $this->assertEquals('/test/string/', Str::wrap('test/string', '/'));
+        $this->assertEquals('/test/string/', Str::wrap('/test/string', '/'));
+        $this->assertEquals('/test/string/', Str::wrap('test/string/', '/'));
+        $this->assertEquals('/test/string/', Str::wrap('/test/string/', '/'));
+        $this->assertEquals('/test/string/', Str::wrap('//test/string/', '/'));
+    }
+
     public function testSnakeCase()
     {
         $this->assertEquals('foo_bar', Str::snake('fooBar'));

@@ -532,6 +532,18 @@ class Str
     }
 
     /**
+     * Begin and end a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $cap
+     * @return string
+     */
+    public static function wrap($value, $cap)
+    {
+        return static::start(static::finish($value, $cap), $cap);
+    }
+
+    /**
      * Generate a time-ordered UUID (version 4).
      *
      * @return \Ramsey\Uuid\UuidInterface

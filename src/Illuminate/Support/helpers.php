@@ -997,6 +997,21 @@ if (! function_exists('str_start')) {
     }
 }
 
+if (! function_exists('str_wrap')) {
+    /**
+     * Begin and end a string with a single instance of a given value.
+     *
+     * @param  string  $value
+     * @param  string  $cap
+     * @return string
+     */
+    function str_wrap($value, $cap)
+    {
+        return Str::wrap($value, $cap);
+    }
+}
+
+
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
