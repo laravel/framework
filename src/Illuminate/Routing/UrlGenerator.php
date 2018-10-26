@@ -339,7 +339,7 @@ class UrlGenerator implements UrlGeneratorContract
      * Determine if the given request has a valid signature.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @param bool $absolute check with url that was generated with a relative signed url
+     * @param  bool  $absolute
      * @return bool
      */
     public function hasValidSignature(Request $request, $absolute = true)
