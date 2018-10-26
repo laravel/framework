@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Query\Grammars\Grammar;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Query\Grammars\Grammar;
 
 class DatabaseQueryGrammarTest extends TestCase
 {

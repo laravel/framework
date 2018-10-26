@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Database\Query\Grammars\PostgresGrammar;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Database\Query\Grammars\PostgresGrammar;
 
 class DatabasePostgresQueryGrammarTest extends TestCase
 {
