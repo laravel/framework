@@ -317,7 +317,7 @@ class UrlGenerator implements UrlGeneratorContract
         $key = call_user_func($this->keyResolver);
 
         return $this->route($name, $parameters + [
-            'signature' => hash_hmac('sha256', $this->route($name, $parameters), $key),
+            'signature' => hash_hmac('sha256', $this->route($name, $parameters, $absolute), $key),
         ], $absolute);
     }
 
@@ -339,11 +339,14 @@ class UrlGenerator implements UrlGeneratorContract
      * Determine if the given request has a valid signature.
      *
      * @param  \Illuminate\Http\Request  $request
+     * @param bool $absolute check with url that was generated with a relative signed url
      * @return bool
      */
-    public function hasValidSignature(Request $request)
+    public function hasValidSignature(Request $request, $absolute = true)
     {
-        $original = rtrim($request->url().'?'.Arr::query(
+        $url = $absolute ? $request->url() : '/'.$request->path();
+
+        $original = rtrim($url.'?'.Arr::query(
             Arr::except($request->query(), 'signature')
         ), '?');
 
