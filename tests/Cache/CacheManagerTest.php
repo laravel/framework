@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Illuminate\Cache\ArrayStore;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
 
 class CacheManagerTest extends TestCase
@@ -63,7 +63,7 @@ class CacheManagerTest extends TestCase
                 ],
             ],
         ]);
-        $cacheManager->extend('forget', function() {
+        $cacheManager->extend('forget', function () {
             return new ArrayStore();
         });
 
