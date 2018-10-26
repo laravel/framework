@@ -738,6 +738,9 @@ trait HasAttributes
      */
     protected function asDecimal($value, $decimals)
     {
+        /**
+         * @see http://php-decimal.io/#toFixed
+         */
         if ($value instanceof \Decimal\Decimal) {
             return $value->toFixed($decimals, false, PHP_ROUND_HALF_UP);
         }
