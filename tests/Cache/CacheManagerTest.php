@@ -30,7 +30,7 @@ class CacheManagerTest extends TestCase
         $this->assertEquals($cacheManager, $cacheManager->store(__CLASS__));
     }
 
-    public function testForgetCache()
+    public function testForgetDriver()
     {
         $cacheManager = m::mock(CacheManager::class)
             ->shouldAllowMockingProtectedMethods()
@@ -48,13 +48,13 @@ class CacheManagerTest extends TestCase
         foreach (['array', ['array'], null] as $option) {
             $cacheManager->store('array');
             $cacheManager->store('array');
-            $cacheManager->forgetCache($option);
+            $cacheManager->forgetDriver($option);
             $cacheManager->store('array');
             $cacheManager->store('array');
         }
     }
 
-    public function testForgetCacheForgets()
+    public function testForgetDriverForgets()
     {
         $cacheManager = new CacheManager([
             'config' => [
@@ -69,7 +69,7 @@ class CacheManagerTest extends TestCase
 
         $cacheManager->store('forget')->forever('foo', 'bar');
         $this->assertSame('bar', $cacheManager->store('forget')->get('foo'));
-        $cacheManager->forgetCache('forget');
+        $cacheManager->forgetDriver('forget');
         $this->assertNull($cacheManager->store('forget')->get('foo'));
     }
 }
