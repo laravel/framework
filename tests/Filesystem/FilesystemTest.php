@@ -44,9 +44,9 @@ class FilesystemTest extends TestCase
 
     public function testReplaceStoresFiles()
     {
-        $tempFile   = "{$this->tempDir}/file.txt";
+        $tempFile = "{$this->tempDir}/file.txt";
         $symlinkDir = "{$this->tempDir}/symlink_dir";
-        $symlink    = "{$symlinkDir}/symlink.txt";
+        $symlink = "{$symlinkDir}/symlink.txt";
 
         mkdir($symlinkDir);
         symlink($tempFile, $symlink);
@@ -55,7 +55,7 @@ class FilesystemTest extends TestCase
         chmod($symlinkDir, 0555);
 
         // Test with a weird non-standard umask.
-        $umask         = 0131;
+        $umask = 0131;
         $originalUmask = umask($umask);
 
         $filesystem = new Filesystem;
