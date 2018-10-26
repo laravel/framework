@@ -1011,7 +1011,6 @@ if (! function_exists('str_wrap')) {
     }
 }
 
-
 if (! function_exists('studly_case')) {
     /**
      * Convert a value to studly caps case.
