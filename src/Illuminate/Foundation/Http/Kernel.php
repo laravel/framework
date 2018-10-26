@@ -335,4 +335,14 @@ class Kernel implements KernelContract
     {
         return $this->app;
     }
+
+    /**
+     * Get the application's route middleware groups.
+     *
+     * @return array
+     */
+    public function getMiddlewareGroups()
+    {
+        return $this->middlewareGroups;
+    }
 }
