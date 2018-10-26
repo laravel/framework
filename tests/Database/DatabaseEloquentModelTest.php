@@ -1432,8 +1432,8 @@ class DatabaseEloquentModelTest extends TestCase
         $model = new EloquentModelStub;
         $model->id = 'id';
         $model->foo = 'bar';
-        $model->created_at = new DateTime;
-        $model->updated_at = new DateTime;
+        $model->created_at = time();
+        $model->updated_at = time();
         $replicated = $model->replicate();
 
         $this->assertNull($replicated->id);

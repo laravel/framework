@@ -163,7 +163,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $router->get('test', function () {
-            return (new SymfonyResponse('test', 304, ['foo' => 'bar']))->setLastModified(new DateTime);
+            return (new SymfonyResponse('test', 304, ['foo' => 'bar']))->setLastModified(time());
         });
 
         $response = $router->dispatch(Request::create('test', 'GET'));

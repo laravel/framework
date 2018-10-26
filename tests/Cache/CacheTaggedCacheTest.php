@@ -31,7 +31,7 @@ class CacheTaggedCacheTest extends TestCase
     {
         $store = new ArrayStore;
         $tags = ['bop', 'zap'];
-        $duration = new DateTime;
+        $duration = time();
         $duration->add(new DateInterval('PT10M'));
         $store->tags($tags)->put('foo', 'bar', $duration);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
