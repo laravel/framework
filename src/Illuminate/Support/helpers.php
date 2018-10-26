@@ -891,7 +891,7 @@ if (! function_exists('str_match')) {
      */
     function str_match($pattern, $value)
     {
-        return Str::is($pattern, $value);
+        return Str::match($pattern, $value);
     }
 }
 
