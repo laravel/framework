@@ -120,6 +120,13 @@ class Route
     public static $validators;
 
     /**
+     * Registered potential bindings to the action's parameters.
+     *
+     * @var array
+     */
+    protected $lateBindings = [];
+
+    /**
      * Create a new Route instance.
      *
      * @param  array|string  $methods
@@ -301,6 +308,31 @@ class Route
                         ->parameters($request);
 
         return $this;
+    }
+
+    /**
+     * Register a potential binding.
+     *
+     * @param  string  $abstract
+     * @param  \Closure|string|null  $concrete
+     * @param  bool  $shared
+     * @return $this
+     */
+    public function lateBind($abstract, $concrete = null, $shared = false)
+    {
+        $this->lateBindings[$abstract] = compact('concrete', 'shared');
+
+        return $this;
+    }
+
+    /**
+     * Returns the lateBindings array.
+     *
+     * @return array
+     */
+    public function lateBindings()
+    {
+        return $this->lateBindings;
     }
 
     /**

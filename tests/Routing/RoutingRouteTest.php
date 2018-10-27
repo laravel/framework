@@ -1469,6 +1469,25 @@ class RoutingRouteTest extends TestCase
         $router->dispatch(Request::create('foo/baz', 'GET'))->getContent();
     }
 
+    public function testLateParameterBind()
+    {
+        $router = $this->getRouter();
+        $exampleModel = new TestLateParameter();
+        $exampleModel->testProperty = 'testValue' . random_int(1, 6543);
+        $currentRoute = $router->get('foo', function (TestLateParameter $m) use ($exampleModel) {
+            $this->assertEquals($exampleModel, $m);
+        });
+
+        $currentRoute->lateBind(
+            TestLateParameter::class,
+            function () use($exampleModel) {
+                return $exampleModel;
+            }
+        );
+
+        $router->dispatch(Request::create('foo'), 'GET');
+    }
+
     public function testDispatchingCallableActionClasses()
     {
         $router = $this->getRouter();
@@ -1558,6 +1577,11 @@ class RoutingRouteTest extends TestCase
 
         return $router;
     }
+}
+
+class TestLateParameter
+{
+    public $testProperty = '';
 }
 
 class RouteTestControllerStub extends Controller
