@@ -110,7 +110,7 @@ class ApplicationDatabaseMigrationStub extends Application
         }
     }
 
-    public function environment()
+    public function environment(...$environments)
     {
         return 'development';
     }
