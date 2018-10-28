@@ -1473,14 +1473,14 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $exampleModel = new TestLateParameter();
-        $exampleModel->testProperty = 'testValue' . random_int(1, 6543);
+        $exampleModel->testProperty = 'testValue'.random_int(1, 6543);
         $currentRoute = $router->get('foo', function (TestLateParameter $m) use ($exampleModel) {
             $this->assertEquals($exampleModel, $m);
         });
 
         $currentRoute->lateBind(
             TestLateParameter::class,
-            function () use($exampleModel) {
+            function () use ($exampleModel) {
                 return $exampleModel;
             }
         );
