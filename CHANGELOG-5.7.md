@@ -1,5 +1,22 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added `CacheManager::forgetDriver` method ([#26264](https://github.com/laravel/framework/pull/26264), [fd9ef49](https://github.com/laravel/framework/commit/fd9ef492faefff96deab5285e30bc1b675211bcb))
+- Added `Illuminate\Foundation\Http\Kernel::getMiddlewareGroups` method ([#26268](https://github.com/laravel/framework/pull/26268))
+
+### Fixed
+- Checked `$absolute` parameter in `UrlGenerator::signedRoute` ([#26265](https://github.com/laravel/framework/pull/26265))
+- Fixed error in resource building after running `php artisan preset none` command ([41becda](https://github.com/laravel/framework/pull/26244/commits/41becda26a6bfcfaf9754beb9106b6ca0f328a61), [#26244](https://github.com/laravel/framework/pull/26244))
+
+### Changed
+- Made expectation closure optional for `InteractsWithContainer::mock` and `InteractsWithContainer::spy` ([#26242](https://github.com/laravel/framework/pull/26242))
+- Allowed multiple `createPayloadCallback` on queues ([#26250](https://github.com/laravel/framework/pull/26250), [6e3d568](https://github.com/laravel/framework/commit/6e3d568757a8e4124b49bf9ac94f1db7a66437a1))
+- Changed wording on default 403 view ([#26258](https://github.com/laravel/framework/pull/26258))
+- Bump `vue.js` to `^2.5.17` in `artisan preset vue` command ([89f56bf](https://github.com/laravel/framework/pull/26244/commits/89f56bf8f9abb310bf985045c13103cb73a40351), [#26244](https://github.com/laravel/framework/pull/26244))
+
+
 ## [v5.7.11 (2018-10-24)](https://github.com/laravel/framework/compare/v5.7.10...v5.7.11)
 
 ### Added
