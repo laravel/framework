@@ -6,9 +6,8 @@ use Illuminate\Support\Carbon;
 use Illuminate\Database\Connection;
 use Illuminate\Queue\Jobs\DatabaseJob;
 use Illuminate\Queue\Jobs\DatabaseJobRecord;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class DatabaseQueue extends Queue implements QueueContract
+class DatabaseQueue extends Queue
 {
     /**
      * The database connection instance.

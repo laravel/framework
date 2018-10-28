@@ -5,9 +5,8 @@ namespace Illuminate\Queue;
 use Illuminate\Support\Str;
 use Illuminate\Queue\Jobs\RedisJob;
 use Illuminate\Contracts\Redis\Factory as Redis;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-class RedisQueue extends Queue implements QueueContract
+class RedisQueue extends Queue
 {
     /**
      * The Redis factory implementation.

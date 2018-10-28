@@ -5,8 +5,9 @@ namespace Illuminate\Queue;
 use DateTimeInterface;
 use Illuminate\Container\Container;
 use Illuminate\Support\InteractsWithTime;
+use Illuminate\Contracts\Queue\Queue as QueueContract;
 
-abstract class Queue
+abstract class Queue implements QueueContract
 {
     use InteractsWithTime;
 

@@ -6,10 +6,9 @@ use Exception;
 use Throwable;
 use Illuminate\Queue\Jobs\SyncJob;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Contracts\Queue\Queue as QueueContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 
-class SyncQueue extends Queue implements QueueContract
+class SyncQueue extends Queue
 {
     /**
      * Get the size of the queue.
