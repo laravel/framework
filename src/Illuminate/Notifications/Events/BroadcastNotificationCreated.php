@@ -103,9 +103,9 @@ class BroadcastNotificationCreated implements ShouldBroadcast
                     ? $this->notification->broadcastType()
                     : get_class($this->notification);
     }
-    
+
     /**
-     * Get the type of the broadcasted event.
+     * Get the event name for the broadcasted event.
      *
      * @return string
      */
@@ -114,6 +114,7 @@ class BroadcastNotificationCreated implements ShouldBroadcast
         if (method_exists($this->notification, 'broadcastAs')) {
             return $this->notification->broadcastAs();
         }
+        
          return static::class;
     }
 }
