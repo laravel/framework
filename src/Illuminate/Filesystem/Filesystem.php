@@ -127,16 +127,17 @@ class Filesystem
      *
      * This will replace the target file permissions. It also resolves symlinks to replace the symlink's target file.
      *
-     * @param string $path
-     * @param string $content
+     * @param  string  $path
+     * @param  string  $content
+     * @return void
      */
     public function replace($path, $content)
     {
-        // Just in case path already exists and is a symlink, we want to make sure we get the real path.
+        // If the path already exists and is a symlink, make sure we get the real path...
         clearstatcache(true, $path);
+
         $path = realpath($path) ?: $path;
 
-        // Write out the contents to a temp file, so we then can rename the file atomically.
         $tempPath = tempnam(dirname($path), basename($path));
 
         // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600.
