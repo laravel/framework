@@ -4,6 +4,7 @@ namespace Illuminate\Tests\Foundation;
 
 use stdClass;
 use Mockery as m;
+use Illuminate\Foundation\Mix;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 
@@ -67,7 +68,7 @@ class FoundationHelpersTest extends TestCase
     {
         $file = 'unversioned.css';
 
-        app()->singleton('path.public', function () {
+        (new Application)->singleton('path.public', function () {
             return __DIR__;
         });
 
@@ -82,5 +83,14 @@ class FoundationHelpersTest extends TestCase
         $this->assertEquals('/versioned.css', $result);
 
         unlink(public_path('mix-manifest.json'));
+    }
+
+    public function testMixIsSwappableForTests()
+    {
+        (new Application)->instance('mix', function () {
+            return 'expected';
+        });
+
+        $this->assertSame('expected', mix('asset.png'));
     }
 }
