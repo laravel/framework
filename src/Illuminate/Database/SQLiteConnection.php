@@ -27,6 +27,7 @@ class SQLiteConnection extends Connection
             $this->getSchemaBuilder()->enableForeignKeyConstraints();
         }
     }
+
     /**
      * Get the default query grammar instance.
      *
@@ -84,7 +85,7 @@ class SQLiteConnection extends Connection
     /**
      * Get the database connection foreign key constraints configuration option.
      *
-     * @return boolean|null
+     * @return bool|null
      */
     protected function getForeignKeyConstraintsConfigurationValue()
     {
