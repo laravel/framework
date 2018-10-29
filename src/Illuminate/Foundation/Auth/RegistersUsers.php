@@ -61,7 +61,7 @@ trait RegistersUsers
             return response()->json([
                 'status' => trans('auth.registered'),
                 'user' => $user,
-                'token' => $token
+                'token' => $token,
             ], 201);
         }
 

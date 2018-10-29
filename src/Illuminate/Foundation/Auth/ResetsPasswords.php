@@ -137,7 +137,7 @@ trait ResetsPasswords
             return response()->json([
                 'status' => trans($response),
                 'user' => $user,
-                'token' => $token
+                'token' => $token,
             ], 202);
         }
 
@@ -156,7 +156,7 @@ trait ResetsPasswords
     protected function sendResetFailedResponse(Request $request, $response)
     {
         throw ValidationException::withMessages([
-            'email' => trans($response)
+            'email' => trans($response),
         ]);
     }
 

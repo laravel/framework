@@ -124,7 +124,7 @@ trait AuthenticatesUsers
             return response()->json([
                 'status' => trans('auth.authenticated'),
                 'user' => $user,
-                'token' => $token
+                'token' => $token,
             ]);
         }
 
@@ -183,7 +183,7 @@ trait AuthenticatesUsers
     {
         if ($request->expectsJson()) {
             return response()->json([
-                'status' => trans('auth.logout')
+                'status' => trans('auth.logout'),
             ]);
         }
 

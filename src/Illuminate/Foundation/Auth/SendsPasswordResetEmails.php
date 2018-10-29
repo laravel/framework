@@ -81,7 +81,7 @@ trait SendsPasswordResetEmails
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
         throw ValidationException::withMessages([
-            'email' => trans($response)
+            'email' => trans($response),
         ]);
     }
 
