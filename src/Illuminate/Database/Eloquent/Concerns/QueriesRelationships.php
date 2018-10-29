@@ -74,6 +74,13 @@ trait QueriesRelationships
     {
         $relations = explode('.', $relations);
 
+        $doesntHave = $operator === '<' && $count === 1;
+
+        if ($doesntHave) {
+            $operator = '>=';
+            $count = 1;
+        }
+
         $closure = function ($q) use (&$closure, &$relations, $operator, $count, $callback) {
             // In order to nest "has", we need to add count relation constraints on the
             // callback Closure. We'll do this by simply passing the Closure its own
@@ -83,7 +90,7 @@ trait QueriesRelationships
                 : $q->has(array_shift($relations), $operator, $count, 'and', $callback);
         };
 
-        return $this->has(array_shift($relations), '>=', 1, $boolean, $closure);
+        return $this->has(array_shift($relations), $doesntHave ? '<' : '>=', 1, $boolean, $closure);
     }
 
     /**
