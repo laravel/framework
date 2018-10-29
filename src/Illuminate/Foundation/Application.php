@@ -7,6 +7,7 @@ use RuntimeException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Foundation\Mix;
 use Illuminate\Support\Collection;
 use Illuminate\Container\Container;
 use Illuminate\Filesystem\Filesystem;
@@ -140,6 +141,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         if ($basePath) {
             $this->setBasePath($basePath);
         }
+
+        $this->registerMixBinding();
 
         $this->registerBaseBindings();
 
@@ -287,6 +290,20 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path.database', $this->databasePath());
         $this->instance('path.resources', $this->resourcePath());
         $this->instance('path.bootstrap', $this->bootstrapPath());
+    }
+
+    /**
+     * Register the mix class binding.
+     *
+     * @return $this
+     */
+    public function registerMixBinding()
+    {
+        $this->singleton('mix', function () {
+            return new Mix;
+        });
+
+        return $this;
     }
 
     /**

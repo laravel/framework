@@ -67,7 +67,7 @@ class FoundationHelpersTest extends TestCase
     {
         $file = 'unversioned.css';
 
-        app()->singleton('path.public', function () {
+        (new Application)->singleton('path.public', function () {
             return __DIR__;
         });
 
@@ -82,5 +82,15 @@ class FoundationHelpersTest extends TestCase
         $this->assertEquals('/versioned.css', $result);
 
         unlink(public_path('mix-manifest.json'));
+    }
+
+    public function testMixIsSwappableForTests()
+    {
+        $app = new Application;
+        $app->instance('mix', function () {
+            return 'expected';
+        });
+
+        $this->assertSame('expected', mix('asset.png'));
     }
 }
