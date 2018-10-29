@@ -11,6 +11,23 @@ use Illuminate\Database\Schema\Grammars\SQLiteGrammar as SchemaGrammar;
 class SQLiteConnection extends Connection
 {
     /**
+     * Create a new database connection instance.
+     *
+     * @param  \PDO|\Closure     $pdo
+     * @param  string   $database
+     * @param  string   $tablePrefix
+     * @param  array    $config
+     * @return void
+     */
+    public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
+    {
+        parent::__construct($pdo, $database, $tablePrefix, $config);
+
+        if ($this->getForeignKeyConstraintsSetting() == true) {
+            $this->getSchemaBuilder()->enableForeignKeyConstraints();
+        }
+    }
+    /**
      * Get the default query grammar instance.
      *
      * @return \Illuminate\Database\Query\Grammars\SQLiteGrammar
@@ -62,5 +79,15 @@ class SQLiteConnection extends Connection
     protected function getDoctrineDriver()
     {
         return new DoctrineDriver;
+    }
+
+    /**
+     * Get the database connection foreign_key_constraints setting.
+     *
+     * @return boolean|null
+     */
+    protected function getForeignKeyConstraintsSetting()
+    {
+        return $this->getConfig('foreign_key_constraints');
     }
 }
