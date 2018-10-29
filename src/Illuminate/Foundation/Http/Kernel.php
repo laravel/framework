@@ -327,6 +327,16 @@ class Kernel implements KernelContract
     }
 
     /**
+     * Get the application's route middleware groups.
+     *
+     * @return array
+     */
+    public function getMiddlewareGroups()
+    {
+        return $this->middlewareGroups;
+    }
+
+    /**
      * Get the Laravel application instance.
      *
      * @return \Illuminate\Contracts\Foundation\Application
