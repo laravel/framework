@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery as m;
 use GuzzleHttp\Client;
-use Mockery\MockInterface;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Notifications\Channels\SlackWebhookChannel;
+use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\SlackMessage;
-use Illuminate\Notifications\Channels\SlackWebhookChannel;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use Mockery\MockInterface;
+use PHPUnit\Framework\TestCase;
 
 class NotificationSlackChannelTest extends TestCase
 {
@@ -40,8 +40,9 @@ class NotificationSlackChannelTest extends TestCase
 
     /**
      * @dataProvider payloadDataProvider
+     *
      * @param Notification $notification
-     * @param array $payload
+     * @param array        $payload
      */
     public function testCorrectPayloadIsSentToSlack(Notification $notification, array $payload)
     {
@@ -50,15 +51,15 @@ class NotificationSlackChannelTest extends TestCase
             $this->assertEquals($argPayload, $payload);
         });
 
-        $this->slackChannel->send(new NotificationSlackChannelTestNotifiable, $notification);
+        $this->slackChannel->send(new NotificationSlackChannelTestNotifiable(), $notification);
     }
 
     public function payloadDataProvider()
     {
         return [
-            'payloadWithIcon' => $this->getPayloadWithIcon(),
-            'payloadWithImageIcon' => $this->getPayloadWithImageIcon(),
-            'payloadWithoutOptionalFields' => $this->getPayloadWithoutOptionalFields(),
+            'payloadWithIcon'                   => $this->getPayloadWithIcon(),
+            'payloadWithImageIcon'              => $this->getPayloadWithImageIcon(),
+            'payloadWithoutOptionalFields'      => $this->getPayloadWithoutOptionalFields(),
             'payloadWithAttachmentFieldBuilder' => $this->getPayloadWithAttachmentFieldBuilder(),
         ];
     }
@@ -66,33 +67,33 @@ class NotificationSlackChannelTest extends TestCase
     private function getPayloadWithIcon()
     {
         return [
-            new NotificationSlackChannelTestNotification,
+            new NotificationSlackChannelTestNotification(),
             [
                 'json' => [
-                    'username' => 'Ghostbot',
-                    'icon_emoji' => ':ghost:',
-                    'channel' => '#ghost-talk',
-                    'text' => 'Content',
+                    'username'    => 'Ghostbot',
+                    'icon_emoji'  => ':ghost:',
+                    'channel'     => '#ghost-talk',
+                    'text'        => 'Content',
                     'attachments' => [
                         [
-                            'title' => 'Laravel',
+                            'title'      => 'Laravel',
                             'title_link' => 'https://laravel.com',
-                            'text' => 'Attachment Content',
-                            'fallback' => 'Attachment Fallback',
-                            'fields' => [
+                            'text'       => 'Attachment Content',
+                            'fallback'   => 'Attachment Fallback',
+                            'fields'     => [
                                 [
                                     'title' => 'Project',
                                     'value' => 'Laravel',
                                     'short' => true,
                                 ],
                             ],
-                            'mrkdwn_in' => ['text'],
-                            'footer' => 'Laravel',
+                            'mrkdwn_in'   => ['text'],
+                            'footer'      => 'Laravel',
                             'footer_icon' => 'https://laravel.com/fake.png',
                             'author_name' => 'Author',
                             'author_link' => 'https://laravel.com/fake_author',
                             'author_icon' => 'https://laravel.com/fake_author.png',
-                            'ts' => 1234567890,
+                            'ts'          => 1234567890,
                         ],
                     ],
                 ],
@@ -103,30 +104,30 @@ class NotificationSlackChannelTest extends TestCase
     private function getPayloadWithImageIcon()
     {
         return [
-            new NotificationSlackChannelTestNotificationWithImageIcon,
+            new NotificationSlackChannelTestNotificationWithImageIcon(),
             [
                 'json' => [
-                    'username' => 'Ghostbot',
-                    'icon_url' => 'http://example.com/image.png',
-                    'channel' => '#ghost-talk',
-                    'text' => 'Content',
+                    'username'    => 'Ghostbot',
+                    'icon_url'    => 'http://example.com/image.png',
+                    'channel'     => '#ghost-talk',
+                    'text'        => 'Content',
                     'attachments' => [
                         [
-                            'title' => 'Laravel',
+                            'title'      => 'Laravel',
                             'title_link' => 'https://laravel.com',
-                            'text' => 'Attachment Content',
-                            'fallback' => 'Attachment Fallback',
-                            'fields' => [
+                            'text'       => 'Attachment Content',
+                            'fallback'   => 'Attachment Fallback',
+                            'fields'     => [
                                 [
                                     'title' => 'Project',
                                     'value' => 'Laravel',
                                     'short' => true,
                                 ],
                             ],
-                            'mrkdwn_in' => ['text'],
-                            'footer' => 'Laravel',
+                            'mrkdwn_in'   => ['text'],
+                            'footer'      => 'Laravel',
                             'footer_icon' => 'https://laravel.com/fake.png',
-                            'ts' => 1234567890,
+                            'ts'          => 1234567890,
                         ],
                     ],
                 ],
@@ -137,16 +138,16 @@ class NotificationSlackChannelTest extends TestCase
     private function getPayloadWithoutOptionalFields()
     {
         return [
-            new NotificationSlackChannelWithoutOptionalFieldsTestNotification,
+            new NotificationSlackChannelWithoutOptionalFieldsTestNotification(),
             [
                 'json' => [
-                    'text' => 'Content',
+                    'text'        => 'Content',
                     'attachments' => [
                         [
-                            'title' => 'Laravel',
+                            'title'      => 'Laravel',
                             'title_link' => 'https://laravel.com',
-                            'text' => 'Attachment Content',
-                            'fields' => [
+                            'text'       => 'Attachment Content',
+                            'fields'     => [
                                 [
                                     'title' => 'Project',
                                     'value' => 'Laravel',
@@ -163,16 +164,16 @@ class NotificationSlackChannelTest extends TestCase
     public function getPayloadWithAttachmentFieldBuilder()
     {
         return [
-            new NotificationSlackChannelWithAttachmentFieldBuilderTestNotification,
+            new NotificationSlackChannelWithAttachmentFieldBuilderTestNotification(),
             [
                 'json' => [
-                    'text' => 'Content',
+                    'text'        => 'Content',
                     'attachments' => [
                         [
-                            'title' => 'Laravel',
-                            'text' => 'Attachment Content',
+                            'title'      => 'Laravel',
+                            'text'       => 'Attachment Content',
                             'title_link' => 'https://laravel.com',
-                            'fields' => [
+                            'fields'     => [
                                 [
                                     'title' => 'Project',
                                     'value' => 'Laravel',
@@ -206,7 +207,7 @@ class NotificationSlackChannelTestNotification extends Notification
 {
     public function toSlack($notifiable)
     {
-        return (new SlackMessage)
+        return (new SlackMessage())
                     ->from('Ghostbot', ':ghost:')
                     ->to('#ghost-talk')
                     ->content('Content')
@@ -232,7 +233,7 @@ class NotificationSlackChannelTestNotificationWithImageIcon extends Notification
 {
     public function toSlack($notifiable)
     {
-        return (new SlackMessage)
+        return (new SlackMessage())
                     ->from('Ghostbot')
                     ->image('http://example.com/image.png')
                     ->to('#ghost-talk')
@@ -258,7 +259,7 @@ class NotificationSlackChannelWithoutOptionalFieldsTestNotification extends Noti
 {
     public function toSlack($notifiable)
     {
-        return (new SlackMessage)
+        return (new SlackMessage())
                     ->content('Content')
                     ->attachment(function ($attachment) {
                         $attachment->title('Laravel', 'https://laravel.com')
@@ -274,7 +275,7 @@ class NotificationSlackChannelWithAttachmentFieldBuilderTestNotification extends
 {
     public function toSlack($notifiable)
     {
-        return (new SlackMessage)
+        return (new SlackMessage())
             ->content('Content')
             ->attachment(function ($attachment) {
                 $attachment->title('Laravel', 'https://laravel.com')

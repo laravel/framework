@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Routing;
 
+use Illuminate\Contracts\Routing\UrlRoutable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteCollection;
+use Illuminate\Routing\UrlGenerator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\UrlGenerator;
-use Illuminate\Routing\RouteCollection;
-use Illuminate\Contracts\Routing\UrlRoutable;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class RoutingUrlGeneratorTest extends TestCase
@@ -16,7 +16,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testBasicGeneration()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -29,7 +29,7 @@ class RoutingUrlGeneratorTest extends TestCase
          * Test HTTPS request URL generation...
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('https://www.foo.com/')
         );
 
@@ -39,7 +39,7 @@ class RoutingUrlGeneratorTest extends TestCase
          * Test asset URL generation...
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/index.php/')
         );
 
@@ -50,7 +50,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testBasicGenerationWithHostFormatting()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -73,7 +73,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $request->server->set('PHP_SELF', '/subfolder/index.php');
 
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request
         );
 
@@ -92,7 +92,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $request->server->set('PHP_SELF', '/subfolder/index.php');
 
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request
         );
 
@@ -112,7 +112,7 @@ class RoutingUrlGeneratorTest extends TestCase
         $request->server->set('PHP_SELF', '/other.php');
 
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request
         );
 
@@ -127,7 +127,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testBasicGenerationWithPathFormatting()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -145,7 +145,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testUrlFormattersShouldReceiveTargetRoute()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://abc.com/')
         );
 
@@ -167,7 +167,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testBasicRouteGeneration()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -260,7 +260,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testFluentRouteNameDefinitions()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -278,7 +278,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testControllerRoutesWithADefaultNamespace()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -304,7 +304,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testControllerRoutesOutsideOfDefaultNamespace()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -323,14 +323,14 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testRoutableInterfaceRouting()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
         $routes->add($route);
 
-        $model = new RoutableInterfaceStub;
+        $model = new RoutableInterfaceStub();
         $model->key = 'routable';
 
         $this->assertEquals('/foo/routable', $url->route('routable', [$model], false));
@@ -339,14 +339,14 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testRoutableInterfaceRoutingWithSingleParameter()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
         $route = new Route(['GET'], 'foo/{bar}', ['as' => 'routable']);
         $routes->add($route);
 
-        $model = new RoutableInterfaceStub;
+        $model = new RoutableInterfaceStub();
         $model->key = 'routable';
 
         $this->assertEquals('/foo/routable', $url->route('routable', $model, false));
@@ -355,7 +355,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testRoutesMaintainRequestScheme()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('https://www.foo.com/')
         );
 
@@ -371,7 +371,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testHttpOnlyRoutes()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('https://www.foo.com/')
         );
 
@@ -387,7 +387,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testRoutesWithDomains()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -408,7 +408,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testRoutesWithDomainsAndPorts()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com:8080/')
         );
 
@@ -431,7 +431,7 @@ class RoutingUrlGeneratorTest extends TestCase
          * http:// Route
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -444,7 +444,7 @@ class RoutingUrlGeneratorTest extends TestCase
          * https:// Route
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('https://www.foo.com/')
         );
 
@@ -457,7 +457,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testHttpsRoutesWithDomains()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('https://foo.com/')
         );
 
@@ -475,7 +475,7 @@ class RoutingUrlGeneratorTest extends TestCase
         Request::setTrustedProxies(['10.0.0.1'], SymfonyRequest::HEADER_X_FORWARDED_ALL);
 
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/', 'GET', [], [], [], ['REMOTE_ADDR' => '10.0.0.1', 'HTTP_X_FORWARDED_PORT' => '80'])
         );
 
@@ -491,7 +491,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testUrlGenerationForControllersRequiresPassingOfRequiredParameters()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com:8080/')
         );
 
@@ -506,7 +506,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testForceRootUrl()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -521,7 +521,7 @@ class RoutingUrlGeneratorTest extends TestCase
          * Route Based...
          */
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -538,7 +538,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testPrevious()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -558,7 +558,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testRouteNotDefinedException()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
 
@@ -568,7 +568,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testSignedUrl()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {
@@ -592,7 +592,7 @@ class RoutingUrlGeneratorTest extends TestCase
     public function testSignedRelativeUrl()
     {
         $url = new UrlGenerator(
-            $routes = new RouteCollection,
+            $routes = new RouteCollection(),
             $request = Request::create('http://www.foo.com/')
         );
         $url->setKeyResolver(function () {

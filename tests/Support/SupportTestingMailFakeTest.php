@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Support\Testing\Fakes\MailFake;
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Contracts\Translation\HasLocalePreference;
+use Illuminate\Mail\Mailable;
+use Illuminate\Support\Testing\Fakes\MailFake;
+use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingMailFakeTest extends TestCase
 {
@@ -25,8 +25,8 @@ class SupportTestingMailFakeTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->fake = new MailFake;
-        $this->mailable = new MailableStub;
+        $this->fake = new MailFake();
+        $this->mailable = new MailableStub();
     }
 
     public function testAssertSent()
@@ -45,7 +45,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testAssertSentWhenRecipientHasPreferredLocale()
     {
-        $user = new LocalizedRecipientStub;
+        $user = new LocalizedRecipientStub();
 
         $this->fake->to($user)->send($this->mailable);
 
@@ -114,7 +114,7 @@ class SupportTestingMailFakeTest extends TestCase
 
     public function testSendQueuesAMailableThatShouldBeQueued()
     {
-        $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub);
+        $this->fake->to('taylor@laravel.com')->send(new QueueableMailableStub());
 
         $this->fake->assertQueued(QueueableMailableStub::class);
 

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Auth\ApiAuthenticationWithEloquentTest;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 class ApiAuthenticationWithEloquentTest extends TestCase
 {
@@ -20,12 +20,12 @@ class ApiAuthenticationWithEloquentTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'mysql',
-            'host' => env('DB_HOST', '127.0.0.1'),
+            'driver'   => 'mysql',
+            'host'     => env('DB_HOST', '127.0.0.1'),
             'username' => 'root',
             'password' => 'invalid-credentials',
             'database' => 'forge',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 

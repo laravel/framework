@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Connection;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabasePostgresSchemaGrammarTest extends TestCase
 {
@@ -832,7 +832,7 @@ class DatabasePostgresSchemaGrammarTest extends TestCase
 
     public function getGrammar()
     {
-        return new PostgresGrammar;
+        return new PostgresGrammar();
     }
 
     public function testGrammarsAreMacroable()

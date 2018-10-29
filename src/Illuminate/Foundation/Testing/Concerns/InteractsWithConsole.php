@@ -32,13 +32,14 @@ trait InteractsWithConsole
     /**
      * Call artisan command and return code.
      *
-     * @param  string  $command
-     * @param  array  $parameters
+     * @param string $command
+     * @param array  $parameters
+     *
      * @return \Illuminate\Foundation\Testing\PendingCommand|int
      */
     public function artisan($command, $parameters = [])
     {
-        if (! $this->mockConsoleOutput) {
+        if (!$this->mockConsoleOutput) {
             return $this->app[Kernel::class]->call($command, $parameters);
         }
 

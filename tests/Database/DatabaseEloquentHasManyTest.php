@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
-use stdClass;
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentHasManyTest extends TestCase
 {
@@ -201,9 +201,9 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
         $relation->getQuery()->shouldReceive('whereIn')->once()->with('table.foreign_key', [1, 2]);
-        $model1 = new EloquentHasManyModelStub;
+        $model1 = new EloquentHasManyModelStub();
         $model1->id = 1;
-        $model2 = new EloquentHasManyModelStub;
+        $model2 = new EloquentHasManyModelStub();
         $model2->id = 2;
         $relation->addEagerConstraints([$model1, $model2]);
     }
@@ -212,18 +212,18 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $relation = $this->getRelation();
 
-        $result1 = new EloquentHasManyModelStub;
+        $result1 = new EloquentHasManyModelStub();
         $result1->foreign_key = 1;
-        $result2 = new EloquentHasManyModelStub;
+        $result2 = new EloquentHasManyModelStub();
         $result2->foreign_key = 2;
-        $result3 = new EloquentHasManyModelStub;
+        $result3 = new EloquentHasManyModelStub();
         $result3->foreign_key = 2;
 
-        $model1 = new EloquentHasManyModelStub;
+        $model1 = new EloquentHasManyModelStub();
         $model1->id = 1;
-        $model2 = new EloquentHasManyModelStub;
+        $model2 = new EloquentHasManyModelStub();
         $model2->id = 2;
-        $model3 = new EloquentHasManyModelStub;
+        $model3 = new EloquentHasManyModelStub();
         $model3->id = 3;
 
         $relation->getRelated()->shouldReceive('newCollection')->andReturnUsing(function ($array) {
@@ -243,11 +243,11 @@ class DatabaseEloquentHasManyTest extends TestCase
     {
         $records = [
             'taylor' => ['name' => 'taylor'],
-            'colin' => ['name' => 'colin'],
+            'colin'  => ['name' => 'colin'],
         ];
 
         $relation = $this->getRelation();
-        $relation->getRelated()->shouldReceive('newCollection')->once()->andReturn(new Collection);
+        $relation->getRelated()->shouldReceive('newCollection')->once()->andReturn(new Collection());
 
         $taylor = $this->expectCreatedModel($relation, ['name' => 'taylor']);
         $colin = $this->expectCreatedModel($relation, ['name' => 'colin']);

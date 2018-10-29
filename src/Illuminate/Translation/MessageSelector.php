@@ -9,9 +9,10 @@ class MessageSelector
     /**
      * Select a proper translation string based on the given number.
      *
-     * @param  string  $line
-     * @param  int  $number
-     * @param  string  $locale
+     * @param string $line
+     * @param int    $number
+     * @param string $locale
+     *
      * @return mixed
      */
     public function choose($line, $number, $locale)
@@ -26,7 +27,7 @@ class MessageSelector
 
         $pluralIndex = $this->getPluralIndex($locale, $number);
 
-        if (count($segments) === 1 || ! isset($segments[$pluralIndex])) {
+        if (count($segments) === 1 || !isset($segments[$pluralIndex])) {
             return $segments[0];
         }
 
@@ -36,14 +37,15 @@ class MessageSelector
     /**
      * Extract a translation string using inline conditions.
      *
-     * @param  array  $segments
-     * @param  int  $number
+     * @param array $segments
+     * @param int   $number
+     *
      * @return mixed
      */
     private function extract($segments, $number)
     {
         foreach ($segments as $part) {
-            if (! is_null($line = $this->extractFromString($part, $number))) {
+            if (!is_null($line = $this->extractFromString($part, $number))) {
                 return $line;
             }
         }
@@ -52,8 +54,9 @@ class MessageSelector
     /**
      * Get the translation string if the condition matches.
      *
-     * @param  string  $part
-     * @param  int  $number
+     * @param string $part
+     * @param int    $number
+     *
      * @return mixed
      */
     private function extractFromString($part, $number)
@@ -86,7 +89,8 @@ class MessageSelector
     /**
      * Strip the inline conditions from each segment, just leaving the text.
      *
-     * @param  array  $segments
+     * @param array $segments
+     *
      * @return array
      */
     private function stripConditions($segments)
@@ -103,8 +107,9 @@ class MessageSelector
      * is subject to the new BSD license (http://framework.zend.com/license/new-bsd)
      * Copyright (c) 2005-2010 - Zend Technologies USA Inc. (http://www.zend.com)
      *
-     * @param  string  $locale
-     * @param  int  $number
+     * @param string $locale
+     * @param int    $number
+     *
      * @return int
      */
     public function getPluralIndex($locale, $number)

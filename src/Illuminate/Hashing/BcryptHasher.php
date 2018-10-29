@@ -2,8 +2,8 @@
 
 namespace Illuminate\Hashing;
 
-use RuntimeException;
 use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use RuntimeException;
 
 class BcryptHasher extends AbstractHasher implements HasherContract
 {
@@ -24,7 +24,8 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Create a new hasher instance.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return void
      */
     public function __construct(array $options = [])
@@ -36,11 +37,12 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Hash the given value.
      *
-     * @param  string  $value
-     * @param  array   $options
-     * @return string
+     * @param string $value
+     * @param array  $options
      *
      * @throws \RuntimeException
+     *
+     * @return string
      */
     public function make($value, array $options = [])
     {
@@ -58,12 +60,13 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Check the given plain value against a hash.
      *
-     * @param  string  $value
-     * @param  string  $hashedValue
-     * @param  array  $options
-     * @return bool
+     * @param string $value
+     * @param string $hashedValue
+     * @param array  $options
      *
      * @throws \RuntimeException
+     *
+     * @return bool
      */
     public function check($value, $hashedValue, array $options = [])
     {
@@ -77,8 +80,9 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Check if the given hash has been hashed using the given options.
      *
-     * @param  string  $hashedValue
-     * @param  array   $options
+     * @param string $hashedValue
+     * @param array  $options
+     *
      * @return bool
      */
     public function needsRehash($hashedValue, array $options = [])
@@ -91,7 +95,8 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Set the default password work factor.
      *
-     * @param  int  $rounds
+     * @param int $rounds
+     *
      * @return $this
      */
     public function setRounds($rounds)
@@ -104,7 +109,8 @@ class BcryptHasher extends AbstractHasher implements HasherContract
     /**
      * Extract the cost value from the options array.
      *
-     * @param  array  $options
+     * @param array $options
+     *
      * @return int
      */
     protected function cost(array $options = [])

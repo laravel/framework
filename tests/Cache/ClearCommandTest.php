@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\CacheManager;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Foundation\Application;
 use Illuminate\Cache\Console\ClearCommand;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Foundation\Application;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
 
@@ -47,7 +47,7 @@ class ClearCommandTest extends TestCase
         $this->cacheRepository = m::mock(Repository::class);
         $this->command = new ClearCommandTestStub($this->cacheManager, $this->files);
 
-        $app = new Application;
+        $app = new Application();
         $app['path.storage'] = __DIR__;
         $this->command->setLaravel($app);
     }
@@ -143,7 +143,7 @@ class ClearCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new ArrayInput($input), new NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput());
     }
 }
 

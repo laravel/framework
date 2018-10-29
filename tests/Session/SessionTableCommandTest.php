@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Session;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Composer;
+use Illuminate\Database\Migrations\MigrationCreator;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
+use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Support\Composer;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Database\Migrations\MigrationCreator;
 
 class SessionTableCommandTest extends TestCase
 {
@@ -27,7 +27,7 @@ class SessionTableCommandTest extends TestCase
         );
         $creator = m::mock(MigrationCreator::class)->shouldIgnoreMissing();
 
-        $app = new Application;
+        $app = new Application();
         $app->useDatabasePath(__DIR__);
         $app['migration.creator'] = $creator;
         $command->setLaravel($app);
@@ -42,7 +42,7 @@ class SessionTableCommandTest extends TestCase
 
     protected function runCommand($command, $input = [])
     {
-        return $command->run(new ArrayInput($input), new NullOutput);
+        return $command->run(new ArrayInput($input), new NullOutput());
     }
 }
 

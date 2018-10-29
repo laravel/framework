@@ -3,8 +3,8 @@
 namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\Command;
-use Illuminate\Encryption\Encrypter;
 use Illuminate\Console\ConfirmableTrait;
+use Illuminate\Encryption\Encrypter;
 
 class KeyGenerateCommand extends Command
 {
@@ -42,7 +42,7 @@ class KeyGenerateCommand extends Command
         // Next, we will replace the application key in the environment file so it is
         // automatically setup for this developer. This key gets generated using a
         // secure random byte generator and is later base64 encoded for storage.
-        if (! $this->setKeyInEnvironmentFile($key)) {
+        if (!$this->setKeyInEnvironmentFile($key)) {
             return;
         }
 
@@ -66,14 +66,15 @@ class KeyGenerateCommand extends Command
     /**
      * Set the application key in the environment file.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     protected function setKeyInEnvironmentFile($key)
     {
         $currentKey = $this->laravel['config']['app.key'];
 
-        if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
+        if (strlen($currentKey) !== 0 && (!$this->confirmToProceed())) {
             return false;
         }
 
@@ -85,7 +86,8 @@ class KeyGenerateCommand extends Command
     /**
      * Write a new environment file with the given key.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return void
      */
     protected function writeNewEnvironmentFileWith($key)

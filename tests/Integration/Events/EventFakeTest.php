@@ -2,18 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Events;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 class EventFakeTest extends TestCase
 {
     /**
      * Define environment setup.
      *
-     * @param  \Illuminate\Foundation\Application   $app
+     * @param \Illuminate\Foundation\Application $app
      *
      * @return void
      */
@@ -25,9 +25,9 @@ class EventFakeTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 
@@ -65,7 +65,7 @@ class EventFakeTest extends TestCase
         Event::fake(NonImportantEvent::class);
         Post::observe([PostObserver::class]);
 
-        $post = new Post;
+        $post = new Post();
         $post->title = 'xyz';
         $post->save();
 

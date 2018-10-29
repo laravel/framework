@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use Illuminate\Database\Seeder;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Container\Container;
+use Illuminate\Database\ConnectionResolverInterface;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\Seeder;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\NullOutput;
-use Illuminate\Database\Console\Seeds\SeedCommand;
-use Illuminate\Database\ConnectionResolverInterface;
 
 class SeedCommandTest extends TestCase
 {
     public function testHandle()
     {
         $input = new ArrayInput(['--force' => true, '--database' => 'sqlite']);
-        $output = new NullOutput;
+        $output = new NullOutput();
 
         $seeder = m::mock(Seeder::class);
         $seeder->shouldReceive('setContainer')->once()->andReturnSelf();

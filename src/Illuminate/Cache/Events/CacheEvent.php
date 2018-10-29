@@ -21,8 +21,9 @@ abstract class CacheEvent
     /**
      * Create a new event instance.
      *
-     * @param  string  $key
-     * @param  array  $tags
+     * @param string $key
+     * @param array  $tags
+     *
      * @return void
      */
     public function __construct($key, array $tags = [])
@@ -34,7 +35,8 @@ abstract class CacheEvent
     /**
      * Set the tags for the cache event.
      *
-     * @param  array  $tags
+     * @param array $tags
+     *
      * @return $this
      */
     public function setTags($tags)

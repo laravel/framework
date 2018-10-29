@@ -31,13 +31,13 @@ class AuthMakeCommand extends Command
      * @var array
      */
     protected $views = [
-        'auth/login.stub' => 'auth/login.blade.php',
-        'auth/register.stub' => 'auth/register.blade.php',
-        'auth/verify.stub' => 'auth/verify.blade.php',
+        'auth/login.stub'           => 'auth/login.blade.php',
+        'auth/register.stub'        => 'auth/register.blade.php',
+        'auth/verify.stub'          => 'auth/verify.blade.php',
         'auth/passwords/email.stub' => 'auth/passwords/email.blade.php',
         'auth/passwords/reset.stub' => 'auth/passwords/reset.blade.php',
-        'layouts/app.stub' => 'layouts/app.blade.php',
-        'home.stub' => 'home.blade.php',
+        'layouts/app.stub'          => 'layouts/app.blade.php',
+        'home.stub'                 => 'home.blade.php',
     ];
 
     /**
@@ -51,7 +51,7 @@ class AuthMakeCommand extends Command
 
         $this->exportViews();
 
-        if (! $this->option('views')) {
+        if (!$this->option('views')) {
             file_put_contents(
                 app_path('Http/Controllers/HomeController.php'),
                 $this->compileControllerStub()
@@ -74,11 +74,11 @@ class AuthMakeCommand extends Command
      */
     protected function createDirectories()
     {
-        if (! is_dir($directory = resource_path('views/layouts'))) {
+        if (!is_dir($directory = resource_path('views/layouts'))) {
             mkdir($directory, 0755, true);
         }
 
-        if (! is_dir($directory = resource_path('views/auth/passwords'))) {
+        if (!is_dir($directory = resource_path('views/auth/passwords'))) {
             mkdir($directory, 0755, true);
         }
     }
@@ -91,8 +91,8 @@ class AuthMakeCommand extends Command
     protected function exportViews()
     {
         foreach ($this->views as $key => $value) {
-            if (file_exists($view = resource_path('views/'.$value)) && ! $this->option('force')) {
-                if (! $this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
+            if (file_exists($view = resource_path('views/'.$value)) && !$this->option('force')) {
+                if (!$this->confirm("The [{$value}] view already exists. Do you want to replace it?")) {
                     continue;
                 }
             }

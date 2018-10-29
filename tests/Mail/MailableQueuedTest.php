@@ -2,20 +2,20 @@
 
 namespace Illuminate\Tests\Mail;
 
-use Mockery as m;
-use Swift_Mailer;
-use Illuminate\Mail\Mailer;
 use Illuminate\Bus\Queueable;
-use Illuminate\Mail\Mailable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Foundation\Application;
-use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemManager;
+use Illuminate\Foundation\Application;
+use Illuminate\Mail\Mailable;
+use Illuminate\Mail\Mailer;
+use Illuminate\Mail\SendQueuedMailable;
 use Illuminate\Support\Testing\Fakes\QueueFake;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Swift_Mailer;
 
 class MailableQueuedTest extends TestCase
 {
@@ -26,13 +26,13 @@ class MailableQueuedTest extends TestCase
 
     public function testQueuedMailableSent()
     {
-        $queueFake = new QueueFake(new Application);
+        $queueFake = new QueueFake(new Application());
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
             ->setMethods(['createMessage', 'to'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub;
+        $mailable = new MailableQueableStub();
         $queueFake->assertNothingPushed();
         $mailer->send($mailable);
         $queueFake->assertPushedOn(null, SendQueuedMailable::class);
@@ -40,13 +40,13 @@ class MailableQueuedTest extends TestCase
 
     public function testQueuedMailableWithAttachmentSent()
     {
-        $queueFake = new QueueFake(new Application);
+        $queueFake = new QueueFake(new Application());
         $mailer = $this->getMockBuilder(Mailer::class)
             ->setConstructorArgs($this->getMocks())
             ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub;
+        $mailable = new MailableQueableStub();
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
         $mailable->attach('foo.jpg', $attachmentOption);
         $this->assertInternalType('array', $mailable->attachments);
@@ -59,7 +59,7 @@ class MailableQueuedTest extends TestCase
 
     public function testQueuedMailableWithAttachmentFromDiskSent()
     {
-        $app = new Application;
+        $app = new Application();
         $container = Container::getInstance();
         $this->getMockBuilder(Filesystem::class)
             ->getMock();
@@ -75,7 +75,7 @@ class MailableQueuedTest extends TestCase
             ->setMethods(['createMessage'])
             ->getMock();
         $mailer->setQueue($queueFake);
-        $mailable = new MailableQueableStub;
+        $mailable = new MailableQueableStub();
         $attachmentOption = ['mime' => 'image/jpeg', 'as' => 'bar.jpg'];
 
         $mailable->attachFromStorage('/', 'foo.jpg', $attachmentOption);

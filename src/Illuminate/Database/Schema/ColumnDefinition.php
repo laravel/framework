@@ -6,6 +6,7 @@ use Illuminate\Support\Fluent;
 
 /**
  * Class ColumnDefinition.
+ *
  * @method ColumnDefinition after(string $column) Place the column "after" another column (MySQL)
  * @method ColumnDefinition autoIncrement() Set INTEGER columns as auto-increment (primary key)
  * @method ColumnDefinition charset(string $charset) Specify a character set for the column (MySQL)

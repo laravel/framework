@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Support;
 
 use Illuminate\Bus\Queueable;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Testing\Fakes\QueueFake;
-use PHPUnit\Framework\ExpectationFailedException;
 use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingQueueFakeTest extends TestCase
 {
@@ -24,8 +24,8 @@ class SupportTestingQueueFakeTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->fake = new QueueFake(new Application);
-        $this->job = new JobStub;
+        $this->fake = new QueueFake(new Application());
+        $this->job = new JobStub();
     }
 
     public function testAssertPushed()
@@ -115,7 +115,7 @@ class SupportTestingQueueFakeTest extends TestCase
         $queue = 'my-test-queue';
         $this->fake->bulk([
             $this->job,
-            new JobStub,
+            new JobStub(),
         ], null, $queue);
 
         $this->fake->assertPushedOn($queue, JobStub::class);
@@ -125,7 +125,7 @@ class SupportTestingQueueFakeTest extends TestCase
     public function testAssertPushedWithChainUsingClassesOrObjectsArray()
     {
         $this->fake->push(new JobWithChainStub([
-            new JobStub,
+            new JobStub(),
         ]));
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
@@ -133,18 +133,18 @@ class SupportTestingQueueFakeTest extends TestCase
         ]);
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
-            new JobStub,
+            new JobStub(),
         ]);
     }
 
     public function testAssertPushedWithChainSameJobDifferentChains()
     {
         $this->fake->push(new JobWithChainStub([
-            new JobStub,
+            new JobStub(),
         ]));
         $this->fake->push(new JobWithChainStub([
-            new JobStub,
-            new JobStub,
+            new JobStub(),
+            new JobStub(),
         ]));
 
         $this->fake->assertPushedWithChain(JobWithChainStub::class, [
@@ -160,12 +160,12 @@ class SupportTestingQueueFakeTest extends TestCase
     public function testAssertPushedWithChainUsingCallback()
     {
         $this->fake->push(new JobWithChainAndParameterStub('first', [
-            new JobStub,
-            new JobStub,
+            new JobStub(),
+            new JobStub(),
         ]));
 
         $this->fake->push(new JobWithChainAndParameterStub('second', [
-            new JobStub,
+            new JobStub(),
         ]));
 
         $this->fake->assertPushedWithChain(JobWithChainAndParameterStub::class, [
@@ -197,7 +197,7 @@ class SupportTestingQueueFakeTest extends TestCase
         }
 
         $this->fake->push(new JobWithChainStub([
-            new JobStub,
+            new JobStub(),
         ]));
 
         try {
@@ -209,8 +209,8 @@ class SupportTestingQueueFakeTest extends TestCase
 
         try {
             $this->fake->assertPushedWithChain(JobWithChainStub::class, [
-                new JobStub,
-                new JobStub,
+                new JobStub(),
+                new JobStub(),
             ]);
             $this->fail();
         } catch (ExpectationFailedException $e) {

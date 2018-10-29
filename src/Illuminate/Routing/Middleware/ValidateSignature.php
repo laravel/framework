@@ -10,11 +10,12 @@ class ValidateSignature
     /**
      * Handle an incoming request.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Closure  $next
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @param \Closure                 $next
      *
      * @throws \Illuminate\Routing\Exceptions\InvalidSignatureException
+     *
+     * @return \Illuminate\Http\Response
      */
     public function handle($request, Closure $next)
     {
@@ -22,6 +23,6 @@ class ValidateSignature
             return $next($request);
         }
 
-        throw new InvalidSignatureException;
+        throw new InvalidSignatureException();
     }
 }

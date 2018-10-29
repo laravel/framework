@@ -12,7 +12,8 @@ class ProcessUtils
     /**
      * Escapes a string to be used as a shell argument.
      *
-     * @param  string  $argument
+     * @param string $argument
+     *
      * @return string
      */
     public static function escapeArgument($argument)
@@ -58,8 +59,9 @@ class ProcessUtils
     /**
      * Is the given string surrounded by the given character?
      *
-     * @param  string  $arg
-     * @param  string  $char
+     * @param string $arg
+     * @param string $char
+     *
      * @return bool
      */
     protected static function isSurroundedBy($arg, $char)

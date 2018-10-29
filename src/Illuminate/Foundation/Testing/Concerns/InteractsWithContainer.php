@@ -10,8 +10,9 @@ trait InteractsWithContainer
     /**
      * Register an instance of an object in the container.
      *
-     * @param  string  $abstract
-     * @param  object  $instance
+     * @param string $abstract
+     * @param object $instance
+     *
      * @return object
      */
     protected function swap($abstract, $instance)
@@ -22,8 +23,9 @@ trait InteractsWithContainer
     /**
      * Register an instance of an object in the container.
      *
-     * @param  string  $abstract
-     * @param  object  $instance
+     * @param string $abstract
+     * @param object $instance
+     *
      * @return object
      */
     protected function instance($abstract, $instance)
@@ -36,8 +38,9 @@ trait InteractsWithContainer
     /**
      * Mock an instance of an object in the container.
      *
-     * @param  string  $abstract
-     * @param  \Closure|null  $instance
+     * @param string        $abstract
+     * @param \Closure|null $instance
+     *
      * @return object
      */
     protected function mock($abstract, Closure $mock = null)
@@ -48,8 +51,9 @@ trait InteractsWithContainer
     /**
      * Spy an instance of an object in the container.
      *
-     * @param  string  $abstract
-     * @param  \Closure|null  $instance
+     * @param string        $abstract
+     * @param \Closure|null $instance
+     *
      * @return object
      */
     protected function spy($abstract, Closure $mock = null)

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Carbon;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSoftDeletingTraitTest extends TestCase
 {

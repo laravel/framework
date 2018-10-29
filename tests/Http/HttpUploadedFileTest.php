@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Http;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Http\UploadedFile;
+use PHPUnit\Framework\TestCase;
 
 class HttpUploadedFileTest extends TestCase
 {

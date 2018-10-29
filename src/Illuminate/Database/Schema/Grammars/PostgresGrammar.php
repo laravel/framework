@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Schema\Grammars;
 
-use Illuminate\Support\Fluent;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Fluent;
 
 class PostgresGrammar extends Grammar
 {
@@ -58,8 +58,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a create table command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileCreate(Blueprint $blueprint, Fluent $command)
@@ -74,8 +75,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a column addition command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileAdd(Blueprint $blueprint, Fluent $command)
@@ -89,8 +91,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a primary key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compilePrimary(Blueprint $blueprint, Fluent $command)
@@ -103,8 +106,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a unique key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileUnique(Blueprint $blueprint, Fluent $command)
@@ -119,8 +123,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a plain index key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileIndex(Blueprint $blueprint, Fluent $command)
@@ -136,8 +141,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a spatial index key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileSpatialIndex(Blueprint $blueprint, Fluent $command)
@@ -150,19 +156,20 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileForeign(Blueprint $blueprint, Fluent $command)
     {
         $sql = parent::compileForeign($blueprint, $command);
 
-        if (! is_null($command->deferrable)) {
+        if (!is_null($command->deferrable)) {
             $sql .= $command->deferrable ? ' deferrable' : ' not deferrable';
         }
 
-        if ($command->deferrable && ! is_null($command->initiallyImmediate)) {
+        if ($command->deferrable && !is_null($command->initiallyImmediate)) {
             $sql .= $command->initiallyImmediate ? ' initially immediate' : ' initially deferred';
         }
 
@@ -172,8 +179,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop table command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDrop(Blueprint $blueprint, Fluent $command)
@@ -184,8 +192,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop table (if exists) command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropIfExists(Blueprint $blueprint, Fluent $command)
@@ -196,7 +205,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all tables.
      *
-     * @param  string  $tables
+     * @param string $tables
+     *
      * @return string
      */
     public function compileDropAllTables($tables)
@@ -207,7 +217,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to drop all views.
      *
-     * @param  string  $views
+     * @param string $views
+     *
      * @return string
      */
     public function compileDropAllViews($views)
@@ -218,7 +229,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all table names.
      *
-     * @param  string  $schema
+     * @param string $schema
+     *
      * @return string
      */
     public function compileGetAllTables($schema)
@@ -229,7 +241,8 @@ class PostgresGrammar extends Grammar
     /**
      * Compile the SQL needed to retrieve all view names.
      *
-     * @param  string  $schema
+     * @param string $schema
+     *
      * @return string
      */
     public function compileGetAllViews($schema)
@@ -240,8 +253,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop column command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropColumn(Blueprint $blueprint, Fluent $command)
@@ -254,8 +268,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop primary key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropPrimary(Blueprint $blueprint, Fluent $command)
@@ -268,8 +283,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop unique key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropUnique(Blueprint $blueprint, Fluent $command)
@@ -282,8 +298,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropIndex(Blueprint $blueprint, Fluent $command)
@@ -294,8 +311,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop spatial index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropSpatialIndex(Blueprint $blueprint, Fluent $command)
@@ -306,8 +324,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a drop foreign key command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileDropForeign(Blueprint $blueprint, Fluent $command)
@@ -320,8 +339,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a rename table command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileRename(Blueprint $blueprint, Fluent $command)
@@ -334,8 +354,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a rename index command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint $blueprint
-     * @param  \Illuminate\Support\Fluent $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileRenameIndex(Blueprint $blueprint, Fluent $command)
@@ -369,8 +390,9 @@ class PostgresGrammar extends Grammar
     /**
      * Compile a comment command.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $command
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $command
+     *
      * @return string
      */
     public function compileComment(Blueprint $blueprint, Fluent $command)
@@ -385,7 +407,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a char type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeChar(Fluent $column)
@@ -396,7 +419,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a string type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeString(Fluent $column)
@@ -407,7 +431,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeText(Fluent $column)
@@ -418,7 +443,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a medium text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeMediumText(Fluent $column)
@@ -429,7 +455,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a long text type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeLongText(Fluent $column)
@@ -440,7 +467,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for an integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeInteger(Fluent $column)
@@ -451,7 +479,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a big integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeBigInteger(Fluent $column)
@@ -462,7 +491,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a medium integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeMediumInteger(Fluent $column)
@@ -473,7 +503,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a tiny integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeTinyInteger(Fluent $column)
@@ -484,7 +515,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a small integer type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeSmallInteger(Fluent $column)
@@ -495,27 +527,28 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a generatable column.
      *
-     * @param  string  $type
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param string                     $type
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function generatableColumn($type, Fluent $column)
     {
-        if (! $column->autoIncrement && is_null($column->generatedAs)) {
+        if (!$column->autoIncrement && is_null($column->generatedAs)) {
             return $type;
         }
 
         if ($column->autoIncrement && is_null($column->generatedAs)) {
             return with([
-                'integer' => 'serial',
-                'bigint' => 'bigserial',
+                'integer'  => 'serial',
+                'bigint'   => 'bigserial',
                 'smallint' => 'smallserial',
             ])[$type];
         }
 
         $options = '';
 
-        if (! is_bool($column->generatedAs) && ! empty($column->generatedAs)) {
+        if (!is_bool($column->generatedAs) && !empty($column->generatedAs)) {
             $options = sprintf(' (%s)', $column->generatedAs);
         }
 
@@ -530,7 +563,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a float type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeFloat(Fluent $column)
@@ -541,7 +575,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a double type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeDouble(Fluent $column)
@@ -552,7 +587,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a real type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeReal(Fluent $column)
@@ -563,7 +599,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a decimal type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeDecimal(Fluent $column)
@@ -574,7 +611,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a boolean type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeBoolean(Fluent $column)
@@ -585,7 +623,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for an enumeration type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeEnum(Fluent $column)
@@ -600,7 +639,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a json type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeJson(Fluent $column)
@@ -611,7 +651,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a jsonb type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeJsonb(Fluent $column)
@@ -622,7 +663,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeDate(Fluent $column)
@@ -633,7 +675,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date-time type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeDateTime(Fluent $column)
@@ -644,7 +687,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a date-time (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeDateTimeTz(Fluent $column)
@@ -655,7 +699,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a time type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeTime(Fluent $column)
@@ -666,7 +711,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a time (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeTimeTz(Fluent $column)
@@ -677,7 +723,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a timestamp type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeTimestamp(Fluent $column)
@@ -690,7 +737,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a timestamp (with time zone) type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeTimestampTz(Fluent $column)
@@ -703,7 +751,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a year type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeYear(Fluent $column)
@@ -714,7 +763,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a binary type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeBinary(Fluent $column)
@@ -725,7 +775,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a uuid type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeUuid(Fluent $column)
@@ -736,7 +787,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for an IP address type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeIpAddress(Fluent $column)
@@ -747,7 +799,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a MAC address type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeMacAddress(Fluent $column)
@@ -758,7 +811,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial Geometry type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeGeometry(Fluent $column)
@@ -769,7 +823,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial Point type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typePoint(Fluent $column)
@@ -780,7 +835,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial LineString type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeLineString(Fluent $column)
@@ -791,7 +847,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial Polygon type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typePolygon(Fluent $column)
@@ -802,7 +859,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial GeometryCollection type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeGeometryCollection(Fluent $column)
@@ -813,7 +871,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPoint type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeMultiPoint(Fluent $column)
@@ -824,7 +883,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiLineString type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     public function typeMultiLineString(Fluent $column)
@@ -835,7 +895,8 @@ class PostgresGrammar extends Grammar
     /**
      * Create the column definition for a spatial MultiPolygon type.
      *
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Support\Fluent $column
+     *
      * @return string
      */
     protected function typeMultiPolygon(Fluent $column)
@@ -846,7 +907,8 @@ class PostgresGrammar extends Grammar
     /**
      * Format the column definition for a PostGIS spatial type.
      *
-     * @param  string  $type
+     * @param string $type
+     *
      * @return string
      */
     private function formatPostGisType(string $type)
@@ -857,8 +919,9 @@ class PostgresGrammar extends Grammar
     /**
      * Get the SQL for a nullable column modifier.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $column
+     *
      * @return string|null
      */
     protected function modifyNullable(Blueprint $blueprint, Fluent $column)
@@ -869,13 +932,14 @@ class PostgresGrammar extends Grammar
     /**
      * Get the SQL for a default column modifier.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $column
+     *
      * @return string|null
      */
     protected function modifyDefault(Blueprint $blueprint, Fluent $column)
     {
-        if (! is_null($column->default)) {
+        if (!is_null($column->default)) {
             return ' default '.$this->getDefaultValue($column->default);
         }
     }
@@ -883,8 +947,9 @@ class PostgresGrammar extends Grammar
     /**
      * Get the SQL for an auto-increment column modifier.
      *
-     * @param  \Illuminate\Database\Schema\Blueprint  $blueprint
-     * @param  \Illuminate\Support\Fluent  $column
+     * @param \Illuminate\Database\Schema\Blueprint $blueprint
+     * @param \Illuminate\Support\Fluent            $column
+     *
      * @return string|null
      */
     protected function modifyIncrement(Blueprint $blueprint, Fluent $column)

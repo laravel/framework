@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar;
-use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\PostgresGrammar;
+use Illuminate\Database\Schema\Grammars\SQLiteGrammar;
 use Illuminate\Database\Schema\Grammars\SqlServerGrammar;
+use Illuminate\Support\Facades\Facade;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 {
@@ -23,16 +23,16 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
      */
     public function setUp()
     {
-        $this->db = $db = new DB;
+        $this->db = $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $db->setAsGlobal();
 
-        $container = new Container;
+        $container = new Container();
         $container->instance('db', $db->getDatabaseManager());
         Facade::setFacadeApplication($container);
     }
@@ -55,7 +55,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->integer('age')->change();
         });
 
-        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar());
 
         $expected = [
             'CREATE TEMPORARY TABLE __temp__users AS SELECT name, age FROM users',
@@ -88,7 +88,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
             $table->renameIndex('index1', 'index2');
         });
 
-        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new SQLiteGrammar());
 
         $expected = [
             'DROP INDEX index1',
@@ -97,7 +97,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $queries = $blueprint->toSql($this->db->connection(), new SqlServerGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new SqlServerGrammar());
 
         $expected = [
             'sp_rename N\'"users"."index1"\', "index2", N\'INDEX\'',
@@ -105,7 +105,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $queries = $blueprint->toSql($this->db->connection(), new MySqlGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new MySqlGrammar());
 
         $expected = [
             'alter table `users` rename index `index1` to `index2`',
@@ -113,7 +113,7 @@ class DatabaseSchemaBlueprintIntegrationTest extends TestCase
 
         $this->assertEquals($expected, $queries);
 
-        $queries = $blueprint->toSql($this->db->connection(), new PostgresGrammar);
+        $queries = $blueprint->toSql($this->db->connection(), new PostgresGrammar());
 
         $expected = [
             'alter index "index1" rename to "index2"',

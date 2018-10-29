@@ -42,10 +42,11 @@ class CommandExecuted
     /**
      * Create a new event instance.
      *
-     * @param  string  $command
-     * @param  array  $parameters
-     * @param  float|null  $time
-     * @param  \Illuminate\Redis\Connections\Connection  $connection
+     * @param string                                   $command
+     * @param array                                    $parameters
+     * @param float|null                               $time
+     * @param \Illuminate\Redis\Connections\Connection $connection
+     *
      * @return void
      */
     public function __construct($command, $parameters, $time, $connection)

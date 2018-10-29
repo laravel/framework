@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Database;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
-use Illuminate\Support\Facades\Facade;
 use Illuminate\Database\Capsule\Manager as DB;
+use Illuminate\Support\Facades\Facade;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseSchemaBuilderIntegrationTest extends TestCase
 {
@@ -18,16 +18,16 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
      */
     public function setUp()
     {
-        $this->db = $db = new DB;
+        $this->db = $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $db->setAsGlobal();
 
-        $container = new Container;
+        $container = new Container();
         $container->instance('db', $db->getDatabaseManager());
         Facade::setFacadeApplication($container);
     }
@@ -75,9 +75,9 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
     public function testHasColumnAndIndexWithPrefixIndexDisabled()
     {
         $this->db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => 'example_',
+            'driver'         => 'sqlite',
+            'database'       => ':memory:',
+            'prefix'         => 'example_',
             'prefix_indexes' => false,
         ]);
 
@@ -92,9 +92,9 @@ class DatabaseSchemaBuilderIntegrationTest extends TestCase
     public function testHasColumnAndIndexWithPrefixIndexEnabled()
     {
         $this->db->addConnection([
-            'driver' => 'sqlite',
-            'database' => ':memory:',
-            'prefix' => 'example_',
+            'driver'         => 'sqlite',
+            'database'       => ':memory:',
+            'prefix'         => 'example_',
             'prefix_indexes' => true,
         ]);
 

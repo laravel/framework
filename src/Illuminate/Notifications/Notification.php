@@ -35,7 +35,8 @@ class Notification
     /**
      * Set the locale to send this notification in.
      *
-     * @param  string  $locale
+     * @param string $locale
+     *
      * @return $this
      */
     public function locale($locale)

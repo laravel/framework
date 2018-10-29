@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Integration\Routing;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Facades\Route;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -14,7 +14,7 @@ class ResponsableTest extends TestCase
     public function test_responsable_objects_are_rendered()
     {
         Route::get('/responsable', function () {
-            return new TestResponsableResponse;
+            return new TestResponsableResponse();
         });
 
         $response = $this->get('/responsable');

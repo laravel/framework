@@ -2,13 +2,13 @@
 
 namespace Illuminate\Foundation\Testing;
 
-use Mockery;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Contracts\Console\Kernel;
-use Symfony\Component\Console\Input\ArrayInput;
-use PHPUnit\Framework\TestCase as PHPUnitTestCase;
-use Symfony\Component\Console\Output\BufferedOutput;
+use Mockery;
 use Mockery\Exception\NoMatchingExpectationException;
+use PHPUnit\Framework\TestCase as PHPUnitTestCase;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\BufferedOutput;
 
 class PendingCommand
 {
@@ -57,10 +57,11 @@ class PendingCommand
     /**
      * Create a new pending console command run.
      *
-     * @param  \PHPUnit\Framework\TestCase  $test
-     * @param  \Illuminate\Foundation\Application  $app
-     * @param  string  $command
-     * @param  array  $parameters
+     * @param \PHPUnit\Framework\TestCase        $test
+     * @param \Illuminate\Foundation\Application $app
+     * @param string                             $command
+     * @param array                              $parameters
+     *
      * @return void
      */
     public function __construct(PHPUnitTestCase $test, $app, $command, $parameters)
@@ -74,8 +75,9 @@ class PendingCommand
     /**
      * Specify a question that should be asked when the command runs.
      *
-     * @param  string  $question
-     * @param  string  $answer
+     * @param string $question
+     * @param string $answer
+     *
      * @return $this
      */
     public function expectsQuestion($question, $answer)
@@ -88,7 +90,8 @@ class PendingCommand
     /**
      * Specify output that should be printed when the command runs.
      *
-     * @param  string  $output
+     * @param string $output
+     *
      * @return $this
      */
     public function expectsOutput($output)
@@ -101,7 +104,8 @@ class PendingCommand
     /**
      * Assert that the command has the given exit code.
      *
-     * @param  int  $exitCode
+     * @param int $exitCode
+     *
      * @return $this
      */
     public function assertExitCode($exitCode)

@@ -42,10 +42,11 @@ class QueryExecuted
     /**
      * Create a new event instance.
      *
-     * @param  string  $sql
-     * @param  array  $bindings
-     * @param  float|null  $time
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param string                          $sql
+     * @param array                           $bindings
+     * @param float|null                      $time
+     * @param \Illuminate\Database\Connection $connection
+     *
      * @return void
      */
     public function __construct($sql, $bindings, $time, $connection)

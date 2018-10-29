@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Foundation\Application as ApplicationContract;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\Application;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Foundation\ProviderRepository;
-use Illuminate\Contracts\Foundation\Application as ApplicationContract;
+use Illuminate\Support\ServiceProvider;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class FoundationProviderRepositoryTest extends TestCase
 {
@@ -63,7 +63,7 @@ class FoundationProviderRepositoryTest extends TestCase
 
     public function testShouldRecompileReturnsCorrectValue()
     {
-        $repo = new ProviderRepository(m::mock(ApplicationContract::class), new Filesystem, __DIR__.'/services.php');
+        $repo = new ProviderRepository(m::mock(ApplicationContract::class), new Filesystem(), __DIR__.'/services.php');
         $this->assertTrue($repo->shouldRecompile(null, []));
         $this->assertTrue($repo->shouldRecompile(['providers' => ['foo']], ['foo', 'bar']));
         $this->assertFalse($repo->shouldRecompile(['providers' => ['foo']], ['foo']));

@@ -23,7 +23,8 @@ class Event extends Facade
     /**
      * Replace the bound instance with a fake.
      *
-     * @param  array|string  $eventsToFake
+     * @param array|string $eventsToFake
+     *
      * @return void
      */
     public static function fake($eventsToFake = [])
@@ -36,8 +37,9 @@ class Event extends Facade
     /**
      * Replace the bound instance with a fake during the given callable's execution.
      *
-     * @param  callable  $callable
-     * @param  array  $eventsToFake
+     * @param callable $callable
+     * @param array    $eventsToFake
+     *
      * @return callable
      */
     public static function fakeFor(callable $callable, array $eventsToFake = [])

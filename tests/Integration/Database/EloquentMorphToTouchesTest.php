@@ -3,9 +3,9 @@
 namespace Illuminate\Tests\Integration\Database\EloquentMorphToTouchesTest;
 
 use DB;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Tests\Integration\Database\DatabaseTestCase;
 
 /**
@@ -32,7 +32,7 @@ class EloquentMorphToTouchesTest extends DatabaseTestCase
 
     public function test_not_null()
     {
-        $comment = (new Comment)->commentable()->associate(Post::first());
+        $comment = (new Comment())->commentable()->associate(Post::first());
 
         DB::enableQueryLog();
 

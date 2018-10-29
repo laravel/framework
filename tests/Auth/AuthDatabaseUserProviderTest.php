@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
+use Illuminate\Auth\DatabaseUserProvider;
+use Illuminate\Auth\GenericUser;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Database\Connection;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Auth\GenericUser;
-use Illuminate\Database\Connection;
-use Illuminate\Contracts\Hashing\Hasher;
-use Illuminate\Auth\DatabaseUserProvider;
-use Illuminate\Contracts\Auth\Authenticatable;
+use stdClass;
 
 class AuthDatabaseUserProviderTest extends TestCase
 {
@@ -46,7 +46,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
     public function testRetrieveByTokenReturnsUser()
     {
-        $mockUser = new stdClass;
+        $mockUser = new stdClass();
         $mockUser->remember_token = 'a';
 
         $conn = m::mock(Connection::class);
@@ -73,7 +73,7 @@ class AuthDatabaseUserProviderTest extends TestCase
 
     public function testRetrieveByBadTokenReturnsNull()
     {
-        $mockUser = new stdClass;
+        $mockUser = new stdClass();
         $mockUser->remember_token = null;
 
         $conn = m::mock(Connection::class);

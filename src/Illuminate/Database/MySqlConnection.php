@@ -2,12 +2,12 @@
 
 namespace Illuminate\Database;
 
-use PDO;
-use Illuminate\Database\Schema\MySqlBuilder;
-use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Doctrine\DBAL\Driver\PDOMySql\Driver as DoctrineDriver;
 use Illuminate\Database\Query\Grammars\MySqlGrammar as QueryGrammar;
+use Illuminate\Database\Query\Processors\MySqlProcessor;
 use Illuminate\Database\Schema\Grammars\MySqlGrammar as SchemaGrammar;
+use Illuminate\Database\Schema\MySqlBuilder;
+use PDO;
 
 class MySqlConnection extends Connection
 {
@@ -18,7 +18,7 @@ class MySqlConnection extends Connection
      */
     protected function getDefaultQueryGrammar()
     {
-        return $this->withTablePrefix(new QueryGrammar);
+        return $this->withTablePrefix(new QueryGrammar());
     }
 
     /**
@@ -42,7 +42,7 @@ class MySqlConnection extends Connection
      */
     protected function getDefaultSchemaGrammar()
     {
-        return $this->withTablePrefix(new SchemaGrammar);
+        return $this->withTablePrefix(new SchemaGrammar());
     }
 
     /**
@@ -52,7 +52,7 @@ class MySqlConnection extends Connection
      */
     protected function getDefaultPostProcessor()
     {
-        return new MySqlProcessor;
+        return new MySqlProcessor();
     }
 
     /**
@@ -62,14 +62,15 @@ class MySqlConnection extends Connection
      */
     protected function getDoctrineDriver()
     {
-        return new DoctrineDriver;
+        return new DoctrineDriver();
     }
 
     /**
      * Bind values to their parameters in the given statement.
      *
-     * @param  \PDOStatement $statement
-     * @param  array  $bindings
+     * @param \PDOStatement $statement
+     * @param array         $bindings
+     *
      * @return void
      */
     public function bindValues($statement, $bindings)

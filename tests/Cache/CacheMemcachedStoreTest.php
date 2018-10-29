@@ -2,17 +2,17 @@
 
 namespace Illuminate\Tests\Cache;
 
-use stdClass;
-use Memcached;
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\MemcachedStore;
+use Illuminate\Support\Carbon;
+use Memcached;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheMemcachedStoreTest extends TestCase
 {
     public function testGetReturnsNullWhenNotFound()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -25,7 +25,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testMemcacheValueIsReturned()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -38,7 +38,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testMemcacheGetMultiValuesAreReturnedWithCorrectKeys()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -61,7 +61,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testSetMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -75,7 +75,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testIncrementMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -87,7 +87,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testDecrementMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -99,7 +99,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testStoreItemForeverProperlyCallsMemcached()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -111,7 +111,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testForgetMethodProperlyCallsMemcache()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -123,7 +123,7 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testFlushesCached()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
@@ -136,11 +136,11 @@ class CacheMemcachedStoreTest extends TestCase
 
     public function testGetAndSetPrefix()
     {
-        if (! class_exists(Memcached::class)) {
+        if (!class_exists(Memcached::class)) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
-        $store = new MemcachedStore(new Memcached, 'bar');
+        $store = new MemcachedStore(new Memcached(), 'bar');
         $this->assertEquals('bar:', $store->getPrefix());
         $store->setPrefix('foo');
         $this->assertEquals('foo:', $store->getPrefix());

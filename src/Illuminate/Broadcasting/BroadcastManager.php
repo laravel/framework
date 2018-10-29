@@ -3,15 +3,15 @@
 namespace Illuminate\Broadcasting;
 
 use Closure;
-use Pusher\Pusher;
-use Psr\Log\LoggerInterface;
-use InvalidArgumentException;
 use Illuminate\Broadcasting\Broadcasters\LogBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\NullBroadcaster;
-use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
-use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Broadcasting\Broadcasters\PusherBroadcaster;
+use Illuminate\Broadcasting\Broadcasters\RedisBroadcaster;
 use Illuminate\Contracts\Broadcasting\Factory as FactoryContract;
+use Illuminate\Contracts\Broadcasting\ShouldBroadcastNow;
+use InvalidArgumentException;
+use Psr\Log\LoggerInterface;
+use Pusher\Pusher;
 
 /**
  * @mixin \Illuminate\Contracts\Broadcasting\Broadcaster
@@ -42,7 +42,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Create a new manager instance.
      *
-     * @param  \Illuminate\Foundation\Application  $app
+     * @param \Illuminate\Foundation\Application $app
+     *
      * @return void
      */
     public function __construct($app)
@@ -53,7 +54,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Register the routes for handling broadcast authentication and sockets.
      *
-     * @param  array|null  $attributes
+     * @param array|null $attributes
+     *
      * @return void
      */
     public function routes(array $attributes = null)
@@ -75,12 +77,13 @@ class BroadcastManager implements FactoryContract
     /**
      * Get the socket ID for the given request.
      *
-     * @param  \Illuminate\Http\Request|null  $request
+     * @param \Illuminate\Http\Request|null $request
+     *
      * @return string|null
      */
     public function socket($request = null)
     {
-        if (! $request && ! $this->app->bound('request')) {
+        if (!$request && !$this->app->bound('request')) {
             return;
         }
 
@@ -92,7 +95,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Begin broadcasting an event.
      *
-     * @param  mixed|null  $event
+     * @param mixed|null $event
+     *
      * @return \Illuminate\Broadcasting\PendingBroadcast|void
      */
     public function event($event = null)
@@ -103,7 +107,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Queue the given event for broadcast.
      *
-     * @param  mixed  $event
+     * @param mixed $event
+     *
      * @return void
      */
     public function queue($event)
@@ -132,7 +137,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string  $driver
+     * @param string $driver
+     *
      * @return mixed
      */
     public function connection($driver = null)
@@ -143,7 +149,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Get a driver instance.
      *
-     * @param  string|null  $name
+     * @param string|null $name
+     *
      * @return mixed
      */
     public function driver($name = null)
@@ -156,7 +163,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Attempt to get the connection from the local cache.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function get($name)
@@ -167,10 +175,11 @@ class BroadcastManager implements FactoryContract
     /**
      * Resolve the given store.
      *
-     * @param  string  $name
-     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
+     * @param string $name
      *
      * @throws \InvalidArgumentException
+     *
+     * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function resolve($name)
     {
@@ -186,7 +195,7 @@ class BroadcastManager implements FactoryContract
 
         $driverMethod = 'create'.ucfirst($config['driver']).'Driver';
 
-        if (! method_exists($this, $driverMethod)) {
+        if (!method_exists($this, $driverMethod)) {
             throw new InvalidArgumentException("Driver [{$config['driver']}] is not supported.");
         }
 
@@ -196,7 +205,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Call a custom driver creator.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return mixed
      */
     protected function callCustomCreator(array $config)
@@ -207,7 +217,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createPusherDriver(array $config)
@@ -227,7 +238,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createRedisDriver(array $config)
@@ -240,7 +252,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createLogDriver(array $config)
@@ -253,18 +266,20 @@ class BroadcastManager implements FactoryContract
     /**
      * Create an instance of the driver.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \Illuminate\Contracts\Broadcasting\Broadcaster
      */
     protected function createNullDriver(array $config)
     {
-        return new NullBroadcaster;
+        return new NullBroadcaster();
     }
 
     /**
      * Get the connection configuration.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return array
      */
     protected function getConfig($name)
@@ -285,7 +300,8 @@ class BroadcastManager implements FactoryContract
     /**
      * Set the default driver name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return void
      */
     public function setDefaultDriver($name)
@@ -296,8 +312,9 @@ class BroadcastManager implements FactoryContract
     /**
      * Register a custom driver creator Closure.
      *
-     * @param  string    $driver
-     * @param  \Closure  $callback
+     * @param string   $driver
+     * @param \Closure $callback
+     *
      * @return $this
      */
     public function extend($driver, Closure $callback)
@@ -310,8 +327,9 @@ class BroadcastManager implements FactoryContract
     /**
      * Dynamically call the default driver instance.
      *
-     * @param  string  $method
-     * @param  array   $parameters
+     * @param string $method
+     * @param array  $parameters
+     *
      * @return mixed
      */
     public function __call($method, $parameters)

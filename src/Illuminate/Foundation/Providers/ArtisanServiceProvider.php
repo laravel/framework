@@ -2,75 +2,75 @@
 
 namespace Illuminate\Foundation\Providers;
 
-use Illuminate\Support\ServiceProvider;
-use Illuminate\Queue\Console\TableCommand;
 use Illuminate\Auth\Console\AuthMakeCommand;
-use Illuminate\Foundation\Console\UpCommand;
-use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
-use Illuminate\Foundation\Console\ServeCommand;
-use Illuminate\Foundation\Console\PresetCommand;
-use Illuminate\Queue\Console\FailedTableCommand;
-use Illuminate\Foundation\Console\AppNameCommand;
-use Illuminate\Foundation\Console\JobMakeCommand;
-use Illuminate\Database\Console\Seeds\SeedCommand;
-use Illuminate\Foundation\Console\MailMakeCommand;
-use Illuminate\Foundation\Console\OptimizeCommand;
-use Illuminate\Foundation\Console\RuleMakeCommand;
-use Illuminate\Foundation\Console\TestMakeCommand;
-use Illuminate\Foundation\Console\EventMakeCommand;
-use Illuminate\Foundation\Console\ModelMakeCommand;
-use Illuminate\Foundation\Console\RouteListCommand;
-use Illuminate\Foundation\Console\ViewCacheCommand;
-use Illuminate\Foundation\Console\ViewClearCommand;
-use Illuminate\Session\Console\SessionTableCommand;
-use Illuminate\Foundation\Console\PolicyMakeCommand;
-use Illuminate\Foundation\Console\RouteCacheCommand;
-use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
+use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
+use Illuminate\Console\Scheduling\ScheduleFinishCommand;
 use Illuminate\Console\Scheduling\ScheduleRunCommand;
+use Illuminate\Database\Console\Factories\FactoryMakeCommand;
+use Illuminate\Database\Console\Migrations\FreshCommand as MigrateFreshCommand;
+use Illuminate\Database\Console\Migrations\InstallCommand as MigrateInstallCommand;
+use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Database\Console\Migrations\RefreshCommand as MigrateRefreshCommand;
+use Illuminate\Database\Console\Migrations\ResetCommand as MigrateResetCommand;
+use Illuminate\Database\Console\Migrations\RollbackCommand as MigrateRollbackCommand;
+use Illuminate\Database\Console\Migrations\StatusCommand as MigrateStatusCommand;
+use Illuminate\Database\Console\Seeds\SeedCommand;
+use Illuminate\Database\Console\Seeds\SeederMakeCommand;
+use Illuminate\Foundation\Console\AppNameCommand;
 use Illuminate\Foundation\Console\ChannelMakeCommand;
+use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\ConfigCacheCommand;
 use Illuminate\Foundation\Console\ConfigClearCommand;
 use Illuminate\Foundation\Console\ConsoleMakeCommand;
+use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Foundation\Console\EnvironmentCommand;
-use Illuminate\Foundation\Console\KeyGenerateCommand;
-use Illuminate\Foundation\Console\RequestMakeCommand;
-use Illuminate\Foundation\Console\StorageLinkCommand;
-use Illuminate\Routing\Console\ControllerMakeCommand;
-use Illuminate\Routing\Console\MiddlewareMakeCommand;
-use Illuminate\Foundation\Console\ListenerMakeCommand;
-use Illuminate\Foundation\Console\ObserverMakeCommand;
-use Illuminate\Foundation\Console\ProviderMakeCommand;
-use Illuminate\Foundation\Console\ResourceMakeCommand;
-use Illuminate\Foundation\Console\ClearCompiledCommand;
 use Illuminate\Foundation\Console\EventGenerateCommand;
+use Illuminate\Foundation\Console\EventMakeCommand;
 use Illuminate\Foundation\Console\ExceptionMakeCommand;
-use Illuminate\Foundation\Console\OptimizeClearCommand;
-use Illuminate\Foundation\Console\VendorPublishCommand;
-use Illuminate\Console\Scheduling\ScheduleFinishCommand;
-use Illuminate\Database\Console\Seeds\SeederMakeCommand;
-use Illuminate\Foundation\Console\PackageDiscoverCommand;
-use Illuminate\Database\Console\Migrations\MigrateCommand;
+use Illuminate\Foundation\Console\JobMakeCommand;
+use Illuminate\Foundation\Console\KeyGenerateCommand;
+use Illuminate\Foundation\Console\ListenerMakeCommand;
+use Illuminate\Foundation\Console\MailMakeCommand;
+use Illuminate\Foundation\Console\ModelMakeCommand;
 use Illuminate\Foundation\Console\NotificationMakeCommand;
-use Illuminate\Database\Console\Factories\FactoryMakeCommand;
-use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
-use Illuminate\Database\Console\Migrations\MigrateMakeCommand;
+use Illuminate\Foundation\Console\ObserverMakeCommand;
+use Illuminate\Foundation\Console\OptimizeClearCommand;
+use Illuminate\Foundation\Console\OptimizeCommand;
+use Illuminate\Foundation\Console\PackageDiscoverCommand;
+use Illuminate\Foundation\Console\PolicyMakeCommand;
+use Illuminate\Foundation\Console\PresetCommand;
+use Illuminate\Foundation\Console\ProviderMakeCommand;
+use Illuminate\Foundation\Console\RequestMakeCommand;
+use Illuminate\Foundation\Console\ResourceMakeCommand;
+use Illuminate\Foundation\Console\RouteCacheCommand;
+use Illuminate\Foundation\Console\RouteClearCommand;
+use Illuminate\Foundation\Console\RouteListCommand;
+use Illuminate\Foundation\Console\RuleMakeCommand;
+use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Foundation\Console\StorageLinkCommand;
+use Illuminate\Foundation\Console\TestMakeCommand;
+use Illuminate\Foundation\Console\UpCommand;
+use Illuminate\Foundation\Console\VendorPublishCommand;
+use Illuminate\Foundation\Console\ViewCacheCommand;
+use Illuminate\Foundation\Console\ViewClearCommand;
 use Illuminate\Notifications\Console\NotificationTableCommand;
-use Illuminate\Cache\Console\ClearCommand as CacheClearCommand;
-use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
-use Illuminate\Cache\Console\ForgetCommand as CacheForgetCommand;
-use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
-use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
-use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Queue\Console\FlushFailedCommand as FlushFailedQueueCommand;
 use Illuminate\Queue\Console\ForgetFailedCommand as ForgetFailedQueueCommand;
-use Illuminate\Database\Console\Migrations\FreshCommand as MigrateFreshCommand;
-use Illuminate\Database\Console\Migrations\ResetCommand as MigrateResetCommand;
-use Illuminate\Database\Console\Migrations\StatusCommand as MigrateStatusCommand;
-use Illuminate\Database\Console\Migrations\InstallCommand as MigrateInstallCommand;
-use Illuminate\Database\Console\Migrations\RefreshCommand as MigrateRefreshCommand;
-use Illuminate\Database\Console\Migrations\RollbackCommand as MigrateRollbackCommand;
+use Illuminate\Queue\Console\ListenCommand as QueueListenCommand;
+use Illuminate\Queue\Console\ListFailedCommand as ListFailedQueueCommand;
+use Illuminate\Queue\Console\RestartCommand as QueueRestartCommand;
+use Illuminate\Queue\Console\RetryCommand as QueueRetryCommand;
+use Illuminate\Queue\Console\TableCommand;
+use Illuminate\Queue\Console\WorkCommand as QueueWorkCommand;
+use Illuminate\Routing\Console\ControllerMakeCommand;
+use Illuminate\Routing\Console\MiddlewareMakeCommand;
+use Illuminate\Session\Console\SessionTableCommand;
+use Illuminate\Support\ServiceProvider;
 
 class ArtisanServiceProvider extends ServiceProvider
 {
@@ -87,43 +87,43 @@ class ArtisanServiceProvider extends ServiceProvider
      * @var array
      */
     protected $commands = [
-        'CacheClear' => 'command.cache.clear',
-        'CacheForget' => 'command.cache.forget',
-        'ClearCompiled' => 'command.clear-compiled',
-        'ClearResets' => 'command.auth.resets.clear',
-        'ConfigCache' => 'command.config.cache',
-        'ConfigClear' => 'command.config.clear',
-        'Down' => 'command.down',
-        'Environment' => 'command.environment',
-        'KeyGenerate' => 'command.key.generate',
-        'Migrate' => 'command.migrate',
-        'MigrateFresh' => 'command.migrate.fresh',
-        'MigrateInstall' => 'command.migrate.install',
-        'MigrateRefresh' => 'command.migrate.refresh',
-        'MigrateReset' => 'command.migrate.reset',
+        'CacheClear'      => 'command.cache.clear',
+        'CacheForget'     => 'command.cache.forget',
+        'ClearCompiled'   => 'command.clear-compiled',
+        'ClearResets'     => 'command.auth.resets.clear',
+        'ConfigCache'     => 'command.config.cache',
+        'ConfigClear'     => 'command.config.clear',
+        'Down'            => 'command.down',
+        'Environment'     => 'command.environment',
+        'KeyGenerate'     => 'command.key.generate',
+        'Migrate'         => 'command.migrate',
+        'MigrateFresh'    => 'command.migrate.fresh',
+        'MigrateInstall'  => 'command.migrate.install',
+        'MigrateRefresh'  => 'command.migrate.refresh',
+        'MigrateReset'    => 'command.migrate.reset',
         'MigrateRollback' => 'command.migrate.rollback',
-        'MigrateStatus' => 'command.migrate.status',
-        'Optimize' => 'command.optimize',
-        'OptimizeClear' => 'command.optimize.clear',
+        'MigrateStatus'   => 'command.migrate.status',
+        'Optimize'        => 'command.optimize',
+        'OptimizeClear'   => 'command.optimize.clear',
         'PackageDiscover' => 'command.package.discover',
-        'Preset' => 'command.preset',
-        'QueueFailed' => 'command.queue.failed',
-        'QueueFlush' => 'command.queue.flush',
-        'QueueForget' => 'command.queue.forget',
-        'QueueListen' => 'command.queue.listen',
-        'QueueRestart' => 'command.queue.restart',
-        'QueueRetry' => 'command.queue.retry',
-        'QueueWork' => 'command.queue.work',
-        'RouteCache' => 'command.route.cache',
-        'RouteClear' => 'command.route.clear',
-        'RouteList' => 'command.route.list',
-        'Seed' => 'command.seed',
-        'ScheduleFinish' => ScheduleFinishCommand::class,
-        'ScheduleRun' => ScheduleRunCommand::class,
-        'StorageLink' => 'command.storage.link',
-        'Up' => 'command.up',
-        'ViewCache' => 'command.view.cache',
-        'ViewClear' => 'command.view.clear',
+        'Preset'          => 'command.preset',
+        'QueueFailed'     => 'command.queue.failed',
+        'QueueFlush'      => 'command.queue.flush',
+        'QueueForget'     => 'command.queue.forget',
+        'QueueListen'     => 'command.queue.listen',
+        'QueueRestart'    => 'command.queue.restart',
+        'QueueRetry'      => 'command.queue.retry',
+        'QueueWork'       => 'command.queue.work',
+        'RouteCache'      => 'command.route.cache',
+        'RouteClear'      => 'command.route.clear',
+        'RouteList'       => 'command.route.list',
+        'Seed'            => 'command.seed',
+        'ScheduleFinish'  => ScheduleFinishCommand::class,
+        'ScheduleRun'     => ScheduleRunCommand::class,
+        'StorageLink'     => 'command.storage.link',
+        'Up'              => 'command.up',
+        'ViewCache'       => 'command.view.cache',
+        'ViewClear'       => 'command.view.clear',
     ];
 
     /**
@@ -132,37 +132,37 @@ class ArtisanServiceProvider extends ServiceProvider
      * @var array
      */
     protected $devCommands = [
-        'AppName' => 'command.app.name',
-        'AuthMake' => 'command.auth.make',
-        'CacheTable' => 'command.cache.table',
-        'ChannelMake' => 'command.channel.make',
-        'ConsoleMake' => 'command.console.make',
-        'ControllerMake' => 'command.controller.make',
-        'EventGenerate' => 'command.event.generate',
-        'EventMake' => 'command.event.make',
-        'ExceptionMake' => 'command.exception.make',
-        'FactoryMake' => 'command.factory.make',
-        'JobMake' => 'command.job.make',
-        'ListenerMake' => 'command.listener.make',
-        'MailMake' => 'command.mail.make',
-        'MiddlewareMake' => 'command.middleware.make',
-        'MigrateMake' => 'command.migrate.make',
-        'ModelMake' => 'command.model.make',
-        'NotificationMake' => 'command.notification.make',
+        'AppName'           => 'command.app.name',
+        'AuthMake'          => 'command.auth.make',
+        'CacheTable'        => 'command.cache.table',
+        'ChannelMake'       => 'command.channel.make',
+        'ConsoleMake'       => 'command.console.make',
+        'ControllerMake'    => 'command.controller.make',
+        'EventGenerate'     => 'command.event.generate',
+        'EventMake'         => 'command.event.make',
+        'ExceptionMake'     => 'command.exception.make',
+        'FactoryMake'       => 'command.factory.make',
+        'JobMake'           => 'command.job.make',
+        'ListenerMake'      => 'command.listener.make',
+        'MailMake'          => 'command.mail.make',
+        'MiddlewareMake'    => 'command.middleware.make',
+        'MigrateMake'       => 'command.migrate.make',
+        'ModelMake'         => 'command.model.make',
+        'NotificationMake'  => 'command.notification.make',
         'NotificationTable' => 'command.notification.table',
-        'ObserverMake' => 'command.observer.make',
-        'PolicyMake' => 'command.policy.make',
-        'ProviderMake' => 'command.provider.make',
-        'QueueFailedTable' => 'command.queue.failed-table',
-        'QueueTable' => 'command.queue.table',
-        'RequestMake' => 'command.request.make',
-        'ResourceMake' => 'command.resource.make',
-        'RuleMake' => 'command.rule.make',
-        'SeederMake' => 'command.seeder.make',
-        'SessionTable' => 'command.session.table',
-        'Serve' => 'command.serve',
-        'TestMake' => 'command.test.make',
-        'VendorPublish' => 'command.vendor.publish',
+        'ObserverMake'      => 'command.observer.make',
+        'PolicyMake'        => 'command.policy.make',
+        'ProviderMake'      => 'command.provider.make',
+        'QueueFailedTable'  => 'command.queue.failed-table',
+        'QueueTable'        => 'command.queue.table',
+        'RequestMake'       => 'command.request.make',
+        'ResourceMake'      => 'command.resource.make',
+        'RuleMake'          => 'command.rule.make',
+        'SeederMake'        => 'command.seeder.make',
+        'SessionTable'      => 'command.session.table',
+        'Serve'             => 'command.serve',
+        'TestMake'          => 'command.test.make',
+        'VendorPublish'     => 'command.vendor.publish',
     ];
 
     /**
@@ -180,7 +180,8 @@ class ArtisanServiceProvider extends ServiceProvider
     /**
      * Register the given commands.
      *
-     * @param  array  $commands
+     * @param array $commands
+     *
      * @return void
      */
     protected function registerCommands(array $commands)
@@ -212,7 +213,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerAuthMakeCommand()
     {
         $this->app->singleton('command.auth.make', function () {
-            return new AuthMakeCommand;
+            return new AuthMakeCommand();
         });
     }
 
@@ -272,7 +273,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerClearCompiledCommand()
     {
         $this->app->singleton('command.clear-compiled', function () {
-            return new ClearCompiledCommand;
+            return new ClearCompiledCommand();
         });
     }
 
@@ -284,7 +285,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerClearResetsCommand()
     {
         $this->app->singleton('command.auth.resets.clear', function () {
-            return new ClearResetsCommand;
+            return new ClearResetsCommand();
         });
     }
 
@@ -344,7 +345,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerEventGenerateCommand()
     {
         $this->app->singleton('command.event.generate', function () {
-            return new EventGenerateCommand;
+            return new EventGenerateCommand();
         });
     }
 
@@ -392,7 +393,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerDownCommand()
     {
         $this->app->singleton('command.down', function () {
-            return new DownCommand;
+            return new DownCommand();
         });
     }
 
@@ -404,7 +405,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerEnvironmentCommand()
     {
         $this->app->singleton('command.environment', function () {
-            return new EnvironmentCommand;
+            return new EnvironmentCommand();
         });
     }
 
@@ -428,7 +429,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerKeyGenerateCommand()
     {
         $this->app->singleton('command.key.generate', function () {
-            return new KeyGenerateCommand;
+            return new KeyGenerateCommand();
         });
     }
 
@@ -488,7 +489,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerMigrateFreshCommand()
     {
         $this->app->singleton('command.migrate.fresh', function () {
-            return new MigrateFreshCommand;
+            return new MigrateFreshCommand();
         });
     }
 
@@ -531,7 +532,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerMigrateRefreshCommand()
     {
         $this->app->singleton('command.migrate.refresh', function () {
-            return new MigrateRefreshCommand;
+            return new MigrateRefreshCommand();
         });
     }
 
@@ -615,7 +616,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerOptimizeCommand()
     {
         $this->app->singleton('command.optimize', function () {
-            return new OptimizeCommand;
+            return new OptimizeCommand();
         });
     }
 
@@ -639,7 +640,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerOptimizeClearCommand()
     {
         $this->app->singleton('command.optimize.clear', function () {
-            return new OptimizeClearCommand;
+            return new OptimizeClearCommand();
         });
     }
 
@@ -651,7 +652,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerPackageDiscoverCommand()
     {
         $this->app->singleton('command.package.discover', function () {
-            return new PackageDiscoverCommand;
+            return new PackageDiscoverCommand();
         });
     }
 
@@ -675,7 +676,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerPresetCommand()
     {
         $this->app->singleton('command.preset', function () {
-            return new PresetCommand;
+            return new PresetCommand();
         });
     }
 
@@ -699,7 +700,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerQueueFailedCommand()
     {
         $this->app->singleton('command.queue.failed', function () {
-            return new ListFailedQueueCommand;
+            return new ListFailedQueueCommand();
         });
     }
 
@@ -711,7 +712,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerQueueForgetCommand()
     {
         $this->app->singleton('command.queue.forget', function () {
-            return new ForgetFailedQueueCommand;
+            return new ForgetFailedQueueCommand();
         });
     }
 
@@ -723,7 +724,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerQueueFlushCommand()
     {
         $this->app->singleton('command.queue.flush', function () {
-            return new FlushFailedQueueCommand;
+            return new FlushFailedQueueCommand();
         });
     }
 
@@ -747,7 +748,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerQueueRestartCommand()
     {
         $this->app->singleton('command.queue.restart', function () {
-            return new QueueRestartCommand;
+            return new QueueRestartCommand();
         });
     }
 
@@ -759,7 +760,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerQueueRetryCommand()
     {
         $this->app->singleton('command.queue.retry', function () {
-            return new QueueRetryCommand;
+            return new QueueRetryCommand();
         });
     }
 
@@ -867,7 +868,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerStorageLinkCommand()
     {
         $this->app->singleton('command.storage.link', function () {
-            return new StorageLinkCommand;
+            return new StorageLinkCommand();
         });
     }
 
@@ -947,7 +948,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerServeCommand()
     {
         $this->app->singleton('command.serve', function () {
-            return new ServeCommand;
+            return new ServeCommand();
         });
     }
 
@@ -971,7 +972,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerUpCommand()
     {
         $this->app->singleton('command.up', function () {
-            return new UpCommand;
+            return new UpCommand();
         });
     }
 
@@ -995,7 +996,7 @@ class ArtisanServiceProvider extends ServiceProvider
     protected function registerViewCacheCommand()
     {
         $this->app->singleton('command.view.cache', function () {
-            return new ViewCacheCommand;
+            return new ViewCacheCommand();
         });
     }
 

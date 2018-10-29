@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Support;
 
+use Carbon\Carbon as BaseCarbon;
 use DateTime;
 use DateTimeInterface;
 use Illuminate\Support\Carbon;
 use PHPUnit\Framework\TestCase;
-use Carbon\Carbon as BaseCarbon;
 
 class SupportCarbonTest extends TestCase
 {
@@ -88,18 +88,18 @@ class SupportCarbonTest extends TestCase
     public function testCarbonCanSerializeToJson()
     {
         $this->assertSame([
-            'date' => '2017-06-27 13:14:15.000000',
+            'date'          => '2017-06-27 13:14:15.000000',
             'timezone_type' => 3,
-            'timezone' => 'UTC',
+            'timezone'      => 'UTC',
         ], $this->now->jsonSerialize());
     }
 
     public function testSetStateReturnsCorrectType()
     {
         $carbon = Carbon::__set_state([
-            'date' => '2017-06-27 13:14:15.000000',
+            'date'          => '2017-06-27 13:14:15.000000',
             'timezone_type' => 3,
-            'timezone' => 'UTC',
+            'timezone'      => 'UTC',
         ]);
 
         $this->assertInstanceOf(Carbon::class, $carbon);

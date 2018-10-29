@@ -9,14 +9,14 @@ class PostResourceWithOptionalData extends JsonResource
     public function toArray($request)
     {
         return [
-            'id' => $this->id,
-            'first' => $this->when(false, 'value'),
+            'id'     => $this->id,
+            'first'  => $this->when(false, 'value'),
             'second' => $this->when(true, 'value'),
-            'third' => $this->when(true, function () {
+            'third'  => $this->when(true, function () {
                 return 'value';
             }),
             'fourth' => $this->when(false, 'value', 'default'),
-            'fifth' => $this->when(false, 'value', function () {
+            'fifth'  => $this->when(false, 'value', function () {
                 return 'default';
             }),
         ];

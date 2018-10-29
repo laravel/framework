@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayAccess;
-use Mockery as m;
-use RuntimeException;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Optional;
 use Illuminate\Contracts\Support\Htmlable;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Optional;
+use Illuminate\Support\Str;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use RuntimeException;
+use stdClass;
 
 class SupportHelpersTest extends TestCase
 {
@@ -91,13 +91,13 @@ class SupportHelpersTest extends TestCase
         $array = [
             [
                 'account' => 'a',
-                'users' => [
+                'users'   => [
                     ['first' => 'taylor', 'last' => 'otwell', 'email' => 'taylorotwell@gmail.com'],
                 ],
             ],
             [
                 'account' => 'b',
-                'users' => [
+                'users'   => [
                     ['first' => 'abigail', 'last' => 'otwell'],
                     ['first' => 'dayle', 'last' => 'rees'],
                 ],
@@ -350,8 +350,8 @@ class SupportHelpersTest extends TestCase
 
     public function testObjectGet()
     {
-        $class = new stdClass;
-        $class->name = new stdClass;
+        $class = new stdClass();
+        $class->name = new stdClass();
         $class->name->first = 'Taylor';
 
         $this->assertEquals('Taylor', object_get($class, 'name.first'));
@@ -679,7 +679,7 @@ class SupportHelpersTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
-        $object = new stdClass;
+        $object = new stdClass();
         $object->value = 'a';
         $this->assertEquals(['a'], Arr::wrap($string));
         $this->assertEquals($array, Arr::wrap($array));
@@ -713,14 +713,14 @@ class SupportHelpersTest extends TestCase
             SupportTestTraitTwo::class => SupportTestTraitTwo::class,
             SupportTestTraitOne::class => SupportTestTraitOne::class,
         ],
-        class_uses_recursive(new SupportTestClassTwo));
+        class_uses_recursive(new SupportTestClassTwo()));
     }
 
     public function testClassUsesRecursiveReturnParentTraitsFirst()
     {
         $this->assertSame([
-            SupportTestTraitTwo::class => SupportTestTraitTwo::class,
-            SupportTestTraitOne::class => SupportTestTraitOne::class,
+            SupportTestTraitTwo::class   => SupportTestTraitTwo::class,
+            SupportTestTraitOne::class   => SupportTestTraitOne::class,
             SupportTestTraitThree::class => SupportTestTraitThree::class,
         ],
         class_uses_recursive(SupportTestClassThree::class));
@@ -756,12 +756,12 @@ class SupportHelpersTest extends TestCase
      */
     public function testThrow()
     {
-        throw_if(true, new RuntimeException);
+        throw_if(true, new RuntimeException());
     }
 
     public function testThrowReturnIfNotThrown()
     {
-        $this->assertSame('foo', throw_unless('foo', new RuntimeException));
+        $this->assertSame('foo', throw_unless('foo', new RuntimeException()));
     }
 
     /**
@@ -777,7 +777,7 @@ class SupportHelpersTest extends TestCase
     {
         $this->assertNull(optional(null)->something());
 
-        $this->assertEquals(10, optional(new class {
+        $this->assertEquals(10, optional(new class() {
             public function something()
             {
                 return 10;
@@ -855,10 +855,10 @@ class SupportHelpersTest extends TestCase
 
         $this->assertNull(optional(null)->present()->something());
 
-        $this->assertEquals('$10.00', optional(new class {
+        $this->assertEquals('$10.00', optional(new class() {
             public function present()
             {
-                return new class {
+                return new class() {
                     public function something()
                     {
                         return '$10.00';

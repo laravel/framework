@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console\Presets;
 
-use Illuminate\Support\Arr;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Arr;
 
 class Vue extends Preset
 {
@@ -25,7 +25,8 @@ class Vue extends Preset
     /**
      * Update the given package array.
      *
-     * @param  array  $packages
+     * @param array $packages
+     *
      * @return array
      */
     protected static function updatePackageArray(array $packages)
@@ -54,7 +55,7 @@ class Vue extends Preset
      */
     protected static function updateComponent()
     {
-        (new Filesystem)->delete(
+        (new Filesystem())->delete(
             resource_path('js/components/Example.js')
         );
 

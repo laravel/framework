@@ -3,27 +3,27 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
-use stdClass;
 use Exception;
-use Illuminate\Support\Str;
+use Illuminate\Auth\Middleware\Authenticate;
+use Illuminate\Auth\Middleware\Authorize;
+use Illuminate\Container\Container;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Routing\Route;
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
-use Illuminate\Routing\RouteGroup;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Routing\ResourceRegistrar;
-use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Auth\Middleware\Authenticate;
-use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Routing\ResourceRegistrar;
+use Illuminate\Routing\Route;
+use Illuminate\Routing\RouteGroup;
+use Illuminate\Routing\Router;
+use Illuminate\Support\Str;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class RoutingRouteTest extends TestCase
@@ -163,7 +163,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $router->get('test', function () {
-            return (new SymfonyResponse('test', 304, ['foo' => 'bar']))->setLastModified(new DateTime);
+            return (new SymfonyResponse('test', 304, ['foo' => 'bar']))->setLastModified(new DateTime());
         });
 
         $response = $router->dispatch(Request::create('test', 'GET'));
@@ -201,7 +201,7 @@ class RoutingRouteTest extends TestCase
     {
         $router = $this->getRouter();
         $router->get('foo/bar', [
-            'uses' => RouteTestClosureMiddlewareController::class.'@index',
+            'uses'       => RouteTestClosureMiddlewareController::class.'@index',
             'middleware' => 'foo',
         ]);
         $router->aliasMiddleware('foo', function ($request, $next) {
@@ -497,7 +497,7 @@ class RoutingRouteTest extends TestCase
         unset($_SERVER['__test.controller_callAction_parameters']);
         $router->get(($str = Str::random()).'/{user}/{defaultNull?}/{team?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => RouteTestAnotherControllerWithParameterStub::class.'@withModels',
+            'uses'       => RouteTestAnotherControllerWithParameterStub::class.'@withModels',
         ]);
         $router->dispatch(Request::create($str.'/1', 'GET'));
 
@@ -837,7 +837,7 @@ class RoutingRouteTest extends TestCase
             return $name;
         }]);
         $router->model('bar', RouteModelBindingNullStub::class, function ($value) {
-            return (new RouteModelBindingClosureStub)->findAlternate($value);
+            return (new RouteModelBindingClosureStub())->findAlternate($value);
         });
         $this->assertEquals('tayloralt', $router->dispatch(Request::create('foo/TAYLOR', 'GET'))->getContent());
     }
@@ -859,8 +859,8 @@ class RoutingRouteTest extends TestCase
 
     public function testModelBindingThroughIOC()
     {
-        $container = new Container;
-        $router = new Router(new Dispatcher, $container);
+        $container = new Container();
+        $router = new Router(new Dispatcher(), $container);
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
@@ -1156,7 +1156,7 @@ class RoutingRouteTest extends TestCase
 
         ResourceRegistrar::verbs([
             'create' => 'ajouter',
-            'edit' => 'modifier',
+            'edit'   => 'modifier',
         ]);
         $router = $this->getRouter();
         $router->resource('foo', 'FooController');
@@ -1253,7 +1253,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->resource('foo', 'FooController', ['names' => [
             'index' => 'foo',
-            'show' => 'bar',
+            'show'  => 'bar',
         ]]);
 
         $this->assertTrue($router->getRoutes()->hasNamedRoute('foo'));
@@ -1273,8 +1273,8 @@ class RoutingRouteTest extends TestCase
 
     public function testRouterFiresRoutedEvent()
     {
-        $container = new Container;
-        $router = new Router(new Dispatcher, $container);
+        $container = new Container();
+        $router = new Router(new Dispatcher(), $container);
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
@@ -1397,7 +1397,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
+            'uses'       => function (RoutingTestUserModel $bar) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
@@ -1412,7 +1412,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
+            'uses'       => function (RoutingTestUserModel $bar = null) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestUserModel::class, $bar);
 
                 return $bar->value;
@@ -1427,7 +1427,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar = null) use ($phpunit) {
+            'uses'       => function (RoutingTestUserModel $bar = null) use ($phpunit) {
                 $phpunit->assertNull($bar);
             },
         ]);
@@ -1443,7 +1443,7 @@ class RoutingRouteTest extends TestCase
         $router = $this->getRouter();
         $router->get('foo/{bar?}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestNonExistingUserModel $bar = null) use ($phpunit) {
+            'uses'       => function (RoutingTestNonExistingUserModel $bar = null) use ($phpunit) {
                 $phpunit->fail('ModelNotFoundException was expected.');
             },
         ]);
@@ -1453,8 +1453,8 @@ class RoutingRouteTest extends TestCase
     public function testImplicitBindingThroughIOC()
     {
         $phpunit = $this;
-        $container = new Container;
-        $router = new Router(new Dispatcher, $container);
+        $container = new Container();
+        $router = new Router(new Dispatcher(), $container);
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
         });
@@ -1462,7 +1462,7 @@ class RoutingRouteTest extends TestCase
         $container->bind(RoutingTestUserModel::class, RoutingTestExtendedUserModel::class);
         $router->get('foo/{bar}', [
             'middleware' => SubstituteBindings::class,
-            'uses' => function (RoutingTestUserModel $bar) use ($phpunit) {
+            'uses'       => function (RoutingTestUserModel $bar) use ($phpunit) {
                 $phpunit->assertInstanceOf(RoutingTestExtendedUserModel::class, $bar);
             },
         ]);
@@ -1599,9 +1599,9 @@ class RoutingRouteTest extends TestCase
 
     protected function getRouter()
     {
-        $container = new Container;
+        $container = new Container();
 
-        $router = new Router(new Dispatcher, $container);
+        $router = new Router(new Dispatcher(), $container);
 
         $container->singleton(Registrar::class, function () use ($router) {
             return $router;
@@ -1622,7 +1622,6 @@ class TestLateParameter
 
     public function getTestProperty()
     {
-
         return $this->testProperty;
     }
 }
@@ -1631,7 +1630,6 @@ class TestLateController extends Controller
 {
     public function testLateBinderMethod(TestLateParameter $tlp)
     {
-
         return $tlp->getTestProperty();
     }
 }
@@ -1932,7 +1930,7 @@ class RoutingTestNonExistingUserModel extends RoutingTestUserModel
 
     public function firstOrFail()
     {
-        throw new ModelNotFoundException;
+        throw new ModelNotFoundException();
     }
 }
 

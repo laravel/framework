@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Auth;
 
-use stdClass;
-use Mockery as m;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Auth\Access\Gate;
-use Illuminate\Events\Dispatcher;
-use Illuminate\Container\Container;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Auth\Middleware\Authorize;
-use Illuminate\Contracts\Routing\Registrar;
-use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
+use Illuminate\Contracts\Routing\Registrar;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Events\Dispatcher;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Middleware\SubstituteBindings;
+use Illuminate\Routing\Router;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class AuthorizeMiddlewareTest extends TestCase
 {
@@ -31,9 +31,9 @@ class AuthorizeMiddlewareTest extends TestCase
     {
         parent::setUp();
 
-        $this->user = new stdClass;
+        $this->user = new stdClass();
 
-        Container::setInstance($this->container = new Container);
+        Container::setInstance($this->container = new Container());
 
         $this->container->singleton(GateContract::class, function () {
             return new Gate($this->container, function () {
@@ -41,7 +41,7 @@ class AuthorizeMiddlewareTest extends TestCase
             });
         });
 
-        $this->router = new Router(new Dispatcher, $this->container);
+        $this->router = new Router(new Dispatcher(), $this->container);
 
         $this->container->singleton(Registrar::class, function () {
             return $this->router;
@@ -62,7 +62,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard',
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -78,7 +78,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard',
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -96,7 +96,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard', [
             'middleware' => Authorize::class.':view-dashboard,true',
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -114,7 +114,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('dashboard/{route_parameter}', [
             'middleware' => Authorize::class.':view-dashboard,route_parameter',
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -138,7 +138,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('users/create', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':create,App\User'],
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -156,7 +156,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('users/create', [
             'middleware' => Authorize::class.':create,App\User',
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -172,7 +172,7 @@ class AuthorizeMiddlewareTest extends TestCase
      */
     public function testModelUnauthorized()
     {
-        $post = new stdClass;
+        $post = new stdClass();
 
         $this->router->bind('post', function () use ($post) {
             return $post;
@@ -186,7 +186,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('posts/{post}/edit', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':edit,post'],
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);
@@ -196,7 +196,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
     public function testModelAuthorized()
     {
-        $post = new stdClass;
+        $post = new stdClass();
 
         $this->router->bind('post', function () use ($post) {
             return $post;
@@ -210,7 +210,7 @@ class AuthorizeMiddlewareTest extends TestCase
 
         $this->router->get('posts/{post}/edit', [
             'middleware' => [SubstituteBindings::class, Authorize::class.':edit,post'],
-            'uses' => function () {
+            'uses'       => function () {
                 return 'success';
             },
         ]);

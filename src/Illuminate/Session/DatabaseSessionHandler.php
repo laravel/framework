@@ -2,14 +2,14 @@
 
 namespace Illuminate\Session;
 
-use Illuminate\Support\Arr;
-use SessionHandlerInterface;
-use Illuminate\Support\Carbon;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Database\QueryException;
-use Illuminate\Support\InteractsWithTime;
-use Illuminate\Database\ConnectionInterface;
 use Illuminate\Contracts\Container\Container;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\InteractsWithTime;
+use SessionHandlerInterface;
 
 class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareInterface
 {
@@ -53,10 +53,11 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Create a new database session handler instance.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  string  $table
-     * @param  int  $minutes
-     * @param  \Illuminate\Contracts\Container\Container|null  $container
+     * @param \Illuminate\Database\ConnectionInterface       $connection
+     * @param string                                         $table
+     * @param int                                            $minutes
+     * @param \Illuminate\Contracts\Container\Container|null $container
+     *
      * @return void
      */
     public function __construct(ConnectionInterface $connection, $table, $minutes, Container $container = null)
@@ -108,7 +109,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Determine if the session is expired.
      *
-     * @param  \stdClass  $session
+     * @param \stdClass $session
+     *
      * @return bool
      */
     protected function expired($session)
@@ -124,7 +126,7 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     {
         $payload = $this->getDefaultPayload($data);
 
-        if (! $this->exists) {
+        if (!$this->exists) {
             $this->read($sessionId);
         }
 
@@ -140,8 +142,9 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Perform an insert operation on the session ID.
      *
-     * @param  string  $sessionId
-     * @param  string  $payload
+     * @param string $sessionId
+     * @param string $payload
+     *
      * @return bool|null
      */
     protected function performInsert($sessionId, $payload)
@@ -156,8 +159,9 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Perform an update operation on the session ID.
      *
-     * @param  string  $sessionId
-     * @param  string  $payload
+     * @param string $sessionId
+     * @param string $payload
+     *
      * @return int
      */
     protected function performUpdate($sessionId, $payload)
@@ -168,17 +172,18 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Get the default payload for the session.
      *
-     * @param  string  $data
+     * @param string $data
+     *
      * @return array
      */
     protected function getDefaultPayload($data)
     {
         $payload = [
-            'payload' => base64_encode($data),
+            'payload'       => base64_encode($data),
             'last_activity' => $this->currentTime(),
         ];
 
-        if (! $this->container) {
+        if (!$this->container) {
             return $payload;
         }
 
@@ -191,7 +196,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Add the user information to the session payload.
      *
-     * @param  array  $payload
+     * @param array $payload
+     *
      * @return $this
      */
     protected function addUserInformation(&$payload)
@@ -216,7 +222,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Add the request information to the session payload.
      *
-     * @param  array  $payload
+     * @param array $payload
+     *
      * @return $this
      */
     protected function addRequestInformation(&$payload)
@@ -282,7 +289,8 @@ class DatabaseSessionHandler implements SessionHandlerInterface, ExistenceAwareI
     /**
      * Set the existence state for the session.
      *
-     * @param  bool  $value
+     * @param bool $value
+     *
      * @return $this
      */
     public function setExists($value)

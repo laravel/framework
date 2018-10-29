@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Notifications;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notification;
 use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Notifications\Channels\BroadcastChannel;
-use Illuminate\Notifications\Messages\BroadcastMessage;
 use Illuminate\Notifications\Events\BroadcastNotificationCreated;
+use Illuminate\Notifications\Messages\BroadcastMessage;
+use Illuminate\Notifications\Notification;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class NotificationBroadcastChannelTest extends TestCase
 {
@@ -20,7 +20,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testDatabaseChannelCreatesDatabaseRecordWithProperData()
     {
-        $notification = new NotificationBroadcastChannelTestNotification;
+        $notification = new NotificationBroadcastChannelTestNotification();
         $notification->id = 1;
         $notifiable = m::mock();
 
@@ -32,7 +32,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedOnCustomChannels()
     {
-        $notification = new CustomChannelsTestNotification;
+        $notification = new CustomChannelsTestNotification();
         $notification->id = 1;
         $notifiable = m::mock();
 
@@ -47,7 +47,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomEventName()
     {
-        $notification = new CustomEventNameTestNotification;
+        $notification = new CustomEventNameTestNotification();
         $notification->id = 1;
         $notifiable = m::mock();
 
@@ -62,7 +62,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedWithCustomDataType()
     {
-        $notification = new CustomEventNameTestNotification;
+        $notification = new CustomEventNameTestNotification();
         $notification->id = 1;
         $notifiable = m::mock();
 
@@ -77,7 +77,7 @@ class NotificationBroadcastChannelTest extends TestCase
 
     public function testNotificationIsBroadcastedNow()
     {
-        $notification = new TestNotificationBroadCastedNow;
+        $notification = new TestNotificationBroadCastedNow();
         $notification->id = 1;
         $notifiable = m::mock();
 

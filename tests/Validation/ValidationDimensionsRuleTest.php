@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Validation;
 
 use Illuminate\Validation\Rule;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Rules\Dimensions;
+use PHPUnit\Framework\TestCase;
 
 class ValidationDimensionsRuleTest extends TestCase
 {

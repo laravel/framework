@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Foundation\Http;
 
-use Illuminate\Routing\Router;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Http\Kernel;
+use Illuminate\Routing\Router;
+use PHPUnit\Framework\TestCase;
 
 class KernelTest extends TestCase
 {
@@ -22,7 +22,7 @@ class KernelTest extends TestCase
      */
     protected function getApplication()
     {
-        return new Application;
+        return new Application();
     }
 
     /**
@@ -30,6 +30,6 @@ class KernelTest extends TestCase
      */
     protected function getRouter()
     {
-        return new Router(new Dispatcher);
+        return new Router(new Dispatcher());
     }
 }

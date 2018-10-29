@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Log;
 
-use ReflectionProperty;
 use Illuminate\Log\Logger;
 use Illuminate\Log\LogManager;
+use Monolog\Formatter\HtmlFormatter;
+use Monolog\Formatter\NormalizerFormatter;
+use Monolog\Handler\LogEntriesHandler;
+use Monolog\Handler\NewRelicHandler;
+use Monolog\Handler\StreamHandler;
 use Monolog\Logger as Monolog;
 use Orchestra\Testbench\TestCase;
-use Monolog\Handler\StreamHandler;
-use Monolog\Formatter\HtmlFormatter;
-use Monolog\Handler\NewRelicHandler;
-use Monolog\Handler\LogEntriesHandler;
-use Monolog\Formatter\NormalizerFormatter;
+use ReflectionProperty;
 
 class LogManagerTest extends TestCase
 {
@@ -29,12 +29,12 @@ class LogManagerTest extends TestCase
     {
         $config = $this->app['config'];
         $config->set('logging.channels.nonbubblingstream', [
-            'driver' => 'monolog',
-            'name' => 'foobar',
+            'driver'  => 'monolog',
+            'name'    => 'foobar',
             'handler' => StreamHandler::class,
-            'with' => [
+            'with'    => [
                 'stream' => 'php://stderr',
-                'level' => Monolog::NOTICE,
+                'level'  => Monolog::NOTICE,
                 'bubble' => false,
             ],
         ]);
@@ -57,10 +57,10 @@ class LogManagerTest extends TestCase
         $this->assertEquals('php://stderr', $url->getValue($handlers[0]));
 
         $config->set('logging.channels.logentries', [
-            'driver' => 'monolog',
-            'name' => 'le',
+            'driver'  => 'monolog',
+            'name'    => 'le',
             'handler' => LogEntriesHandler::class,
-            'with' => [
+            'with'    => [
                 'token' => '123456789',
             ],
         ]);
@@ -79,9 +79,9 @@ class LogManagerTest extends TestCase
     {
         $config = $this->app['config'];
         $config->set('logging.channels.newrelic', [
-            'driver' => 'monolog',
-            'name' => 'nr',
-            'handler' => NewRelicHandler::class,
+            'driver'    => 'monolog',
+            'name'      => 'nr',
+            'handler'   => NewRelicHandler::class,
             'formatter' => 'default',
         ]);
 
@@ -95,10 +95,10 @@ class LogManagerTest extends TestCase
         $this->assertInstanceOf(NormalizerFormatter::class, $handler->getFormatter());
 
         $config->set('logging.channels.newrelic2', [
-            'driver' => 'monolog',
-            'name' => 'nr',
-            'handler' => NewRelicHandler::class,
-            'formatter' => HtmlFormatter::class,
+            'driver'         => 'monolog',
+            'name'           => 'nr',
+            'handler'        => NewRelicHandler::class,
+            'formatter'      => HtmlFormatter::class,
             'formatter_with' => [
                 'dateFormat' => 'Y/m/d--test',
             ],
