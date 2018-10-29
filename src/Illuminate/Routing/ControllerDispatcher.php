@@ -37,6 +37,8 @@ class ControllerDispatcher implements ControllerDispatcherContract
      */
     public function dispatch(Route $route, $controller, $method)
     {
+        $this->lateBindings = $route->lateBindings();
+
         $parameters = $this->resolveClassMethodDependencies(
             $route->parametersWithoutNulls(), $controller, $method
         );

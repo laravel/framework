@@ -10,6 +10,36 @@ use ReflectionFunctionAbstract;
 trait RouteDependencyResolverTrait
 {
     /**
+     * Registered potential bindings to the action's parameters.
+     *
+     * @var array
+     */
+    protected $lateBindings = [];
+
+    /**
+     * Returns the lateBindings array.
+     *
+     * @return array
+     */
+    public function lateBindings()
+    {
+        return $this->lateBindings;
+    }
+
+    protected function executeLateBindings()
+    {
+        $bindings = $this->lateBindings();
+
+        foreach ($bindings as $abstract => $value) {
+            $this->container->bind(
+                $abstract,
+                $value['concrete'],
+                $value['shared']
+            );
+        }
+    }
+
+    /**
      * Resolve the object method's type-hinted dependencies.
      *
      * @param  array  $parameters
@@ -37,6 +67,8 @@ trait RouteDependencyResolverTrait
      */
     public function resolveMethodDependencies(array $parameters, ReflectionFunctionAbstract $reflector)
     {
+        $this->executeLateBindings();
+
         $instanceCount = 0;
 
         $values = array_values($parameters);
@@ -69,17 +101,6 @@ trait RouteDependencyResolverTrait
     protected function transformDependency(ReflectionParameter $parameter, $parameters)
     {
         $class = $parameter->getClass();
-
-        if ($this instanceof Route) {
-            $bindings = $this->lateBindings();
-            foreach ($bindings as $abstract => $value) {
-                $this->container->bind(
-                    $abstract,
-                    $value['concrete'],
-                    $value['shared']
-                );
-            }
-        }
 
         // If the parameter has a type-hinted class, we will check to see if it is already in
         // the list of parameters. If it is we will just skip it as it is probably a model
