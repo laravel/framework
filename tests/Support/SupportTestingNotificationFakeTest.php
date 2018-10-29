@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use PHPUnit\Framework\TestCase;
+use Illuminate\Contracts\Translation\HasLocalePreference;
 use Illuminate\Foundation\Auth\User;
 use Illuminate\Notifications\Notification;
-use PHPUnit\Framework\ExpectationFailedException;
-use PHPUnit\Framework\Constraint\ExceptionMessage;
 use Illuminate\Support\Testing\Fakes\NotificationFake;
-use Illuminate\Contracts\Translation\HasLocalePreference;
+use PHPUnit\Framework\Constraint\ExceptionMessage;
+use PHPUnit\Framework\ExpectationFailedException;
+use PHPUnit\Framework\TestCase;
 
 class SupportTestingNotificationFakeTest extends TestCase
 {
@@ -30,9 +30,9 @@ class SupportTestingNotificationFakeTest extends TestCase
     protected function setUp()
     {
         parent::setUp();
-        $this->fake = new NotificationFake;
-        $this->notification = new NotificationStub;
-        $this->user = new UserStub;
+        $this->fake = new NotificationFake();
+        $this->notification = new NotificationStub();
+        $this->user = new UserStub();
     }
 
     public function testAssertSentTo()
@@ -44,7 +44,7 @@ class SupportTestingNotificationFakeTest extends TestCase
             $this->assertThat($e, new ExceptionMessage('The expected [Illuminate\Tests\Support\NotificationStub] notification was not sent.'));
         }
 
-        $this->fake->send($this->user, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub());
 
         $this->fake->assertSentTo($this->user, NotificationStub::class);
     }
@@ -53,7 +53,7 @@ class SupportTestingNotificationFakeTest extends TestCase
     {
         $this->fake->assertNotSentTo($this->user, NotificationStub::class);
 
-        $this->fake->send($this->user, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub());
 
         try {
             $this->fake->assertNotSentTo($this->user, NotificationStub::class);
@@ -65,7 +65,7 @@ class SupportTestingNotificationFakeTest extends TestCase
 
     public function testResettingNotificationId()
     {
-        $notification = new NotificationStub;
+        $notification = new NotificationStub();
 
         $this->fake->send($this->user, $notification);
 
@@ -87,20 +87,20 @@ class SupportTestingNotificationFakeTest extends TestCase
     {
         $this->fake->assertTimesSent(0, NotificationStub::class);
 
-        $this->fake->send($this->user, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub());
 
-        $this->fake->send($this->user, new NotificationStub);
+        $this->fake->send($this->user, new NotificationStub());
 
-        $this->fake->send(new UserStub, new NotificationStub);
+        $this->fake->send(new UserStub(), new NotificationStub());
 
         $this->fake->assertTimesSent(3, NotificationStub::class);
     }
 
     public function testAssertSentToWhenNotifiableHasPreferredLocale()
     {
-        $user = new LocalizedUserStub;
+        $user = new LocalizedUserStub();
 
-        $this->fake->send($user, new NotificationStub);
+        $this->fake->send($user, new NotificationStub());
 
         $this->fake->assertSentTo($user, NotificationStub::class, function ($notification, $channels, $notifiable, $locale) use ($user) {
             return $notifiable === $user && $locale === 'au';

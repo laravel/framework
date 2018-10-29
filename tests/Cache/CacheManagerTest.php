@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ArrayStore;
 use Illuminate\Cache\CacheManager;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheManagerTest extends TestCase
 {

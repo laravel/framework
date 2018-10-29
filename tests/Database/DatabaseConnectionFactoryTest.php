@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Database;
 
-use PDO;
-use Mockery as m;
-use ReflectionProperty;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Container\Container;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Connectors\ConnectionFactory;
+use Mockery as m;
+use PDO;
+use PHPUnit\Framework\TestCase;
+use ReflectionProperty;
 
 class DatabaseConnectionFactoryTest extends TestCase
 {
@@ -16,16 +16,16 @@ class DatabaseConnectionFactoryTest extends TestCase
 
     public function setUp()
     {
-        $this->db = new DB;
+        $this->db = new DB();
 
         $this->db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
         $this->db->addConnection([
             'driver' => 'sqlite',
-            'read' => [
+            'read'   => [
                 'database'  => ':memory:',
             ],
             'write' => [

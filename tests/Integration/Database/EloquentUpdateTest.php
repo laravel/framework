@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Integration\Database;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -19,9 +19,9 @@ class EloquentUpdateTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
     }
 
@@ -47,7 +47,7 @@ class EloquentUpdateTest extends TestCase
     public function testBasicUpdate()
     {
         TestUpdateModel1::create([
-            'name' => str_random(),
+            'name'  => str_random(),
             'title' => 'Ms.',
         ]);
 
@@ -71,7 +71,7 @@ class EloquentUpdateTest extends TestCase
     public function testUpdatedAtWithJoins()
     {
         TestUpdateModel1::create([
-            'name' => 'Abdul',
+            'name'  => 'Abdul',
             'title' => 'Mr.',
         ]);
 
@@ -92,7 +92,7 @@ class EloquentUpdateTest extends TestCase
     public function testSoftDeleteWithJoins()
     {
         TestUpdateModel1::create([
-            'name' => str_random(),
+            'name'  => str_random(),
             'title' => 'Mr.',
         ]);
 

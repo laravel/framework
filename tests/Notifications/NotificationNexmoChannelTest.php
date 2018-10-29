@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Notifications;
 
+use Illuminate\Notifications\Channels\NexmoSmsChannel;
+use Illuminate\Notifications\Messages\NexmoMessage;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
 use Mockery as m;
 use Nexmo\Client;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Notifications\Messages\NexmoMessage;
-use Illuminate\Notifications\Channels\NexmoSmsChannel;
 
 class NotificationNexmoChannelTest extends TestCase
 {
@@ -19,8 +19,8 @@ class NotificationNexmoChannelTest extends TestCase
 
     public function testSmsIsSentViaNexmo()
     {
-        $notification = new NotificationNexmoChannelTestNotification;
-        $notifiable = new NotificationNexmoChannelTestNotifiable;
+        $notification = new NotificationNexmoChannelTestNotification();
+        $notifiable = new NotificationNexmoChannelTestNotifiable();
 
         $channel = new NexmoSmsChannel(
             $nexmo = m::mock(Client::class), '4444444444'
@@ -29,7 +29,7 @@ class NotificationNexmoChannelTest extends TestCase
         $nexmo->shouldReceive('message->send')->with([
             'type' => 'text',
             'from' => '4444444444',
-            'to' => '5555555555',
+            'to'   => '5555555555',
             'text' => 'this is my message',
         ]);
 
@@ -38,8 +38,8 @@ class NotificationNexmoChannelTest extends TestCase
 
     public function testSmsIsSentViaNexmoWithCustomFrom()
     {
-        $notification = new NotificationNexmoChannelTestCustomFromNotification;
-        $notifiable = new NotificationNexmoChannelTestNotifiable;
+        $notification = new NotificationNexmoChannelTestCustomFromNotification();
+        $notifiable = new NotificationNexmoChannelTestNotifiable();
 
         $channel = new NexmoSmsChannel(
             $nexmo = m::mock(Client::class), '4444444444'
@@ -48,7 +48,7 @@ class NotificationNexmoChannelTest extends TestCase
         $nexmo->shouldReceive('message->send')->with([
             'type' => 'unicode',
             'from' => '5554443333',
-            'to' => '5555555555',
+            'to'   => '5555555555',
             'text' => 'this is my message',
         ]);
 

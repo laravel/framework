@@ -2,8 +2,8 @@
 
 namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Validation\Validator;
+use PHPUnit\Framework\TestCase;
 
 class ValidationAddFailureTest extends TestCase
 {
@@ -14,7 +14,7 @@ class ValidationAddFailureTest extends TestCase
      */
     public function makeValidator()
     {
-        $mainTest = new ValidationValidatorTest;
+        $mainTest = new ValidationValidatorTest();
         $trans = $mainTest->getIlluminateArrayTranslator();
 
         return new Validator($trans, ['foo' => ['bar' => ['baz' => '']]], ['foo.bar.baz' => 'sometimes|required']);

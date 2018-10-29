@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Pagination\Paginator;
-use Illuminate\Database\Query\Builder;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Query\Builder;
+use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
 {
@@ -17,7 +17,7 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
     {
         Carbon::setTestNow(Carbon::now());
 
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -587,9 +587,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
         $post1->comments()->create([
-            'body' => 'Comment Body',
+            'body'       => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_id'   => $abigail->id,
         ]);
 
         $abigail->delete();
@@ -624,9 +624,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
 
         $post1->comments()->create([
-            'body' => 'Comment Body',
+            'body'       => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_id'   => $abigail->id,
         ]);
 
         TestCommentWithoutSoftDelete::with(['owner' => function ($q) {
@@ -641,9 +641,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
         $post1->comments()->create([
-            'body' => 'Comment Body',
+            'body'       => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_id'   => $abigail->id,
         ]);
 
         $comment = SoftDeletesTestCommentWithTrashed::with(['owner' => function ($q) {
@@ -660,9 +660,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $abigail = SoftDeletesTestUser::where('email', 'abigailotwell@gmail.com')->first();
         $post1 = $abigail->posts()->create(['title' => 'First Title']);
         $post1->comments()->create([
-            'body' => 'Comment Body',
+            'body'       => 'Comment Body',
             'owner_type' => SoftDeletesTestUser::class,
-            'owner_id' => $abigail->id,
+            'owner_id'   => $abigail->id,
         ]);
 
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();
@@ -680,9 +680,9 @@ class DatabaseEloquentSoftDeletesIntegrationTest extends TestCase
         $taylor = TestUserWithoutSoftDelete::create(['id' => 1, 'email' => 'taylorotwell@gmail.com']);
         $post1 = $taylor->posts()->create(['title' => 'First Title']);
         $post1->comments()->create([
-            'body' => 'Comment Body',
+            'body'       => 'Comment Body',
             'owner_type' => TestUserWithoutSoftDelete::class,
-            'owner_id' => $taylor->id,
+            'owner_id'   => $taylor->id,
         ]);
 
         $comment = SoftDeletesTestCommentWithTrashed::with('owner')->first();

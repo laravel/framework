@@ -18,7 +18,8 @@ class Verified
     /**
      * Create a new event instance.
      *
-     * @param  \Illuminate\Contracts\Auth\MustVerifyEmail  $user
+     * @param \Illuminate\Contracts\Auth\MustVerifyEmail $user
+     *
      * @return void
      */
     public function __construct($user)

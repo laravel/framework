@@ -10,7 +10,8 @@ trait DetectsDeadlocks
     /**
      * Determine if the given exception was caused by a deadlock.
      *
-     * @param  \Exception  $e
+     * @param \Exception $e
+     *
      * @return bool
      */
     protected function causedByDeadlock(Exception $e)

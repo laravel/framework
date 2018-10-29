@@ -2,11 +2,11 @@
 
 namespace Illuminate\Tests\Database;
 
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class DatabaseEloquentBelongsToManyWithDefaultAttributesTest extends TestCase
 {

@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use Mockery as m;
-use Illuminate\Support\Str;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Console\OutputStyle;
 use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Facade;
-use Illuminate\Database\Migrations\Migrator;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Migrations\DatabaseMigrationRepository;
+use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Facade;
+use Illuminate\Support\Str;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseMigratorIntegrationTest extends TestCase
 {
@@ -25,7 +25,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
      */
     public function setUp()
     {
-        $this->db = $db = new DB;
+        $this->db = $db = new DB();
 
         $db->addConnection([
             'driver'    => 'sqlite',
@@ -34,14 +34,14 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $db->setAsGlobal();
 
-        $container = new Container;
+        $container = new Container();
         $container->instance('db', $db->getDatabaseManager());
         Facade::setFacadeApplication($container);
 
         $this->migrator = new Migrator(
             $repository = new DatabaseMigrationRepository($db->getDatabaseManager(), 'migrations'),
             $db->getDatabaseManager(),
-            new Filesystem
+            new Filesystem()
         );
 
         $output = m::mock(OutputStyle::class);
@@ -49,7 +49,7 @@ class DatabaseMigratorIntegrationTest extends TestCase
 
         $this->migrator->setOutput($output);
 
-        if (! $repository->repositoryExists()) {
+        if (!$repository->repositoryExists()) {
             $repository->createRepository();
         }
     }

@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Integration\Queue;
 
-use Mockery as m;
 use Illuminate\Bus\Dispatcher;
-use Orchestra\Testbench\TestCase;
 use Illuminate\Contracts\Queue\Job;
-use Illuminate\Support\Facades\Event;
-use Illuminate\Queue\Events\JobFailed;
-use Illuminate\Queue\CallQueuedHandler;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Queue\CallQueuedHandler;
+use Illuminate\Queue\Events\JobFailed;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Support\Facades\Event;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -38,7 +38,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('delete')->once();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerTestJob),
+            'command' => serialize(new CallQueuedHandlerTestJob()),
         ]);
 
         $this->assertTrue(CallQueuedHandlerTestJob::$handled);
@@ -59,7 +59,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('failed')->once();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+            'command' => serialize(new CallQueuedHandlerExceptionThrower()),
         ]);
 
         Event::assertDispatched(JobFailed::class);
@@ -80,7 +80,7 @@ class CallQueuedHandlerTest extends TestCase
         $job->shouldReceive('failed')->never();
 
         $instance->call($job, [
-            'command' => serialize(new CallQueuedHandlerExceptionThrower),
+            'command' => serialize(new CallQueuedHandlerExceptionThrower()),
         ]);
 
         Event::assertNotDispatched(JobFailed::class);

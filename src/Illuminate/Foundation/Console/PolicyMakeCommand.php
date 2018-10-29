@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Console;
 
-use Illuminate\Support\Str;
 use Illuminate\Console\GeneratorCommand;
+use Illuminate\Support\Str;
 use Symfony\Component\Console\Input\InputOption;
 
 class PolicyMakeCommand extends GeneratorCommand
@@ -32,7 +32,8 @@ class PolicyMakeCommand extends GeneratorCommand
     /**
      * Build the class with the given name.
      *
-     * @param  string  $name
+     * @param string $name
+     *
      * @return string
      */
     protected function buildClass($name)
@@ -49,14 +50,15 @@ class PolicyMakeCommand extends GeneratorCommand
     /**
      * Replace the User model namespace.
      *
-     * @param  string  $stub
+     * @param string $stub
+     *
      * @return string
      */
     protected function replaceUserNamespace($stub)
     {
         $model = $this->userProviderModel();
 
-        if (! $model) {
+        if (!$model) {
             return $stub;
         }
 
@@ -70,8 +72,9 @@ class PolicyMakeCommand extends GeneratorCommand
     /**
      * Replace the model for the given stub.
      *
-     * @param  string  $stub
-     * @param  string  $model
+     * @param string $stub
+     * @param string $model
+     *
      * @return string
      */
     protected function replaceModel($stub, $model)
@@ -122,7 +125,8 @@ class PolicyMakeCommand extends GeneratorCommand
     /**
      * Get the default namespace for the class.
      *
-     * @param  string  $rootNamespace
+     * @param string $rootNamespace
+     *
      * @return string
      */
     protected function getDefaultNamespace($rootNamespace)

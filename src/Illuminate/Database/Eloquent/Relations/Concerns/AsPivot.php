@@ -2,9 +2,9 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use Illuminate\Support\Str;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 
 trait AsPivot
 {
@@ -32,15 +32,16 @@ trait AsPivot
     /**
      * Create a new pivot model instance.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array   $attributes
-     * @param  string  $table
-     * @param  bool    $exists
+     * @param \Illuminate\Database\Eloquent\Model $parent
+     * @param array                               $attributes
+     * @param string                              $table
+     * @param bool                                $exists
+     *
      * @return static
      */
     public static function fromAttributes(Model $parent, $attributes, $table, $exists = false)
     {
-        $instance = new static;
+        $instance = new static();
 
         // The pivot model is a "dynamic" model since we will set the tables dynamically
         // for the instance. This allows it work for any intermediate tables for the
@@ -65,10 +66,11 @@ trait AsPivot
     /**
      * Create a new pivot model from raw values returned from a query.
      *
-     * @param  \Illuminate\Database\Eloquent\Model  $parent
-     * @param  array   $attributes
-     * @param  string  $table
-     * @param  bool    $exists
+     * @param \Illuminate\Database\Eloquent\Model $parent
+     * @param array                               $attributes
+     * @param string                              $table
+     * @param bool                                $exists
+     *
      * @return static
      */
     public static function fromRawAttributes(Model $parent, $attributes, $table, $exists = false)
@@ -85,7 +87,8 @@ trait AsPivot
     /**
      * Set the keys for a save update query.
      *
-     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function setKeysForSaveQuery(Builder $query)
@@ -137,7 +140,7 @@ trait AsPivot
      */
     public function getTable()
     {
-        if (! isset($this->table)) {
+        if (!isset($this->table)) {
             $this->setTable(str_replace(
                 '\\', '', Str::snake(Str::singular(class_basename($this)))
             ));
@@ -179,8 +182,9 @@ trait AsPivot
     /**
      * Set the key names for the pivot model instance.
      *
-     * @param  string  $foreignKey
-     * @param  string  $relatedKey
+     * @param string $foreignKey
+     * @param string $relatedKey
+     *
      * @return $this
      */
     public function setPivotKeys($foreignKey, $relatedKey)
@@ -247,7 +251,8 @@ trait AsPivot
     /**
      * Get a new query to restore one or more models by their queueable IDs.
      *
-     * @param  array|int  $ids
+     * @param array|int $ids
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     public function newQueryForRestoration($ids)
@@ -256,7 +261,7 @@ trait AsPivot
             return $this->newQueryForCollectionRestoration($ids);
         }
 
-        if (! Str::contains($ids, ':')) {
+        if (!Str::contains($ids, ':')) {
             return parent::newQueryForRestoration($ids);
         }
 
@@ -270,12 +275,13 @@ trait AsPivot
     /**
      * Get a new query to restore multiple models by their queueable IDs.
      *
-     * @param  array|int  $ids
+     * @param array|int $ids
+     *
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function newQueryForCollectionRestoration(array $ids)
     {
-        if (! Str::contains($ids[0], ':')) {
+        if (!Str::contains($ids[0], ':')) {
             return parent::newQueryForRestoration($ids);
         }
 

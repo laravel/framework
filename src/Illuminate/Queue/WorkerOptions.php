@@ -56,13 +56,14 @@ class WorkerOptions
     /**
      * Create a new worker options instance.
      *
-     * @param  int  $delay
-     * @param  int  $memory
-     * @param  int  $timeout
-     * @param  int  $sleep
-     * @param  int  $maxTries
-     * @param  bool  $force
-     * @param  bool  $stopWhenEmpty
+     * @param int  $delay
+     * @param int  $memory
+     * @param int  $timeout
+     * @param int  $sleep
+     * @param int  $maxTries
+     * @param bool $force
+     * @param bool $stopWhenEmpty
+     *
      * @return void
      */
     public function __construct($delay = 0, $memory = 128, $timeout = 60, $sleep = 3, $maxTries = 0, $force = false, $stopWhenEmpty = false)

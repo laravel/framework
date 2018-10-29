@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\Database;
 
-use stdClass;
+use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
+use Illuminate\Database\Query\Builder as BaseBuilder;
+use Illuminate\Database\Query\Grammars\Grammar;
+use Illuminate\Database\Query\Processors\Processor;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\ConnectionInterface;
-use Illuminate\Database\Query\Grammars\Grammar;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
-use Illuminate\Database\Query\Processors\Processor;
-use Illuminate\Database\Query\Builder as BaseBuilder;
-use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use stdClass;
 
 class DatabaseSoftDeletingScopeTest extends TestCase
 {
@@ -38,7 +38,7 @@ class DatabaseSoftDeletingScopeTest extends TestCase
             m::mock(Grammar::class),
             m::mock(Processor::class)
         ));
-        $scope = new SoftDeletingScope;
+        $scope = new SoftDeletingScope();
         $scope->extend($builder);
         $callback = $builder->getMacro('restore');
         $givenBuilder = m::mock(EloquentBuilder::class);

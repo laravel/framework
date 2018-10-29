@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Http;
 
-use stdClass;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Contracts\Support\Jsonable;
+use Illuminate\Http\JsonResponse;
 use JsonSerializable;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Contracts\Support\Jsonable;
-use Illuminate\Contracts\Support\Arrayable;
+use stdClass;
 
 class HttpJsonResponseTest extends TestCase
 {
@@ -27,20 +27,20 @@ class HttpJsonResponseTest extends TestCase
     public function setAndRetrieveDataProvider(): array
     {
         return [
-            'Jsonable data' => [new JsonResponseTestJsonableObject],
-            'JsonSerializable data' => [new JsonResponseTestJsonSerializeObject],
-            'Arrayable data' => [new JsonResponseTestArrayableObject],
-            'Array data' => [['foo' => 'bar']],
+            'Jsonable data'         => [new JsonResponseTestJsonableObject()],
+            'JsonSerializable data' => [new JsonResponseTestJsonSerializeObject()],
+            'Arrayable data'        => [new JsonResponseTestArrayableObject()],
+            'Array data'            => [['foo' => 'bar']],
         ];
     }
 
     public function testGetOriginalContent()
     {
-        $response = new JsonResponse(new JsonResponseTestArrayableObject);
+        $response = new JsonResponse(new JsonResponseTestArrayableObject());
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
 
-        $response = new JsonResponse;
-        $response->setData(new JsonResponseTestArrayableObject);
+        $response = new JsonResponse();
+        $response->setData(new JsonResponseTestArrayableObject());
         $this->assertInstanceOf(JsonResponseTestArrayableObject::class, $response->getOriginalContent());
     }
 
@@ -98,8 +98,8 @@ class HttpJsonResponseTest extends TestCase
         $resource = tmpfile();
 
         // Recursion can't be encoded
-        $recursiveObject = new stdClass;
-        $objectB = new stdClass;
+        $recursiveObject = new stdClass();
+        $objectB = new stdClass();
         $recursiveObject->b = $objectB;
         $objectB->a = $recursiveObject;
 

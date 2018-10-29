@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Database;
 
-use stdClass;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class DatabaseEloquentCastsDatabaseStringTest extends TestCase
 {
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 
@@ -57,8 +57,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
     {
         /** @var TableForCasting $model */
         $model = TableForCasting::create([
-            'array_attributes' => ['key1'=>'value1'],
-            'json_attributes' => ['json_key'=>'json_value'],
+            'array_attributes'  => ['key1'=>'value1'],
+            'json_attributes'   => ['json_key'=>'json_value'],
             'object_attributes' => ['json_key'=>'json_value'],
         ]);
         $this->assertSame('{"key1":"value1"}', $model->getOriginal('array_attributes'));
@@ -68,7 +68,7 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
         $this->assertSame(['json_key'=>'json_value'], $model->getAttribute('json_attributes'));
 
         $this->assertSame('{"json_key":"json_value"}', $model->getOriginal('object_attributes'));
-        $stdClass = new stdClass;
+        $stdClass = new stdClass();
         $stdClass->json_key = 'json_value';
         $this->assertEquals($stdClass, $model->getAttribute('object_attributes'));
     }
@@ -77,8 +77,8 @@ class DatabaseEloquentCastsDatabaseStringTest extends TestCase
     {
         /** @var TableForCasting $model */
         $model = TableForCasting::create([
-            'array_attributes' => [],
-            'json_attributes' => [],
+            'array_attributes'  => [],
+            'json_attributes'   => [],
             'object_attributes' => [],
         ]);
         $this->assertSame('[]', $model->getOriginal('array_attributes'));
@@ -131,8 +131,8 @@ class TableForCasting extends Eloquent
      * @var array
      */
     protected $casts = [
-        'array_attributes' => 'array',
-        'json_attributes' => 'json',
+        'array_attributes'  => 'array',
+        'json_attributes'   => 'json',
         'object_attributes' => 'object',
     ];
 }

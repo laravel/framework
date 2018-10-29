@@ -2,18 +2,18 @@
 
 namespace Illuminate\Tests\Integration\Notifications;
 
-use Mockery as m;
-use Illuminate\Mail\Message;
-use Illuminate\Mail\Markdown;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Contracts\Mail\Mailer;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\Contracts\Mail\Mailable;
+use Illuminate\Contracts\Mail\Mailer;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Notifications\Notification;
+use Illuminate\Mail\Markdown;
+use Illuminate\Mail\Message;
 use Illuminate\Notifications\Channels\MailChannel;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Notifications\Notification;
+use Illuminate\Support\Facades\Schema;
+use Mockery as m;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -37,9 +37,9 @@ class SendingMailNotificationsTest extends TestCase
         $app['config']->set('database.default', 'testbench');
 
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         $this->mailer = m::mock(Mailer::class);
@@ -67,7 +67,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent()
     {
-        $notification = new TestMailNotification;
+        $notification = new TestMailNotification();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -79,7 +79,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification'        => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {
@@ -110,11 +110,11 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent_to_named_address()
     {
-        $notification = new TestMailNotification;
+        $notification = new TestMailNotification();
 
         $user = NotifiableUserWithNamedAddress::forceCreate([
             'email' => 'taylor@laravel.com',
-            'name' => 'Taylor Otwell',
+            'name'  => 'Taylor Otwell',
         ]);
 
         $this->markdown->shouldReceive('render')->once()->andReturn('htmlContent');
@@ -123,7 +123,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification'        => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {
@@ -154,7 +154,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent_with_subject()
     {
-        $notification = new TestMailNotificationWithSubject;
+        $notification = new TestMailNotificationWithSubject();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -166,7 +166,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification'        => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {
@@ -187,7 +187,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent_to_multiple_adresses()
     {
-        $notification = new TestMailNotificationWithSubject;
+        $notification = new TestMailNotificationWithSubject();
 
         $user = NotifiableUserWithMultipleAddreses::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -199,7 +199,7 @@ class SendingMailNotificationsTest extends TestCase
         $this->mailer->shouldReceive('send')->once()->with(
             ['html' => 'htmlContent', 'text' => 'textContent'],
             array_merge($notification->toMail($user)->toArray(), [
-                '__laravel_notification' => get_class($notification),
+                '__laravel_notification'        => get_class($notification),
                 '__laravel_notification_queued' => false,
             ]),
             m::on(function ($closure) {
@@ -220,7 +220,7 @@ class SendingMailNotificationsTest extends TestCase
 
     public function test_mail_is_sent_using_mailable()
     {
-        $notification = new TestMailNotificationWithMailable;
+        $notification = new TestMailNotificationWithMailable();
 
         $user = NotifiableUser::forceCreate([
             'email' => 'taylor@laravel.com',
@@ -269,7 +269,7 @@ class TestMailNotification extends Notification
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->priority(1)
             ->cc('cc@deepblue.com', 'cc')
             ->bcc('bcc@deepblue.com', 'bcc')
@@ -288,7 +288,7 @@ class TestMailNotificationWithSubject extends Notification
 
     public function toMail($notifiable)
     {
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject('mail custom subject')
             ->line('The introduction to the notification.');
     }

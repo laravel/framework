@@ -31,7 +31,7 @@ class FreshCommand extends Command
      */
     public function handle()
     {
-        if (! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
@@ -49,10 +49,10 @@ class FreshCommand extends Command
 
         $this->call('migrate', [
             '--database' => $database,
-            '--path' => $this->input->getOption('path'),
+            '--path'     => $this->input->getOption('path'),
             '--realpath' => $this->input->getOption('realpath'),
-            '--force' => true,
-            '--step' => $this->option('step'),
+            '--force'    => true,
+            '--step'     => $this->option('step'),
         ]);
 
         if ($this->needsSeeding()) {
@@ -63,7 +63,8 @@ class FreshCommand extends Command
     /**
      * Drop all of the database tables.
      *
-     * @param  string  $database
+     * @param string $database
+     *
      * @return void
      */
     protected function dropAllTables($database)
@@ -76,7 +77,8 @@ class FreshCommand extends Command
     /**
      * Drop all of the database views.
      *
-     * @param  string  $database
+     * @param string $database
+     *
      * @return void
      */
     protected function dropAllViews($database)
@@ -99,15 +101,16 @@ class FreshCommand extends Command
     /**
      * Run the database seeder command.
      *
-     * @param  string  $database
+     * @param string $database
+     *
      * @return void
      */
     protected function runSeeder($database)
     {
         $this->call('db:seed', [
             '--database' => $database,
-            '--class' => $this->option('seeder') ?: 'DatabaseSeeder',
-            '--force' => $this->option('force'),
+            '--class'    => $this->option('seeder') ?: 'DatabaseSeeder',
+            '--force'    => $this->option('force'),
         ]);
     }
 

@@ -4,11 +4,11 @@ namespace Illuminate\Cache;
 
 use Closure;
 use Exception;
-use Illuminate\Support\Str;
 use Illuminate\Contracts\Cache\Store;
-use Illuminate\Support\InteractsWithTime;
-use Illuminate\Database\PostgresConnection;
 use Illuminate\Database\ConnectionInterface;
+use Illuminate\Database\PostgresConnection;
+use Illuminate\Support\InteractsWithTime;
+use Illuminate\Support\Str;
 
 class DatabaseStore implements Store
 {
@@ -38,9 +38,10 @@ class DatabaseStore implements Store
     /**
      * Create a new database store.
      *
-     * @param  \Illuminate\Database\ConnectionInterface  $connection
-     * @param  string  $table
-     * @param  string  $prefix
+     * @param \Illuminate\Database\ConnectionInterface $connection
+     * @param string                                   $table
+     * @param string                                   $prefix
+     *
      * @return void
      */
     public function __construct(ConnectionInterface $connection, $table, $prefix = '')
@@ -53,7 +54,8 @@ class DatabaseStore implements Store
     /**
      * Retrieve an item from the cache by key.
      *
-     * @param  string|array  $key
+     * @param string|array $key
+     *
      * @return mixed
      */
     public function get($key)
@@ -86,9 +88,10 @@ class DatabaseStore implements Store
     /**
      * Store an item in the cache for a given number of minutes.
      *
-     * @param  string  $key
-     * @param  mixed   $value
-     * @param  float|int  $minutes
+     * @param string    $key
+     * @param mixed     $value
+     * @param float|int $minutes
+     *
      * @return void
      */
     public function put($key, $value, $minutes)
@@ -109,8 +112,9 @@ class DatabaseStore implements Store
     /**
      * Increment the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function increment($key, $value = 1)
@@ -123,8 +127,9 @@ class DatabaseStore implements Store
     /**
      * Decrement the value of an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return int|bool
      */
     public function decrement($key, $value = 1)
@@ -137,9 +142,10 @@ class DatabaseStore implements Store
     /**
      * Increment or decrement an item in the cache.
      *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @param  \Closure  $callback
+     * @param string   $key
+     * @param mixed    $value
+     * @param \Closure $callback
+     *
      * @return int|bool
      */
     protected function incrementOrDecrement($key, $value, Closure $callback)
@@ -166,7 +172,7 @@ class DatabaseStore implements Store
             // so we do not have to recreate all this logic in each of the functions.
             $new = $callback((int) $current, $value);
 
-            if (! is_numeric($current)) {
+            if (!is_numeric($current)) {
                 return false;
             }
 
@@ -194,8 +200,9 @@ class DatabaseStore implements Store
     /**
      * Store an item in the cache indefinitely.
      *
-     * @param  string  $key
-     * @param  mixed   $value
+     * @param string $key
+     * @param mixed  $value
+     *
      * @return void
      */
     public function forever($key, $value)
@@ -206,7 +213,8 @@ class DatabaseStore implements Store
     /**
      * Remove an item from the cache.
      *
-     * @param  string  $key
+     * @param string $key
+     *
      * @return bool
      */
     public function forget($key)
@@ -261,7 +269,8 @@ class DatabaseStore implements Store
     /**
      * Serialize the given value.
      *
-     * @param  mixed  $value
+     * @param mixed $value
+     *
      * @return string
      */
     protected function serialize($value)
@@ -278,12 +287,13 @@ class DatabaseStore implements Store
     /**
      * Unserialize the given value.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return mixed
      */
     protected function unserialize($value)
     {
-        if ($this->connection instanceof PostgresConnection && ! Str::contains($value, [':', ';'])) {
+        if ($this->connection instanceof PostgresConnection && !Str::contains($value, [':', ';'])) {
             $value = base64_decode($value);
         }
 

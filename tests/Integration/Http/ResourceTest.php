@@ -2,27 +2,27 @@
 
 namespace Illuminate\Tests\Integration\Http;
 
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Http\Resources\MergeValue;
 use Illuminate\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Illuminate\Tests\Integration\Http\Fixtures\Post;
+use Illuminate\Support\Facades\Route;
 use Illuminate\Tests\Integration\Http\Fixtures\Author;
-use Illuminate\Http\Resources\ConditionallyLoadsAttributes;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\Post;
 use Illuminate\Tests\Integration\Http\Fixtures\PostCollectionResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResource;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
 use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithoutWrap;
 use Illuminate\Tests\Integration\Http\Fixtures\ReallyEmptyPostResource;
 use Illuminate\Tests\Integration\Http\Fixtures\SerializablePostResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithExtraData;
-use Illuminate\Tests\Integration\Http\Fixtures\EmptyPostCollectionResource;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalData;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalMerging;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\AuthorResourceWithOptionalRelationship;
-use Illuminate\Tests\Integration\Http\Fixtures\PostResourceWithOptionalPivotRelationship;
+use Illuminate\Tests\Integration\Http\Fixtures\Subscription;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -33,7 +33,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostResource(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -46,7 +46,7 @@ class ResourceTest extends TestCase
 
         $response->assertJson([
             'data' => [
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ],
         ]);
@@ -56,7 +56,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostResourceWithoutWrap(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -66,7 +66,7 @@ class ResourceTest extends TestCase
         );
 
         $response->assertJson([
-            'id' => 5,
+            'id'    => 5,
             'title' => 'Test Title',
         ]);
     }
@@ -87,11 +87,11 @@ class ResourceTest extends TestCase
 
         $response->assertJson([
             'data' => [
-                'id' => 5,
+                'id'     => 5,
                 'second' => 'value',
-                'third' => 'value',
+                'third'  => 'value',
                 'fourth' => 'default',
-                'fifth' => 'default',
+                'fifth'  => 'default',
             ],
         ]);
     }
@@ -112,7 +112,7 @@ class ResourceTest extends TestCase
 
         $response->assertExactJson([
             'data' => [
-                'id' => 5,
+                'id'     => 5,
                 'second' => 'value',
             ],
         ]);
@@ -122,7 +122,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostResourceWithOptionalRelationship(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -144,7 +144,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $post = new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]);
 
@@ -161,8 +161,8 @@ class ResourceTest extends TestCase
 
         $response->assertExactJson([
             'data' => [
-                'id' => 5,
-                'author' => ['name' => 'jrrmartin'],
+                'id'          => 5,
+                'author'      => ['name' => 'jrrmartin'],
                 'author_name' => 'jrrmartin',
             ],
         ]);
@@ -172,7 +172,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $post = new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]);
 
@@ -189,8 +189,8 @@ class ResourceTest extends TestCase
 
         $response->assertExactJson([
             'data' => [
-                'id' => 5,
-                'author' => null,
+                'id'          => 5,
+                'author'      => null,
                 'author_name' => null,
             ],
         ]);
@@ -212,8 +212,8 @@ class ResourceTest extends TestCase
 
         $response->assertExactJson([
             'data' => [
-                'name' => 'jrrmartin',
-                'posts_count' => 'not loaded',
+                'name'              => 'jrrmartin',
+                'posts_count'       => 'not loaded',
                 'latest_post_title' => 'not loaded',
             ],
         ]);
@@ -223,7 +223,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $post = new Post(['id' => 5]);
-            $post->setRelation('pivot', new Subscription);
+            $post->setRelation('pivot', new Subscription());
 
             return new PostResourceWithOptionalPivotRelationship($post);
         });
@@ -236,7 +236,7 @@ class ResourceTest extends TestCase
 
         $response->assertExactJson([
             'data' => [
-                'id' => 5,
+                'id'           => 5,
                 'subscription' => [
                     'foo' => 'bar',
                 ],
@@ -248,7 +248,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $post = new Post(['id' => 5]);
-            $post->setRelation('accessor', new Subscription);
+            $post->setRelation('accessor', new Subscription());
 
             return new PostResourceWithOptionalPivotRelationship($post);
         });
@@ -261,7 +261,7 @@ class ResourceTest extends TestCase
 
         $response->assertExactJson([
             'data' => [
-                'id' => 5,
+                'id'                  => 5,
                 'custom_subscription' => [
                     'foo' => 'bar',
                 ],
@@ -272,7 +272,7 @@ class ResourceTest extends TestCase
     public function test_resource_is_url_routable()
     {
         $post = new PostResource(new Post([
-            'id' => 5,
+            'id'    => 5,
             'title' => 'Test Title',
         ]));
 
@@ -282,7 +282,7 @@ class ResourceTest extends TestCase
     public function test_named_routes_are_url_routable()
     {
         $post = new PostResource(new Post([
-            'id' => 5,
+            'id'    => 5,
             'title' => 'Test Title',
         ]));
 
@@ -299,7 +299,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new SerializablePostResource(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -321,7 +321,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostResource(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -338,7 +338,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostResourceWithExtraData(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -349,7 +349,7 @@ class ResourceTest extends TestCase
 
         $response->assertJson([
             'data' => [
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ],
             'foo' => 'bar',
@@ -360,7 +360,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return (new PostResourceWithExtraData(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ])))->additional(['baz' => 'qux']);
         });
@@ -371,7 +371,7 @@ class ResourceTest extends TestCase
 
         $response->assertJson([
             'data' => [
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ],
             'foo' => 'bar',
@@ -383,7 +383,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return (new PostResource(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ])))->response()->setStatusCode(202)->header('X-Custom', 'True');
         });
@@ -400,7 +400,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             $post = new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]);
 
@@ -420,7 +420,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new PostCollectionResource(collect([new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ])]));
         });
@@ -434,7 +434,7 @@ class ResourceTest extends TestCase
         $response->assertJson([
             'data' => [
                 [
-                    'id' => 5,
+                    'id'    => 5,
                     'title' => 'Test Title',
                 ],
             ],
@@ -461,24 +461,24 @@ class ResourceTest extends TestCase
         $response->assertJson([
             'data' => [
                 [
-                    'id' => 5,
+                    'id'    => 5,
                     'title' => 'Test Title',
                 ],
             ],
             'links' => [
                 'first' => '/?page=1',
-                'last' => '/?page=1',
-                'prev' => null,
-                'next' => null,
+                'last'  => '/?page=1',
+                'prev'  => null,
+                'next'  => null,
             ],
             'meta' => [
                 'current_page' => 1,
-                'from' => 1,
-                'last_page' => 1,
-                'path' => '/',
-                'per_page' => 15,
-                'to' => 1,
-                'total' => 10,
+                'from'         => 1,
+                'last_page'    => 1,
+                'path'         => '/',
+                'per_page'     => 15,
+                'to'           => 1,
+                'total'        => 10,
             ],
         ]);
     }
@@ -501,25 +501,25 @@ class ResourceTest extends TestCase
         $response->assertJson([
             'data' => [
                 [
-                    'id' => 5,
-                    'title' => 'Test Title',
+                    'id'     => 5,
+                    'title'  => 'Test Title',
                     'custom' => true,
                 ],
             ],
             'links' => [
                 'first' => '/?page=1',
-                'last' => '/?page=1',
-                'prev' => null,
-                'next' => null,
+                'last'  => '/?page=1',
+                'prev'  => null,
+                'next'  => null,
             ],
             'meta' => [
                 'current_page' => 1,
-                'from' => 1,
-                'last_page' => 1,
-                'path' => '/',
-                'per_page' => 15,
-                'to' => 1,
-                'total' => 10,
+                'from'         => 1,
+                'last_page'    => 1,
+                'path'         => '/',
+                'per_page'     => 15,
+                'to'           => 1,
+                'total'        => 10,
             ],
         ]);
     }
@@ -528,7 +528,7 @@ class ResourceTest extends TestCase
     {
         Route::get('/', function () {
             return new ReallyEmptyPostResource(new Post([
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ]));
         });
@@ -541,7 +541,7 @@ class ResourceTest extends TestCase
 
         $response->assertJson([
             'data' => [
-                'id' => 5,
+                'id'    => 5,
                 'title' => 'Test Title',
             ],
         ]);
@@ -578,7 +578,7 @@ class ResourceTest extends TestCase
 
     public function test_leading_merge__keyed_value_is_merged_correctly()
     {
-        $filter = new class {
+        $filter = new class() {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -598,7 +598,7 @@ class ResourceTest extends TestCase
 
     public function test_leading_merge_value_is_merged_correctly()
     {
-        $filter = new class {
+        $filter = new class() {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -623,7 +623,7 @@ class ResourceTest extends TestCase
 
     public function test_merge_values_may_be_missing()
     {
-        $filter = new class {
+        $filter = new class() {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -648,7 +648,7 @@ class ResourceTest extends TestCase
 
     public function test_initial_merge_values_may_be_missing()
     {
-        $filter = new class {
+        $filter = new class() {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -673,7 +673,7 @@ class ResourceTest extends TestCase
 
     public function test_all_merge_values_may_be_missing()
     {
-        $filter = new class {
+        $filter = new class() {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -698,7 +698,7 @@ class ResourceTest extends TestCase
 
     public function test_nested_merges()
     {
-        $filter = new class {
+        $filter = new class() {
             use ConditionallyLoadsAttributes;
 
             public function work()
@@ -734,11 +734,11 @@ class ResourceTest extends TestCase
     public function test_the_resource_can_be_an_array()
     {
         $this->assertJsonResourceResponse([
-            'user@example.com' => 'John',
+            'user@example.com'  => 'John',
             'admin@example.com' => 'Hank',
         ], [
             'data' => [
-                'user@example.com' => 'John',
+                'user@example.com'  => 'John',
                 'admin@example.com' => 'Hank',
             ],
         ]);
@@ -772,8 +772,8 @@ class ResourceTest extends TestCase
         ], ['data' => ['John', 'Hank', 'Bill']]);
 
         $this->assertJsonResourceResponse([
-            5 => 'John',
-            6 => 'Hank',
+            5   => 'John',
+            6   => 'Hank',
             'a' => 'Bill',
         ], ['data' => ['John', 'Hank', 'Bill']]);
     }

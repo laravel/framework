@@ -3,11 +3,11 @@
 namespace Illuminate\Tests\Integration\Database;
 
 use Faker\Generator;
-use Orchestra\Testbench\TestCase;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Factory;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Schema;
+use Orchestra\Testbench\TestCase;
 
 /**
  * @group integration
@@ -20,21 +20,21 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $app['config']->set('database.default', 'testbench');
         $app['config']->set('database.connections.testbench', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
         $app['config']->set('database.connections.alternative-connection', [
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
-            'prefix' => '',
+            'prefix'   => '',
         ]);
 
         $factory = new Factory($app->make(Generator::class));
 
         $factory->define(FactoryBuildableUser::class, function (Generator $faker) {
             return [
-                'name' => $faker->name,
+                'name'  => $faker->name,
                 'email' => $faker->unique()->safeEmail,
             ];
         });
@@ -62,7 +62,7 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->define(FactoryBuildableTeam::class, function (Generator $faker) {
             return [
-                'name' => $faker->name,
+                'name'     => $faker->name,
                 'owner_id' => function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
                 },
@@ -75,9 +75,9 @@ class EloquentFactoryBuilderTest extends TestCase
 
         $factory->define(FactoryBuildableServer::class, function (Generator $faker) {
             return [
-                'name' => $faker->name,
-                'status' => 'active',
-                'tags' => ['Storage', 'Data'],
+                'name'    => $faker->name,
+                'status'  => 'active',
+                'tags'    => ['Storage', 'Data'],
                 'user_id' => function () {
                     return factory(FactoryBuildableUser::class)->create()->id;
                 },

@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
-use Mockery as m;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\RedisStore;
 use Illuminate\Contracts\Redis\Factory;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class CacheRedisStoreTest extends TestCase
 {
@@ -81,7 +81,7 @@ class CacheRedisStoreTest extends TestCase
         $redis->putMany([
             'foo'   => 'bar',
             'baz'   => 'qux',
-            'bar' => 'norf',
+            'bar'   => 'norf',
         ], 60);
     }
 

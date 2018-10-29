@@ -2,22 +2,22 @@
 
 namespace Illuminate\Tests\Foundation;
 
-use stdClass;
 use Exception;
-use Mockery as m;
-use RuntimeException;
-use Psr\Log\LoggerInterface;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Routing\Redirector;
-use Illuminate\Container\Container;
-use Illuminate\Contracts\View\Factory;
-use Illuminate\Routing\ResponseFactory;
 use Illuminate\Config\Repository as Config;
-use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Foundation\Exceptions\Handler;
-use Symfony\Component\HttpKernel\Exception\HttpException;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Illuminate\Container\Container;
 use Illuminate\Contracts\Routing\ResponseFactory as ResponseFactoryContract;
+use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Contracts\View\Factory;
+use Illuminate\Foundation\Exceptions\Handler;
+use Illuminate\Routing\Redirector;
+use Illuminate\Routing\ResponseFactory;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use RuntimeException;
+use stdClass;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class FoundationExceptionsHandlerTest extends TestCase
 {
@@ -35,7 +35,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
         $this->request = m::mock(stdClass::class);
 
-        $this->container = Container::setInstance(new Container);
+        $this->container = Container::setInstance(new Container());
 
         $this->container->singleton('config', function () {
             return $this->config;
@@ -81,7 +81,7 @@ class FoundationExceptionsHandlerTest extends TestCase
 
     public function testReturnsCustomResponseWhenExceptionImplementsResponsable()
     {
-        $response = $this->handler->render($this->request, new CustomException)->getContent();
+        $response = $this->handler->render($this->request, new CustomException())->getContent();
 
         $this->assertSame('{"response":"My custom exception response"}', $response);
     }

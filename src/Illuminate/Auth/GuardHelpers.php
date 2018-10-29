@@ -2,8 +2,8 @@
 
 namespace Illuminate\Auth;
 
-use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
+use Illuminate\Contracts\Auth\UserProvider;
 
 /**
  * These methods are typically the same across all guards.
@@ -27,17 +27,17 @@ trait GuardHelpers
     /**
      * Determine if current user is authenticated. If not, throw an exception.
      *
-     * @return \Illuminate\Contracts\Auth\Authenticatable
-     *
      * @throws \Illuminate\Auth\AuthenticationException
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable
      */
     public function authenticate()
     {
-        if (! is_null($user = $this->user())) {
+        if (!is_null($user = $this->user())) {
             return $user;
         }
 
-        throw new AuthenticationException;
+        throw new AuthenticationException();
     }
 
     /**
@@ -47,7 +47,7 @@ trait GuardHelpers
      */
     public function hasUser()
     {
-        return ! is_null($this->user);
+        return !is_null($this->user);
     }
 
     /**
@@ -57,7 +57,7 @@ trait GuardHelpers
      */
     public function check()
     {
-        return ! is_null($this->user());
+        return !is_null($this->user());
     }
 
     /**
@@ -67,7 +67,7 @@ trait GuardHelpers
      */
     public function guest()
     {
-        return ! $this->check();
+        return !$this->check();
     }
 
     /**
@@ -85,7 +85,8 @@ trait GuardHelpers
     /**
      * Set the current user.
      *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
+     * @param \Illuminate\Contracts\Auth\Authenticatable $user
+     *
      * @return $this
      */
     public function setUser(AuthenticatableContract $user)
@@ -108,7 +109,8 @@ trait GuardHelpers
     /**
      * Set the user provider used by the guard.
      *
-     * @param  \Illuminate\Contracts\Auth\UserProvider  $provider
+     * @param \Illuminate\Contracts\Auth\UserProvider $provider
+     *
      * @return void
      */
     public function setProvider(UserProvider $provider)

@@ -2,9 +2,9 @@
 
 namespace Illuminate\Tests\Validation;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Validation\Rules\Unique;
+use PHPUnit\Framework\TestCase;
 
 class ValidationUniqueRuleTest extends TestCase
 {

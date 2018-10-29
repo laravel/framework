@@ -9,8 +9,9 @@ trait InteractsWithContentTypes
     /**
      * Determine if the given content types match.
      *
-     * @param  string  $actual
-     * @param  string  $type
+     * @param string $actual
+     * @param string $type
+     *
      * @return bool
      */
     public static function matchesType($actual, $type)
@@ -41,7 +42,7 @@ trait InteractsWithContentTypes
      */
     public function expectsJson()
     {
-        return ($this->ajax() && ! $this->pjax() && $this->acceptsAnyContentType()) || $this->wantsJson();
+        return ($this->ajax() && !$this->pjax() && $this->acceptsAnyContentType()) || $this->wantsJson();
     }
 
     /**
@@ -59,7 +60,8 @@ trait InteractsWithContentTypes
     /**
      * Determines whether the current requests accepts a given content type.
      *
-     * @param  string|array  $contentTypes
+     * @param string|array $contentTypes
+     *
      * @return bool
      */
     public function accepts($contentTypes)
@@ -90,7 +92,8 @@ trait InteractsWithContentTypes
     /**
      * Return the most suitable content type from the given array based on content negotiation.
      *
-     * @param  string|array  $contentTypes
+     * @param string|array $contentTypes
+     *
      * @return string|null
      */
     public function prefers($contentTypes)
@@ -107,7 +110,7 @@ trait InteractsWithContentTypes
             foreach ($contentTypes as $contentType) {
                 $type = $contentType;
 
-                if (! is_null($mimeType = $this->getMimeType($contentType))) {
+                if (!is_null($mimeType = $this->getMimeType($contentType))) {
                     $type = $mimeType;
                 }
 
@@ -155,7 +158,8 @@ trait InteractsWithContentTypes
     /**
      * Get the data format expected in the response.
      *
-     * @param  string  $default
+     * @param string $default
+     *
      * @return string
      */
     public function format($default = 'html')

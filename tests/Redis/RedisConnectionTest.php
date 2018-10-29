@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Redis;
 
+use Illuminate\Contracts\Events\Dispatcher;
+use Illuminate\Foundation\Application;
+use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
+use Illuminate\Redis\Connections\Connection;
+use Illuminate\Redis\RedisManager;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Redis\RedisManager;
-use Illuminate\Foundation\Application;
-use Illuminate\Contracts\Events\Dispatcher;
-use Illuminate\Redis\Connections\Connection;
-use Illuminate\Foundation\Testing\Concerns\InteractsWithRedis;
 
 class RedisConnectionTest extends TestCase
 {
@@ -19,11 +19,11 @@ class RedisConnectionTest extends TestCase
         parent::setUp();
         $this->setUpRedis();
 
-        if (! isset($this->redis['phpredis'])) {
+        if (!isset($this->redis['phpredis'])) {
             $this->markTestSkipped('PhpRedis should be enabled to run the tests');
         }
 
-        if (! isset($this->redis['predis'])) {
+        if (!isset($this->redis['predis'])) {
             $this->markTestSkipped('Predis should be enabled to run the tests');
         }
     }
@@ -237,14 +237,14 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(5, $redis->zscore('output', 'matt'));
 
             $redis->zinterstore('output2', ['set1', 'set2'], [
-                'weights' => [3, 2],
+                'weights'   => [3, 2],
                 'aggregate' => 'sum',
             ]);
             $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
             $this->assertEquals(12, $redis->zscore('output2', 'matt'));
 
             $redis->zinterstore('output3', ['set1', 'set2'], [
-                'weights' => [3, 2],
+                'weights'   => [3, 2],
                 'aggregate' => 'min',
             ]);
             $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
@@ -267,7 +267,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(3, $redis->zscore('output', 'taylor'));
 
             $redis->zunionstore('output2', ['set1', 'set2'], [
-                'weights' => [3, 2],
+                'weights'   => [3, 2],
                 'aggregate' => 'sum',
             ]);
             $this->assertEquals(7, $redis->zscore('output2', 'jeffrey'));
@@ -275,7 +275,7 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(9, $redis->zscore('output2', 'taylor'));
 
             $redis->zunionstore('output3', ['set1', 'set2'], [
-                'weights' => [3, 2],
+                'weights'   => [3, 2],
                 'aggregate' => 'min',
             ]);
             $this->assertEquals(3, $redis->zscore('output3', 'jeffrey'));
@@ -319,9 +319,9 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(['jeffrey'], $redis->zrangebyscore('set', 0, 3));
             $this->assertEquals(['matt' => 5, 'taylor' => 10], $redis->zrangebyscore('set', 0, 11, [
                 'withscores' => true,
-                'limit' => [
+                'limit'      => [
                     'offset' => 1,
-                    'count' => 2,
+                    'count'  => 2,
                 ],
             ]));
 
@@ -336,9 +336,9 @@ class RedisConnectionTest extends TestCase
             $this->assertEquals(['taylor'], $redis->ZREVRANGEBYSCORE('set', 10, 6));
             $this->assertEquals(['matt' => 5, 'jeffrey' => 1], $redis->ZREVRANGEBYSCORE('set', 10, 0, [
                 'withscores' => true,
-                'limit' => [
+                'limit'      => [
                     'offset' => 1,
-                    'count' => 2,
+                    'count'  => 2,
                 ],
             ]));
 
@@ -539,26 +539,26 @@ class RedisConnectionTest extends TestCase
             $host = getenv('REDIS_HOST') ?: '127.0.0.1';
             $port = getenv('REDIS_PORT') ?: 6379;
 
-            $prefixedPhpredis = new RedisManager(new Application, 'phpredis', [
+            $prefixedPhpredis = new RedisManager(new Application(), 'phpredis', [
                 'cluster' => false,
                 'default' => [
-                    'host' => $host,
-                    'port' => $port,
+                    'host'     => $host,
+                    'port'     => $port,
                     'database' => 5,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
+                    'options'  => ['prefix' => 'laravel:'],
+                    'timeout'  => 0.5,
                 ],
             ]);
 
-            $persistentPhpRedis = new RedisManager(new Application, 'phpredis', [
+            $persistentPhpRedis = new RedisManager(new Application(), 'phpredis', [
                 'cluster' => false,
                 'default' => [
-                    'host' => $host,
-                    'port' => $port,
-                    'database' => 6,
-                    'options' => ['prefix' => 'laravel:'],
-                    'timeout' => 0.5,
-                    'persistent' => true,
+                    'host'          => $host,
+                    'port'          => $port,
+                    'database'      => 6,
+                    'options'       => ['prefix' => 'laravel:'],
+                    'timeout'       => 0.5,
+                    'persistent'    => true,
                     'persistent_id' => 'laravel',
                 ],
             ]);

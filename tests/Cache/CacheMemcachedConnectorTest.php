@@ -2,10 +2,10 @@
 
 namespace Illuminate\Tests\Cache;
 
+use Illuminate\Cache\MemcachedConnector;
 use Memcached;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Cache\MemcachedConnector;
 
 class CacheMemcachedConnectorTest extends TestCase
 {
@@ -47,12 +47,12 @@ class CacheMemcachedConnectorTest extends TestCase
 
     public function testServersAreAddedCorrectlyWithValidOptions()
     {
-        if (! class_exists('Memcached')) {
+        if (!class_exists('Memcached')) {
             $this->markTestSkipped('Memcached module not installed');
         }
 
         $validOptions = [
-            Memcached::OPT_NO_BLOCK => true,
+            Memcached::OPT_NO_BLOCK        => true,
             Memcached::OPT_CONNECT_TIMEOUT => 2000,
         ];
 
@@ -71,7 +71,7 @@ class CacheMemcachedConnectorTest extends TestCase
 
     public function testServersAreAddedCorrectlyWithSaslCredentials()
     {
-        if (! class_exists('Memcached')) {
+        if (!class_exists('Memcached')) {
             $this->markTestSkipped('Memcached module not installed');
         }
 

@@ -7,7 +7,7 @@ class AuthorResourceWithOptionalRelationship extends PostResource
     public function toArray($request)
     {
         return [
-            'name' => $this->name,
+            'name'        => $this->name,
             'posts_count' => $this->whenLoaded('posts', function () {
                 return $this->posts->count().' posts';
             }, function () {

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Foundation\Validation;
 
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Validation\Factory;
+use Illuminate\Http\Request;
 use Illuminate\Validation\ValidationException;
 
 trait ValidatesRequests
@@ -11,11 +11,12 @@ trait ValidatesRequests
     /**
      * Run the validation routine against the given validator.
      *
-     * @param  \Illuminate\Contracts\Validation\Validator|array  $validator
-     * @param  \Illuminate\Http\Request|null  $request
-     * @return array
+     * @param \Illuminate\Contracts\Validation\Validator|array $validator
+     * @param \Illuminate\Http\Request|null                    $request
      *
      * @throws \Illuminate\Validation\ValidationException
+     *
+     * @return array
      */
     public function validateWith($validator, Request $request = null)
     {
@@ -31,13 +32,14 @@ trait ValidatesRequests
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
-     * @return array
+     * @param \Illuminate\Http\Request $request
+     * @param array                    $rules
+     * @param array                    $messages
+     * @param array                    $customAttributes
      *
      * @throws \Illuminate\Validation\ValidationException
+     *
+     * @return array
      */
     public function validate(Request $request, array $rules,
                              array $messages = [], array $customAttributes = [])
@@ -50,14 +52,15 @@ trait ValidatesRequests
     /**
      * Validate the given request with the given rules.
      *
-     * @param  string  $errorBag
-     * @param  \Illuminate\Http\Request  $request
-     * @param  array  $rules
-     * @param  array  $messages
-     * @param  array  $customAttributes
-     * @return array
+     * @param string                   $errorBag
+     * @param \Illuminate\Http\Request $request
+     * @param array                    $rules
+     * @param array                    $messages
+     * @param array                    $customAttributes
      *
      * @throws \Illuminate\Validation\ValidationException
+     *
+     * @return array
      */
     public function validateWithBag($errorBag, Request $request, array $rules,
                                     array $messages = [], array $customAttributes = [])

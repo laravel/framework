@@ -16,7 +16,8 @@ class MergeValue
     /**
      * Create new merge value instance.
      *
-     * @param  \Illuminate\Support\Collection|array  $data
+     * @param \Illuminate\Support\Collection|array $data
+     *
      * @return void
      */
     public function __construct($data)

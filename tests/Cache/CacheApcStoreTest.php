@@ -3,8 +3,8 @@
 namespace Illuminate\Tests\Cache;
 
 use Illuminate\Cache\ApcStore;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Cache\ApcWrapper;
+use PHPUnit\Framework\TestCase;
 
 class CacheApcStoreTest extends TestCase
 {

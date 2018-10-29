@@ -14,7 +14,8 @@ class WorkerStopping
     /**
      * Create a new event instance.
      *
-     * @param  int  $status
+     * @param int $status
+     *
      * @return void
      */
     public function __construct($status = 0)

@@ -2,8 +2,8 @@
 
 namespace Illuminate\Database\Console\Migrations;
 
-use Illuminate\Support\Collection;
 use Illuminate\Database\Migrations\Migrator;
+use Illuminate\Support\Collection;
 use Symfony\Component\Console\Input\InputOption;
 
 class StatusCommand extends BaseCommand
@@ -32,7 +32,8 @@ class StatusCommand extends BaseCommand
     /**
      * Create a new migration rollback command instance.
      *
-     * @param  \Illuminate\Database\Migrations\Migrator $migrator
+     * @param \Illuminate\Database\Migrations\Migrator $migrator
+     *
      * @return void
      */
     public function __construct(Migrator $migrator)
@@ -51,7 +52,7 @@ class StatusCommand extends BaseCommand
     {
         $this->migrator->setConnection($this->option('database'));
 
-        if (! $this->migrator->repositoryExists()) {
+        if (!$this->migrator->repositoryExists()) {
             return $this->error('No migrations found.');
         }
 
@@ -69,8 +70,9 @@ class StatusCommand extends BaseCommand
     /**
      * Get the status for the given ran migrations.
      *
-     * @param  array  $ran
-     * @param  array  $batches
+     * @param array $ran
+     * @param array $batches
+     *
      * @return \Illuminate\Support\Collection
      */
     protected function getStatusFor(array $ran, array $batches)

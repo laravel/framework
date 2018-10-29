@@ -2,10 +2,10 @@
 
 namespace Illuminate\Database\Query\Grammars;
 
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Query\JsonExpression;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class MySqlGrammar extends Grammar
 {
@@ -38,7 +38,8 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a select query into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param \Illuminate\Database\Query\Builder $query
+     *
      * @return string
      */
     public function compileSelect(Builder $query)
@@ -55,8 +56,9 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a "JSON contains" statement into SQL.
      *
-     * @param  string  $column
-     * @param  string  $value
+     * @param string $column
+     * @param string $value
+     *
      * @return string
      */
     protected function compileJsonContains($column, $value)
@@ -67,9 +69,10 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a "JSON length" statement into SQL.
      *
-     * @param  string  $column
-     * @param  string  $operator
-     * @param  string  $value
+     * @param string $column
+     * @param string $operator
+     * @param string $value
+     *
      * @return string
      */
     protected function compileJsonLength($column, $operator, $value)
@@ -82,7 +85,8 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a single union statement.
      *
-     * @param  array  $union
+     * @param array $union
+     *
      * @return string
      */
     protected function compileUnion(array $union)
@@ -95,7 +99,8 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the random statement into SQL.
      *
-     * @param  string  $seed
+     * @param string $seed
+     *
      * @return string
      */
     public function compileRandom($seed)
@@ -106,13 +111,14 @@ class MySqlGrammar extends Grammar
     /**
      * Compile the lock into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  bool|string  $value
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param bool|string                        $value
+     *
      * @return string
      */
     protected function compileLock(Builder $query, $value)
     {
-        if (! is_string($value)) {
+        if (!is_string($value)) {
             return $value ? 'for update' : 'lock in share mode';
         }
 
@@ -122,8 +128,9 @@ class MySqlGrammar extends Grammar
     /**
      * Compile an update statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  array  $values
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param array                              $values
+     *
      * @return string
      */
     public function compileUpdate(Builder $query, $values)
@@ -154,7 +161,7 @@ class MySqlGrammar extends Grammar
         // If the query has an order by clause we will compile it since MySQL supports
         // order bys on update statements. We'll compile them using the typical way
         // of compiling order bys. Then they will be appended to the SQL queries.
-        if (! empty($query->orders)) {
+        if (!empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
 
@@ -171,7 +178,8 @@ class MySqlGrammar extends Grammar
     /**
      * Compile all of the columns for an update statement.
      *
-     * @param  array  $values
+     * @param array $values
+     *
      * @return string
      */
     protected function compileUpdateColumns($values)
@@ -188,8 +196,9 @@ class MySqlGrammar extends Grammar
     /**
      * Prepares a JSON column being updated using the JSON_SET function.
      *
-     * @param  string  $key
-     * @param  \Illuminate\Database\Query\JsonExpression  $value
+     * @param string                                    $key
+     * @param \Illuminate\Database\Query\JsonExpression $value
+     *
      * @return string
      */
     protected function compileJsonUpdateColumn($key, JsonExpression $value)
@@ -204,8 +213,9 @@ class MySqlGrammar extends Grammar
      *
      * Booleans, integers, and doubles are inserted into JSON updates as raw values.
      *
-     * @param  array  $bindings
-     * @param  array  $values
+     * @param array $bindings
+     * @param array $values
+     *
      * @return array
      */
     public function prepareBindingsForUpdate(array $bindings, array $values)
@@ -220,7 +230,8 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete statement into SQL.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
+     * @param \Illuminate\Database\Query\Builder $query
+     *
      * @return string
      */
     public function compileDelete(Builder $query)
@@ -237,7 +248,8 @@ class MySqlGrammar extends Grammar
     /**
      * Prepare the bindings for a delete statement.
      *
-     * @param  array  $bindings
+     * @param array $bindings
+     *
      * @return array
      */
     public function prepareBindingsForDelete(array $bindings)
@@ -252,9 +264,10 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete query that does not use joins.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $table
-     * @param  array  $where
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param string                             $table
+     * @param array                              $where
+     *
      * @return string
      */
     protected function compileDeleteWithoutJoins($query, $table, $where)
@@ -264,7 +277,7 @@ class MySqlGrammar extends Grammar
         // When using MySQL, delete statements may contain order by statements and limits
         // so we will compile both of those here. Once we have finished compiling this
         // we will return the completed SQL statement so it will be executed for us.
-        if (! empty($query->orders)) {
+        if (!empty($query->orders)) {
             $sql .= ' '.$this->compileOrders($query, $query->orders);
         }
 
@@ -278,9 +291,10 @@ class MySqlGrammar extends Grammar
     /**
      * Compile a delete query that uses joins.
      *
-     * @param  \Illuminate\Database\Query\Builder  $query
-     * @param  string  $table
-     * @param  array  $where
+     * @param \Illuminate\Database\Query\Builder $query
+     * @param string                             $table
+     * @param array                              $where
+     *
      * @return string
      */
     protected function compileDeleteWithJoins($query, $table, $where)
@@ -296,7 +310,8 @@ class MySqlGrammar extends Grammar
     /**
      * Wrap a single string in keyword identifiers.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function wrapValue($value)
@@ -307,7 +322,8 @@ class MySqlGrammar extends Grammar
     /**
      * Wrap the given JSON selector.
      *
-     * @param  string  $value
+     * @param string $value
+     *
      * @return string
      */
     protected function wrapJsonSelector($value)

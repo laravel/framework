@@ -2,13 +2,13 @@
 
 namespace Illuminate\Tests\Support;
 
-use stdClass;
 use ArrayObject;
 use Illuminate\Support\Arr;
-use InvalidArgumentException;
 use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Support\Collection;
+use InvalidArgumentException;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class SupportArrTest extends TestCase
 {
@@ -17,11 +17,11 @@ class SupportArrTest extends TestCase
         $this->assertTrue(Arr::accessible([]));
         $this->assertTrue(Arr::accessible([1, 2]));
         $this->assertTrue(Arr::accessible(['a' => 1, 'b' => 2]));
-        $this->assertTrue(Arr::accessible(new Collection));
+        $this->assertTrue(Arr::accessible(new Collection()));
 
         $this->assertFalse(Arr::accessible(null));
         $this->assertFalse(Arr::accessible('abc'));
-        $this->assertFalse(Arr::accessible(new stdClass));
+        $this->assertFalse(Arr::accessible(new stdClass()));
         $this->assertFalse(Arr::accessible((object) ['a' => 1, 'b' => 2]));
     }
 
@@ -372,12 +372,12 @@ class SupportArrTest extends TestCase
         $test2 = Arr::pluck($array, null, 'name');
 
         $this->assertEquals([
-            'Taylor' => 'developer',
+            'Taylor'  => 'developer',
             'Abigail' => 'developer',
         ], $test1);
 
         $this->assertEquals([
-            'Taylor' => ['name' => 'Taylor', 'role' => 'developer'],
+            'Taylor'  => ['name' => 'Taylor', 'role' => 'developer'],
             'Abigail' => ['name' => 'Abigail', 'role' => 'developer'],
         ], $test2);
     }
@@ -556,7 +556,7 @@ class SupportArrTest extends TestCase
                 ],
                 [
                     'name' => 'jane',
-                    'age' => 25,
+                    'age'  => 25,
                 ],
             ],
             'repositories' => [
@@ -587,12 +587,12 @@ class SupportArrTest extends TestCase
             ],
             'users' => [
                 [
-                    'age' => 25,
+                    'age'  => 25,
                     'name' => 'jane',
                 ],
                 [
-                    'mail' => 'joe@example.com',
-                    'name' => 'joe',
+                    'mail'    => 'joe@example.com',
+                    'name'    => 'joe',
                     'numbers' => [0, 1, 2],
                 ],
             ],
@@ -676,7 +676,7 @@ class SupportArrTest extends TestCase
     {
         $string = 'a';
         $array = ['a'];
-        $object = new stdClass;
+        $object = new stdClass();
         $object->value = 'a';
         $this->assertEquals(['a'], Arr::wrap($string));
         $this->assertEquals($array, Arr::wrap($array));

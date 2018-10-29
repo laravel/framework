@@ -3,22 +3,22 @@
 namespace Illuminate\Tests\View;
 
 use Closure;
-use stdClass;
-use Mockery as m;
-use ReflectionFunction;
-use Illuminate\View\View;
-use Illuminate\View\Factory;
-use InvalidArgumentException;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Container\Container;
+use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
 use Illuminate\Contracts\View\Engine;
-use Illuminate\View\Engines\PhpEngine;
-use Illuminate\View\ViewFinderInterface;
+use Illuminate\Events\Dispatcher;
+use Illuminate\View\Compilers\CompilerInterface;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
-use Illuminate\View\Compilers\CompilerInterface;
-use Illuminate\Contracts\Events\Dispatcher as DispatcherContract;
+use Illuminate\View\Engines\PhpEngine;
+use Illuminate\View\Factory;
+use Illuminate\View\View;
+use Illuminate\View\ViewFinderInterface;
+use InvalidArgumentException;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use ReflectionFunction;
+use stdClass;
 
 class ViewFactoryTest extends TestCase
 {
@@ -35,7 +35,7 @@ class ViewFactoryTest extends TestCase
         $factory->getFinder()->shouldReceive('find')->once()->with('view')->andReturn('path.php');
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock(Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $factory->setDispatcher(new Dispatcher);
+        $factory->setDispatcher(new Dispatcher());
         $factory->creator('view', function ($view) {
             $_SERVER['__test.view'] = $view;
         });
@@ -67,7 +67,7 @@ class ViewFactoryTest extends TestCase
         $factory->getFinder()->shouldReceive('find')->once()->with('bar')->andThrow(InvalidArgumentException::class);
         $factory->getEngineResolver()->shouldReceive('resolve')->once()->with('php')->andReturn($engine = m::mock(Engine::class));
         $factory->getFinder()->shouldReceive('addExtension')->once()->with('php');
-        $factory->setDispatcher(new Dispatcher);
+        $factory->setDispatcher(new Dispatcher());
         $factory->creator('view', function ($view) {
             $_SERVER['__test.view'] = $view;
         });
@@ -186,7 +186,7 @@ class ViewFactoryTest extends TestCase
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: qux', m::type(Closure::class));
         $factory->getDispatcher()->shouldReceive('listen')->once()->with('composing: foo', m::type(Closure::class));
         $composers = $factory->composers([
-            'foo' => 'bar',
+            'foo'     => 'bar',
             'baz@baz' => ['qux', 'foo'],
         ]);
 
@@ -337,7 +337,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
         $factory->getFinder()->shouldReceive('find')->andReturn(__DIR__.'/fixtures/component.php');
-        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine);
+        $factory->getEngineResolver()->shouldReceive('resolve')->andReturn(new PhpEngine());
         $factory->getDispatcher()->shouldReceive('dispatch');
         $factory->startComponent('component', ['name' => 'Taylor']);
         $factory->slot('title');
@@ -351,7 +351,7 @@ class ViewFactoryTest extends TestCase
 
     public function testTranslation()
     {
-        $container = new Container;
+        $container = new Container();
         $container->instance('translator', $translator = m::mock(stdClass::class));
         $translator->shouldReceive('getFromJson')->with('Foo', ['name' => 'taylor'])->andReturn('Bar');
         $factory = $this->getFactory();
@@ -538,13 +538,13 @@ class ViewFactoryTest extends TestCase
 
         $expectedLoop = [
             'iteration' => 0,
-            'index' => 0,
+            'index'     => 0,
             'remaining' => 3,
-            'count' => 3,
-            'first' => true,
-            'last' => false,
-            'depth' => 1,
-            'parent' => null,
+            'count'     => 3,
+            'first'     => true,
+            'last'      => false,
+            'depth'     => 1,
+            'parent'    => null,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());
@@ -553,13 +553,13 @@ class ViewFactoryTest extends TestCase
 
         $secondExpectedLoop = [
             'iteration' => 0,
-            'index' => 0,
+            'index'     => 0,
             'remaining' => 4,
-            'count' => 4,
-            'first' => true,
-            'last' => false,
-            'depth' => 2,
-            'parent' => (object) $expectedLoop,
+            'count'     => 4,
+            'first'     => true,
+            'last'      => false,
+            'depth'     => 2,
+            'parent'    => (object) $expectedLoop,
         ];
         $this->assertEquals([$expectedLoop, $secondExpectedLoop], $factory->getLoopStack());
 
@@ -572,7 +572,7 @@ class ViewFactoryTest extends TestCase
     {
         $factory = $this->getFactory();
 
-        $data = (new class {
+        $data = (new class() {
             public function generate()
             {
                 for ($count = 0; $count < 3; $count++) {
@@ -596,13 +596,13 @@ class ViewFactoryTest extends TestCase
 
         $expectedLoop = [
             'iteration' => 0,
-            'index' => 0,
+            'index'     => 0,
             'remaining' => null,
-            'count' => null,
-            'first' => true,
-            'last' => null,
-            'depth' => 1,
-            'parent' => null,
+            'count'     => null,
+            'first'     => true,
+            'last'      => null,
+            'depth'     => 1,
+            'parent'    => null,
         ];
 
         $this->assertEquals([$expectedLoop], $factory->getLoopStack());

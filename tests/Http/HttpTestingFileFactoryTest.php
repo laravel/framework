@@ -2,14 +2,14 @@
 
 namespace Illuminate\Tests\Http;
 
-use PHPUnit\Framework\TestCase;
 use Illuminate\Http\Testing\FileFactory;
+use PHPUnit\Framework\TestCase;
 
 class HttpTestingFileFactoryTest extends TestCase
 {
     public function testImagePng()
     {
-        $image = (new FileFactory)->image('test.png', 15, 20);
+        $image = (new FileFactory())->image('test.png', 15, 20);
 
         $info = getimagesize($image->getRealPath());
 
@@ -20,7 +20,7 @@ class HttpTestingFileFactoryTest extends TestCase
 
     public function testImageJpeg()
     {
-        $image = (new FileFactory)->image('test.jpeg', 15, 20);
+        $image = (new FileFactory())->image('test.jpeg', 15, 20);
 
         $info = getimagesize($image->getRealPath());
 

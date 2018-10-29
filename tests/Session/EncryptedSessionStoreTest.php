@@ -2,12 +2,12 @@
 
 namespace Illuminate\Tests\Session;
 
+use Illuminate\Contracts\Encryption\Encrypter;
+use Illuminate\Session\EncryptedStore;
 use Mockery as m;
+use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 use SessionHandlerInterface;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Session\EncryptedStore;
-use Illuminate\Contracts\Encryption\Encrypter;
 
 class EncryptedSessionStoreTest extends TestCase
 {
@@ -27,8 +27,8 @@ class EncryptedSessionStoreTest extends TestCase
         $session->now('qux', 'norf');
         $serialized = serialize([
             '_token' => $session->token(),
-            'foo' => 'bar',
-            'baz' => 'boom',
+            'foo'    => 'bar',
+            'baz'    => 'boom',
             '_flash' => [
                 'new' => [],
                 'old' => ['baz'],

@@ -2,19 +2,19 @@
 
 namespace Illuminate\Tests\Database;
 
-use Illuminate\Support\Carbon;
-use PHPUnit\Framework\TestCase;
 use Illuminate\Database\Capsule\Manager as DB;
 use Illuminate\Database\Eloquent\Model as Eloquent;
+use Illuminate\Support\Carbon;
+use PHPUnit\Framework\TestCase;
 
 class DatabaseEloquentTimestampsTest extends TestCase
 {
     public function setUp()
     {
-        $db = new DB;
+        $db = new DB();
 
         $db->addConnection([
-            'driver' => 'sqlite',
+            'driver'   => 'sqlite',
             'database' => ':memory:',
         ]);
 

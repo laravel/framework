@@ -2,16 +2,16 @@
 
 namespace Illuminate\Tests\View;
 
-use Closure;
 use ArrayAccess;
-use Mockery as m;
-use Illuminate\View\View;
-use Illuminate\View\Factory;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\MessageBag;
-use Illuminate\Contracts\View\Engine;
+use Closure;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Contracts\View\Engine;
+use Illuminate\Support\MessageBag;
+use Illuminate\View\Factory;
+use Illuminate\View\View;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
 
 class ViewTest extends TestCase
 {
@@ -147,7 +147,7 @@ class ViewTest extends TestCase
 
     public function testViewConstructedWithObjectData()
     {
-        $view = $this->getView(new DataObjectStub);
+        $view = $this->getView(new DataObjectStub());
         $this->assertInstanceOf(ArrayAccess::class, $view);
         $this->assertTrue($view->offsetExists('foo'));
         $this->assertEquals($view->offsetGet('foo'), 'bar');

@@ -12,16 +12,17 @@ class PostgresConnector extends Connector implements ConnectorInterface
      * @var array
      */
     protected $options = [
-        PDO::ATTR_CASE => PDO::CASE_NATURAL,
-        PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-        PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
+        PDO::ATTR_CASE              => PDO::CASE_NATURAL,
+        PDO::ATTR_ERRMODE           => PDO::ERRMODE_EXCEPTION,
+        PDO::ATTR_ORACLE_NULLS      => PDO::NULL_NATURAL,
         PDO::ATTR_STRINGIFY_FETCHES => false,
     ];
 
     /**
      * Establish a database connection.
      *
-     * @param  array  $config
+     * @param array $config
+     *
      * @return \PDO
      */
     public function connect(array $config)
@@ -53,13 +54,14 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Set the connection character set and collation.
      *
-     * @param  \PDO  $connection
-     * @param  array  $config
+     * @param \PDO  $connection
+     * @param array $config
+     *
      * @return void
      */
     protected function configureEncoding($connection, $config)
     {
-        if (! isset($config['charset'])) {
+        if (!isset($config['charset'])) {
             return;
         }
 
@@ -69,8 +71,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Set the timezone on the connection.
      *
-     * @param  \PDO  $connection
-     * @param  array  $config
+     * @param \PDO  $connection
+     * @param array $config
+     *
      * @return void
      */
     protected function configureTimezone($connection, array $config)
@@ -85,8 +88,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Set the schema on the connection.
      *
-     * @param  \PDO  $connection
-     * @param  array  $config
+     * @param \PDO  $connection
+     * @param array $config
+     *
      * @return void
      */
     protected function configureSchema($connection, $config)
@@ -101,7 +105,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Format the schema for the DSN.
      *
-     * @param  array|string  $schema
+     * @param array|string $schema
+     *
      * @return string
      */
     protected function formatSchema($schema)
@@ -116,8 +121,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Set the schema on the connection.
      *
-     * @param  \PDO  $connection
-     * @param  array  $config
+     * @param \PDO  $connection
+     * @param array $config
+     *
      * @return void
      */
     protected function configureApplicationName($connection, $config)
@@ -132,7 +138,8 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Create a DSN string from a configuration.
      *
-     * @param  array   $config
+     * @param array $config
+     *
      * @return string
      */
     protected function getDsn(array $config)
@@ -159,8 +166,9 @@ class PostgresConnector extends Connector implements ConnectorInterface
     /**
      * Add the SSL options to the DSN.
      *
-     * @param  string  $dsn
-     * @param  array  $config
+     * @param string $dsn
+     * @param array  $config
+     *
      * @return string
      */
     protected function addSslOptions($dsn, array $config)

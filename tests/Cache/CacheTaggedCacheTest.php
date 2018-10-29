@@ -2,15 +2,15 @@
 
 namespace Illuminate\Tests\Cache;
 
-use DateTime;
-use stdClass;
 use DateInterval;
-use Mockery as m;
-use Illuminate\Cache\TagSet;
-use PHPUnit\Framework\TestCase;
+use DateTime;
 use Illuminate\Cache\ArrayStore;
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\RedisTaggedCache;
+use Illuminate\Cache\TagSet;
+use Illuminate\Contracts\Cache\Store;
+use Mockery as m;
+use PHPUnit\Framework\TestCase;
+use stdClass;
 
 class CacheTaggedCacheTest extends TestCase
 {
@@ -21,7 +21,7 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testCacheCanBeSavedWithMultipleTags()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags = ['bop', 'zap'];
         $store->tags($tags)->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
@@ -29,9 +29,9 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testCacheCanBeSetWithDatetimeArgument()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags = ['bop', 'zap'];
-        $duration = new DateTime;
+        $duration = new DateTime();
         $duration->add(new DateInterval('PT10M'));
         $store->tags($tags)->put('foo', 'bar', $duration);
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
@@ -39,7 +39,7 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testCacheSavedWithMultipleTagsCanBeFlushed()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags1 = ['bop', 'zap'];
         $store->tags($tags1)->put('foo', 'bar', 10);
         $tags2 = ['bam', 'pow'];
@@ -51,14 +51,14 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testTagsWithStringArgument()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->tags('bop')->put('foo', 'bar', 10);
         $this->assertEquals('bar', $store->tags('bop')->get('foo'));
     }
 
     public function testTagsWithIncrementCanBeFlushed()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->tags('bop')->increment('foo', 5);
         $this->assertEquals(5, $store->tags('bop')->get('foo'));
         $store->tags('bop')->flush();
@@ -67,7 +67,7 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testTagsWithDecrementCanBeFlushed()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $store->tags('bop')->decrement('foo', 5);
         $this->assertEquals(-5, $store->tags('bop')->get('foo'));
         $store->tags('bop')->flush();
@@ -76,7 +76,7 @@ class CacheTaggedCacheTest extends TestCase
 
     public function testTagsCacheForever()
     {
-        $store = new ArrayStore;
+        $store = new ArrayStore();
         $tags = ['bop', 'zap'];
         $store->tags($tags)->forever('foo', 'bar');
         $this->assertEquals('bar', $store->tags($tags)->get('foo'));
