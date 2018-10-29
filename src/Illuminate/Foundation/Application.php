@@ -141,6 +141,8 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
             $this->setBasePath($basePath);
         }
 
+        $this->registerMixBinding();
+
         $this->registerBaseBindings();
 
         $this->registerBaseServiceProviders();
@@ -287,6 +289,20 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->instance('path.database', $this->databasePath());
         $this->instance('path.resources', $this->resourcePath());
         $this->instance('path.bootstrap', $this->bootstrapPath());
+    }
+
+    /**
+     * Register the mix class binding.
+     *
+     * @return $this
+     */
+    public function registerMixBinding()
+    {
+        $this->singleton('mix', function () {
+            return new Mix;
+        });
+
+        return $this;
     }
 
     /**
