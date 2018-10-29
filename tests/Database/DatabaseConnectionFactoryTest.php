@@ -102,4 +102,17 @@ class DatabaseConnectionFactoryTest extends TestCase
 
         $this->assertEquals('connector', $factory->createConnector(['driver' => 'foo']));
     }
+
+    public function testSqliteForeignKeyConstraints()
+    {
+        $this->db->addConnection([
+            'driver' => 'sqlite',
+            'database' => ':memory:',
+            'foreign_key_constraints' => true,
+        ], 'constraints_set');
+
+        $this->assertEquals(0, $this->db->connection()->select('PRAGMA foreign_keys')[0]->foreign_keys);
+
+        $this->assertEquals(1, $this->db->connection('constraints_set')->select('PRAGMA foreign_keys')[0]->foreign_keys);
+    }
 }
