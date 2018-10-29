@@ -23,7 +23,7 @@ class SQLiteConnection extends Connection
     {
         parent::__construct($pdo, $database, $tablePrefix, $config);
 
-        if ($this->getForeignKeyConstraintsConfigurationValue() == true) {
+        if ($this->getForeignKeyConstraintsConfigurationValue()) {
             $this->getSchemaBuilder()->enableForeignKeyConstraints();
         }
     }
@@ -85,10 +85,10 @@ class SQLiteConnection extends Connection
     /**
      * Get the database connection foreign key constraints configuration option.
      *
-     * @return bool|null
+     * @return bool
      */
     protected function getForeignKeyConstraintsConfigurationValue()
     {
-        return $this->getConfig('foreign_key_constraints');
+        return (bool) $this->getConfig('foreign_key_constraints');
     }
 }
