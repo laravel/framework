@@ -1,5 +1,37 @@
 # Release Notes for 5.7.x
 
+## Unreleased
+
+### Added
+- Added `CacheManager::forgetDriver` method ([#26264](https://github.com/laravel/framework/pull/26264), [fd9ef49](https://github.com/laravel/framework/commit/fd9ef492faefff96deab5285e30bc1b675211bcb))
+- Added `Illuminate\Foundation\Http\Kernel::getMiddlewareGroups` method ([#26268](https://github.com/laravel/framework/pull/26268))
+
+### Fixed
+- Checked `$absolute` parameter in `UrlGenerator::signedRoute` ([#26265](https://github.com/laravel/framework/pull/26265))
+- Fixed error in resource building after running `php artisan preset none` command ([41becda](https://github.com/laravel/framework/pull/26244/commits/41becda26a6bfcfaf9754beb9106b6ca0f328a61), [#26244](https://github.com/laravel/framework/pull/26244))
+
+### Changed
+- Made expectation closure optional for `InteractsWithContainer::mock` and `InteractsWithContainer::spy` ([#26242](https://github.com/laravel/framework/pull/26242))
+- Allowed multiple `createPayloadCallback` on queues ([#26250](https://github.com/laravel/framework/pull/26250), [6e3d568](https://github.com/laravel/framework/commit/6e3d568757a8e4124b49bf9ac94f1db7a66437a1))
+- Changed wording on default 403 view ([#26258](https://github.com/laravel/framework/pull/26258))
+- Bump `vue.js` to `^2.5.17` in `artisan preset vue` command ([89f56bf](https://github.com/laravel/framework/pull/26244/commits/89f56bf8f9abb310bf985045c13103cb73a40351), [#26244](https://github.com/laravel/framework/pull/26244))
+
+
+## [v5.7.11 (2018-10-24)](https://github.com/laravel/framework/compare/v5.7.10...v5.7.11)
+
+### Added
+- Added `decimal:<num>` cast to Model ([#26173](https://github.com/laravel/framework/pull/26173))
+- Allowed updateExistingPivot to receive an arrayable item ([#26167](https://github.com/laravel/framework/pull/26167))
+- Added `setIntendedUrl` method to `Routing/Redirector.php` ([#26227](https://github.com/laravel/framework/pull/26227))
+- Added `ORA-03114` string to `DetectsLostConnections` trait ([#26233](https://github.com/laravel/framework/pull/26233))
+
+### Fixed
+- Fixed an issue where the worker process would not be killed by the listener when the timeout is exceeded ([#25981](https://github.com/laravel/framework/pull/25981))
+
+### Changed
+- Reverted filesystem changes which were done in [#26010](https://github.com/laravel/framework/pull/26010) ([#26231](https://github.com/laravel/framework/pull/26231))
+
+
 ## [v5.7.10 (2018-10-23)](https://github.com/laravel/framework/compare/v5.7.9...v5.7.10)
 
 ### Added

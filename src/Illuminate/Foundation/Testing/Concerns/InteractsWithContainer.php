@@ -37,23 +37,23 @@ trait InteractsWithContainer
      * Mock an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure  $instance
+     * @param  \Closure|null  $instance
      * @return object
      */
-    protected function mock($abstract, Closure $mock)
+    protected function mock($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::mock($abstract, $mock));
+        return $this->instance($abstract, Mockery::mock(...array_filter(func_get_args())));
     }
 
     /**
      * Spy an instance of an object in the container.
      *
      * @param  string  $abstract
-     * @param  \Closure  $instance
+     * @param  \Closure|null  $instance
      * @return object
      */
-    protected function spy($abstract, Closure $mock)
+    protected function spy($abstract, Closure $mock = null)
     {
-        return $this->instance($abstract, Mockery::spy($abstract, $mock));
+        return $this->instance($abstract, Mockery::spy(...array_filter(func_get_args())));
     }
 }

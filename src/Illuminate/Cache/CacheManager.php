@@ -279,6 +279,25 @@ class CacheManager implements FactoryContract
     }
 
     /**
+     * Unset the given driver instances.
+     *
+     * @param  array|string|null  $name
+     * @return $this
+     */
+    public function forgetDriver($name = null)
+    {
+        $name = $name ?? $this->getDefaultDriver();
+
+        foreach ((array) $name as $cacheName) {
+            if (isset($this->stores[$cacheName])) {
+                unset($this->stores[$cacheName]);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Register a custom driver creator Closure.
      *
      * @param  string    $driver

@@ -564,6 +564,56 @@ class RoutingUrlGeneratorTest extends TestCase
 
         $url->route('not_exists_route');
     }
+
+    public function testSignedUrl()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $request = Request::create($url->signedRoute('foo'));
+
+        $this->assertTrue($url->hasValidSignature($request));
+
+        $request = Request::create($url->signedRoute('foo').'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request));
+    }
+
+    public function testSignedRelativeUrl()
+    {
+        $url = new UrlGenerator(
+            $routes = new RouteCollection,
+            $request = Request::create('http://www.foo.com/')
+        );
+        $url->setKeyResolver(function () {
+            return 'secret';
+        });
+
+        $route = new Route(['GET'], 'foo', ['as' => 'foo', function () {
+            //
+        }]);
+        $routes->add($route);
+
+        $result = $url->signedRoute('foo', [], null, false);
+
+        $request = Request::create($result);
+
+        $this->assertTrue($url->hasValidSignature($request, false));
+
+        $request = Request::create($url->signedRoute('foo', [], null, false).'?tempered=true');
+
+        $this->assertFalse($url->hasValidSignature($request, false));
+    }
 }
 
 class RoutableInterfaceStub implements UrlRoutable

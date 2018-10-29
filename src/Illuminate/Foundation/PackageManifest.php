@@ -2,6 +2,7 @@
 
 namespace Illuminate\Foundation;
 
+use Exception;
 use Illuminate\Filesystem\Filesystem;
 
 class PackageManifest
@@ -96,7 +97,7 @@ class PackageManifest
             $this->build();
         }
 
-        $this->files->get($this->manifestPath);
+        $this->files->get($this->manifestPath, true);
 
         return $this->manifest = file_exists($this->manifestPath) ?
             $this->files->getRequire($this->manifestPath) : [];
@@ -163,9 +164,13 @@ class PackageManifest
      */
     protected function write(array $manifest)
     {
-        $this->files->replace(
-            $this->manifestPath,
-            '<?php return '.var_export($manifest, true).';'
+        if (! is_writable(dirname($this->manifestPath))) {
+            throw new Exception('The '.dirname($this->manifestPath).' directory must be present and writable.');
+        }
+
+        $this->files->put(
+            $this->manifestPath, '<?php return '.var_export($manifest, true).';',
+            true
         );
     }
 }
