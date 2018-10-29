@@ -576,7 +576,7 @@ if (! function_exists('mix')) {
      */
     function mix($path, $manifestDirectory = '')
     {
-        return app('mix')(...func_get_args());
+        return app(Mix::class)(...func_get_args());
     }
 }
 

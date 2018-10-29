@@ -87,7 +87,7 @@ class FoundationHelpersTest extends TestCase
 
     public function testMixIsSwappableForTests()
     {
-        (new Application)->instance('mix', function () {
+        (new Application)->instance(Mix::class, function () {
             return 'expected';
         });
 
