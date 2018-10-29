@@ -4,13 +4,14 @@ namespace Illuminate\Foundation\Auth;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\ValidationException;
 
 trait SendsPasswordResetEmails
 {
     /**
      * Display the form to request a password reset link.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function showLinkRequestForm()
     {
@@ -21,7 +22,9 @@ trait SendsPasswordResetEmails
      * Send a reset link to the given user.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function sendResetLinkEmail(Request $request)
     {
@@ -55,10 +58,14 @@ trait SendsPasswordResetEmails
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
+        if ($request->expectsJson()) {
+            return response()->json(['status' => trans($response)]);
+        }
+
         return back()->with('status', trans($response));
     }
 
@@ -67,13 +74,15 @@ trait SendsPasswordResetEmails
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
-        return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => trans($response)]);
+        throw ValidationException::withMessages([
+            'email' => trans($response)
+        ]);
     }
 
     /**

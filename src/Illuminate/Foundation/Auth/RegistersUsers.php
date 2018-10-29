@@ -13,7 +13,7 @@ trait RegistersUsers
     /**
      * Show the application registration form.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function showRegistrationForm()
     {
@@ -24,7 +24,7 @@ trait RegistersUsers
      * Handle a registration request for the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function register(Request $request)
     {
@@ -32,10 +32,9 @@ trait RegistersUsers
 
         event(new Registered($user = $this->create($request->all())));
 
-        $this->guard()->login($user);
+        $token = $this->guard()->login($user);
 
-        return $this->registered($request, $user)
-                        ?: redirect($this->redirectPath());
+        return $this->registered($request, $user, $token);
     }
 
     /**
@@ -53,10 +52,19 @@ trait RegistersUsers
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
-     * @return mixed
+     * @param  mixed  $token
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    protected function registered(Request $request, $user)
+    protected function registered(Request $request, $user, $token = null)
     {
-        //
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => trans('auth.registered'),
+                'user' => $user,
+                'token' => $token
+            ], 201);
+        }
+
+        return redirect($this->redirectPath());
     }
 }

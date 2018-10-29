@@ -20,7 +20,7 @@ trait ResetsPasswords
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string|null  $token
-     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     * @return \Illuminate\View\View
      */
     public function showResetForm(Request $request, $token = null)
     {
@@ -33,7 +33,9 @@ trait ResetsPasswords
      * Reset the given user's password.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function reset(Request $request)
     {
@@ -42,9 +44,13 @@ trait ResetsPasswords
         // Here we will attempt to reset the user's password. If it is successful we
         // will update the password on an actual user model and persist it to the
         // database. Otherwise we will parse the error and return the response.
+        $token = null;
+        $userLogged = null;
         $response = $this->broker()->reset(
-            $this->credentials($request), function ($user, $password) {
-                $this->resetPassword($user, $password);
+            $this->credentials($request),
+            function ($user, $password) use (&$token, &$userLogged) {
+                $token = $this->resetPassword($user, $password);
+                $userLogged = $user;
             }
         );
 
@@ -52,7 +58,7 @@ trait ResetsPasswords
         // the application's home authenticated view. If there is an error we can
         // redirect them back to where they came from with their error message.
         return $response == Password::PASSWORD_RESET
-                    ? $this->sendResetResponse($request, $response)
+                    ? $this->sendResetResponse($request, $response, $userLogged, $token)
                     : $this->sendResetFailedResponse($request, $response);
     }
 
@@ -89,7 +95,10 @@ trait ResetsPasswords
     protected function credentials(Request $request)
     {
         return $request->only(
-            'email', 'password', 'password_confirmation', 'token'
+            'email',
+            'password',
+            'password_confirmation',
+            'token'
         );
     }
 
@@ -98,7 +107,7 @@ trait ResetsPasswords
      *
      * @param  \Illuminate\Contracts\Auth\CanResetPassword  $user
      * @param  string  $password
-     * @return void
+     * @return mixed
      */
     protected function resetPassword($user, $password)
     {
@@ -110,7 +119,7 @@ trait ResetsPasswords
 
         event(new PasswordReset($user));
 
-        $this->guard()->login($user);
+        return $this->guard()->login($user);
     }
 
     /**
@@ -118,12 +127,21 @@ trait ResetsPasswords
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @param  mixed  $user
+     * @param  mixed  $token
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    protected function sendResetResponse(Request $request, $response)
+    protected function sendResetResponse(Request $request, $response, $user = null, $token = null)
     {
-        return redirect($this->redirectPath())
-                            ->with('status', trans($response));
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => trans($response),
+                'user' => $user,
+                'token' => $token
+            ], 202);
+        }
+
+        return redirect($this->redirectPath())->with('status', trans($response));
     }
 
     /**
@@ -131,13 +149,15 @@ trait ResetsPasswords
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  string  $response
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\JsonResponse
+     * @return \Symfony\Component\HttpFoundation\Response
+     *
+     * @throws \Illuminate\Validation\ValidationException
      */
     protected function sendResetFailedResponse(Request $request, $response)
     {
-        return redirect()->back()
-                    ->withInput($request->only('email'))
-                    ->withErrors(['email' => trans($response)]);
+        throw ValidationException::withMessages([
+            'email' => trans($response)
+        ]);
     }
 
     /**

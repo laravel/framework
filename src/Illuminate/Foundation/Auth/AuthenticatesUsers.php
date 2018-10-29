@@ -13,7 +13,7 @@ trait AuthenticatesUsers
     /**
      * Show the application's login form.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\View\View
      */
     public function showLoginForm()
     {
@@ -41,8 +41,8 @@ trait AuthenticatesUsers
             return $this->sendLockoutResponse($request);
         }
 
-        if ($this->attemptLogin($request)) {
-            return $this->sendLoginResponse($request);
+        if ($token = $this->attemptLogin($request)) {
+            return $this->sendLoginResponse($request, $token);
         }
 
         // If the login attempt was unsuccessful we will increment the number of attempts
@@ -76,7 +76,8 @@ trait AuthenticatesUsers
     protected function attemptLogin(Request $request)
     {
         return $this->guard()->attempt(
-            $this->credentials($request), $request->filled('remember')
+            $this->credentials($request),
+            $request->filled('remember')
         );
     }
 
@@ -95,16 +96,18 @@ trait AuthenticatesUsers
      * Send the response after the user was authenticated.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param  mixed  $token
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    protected function sendLoginResponse(Request $request)
+    protected function sendLoginResponse(Request $request, $token = null)
     {
-        $request->session()->regenerate();
+        if ($request->hasSession()) {
+            $request->session()->regenerate();
+        }
 
         $this->clearLoginAttempts($request);
 
-        return $this->authenticated($request, $this->guard()->user())
-                ?: redirect()->intended($this->redirectPath());
+        return $this->authenticated($request, $this->guard()->user(), $token);
     }
 
     /**
@@ -112,11 +115,20 @@ trait AuthenticatesUsers
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  mixed  $user
-     * @return mixed
+     * @param  mixed  $token
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
-    protected function authenticated(Request $request, $user)
+    protected function authenticated(Request $request, $user, $token = null)
     {
-        //
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => trans('auth.authenticated'),
+                'user' => $user,
+                'token' => $token
+            ]);
+        }
+
+        return redirect()->intended($this->redirectPath());
     }
 
     /**
@@ -148,26 +160,34 @@ trait AuthenticatesUsers
      * Log the user out of the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     public function logout(Request $request)
     {
         $this->guard()->logout();
 
-        $request->session()->invalidate();
+        if ($request->hasSession()) {
+            $request->session()->invalidate();
+        }
 
-        return $this->loggedOut($request) ?: redirect('/');
+        return $this->loggedOut($request);
     }
 
     /**
      * The user has logged out of the application.
      *
      * @param  \Illuminate\Http\Request  $request
-     * @return mixed
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\Http\JsonResponse
      */
     protected function loggedOut(Request $request)
     {
-        //
+        if ($request->expectsJson()) {
+            return response()->json([
+                'status' => trans('auth.logout')
+            ]);
+        }
+
+        return redirect('/');
     }
 
     /**
