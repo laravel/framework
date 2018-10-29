@@ -24,13 +24,13 @@ interface Container extends ContainerInterface
      */
     public function alias($abstract, $alias);
 
-    /**
-     * Assign a set of tags to a given binding.
-     *
-     * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
-     * @return void
-     */
+	/**
+	 * Assign a set of tags to a given binding.
+	 *
+	 * @param  array|string $abstracts
+	 * @param  array|mixed ...$tags
+	 * @return void
+	 */
     public function tag($abstracts, $tags);
 
     /**

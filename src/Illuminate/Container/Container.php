@@ -429,13 +429,13 @@ class Container implements ArrayAccess, ContainerContract
         }
     }
 
-    /**
-     * Assign a set of tags to a given binding.
-     *
-     * @param  array|string  $abstracts
-     * @param  array|mixed   ...$tags
-     * @return void
-     */
+	/**
+	 * Assign a set of tags to a given binding.
+	 *
+	 * @param  array|string $abstracts
+	 * @param  array|mixed ...$tags
+	 * @return void
+	 */
     public function tag($abstracts, $tags)
     {
         $tags = is_array($tags) ? $tags : array_slice(func_get_args(), 1);

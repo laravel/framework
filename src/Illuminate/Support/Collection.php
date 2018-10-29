@@ -296,11 +296,12 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         ));
     }
 
-    /**
-     * Dump the collection and end the script.
-     *
-     * @return void
-     */
+	/**
+	 * Dump the collection and end the script.
+	 *
+	 * @param array $args
+	 * @return void
+	 */
     public function dd(...$args)
     {
         call_user_func_array([$this, 'dump'], $args);
@@ -1696,15 +1697,15 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
         };
     }
 
-    /**
-     * Zip the collection together with one or more arrays.
-     *
-     * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);
-     *      => [[1, 4], [2, 5], [3, 6]]
-     *
-     * @param  mixed ...$items
-     * @return static
-     */
+	/**
+	 * Zip the collection together with one or more arrays.
+	 *
+	 * e.g. new Collection([1, 2, 3])->zip([4, 5, 6]);
+	 *      => [[1, 4], [2, 5], [3, 6]]
+	 *
+	 * @param $items
+	 * @return static
+	 */
     public function zip($items)
     {
         $arrayableItems = array_map(function ($items) {

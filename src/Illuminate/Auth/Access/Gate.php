@@ -381,13 +381,13 @@ class Gate implements GateContract
         return false;
     }
 
-    /**
-     * Determine if the callback allows guests.
-     *
-     * @param  callable  $callback
-     * @param  array  $arguments
-     * @return bool
-     */
+	/**
+	 * Determine if the callback allows guests.
+	 *
+	 * @param  callable $callback
+	 * @return bool
+	 * @throws \ReflectionException
+	 */
     protected function callbackAllowsGuests($callback)
     {
         $parameters = (new ReflectionFunction($callback))->getParameters();
@@ -445,15 +445,15 @@ class Gate implements GateContract
         }
     }
 
-    /**
-     * Call all of the after callbacks with check result.
-     *
-     * @param  \Illuminate\Contracts\Auth\Authenticatable  $user
-     * @param  string  $ability
-     * @param  array  $arguments
-     * @param  bool  $result
-     * @return void
-     */
+	/**
+	 * Call all of the after callbacks with check result.
+	 *
+	 * @param  \Illuminate\Contracts\Auth\Authenticatable $user
+	 * @param  string $ability
+	 * @param  array $arguments
+	 * @param  bool $result
+	 * @return bool
+	 */
     protected function callAfterCallbacks($user, $ability, array $arguments, $result)
     {
         foreach ($this->afterCallbacks as $after) {

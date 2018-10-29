@@ -213,7 +213,7 @@ class Connection implements ConnectionInterface
     /**
      * Get the default schema grammar instance.
      *
-     * @return \Illuminate\Database\Schema\Grammars\Grammar
+     * @return void
      */
     protected function getDefaultSchemaGrammar()
     {

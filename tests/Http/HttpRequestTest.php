@@ -69,9 +69,12 @@ class HttpRequestTest extends TestCase
         $this->assertEquals('foo bar', $request->decodedPath());
     }
 
-    /**
-     * @dataProvider segmentProvider
-     */
+	/**
+	 * @dataProvider segmentProvider
+	 * @param $path
+	 * @param $segment
+	 * @param $expected
+	 */
     public function testSegmentMethod($path, $segment, $expected)
     {
         $request = Request::create($path, 'GET');
