@@ -41,7 +41,6 @@ trait HasRelationships
      */
     public static $manyMethods = [
         'belongsToMany', 'morphToMany', 'morphedByMany',
-        'guessBelongsToManyRelation', 'findFirstMethodThatIsntRelation',
     ];
 
     /**
@@ -546,14 +545,19 @@ trait HasRelationships
     }
 
     /**
-     * Get the relationship name of the belongs to many.
+     * Get the relationship name of the belongsToMany.
      *
-     * @return string
+     * @return string|null
      */
     protected function guessBelongsToManyRelation()
     {
+        // Search the call stack for the name of the relationship defined in the model
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-            return ! in_array($trace['function'], Model::$manyMethods);
+            // Exclude names of the relationship methods and this method itself
+            return ! in_array(
+                $trace['function'],
+                array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])
+            );
         });
 
         return ! is_null($caller) ? $caller['function'] : null;
