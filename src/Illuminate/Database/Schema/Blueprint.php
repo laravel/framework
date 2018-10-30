@@ -294,12 +294,23 @@ class Blueprint
     }
 
     /**
+     * Indicate that the given column should be dropped.
+     *
+     * @param  string  $column
+     * @return \Illuminate\Support\Fluent
+     */
+    public function dropColumn($column)
+    {
+        return $this->dropColumns($column);
+    }
+
+    /**
      * Indicate that the given columns should be dropped.
      *
      * @param  array|mixed  $columns
      * @return \Illuminate\Support\Fluent
      */
-    public function dropColumn($columns)
+    public function dropColumns($columns)
     {
         $columns = is_array($columns) ? $columns : func_get_args();
 
