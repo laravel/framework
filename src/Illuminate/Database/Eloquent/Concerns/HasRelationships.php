@@ -545,15 +545,13 @@ trait HasRelationships
     }
 
     /**
-     * Get the relationship name of the belongsToMany.
+     * Get the relationship name of the belongsToMany relationship.
      *
      * @return string|null
      */
     protected function guessBelongsToManyRelation()
     {
-        // Search the call stack for the name of the relationship defined in the model
         $caller = Arr::first(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS), function ($trace) {
-            // Exclude names of the relationship methods and this method itself
             return ! in_array(
                 $trace['function'],
                 array_merge(static::$manyMethods, ['guessBelongsToManyRelation'])
