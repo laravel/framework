@@ -17,7 +17,7 @@ class ContextualBindingBuilder implements ContextualBindingBuilderContract
     /**
      * The concrete instance.
      *
-     * @var string
+     * @var string|array
      */
     protected $concrete;
 
