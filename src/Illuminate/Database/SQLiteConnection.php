@@ -22,7 +22,7 @@ class SQLiteConnection extends Connection
     public function __construct($pdo, $database = '', $tablePrefix = '', array $config = [])
     {
         parent::__construct($pdo, $database, $tablePrefix, $config);
-        
+
         $enableForeignKeyConstraints = $this->getForeignKeyConstraintsConfigurationValue();
 
         if ($enableForeignKeyConstraints === null) {
