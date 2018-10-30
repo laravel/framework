@@ -32,7 +32,6 @@ class SQLiteConnection extends Connection
         $enableForeignKeyConstraints
             ? $this->getSchemaBuilder()->enableForeignKeyConstraints()
             : $this->getSchemaBuilder()->disableForeignKeyConstraints();
-        }
     }
 
     /**
