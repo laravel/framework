@@ -712,7 +712,7 @@ class Container implements ArrayAccess, ContainerContract
      * Get the contextual concrete binding for the given abstract.
      *
      * @param  string  $abstract
-     * @return string|null
+     * @return \Closure|string|null
      */
     protected function getContextualConcrete($abstract)
     {
@@ -738,7 +738,7 @@ class Container implements ArrayAccess, ContainerContract
      * Find the concrete binding for the given abstract in the contextual binding array.
      *
      * @param  string  $abstract
-     * @return string|null
+     * @return \Closure|string|null
      */
     protected function findInContextualBindings($abstract)
     {
