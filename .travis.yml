@@ -13,6 +13,7 @@ matrix:
     - php: 7.2
     - php: 7.2
       env: setup=lowest
+    - php: 7.3
 
 sudo: false
 
