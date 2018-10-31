@@ -319,7 +319,7 @@ class Kernel implements KernelContract
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  \Exception  $e
-     * @return \Symfony\Component\HttpFoundation\Response
+     * @return \Illuminate\Http\Response
      */
     protected function renderException($request, Exception $e)
     {
