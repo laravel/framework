@@ -429,11 +429,9 @@ class Migrator
     {
         return Collection::make($paths)->flatMap(function ($path) {
             return $this->files->glob($path.'/*_*.php');
-        })->filter()->sortBy(function ($file) {
+        })->filter()->values()->keyBy(function ($file) {
             return $this->getMigrationName($file);
-        })->values()->keyBy(function ($file) {
-            return $this->getMigrationName($file);
-        })->all();
+        })->sortKeys()->all();
     }
 
     /**
