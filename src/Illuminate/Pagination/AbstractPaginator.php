@@ -200,7 +200,7 @@ abstract class AbstractPaginator implements Htmlable
         if (is_null($key)) {
             return $this;
         }
-        
+
         if (is_array($key)) {
             return $this->appendArray($key);
         }
