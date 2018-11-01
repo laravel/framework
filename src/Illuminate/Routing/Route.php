@@ -569,7 +569,11 @@ class Route
      */
     public function subDomain($subDomain, $domain = null)
     {
-        $this->action['domain'] = $subDomain.'.'.($domain ?? env('BASE_NAME'));
+        if (is_null($domain)) {
+            $domain = parse_url(env('APP_URL'))['host'];
+        }
+
+        $this->action['domain'] = $subDomain.'.'.$domain;
 
         return $this;
     }
