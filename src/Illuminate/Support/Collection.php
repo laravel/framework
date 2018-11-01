@@ -502,6 +502,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     }
 
     /**
+     * Apply the callback if the collection is empty.
+     *
+     * @param  bool  $value
+     * @param  callable  $callback
+     * @param  callable  $default
+     * @return static|mixed
+     */
+    public function whenEmpty(callable $callback, callable $default = null)
+    {
+        return $this->when($this->isEmpty(), $callback, $default);
+    }
+
+    /**
+     * Apply the callback if the collection is not empty.
+     *
+     * @param  bool  $value
+     * @param  callable  $callback
+     * @param  callable  $default
+     * @return static|mixed
+     */
+    public function whenNotEmpty(callable $callback, callable $default = null)
+    {
+        return $this->when($this->isNotEmpty(), $callback, $default);
+    }
+
+    /**
      * Apply the callback if the value is falsy.
      *
      * @param  bool  $value
@@ -512,6 +538,32 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function unless($value, callable $callback, callable $default = null)
     {
         return $this->when(! $value, $callback, $default);
+    }
+
+    /**
+     * Apply the callback unless the collection is empty.
+     *
+     * @param  bool  $value
+     * @param  callable  $callback
+     * @param  callable  $default
+     * @return static|mixed
+     */
+    public function unlessEmpty(callable $callback, callable $default = null)
+    {
+        return $this->unless($this->isEmpty(), $callback, $default);
+    }
+
+    /**
+     * Apply the callback unless the collection is not empty.
+     *
+     * @param  bool  $value
+     * @param  callable  $callback
+     * @param  callable  $default
+     * @return static|mixed
+     */
+    public function unlessNotEmpty(callable $callback, callable $default = null)
+    {
+        return $this->unless($this->isNotEmpty(), $callback, $default);
     }
 
     /**
