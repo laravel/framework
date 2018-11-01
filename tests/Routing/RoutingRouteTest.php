@@ -25,6 +25,8 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
+use Symfony\Component\HttpFoundation\JsonResponse as SymfonyJsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse as SymfonyRedirectResponse;
 
 class RoutingRouteTest extends TestCase
 {
@@ -1544,6 +1546,29 @@ class RoutingRouteTest extends TestCase
         $response = $router->dispatch(Request::create('contact_us', 'GET'));
         $this->assertTrue($response->isRedirect('contact'));
         $this->assertEquals(301, $response->getStatusCode());
+    }
+
+    /**
+     * @dataProvider originalSymfonyResponseProvider
+     */
+    public function testReturnOrignalSymfonyResponse(SymfonyResponse $response)
+    {
+        $router = $this->getRouter();
+
+        $router->get('/', function () use ($response) {
+            return $response;
+        });
+
+        $this->assertSame($response, $router->dispatch(Request::create('/')));
+    }
+
+    public function originalSymfonyResponseProvider()
+    {
+        return [
+            [new SymfonyResponse('A symfony response')],
+            [new SymfonyJsonResponse('A symfony json response')],
+            [new SymfonyRedirectResponse('A symfony json response')],
+        ];
     }
 
     protected function getRouter()
