@@ -630,7 +630,9 @@ class MySqlGrammar extends Grammar
      */
     protected function typeDateTime(Fluent $column)
     {
-        return $column->precision ? "datetime($column->precision)" : 'datetime';
+        $columnType = $column->precision ? "datetime($column->precision)" : 'datetime';
+
+        return $column->useCurrent ? "$columnType default CURRENT_TIMESTAMP" : $columnType;
     }
 
     /**
