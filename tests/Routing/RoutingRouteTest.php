@@ -579,7 +579,7 @@ class RoutingRouteTest extends TestCase
         $router->get('/foo/bar')->subDomain('api')->uses(function () {
             return 'hello';
         });
-        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
+        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.localhost/foo/bar', 'GET'))->getContent());
     }
 
     public function testMatchesMethodAgainstRequests()
