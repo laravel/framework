@@ -128,6 +128,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     protected static $traitInitializers = [];
 
     /**
+     * The array of trait get attributes that will be called on each get attributes.
+     *
+     * @var array
+     */
+    protected static $traitGetAttributes = [];
+
+    /**
+     * The array of trait set attributes that will be called on each set attributes.
+     *
+     * @var array
+     */
+    protected static $traitSetAttributes = [];
+
+    /**
      * The array of global scopes on the model.
      *
      * @var array
@@ -222,12 +236,20 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
                 $booted[] = $method;
             }
 
-            if (method_exists($class, $method = 'initialize'.class_basename($trait))) {
-                static::$traitInitializers[$class][] = $method;
+            $checkers = [
+                'initialize' => 'traitInitializers',
+                'getAttribute' => 'traitGetAttributes',
+                'setAttribute' => 'traitSetAttributes'
+            ];
 
-                static::$traitInitializers[$class] = array_unique(
-                    static::$traitInitializers[$class]
-                );
+            foreach ($checkers as $methodName => $staticName) {
+                if (method_exists($class, $method = $methodName.class_basename($trait))) {
+                    static::${$staticName}[$class][] = $method;
+
+                    static::${$staticName}[$class] = array_unique(
+                        static::${$staticName}[$class]
+                    );
+                }
             }
         }
     }

@@ -1396,6 +1396,26 @@ class DatabaseEloquentModelTest extends TestCase
         $this->assertTrue($model->fooBarIsInitialized);
     }
 
+    public function testModelsTraitSetters()
+    {
+        $model = new EloquentModelStubWithTrait;
+        $model->test = 8;
+        $this->assertSame(16, $model->getTestValue());
+    }
+
+    public function testModelsTraitGetters()
+    {
+        $model = new EloquentModelStubWithTrait;
+        $model->test = 8;
+        $this->assertSame(4, $model->test);
+
+        // Test mutated attributes don't go through the traits getter and setters
+        $model->test_mutated = 8;
+        $this->assertSame(8, $model->test_mutated);
+
+        $this->assertSame(['test' => 4, 'test_mutated' => 8], $model->attributesToArray());
+    }
+
     public function testAppendingOfAttributes()
     {
         $model = new EloquentModelAppendsStub;
@@ -1945,6 +1965,31 @@ trait FooBarTrait
     public function initializeFooBarTrait()
     {
         $this->fooBarIsInitialized = true;
+    }
+
+    public function getAttributeFooBarTrait($key, $value)
+    {
+        return $value / 4;
+    }
+
+    public function setAttributeFooBarTrait($key, $value)
+    {
+        return $value * 2;
+    }
+
+    public function getTestMutatedAttribute($value)
+    {
+        return $value;
+    }
+
+    public function setTestMutatedAttribute($value)
+    {
+        return $this->attributes['test_mutated'] = $value;
+    }
+
+    public function getTestValue()
+    {
+        return $this->attributes['test'];
     }
 }
 

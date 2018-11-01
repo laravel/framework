@@ -95,6 +95,11 @@ trait HasAttributes
             $attributes, $mutatedAttributes = $this->getMutatedAttributes()
         );
 
+        // Run through the traits first to do their converts.
+        $attributes = $this->addTraitGetAttributesToArray(
+            $attributes, $mutatedAttributes
+        );
+
         // Next we will handle any casts that have been setup for this model and cast
         // the values to their appropriate type. If the attribute has a mutator we
         // will not perform the cast on those attributes to avoid any confusion.
@@ -156,6 +161,28 @@ trait HasAttributes
             $attributes[$key] = $this->mutateAttributeForArray(
                 $key, $attributes[$key]
             );
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Add the trait get attributes to the attributes array.
+     *
+     * @param  array  $attributes
+     * @param  array  $mutatedAttributes
+     * @return array
+     */
+    protected function addTraitGetAttributesToArray(array $attributes, array $mutatedAttributes)
+    {
+        if (! empty(static::$traitGetAttributes[static::class])) {
+            foreach (static::$traitGetAttributes[static::class] as $method) {
+                foreach ($attributes as $key => $value) {
+                    if (!in_array($key, $mutatedAttributes)) {
+                        $attributes[$key] = $this->{$method}($key, $value);
+                    }
+                }
+            }
         }
 
         return $attributes;
@@ -342,6 +369,13 @@ trait HasAttributes
         // retrieval from the model to a form that is more useful for usage.
         if ($this->hasGetMutator($key)) {
             return $this->mutateAttribute($key, $value);
+        }
+
+        // Run through the trait getters
+        if (! empty(static::$traitGetAttributes[static::class])) {
+            foreach (static::$traitGetAttributes[static::class] as $method) {
+                $value = $this->{$method}($key, $value);
+            }
         }
 
         // If the attribute exists within the cast array, we will convert it to
@@ -579,6 +613,12 @@ trait HasAttributes
         // attribute in the array's value in the case of deeply nested items.
         if (Str::contains($key, '->')) {
             return $this->fillJsonAttribute($key, $value);
+        }
+
+        if (! empty(static::$traitSetAttributes[static::class])) {
+            foreach (static::$traitSetAttributes[static::class] as $method) {
+                $value = $this->{$method}($key, $value);
+            }
         }
 
         $this->attributes[$key] = $value;
