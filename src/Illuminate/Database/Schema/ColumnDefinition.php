@@ -12,7 +12,7 @@ use Illuminate\Support\Fluent;
  * @method ColumnDefinition collation(string $collation) Specify a collation for the column (MySQL/SQL Server)
  * @method ColumnDefinition comment(string $comment) Add a comment to the column (MySQL)
  * @method ColumnDefinition default(mixed $value) Specify a "default" value for the column
- * @method ColumnDefinition first(string $column) Place the column "first" in the table (MySQL)
+ * @method ColumnDefinition first() Place the column "first" in the table (MySQL)
  * @method ColumnDefinition nullable($value = true) Allow NULL values to be inserted into the column
  * @method ColumnDefinition storedAs($expression) Create a stored generated column (MySQL)
  * @method ColumnDefinition unique() Add a unique index
@@ -22,6 +22,7 @@ use Illuminate\Support\Fluent;
  * @method ColumnDefinition generatedAs($expression) Create a SQL compliant identity column (PostgreSQL)
  * @method ColumnDefinition always() Used as a modifier for generatedAs() (PostgreSQL)
  * @method ColumnDefinition index() Add an index
+ * @method ColumnDefinition change() Change the column
  */
 class ColumnDefinition extends Fluent
 {
