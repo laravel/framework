@@ -239,7 +239,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
             $checkers = [
                 'initialize' => 'traitInitializers',
                 'getAttribute' => 'traitGetAttributes',
-                'setAttribute' => 'traitSetAttributes'
+                'setAttribute' => 'traitSetAttributes',
             ];
 
             foreach ($checkers as $methodName => $staticName) {

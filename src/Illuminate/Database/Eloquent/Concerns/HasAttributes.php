@@ -178,7 +178,7 @@ trait HasAttributes
         if (! empty(static::$traitGetAttributes[static::class])) {
             foreach (static::$traitGetAttributes[static::class] as $method) {
                 foreach ($attributes as $key => $value) {
-                    if (!in_array($key, $mutatedAttributes)) {
+                    if (! in_array($key, $mutatedAttributes)) {
                         $attributes[$key] = $this->{$method}($key, $value);
                     }
                 }
