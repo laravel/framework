@@ -63,12 +63,17 @@ class TransformsRequest
      * Clean the data in the given array.
      *
      * @param  array  $data
+     * @param  string  $key
      * @return array
      */
-    protected function cleanArray(array $data)
+    protected function cleanArray(array $data, $key = '')
     {
-        return collect($data)->map(function ($value, $key) {
-            return $this->cleanValue($key, $value);
+        return collect($data)->map(function ($arrayValue, $arrayKey) use ($key) {
+            if ($key != '') {
+                $arrayKey = $key;
+            }
+
+            return $this->cleanValue($arrayKey, $arrayValue);
         })->all();
     }
 
@@ -82,9 +87,8 @@ class TransformsRequest
     protected function cleanValue($key, $value)
     {
         if (is_array($value)) {
-            return $this->cleanArray($value);
+            return $this->cleanArray($value, $key);
         }
-
         return $this->transform($key, $value);
     }
 
