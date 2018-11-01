@@ -5,6 +5,7 @@ namespace Illuminate\Support\Facades;
 /**
  * @method static \Illuminate\Contracts\Cache\Repository  store(string|null $name = null)
  * @method static bool has(string $key)
+ * @method static bool missing(string $key)
  * @method static mixed get(string $key, mixed $default = null)
  * @method static mixed pull(string $key, mixed $default = null)
  * @method static void put(string $key, $value, \DateTimeInterface|\DateInterval|float|int $minutes)
