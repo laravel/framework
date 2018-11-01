@@ -569,7 +569,7 @@ class Route
      */
     public function subDomain($subDomain, $domain = null)
     {
-        $this->action['domain'] = $subDomain.".".($domain ?? env("BASE_NAME"));
+        $this->action['domain'] = $subDomain.'.'.($domain ?? env('BASE_NAME'));
 
         return $this;
     }
