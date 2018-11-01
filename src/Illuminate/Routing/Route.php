@@ -3,7 +3,6 @@
 namespace Illuminate\Routing;
 
 use Closure;
-use Illuminate\Support\Facades\Config;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
