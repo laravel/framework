@@ -610,7 +610,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timestampTz('created_at');
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) not null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset not null', $statements[0]);
     }
 
     public function testAddingTimestampTzWithPrecision()
@@ -637,7 +637,7 @@ class DatabaseSqlServerSchemaGrammarTest extends TestCase
         $blueprint->timestampsTz();
         $statements = $blueprint->toSql($this->getConnection(), $this->getGrammar());
         $this->assertCount(1, $statements);
-        $this->assertEquals('alter table "users" add "created_at" datetimeoffset(0) null, "updated_at" datetimeoffset(0) null', $statements[0]);
+        $this->assertEquals('alter table "users" add "created_at" datetimeoffset null, "updated_at" datetimeoffset null', $statements[0]);
     }
 
     public function testAddingRememberToken()
