@@ -561,6 +561,20 @@ class Route
     }
 
     /**
+     * Get the sub domain for the route.
+     *
+     * @param string $subDomain
+     * @param string|null $domain
+     * @return $this
+     */
+    public function subDomain($subDomain, $domain = null)
+    {
+        $this->action['domain'] = $subDomain . "." . ( $domain ?? env("BASE_NAME") );
+
+        return $this;
+    }
+
+    /**
      * Get the domain defined for the route.
      *
      * @return string|null
