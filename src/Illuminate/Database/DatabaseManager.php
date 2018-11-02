@@ -97,6 +97,8 @@ class DatabaseManager implements ConnectionResolverInterface
      *
      * @param  string  $name
      * @return \Illuminate\Database\Connection
+     *
+     * @throws \InvalidArgumentException
      */
     protected function makeConnection($name)
     {
@@ -107,6 +109,10 @@ class DatabaseManager implements ConnectionResolverInterface
         // Closure and pass it the config allowing it to resolve the connection.
         if (isset($this->extensions[$name])) {
             return call_user_func($this->extensions[$name], $config, $name);
+        }
+
+        if (is_null($config)) {
+            throw new InvalidArgumentException("Database [{$name}] not configured.");
         }
 
         // Next we will check to see if an extension has been registered for a driver
@@ -123,9 +129,7 @@ class DatabaseManager implements ConnectionResolverInterface
      * Get the configuration for a connection.
      *
      * @param  string  $name
-     * @return array
-     *
-     * @throws \InvalidArgumentException
+     * @return array|null
      */
     protected function configuration($name)
     {
@@ -136,11 +140,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // If the configuration doesn't exist, we'll throw an exception and bail.
         $connections = $this->app['config']['database.connections'];
 
-        if (is_null($config = Arr::get($connections, $name))) {
-            throw new InvalidArgumentException("Database [{$name}] not configured.");
-        }
-
-        return $config;
+        return Arr::get($connections, $name);
     }
 
     /**
