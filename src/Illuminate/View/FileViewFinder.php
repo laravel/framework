@@ -53,7 +53,7 @@ class FileViewFinder implements ViewFinderInterface
     public function __construct(Filesystem $files, array $paths, array $extensions = null)
     {
         $this->files = $files;
-        $this->paths = $paths;
+        $this->paths = array_map([$this, 'normalizePath'], $paths);
 
         if (isset($extensions)) {
             $this->extensions = $extensions;
@@ -158,7 +158,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function addLocation($location)
     {
-        $this->paths[] = $location;
+        $this->paths[] = $this->normalizePath($location);
     }
 
     /**
@@ -169,7 +169,7 @@ class FileViewFinder implements ViewFinderInterface
      */
     public function prependLocation($location)
     {
-        array_unshift($this->paths, $location);
+        array_unshift($this->paths, $this->normalizePath($location));
     }
 
     /**
@@ -294,5 +294,16 @@ class FileViewFinder implements ViewFinderInterface
     public function getExtensions()
     {
         return $this->extensions;
+    }
+
+    /**
+     * Replace unnecessary relative fragments from the absolute view path.
+     *
+     * @param string $path
+     * @return string
+     */
+    protected function normalizePath($path)
+    {
+        return realpath($path) ?: $path;
     }
 }
