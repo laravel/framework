@@ -297,7 +297,7 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
-     * Replace unnecessary "../" fragments from the view path
+     * Replace unnecessary "../" fragments from the view path.
      *
      * @param string $path
      * @return string

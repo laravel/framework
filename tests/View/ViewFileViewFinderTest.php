@@ -167,7 +167,6 @@ class ViewFileViewFinderTest extends TestCase
         $this->assertSame($exceptedPath, $normalizedPath);
     }
 
-
     protected function getFinder()
     {
         return new FileViewFinder(m::mock(Filesystem::class), [__DIR__]);
