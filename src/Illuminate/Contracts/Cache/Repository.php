@@ -16,14 +16,6 @@ interface Repository extends CacheInterface
     public function has($key);
 
     /**
-     * Determine if an item doesn't exist in the cache.
-     *
-     * @param  string  $key
-     * @return bool
-     */
-    public function missing($key);
-
-    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
