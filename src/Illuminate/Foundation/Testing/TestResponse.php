@@ -63,23 +63,23 @@ class TestResponse
      * @param  array $arrayAssoc
      * @return array
      */
-    public static function mergeAssociateArrayRecursive(array $arrayStdClass, array $arrayAssoc): array
+    public static function normalizingArraysObjects (array $arrayStdClass, array $arrayAssoc): array
     {
         $merged = $arrayStdClass;
 
         // If arrayAssoc key has in $arrayStdClass and value is not empty, replace here.
         // This converts stdClass to accos array and leaves the empty stdClass
 
-        foreach ($arrayAssoc as $k => $v) {
-            if (empty($v)) {
+        foreach ($arrayAssoc as $key => $value) {
+            if (empty($value)) {
                 continue;
             }
-            if (is_array($v) && (empty($merged[$k]) || $merged[$k] == (object) [])) {
-                // k-v map
-                $merged[$k] = static::mergeAssociateArrayRecursive($merged[$k], $v);
-            } else {
-                $merged[$k] = $v;
+
+            if (is_array($value)) {
+                $value = self::normalizingArraysObjects((array)$merged[$key], $value);
             }
+
+            $merged[$key] = $value;
         }
 
         return $merged;
@@ -485,6 +485,7 @@ class TestResponse
             (array) $this->decodeResponseJson()
         ));
 
+
         PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
 
         return $this;
@@ -725,7 +726,7 @@ class TestResponse
 
         $decodedResponseAssoc = json_decode($this->getContent(), true);
 
-        $decodedResponse = static::mergeAssociateArrayRecursive($decodedResponseStdClass, $decodedResponseAssoc);
+        $decodedResponse = static::normalizingArraysObjects($decodedResponseStdClass, $decodedResponseAssoc);
 
         return data_get($decodedResponse, $key);
     }
