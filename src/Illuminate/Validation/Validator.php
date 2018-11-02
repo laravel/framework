@@ -547,9 +547,13 @@ class Validator implements ValidatorContract
         if (! $rule->passes($attribute, $value)) {
             $this->failedRules[$attribute][get_class($rule)] = [];
 
-            $this->messages->add($attribute, $this->makeReplacements(
-                $rule->message(), $attribute, get_class($rule), []
-            ));
+            $messages = (array) $rule->message();
+
+            foreach ($messages as $message) {
+                $this->messages->add($attribute, $this->makeReplacements(
+                    $message, $attribute, get_class($rule), []
+                ));
+            }
         }
     }
 
