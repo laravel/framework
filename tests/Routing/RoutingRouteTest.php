@@ -3,7 +3,6 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
-use Illuminate\Config\Repository;
 use stdClass;
 use Exception;
 use Illuminate\Support\Str;
@@ -12,6 +11,7 @@ use Illuminate\Http\Response;
 use Illuminate\Routing\Route;
 use Illuminate\Routing\Router;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Config\Repository;
 use Illuminate\Events\Dispatcher;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Routing\Controller;
