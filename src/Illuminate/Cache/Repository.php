@@ -71,6 +71,17 @@ class Repository implements CacheContract, ArrayAccess
     }
 
     /**
+     * Determine if an item doesn't exist in the cache.
+     *
+     * @param  string  $key
+     * @return bool
+     */
+    public function missing($key)
+    {
+        return ! $this->has($key);
+    }
+
+    /**
      * Retrieve an item from the cache by key.
      *
      * @param  string  $key
