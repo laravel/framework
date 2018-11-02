@@ -69,7 +69,7 @@ class TransformsRequest
     protected function cleanArray(array $data, $parentKey = '')
     {
         return collect($data)->map(function ($value, $key) use ($parentKey) {
-            if (is_numeric($key) && $parentKey != '') {
+            if (is_int($key) && $parentKey != '') {
                 $key = $parentKey;
             }
 
