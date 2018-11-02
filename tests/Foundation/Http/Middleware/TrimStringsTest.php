@@ -83,6 +83,27 @@ class TrimStringsTest extends TestCase
             $this->assertEquals('  value2  ', $t2[1]);
         });
     }
+
+    public function testTrimNestedArrayFieldsExceptSome()
+    {
+        $middleware = new TrimStringsExcept;
+        $request = new Request(
+            [
+                'nested' => [
+                                [
+                                    'field1' => ' trimmed ',
+                                    'field2' => ' not trimmed ',
+                                ],
+                            ],
+            ]
+        );
+
+        $middleware->handle($request, function (Request $request) {
+            $t = $request->get('nested');
+            $this->assertEquals('trimmed', $t[0]['field1']);
+            $this->assertEquals(' not trimmed ', $t[0]['field2']);
+        });
+    }
 }
 
 class TrimStringsExcept extends TrimStrings
