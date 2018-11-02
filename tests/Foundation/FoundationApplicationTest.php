@@ -174,9 +174,13 @@ class FoundationApplicationTest extends TestCase
     public function testEnvironment()
     {
         $app = new Application;
-        $app['env'] = 'foo';
+        $app['env'] = 'bar';
 
-        $this->assertEquals('foo', $app->environment());
+        $this->assertEquals('bar', $app->environment());
+
+        $app->bind('env', function () {
+            return 'foo';
+        });
 
         $this->assertTrue($app->environment('foo'));
         $this->assertTrue($app->environment('f*'));
@@ -187,6 +191,11 @@ class FoundationApplicationTest extends TestCase
         $this->assertFalse($app->environment('q*'));
         $this->assertFalse($app->environment('qux', 'bar'));
         $this->assertFalse($app->environment(['qux', 'bar']));
+
+        $app['env'] = 'local';
+        $this->assertTrue($app->isLocal());
+        $app['env'] = 'dev';
+        $this->assertFalse($app->isLocal());
     }
 
     public function testMethodAfterLoadingEnvironmentAddsClosure()

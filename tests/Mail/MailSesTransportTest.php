@@ -6,7 +6,7 @@ use Swift_Message;
 use Aws\Ses\SesClient;
 use Illuminate\Support\Str;
 use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
+use Illuminate\Config\Repository;
 use Illuminate\Mail\TransportManager;
 use Illuminate\Foundation\Application;
 use Illuminate\Mail\Transport\SesTransport;
@@ -15,16 +15,15 @@ class MailSesTransportTest extends TestCase
 {
     public function testGetTransport()
     {
-        /** @var Application $app */
-        $app = [
-            'config' => new Collection([
-                'services.ses' => [
-                    'key'    => 'foo',
-                    'secret' => 'bar',
-                    'region' => 'us-east-1',
-                ],
-            ]),
-        ];
+        $app = new Application();
+        $config = new Repository();
+        $config->set('services.ses', [
+            'key'    => 'foo',
+            'secret' => 'bar',
+            'region' => 'us-east-1',
+        ]);
+
+        $app->instance('config', $config);
 
         $manager = new TransportManager($app);
 

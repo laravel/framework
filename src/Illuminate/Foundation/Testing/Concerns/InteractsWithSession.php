@@ -28,7 +28,7 @@ trait InteractsWithSession
         $this->startSession();
 
         foreach ($data as $key => $value) {
-            $this->app['session']->put($key, $value);
+            $this->app->make('session')->put($key, $value);
         }
 
         return $this;
@@ -41,8 +41,8 @@ trait InteractsWithSession
      */
     protected function startSession()
     {
-        if (! $this->app['session']->isStarted()) {
-            $this->app['session']->start();
+        if (! $this->app->make('session')->isStarted()) {
+            $this->app->make('session')->start();
         }
 
         return $this;
@@ -57,7 +57,7 @@ trait InteractsWithSession
     {
         $this->startSession();
 
-        $this->app['session']->flush();
+        $this->app->make('session')->flush();
 
         return $this;
     }

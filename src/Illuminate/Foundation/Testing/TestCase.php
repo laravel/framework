@@ -77,7 +77,7 @@ abstract class TestCase extends BaseTestCase
 
         Facade::clearResolvedInstances();
 
-        Model::setEventDispatcher($this->app['events']);
+        Model::setEventDispatcher($this->app->make('events'));
 
         $this->setUpHasRun = true;
     }

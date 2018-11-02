@@ -154,7 +154,11 @@ abstract class Facade
             return static::$resolvedInstance[$name];
         }
 
-        return static::$resolvedInstance[$name] = static::$app[$name];
+        if (! isset(static::$app)) {
+            return static::$resolvedInstance[$name] = null;
+        }
+
+        return static::$resolvedInstance[$name] = static::$app->make($name);
     }
 
     /**

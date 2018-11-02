@@ -296,7 +296,7 @@ class FilesystemManager implements FactoryContract
         }
 
         return new Cache(
-            $this->app['cache']->store($config['store']),
+            $this->app->make('cache')->store($config['store']),
             $config['prefix'] ?? 'flysystem',
             $config['expire'] ?? null
         );
@@ -335,7 +335,7 @@ class FilesystemManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["filesystems.disks.{$name}"];
+        return $this->app->make('config')->get("filesystems.disks.{$name}");
     }
 
     /**
@@ -345,7 +345,7 @@ class FilesystemManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['filesystems.default'];
+        return $this->app->make('config')->get('filesystems.default');
     }
 
     /**
@@ -355,7 +355,7 @@ class FilesystemManager implements FactoryContract
      */
     public function getDefaultCloudDriver()
     {
-        return $this->app['config']['filesystems.cloud'];
+        return $this->app->make('config')->get('filesystems.cloud');
     }
 
     /**

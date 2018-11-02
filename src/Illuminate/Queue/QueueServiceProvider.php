@@ -10,6 +10,7 @@ use Illuminate\Queue\Connectors\NullConnector;
 use Illuminate\Queue\Connectors\SyncConnector;
 use Illuminate\Queue\Connectors\RedisConnector;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Queue\Connectors\DatabaseConnector;
 use Illuminate\Queue\Failed\NullFailedJobProvider;
 use Illuminate\Queue\Connectors\BeanstalkdConnector;
@@ -46,7 +47,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerManager()
     {
-        $this->app->singleton('queue', function ($app) {
+        $this->app->singleton('queue', function (Application $app) {
             // Once we have an instance of the queue manager, we will register the various
             // resolvers for the queue connectors. These connectors are responsible for
             // creating the classes that accept queue configs and instantiate queues.
@@ -63,8 +64,8 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerConnection()
     {
-        $this->app->singleton('queue.connection', function ($app) {
-            return $app['queue']->connection();
+        $this->app->singleton('queue.connection', function (Application $app) {
+            return $app->make('queue')->connection();
         });
     }
 
@@ -116,7 +117,7 @@ class QueueServiceProvider extends ServiceProvider
     protected function registerDatabaseConnector($manager)
     {
         $manager->addConnector('database', function () {
-            return new DatabaseConnector($this->app['db']);
+            return new DatabaseConnector($this->app->make('db'));
         });
     }
 
@@ -129,7 +130,7 @@ class QueueServiceProvider extends ServiceProvider
     protected function registerRedisConnector($manager)
     {
         $manager->addConnector('redis', function () {
-            return new RedisConnector($this->app['redis']);
+            return new RedisConnector($this->app->make('redis'));
         });
     }
 
@@ -168,7 +169,7 @@ class QueueServiceProvider extends ServiceProvider
     {
         $this->app->singleton('queue.worker', function () {
             return new Worker(
-                $this->app['queue'], $this->app['events'], $this->app[ExceptionHandler::class]
+                $this->app->make('queue'), $this->app->make('events'), $this->app->make(ExceptionHandler::class)
             );
         });
     }
@@ -193,7 +194,7 @@ class QueueServiceProvider extends ServiceProvider
     protected function registerFailedJobServices()
     {
         $this->app->singleton('queue.failer', function () {
-            $config = $this->app['config']['queue.failed'];
+            $config = $this->app->make('config')->get('queue.failed');
 
             return isset($config['table'])
                         ? $this->databaseFailedJobProvider($config)
@@ -210,7 +211,7 @@ class QueueServiceProvider extends ServiceProvider
     protected function databaseFailedJobProvider($config)
     {
         return new DatabaseFailedJobProvider(
-            $this->app['db'], $config['database'], $config['table']
+            $this->app->make('db'), $config['database'], $config['table']
         );
     }
 
@@ -221,7 +222,7 @@ class QueueServiceProvider extends ServiceProvider
      */
     protected function registerOpisSecurityKey()
     {
-        if (Str::startsWith($key = $this->app['config']->get('app.key'), 'base64:')) {
+        if (Str::startsWith($key = $this->app->make('config')->get('app.key'), 'base64:')) {
             $key = base64_decode(substr($key, 7));
         }
 

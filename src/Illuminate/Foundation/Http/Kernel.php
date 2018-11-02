@@ -124,7 +124,7 @@ class Kernel implements KernelContract
             $response = $this->renderException($request, $e);
         }
 
-        $this->app['events']->dispatch(
+        $this->app->make('events')->dispatch(
             new Events\RequestHandled($request, $response)
         );
 
@@ -311,7 +311,7 @@ class Kernel implements KernelContract
      */
     protected function reportException(Exception $e)
     {
-        $this->app[ExceptionHandler::class]->report($e);
+        $this->app->make(ExceptionHandler::class)->report($e);
     }
 
     /**
@@ -323,7 +323,7 @@ class Kernel implements KernelContract
      */
     protected function renderException($request, Exception $e)
     {
-        return $this->app[ExceptionHandler::class]->render($request, $e);
+        return $this->app->make(ExceptionHandler::class)->render($request, $e);
     }
 
     /**

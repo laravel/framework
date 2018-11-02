@@ -27,7 +27,7 @@ class FlushFailedCommand extends Command
      */
     public function handle()
     {
-        $this->laravel['queue.failer']->flush();
+        $this->laravel->make('queue.failer')->flush();
 
         $this->info('All failed jobs deleted successfully!');
     }

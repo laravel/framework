@@ -82,6 +82,6 @@ class ConfigCacheCommand extends Command
 
         $app->make(ConsoleKernelContract::class)->bootstrap();
 
-        return $app['config']->all();
+        return $app->make('config')->all();
     }
 }

@@ -3,6 +3,7 @@
 namespace Illuminate\Validation;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class ValidationServiceProvider extends ServiceProvider
 {
@@ -32,14 +33,14 @@ class ValidationServiceProvider extends ServiceProvider
      */
     protected function registerValidationFactory()
     {
-        $this->app->singleton('validator', function ($app) {
-            $validator = new Factory($app['translator'], $app);
+        $this->app->singleton('validator', function (Application $app) {
+            $validator = new Factory($app->make('translator'), $app);
 
             // The validation presence verifier is responsible for determining the existence of
             // values in a given data collection which is typically a relational database or
             // other persistent data stores. It is used to check for "uniqueness" as well.
-            if (isset($app['db'], $app['validation.presence'])) {
-                $validator->setPresenceVerifier($app['validation.presence']);
+            if ($app->bound('db') && $app->bound('validation.presence')) {
+                $validator->setPresenceVerifier($app->make('validation.presence'));
             }
 
             return $validator;
@@ -53,8 +54,8 @@ class ValidationServiceProvider extends ServiceProvider
      */
     protected function registerPresenceVerifier()
     {
-        $this->app->singleton('validation.presence', function ($app) {
-            return new DatabasePresenceVerifier($app['db']);
+        $this->app->singleton('validation.presence', function (Application $app) {
+            return new DatabasePresenceVerifier($app->make('db'));
         });
     }
 

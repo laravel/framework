@@ -30,15 +30,15 @@ class PaginationServiceProvider extends ServiceProvider
     public function register()
     {
         Paginator::viewFactoryResolver(function () {
-            return $this->app['view'];
+            return $this->app->make('view');
         });
 
         Paginator::currentPathResolver(function () {
-            return $this->app['request']->url();
+            return $this->app->make('request')->url();
         });
 
         Paginator::currentPageResolver(function ($pageName = 'page') {
-            $page = $this->app['request']->input($pageName);
+            $page = $this->app->make('request')->input($pageName);
 
             if (filter_var($page, FILTER_VALIDATE_INT) !== false && (int) $page >= 1) {
                 return (int) $page;

@@ -49,7 +49,7 @@ class ListFailedCommand extends Command
      */
     protected function getFailedJobs()
     {
-        $failed = $this->laravel['queue.failer']->all();
+        $failed = $this->laravel->make('queue.failer')->all();
 
         return collect($failed)->map(function ($failed) {
             return $this->parseFailedJob((array) $failed);

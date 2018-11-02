@@ -3,6 +3,7 @@
 namespace Illuminate\Translation;
 
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class TranslationServiceProvider extends ServiceProvider
 {
@@ -22,17 +23,17 @@ class TranslationServiceProvider extends ServiceProvider
     {
         $this->registerLoader();
 
-        $this->app->singleton('translator', function ($app) {
-            $loader = $app['translation.loader'];
+        $this->app->singleton('translator', function (Application $app) {
+            $loader = $app->make('translation.loader');
 
             // When registering the translator component, we'll need to set the default
             // locale as well as the fallback locale. So, we'll grab the application
             // configuration so we can easily get both of these values from there.
-            $locale = $app['config']['app.locale'];
+            $locale = $app->make('config')->get('app.locale');
 
             $trans = new Translator($loader, $locale);
 
-            $trans->setFallback($app['config']['app.fallback_locale']);
+            $trans->setFallback($app->make('config')->get('app.fallback_locale'));
 
             return $trans;
         });
@@ -45,8 +46,8 @@ class TranslationServiceProvider extends ServiceProvider
      */
     protected function registerLoader()
     {
-        $this->app->singleton('translation.loader', function ($app) {
-            return new FileLoader($app['files'], $app['path.lang']);
+        $this->app->singleton('translation.loader', function (Application $app) {
+            return new FileLoader($app->make('files'), $app->make('path.lang'));
         });
     }
 

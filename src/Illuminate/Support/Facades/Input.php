@@ -57,7 +57,7 @@ class Input extends Facade
      */
     public static function get($key = null, $default = null)
     {
-        return static::$app['request']->input($key, $default);
+        return static::$app->make('request')->input($key, $default);
     }
 
     /**

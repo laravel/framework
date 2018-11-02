@@ -200,11 +200,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         $this->hasBeenBootstrapped = true;
 
         foreach ($bootstrappers as $bootstrapper) {
-            $this['events']->fire('bootstrapping: '.$bootstrapper, [$this]);
+            $this->make('events')->dispatch('bootstrapping: '.$bootstrapper, [$this]);
 
             $this->make($bootstrapper)->bootstrap($this);
 
-            $this['events']->fire('bootstrapped: '.$bootstrapper, [$this]);
+            $this->make('events')->dispatch('bootstrapped: '.$bootstrapper, [$this]);
         }
     }
 
@@ -230,7 +230,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function beforeBootstrapping($bootstrapper, Closure $callback)
     {
-        $this['events']->listen('bootstrapping: '.$bootstrapper, $callback);
+        $this->make('events')->listen('bootstrapping: '.$bootstrapper, $callback);
     }
 
     /**
@@ -242,7 +242,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function afterBootstrapping($bootstrapper, Closure $callback)
     {
-        $this['events']->listen('bootstrapped: '.$bootstrapper, $callback);
+        $this->make('events')->listen('bootstrapped: '.$bootstrapper, $callback);
     }
 
     /**
@@ -481,10 +481,10 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
         if (count($environments) > 0) {
             $patterns = is_array($environments[0]) ? $environments[0] : $environments;
 
-            return Str::is($patterns, $this['env']);
+            return Str::is($patterns, $this->make('env'));
         }
 
-        return $this['env'];
+        return $this->make('env');
     }
 
     /**
@@ -494,7 +494,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function isLocal()
     {
-        return $this['env'] === 'local';
+        return $this->make('env') === 'local';
     }
 
     /**
@@ -507,7 +507,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
     {
         $args = $_SERVER['argv'] ?? null;
 
-        return $this['env'] = (new EnvironmentDetector)->detect($callback, $args);
+        $this->bind('env', function () use ($callback, $args) {
+            return (new EnvironmentDetector)->detect($callback, $args);
+        });
+
+        return $this->make('env');
     }
 
     /**
@@ -527,7 +531,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function runningUnitTests()
     {
-        return $this['env'] === 'testing';
+        return $this->make('env') === 'testing';
     }
 
     /**
@@ -838,7 +842,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function handle(SymfonyRequest $request, $type = self::MASTER_REQUEST, $catch = true)
     {
-        return $this[HttpKernelContract::class]->handle(Request::createFromBase($request));
+        return $this->make(HttpKernelContract::class)->handle(Request::createFromBase($request));
     }
 
     /**
@@ -899,7 +903,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function routesAreCached()
     {
-        return $this['files']->exists($this->getCachedRoutesPath());
+        return $this->make('files')->exists($this->getCachedRoutesPath());
     }
 
     /**
@@ -1037,7 +1041,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function getLocale()
     {
-        return $this['config']->get('app.locale');
+        return $this->make('config')->get('app.locale');
     }
 
     /**
@@ -1048,11 +1052,11 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      */
     public function setLocale($locale)
     {
-        $this['config']->set('app.locale', $locale);
+        $this->make('config')->set('app.locale', $locale);
 
-        $this['translator']->setLocale($locale);
+        $this->make('translator')->setLocale($locale);
 
-        $this['events']->dispatch(new Events\LocaleUpdated($locale));
+        $this->make('events')->dispatch(new Events\LocaleUpdated($locale));
     }
 
     /**

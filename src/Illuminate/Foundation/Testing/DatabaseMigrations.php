@@ -15,7 +15,7 @@ trait DatabaseMigrations
     {
         $this->artisan('migrate:fresh');
 
-        $this->app[Kernel::class]->setArtisan(null);
+        $this->app->make(Kernel::class)->setArtisan(null);
 
         $this->beforeApplicationDestroyed(function () {
             $this->artisan('migrate:rollback');

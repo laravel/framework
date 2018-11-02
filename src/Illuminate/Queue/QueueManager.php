@@ -52,7 +52,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function before($callback)
     {
-        $this->app['events']->listen(Events\JobProcessing::class, $callback);
+        $this->app->make('events')->listen(Events\JobProcessing::class, $callback);
     }
 
     /**
@@ -63,7 +63,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function after($callback)
     {
-        $this->app['events']->listen(Events\JobProcessed::class, $callback);
+        $this->app->make('events')->listen(Events\JobProcessed::class, $callback);
     }
 
     /**
@@ -74,7 +74,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function exceptionOccurred($callback)
     {
-        $this->app['events']->listen(Events\JobExceptionOccurred::class, $callback);
+        $this->app->make('events')->listen(Events\JobExceptionOccurred::class, $callback);
     }
 
     /**
@@ -85,7 +85,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function looping($callback)
     {
-        $this->app['events']->listen(Events\Looping::class, $callback);
+        $this->app->make('events')->listen(Events\Looping::class, $callback);
     }
 
     /**
@@ -96,7 +96,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function failing($callback)
     {
-        $this->app['events']->listen(Events\JobFailed::class, $callback);
+        $this->app->make('events')->listen(Events\JobFailed::class, $callback);
     }
 
     /**
@@ -107,7 +107,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function stopping($callback)
     {
-        $this->app['events']->listen(Events\WorkerStopping::class, $callback);
+        $this->app->make('events')->listen(Events\WorkerStopping::class, $callback);
     }
 
     /**
@@ -208,7 +208,7 @@ class QueueManager implements FactoryContract, MonitorContract
     protected function getConfig($name)
     {
         if (! is_null($name) && $name !== 'null') {
-            return $this->app['config']["queue.connections.{$name}"];
+            return $this->app->make('config')->get("queue.connections.{$name}");
         }
 
         return ['driver' => 'null'];
@@ -221,7 +221,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['queue.default'];
+        return $this->app->make('config')->get('queue.default');
     }
 
     /**
@@ -232,7 +232,7 @@ class QueueManager implements FactoryContract, MonitorContract
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['queue.default'] = $name;
+        $this->app->make('config')->set('queue.default', $name);
     }
 
     /**

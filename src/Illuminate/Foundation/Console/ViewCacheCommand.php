@@ -45,7 +45,7 @@ class ViewCacheCommand extends Command
      */
     protected function compileViews(Collection $views)
     {
-        $compiler = $this->laravel['view']->getEngineResolver()->resolve('blade')->getCompiler();
+        $compiler = $this->laravel->make('view')->getEngineResolver()->resolve('blade')->getCompiler();
 
         $views->map(function (SplFileInfo $file) use ($compiler) {
             $compiler->compile($file->getRealPath());
@@ -76,7 +76,7 @@ class ViewCacheCommand extends Command
      */
     protected function paths()
     {
-        $finder = $this->laravel['view']->getFinder();
+        $finder = $this->laravel->make('view')->getFinder();
 
         return collect($finder->getPaths())->merge(
             collect($finder->getHints())->flatten()

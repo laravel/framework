@@ -134,7 +134,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // To get the database connection configuration, we will just pull each of the
         // connection configurations and get the configurations for the given name.
         // If the configuration doesn't exist, we'll throw an exception and bail.
-        $connections = $this->app['config']['database.connections'];
+        $connections = $this->app->make('config')->get('database.connections');
 
         if (is_null($config = Arr::get($connections, $name))) {
             throw new InvalidArgumentException("Database [{$name}] not configured.");
@@ -158,7 +158,7 @@ class DatabaseManager implements ConnectionResolverInterface
         // connection. This method basically just configures and prepares it to get
         // used by the application. Once we're finished we'll return it back out.
         if ($this->app->bound('events')) {
-            $connection->setEventDispatcher($this->app['events']);
+            $connection->setEventDispatcher($this->app->make('events'));
         }
 
         // Here we'll set a reconnector callback. This reconnector can be any callable
@@ -256,7 +256,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function getDefaultConnection()
     {
-        return $this->app['config']['database.default'];
+        return $this->app->make('config')->get('database.default');
     }
 
     /**
@@ -267,7 +267,7 @@ class DatabaseManager implements ConnectionResolverInterface
      */
     public function setDefaultConnection($name)
     {
-        $this->app['config']['database.default'] = $name;
+        $this->app->make('config')->set('database.default', $name);
     }
 
     /**

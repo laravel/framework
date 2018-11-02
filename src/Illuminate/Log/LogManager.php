@@ -63,7 +63,7 @@ class LogManager implements LoggerInterface
     {
         return new Logger(
             $this->createStackDriver(compact('channels', 'channel')),
-            $this->app['events']
+            $this->app->make('events')
         );
     }
 
@@ -99,7 +99,7 @@ class LogManager implements LoggerInterface
     {
         try {
             return $this->channels[$name] ?? with($this->resolve($name), function ($logger) use ($name) {
-                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app['events']));
+                return $this->channels[$name] = $this->tap($name, new Logger($logger, $this->app->make('events')));
             });
         } catch (Throwable $e) {
             return tap($this->createEmergencyLogger(), function ($logger) use ($e) {
@@ -148,7 +148,7 @@ class LogManager implements LoggerInterface
     {
         return new Logger(new Monolog('laravel', $this->prepareHandlers([new StreamHandler(
                 $this->app->storagePath().'/logs/laravel.log', $this->level(['level' => 'debug'])
-        )])), $this->app['events']);
+        )])), $this->app->make('events'));
     }
 
     /**
@@ -285,7 +285,7 @@ class LogManager implements LoggerInterface
     {
         return new Monolog($this->parseChannel($config), [
             $this->prepareHandler(new SyslogHandler(
-                Str::snake($this->app['config']['app.name'], '-'), $config['facility'] ?? LOG_USER, $this->level($config))
+                Str::snake($this->app->make('config')->get('app.name'), '-'), $config['facility'] ?? LOG_USER, $this->level($config))
             ),
         ]);
     }
@@ -392,7 +392,7 @@ class LogManager implements LoggerInterface
      */
     protected function configurationFor($name)
     {
-        return $this->app['config']["logging.channels.{$name}"];
+        return $this->app->make('config')->get("logging.channels.{$name}");
     }
 
     /**
@@ -402,7 +402,7 @@ class LogManager implements LoggerInterface
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['logging.default'];
+        return $this->app->make('config')->get('logging.default');
     }
 
     /**
@@ -413,7 +413,7 @@ class LogManager implements LoggerInterface
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['logging.default'] = $name;
+        $this->app->make('config')->set('logging.default', $name);
     }
 
     /**

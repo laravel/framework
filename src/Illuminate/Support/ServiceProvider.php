@@ -54,9 +54,9 @@ abstract class ServiceProvider
      */
     protected function mergeConfigFrom($path, $key)
     {
-        $config = $this->app['config']->get($key, []);
+        $config = $this->app->make('config')->get($key, []);
 
-        $this->app['config']->set($key, array_merge(require $path, $config));
+        $this->app->make('config')->set($key, array_merge(require $path, $config));
     }
 
     /**
@@ -81,15 +81,15 @@ abstract class ServiceProvider
      */
     protected function loadViewsFrom($path, $namespace)
     {
-        if (is_array($this->app->config['view']['paths'])) {
-            foreach ($this->app->config['view']['paths'] as $viewPath) {
+        if (is_array($this->app->make('config')->get('view.paths'))) {
+            foreach ($this->app->make('config')->get('view.paths') as $viewPath) {
                 if (is_dir($appPath = $viewPath.'/vendor/'.$namespace)) {
-                    $this->app['view']->addNamespace($namespace, $appPath);
+                    $this->app->make('view')->addNamespace($namespace, $appPath);
                 }
             }
         }
 
-        $this->app['view']->addNamespace($namespace, $path);
+        $this->app->make('view')->addNamespace($namespace, $path);
     }
 
     /**
@@ -101,7 +101,7 @@ abstract class ServiceProvider
      */
     protected function loadTranslationsFrom($path, $namespace)
     {
-        $this->app['translator']->addNamespace($namespace, $path);
+        $this->app->make('translator')->addNamespace($namespace, $path);
     }
 
     /**
@@ -112,7 +112,7 @@ abstract class ServiceProvider
      */
     protected function loadJsonTranslationsFrom($path)
     {
-        $this->app['translator']->addJsonPath($path);
+        $this->app->make('translator')->addJsonPath($path);
     }
 
     /**

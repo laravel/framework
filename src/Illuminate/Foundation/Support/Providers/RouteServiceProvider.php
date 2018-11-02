@@ -36,8 +36,8 @@ class RouteServiceProvider extends ServiceProvider
             $this->loadRoutes();
 
             $this->app->booted(function () {
-                $this->app['router']->getRoutes()->refreshNameLookups();
-                $this->app['router']->getRoutes()->refreshActionLookups();
+                $this->app->make('router')->getRoutes()->refreshNameLookups();
+                $this->app->make('router')->getRoutes()->refreshActionLookups();
             });
         }
     }
@@ -50,7 +50,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function setRootControllerNamespace()
     {
         if (! is_null($this->namespace)) {
-            $this->app[UrlGenerator::class]->setRootControllerNamespace($this->namespace);
+            $this->app->make(UrlGenerator::class)->setRootControllerNamespace($this->namespace);
         }
     }
 

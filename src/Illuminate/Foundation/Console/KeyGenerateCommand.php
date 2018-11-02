@@ -46,7 +46,7 @@ class KeyGenerateCommand extends Command
             return;
         }
 
-        $this->laravel['config']['app.key'] = $key;
+        $this->laravel->make('config')->set('app.key', $key);
 
         $this->info('Application key set successfully.');
     }
@@ -59,7 +59,7 @@ class KeyGenerateCommand extends Command
     protected function generateRandomKey()
     {
         return 'base64:'.base64_encode(
-            Encrypter::generateKey($this->laravel['config']['app.cipher'])
+            Encrypter::generateKey($this->laravel->make('config')->get('app.cipher'))
         );
     }
 
@@ -71,7 +71,7 @@ class KeyGenerateCommand extends Command
      */
     protected function setKeyInEnvironmentFile($key)
     {
-        $currentKey = $this->laravel['config']['app.key'];
+        $currentKey = $this->laravel->make('config')->get('app.key');
 
         if (strlen($currentKey) !== 0 && (! $this->confirmToProceed())) {
             return false;
@@ -104,7 +104,7 @@ class KeyGenerateCommand extends Command
      */
     protected function keyReplacementPattern()
     {
-        $escaped = preg_quote('='.$this->laravel['config']['app.key'], '/');
+        $escaped = preg_quote('='.$this->laravel->make('config')->get('app.key'), '/');
 
         return "/^APP_KEY{$escaped}/m";
     }

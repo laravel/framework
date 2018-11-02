@@ -63,7 +63,7 @@ class TransportManager extends Manager
      */
     protected function createSendmailDriver()
     {
-        return new SendmailTransport($this->app['config']['mail']['sendmail']);
+        return new SendmailTransport($this->app->make('config')->get('mail.sendmail'));
     }
 
     /**
@@ -73,7 +73,7 @@ class TransportManager extends Manager
      */
     protected function createSesDriver()
     {
-        $config = array_merge($this->app['config']->get('services.ses', []), [
+        $config = array_merge($this->app->make('config')->get('services.ses', []), [
             'version' => 'latest', 'service' => 'email',
         ]);
 
@@ -115,7 +115,7 @@ class TransportManager extends Manager
      */
     protected function createMailgunDriver()
     {
-        $config = $this->app['config']->get('services.mailgun', []);
+        $config = $this->app->make('config')->get('services.mailgun', []);
 
         return new MailgunTransport(
             $this->guzzle($config),
@@ -132,7 +132,7 @@ class TransportManager extends Manager
      */
     protected function createMandrillDriver()
     {
-        $config = $this->app['config']->get('services.mandrill', []);
+        $config = $this->app->make('config')->get('services.mandrill', []);
 
         return new MandrillTransport(
             $this->guzzle($config), $config['secret']
@@ -146,7 +146,7 @@ class TransportManager extends Manager
      */
     protected function createSparkPostDriver()
     {
-        $config = $this->app['config']->get('services.sparkpost', []);
+        $config = $this->app->make('config')->get('services.sparkpost', []);
 
         return new SparkPostTransport(
             $this->guzzle($config), $config['secret'], $config['options'] ?? []
@@ -193,7 +193,7 @@ class TransportManager extends Manager
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['mail.driver'];
+        return $this->app->make('config')->get('mail.driver');
     }
 
     /**
@@ -204,6 +204,6 @@ class TransportManager extends Manager
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['mail.driver'] = $name;
+        $this->app->make('config')->set('mail.driver', $name);
     }
 }

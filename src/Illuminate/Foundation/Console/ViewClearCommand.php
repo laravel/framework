@@ -51,7 +51,7 @@ class ViewClearCommand extends Command
      */
     public function handle()
     {
-        $path = $this->laravel['config']['view.compiled'];
+        $path = $this->laravel->make('config')->get('view.compiled');
 
         if (! $path) {
             throw new RuntimeException('View path not found.');

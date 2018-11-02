@@ -39,7 +39,7 @@ trait RefreshDatabase
     {
         $this->artisan('migrate');
 
-        $this->app[Kernel::class]->setArtisan(null);
+        $this->app->make(Kernel::class)->setArtisan(null);
     }
 
     /**
@@ -54,7 +54,7 @@ trait RefreshDatabase
                 '--drop-views' => true,
             ] : []);
 
-            $this->app[Kernel::class]->setArtisan(null);
+            $this->app->make(Kernel::class)->setArtisan(null);
 
             RefreshDatabaseState::$migrated = true;
         }

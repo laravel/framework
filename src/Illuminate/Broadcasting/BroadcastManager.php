@@ -64,7 +64,7 @@ class BroadcastManager implements FactoryContract
 
         $attributes = $attributes ?: ['middleware' => ['web']];
 
-        $this->app['router']->group($attributes, function ($router) {
+        $this->app->make('router')->group($attributes, function ($router) {
             $router->match(
                 ['get', 'post'], '/broadcasting/auth',
                 '\\'.BroadcastController::class.'@authenticate'
@@ -84,7 +84,7 @@ class BroadcastManager implements FactoryContract
             return;
         }
 
-        $request = $request ?: $this->app['request'];
+        $request = $request ?: $this->app->make('request');
 
         return $request->header('X-Socket-ID');
     }
@@ -269,7 +269,7 @@ class BroadcastManager implements FactoryContract
      */
     protected function getConfig($name)
     {
-        return $this->app['config']["broadcasting.connections.{$name}"];
+        return $this->app->make('config')->get("broadcasting.connections.{$name}");
     }
 
     /**
@@ -279,7 +279,7 @@ class BroadcastManager implements FactoryContract
      */
     public function getDefaultDriver()
     {
-        return $this->app['config']['broadcasting.default'];
+        return $this->app->make('config')->get('broadcasting.default');
     }
 
     /**
@@ -290,7 +290,7 @@ class BroadcastManager implements FactoryContract
      */
     public function setDefaultDriver($name)
     {
-        $this->app['config']['broadcasting.default'] = $name;
+        $this->app->make('config')->set('broadcasting.default', $name);
     }
 
     /**

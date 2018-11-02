@@ -31,9 +31,9 @@ trait InteractsWithAuthentication
             $user->wasRecentlyCreated = false;
         }
 
-        $this->app['auth']->guard($driver)->setUser($user);
+        $this->app->make('auth')->guard($driver)->setUser($user);
 
-        $this->app['auth']->shouldUse($driver);
+        $this->app->make('auth')->shouldUse($driver);
 
         return $this;
     }

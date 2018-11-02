@@ -30,7 +30,7 @@ class RestartCommand extends Command
      */
     public function handle()
     {
-        $this->laravel['cache']->forever('illuminate:queue:restart', $this->currentTime());
+        $this->laravel->make('cache')->forever('illuminate:queue:restart', $this->currentTime());
 
         $this->info('Broadcasting queue restart signal.');
     }

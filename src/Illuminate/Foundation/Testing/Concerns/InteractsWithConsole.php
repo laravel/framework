@@ -39,7 +39,7 @@ trait InteractsWithConsole
     public function artisan($command, $parameters = [])
     {
         if (! $this->mockConsoleOutput) {
-            return $this->app[Kernel::class]->call($command, $parameters);
+            return $this->app->make(Kernel::class)->call($command, $parameters);
         }
 
         $this->beforeApplicationDestroyed(function () {

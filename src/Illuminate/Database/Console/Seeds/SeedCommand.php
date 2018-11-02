@@ -87,7 +87,7 @@ class SeedCommand extends Command
     {
         $database = $this->input->getOption('database');
 
-        return $database ?: $this->laravel['config']['database.default'];
+        return $database ?: $this->laravel->make('config')->get('database.default');
     }
 
     /**

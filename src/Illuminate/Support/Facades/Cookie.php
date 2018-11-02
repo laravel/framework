@@ -19,7 +19,7 @@ class Cookie extends Facade
      */
     public static function has($key)
     {
-        return ! is_null(static::$app['request']->cookie($key, null));
+        return ! is_null(static::$app->make('request')->cookie($key, null));
     }
 
     /**
@@ -31,7 +31,7 @@ class Cookie extends Facade
      */
     public static function get($key = null, $default = null)
     {
-        return static::$app['request']->cookie($key, $default);
+        return static::$app->make('request')->cookie($key, $default);
     }
 
     /**

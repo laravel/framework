@@ -75,7 +75,7 @@ class WorkCommand extends Command
         $this->listenForEvents();
 
         $connection = $this->argument('connection')
-                        ?: $this->laravel['config']['queue.default'];
+                        ?: $this->laravel->make('config')->get('queue.default');
 
         // We need to get the right queue for the connection which is set in the queue
         // configuration file for the application. We will pull it based on the set
@@ -96,7 +96,7 @@ class WorkCommand extends Command
      */
     protected function runWorker($connection, $queue)
     {
-        $this->worker->setCache($this->laravel['cache']->driver());
+        $this->worker->setCache($this->laravel->make('cache')->driver());
 
         return $this->worker->{$this->option('once') ? 'runNextJob' : 'daemon'}(
             $connection, $queue, $this->gatherWorkerOptions()
@@ -125,15 +125,15 @@ class WorkCommand extends Command
      */
     protected function listenForEvents()
     {
-        $this->laravel['events']->listen(JobProcessing::class, function ($event) {
+        $this->laravel->make('events')->listen(JobProcessing::class, function ($event) {
             $this->writeOutput($event->job, 'starting');
         });
 
-        $this->laravel['events']->listen(JobProcessed::class, function ($event) {
+        $this->laravel->make('events')->listen(JobProcessed::class, function ($event) {
             $this->writeOutput($event->job, 'success');
         });
 
-        $this->laravel['events']->listen(JobFailed::class, function ($event) {
+        $this->laravel->make('events')->listen(JobFailed::class, function ($event) {
             $this->writeOutput($event->job, 'failed');
 
             $this->logFailedJob($event);
@@ -185,7 +185,7 @@ class WorkCommand extends Command
      */
     protected function logFailedJob(JobFailed $event)
     {
-        $this->laravel['queue.failer']->log(
+        $this->laravel->make('queue.failer')->log(
             $event->connectionName, $event->job->getQueue(),
             $event->job->getRawBody(), $event->exception
         );
@@ -199,7 +199,7 @@ class WorkCommand extends Command
      */
     protected function getQueue($connection)
     {
-        return $this->option('queue') ?: $this->laravel['config']->get(
+        return $this->option('queue') ?: $this->laravel->make('config')->get(
             "queue.connections.{$connection}.queue", 'default'
         );
     }

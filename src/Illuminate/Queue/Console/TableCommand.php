@@ -57,7 +57,7 @@ class TableCommand extends Command
      */
     public function handle()
     {
-        $table = $this->laravel['config']['queue.connections.database.table'];
+        $table = $this->laravel->make('config')->get('queue.connections.database.table');
 
         $this->replaceMigration(
             $this->createBaseMigration($table), $table, Str::studly($table)
@@ -76,7 +76,7 @@ class TableCommand extends Command
      */
     protected function createBaseMigration($table = 'jobs')
     {
-        return $this->laravel['migration.creator']->create(
+        return $this->laravel->make('migration.creator')->create(
             'create_'.$table.'_table', $this->laravel->databasePath().'/migrations'
         );
     }

@@ -107,10 +107,10 @@ class ChannelManager extends Manager implements DispatcherContract, FactoryContr
     {
         return new Channels\NexmoSmsChannel(
             new NexmoClient(new NexmoCredentials(
-                $this->app['config']['services.nexmo.key'],
-                $this->app['config']['services.nexmo.secret']
+                $this->app->make('config')->get('services.nexmo.key'),
+                $this->app->make('config')->get('services.nexmo.secret')
             )),
-            $this->app['config']['services.nexmo.sms_from']
+            $this->app->make('config')->get('services.nexmo.sms_from')
         );
     }
 

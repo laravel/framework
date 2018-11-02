@@ -4,6 +4,7 @@ namespace Illuminate\Redis;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Contracts\Foundation\Application;
 
 class RedisServiceProvider extends ServiceProvider
 {
@@ -21,14 +22,14 @@ class RedisServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton('redis', function ($app) {
+        $this->app->singleton('redis', function (Application $app) {
             $config = $app->make('config')->get('database.redis', []);
 
             return new RedisManager($app, Arr::pull($config, 'client', 'predis'), $config);
         });
 
-        $this->app->bind('redis.connection', function ($app) {
-            return $app['redis']->connection();
+        $this->app->bind('redis.connection', function (Application $app) {
+            return $app->make('redis')->connection();
         });
     }
 

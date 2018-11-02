@@ -10,6 +10,7 @@ use Illuminate\Foundation\Console\DownCommand;
 use Illuminate\Auth\Console\ClearResetsCommand;
 use Illuminate\Cache\Console\CacheTableCommand;
 use Illuminate\Foundation\Console\ServeCommand;
+use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Foundation\Console\PresetCommand;
 use Illuminate\Queue\Console\FailedTableCommand;
 use Illuminate\Foundation\Console\AppNameCommand;
@@ -199,8 +200,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerAppNameCommand()
     {
-        $this->app->singleton('command.app.name', function ($app) {
-            return new AppNameCommand($app['composer'], $app['files']);
+        $this->app->singleton('command.app.name', function (Application $app) {
+            return new AppNameCommand($app->make('composer'), $app->make('files'));
         });
     }
 
@@ -223,8 +224,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerCacheClearCommand()
     {
-        $this->app->singleton('command.cache.clear', function ($app) {
-            return new CacheClearCommand($app['cache'], $app['files']);
+        $this->app->singleton('command.cache.clear', function (Application $app) {
+            return new CacheClearCommand($app->make('cache'), $app->make('files'));
         });
     }
 
@@ -235,8 +236,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerCacheForgetCommand()
     {
-        $this->app->singleton('command.cache.forget', function ($app) {
-            return new CacheForgetCommand($app['cache']);
+        $this->app->singleton('command.cache.forget', function (Application $app) {
+            return new CacheForgetCommand($app->make('cache'));
         });
     }
 
@@ -247,8 +248,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerCacheTableCommand()
     {
-        $this->app->singleton('command.cache.table', function ($app) {
-            return new CacheTableCommand($app['files'], $app['composer']);
+        $this->app->singleton('command.cache.table', function (Application $app) {
+            return new CacheTableCommand($app->make('files'), $app->make('composer'));
         });
     }
 
@@ -259,8 +260,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerChannelMakeCommand()
     {
-        $this->app->singleton('command.channel.make', function ($app) {
-            return new ChannelMakeCommand($app['files']);
+        $this->app->singleton('command.channel.make', function (Application $app) {
+            return new ChannelMakeCommand($app->make('files'));
         });
     }
 
@@ -295,8 +296,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerConfigCacheCommand()
     {
-        $this->app->singleton('command.config.cache', function ($app) {
-            return new ConfigCacheCommand($app['files']);
+        $this->app->singleton('command.config.cache', function (Application $app) {
+            return new ConfigCacheCommand($app->make('files'));
         });
     }
 
@@ -307,8 +308,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerConfigClearCommand()
     {
-        $this->app->singleton('command.config.clear', function ($app) {
-            return new ConfigClearCommand($app['files']);
+        $this->app->singleton('command.config.clear', function (Application $app) {
+            return new ConfigClearCommand($app->make('files'));
         });
     }
 
@@ -319,8 +320,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerConsoleMakeCommand()
     {
-        $this->app->singleton('command.console.make', function ($app) {
-            return new ConsoleMakeCommand($app['files']);
+        $this->app->singleton('command.console.make', function (Application $app) {
+            return new ConsoleMakeCommand($app->make('files'));
         });
     }
 
@@ -331,8 +332,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerControllerMakeCommand()
     {
-        $this->app->singleton('command.controller.make', function ($app) {
-            return new ControllerMakeCommand($app['files']);
+        $this->app->singleton('command.controller.make', function (Application $app) {
+            return new ControllerMakeCommand($app->make('files'));
         });
     }
 
@@ -355,8 +356,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerEventMakeCommand()
     {
-        $this->app->singleton('command.event.make', function ($app) {
-            return new EventMakeCommand($app['files']);
+        $this->app->singleton('command.event.make', function (Application $app) {
+            return new EventMakeCommand($app->make('files'));
         });
     }
 
@@ -367,8 +368,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerExceptionMakeCommand()
     {
-        $this->app->singleton('command.exception.make', function ($app) {
-            return new ExceptionMakeCommand($app['files']);
+        $this->app->singleton('command.exception.make', function (Application $app) {
+            return new ExceptionMakeCommand($app->make('files'));
         });
     }
 
@@ -379,8 +380,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerFactoryMakeCommand()
     {
-        $this->app->singleton('command.factory.make', function ($app) {
-            return new FactoryMakeCommand($app['files']);
+        $this->app->singleton('command.factory.make', function (Application $app) {
+            return new FactoryMakeCommand($app->make('files'));
         });
     }
 
@@ -415,8 +416,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerJobMakeCommand()
     {
-        $this->app->singleton('command.job.make', function ($app) {
-            return new JobMakeCommand($app['files']);
+        $this->app->singleton('command.job.make', function (Application $app) {
+            return new JobMakeCommand($app->make('files'));
         });
     }
 
@@ -439,8 +440,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerListenerMakeCommand()
     {
-        $this->app->singleton('command.listener.make', function ($app) {
-            return new ListenerMakeCommand($app['files']);
+        $this->app->singleton('command.listener.make', function (Application $app) {
+            return new ListenerMakeCommand($app->make('files'));
         });
     }
 
@@ -451,8 +452,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMailMakeCommand()
     {
-        $this->app->singleton('command.mail.make', function ($app) {
-            return new MailMakeCommand($app['files']);
+        $this->app->singleton('command.mail.make', function (Application $app) {
+            return new MailMakeCommand($app->make('files'));
         });
     }
 
@@ -463,8 +464,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMiddlewareMakeCommand()
     {
-        $this->app->singleton('command.middleware.make', function ($app) {
-            return new MiddlewareMakeCommand($app['files']);
+        $this->app->singleton('command.middleware.make', function (Application $app) {
+            return new MiddlewareMakeCommand($app->make('files'));
         });
     }
 
@@ -475,8 +476,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMigrateCommand()
     {
-        $this->app->singleton('command.migrate', function ($app) {
-            return new MigrateCommand($app['migrator']);
+        $this->app->singleton('command.migrate', function (Application $app) {
+            return new MigrateCommand($app->make('migrator'));
         });
     }
 
@@ -499,8 +500,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMigrateInstallCommand()
     {
-        $this->app->singleton('command.migrate.install', function ($app) {
-            return new MigrateInstallCommand($app['migration.repository']);
+        $this->app->singleton('command.migrate.install', function (Application $app) {
+            return new MigrateInstallCommand($app->make('migration.repository'));
         });
     }
 
@@ -511,13 +512,13 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMigrateMakeCommand()
     {
-        $this->app->singleton('command.migrate.make', function ($app) {
+        $this->app->singleton('command.migrate.make', function (Application $app) {
             // Once we have the migration creator registered, we will create the command
             // and inject the creator. The creator is responsible for the actual file
             // creation of the migrations, and may be extended by these developers.
-            $creator = $app['migration.creator'];
+            $creator = $app->make('migration.creator');
 
-            $composer = $app['composer'];
+            $composer = $app->make('composer');
 
             return new MigrateMakeCommand($creator, $composer);
         });
@@ -542,8 +543,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMigrateResetCommand()
     {
-        $this->app->singleton('command.migrate.reset', function ($app) {
-            return new MigrateResetCommand($app['migrator']);
+        $this->app->singleton('command.migrate.reset', function (Application $app) {
+            return new MigrateResetCommand($app->make('migrator'));
         });
     }
 
@@ -554,8 +555,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMigrateRollbackCommand()
     {
-        $this->app->singleton('command.migrate.rollback', function ($app) {
-            return new MigrateRollbackCommand($app['migrator']);
+        $this->app->singleton('command.migrate.rollback', function (Application $app) {
+            return new MigrateRollbackCommand($app->make('migrator'));
         });
     }
 
@@ -566,8 +567,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerMigrateStatusCommand()
     {
-        $this->app->singleton('command.migrate.status', function ($app) {
-            return new MigrateStatusCommand($app['migrator']);
+        $this->app->singleton('command.migrate.status', function (Application $app) {
+            return new MigrateStatusCommand($app->make('migrator'));
         });
     }
 
@@ -578,8 +579,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerModelMakeCommand()
     {
-        $this->app->singleton('command.model.make', function ($app) {
-            return new ModelMakeCommand($app['files']);
+        $this->app->singleton('command.model.make', function (Application $app) {
+            return new ModelMakeCommand($app->make('files'));
         });
     }
 
@@ -590,8 +591,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerNotificationMakeCommand()
     {
-        $this->app->singleton('command.notification.make', function ($app) {
-            return new NotificationMakeCommand($app['files']);
+        $this->app->singleton('command.notification.make', function (Application $app) {
+            return new NotificationMakeCommand($app->make('files'));
         });
     }
 
@@ -602,8 +603,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerNotificationTableCommand()
     {
-        $this->app->singleton('command.notification.table', function ($app) {
-            return new NotificationTableCommand($app['files'], $app['composer']);
+        $this->app->singleton('command.notification.table', function (Application $app) {
+            return new NotificationTableCommand($app->make('files'), $app->make('composer'));
         });
     }
 
@@ -626,8 +627,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerObserverMakeCommand()
     {
-        $this->app->singleton('command.observer.make', function ($app) {
-            return new ObserverMakeCommand($app['files']);
+        $this->app->singleton('command.observer.make', function (Application $app) {
+            return new ObserverMakeCommand($app->make('files'));
         });
     }
 
@@ -662,8 +663,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerPolicyMakeCommand()
     {
-        $this->app->singleton('command.policy.make', function ($app) {
-            return new PolicyMakeCommand($app['files']);
+        $this->app->singleton('command.policy.make', function (Application $app) {
+            return new PolicyMakeCommand($app->make('files'));
         });
     }
 
@@ -686,8 +687,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerProviderMakeCommand()
     {
-        $this->app->singleton('command.provider.make', function ($app) {
-            return new ProviderMakeCommand($app['files']);
+        $this->app->singleton('command.provider.make', function (Application $app) {
+            return new ProviderMakeCommand($app->make('files'));
         });
     }
 
@@ -734,8 +735,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerQueueListenCommand()
     {
-        $this->app->singleton('command.queue.listen', function ($app) {
-            return new QueueListenCommand($app['queue.listener']);
+        $this->app->singleton('command.queue.listen', function (Application $app) {
+            return new QueueListenCommand($app->make('queue.listener'));
         });
     }
 
@@ -770,8 +771,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerQueueWorkCommand()
     {
-        $this->app->singleton('command.queue.work', function ($app) {
-            return new QueueWorkCommand($app['queue.worker']);
+        $this->app->singleton('command.queue.work', function (Application $app) {
+            return new QueueWorkCommand($app->make('queue.worker'));
         });
     }
 
@@ -782,8 +783,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerQueueFailedTableCommand()
     {
-        $this->app->singleton('command.queue.failed-table', function ($app) {
-            return new FailedTableCommand($app['files'], $app['composer']);
+        $this->app->singleton('command.queue.failed-table', function (Application $app) {
+            return new FailedTableCommand($app->make('files'), $app->make('composer'));
         });
     }
 
@@ -794,8 +795,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerQueueTableCommand()
     {
-        $this->app->singleton('command.queue.table', function ($app) {
-            return new TableCommand($app['files'], $app['composer']);
+        $this->app->singleton('command.queue.table', function (Application $app) {
+            return new TableCommand($app->make('files'), $app->make('composer'));
         });
     }
 
@@ -806,8 +807,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerRequestMakeCommand()
     {
-        $this->app->singleton('command.request.make', function ($app) {
-            return new RequestMakeCommand($app['files']);
+        $this->app->singleton('command.request.make', function (Application $app) {
+            return new RequestMakeCommand($app->make('files'));
         });
     }
 
@@ -818,8 +819,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerResourceMakeCommand()
     {
-        $this->app->singleton('command.resource.make', function ($app) {
-            return new ResourceMakeCommand($app['files']);
+        $this->app->singleton('command.resource.make', function (Application $app) {
+            return new ResourceMakeCommand($app->make('files'));
         });
     }
 
@@ -830,8 +831,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerRuleMakeCommand()
     {
-        $this->app->singleton('command.rule.make', function ($app) {
-            return new RuleMakeCommand($app['files']);
+        $this->app->singleton('command.rule.make', function (Application $app) {
+            return new RuleMakeCommand($app->make('files'));
         });
     }
 
@@ -842,8 +843,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerSeederMakeCommand()
     {
-        $this->app->singleton('command.seeder.make', function ($app) {
-            return new SeederMakeCommand($app['files'], $app['composer']);
+        $this->app->singleton('command.seeder.make', function (Application $app) {
+            return new SeederMakeCommand($app->make('files'), $app->make('composer'));
         });
     }
 
@@ -854,8 +855,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerSessionTableCommand()
     {
-        $this->app->singleton('command.session.table', function ($app) {
-            return new SessionTableCommand($app['files'], $app['composer']);
+        $this->app->singleton('command.session.table', function (Application $app) {
+            return new SessionTableCommand($app->make('files'), $app->make('composer'));
         });
     }
 
@@ -878,8 +879,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerRouteCacheCommand()
     {
-        $this->app->singleton('command.route.cache', function ($app) {
-            return new RouteCacheCommand($app['files']);
+        $this->app->singleton('command.route.cache', function (Application $app) {
+            return new RouteCacheCommand($app->make('files'));
         });
     }
 
@@ -890,8 +891,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerRouteClearCommand()
     {
-        $this->app->singleton('command.route.clear', function ($app) {
-            return new RouteClearCommand($app['files']);
+        $this->app->singleton('command.route.clear', function (Application $app) {
+            return new RouteClearCommand($app->make('files'));
         });
     }
 
@@ -902,8 +903,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerRouteListCommand()
     {
-        $this->app->singleton('command.route.list', function ($app) {
-            return new RouteListCommand($app['router']);
+        $this->app->singleton('command.route.list', function (Application $app) {
+            return new RouteListCommand($app->make('router'));
         });
     }
 
@@ -914,8 +915,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerSeedCommand()
     {
-        $this->app->singleton('command.seed', function ($app) {
-            return new SeedCommand($app['db']);
+        $this->app->singleton('command.seed', function (Application $app) {
+            return new SeedCommand($app->make('db'));
         });
     }
 
@@ -958,8 +959,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerTestMakeCommand()
     {
-        $this->app->singleton('command.test.make', function ($app) {
-            return new TestMakeCommand($app['files']);
+        $this->app->singleton('command.test.make', function (Application $app) {
+            return new TestMakeCommand($app->make('files'));
         });
     }
 
@@ -982,8 +983,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerVendorPublishCommand()
     {
-        $this->app->singleton('command.vendor.publish', function ($app) {
-            return new VendorPublishCommand($app['files']);
+        $this->app->singleton('command.vendor.publish', function (Application $app) {
+            return new VendorPublishCommand($app->make('files'));
         });
     }
 
@@ -1006,8 +1007,8 @@ class ArtisanServiceProvider extends ServiceProvider
      */
     protected function registerViewClearCommand()
     {
-        $this->app->singleton('command.view.clear', function ($app) {
-            return new ViewClearCommand($app['files']);
+        $this->app->singleton('command.view.clear', function (Application $app) {
+            return new ViewClearCommand($app->make('files'));
         });
     }
 

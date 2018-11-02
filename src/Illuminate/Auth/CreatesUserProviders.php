@@ -54,7 +54,7 @@ trait CreatesUserProviders
     protected function getProviderConfiguration($provider)
     {
         if ($provider = $provider ?: $this->getDefaultUserProvider()) {
-            return $this->app['config']['auth.providers.'.$provider];
+            return $this->app->make('config')->get('auth.providers.'.$provider);
         }
     }
 
@@ -66,9 +66,9 @@ trait CreatesUserProviders
      */
     protected function createDatabaseProvider($config)
     {
-        $connection = $this->app['db']->connection();
+        $connection = $this->app->make('db')->connection();
 
-        return new DatabaseUserProvider($connection, $this->app['hash'], $config['table']);
+        return new DatabaseUserProvider($connection, $this->app->make('hash'), $config['table']);
     }
 
     /**
@@ -79,7 +79,7 @@ trait CreatesUserProviders
      */
     protected function createEloquentProvider($config)
     {
-        return new EloquentUserProvider($this->app['hash'], $config['model']);
+        return new EloquentUserProvider($this->app->make('hash'), $config['model']);
     }
 
     /**
@@ -89,6 +89,6 @@ trait CreatesUserProviders
      */
     public function getDefaultUserProvider()
     {
-        return $this->app['config']['auth.defaults.provider'];
+        return $this->app->make('config')->get('auth.defaults.provider');
     }
 }

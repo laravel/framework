@@ -5,7 +5,9 @@ namespace Illuminate\Tests\Queue;
 use stdClass;
 use Mockery as m;
 use PHPUnit\Framework\TestCase;
+use Illuminate\Config\Repository;
 use Illuminate\Queue\QueueManager;
+use Illuminate\Foundation\Application;
 use Illuminate\Contracts\Encryption\Encrypter;
 
 class QueueManagerTest extends TestCase
@@ -17,13 +19,14 @@ class QueueManagerTest extends TestCase
 
     public function testDefaultConnectionCanBeResolved()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.sync' => ['driver' => 'sync'],
-            ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
-        ];
+        $app = new Application();
+
+        $config = new Repository();
+        $config->set('queue.default', 'sync');
+        $config->set('queue.connections.sync', ['driver' => 'sync']);
+
+        $app->instance('config', $config);
+        $app->instance('encrypter', $encrypter = m::mock(Encrypter::class));
 
         $manager = new QueueManager($app);
         $connector = m::mock(stdClass::class);
@@ -40,13 +43,14 @@ class QueueManagerTest extends TestCase
 
     public function testOtherConnectionCanBeResolved()
     {
-        $app = [
-            'config' => [
-                'queue.default' => 'sync',
-                'queue.connections.foo' => ['driver' => 'bar'],
-            ],
-            'encrypter' => $encrypter = m::mock(Encrypter::class),
-        ];
+        $app = new Application();
+
+        $config = new Repository();
+        $config->set('queue.default', 'sync');
+        $config->set('queue.connections.foo', ['driver' => 'bar']);
+
+        $app->instance('config', $config);
+        $app->instance('encrypter', $encrypter = m::mock(Encrypter::class));
 
         $manager = new QueueManager($app);
         $connector = m::mock(stdClass::class);

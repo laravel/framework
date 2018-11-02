@@ -8,6 +8,7 @@ use Illuminate\View\Engines\FileEngine;
 use Illuminate\View\Engines\CompilerEngine;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Compilers\BladeCompiler;
+use Illuminate\Contracts\Foundation\Application;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -32,15 +33,15 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerFactory()
     {
-        $this->app->singleton('view', function ($app) {
+        $this->app->singleton('view', function (Application $app) {
             // Next we need to grab the engine resolver instance that will be used by the
             // environment. The resolver will be used by an environment to get each of
             // the various engine implementations such as plain PHP or Blade engine.
-            $resolver = $app['view.engine.resolver'];
+            $resolver = $app->make('view.engine.resolver');
 
-            $finder = $app['view.finder'];
+            $finder = $app->make('view.finder');
 
-            $factory = $this->createFactory($resolver, $finder, $app['events']);
+            $factory = $this->createFactory($resolver, $finder, $app->make('events'));
 
             // We will also set the container instance on this view environment since the
             // view composers may be classes registered in the container, which allows
@@ -73,8 +74,8 @@ class ViewServiceProvider extends ServiceProvider
      */
     public function registerViewFinder()
     {
-        $this->app->bind('view.finder', function ($app) {
-            return new FileViewFinder($app['files'], $app['config']['view.paths']);
+        $this->app->bind('view.finder', function (Application $app) {
+            return new FileViewFinder($app->make('files'), $app->make('config')->get('view.paths'));
         });
     }
 
@@ -138,12 +139,12 @@ class ViewServiceProvider extends ServiceProvider
         // instance to pass into the engine so it can compile the views properly.
         $this->app->singleton('blade.compiler', function () {
             return new BladeCompiler(
-                $this->app['files'], $this->app['config']['view.compiled']
+                $this->app->make('files'), $this->app->make('config')->get('view.compiled')
             );
         });
 
         $resolver->register('blade', function () {
-            return new CompilerEngine($this->app['blade.compiler']);
+            return new CompilerEngine($this->app->make('blade.compiler'));
         });
     }
 }

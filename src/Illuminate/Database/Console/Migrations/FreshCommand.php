@@ -68,7 +68,7 @@ class FreshCommand extends Command
      */
     protected function dropAllTables($database)
     {
-        $this->laravel['db']->connection($database)
+        $this->laravel->make('db')->connection($database)
                     ->getSchemaBuilder()
                     ->dropAllTables();
     }
@@ -81,7 +81,7 @@ class FreshCommand extends Command
      */
     protected function dropAllViews($database)
     {
-        $this->laravel['db']->connection($database)
+        $this->laravel->make('db')->connection($database)
                     ->getSchemaBuilder()
                     ->dropAllViews();
     }
