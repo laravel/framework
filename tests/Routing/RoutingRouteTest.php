@@ -3,6 +3,7 @@
 namespace Illuminate\Tests\Routing;
 
 use DateTime;
+use Illuminate\Config\Repository;
 use stdClass;
 use Exception;
 use Illuminate\Support\Str;
@@ -579,7 +580,7 @@ class RoutingRouteTest extends TestCase
         $router->get('/foo/bar')->subDomain('api')->uses(function () {
             return 'hello';
         });
-        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.localhost/foo/bar', 'GET'))->getContent());
+        $this->assertEquals('hello', $router->dispatch(Request::create('http://api.foo.bar/foo/bar', 'GET'))->getContent());
     }
 
     public function testMatchesMethodAgainstRequests()
@@ -1567,6 +1568,11 @@ class RoutingRouteTest extends TestCase
     protected function getRouter()
     {
         $container = new Container;
+
+        $config = new Repository;
+        $config->set('app.url', 'http://foo.bar/');
+
+        $container->instance('config', $config);
 
         $router = new Router(new Dispatcher, $container);
 

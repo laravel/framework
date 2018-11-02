@@ -3,6 +3,8 @@
 namespace Illuminate\Routing;
 
 use Closure;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Config;
 use LogicException;
 use ReflectionFunction;
 use Illuminate\Support\Arr;
@@ -570,7 +572,7 @@ class Route
     public function subDomain($subDomain, $domain = null)
     {
         if (is_null($domain)) {
-            $domain = parse_url(getenv('APP_URL'))['host'];
+            $domain = parse_url($this->container->make('config')->get('app.url'))['host'];
         }
 
         $this->action['domain'] = $subDomain.'.'.$domain;
