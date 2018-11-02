@@ -297,24 +297,13 @@ class FileViewFinder implements ViewFinderInterface
     }
 
     /**
-     * Replace unnecessary "../" fragments from the view path.
+     * Replace unnecessary relative fragments from the absolute view path.
      *
      * @param string $path
      * @return string
      */
     protected function normalizePath($path)
     {
-        $normalizedSegments = [];
-        $segments = explode(DIRECTORY_SEPARATOR, $path);
-
-        foreach ($segments as $key => $segment) {
-            if ($segment === '..' && array_key_exists($key - 1, $normalizedSegments)) {
-                unset($normalizedSegments[$key - 1]);
-            } else {
-                $normalizedSegments[$key] = $segment;
-            }
-        }
-
-        return implode(DIRECTORY_SEPARATOR, $normalizedSegments);
+        return realpath($path) ?: $path;
     }
 }

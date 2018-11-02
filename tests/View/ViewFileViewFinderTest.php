@@ -148,11 +148,12 @@ class ViewFileViewFinderTest extends TestCase
     public function pathsProvider()
     {
         return [
-            ['/var/www/path', '/var/www/path'],
-            ['/var/www/../path', '/var/path'],
-            ['/var/../www/path', '/www/path'],
-            ['/var/../www/../path', '/path'],
-            ['/var/../www/../path/../', '/'],
+            ['/etc/passwd', '/etc/passwd'],
+            ['/var/log/../log', '/var/log'],
+            ['/var/../var/../var/log', '/var/log'],
+            ['/var/../var/../var/../', '/'],
+            ['/var/log/../../var', '/var'],
+            ['incorrect_path', 'incorrect_path']
         ];
     }
 
