@@ -153,7 +153,7 @@ class ViewFileViewFinderTest extends TestCase
             ['/var/../var/../var/log', '/var/log'],
             ['/var/../var/../var/../', '/'],
             ['/var/log/../../var', '/var'],
-            ['incorrect_path', 'incorrect_path']
+            ['incorrect_path', 'incorrect_path'],
         ];
     }
 
