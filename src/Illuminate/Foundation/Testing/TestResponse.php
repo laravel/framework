@@ -63,7 +63,7 @@ class TestResponse
      * @param  array $arrayAssoc
      * @return array
      */
-    public static function normalizingArraysObjects (array $arrayStdClass, array $arrayAssoc): array
+    public static function normalizingArraysObjects(array $arrayStdClass, array $arrayAssoc): array
     {
         $merged = $arrayStdClass;
 
@@ -76,7 +76,7 @@ class TestResponse
             }
 
             if (is_array($value)) {
-                $value = self::normalizingArraysObjects((array)$merged[$key], $value);
+                $value = self::normalizingArraysObjects((array) $merged[$key], $value);
             }
 
             $merged[$key] = $value;
@@ -484,7 +484,6 @@ class TestResponse
         $actual = json_encode(Arr::sortRecursive(
             (array) $this->decodeResponseJson()
         ));
-
 
         PHPUnit::assertEquals(json_encode(Arr::sortRecursive($data)), $actual);
 

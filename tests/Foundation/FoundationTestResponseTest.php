@@ -243,37 +243,37 @@ class FoundationTestResponseTest extends TestCase
         $response = new TestResponse((new JsonResponse([
             'payload' => (object) [],
             'a' => [],
-            'b' => (object)[],
+            'b' => (object) [],
             'status' => 'success',
             'data' => [
-                'name' => "West Fannieland",
-                'updated_at' => "2018-10-05 20:48:11",
-                'created_at' => "2018-10-05 20:48:11",
+                'name' => 'West Fannieland',
+                'updated_at' => '2018-10-05 20:48:11',
+                'created_at' => '2018-10-05 20:48:11',
                 'id' => 1,
-                'b' => (object)[],
+                'b' => (object) [],
                 'c' => [
-                    'b' => (object)[],
-                    'name' => 'albert'
+                    'b' => (object) [],
+                    'name' => 'albert',
                 ],
-            ]
+            ],
         ])));
 
         $response->assertExactJson([
             'payload' => (object) [],
-            'b' => (object)[],
+            'b' => (object) [],
             'a' => [],
             'status' => 'success',
             'data' => [
-                'name' => "West Fannieland",
-                'created_at' => "2018-10-05 20:48:11",
+                'name' => 'West Fannieland',
+                'created_at' => '2018-10-05 20:48:11',
                 'id' => 1,
-                'b' => (object)[],
+                'b' => (object) [],
                 'c' => [
-                    'b' => (object)[],
-                    'name' => 'albert'
+                    'b' => (object) [],
+                    'name' => 'albert',
                 ],
-                'updated_at' => "2018-10-05 20:48:11"
-            ]
+                'updated_at' => '2018-10-05 20:48:11',
+            ],
         ]);
     }
 
