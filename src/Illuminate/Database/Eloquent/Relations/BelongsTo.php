@@ -311,6 +311,16 @@ class BelongsTo extends Relation
     }
 
     /**
+     * Get the child of the relationship.
+     *
+     * @return \Illuminate\Database\Eloquent\Model
+     */
+    public function getChild()
+    {
+        return $this->child;
+    }
+
+    /**
      * Get the foreign key of the relationship.
      *
      * @return string
