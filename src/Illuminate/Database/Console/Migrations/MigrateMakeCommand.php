@@ -17,7 +17,8 @@ class MigrateMakeCommand extends BaseCommand
         {--create= : The table to be created}
         {--table= : The table to migrate}
         {--path= : The location where the migration file should be created}
-        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}';
+        {--realpath : Indicate any provided migration file paths are pre-resolved absolute paths}
+        {--soft-delete : Indicate that migration should include Soft Deletes required fields}';
 
     /**
      * The console command description.
@@ -59,6 +60,7 @@ class MigrateMakeCommand extends BaseCommand
      * Execute the console command.
      *
      * @return void
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
     public function handle()
     {
@@ -90,7 +92,7 @@ class MigrateMakeCommand extends BaseCommand
         // Now we are ready to write the migration out to disk. Once we've written
         // the migration out, we will dump-autoload for the entire framework to
         // make sure that the migrations are registered by the class loaders.
-        $this->writeMigration($name, $table, $create);
+        $this->writeMigration($name, $table, $create, $this->usingSoftDeletes());
 
         $this->composer->dumpAutoloads();
     }
@@ -101,12 +103,15 @@ class MigrateMakeCommand extends BaseCommand
      * @param  string  $name
      * @param  string  $table
      * @param  bool    $create
+     * @param  bool    $softDelete
+     *
      * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function writeMigration($name, $table, $create)
+    protected function writeMigration($name, $table, $create, $softDelete)
     {
         $file = pathinfo($this->creator->create(
-            $name, $this->getMigrationPath(), $table, $create
+            $name, $this->getMigrationPath(), $table, $create, $softDelete
         ), PATHINFO_FILENAME);
 
         $this->line("<info>Created Migration:</info> {$file}");
@@ -136,5 +141,15 @@ class MigrateMakeCommand extends BaseCommand
     protected function usingRealPath()
     {
         return $this->input->hasOption('realpath') && $this->option('realpath');
+    }
+
+    /**
+     * Determine is created migration should include Soft Delete required fields.
+     *
+     * @return bool
+     */
+    protected function usingSoftDeletes()
+    {
+        return $this->input->hasOption('soft-delete') && $this->option('soft-delete');
     }
 }

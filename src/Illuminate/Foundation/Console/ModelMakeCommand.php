@@ -119,7 +119,7 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $stubOptions = ($this->isPivot() ? '-pivot' : '').($this->usingSoftDeletes() ? '-softdelete' : '');
+        $stubOptions = ($this->option('pivot') ? '-pivot' : '').($this->usingSoftDeletes() ? '-softdelete' : '');
 
         return $this->stubPath()."/model{$stubOptions}.stub";
     }
@@ -172,17 +172,7 @@ class ModelMakeCommand extends GeneratorCommand
     }
 
     /**
-     * Determine is created model should be a custom intermediate table model.
-     *
-     * @return bool
-     */
-    protected function isPivot()
-    {
-        return $this->input->hasOption('pivot') && $this->option('pivot');
-    }
-
-    /**
-     * Determine is created model and related migration should include Soft Delete required fields.
+     * Determine is created migration should include Soft Delete required fields.
      *
      * @return bool
      */
