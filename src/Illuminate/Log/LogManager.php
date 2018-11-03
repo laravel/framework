@@ -273,7 +273,7 @@ class LogManager implements LoggerInterface
                 $this->level($config),
                 $config['bubble'] ?? true,
                 $config['exclude_fields'] ?? []
-            )),
+            ), $config),
         ]);
     }
 
