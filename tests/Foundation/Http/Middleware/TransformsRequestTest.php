@@ -5,19 +5,38 @@ namespace Illuminate\Tests\Foundation\Http\Middleware;
 use Illuminate\Http\Request;
 use PHPUnit\Framework\TestCase;
 use Illuminate\Foundation\Http\Middleware\TransformsRequest;
+use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
 class TransformsRequestTest extends TestCase
 {
-    public function testLowerAgeAndAddBeer()
+    public function testTransformOncePerKeyWhenMethodIsGet()
+    {
+        $middleware = new TruncateInput;
+        $symfonyRequest = new SymfonyRequest([
+            'bar' => '123',
+            'baz' => 'abc',
+        ]);
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
+
+        $middleware->handle($request, function (Request $request) {
+            $this->assertEquals('12', $request->get('bar'));
+            $this->assertEquals('ab', $request->get('baz'));
+        });
+    }
+
+    public function testTransformOncePerKeyWhenMethodIsPost()
     {
         $middleware = new ManipulateInput;
-        $request = new Request(
+        $symfonyRequest = new SymfonyRequest(
             [
                 'name' => 'Damian',
                 'beers' => 4,
             ],
             ['age' => 28]
         );
+        $symfonyRequest->server->set('REQUEST_METHOD', 'POST');
+        $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
             $this->assertEquals('Damian', $request->get('name'));
@@ -26,10 +45,10 @@ class TransformsRequestTest extends TestCase
         });
     }
 
-    public function testAjaxLowerAgeAndAddBeer()
+    public function testTransformOncePerKeyWhenContentTypeIsJson()
     {
         $middleware = new ManipulateInput;
-        $request = new Request(
+        $symfonyRequest = new SymfonyRequest(
             [
                 'name' => 'Damian',
                 'beers' => 4,
@@ -41,6 +60,8 @@ class TransformsRequestTest extends TestCase
             ['CONTENT_TYPE' => '/json'],
             json_encode(['age' => 28])
         );
+        $symfonyRequest->server->set('REQUEST_METHOD', 'GET');
+        $request = Request::createFromBase($symfonyRequest);
 
         $middleware->handle($request, function (Request $request) {
             $this->assertEquals('Damian', $request->input('name'));
@@ -62,5 +83,13 @@ class ManipulateInput extends TransformsRequest
         }
 
         return $value;
+    }
+}
+
+class TruncateInput extends TransformsRequest
+{
+    protected function transform($key, $value)
+    {
+        return substr($value, 0, -1);
     }
 }
