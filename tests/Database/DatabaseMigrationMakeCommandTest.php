@@ -27,7 +27,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, false);
         $composer->shouldReceive('dumpAutoloads')->once();
 
         $this->runCommand($command, ['name' => 'create_foo']);
@@ -42,7 +42,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, false);
 
         $this->runCommand($command, ['name' => 'create_foo']);
     }
@@ -56,7 +56,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, false);
 
         $this->runCommand($command, ['name' => 'CreateFoo']);
     }
@@ -70,7 +70,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, false);
 
         $this->runCommand($command, ['name' => 'create_foo', '--create' => 'users']);
     }
@@ -84,7 +84,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $app->useDatabasePath(__DIR__);
         $command->setLaravel($app);
-        $creator->shouldReceive('create')->once()->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_users_table', __DIR__.DIRECTORY_SEPARATOR.'migrations', 'users', true, false);
 
         $this->runCommand($command, ['name' => 'create_users_table']);
     }
@@ -98,7 +98,7 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $app = new Application;
         $command->setLaravel($app);
         $app->setBasePath('/home/laravel');
-        $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true);
+        $creator->shouldReceive('create')->once()->with('create_foo', '/home/laravel/vendor/laravel-package/migrations', 'users', true, false);
         $this->runCommand($command, ['name' => 'create_foo', '--path' => 'vendor/laravel-package/migrations', '--create' => 'users']);
     }
 
