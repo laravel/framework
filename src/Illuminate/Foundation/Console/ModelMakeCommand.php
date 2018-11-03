@@ -91,6 +91,7 @@ class ModelMakeCommand extends GeneratorCommand
         $this->call('make:migration', [
             'name' => "create_{$table}_table",
             '--create' => $table,
+            '--soft-delete' => $this->usingSoftDeletes(),
         ]);
     }
 
@@ -118,11 +119,19 @@ class ModelMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        if ($this->option('pivot')) {
-            return __DIR__.'/stubs/pivot.model.stub';
-        }
+        $stubOptions = ($this->isPivot() ? '-pivot' : '').($this->usingSoftDeletes() ? '-softdelete' : '');
 
-        return __DIR__.'/stubs/model.stub';
+        return $this->stubPath()."/model{$stubOptions}.stub";
+    }
+
+    /**
+     * Get the path to the stubs.
+     *
+     * @return string
+     */
+    public function stubPath()
+    {
+        return __DIR__.'/stubs';
     }
 
     /**
@@ -157,6 +166,28 @@ class ModelMakeCommand extends GeneratorCommand
             ['pivot', 'p', InputOption::VALUE_NONE, 'Indicates if the generated model should be a custom intermediate table model'],
 
             ['resource', 'r', InputOption::VALUE_NONE, 'Indicates if the generated controller should be a resource controller'],
+
+            ['soft-delete', 's', InputOption::VALUE_NONE, 'Indicates if the generated model should be a Soft Delete model'],
         ];
+    }
+
+    /**
+     * Determine is created model should be a custom intermediate table model.
+     *
+     * @return bool
+     */
+    protected function isPivot()
+    {
+        return $this->input->hasOption('pivot') && $this->option('pivot');
+    }
+
+    /**
+     * Determine is created model and related migration should include Soft Delete required fields.
+     *
+     * @return bool
+     */
+    protected function usingSoftDeletes()
+    {
+        return $this->input->hasOption('soft-delete') && $this->option('soft-delete');
     }
 }

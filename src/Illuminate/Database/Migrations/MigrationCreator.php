@@ -41,18 +41,19 @@ class MigrationCreator
      * @param  string  $path
      * @param  string  $table
      * @param  bool    $create
-     * @return string
+     * @param  bool    $softDelete
      *
-     * @throws \Exception
+     * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    public function create($name, $path, $table = null, $create = false)
+    public function create($name, $path, $table = null, $create = false, $softDelete = false)
     {
         $this->ensureMigrationDoesntAlreadyExist($name);
 
         // First we will get the stub file for the migration, which serves as a type
         // of template for the migration. Once we have those we will populate the
         // various place-holders, save the file, and run the post create event.
-        $stub = $this->getStub($table, $create);
+        $stub = $this->getStub($table, $create, $softDelete);
 
         $this->files->put(
             $path = $this->getPath($name, $path),
@@ -87,9 +88,12 @@ class MigrationCreator
      *
      * @param  string  $table
      * @param  bool    $create
+     * @param  bool    $softDelete
+     *
      * @return string
+     * @throws \Illuminate\Contracts\Filesystem\FileNotFoundException
      */
-    protected function getStub($table, $create)
+    protected function getStub($table, $create, $softDelete = false)
     {
         if (is_null($table)) {
             return $this->files->get($this->stubPath().'/blank.stub');
@@ -98,7 +102,7 @@ class MigrationCreator
         // We also have stubs for creating new tables and modifying existing tables
         // to save the developer some typing when they are creating a new tables
         // or modifying existing tables. We'll grab the appropriate stub here.
-        $stub = $create ? 'create.stub' : 'update.stub';
+        $stub = ($create ? 'create' : 'update').($softDelete ? '-softdelete' : '').'.stub';
 
         return $this->files->get($this->stubPath()."/{$stub}");
     }

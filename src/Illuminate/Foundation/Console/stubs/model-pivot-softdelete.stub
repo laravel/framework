@@ -1,0 +1,11 @@
+<?php
+
+namespace DummyNamespace;
+
+use Illuminate\Database\Eloquent\Relations\Pivot;
+use Illuminate\Database\Eloquent\SoftDeletes;
+
+class DummyClass extends Pivot
+{
+    use SoftDeletes;
+}
