@@ -47,6 +47,20 @@ class DatabaseMigrationMakeCommandTest extends TestCase
         $this->runCommand($command, ['name' => 'create_foo']);
     }
 
+    public function testBasicCreateGivesCreatorProperArgumentsWithSoftDelete()
+    {
+        $command = new MigrateMakeCommand(
+            $creator = m::mock(MigrationCreator::class),
+            m::mock(Composer::class)->shouldIgnoreMissing()
+        );
+        $app = new Application;
+        $app->useDatabasePath(__DIR__);
+        $command->setLaravel($app);
+        $creator->shouldReceive('create')->once()->with('create_foo', __DIR__.DIRECTORY_SEPARATOR.'migrations', null, false, true);
+
+        $this->runCommand($command, ['name' => 'create_foo', '--soft-delete' => true]);
+    }
+
     public function testBasicCreateGivesCreatorProperArgumentsWhenNameIsStudlyCase()
     {
         $command = new MigrateMakeCommand(
