@@ -4,7 +4,6 @@ namespace Illuminate\Container;
 
 use Closure;
 use Exception;
-use ArrayAccess;
 use LogicException;
 use ReflectionClass;
 use ReflectionParameter;
@@ -12,7 +11,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Container\Container as ContainerContract;
 
-class Container implements ArrayAccess, ContainerContract
+class Container implements ContainerContract
 {
     /**
      * The current globally available container (if any).
