@@ -58,31 +58,42 @@ class TestResponse
     }
 
     /**
-     * Merge stdClass array and assoc array recursively.
-     * @param  array $arrayStdClass
-     * @param  array $arrayAssoc
-     * @return array
+     * JSON decode assoc and keep the empty object.
+     * @param string $json
+     * @link https://github.com/laravel/framework/issues/25769
+     * @return mixed
      */
-    public static function normalizingArraysObjects(array $arrayStdClass, array $arrayAssoc): array
+    public static function jsonDecodeKeepEmptyObject(string $json)
     {
-        $merged = $arrayStdClass;
+        $patchEmptyObject = function ($array) use (&$patchEmptyObject) {
 
-        // If arrayAssoc key has in $arrayStdClass and value is not empty, replace here.
-        // This converts stdClass to accos array and leaves the empty stdClass
-
-        foreach ($arrayAssoc as $key => $value) {
-            if (empty($value)) {
-                continue;
+            // If it is an empty class,it is reserved.
+            // Otherwise converted into an associative array.
+            if (is_object($array)) {
+                return empty((array) $array)
+                    ? $array
+                    : $patchEmptyObject((array) $array);
             }
 
-            if (is_array($value)) {
-                $value = self::normalizingArraysObjects((array) $merged[$key], $value);
+            foreach ($array as $key => $item) {
+                // We recursively deal with each of these terms.
+                if (is_array($item)
+                    || is_object($item)
+                ) {
+                    $array[$key] = $patchEmptyObject($item);
+                }
             }
 
-            $merged[$key] = $value;
+            return $array;
+        };
+
+        $stdClass = json_decode($json);
+
+        if ($stdClass === false) {
+            return $stdClass;
         }
 
-        return $merged;
+        return $patchEmptyObject($stdClass);
     }
 
     /**
@@ -713,19 +724,15 @@ class TestResponse
      */
     public function decodeResponseJson($key = null)
     {
-        $decodedResponseStdClass = (array) json_decode($this->getContent());
+        $decodedResponse = static::jsonDecodeKeepEmptyObject($this->getContent());
 
-        if (is_null($decodedResponseStdClass) || $decodedResponseStdClass === false) {
+        if (is_null($decodedResponse) || $decodedResponse === false) {
             if ($this->exception) {
                 throw $this->exception;
             } else {
                 PHPUnit::fail('Invalid JSON was returned from the route.');
             }
         }
-
-        $decodedResponseAssoc = json_decode($this->getContent(), true);
-
-        $decodedResponse = static::normalizingArraysObjects($decodedResponseStdClass, $decodedResponseAssoc);
 
         return data_get($decodedResponse, $key);
     }
