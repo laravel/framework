@@ -323,7 +323,7 @@ trait InteractsWithInput
     protected function convertUploadedFiles(array $files)
     {
         return array_map(function ($file) {
-            if (is_null($file) || (is_array($file) && empty(array_filter($file)))) {
+            if (is_null($file) || array_filter($file) === []) {
                 return $file;
             }
 
