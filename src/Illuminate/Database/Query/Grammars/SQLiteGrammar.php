@@ -46,6 +46,10 @@ class SQLiteGrammar extends Grammar
      */
     public function compileSelect(Builder $query)
     {
+        if ($query->unions && $query->aggregate) {
+            return $this->compileUnionAggregate($query);
+        }
+
         $sql = parent::compileSelect($query);
 
         if ($query->unions) {
