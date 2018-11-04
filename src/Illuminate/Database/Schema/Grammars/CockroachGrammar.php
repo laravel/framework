@@ -6,6 +6,20 @@ use Illuminate\Support\Fluent;
 
 class CockroachGrammar extends PostgresGrammar
 {
+
+
+
+    /**
+     * Create the column definition for a date type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeDate(Fluent $column)
+    {
+        return 'date';
+    }
+
     /**
      * Create the column definition for a date-time type.
      *
@@ -26,6 +40,29 @@ class CockroachGrammar extends PostgresGrammar
     protected function typeDateTimeTz(Fluent $column)
     {
         return 'timestamptz';
+    }
+
+    /**
+     * Create the column definition for a time type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTime(Fluent $column)
+    {
+        return "time";
+    }
+
+    /**
+     * Create the column definition for a time (with time zone) type.
+     *
+     * @param  \Illuminate\Support\Fluent  $column
+     * @return string
+     */
+    protected function typeTimeTz(Fluent $column)
+    {
+        // There is no TimeTz in Cockroach
+//        return "time with time zone";
     }
 
     /**
