@@ -841,7 +841,7 @@ trait HasAttributes
      */
     protected function serializeDate(DateTimeInterface $date)
     {
-        if ($this->dateFormat){
+        if ($this->dateFormat) {
             return $date->format($this->dateFormat);
         } elseif (Carbon::getSerializer()) {
             return $date->serialize();
