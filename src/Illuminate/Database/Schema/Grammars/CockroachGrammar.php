@@ -6,9 +6,6 @@ use Illuminate\Support\Fluent;
 
 class CockroachGrammar extends PostgresGrammar
 {
-
-
-
     /**
      * Create the column definition for a date type.
      *
@@ -50,7 +47,7 @@ class CockroachGrammar extends PostgresGrammar
      */
     protected function typeTime(Fluent $column)
     {
-        return "time";
+        return 'time';
     }
 
     /**
